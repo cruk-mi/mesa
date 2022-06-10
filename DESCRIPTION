@@ -1,0 +1,80 @@
+Package: mesa
+Title: Methylation Enrichment Sequencing Analysis
+Version: 0.1.0
+Authors@R: c(
+    person(given = "Simon",
+           family = "Pearce",
+           role = c("aut", "cre"),
+           email = "simon.pearce@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0000-0002-1680-5538")),
+    person(given = "Steven",
+           family = "Hill",
+           role = "aut",
+           email = "steven.hill@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0000-0002-5909-692X"))     
+           )
+Description: Analysis tools for methylation enrichment sequencing data (MBD-seq or MEDIP-seq), building off the qsea package.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports:
+    plyranges,
+    magrittr,
+    limma,
+    glue,
+    ChIPseeker,
+    purrr,
+    progress,
+    tidyselect,
+    rlang,
+    GenomeInfoDb,
+    GenomicRanges,
+    BiocGenerics,
+    Biostrings,
+    gtools,
+    RColorBrewer,
+    pheatmap,
+    HMMcopy,
+    ggplot2,
+    janitor,
+    org.Hs.eg.db,
+    stats,
+    stringr,
+    methods,
+    graphics,
+    grDevices,
+    tibble,
+    tidyr,
+    BSgenome,
+    BiocParallel,
+    matrixStats,
+    IRanges,
+    GenomicAlignments,
+    data.table,
+    Rsamtools,
+    tools,
+    ComplexHeatmap,
+    readr,
+    qsea,
+    BSgenome.Hsapiens.NCBI.GRCh38,
+    memoise
+Depends:
+    qsea,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    BSgenome.Hsapiens.NCBI.GRCh38,
+    R (>= 4.1.0),
+    dplyr
+Suggests: 
+    rmarkdown,
+    knitr,
+    openxlsx,
+    testthat,
+    UpSetR,
+    rtracklayer,
+    ggrepel,
+    MEDIPS,
+    cbctools,
+    workflows
+VignetteBuilder: knitr
