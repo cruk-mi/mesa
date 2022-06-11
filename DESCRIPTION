@@ -75,6 +75,5 @@ Suggests:
     rtracklayer,
     ggrepel,
     MEDIPS,
-    cbctools,
     workflows
 VignetteBuilder: knitr
