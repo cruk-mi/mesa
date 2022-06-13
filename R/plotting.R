@@ -9,6 +9,7 @@
 #' @param clip A level to clip the data at, anything higher than this is replaced with the clip value.
 #' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param clusterRows Whether to cluster the rows or not.
+#' @param clusterCols Whether to cluster the columns or not.
 #' @param clusterMethod What method to use to cluster the dendrograms.
 #' @param description A string to include as part of the title.
 #' @param annotationColors A list specifying some or all of the colours to use for the annotations.
@@ -100,6 +101,7 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 #' @param normMethod Whether to plot nrpm values or beta values.
 #' @param annotationCol A data frame with annotations for the samples.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
+#' @param clusterCols Whether to cluster the columns or not.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
 #' @param upstreamDist Number of basepairs upstream of the gene to include.
 #' @param downstreamDist Number of basepairs downstream of the gene to include.
@@ -292,8 +294,7 @@ plotQseaPCA <- function(qseaSet,
     y = svd$v[,pc2]*svd$d[pc2],
     sample_name = qsea::getSampleNames(qseaSet)
   ) %>%
-    dplyr::left_join(qsea::getSampleTable(qseaSet), by = "sample_name") %>%
-    dplyr::filter(!stringr::str_detect(sample_name, "PooledControl"))
+    dplyr::left_join(qsea::getSampleTable(qseaSet), by = "sample_name")
 
   batchTitleString <- ifelse(!is.null(batchVariable),"Batch-corrected ","")
 
@@ -376,7 +377,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' This function takes a qseaSet and plots a correlation matrix
 #' @param qseaSet The qseaSet object.
 #' @param normMethod What normalisation method to use
-#' @param annoDF A data frame for use of annotation of the rows and columns in pheatmap
+#' @param annotationColors A data frame for use of annotation of the rows and columns in pheatmap
 #' @param ... Other arguments for pheatmap
 #' @return A table
 #' @export

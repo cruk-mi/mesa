@@ -14,16 +14,13 @@ makeQset(
   fragmentSD = NULL,
   CNVmethod = "HMMdefault",
   coverageMethod = "PairedAndR1s",
-  minMapQual = 0,
-  minInsertSize = 50,
+  minMapQual = 10,
+  minInsertSize = 70,
   maxInsertSize = 1000,
   minReferenceLength = 30,
   badRegions = encodeBlacklist,
   badRegions2 = NULL,
   properPairsOnly = FALSE,
-  pooledControlMeCapBam = NULL,
-  pooledControlInputBam = NULL,
-  normalizeToOne = TRUE,
   nCores = 1
 )
 }
@@ -59,10 +56,6 @@ makeQset(
 \item{badRegions2}{A GRanges object containing additional regions to filter out from the result.}
 
 \item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
-
-\item{pooledControlMeCapBam}{A path to a methylation-enriched bam file (preferably with the index in the folder) to use as a control sample for TMM normalisation. Will be called "PooledControl" in the resulting qseaSet. Allows merging of qseaSets generated separately.}
-
-\item{pooledControlInputBam}{A path to a bam file (preferably with the index in the folder) to use as the CNV for the PooledControl sample.}
 
 \item{nCores}{How many cores to use to read the data in. Set as high as possible on your machine for speedy results.}
 }

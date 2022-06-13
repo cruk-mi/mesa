@@ -15,6 +15,8 @@ plotCNVheatmap(
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
+\item{...}{A list of columns to use to annotate the samples with.}
+
 \item{annotationCol}{A data frame with annotations for the samples (can be made with getAnnotationDataFrameIndividual)}
 
 \item{annotationColors}{A list with the colours to use for the column legend, to pass to pheatmap}

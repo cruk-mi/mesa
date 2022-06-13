@@ -17,7 +17,9 @@ summariseDMRsByContrast(
 
 \item{FDRthres}{FDR threshold to apply to each comparison}
 
-\item{log2FCthres}{A betaDelta threshold to apply to each comparison (absolute)}
+\item{log2FCthres}{A log2FC threshold to apply to each comparison (absolute)}
+
+\item{betaDeltaThres}{A betaDelta threshold to apply to each comparison (absolute)}
 }
 \description{
 This function summarises the number of windows called as up/down in each comparison in a .

@@ -35,6 +35,8 @@ plotGRangesHeatmap(
 
 \item{clusterRows}{Whether to cluster the rows or not.}
 
+\item{clusterCols}{Whether to cluster the columns or not.}
+
 \item{minEnrichment}{Minimum enrichment factor for beta values, will give NAs below this.}
 
 \item{maxScale}{The maximum of the scale, not used when plotting beta values.}

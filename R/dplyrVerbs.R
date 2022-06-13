@@ -1,7 +1,7 @@
 #' This function extends the dplyr function filter to act on qseaSet sampleTable.
 #' @method filter qseaSet
 #' @importFrom dplyr filter
-#' @param qseaSet A qseaSet to filter on
+#' @param .data A qseaSet to filter on
 #' @param ... Other arguments to pass to dplyr::filter
 #' @param .preserve Not implemented as irrelevant for qseaSet
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
@@ -58,11 +58,17 @@ mutateQset <- function(qseaSet, ...){
 #' This function extends the dplyr function left_join to act on qseaSet sampleTable.
 #' @method left_join qseaSet
 #' @importFrom dplyr left_join
-#' @param qseaSet A qseaSet to mutate
-#' @param ... Other arguments to pass to dplyr::mutate
+#' @param x A qseaSet to join data onto the sampleTable of
+#' @param y A data frame to join with the sampleTable
+#' @param by A character vector of variables to join by. If NULL, will perform a join on all common variables.
+#' @param copy If x and y are not from the same data source, and copy is TRUE, then y will be copied into the same src as x.
+#' This allows you to join tables across srcs, but it is a potentially expensive operation so you must opt into it.
+#' @param suffix 	If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.
+#' @param ... Other arguments to pass to dplyr::left_join
+#' @param keep Should the join keys from both x and y be preserved in the output?
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::left_join
 #' @export
-left_join.qseaSet <- function(qseaSet, ...){leftJoinQset(qseaSet, ...)}
+left_join.qseaSet <- function(x, y, by = NULL, copy, suffix, ..., keep){leftJoinQset(qseaSet = x, newData = y, ...)}
 
 #' This function takes a qseaSet and appends data to its sampleTable based on a call to dplyr::left_join
 #' @param qseaSet The qseaSet object.
@@ -106,14 +112,14 @@ selectQset <- function(qseaSet, ...){
 #' This function extends the dplyr function pull to act on qseaSet sampleTable.
 #' @method pull qseaSet
 #' @importFrom dplyr pull
-#' @param qseaSet A qseaSet to pull a column from
+#' @param .data A qseaSet to pull a column from the sampleTable of.s
 #' @param var A variable specified as a column name or an integer (negative counting from right)
 #' @param name An optional parameter that specifies the column to be used as names for a named vector. Specified in a similar manner as var.
 #' @param ... Other arguments to pass to dplyr::pull (column name to extract)
 #' @return A vector with the contents of the column of the sample table that was extracted.
 #' @export pull.qseaSet
 #' @export
-pull.qseaSet <- function(.data, ...){pullQset(.data, ...)}
+pull.qseaSet <- function(.data, var = -1, name = NULL, ...){pullQset(.data, ...)}
 
 
 #' This function takes a qseaSet and pulls a column from its sampleTable based on a call to dplyr::pull
@@ -136,7 +142,7 @@ pullQset <- function(qseaSet, ...){
 #' @return A qseaSet with the sample names reordered alphabetically
 #' @export sort.qseaSet
 #' @export
-sort.qseaSet <- function(x, ...){sortQset(x, decreasing = FALSE, ...)}
+sort.qseaSet <- function(x, decreasing = FALSE, ...){sortQset(x, decreasing = decreasing, ...)}
 
 
 #' This function takes a qseaSet and sorts the samples in it, so they are in alphabetical order (with numbers increasing via mixedsort)
@@ -173,7 +179,7 @@ filterRegions <- function(qseaSet, ...){
 #' This function extends the function dplyr::arrange to act on qseaSet, to reorder the samples in the qseaSet.
 #' @method arrange qseaSet
 #' @importFrom dplyr arrange
-#' @param qseaSet A qseaSet to reorder the samples in.
+#' @param .data A qseaSet to reorder the samples in.
 #' @param ... Other arguments to pass to dplyr::arrange
 #' @param .by_group Not implemented as qsea requires a data frame not a tibble for the sampleTable.
 #' @return A qseaSet with the sample names reordered according to a column of the sampleTable.

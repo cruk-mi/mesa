@@ -7,11 +7,11 @@
 \method{filter}{qseaSet}(.data, ..., .preserve = FALSE)
 }
 \arguments{
+\item{.data}{A qseaSet to filter on}
+
 \item{...}{Other arguments to pass to dplyr::filter}
 
 \item{.preserve}{Not implemented as irrelevant for qseaSet}
-
-\item{qseaSet}{A qseaSet to filter on}
 }
 \value{
 A qseaSet object with the sampleTable enhanced with the information on number of reads etc

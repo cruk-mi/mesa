@@ -4,12 +4,23 @@
 \alias{left_join.qseaSet}
 \title{This function extends the dplyr function left_join to act on qseaSet sampleTable.}
 \usage{
-\method{left_join}{qseaSet}(qseaSet, ...)
+\method{left_join}{qseaSet}(x, y, by = NULL, copy, suffix, ..., keep)
 }
 \arguments{
-\item{qseaSet}{A qseaSet to mutate}
+\item{x}{A qseaSet to join data onto the sampleTable of}
 
-\item{...}{Other arguments to pass to dplyr::mutate}
+\item{y}{A data frame to join with the sampleTable}
+
+\item{by}{A character vector of variables to join by. If NULL, will perform a join on all common variables.}
+
+\item{copy}{If x and y are not from the same data source, and copy is TRUE, then y will be copied into the same src as x.
+This allows you to join tables across srcs, but it is a potentially expensive operation so you must opt into it.}
+
+\item{suffix}{If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.}
+
+\item{...}{Other arguments to pass to dplyr::left_join}
+
+\item{keep}{Should the join keys from both x and y be preserved in the output?}
 }
 \value{
 A qseaSet object with the sampleTable changed by a call to dplyr::left_join

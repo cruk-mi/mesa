@@ -13,7 +13,7 @@ plotCorrelationMatrix(qseaSet, ..., normMethod = "nrpm", annotationColors = NA)
 
 \item{normMethod}{What normalisation method to use}
 
-\item{annoDF}{A data frame for use of annotation of the rows and columns in pheatmap}
+\item{annotationColors}{A data frame for use of annotation of the rows and columns in pheatmap}
 }
 \value{
 A table

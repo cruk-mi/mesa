@@ -4,14 +4,14 @@
 \alias{sort.qseaSet}
 \title{This function extends the function sort to act on qseaSet, to reorder the names. It uses gtools::mixedsort to sort numbers correctly (i.e. 10 does not come before 2).}
 \usage{
-\method{sort}{qseaSet}(x, ...)
+\method{sort}{qseaSet}(x, decreasing = FALSE, ...)
 }
 \arguments{
 \item{x}{A qseaSet to reorder the samples of.}
 
-\item{...}{Other arguments to pass to gtools::mixedsort}
-
 \item{decreasing}{Whether to order the qseaSet in reverse alphabetical order}
+
+\item{...}{Other arguments to pass to gtools::mixedsort}
 }
 \value{
 A qseaSet with the sample names reordered alphabetically

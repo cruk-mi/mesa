@@ -20,6 +20,8 @@ removeExpressedWindows(
 \item{maxValue}{The maximum value to allow in any of the samples}
 
 \item{normMethod}{The type of normalisation method to use (nrpm, beta, count)}
+
+\item{.swap}{Whether to change the printed messages as we are actually going to be keeping these windows rather than filtering them.}
 }
 \value{
 A qseaSet object, with only a subset of the windows.

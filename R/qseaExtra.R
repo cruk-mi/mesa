@@ -78,6 +78,7 @@ annotateData <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL,
 #' @param samplesToFilterOut A set of sample names to filter out, or a string to match in the sample names
 #' @param maxValue The maximum value to allow in any of the samples
 #' @param normMethod The type of normalisation method to use (nrpm, beta, count)
+#' @param .swap Whether to change the printed messages as we are actually going to be keeping these windows rather than filtering them.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
 removeExpressedWindows <- function(qseaSet, samplesToFilterOut, maxValue, normMethod, .swap = FALSE){
@@ -236,14 +237,14 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
 
 #' This function takes a qseaSet and makes a new sample by mixing two samples
 #' @param qseaSet The qseaSet object.
-#' @param sample1 First sample name, from which to take proportion of samples
-#' @param sample2 Second sample name
+#' @param arrayReadTable Data frame with the array probe beta values
+#' @param arraySample Name of the array sample to mix
+#' @param qseaSample Name of the qseaSet sample to mix with
 #' @param nReadsTotal Number of reads in total to have after mixing
 #' @param proportion The proportion to take from sample1, the rest will come from sample2
 #' @param newName A name to give the new sample
 #' @param groupName A name to use in the group column in the sampleTable
 #' @param onlyNew Whether to only return the new sample.
-#' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
 #' @return A qseaSet object with an extra
 #' @export
 #'

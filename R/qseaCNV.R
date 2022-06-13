@@ -186,6 +186,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
 #' This function takes a qseaSet and plots a heatmap of the calculated CNV
 #' @param qseaSet The qseaSet object.
+#' @param ... A list of columns to use to annotate the samples with.
 #' @param annotationCol A data frame with annotations for the samples (can be made with getAnnotationDataFrameIndividual)
 #' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
 #' @param clusterRows Whether to cluster the rows of the heatmap

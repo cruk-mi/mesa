@@ -7,11 +7,11 @@
 \method{arrange}{qseaSet}(.data, ..., .by_group = FALSE)
 }
 \arguments{
+\item{.data}{A qseaSet to reorder the samples in.}
+
 \item{...}{Other arguments to pass to dplyr::arrange}
 
 \item{.by_group}{Not implemented as qsea requires a data frame not a tibble for the sampleTable.}
-
-\item{qseaSet}{A qseaSet to reorder the samples in.}
 }
 \value{
 A qseaSet with the sample names reordered according to a column of the sampleTable.

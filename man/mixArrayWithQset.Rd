@@ -19,6 +19,12 @@ mixArrayWithQset(
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
+\item{arrayReadTable}{Data frame with the array probe beta values}
+
+\item{arraySample}{Name of the array sample to mix}
+
+\item{qseaSample}{Name of the qseaSet sample to mix with}
+
 \item{nReadsTotal}{Number of reads in total to have after mixing}
 
 \item{proportion}{The proportion to take from sample1, the rest will come from sample2}
@@ -28,12 +34,6 @@ mixArrayWithQset(
 \item{groupName}{A name to use in the group column in the sampleTable}
 
 \item{onlyNew}{Whether to only return the new sample.}
-
-\item{sample1}{First sample name, from which to take proportion of samples}
-
-\item{sample2}{Second sample name}
-
-\item{renormalise}{Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.}
 }
 \value{
 A qseaSet object with an extra

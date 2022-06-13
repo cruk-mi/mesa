@@ -40,6 +40,8 @@ plotGeneHeatmap(
 
 \item{scaleRows}{Whether to scale the rows of the heatmap}
 
+\item{clusterCols}{Whether to cluster the columns or not.}
+
 \item{downstreamDist}{Number of basepairs downstream of the gene to include.}
 }
 \value{

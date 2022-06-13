@@ -18,8 +18,6 @@
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param badRegions A GRanges object containing regions to filter out from the result. Defaults to the ENCODE blocklist for hg38.
 #' @param badRegions2 A GRanges object containing additional regions to filter out from the result.
-#' @param pooledControlMeCapBam A path to a methylation-enriched bam file (preferably with the index in the folder) to use as a control sample for TMM normalisation. Will be called "PooledControl" in the resulting qseaSet. Allows merging of qseaSets generated separately.
-#' @param pooledControlInputBam A path to a bam file (preferably with the index in the folder) to use as the CNV for the PooledControl sample.
 #' @param nCores How many cores to use to read the data in. Set as high as possible on your machine for speedy results.
 #' @return A qseaSet object, containing all the information required.
 #' @export
@@ -32,16 +30,13 @@ makeQset <- function(sampleTable,
                      fragmentSD = NULL,
                      CNVmethod = "HMMdefault",
                      coverageMethod = "PairedAndR1s",
-                     minMapQual = 0,
-                     minInsertSize = 50,
+                     minMapQual = 10,
+                     minInsertSize = 70,
                      maxInsertSize = 1000,
                      minReferenceLength = 30,
                      badRegions = encodeBlacklist,
                      badRegions2 = NULL,
                      properPairsOnly = FALSE,
-                     pooledControlMeCapBam = NULL,
-                     pooledControlInputBam = NULL,
-                     normalizeToOne = TRUE,
                      nCores = 1) {
 
   if (!is.null(fragmentType)) {
@@ -70,19 +65,6 @@ makeQset <- function(sampleTable,
 
   if (!("group" %in% colnames(sampleTable)))  {
     stop("Required column group included in the sampleTable.")
-  }
-
-  if (!any(sampleTable$sample_name == "PooledControl") & !is.null(pooledControlMeCapBam) & !is.null(pooledControlInputBam)) {
-    message("Adding PooledControl reference sample into object.")
-    sampleTable <- sampleTable %>%
-      tibble::add_row(file_name = pooledControlMeCapBam,
-                      input_file = pooledControlInputBam,
-                      sample_name = "PooledControl",
-                      group = "PooledControl"
-      ) %>%
-      tibble::remove_rownames() %>%
-      dplyr::mutate(sample_name2 = sample_name) %>%
-      tibble::column_to_rownames("sample_name2")
   }
 
 
@@ -233,15 +215,9 @@ makeQset <- function(sampleTable,
   qseaSet@parameters$fragmentLength <- fragmentLength
   qseaSet@parameters$fragmentSD <- fragmentSD
 
-
-  if(!is.null(pooledControlMeCapBam)){
-  # calculate normalisation factors (based on number of reads). Uses TMM normalisation, with a sample as the reference to compare to.
-    # the normalizeToOne = FALSE fix requires a more recent version of qsea with a PR incorporated
-    qseaSet <- qsea::addLibraryFactors(qseaSet, ref = "PooledControl", normalizeToOne = normalizeToOne)
-  } else{
-    message(glue::glue("No PooledControl sample given, TMM normalisation using the first sample in the sample table {qseaSet %>% getSampleNames() %>% head(n = 1)}."))
-    qseaSet <- qsea::addLibraryFactors(qseaSet, ref = 1)
-  }
+  #do not set library factors via TMM, just set to be 1. Makes no difference to beta values, only nrpms are affected.
+  #if you do use TMM, then it depends on the samples in the qseaSet (with one being the reference to compare with)
+  qseaSet <- qsea::addLibraryFactors(qseaSet, factors = 1)
 
   qseaSet <- qsea::addOffset(qseaSet, enrichmentPattern = "CpG", maxPatternDensity = 0.05)
 

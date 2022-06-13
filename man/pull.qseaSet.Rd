@@ -4,16 +4,16 @@
 \alias{pull.qseaSet}
 \title{This function extends the dplyr function pull to act on qseaSet sampleTable.}
 \usage{
-\method{pull}{qseaSet}(.data, ...)
+\method{pull}{qseaSet}(.data, var = -1, name = NULL, ...)
 }
 \arguments{
-\item{...}{Other arguments to pass to dplyr::pull (column name to extract)}
-
-\item{qseaSet}{A qseaSet to pull a column from}
+\item{.data}{A qseaSet to pull a column from the sampleTable of.s}
 
 \item{var}{A variable specified as a column name or an integer (negative counting from right)}
 
 \item{name}{An optional parameter that specifies the column to be used as names for a named vector. Specified in a similar manner as var.}
+
+\item{...}{Other arguments to pass to dplyr::pull (column name to extract)}
 }
 \value{
 A vector with the contents of the column of the sample table that was extracted.

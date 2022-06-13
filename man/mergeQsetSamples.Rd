@@ -4,7 +4,7 @@
 \alias{mergeQsetSamples}
 \title{This function takes a qseaSet and merges samples together into a single sample.}
 \usage{
-mergeQsetSamples(qseaSet, mergeString, normalizeToOne = FALSE)
+mergeQsetSamples(qseaSet, mergeString)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}

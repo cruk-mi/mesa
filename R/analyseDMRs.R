@@ -38,7 +38,7 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
 #' @param DMRtable A data frame with multiple comparisons inside
 #' @param FDRthres FDR threshold to apply to each comparison
 #' @param log2FCthres A log2FC threshold to apply to each comparison (absolute)
-#' @param log2FCthres A betaDelta threshold to apply to each comparison (absolute)
+#' @param betaDeltaThres A betaDelta threshold to apply to each comparison (absolute)
 #' @export
 #'
 summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, betaDeltaThres = 0){

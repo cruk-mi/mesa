@@ -181,7 +181,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' @return A qseaSet object with the samples merged together.
 #' @export
 
-mergeQsetSamples <- function(qseaSet, mergeString, normalizeToOne = FALSE){
+mergeQsetSamples <- function(qseaSet, mergeString){
 
   if (!("PooledControl" %in% qsea::getSampleNames(qseaSet))) {
     stop("The reference sample named PooledControl must be present for renormalisation!")
@@ -301,7 +301,7 @@ mergeQsetSamples <- function(qseaSet, mergeString, normalizeToOne = FALSE){
   #oldSet@libraries$file_name <-  oldSet@libraries$file_name[,c("total_fragments","valid_fragments","fragment_median","fragment_sd","library_factor","offset"), drop = FALSE]
 
   finalSet <-  combineQsets(oldSet, newSet) %>%
-    addQseaNormalisationSteps(enrichmentMethod = "blind1-15", normalizeToOne = normalizeToOne)
+    addQseaNormalisationSteps(enrichmentMethod = "blind1-15")
 
   return(finalSet)
 
