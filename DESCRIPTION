@@ -78,3 +78,6 @@ Suggests:
     MEDIPS,
     workflows
 VignetteBuilder: knitr
+biocViews: Sequencing, DNAMethylation, CpGIsland, 
+        Preprocessing, Normalization, QualityControl, Visualization,
+        CopyNumberVariation, DifferentialMethylation

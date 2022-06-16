@@ -162,10 +162,10 @@ makeQset <- function(sampleTable,
 
   if (nrow(numEmpty) > 0) {stop(glue::glue("Empty sample: {rownames(numEmpty)}"))}
 
-  if (CNVmethod == "qseaPooled") {
+  if (CNVmethod == "qseaInput") {
 
     # calculate the CNV, using the input files included in the sampleTable CSV.
-    # uses HMMCopy behind the scenes, but with the PooledControl sample as a normalisation
+    # uses HMMCopy behind the scenes
     # note that apparently if you give any samples with normal or control in the name it will try and use those to normalise!
     qseaSet <- qsea::addCNV(qseaSet,
                             file_name = "input_file",
