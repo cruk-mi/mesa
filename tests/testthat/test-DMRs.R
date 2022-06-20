@@ -1,5 +1,3 @@
-context("DMR related tests")
-
 test_that("Calculating DMRs", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%

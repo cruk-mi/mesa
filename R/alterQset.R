@@ -183,6 +183,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
 mergeQsetSamples <- function(qseaSet, mergeString){
 
+  ##TODO rewrite this function to
 
   samplesToMerge <- qsea::getSampleTable(qseaSet) %>%
     dplyr::pull(sample_name) %>%
@@ -262,8 +263,6 @@ mergeQsetSamples <- function(qseaSet, mergeString){
   newLibrariesFile <- purrr::map_dfr(newNames, function(x) {
     qseaSet@libraries$file_name[startsWith(rownames(qseaSet@sampleTable), x),] %>%
       tibble::as_tibble() %>%
-      #dplyr::mutate(fragment_length = fragment_median) %>%
-      #dplyr::mutate(total_fragments2 = total_fragments) %>%
       dplyr::summarise(dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~stats::weighted.mean(.x,total_fragments)),
                        dplyr::across(tidyselect::any_of(tidyselect::matches("reads|pairs|r1s|fragments")), ~sum(.x))
       ) %>%
@@ -293,9 +292,6 @@ mergeQsetSamples <- function(qseaSet, mergeString){
 
   oldSet <- qseaSet %>%
     subsetQset(samplesToDrop = samplesToMerge)
-
-
-  #oldSet@libraries$file_name <-  oldSet@libraries$file_name[,c("total_fragments","valid_fragments","fragment_median","fragment_sd","library_factor","offset"), drop = FALSE]
 
   finalSet <-  combineQsets(oldSet, newSet) %>%
     addQseaNormalisationSteps(enrichmentMethod = "blind1-15")

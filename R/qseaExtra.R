@@ -6,6 +6,14 @@
   getCGPositions <<- memoise::memoise(getCGPositions)
 }
 
+#' Check if an object is a qseaSet
+#'
+#' This function checks that an object is a qseaSet.
+#'
+#' @param x The object
+is.qseaSet <- function(x){
+  return(inherits(x,"qseaSet"))
+  }
 
 #' Add annotation onto a data table
 #'

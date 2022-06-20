@@ -10,7 +10,7 @@
 #' @return A qseaSet object, containing all the samples from both qseaSet objects.
 #' @export
 combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
-  if (class(firstQset) == "character") {
+  if (is.character(firstQset)) {
     if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
       message(glue::glue("Character string given as firstQset, loading {firstQset}"))
       firstQset <- readr::read_rds(firstQset)
@@ -48,7 +48,7 @@ combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, 
 #' @export
 combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep = NULL, dropDuplicates = FALSE) {
 
-  if (class(qseaSet1) == "character") {
+  if (is.character(qseaSet1)) {
     if(length(qseaSet1) == 1 & tools::file_ext(qseaSet1) == "rds"){#has to be after first if, else errors if it is a qseaSet
       message(glue::glue("Character string given, loading {qseaSet1}"))
       qseaSet1 <- readr::read_rds(qseaSet1)
