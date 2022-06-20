@@ -183,9 +183,6 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
 mergeQsetSamples <- function(qseaSet, mergeString){
 
-  if (!("PooledControl" %in% qsea::getSampleNames(qseaSet))) {
-    stop("The reference sample named PooledControl must be present for renormalisation!")
-  }
 
   samplesToMerge <- qsea::getSampleTable(qseaSet) %>%
     dplyr::pull(sample_name) %>%
@@ -305,4 +302,43 @@ mergeQsetSamples <- function(qseaSet, mergeString){
 
   return(finalSet)
 
+}
+
+#' This function takes a qseaSet and renames the samples based on a column of the sampleTable.
+#' @param qseaSet The qseaSet object.
+#' @param newNameColumn A column of the qseaSet to use to rename each sample with
+#' @return A qseaSet object with the samples renamed.
+#' @export
+
+relabelQset <- function(qseaSet, newNameColumn){
+
+  renamedNames <- qseaSet %>% qsea::getSampleTable() %>% dplyr::pull(!!rlang::sym(newNameColumn))
+
+  if (any(is.na(renamedNames))) {
+    stop(glue::glue("NAs present in the new sample name column"))
+  }
+
+  if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
+    message("Renaming had no effect!")
+    return(qseaSet)
+  }
+  if (any(duplicated(renamedNames))) {
+    stop(glue::glue("Duplicate sample_name now present: {renamedNames[duplicated(renamedNames)]}"))
+  }
+  newQSet <- qseaSet
+  newQSet@sampleTable <- newQSet@sampleTable %>% tibble::remove_rownames() %>%
+    dplyr::mutate(sample_name = renamedNames,
+                  rownameCol = renamedNames) %>%
+    tibble::column_to_rownames("rownameCol")
+
+  rownames(newQSet@zygosity) <- renamedNames
+  rownames(newQSet@libraries$file_name) <- renamedNames
+  if (!is.null(newQSet@libraries$input_file)) {
+    rownames(newQSet@libraries$input_file) <- renamedNames
+  }
+  colnames(newQSet@count_matrix) <- renamedNames
+  rownames(newQSet@enrichment$parameters) <- renamedNames
+  colnames(newQSet@enrichment$factors) <- renamedNames
+  colnames(GenomicRanges::mcols(newQSet@cnv)) <- renamedNames
+  return(newQSet)
 }

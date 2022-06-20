@@ -3,6 +3,7 @@
 #' This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata
 #'
 #' @param sampleTable A data frame with the sample information to be passed to qsea.
+#' @param BSgenome A BSgenome string. See BSgenome::available.genomes() for options.
 #' @param chrSelect Which chromosomes to use (default 1:22).
 #' @param windowSize What window size (in bp) to use in the genome (default 300).
 #' @param fragmentType What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to a default for CBC)
@@ -16,12 +17,12 @@
 #' @param maxInsertSize For paired reads, only keep them if they are below a maximum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.
 #' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
-#' @param badRegions A GRanges object containing regions to filter out from the result. Defaults to the ENCODE blocklist for hg38.
-#' @param badRegions2 A GRanges object containing additional regions to filter out from the result.
+#' @param badRegions A GRanges object containing regions to filter out from the result.
 #' @param nCores How many cores to use to read the data in. Set as high as possible on your machine for speedy results.
 #' @return A qseaSet object, containing all the information required.
 #' @export
 makeQset <- function(sampleTable,
+                     BSgenome = NULL,
                      chrSelect = 1:22,
                      windowSize = 300,
                      CNVwindowSize = 1000000,
@@ -34,8 +35,7 @@ makeQset <- function(sampleTable,
                      minInsertSize = 70,
                      maxInsertSize = 1000,
                      minReferenceLength = 30,
-                     badRegions = encodeBlacklist,
-                     badRegions2 = NULL,
+                     badRegions = NULL,
                      properPairsOnly = FALSE,
                      nCores = 1) {
 
@@ -69,29 +69,26 @@ makeQset <- function(sampleTable,
 
 
   if(!all(file.exists(sampleTable$file_name))){
-    stop(glue::glue(" MeCap file not found for: {filter(sampleTable,!file.exists(file_name)) %>% pull(sample_name)}. "))
+    stop(glue::glue(" MeCap file not found for: {dplyr::filter(sampleTable,!file.exists(file_name)) %>% dplyr::pull(sample_name)}. "))
   }
 
   if(!all(file.exists(sampleTable$input_file))){
-    stop(glue::glue(" Input file not found for: {filter(sampleTable,!file.exists(input_file)) %>% pull(input_file)}. "))
+    stop(glue::glue(" Input file not found for: {dplyr::filter(sampleTable,!file.exists(input_file)) %>% dplyr::pull(input_file)}. "))
   }
 
 
   # Additional file of bad mapping regions to remove
   ## TODO allow to be a GRanges object or bed
 
-  if (!is.null(badRegions2)) {
-    extraBlacklistGRanges <- plyranges::read_bed(badRegions2)
-
-  } else {
-    extraBlacklistGRanges <- GenomicRanges::GRanges()
+  if (is.null(badRegions)) {
+    badRegions <- GenomicRanges::GRanges()
   }
 
   # Get data for hg38
-  refGenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+  refGenome <- BSgenome::getBSgenome(BSgenome)
   # chromosome lengths, and then a Seqinfo object with that
   chr_length <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
-  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chr_length, NA, "BSgenome.Hsapiens.NCBI.GRCh38")
+  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chr_length, NA, BSgenome)
 
   # number of windows of size windowSize on each chromosome
   nr_wd <- floor(chr_length/windowSize)
@@ -107,15 +104,14 @@ makeQset <- function(sampleTable,
 
   # remove both sets of blacklisted windows from the full set of windows
   windowsWithoutBlacklist <- windowsGRanges %>%
-    plyranges::filter_by_non_overlaps(badRegions) %>%
-    plyranges::filter_by_non_overlaps(extraBlacklistGRanges)
+    plyranges::filter_by_non_overlaps(badRegions)
 
   print(paste0("Considering ", length(windowsWithoutBlacklist), " regions with total size ",
                sum(BiocGenerics::width(windowsWithoutBlacklist))))
 
   #make the initial Qsea object, with the reduced set of windows, using the sampleTable
   qseaSet <- qsea::createQseaSet(sampleTable = sampleTable,
-                                 BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+                                 BSgenome = BSgenome,
                                  chr.select = chrSelect,
                                  Regions = windowsWithoutBlacklist,
                                  window_size = windowSize)
@@ -215,7 +211,7 @@ makeQset <- function(sampleTable,
   qseaSet@parameters$fragmentLength <- fragmentLength
   qseaSet@parameters$fragmentSD <- fragmentSD
 
-  #do not set library factors via TMM, just set to be 1. Makes no difference to beta values, only nrpms are affected.
+  #do not set library factors via TMM, just set to be 1. Makes no difference to beta values as gets normalised out anyway, only nrpms are affected.
   #if you do use TMM, then it depends on the samples in the qseaSet (with one being the reference to compare with)
   qseaSet <- qsea::addLibraryFactors(qseaSet, factors = 1)
 

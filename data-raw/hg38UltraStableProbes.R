@@ -15,7 +15,8 @@ hg38MethyProbePositionsStable <- read_tsv("/data/cep/Methylation/refData/hm450.h
 
 hg38UltraStableProbes <- hg38MethyProbePositionsStable %>%
   filter(State == "Ultra-stable Methylated") %>%
-  as_granges()
+  dplyr::select(seqnames, start, end, Probe_ID) %>%
+  plyranges::as_granges()
 
 
 usethis::use_data(hg38UltraStableProbes, overwrite = TRUE)

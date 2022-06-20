@@ -280,18 +280,16 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #' @param qseaSet The qseaSet object.
 #' @param enrichmentMethod What method to use to calculate the enrichment step
 #' @param maxPatternDensity Maximum CG density in a window to consider it for the background calculation
-#' @param normalizeToOne Whether to normalise
+#' @param noTMM Whether to normalise
 #' @return A qseaSet object with the samples merged together.
 #' @export
 #'
 addQseaNormalisationSteps <- function(qseaSet,
                                       enrichmentMethod = "blind1-15",
                                       maxPatternDensity = 0.05,
-                                      normalizeToOne = FALSE){
-  # calculate normalisation factors (based on number of reads).
-  qseaSet <- qsea::addLibraryFactors(qseaSet,
-                                     ref = "PooledControl",
-                                     normalizeToOne = normalizeToOne)
+                                      noTMM = TRUE){
+  # do not set the
+  qseaSet <- qsea::addLibraryFactors(qseaSet, factors = 1)
 
   qseaSet <- qsea::addOffset(qseaSet, enrichmentPattern = "CpG", maxPatternDensity = maxPatternDensity)
 
