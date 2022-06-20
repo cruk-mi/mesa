@@ -8,7 +8,7 @@ addQseaNormalisationSteps(
   qseaSet,
   enrichmentMethod = "blind1-15",
   maxPatternDensity = 0.05,
-  normalizeToOne = FALSE
+  noTMM = TRUE
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ addQseaNormalisationSteps(
 
 \item{maxPatternDensity}{Maximum CG density in a window to consider it for the background calculation}
 
-\item{normalizeToOne}{Whether to normalise}
+\item{noTMM}{Whether to normalise}
 }
 \value{
 A qseaSet object with the samples merged together.

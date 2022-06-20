@@ -17,9 +17,9 @@ Description: Analysis tools for methylation enrichment sequencing data (MBD-seq 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-LazyDataCompression:xz
+LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports:
     plyranges,
     magrittr,
@@ -71,7 +71,7 @@ Suggests:
     rmarkdown,
     knitr,
     openxlsx,
-    testthat,
+    testthat (>= 3.0.0),
     UpSetR,
     rtracklayer,
     ggrepel,
@@ -81,3 +81,4 @@ VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,
         CopyNumberVariation, DifferentialMethylation
+Config/testthat/edition: 3

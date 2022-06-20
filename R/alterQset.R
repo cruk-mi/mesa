@@ -183,7 +183,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
 mergeQsetSamples <- function(qseaSet, mergeString){
 
-  ##TODO rewrite this function to
+  ##TODO rewrite this function to use a column.
 
   samplesToMerge <- qsea::getSampleTable(qseaSet) %>%
     dplyr::pull(sample_name) %>%
@@ -302,13 +302,15 @@ mergeQsetSamples <- function(qseaSet, mergeString){
 
 #' This function takes a qseaSet and renames the samples based on a column of the sampleTable.
 #' @param qseaSet The qseaSet object.
-#' @param newNameColumn A column of the qseaSet to use to rename each sample with
+#' @param newNameColumn A column of the qseaSet to use to rename each sample with.
 #' @return A qseaSet object with the samples renamed.
 #' @export
 
 relabelQset <- function(qseaSet, newNameColumn){
 
-  renamedNames <- qseaSet %>% qsea::getSampleTable() %>% dplyr::pull(!!rlang::sym(newNameColumn))
+  newNameColumn <- enquo(newNameColumn)
+
+  renamedNames <- qseaSet %>% qsea::getSampleTable() %>% dplyr::pull(!!newNameColumn)
 
   if (any(is.na(renamedNames))) {
     stop(glue::glue("NAs present in the new sample name column"))

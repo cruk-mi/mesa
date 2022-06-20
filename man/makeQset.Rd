@@ -6,6 +6,7 @@
 \usage{
 makeQset(
   sampleTable,
+  BSgenome = NULL,
   chrSelect = 1:22,
   windowSize = 300,
   CNVwindowSize = 1e+06,
@@ -18,14 +19,15 @@ makeQset(
   minInsertSize = 70,
   maxInsertSize = 1000,
   minReferenceLength = 30,
-  badRegions = encodeBlacklist,
-  badRegions2 = NULL,
+  badRegions = NULL,
   properPairsOnly = FALSE,
   nCores = 1
 )
 }
 \arguments{
 \item{sampleTable}{A data frame with the sample information to be passed to qsea.}
+
+\item{BSgenome}{A BSgenome string. See BSgenome::available.genomes() for options.}
 
 \item{chrSelect}{Which chromosomes to use (default 1:22).}
 
@@ -51,9 +53,7 @@ makeQset(
 
 \item{minReferenceLength}{A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.}
 
-\item{badRegions}{A GRanges object containing regions to filter out from the result. Defaults to the ENCODE blocklist for hg38.}
-
-\item{badRegions2}{A GRanges object containing additional regions to filter out from the result.}
+\item{badRegions}{A GRanges object containing regions to filter out from the result.}
 
 \item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
 
