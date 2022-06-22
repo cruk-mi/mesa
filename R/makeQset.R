@@ -18,7 +18,6 @@
 #' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param badRegions A GRanges object containing regions to filter out from the result.
-#' @param nCores How many cores to use to read the data in. Set as high as possible on your machine for speedy results.
 #' @return A qseaSet object, containing all the information required.
 #' @export
 makeQset <- function(sampleTable,
@@ -36,8 +35,7 @@ makeQset <- function(sampleTable,
                      maxInsertSize = 1000,
                      minReferenceLength = 30,
                      badRegions = NULL,
-                     properPairsOnly = FALSE,
-                     nCores = 1) {
+                     properPairsOnly = FALSE) {
 
   if (!is.null(fragmentType)) {
     if (fragmentType %in% c("Sheared","sheared") ) {
@@ -72,19 +70,23 @@ makeQset <- function(sampleTable,
     stop(glue::glue(" MeCap file not found for: {dplyr::filter(sampleTable,!file.exists(file_name)) %>% dplyr::pull(sample_name)}. "))
   }
 
-  if(!all(file.exists(sampleTable$input_file))){
-    stop(glue::glue(" Input file not found for: {dplyr::filter(sampleTable,!file.exists(input_file)) %>% dplyr::pull(input_file)}. "))
+  if ((!("input_file" %in% colnames(sampleTable))) & CNVmethod == "HMMdefault")  {
+    stop("Input_file column needed in the sampleTable for calculating Copy Number Variation (CNV), set CNVmethod = none to not call CNV.")
+  }
+
+  if (("input_file" %in% colnames(sampleTable)) & CNVmethod != "none")  {
+    if(!all(file.exists(sampleTable$input_file))){
+      stop(glue::glue("Input file not found for: {dplyr::filter(sampleTable,!file.exists(input_file)) %>% dplyr::pull(input_file)}. "))
+    }
   }
 
 
-  # Additional file of bad mapping regions to remove
-  ## TODO allow to be a GRanges object or bed
 
   if (is.null(badRegions)) {
     badRegions <- GenomicRanges::GRanges()
   }
 
-  # Get data for hg38
+  # Get data from the BSgenome
   refGenome <- BSgenome::getBSgenome(BSgenome)
   # chromosome lengths, and then a Seqinfo object with that
   chr_length <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
@@ -130,7 +132,7 @@ makeQset <- function(sampleTable,
     )
 
     #this is included in the PairedAndR1s method more efficiently, don't need to call it there.
-    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = nCores)
+    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = BiocParallel::bpworkers())
 
   } else if (coverageMethod == "PairedAndR1s") {
 

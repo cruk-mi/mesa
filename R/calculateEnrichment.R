@@ -4,7 +4,7 @@
 #' @return A data frame with two entries, genome.relH and genome.GoGe
 #' @export
 calculateGenomicCGDistribution <- function(BSgenome){
-  dataset = get(ls(paste("package:", BSgenome, sep = "")))
+  dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
   pdict0 <- Biostrings::PDict(CG)
   params <- methods::new("BSParams", X = dataset, FUN = Biostrings::countPDict, simplify = TRUE, exclude = c("rand", "chrUn"))
@@ -141,7 +141,7 @@ calculateCpGEnrichment <- function(file = NULL, BSgenome = "BSgenome.Hsapiens.NC
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
 getCGPositions <- function(BSgenome, chr.select){
-  MEDIPS::MEDIPS.getPositions("BSgenome.Hsapiens.NCBI.GRCh38", "CG", chr.select)
+  MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
 }
 
 #' This function takes a GRanges object and calculates the enrichment scores.

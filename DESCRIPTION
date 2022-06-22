@@ -76,7 +76,8 @@ Suggests:
     rtracklayer,
     ggrepel,
     MEDIPS,
-    workflows
+    workflows,
+    MEDIPSData
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

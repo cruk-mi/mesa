@@ -1,5 +1,6 @@
 #' This function takes a bam file and gets the coverage over a set of regions. It keeps pairs or high quality R1s.
 #' @param fileName Path to the bam file
+#' @param BSgenome String denoting the BSgenome to be used.
 #' @param regions GRanges object with the regions to calculate the coverage for.
 #' @param fragmentLength Length to extend unpaired reads to
 #' @param minMapQual Minimum mapping quality to include a read (on either end if proper pair)
@@ -11,7 +12,7 @@
 #' @export
 #'
 #'
-getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, regions = NULL, fragmentLength = NULL,
+getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, regions = NULL, fragmentLength = NULL,
                                               minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
                                               minReferenceLength = 30, properPairsOnly = FALSE){
 
@@ -159,7 +160,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, regions = NULL, f
     plyranges::as_granges()
 
   enrichment = calculateCpGEnrichmentGRanges(readGRanges,
-                                             "BSgenome.Hsapiens.NCBI.GRCh38",
+                                             BSgenome,
                                              chr.select = regions %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames())
 
   distributionParameters <- data.frame(
@@ -225,7 +226,9 @@ addBamCoveragePairedAndUnpaired <- function(qs,
   getCGPositions(qsea:::getGenome(qs), qs %>% qsea::getRegions()  %>% GenomeInfoDb::seqnames() %>% levels()) #memoise this once, for using in all the getBamCoveragePairedAndUnpairedR1 function.
 
   bamOutList <- BiocParallel::bplapply(X = sampleTable[, "file_name"],
-                                       FUN = getBamCoveragePairedAndUnpairedR1, regions = Regions,
+                                       FUN = getBamCoveragePairedAndUnpairedR1,
+                                       BSgenome = qsea:::getGenome(qs),
+                                       regions = Regions,
                                        fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,
                                        minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,
                                        minMapQual = minMapQual, BPPARAM = BPPARAM, properPairsOnly = properPairsOnly)

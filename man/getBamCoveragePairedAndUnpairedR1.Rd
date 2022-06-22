@@ -6,6 +6,7 @@
 \usage{
 getBamCoveragePairedAndUnpairedR1(
   fileName = NULL,
+  BSgenome = NULL,
   regions = NULL,
   fragmentLength = NULL,
   minMapQual = 30,
@@ -17,6 +18,8 @@ getBamCoveragePairedAndUnpairedR1(
 }
 \arguments{
 \item{fileName}{Path to the bam file}
+
+\item{BSgenome}{String denoting the BSgenome to be used.}
 
 \item{regions}{GRanges object with the regions to calculate the coverage for.}
 
