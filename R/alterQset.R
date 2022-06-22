@@ -308,7 +308,7 @@ mergeQsetSamples <- function(qseaSet, mergeString){
 
 relabelQset <- function(qseaSet, newNameColumn){
 
-  newNameColumn <- enquo(newNameColumn)
+  newNameColumn <- rlang::enquo(newNameColumn)
 
   renamedNames <- qseaSet %>% qsea::getSampleTable() %>% dplyr::pull(!!newNameColumn)
 

@@ -6,7 +6,7 @@
 \usage{
 calculateCpGEnrichmentGRanges(
   readGRanges = NULL,
-  BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+  BSgenome = NULL,
   chr.select = NULL
 )
 }

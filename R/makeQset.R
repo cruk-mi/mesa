@@ -50,7 +50,7 @@ makeQset <- function(sampleTable,
   }
 
   if (is.null(fragmentLength) | is.null(fragmentSD)) {
-    stop("fragmentLength and fragmentSD must be specified, or fragmentType")
+    stop("fragmentLength and fragmentSD must be specified, or fragmentType can be specified for some defaults.")
   }
 
   if (!("sample_name" %in% colnames(sampleTable)))  {

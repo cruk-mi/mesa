@@ -77,7 +77,8 @@ Suggests:
     ggrepel,
     MEDIPS,
     workflows,
-    MEDIPSData
+    MEDIPSData,
+    BSgenome.Hsapiens.UCSC.hg19
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

@@ -6,7 +6,7 @@
 \usage{
 addMedipsEnrichmentFactors(
   qseaSet,
-  BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+  BSgenome = NULL,
   exportPath = NULL,
   extend = 0,
   shift = 0,

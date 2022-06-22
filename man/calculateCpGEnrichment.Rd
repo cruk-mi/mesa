@@ -6,7 +6,7 @@
 \usage{
 calculateCpGEnrichment(
   file = NULL,
-  BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+  BSgenome = NULL,
   exportPath = NULL,
   extend = 0,
   shift = 0,
@@ -22,7 +22,7 @@ calculateCpGEnrichment(
 
 \item{exportPath}{Location to save a plot and data object into.}
 
-\item{extend, shift, uniq, chr.select, paired}{Options to feed into medips::getGRange or medips::getPairedGRange}
+\item{extend, shift, uniq, chr.select, paired}{Options to feed into MEDIPS::getGRange or MEDIPS::getPairedGRange}
 }
 \value{
 A data frame containing the relH, GoGe and number of reads values for the samples
