@@ -9,6 +9,11 @@ addHyperStableFraction <- function(qseaSet){
       selectQset(-tidyselect::matches("hyperStableFractionp8"))
   }
 
+  if ("hyperStableFractionp9" %in% colnames(qsea::getSampleTable(qseaSet))) {
+    qseaSet <- qseaSet %>%
+      selectQset(-tidyselect::matches("hyperStableFractionp9"))
+  }
+
   hyperStableBetaTable <- qseaSet %>%
     filterByOverlaps(mesa::hg38UltraStableProbes) %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.)) %>%
@@ -58,8 +63,7 @@ getSampleQCSummary <- function(qseaSet){
 
   qseaSet %>%
     qsea::getSampleTable() %>%
-    dplyr::select(sample_name, tidyselect::matches("type"),
-                  tidyselect::matches("valid_fragment|relH|hyperStable|ichor")) %>%
+    dplyr::select(sample_name, tidyselect::matches("valid_fragment|relH|hyperStable|ichorTumo")) %>%
     dplyr::arrange(sample_name) %>%
     tibble::as_tibble() %>%
     return()

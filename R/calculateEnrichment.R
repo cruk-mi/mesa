@@ -25,10 +25,10 @@ calculateGenomicCGDistribution <- function(BSgenome){
 #' @param file The path to the bam file
 #' @param BSgenome Which BSGenome to use (GRCh38 is cached for speed)
 #' @param exportPath Location to save a plot and data object into.
-#' @param extend,shift,uniq,chr.select,paired Options to feed into medips::getGRange or medips::getPairedGRange
+#' @param extend,shift,uniq,chr.select,paired Options to feed into MEDIPS::getGRange or MEDIPS::getPairedGRange
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
-calculateCpGEnrichment <- function(file = NULL, BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38", exportPath = NULL,
+calculateCpGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
                                    extend = 0, shift = 0, uniq = 0,
                                    chr.select = NULL, paired = TRUE){
 
@@ -103,11 +103,6 @@ calculateCpGEnrichment <- function(file = NULL, BSgenome = "BSgenome.Hsapiens.NC
     saveRDS(GRange.Reads, file = stringr::str_replace(file.path(exportPath, fileName), ".bam", ".rds"))
   }
 
-  # if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-  #   genomeCGranges <- CGPatternGRCh38
-  # } else {
-  #   genomeCGranges <- MEDIPS::MEDIPS.getPositions("BSgenome.Hsapiens.NCBI.GRCh38", "CG", chr.select)
-  # }
   genomeCGranges <- getCGPositions(BSgenome, chr.select)
 
 
@@ -151,7 +146,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #' @param chr.select Which chromosomes to use in global calculation
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
-calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38", chr.select = NULL){
+calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -231,7 +226,7 @@ calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = "BSgeno
 #' @param nCores Number of cores to use for parallelisation
 #' @return A qseaSet supplemented with more columns on the sampleTable, related to enrichment.
 #' @export
-addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38", exportPath = NULL,
+addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NULL,
                                        extend = 0, shift = 0, uniq = 0,
                                        chr.select = NULL, paired = TRUE,
                                        file_name = "file_name",

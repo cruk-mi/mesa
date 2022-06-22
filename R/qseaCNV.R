@@ -60,7 +60,9 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   }  else {BPPARAM = BiocParallel::SerialParam()}
 
   bamOutList <- BiocParallel::bplapply(X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
-                                       FUN = getBamCoveragePairedAndUnpairedR1, regions = CNV_Regions,
+                                       FUN = getBamCoveragePairedAndUnpairedR1,
+                                       BSgenome = qsea:::getGenome(qs),
+                                       regions = CNV_Regions,
                                        fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,
                                        minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,
                                        minMapQual = minMapQual, properPairsOnly = properPairsOnly, BPPARAM = BPPARAM)
