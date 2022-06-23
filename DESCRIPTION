@@ -40,7 +40,6 @@ Imports:
     HMMcopy,
     ggplot2,
     janitor,
-    org.Hs.eg.db,
     stats,
     stringr,
     methods,
@@ -59,12 +58,9 @@ Imports:
     ComplexHeatmap,
     readr,
     qsea,
-    BSgenome.Hsapiens.NCBI.GRCh38,
     memoise
 Depends:
     qsea,
-    TxDb.Hsapiens.UCSC.hg38.knownGene,
-    BSgenome.Hsapiens.NCBI.GRCh38,
     R (>= 4.1.0),
     dplyr
 Suggests: 
@@ -78,7 +74,10 @@ Suggests:
     MEDIPS,
     workflows,
     MEDIPSData,
-    BSgenome.Hsapiens.UCSC.hg19
+    BSgenome.Hsapiens.NCBI.GRCh38,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    BSgenome.Hsapiens.UCSC.hg19,
+    org.Hs.eg.db
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

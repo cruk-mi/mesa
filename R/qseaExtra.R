@@ -30,9 +30,26 @@ is.qseaSet <- function(x){
 annotateData <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL, CpGislandsGR = NULL,
                          FantomRegionsGR = NULL) {
 
-  if(genome %in% c("hg38","GRCh38") & is.null(TxDb)) { TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
+  if(genome %in% c("hg38","GRCh38") & is.null(TxDb)) {
 
-  if(genome  %in% c("hg38","GRCh38") & is.null(annoDb)) { annoDb = "org.Hs.eg.db" }
+    if (!requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
+      stop(
+        "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\" must be installed to use this function. Please install and run again.",
+        call. = FALSE
+      )
+    }
+    TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+    }
+
+  if(genome  %in% c("hg38","GRCh38") & is.null(annoDb)) {
+    if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+      stop(
+        "Package \"org.Hs.eg.db\" must be installed to use this function. Please install and run again.",
+        call. = FALSE
+      )
+    }
+
+    annoDb = "org.Hs.eg.db" }
 
   if(genome  %in% c("hg38","GRCh38") & is.null(CpGislandsGR)) { CpGislandsGR = mesa::hg38CpGIslands }
 

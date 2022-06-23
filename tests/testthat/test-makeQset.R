@@ -15,7 +15,7 @@ test_that("Making a hg19 qseaSet", {
                        windowSize = 300,
                        CNVwindowSize = 1000000,
                        fragmentType = "Sheared",
-                       CNVmethod = "none",
+                       CNVmethod = "None",
                        coverageMethod = "PairedAndR1s",
                        minMapQual = 10,
                        minInsertSize = 70,
