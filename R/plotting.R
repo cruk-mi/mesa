@@ -213,7 +213,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta", annotationCol = 
   annotatedData %>%
     dplyr::select(window, dplyr::matches(normMethod)) %>%
     dplyr::select(-dplyr::matches("PooledControl")) %>%
-    dplyr::rename_with(~ str_remove_all(.x, "_beta|_nrpm|_means")) %>%
+    dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%

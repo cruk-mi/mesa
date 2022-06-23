@@ -42,3 +42,8 @@ liftOverhg19 <- function(grOrDf){
 .getGenome <- function() {
   getOption("mesa_genome", default="hg38")
 }
+
+
+expect_no_error <- function(object) {
+  testthat::expect_error({{ object }}, NA)
+}

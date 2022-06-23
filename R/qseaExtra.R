@@ -1,6 +1,6 @@
-.onAttach <- function(libname, pkgname) {
-  packageStartupMessage("Welcome to my methtools package!")
-}
+# .onAttach <- function(libname, pkgname) {
+#   packageStartupMessage("Welcome to my methtools package!")
+# }
 
 .onLoad <- function(libname, pkgname) {
   getCGPositions <<- memoise::memoise(getCGPositions)
@@ -107,6 +107,7 @@ annotateData <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL,
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
 removeExpressedWindows <- function(qseaSet, samplesToFilterOut, maxValue, normMethod, .swap = FALSE){
+
   rowAny <- function(x) {rowSums(x) > 0}
 
   if (!(normMethod %in% c("beta","nrpm","counts"))) {
@@ -139,10 +140,11 @@ removeExpressedWindows <- function(qseaSet, samplesToFilterOut, maxValue, normMe
   keep <- dataTable %>%
     as.data.frame() %>%
     tibble::rowid_to_column(var = ".rowID") %>%
-    dplyr::filter(dplyr::across(tidyselect::matches("_means"), ~ .x < maxValue)) %>%
-    dplyr::pull(.rowID)
+    dplyr::select(matches("_means")) %>%
+    rowSums() %>%
+    {which(. >= maxValue)}
 
-  if(.swap){
+  if(!.swap){
      message(glue::glue("Removing {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} remaining"))
   }else{
     message(glue::glue("Keeping {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} removed"))
@@ -661,7 +663,7 @@ countWindowsOverCutoff <- function(qseaSet, GRanges, samples = NULL,
     filterByOverlaps(GRanges) %>%
     qsea::makeTable(norm_methods = normMethod, samples = samples) %>%
     dplyr::select(dplyr::matches(normMethod)) %>%
-    dplyr::rename_with(~ str_remove_all(.x, "_beta|_nrpm|_means")) %>%
+    dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
     {. >= cutoff}
 
   reducedData %>%
