@@ -60,3 +60,31 @@ test_that("Testing general functionality", {
 
 
 })
+
+
+test_that("Analysing DMRs", {
+
+  expect_no_error(DMRs <- examplePairedTumourQset %>%
+    calculateDMRs(variable = "type",
+                  contrastsToDo = tibble::tibble(sample1 = c("LUAD","LUSC","CRC"),
+                                                 sample2 = c("NormalLung","NormalLung","NormalColon"))))
+
+  expect_equal(DMRs %>%
+                 pivotDMRsLonger() %>%
+                 nrow(), 81)
+
+  expect_equal(DMRs %>%
+                 summariseDMRsByContrast() %>%
+                 dim(),c(3,4))
+
+  expect_equal(DMRs %>%
+                 pivotDMRsLonger() %>%
+                 summariseDMRsByContrast() %>%
+                 dim(),c(3,4))
+
+  expect_equal(DMRs %>%
+                 pivotDMRsLonger() %>%
+                 summariseByGene() %>%
+                 dim(),c(28,8))
+
+})
