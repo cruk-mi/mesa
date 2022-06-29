@@ -6,9 +6,9 @@
 #'
 pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
   pivotedDMRs <- DMRtable %>%
-    dplyr::rename_with(~ str_replace(.x, "_adjPval", ":adjPval")) %>%
-    dplyr::rename_with(~ str_replace(.x, "_log2FC", ":log2FC")) %>%
-    dplyr::rename_with(~ str_replace(.x, "_betaDelta", ":betaDelta")) %>%
+    dplyr::rename_with(~ stringr::str_replace(.x, "_adjPval", ":adjPval")) %>%
+    dplyr::rename_with(~ stringr::str_replace(.x, "_log2FC", ":log2FC")) %>%
+    dplyr::rename_with(~ stringr::str_replace(.x, "_betaDelta", ":betaDelta")) %>%
     tidyr::pivot_longer(tidyselect::matches("_vs_"),
                         names_to = c(".comparison", ".ext"),
                         values_to = ".value",
