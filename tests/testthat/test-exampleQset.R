@@ -88,3 +88,9 @@ test_that("Analysing DMRs", {
                  dim(),c(28,8))
 
 })
+
+test_that("Multiple DMRs", {
+  DMRs <- examplePairedTumourQset %>%
+    calculateDMRs(variable = "type",
+                  contrastsToDo = "all")
+})

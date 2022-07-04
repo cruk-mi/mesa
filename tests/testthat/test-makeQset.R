@@ -69,3 +69,39 @@ test_that("Making a GRCh38 qseaSet", {
   expect_true("relH" %in% (GRCh38testSet %>% addLibraryInformation() %>% getSampleTable() %>% colnames()))
 
 })
+
+test_that("Making a GRCh38 qseaSet proper pairs only", {
+
+  skip_on_ci()
+
+  if(!rlang::is_installed("MEDIPSData")){
+    skip("MEDIPSData Not installed")
+  }
+
+  sampleTable <- data.frame(sample_name = "Test1",
+                            group = "Group1",
+                            file_name = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam",
+                            input_file = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")
+
+  GRCh38testSet <- makeQset(sampleTable,
+                            BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+                            chrSelect = 20:22,
+                            windowSize = 200,
+                            CNVwindowSize = 1000000,
+                            fragmentType = "cfDNA",
+                            CNVmethod = "HMMdefault",
+                            coverageMethod = "PairedAndR1s",
+                            minMapQual = 10,
+                            minInsertSize = 70,
+                            maxInsertSize = 1000,
+                            minReferenceLength = 30,
+                            badRegions = NULL,
+                            properPairsOnly = TRUE)
+
+  expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1) #number of samples
+  expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 3) #number of chromosomes
+  expect_equal(GRCh38testSet %>% getRegions() %>% length(), 809861) #number of windows
+
+  expect_true("relH" %in% (GRCh38testSet %>% addLibraryInformation() %>% getSampleTable() %>% colnames()))
+
+})

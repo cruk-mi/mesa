@@ -6,7 +6,7 @@
 #' @param minMapQual Minimum mapping quality to include a read (on either end if proper pair)
 #' @param maxInsertSize Maximum insert size for a proper paired read
 #' @param minInsertSize Minimum insert size for a proper paired read
-#' @param properPairsOnly Whether to only keep proper pairs, else high quality R1s are kept.
+#' @param properPairsOnly Whether to only keep proper pairs, else high quality R1s are kept. Also rescues pairs that are almost proper pairs.
 #' @param minReferenceLength Minimum length on the reference coordinates for a non-paired read to be included
 #' @return A table
 #' @export
@@ -35,8 +35,16 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     stop(glue::glue("Please supply a bam file, not {file_name}"))
   }
 
-  myParam <- Rsamtools::ScanBamParam(what = c("flag","strand","rname","pos",
+  if(properPairsOnly){
+
+    myParam <- Rsamtools::ScanBamParam(what = c("qname","flag","strand","rname","pos",
                                               "mapq","cigar","isize"), tag = "MQ")
+  } else {
+
+    myParam <- Rsamtools::ScanBamParam(what = c("flag","strand","rname","pos",
+                                                "mapq","cigar","isize"), tag = "MQ")
+
+  }
 
   readBamData <- Rsamtools::scanBam(file = fileName, param = myParam)
 
@@ -74,6 +82,32 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     plyranges::as_granges()
 
   numPairsInit <- length(properPairsGRanges)
+
+  if(properPairsOnly){
+
+  shouldBeProperPairsGRanges <- readDF %>%
+    dplyr::filter(isProperPair == 0, isUnmappedQuery == 0, isSupplementaryAlignment == 0,
+           isSecondaryAlignment == 0, isDuplicate == 0, hasUnmappedMate == 0,
+           isNotPassingQualityControls == 0,
+           abs(isize) <= maxInsertSize, abs(isize) >= minInsertSize) %>%
+    dplyr::group_by(qname) %>% #this grouping is a expensive operation, so filter as much as possible beforehand.
+    dplyr::mutate(nStrands = length(unique(strand)),
+           nSign = length(sign(isize)),
+           inOut = sum(ifelse(strand == "+", 1, -1) * sign(isize))) %>%
+    dplyr::filter(inOut == 2, nSign == 2, nStrands == 2) %>% #filter to just reads that meet the proper pair criteria
+    dplyr::ungroup() %>%
+    dplyr::filter(strand == "+") %>% # keep only the part of the pair that is on the positive strand
+    dplyr::mutate(seqnames = rname, start = pos, end = pos + isize - 1) %>%
+    plyranges::as_granges() %>%
+    #plyranges::filter_by_non_overlaps(mesa::encodeBlacklist) %>%
+    dplyr::filter(MQ >= minMapQual | mapq >= minMapQual)
+
+    message(glue::glue("Rescued {length(shouldBeProperPairsGRanges)} paired reads that met all but the length criteria of being proper paired reads (but 70-1000bp)"))
+
+  properPairsGRanges <- properPairsGRanges %>%
+    plyranges::bind_ranges(shouldBeProperPairsGRanges)
+
+  }
 
   properPairsGRanges <- properPairsGRanges %>%
     dplyr::filter(MQ >= minMapQual | mapq >= minMapQual)  #keep proper pair fragments if either mapq passes the quality
