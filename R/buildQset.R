@@ -81,8 +81,6 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     dplyr::mutate(seqnames = rname, start = pos, end = pos + isize - 1) %>%
     plyranges::as_granges()
 
-  numPairsInit <- length(properPairsGRanges)
-
   if(properPairsOnly){
 
   shouldBeProperPairsGRanges <- readDF %>%
@@ -108,6 +106,8 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     plyranges::bind_ranges(shouldBeProperPairsGRanges)
 
   }
+
+  numPairsInit <- length(properPairsGRanges)
 
   properPairsGRanges <- properPairsGRanges %>%
     dplyr::filter(MQ >= minMapQual | mapq >= minMapQual)  #keep proper pair fragments if either mapq passes the quality

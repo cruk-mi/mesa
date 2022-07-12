@@ -89,7 +89,7 @@ addLibraryInformation <- function(qseaSet){
 subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
 
   if (length(samplesToKeep) == 0 & length(samplesToDrop) == 0 ) {
-    stop("No samples specified!")
+   message("No samples remaining, returning an empty qseaSet.")
   }
 
   if (length(samplesToKeep) > 0 & length(samplesToDrop) > 0 ) {

@@ -106,7 +106,7 @@ annotateData <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL,
 #' @param .swap Whether to change the printed messages as we are actually going to be keeping these windows rather than filtering them.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-removeExpressedWindows <- function(qseaSet, samplesToFilterOut, maxValue, normMethod, .swap = FALSE){
+removeWindowsOverCutoff <- function(qseaSet, samplesToFilterOut, maxValue, normMethod, .swap = FALSE){
 
   rowAny <- function(x) {rowSums(x) > 0}
 
@@ -141,8 +141,8 @@ removeExpressedWindows <- function(qseaSet, samplesToFilterOut, maxValue, normMe
     as.data.frame() %>%
     tibble::rowid_to_column(var = ".rowID") %>%
     dplyr::select(matches("_means")) %>%
-    rowSums() %>%
-    {which(. >= maxValue)}
+    apply(1,max) %>%
+    {which(. <= maxValue)}
 
   if(!.swap){
      message(glue::glue("Removing {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} remaining"))
@@ -162,11 +162,11 @@ removeExpressedWindows <- function(qseaSet, samplesToFilterOut, maxValue, normMe
 #' @param normMethod The type of normalisation method to use (nrpm, beta, count)
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-keepExpressedWindows <- function(qseaSet, samplesToFilterOn, minValue, normMethod){
+keepWindowsOverCutoff <- function(qseaSet, samplesToFilterOn, minValue, normMethod){
 
-  # find which regions would be removed by removeExpressedWindows and keep the opposite set!
+  # find which regions would be removed by removeWindowsOverCutoff and keep the opposite set!
   qseaSet %>%
-    removeExpressedWindows(samplesToFilterOut = samplesToFilterOn, maxValue = minValue, normMethod = normMethod, .swap = TRUE) %>%
+    removeWindowsOverCutoff(samplesToFilterOut = samplesToFilterOn, maxValue = minValue, normMethod = normMethod, .swap = TRUE) %>%
     qsea::getRegions() %>%
     filterByNonOverlaps(qseaSet, .) %>%
     return()
@@ -337,12 +337,11 @@ mixArrayWithQset <- function(qseaSet, arrayReadTable, arraySample, qseaSample, n
   windows2 <- sample(rep(1:nrow(counts), counts[,qseaSample]), replace = FALSE, size = nReads2 * onTargetFrac)
 
   newCounts <- c(windows1, windows2) %>%
-    table() %>%
-    tibble::enframe(name = "window") %>%
-    dplyr::mutate(window = as.integer(window)) %>%
+    enframe(name = NULL, value = "window") %>%
+    dplyr::count(window, name = "n") %>%
     dplyr::left_join(tibble::tibble(window = 1:nrow(counts)),., copy = TRUE, by = "window") %>%
-    dplyr::mutate(value = tidyr::replace_na(value,0)) %>%
-    dplyr::select(value)
+    dplyr::mutate(n = tidyr::replace_na(n,0)) %>%
+    dplyr::select(n)
 
   newSet <- qseaSetFiltered %>%
     subsetQset(samplesToKeep = qsea::getSampleNames(qseaSetFiltered)[1]) %>%

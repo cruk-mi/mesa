@@ -4,14 +4,9 @@
 #'
 addHyperStableFraction <- function(qseaSet){
 
-  if ("hyperStableFractionp8" %in% colnames(qsea::getSampleTable(qseaSet))) {
+  if ("hyperStableEdgar" %in% colnames(qsea::getSampleTable(qseaSet))) {
     qseaSet <- qseaSet %>%
-      selectQset(-tidyselect::matches("hyperStableFractionp8"))
-  }
-
-  if ("hyperStableFractionp9" %in% colnames(qsea::getSampleTable(qseaSet))) {
-    qseaSet <- qseaSet %>%
-      selectQset(-tidyselect::matches("hyperStableFractionp9"))
+      selectQset(-tidyselect::matches("^hyperStableEdgar$"))
   }
 
   hyperStableBetaTable <- qseaSet %>%
@@ -26,17 +21,10 @@ addHyperStableFraction <- function(qseaSet){
     {. >= 0.8} %>%
     apply(2,mean,na.rm = TRUE)
 
-  overp9Fraction <- hyperStableBetaTable %>%
-    replace(., is.na(.), 0) %>%
-    {. >= 0.9} %>%
-    apply(2,mean,na.rm = TRUE)
-
   newData <- tibble::tibble(sample_name = names(overp8Fraction),
-                            hyperStableFractionp8 = overp8Fraction,
-                            hyperStableFractionp9 = overp9Fraction) %>%
+                            hyperStableEdgar = overp8Fraction) %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_beta")) %>%
-    dplyr::mutate(hyperStableFractionp8 = tidyr::replace_na(round(hyperStableFractionp8, 3),0),
-                  hyperStableFractionp9 = tidyr::replace_na(round(hyperStableFractionp9, 3),0))
+    dplyr::mutate(hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3),0))
 
   qseaSet@sampleTable <- cbind(qseaSet@sampleTable, dplyr::select(newData,-sample_name))
 

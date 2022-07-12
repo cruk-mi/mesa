@@ -33,7 +33,7 @@ getBamCoveragePairedAndUnpairedR1(
 
 \item{minReferenceLength}{Minimum length on the reference coordinates for a non-paired read to be included}
 
-\item{properPairsOnly}{Whether to only keep proper pairs, else high quality R1s are kept.}
+\item{properPairsOnly}{Whether to only keep proper pairs, else high quality R1s are kept. Also rescues pairs that are almost proper pairs.}
 }
 \value{
 A table
