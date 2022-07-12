@@ -178,7 +178,7 @@
     <loc>/reference/is.qseaSet.html</loc>
   </url>
   <url>
-    <loc>/reference/keepExpressedWindows.html</loc>
+    <loc>/reference/keepWindowsOverCutoff.html</loc>
   </url>
   <url>
     <loc>/reference/leftJoinQset.html</loc>
@@ -268,10 +268,10 @@
     <loc>/reference/removeCNV.html</loc>
   </url>
   <url>
-    <loc>/reference/removeExpressedWindows.html</loc>
+    <loc>/reference/removeLibraryFactors.html</loc>
   </url>
   <url>
-    <loc>/reference/removeLibraryFactors.html</loc>
+    <loc>/reference/removeWindowsOverCutoff.html</loc>
   </url>
   <url>
     <loc>/reference/remove_almost_empty_cols.html</loc>
