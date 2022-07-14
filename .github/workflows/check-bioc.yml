@@ -43,6 +43,7 @@ env:
 
 jobs:
   r-build-and-check:
+    if: false
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
     container: ${{ matrix.config.cont }}
@@ -291,7 +292,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v2
         #if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && runner.os == 'Linux' "
         with:
           repository: crukmi/mesa
@@ -300,6 +301,7 @@ jobs:
           tags: latest
 
   docker-build-and-push:
+    if: false
     #needs: r-build-and-check
     runs-on: ubuntu-latest
     permissions:
