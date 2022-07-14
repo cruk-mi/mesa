@@ -294,7 +294,7 @@ jobs:
       - uses: docker/build-push-action@v3
         #if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && runner.os == 'Linux' "
         with:
-          repository: cruk-mi/mesa
+          repository: crukmi/mesa
           push: true
           tags: latest
 
