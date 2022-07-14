@@ -295,6 +295,7 @@ jobs:
         #if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && runner.os == 'Linux' "
         with:
           repository: crukmi/mesa
+          context: .
           push: true
           tags: latest
 
