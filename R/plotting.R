@@ -306,9 +306,9 @@ plotQseaPCA <- function(qseaSet,
                                                 shape = plotShape)) +
     ggplot2::geom_point() +
     ggplot2::xlab(glue::glue("PC{pc1} ({propVar[pc1]}%)")) +
-    ggplot2::ylab(glue::glue("PC{pc2} ({propVar[pc2]}%)")) +
-    ggplot2::ggtitle(glue::glue("{plotTitle}"),
-                     subtitle = glue::glue("{batchTitleString}PCA on {length(pca@factor_names)} windows, using {normMethod} values."))
+    ggplot2::ylab(glue::glue("PC{pc2} ({propVar[pc2]}%)")) #+
+    #ggplot2::ggtitle(glue::glue("{plotTitle}"),
+    #                 subtitle = glue::glue("{batchTitleString}PCA on {length(pca@factor_names)} windows, using {normMethod} values."))
 
   if (showNames) {
 
