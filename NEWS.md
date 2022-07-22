@@ -1,17 +1,13 @@
 # mesa 0.2.2
 
-# mesa 0.1.0
-
-NEW FEATURES
-
-* Added a `NEWS.md` file to track changes to the package.
-* Added github actions based on `biocthis()`.
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-* Your main changes to a function `foo()` or parameter `param`.
-
 BUG FIXES
 
-* Your bug fixes. See more details at
-<http://bioconductor.org/developers/package-guidelines/#news>.
+* Update mixQsetSamples to match the mixArrayWithQset code (and now runs with latest version of R).
+* Less stringent checking on the p values being zero bug in qsea, to minimise false positives.
+
+KNOWN ISSUES
+* `pull` is not working directly.
+
+# mesa 0.2.1
+
+Version set for initial release in v2.0.1 of the internal CBC Nextflow pipeline.
