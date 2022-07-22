@@ -118,7 +118,7 @@ selectQset <- function(qseaSet, ...){
 #' @param ... Other arguments to pass to dplyr::pull (column name to extract)
 #' @return A vector with the contents of the column of the sample table that was extracted.
 #' @export pull.qseaSet
-@export
+#' @export
 pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
   stop("This S3 method function is not currently working, please use pullQset directly instead.")
   pullQset(.data, var = var, name = name, ...)}
