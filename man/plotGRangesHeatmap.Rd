@@ -16,7 +16,7 @@ plotGRangesHeatmap(
   maxScale = 5,
   clusterNum = 2,
   description = "",
-  clip = 1000000000,
+  clip = 1e+09,
   minDensity = 0,
   clusterMethod = "ward.D2",
   ...

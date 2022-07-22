@@ -25,7 +25,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     nContrasts <- 0
   }
 
-  if (nContrasts > 0 & is.null(variable) ) {
+  if (nContrasts > 0 & is.null(variable) & is.data.frame(contrastsToDo)) {
 
     if ("variable" %in% colnames(contrastsToDo)) {
 
@@ -137,9 +137,16 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
     pb$tick()
     print("")
-    if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.05 & checkPVals) {
-      stop("Error! More than 5% of windows have p-values of exactly 0, possibly an error! \n
+    if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.1 & checkPVals) {
+
+      if(is.null(covariates)){
+        warning("Warning! More than 10% of windows have p-values of exactly 0, possibly something has gone wrong! \n
+           Set checkPVals = FALSE to ignore this if sure.")
+      } else {
+
+      stop("Error! More than 10% of windows have p-values of exactly 0, possibly an error! \n
            Try not including covariates in the model if included, or set checkPVals = FALSE to ignore this if sure.")
+      }
     }
   }
   print("Contrasts Complete")
@@ -319,20 +326,12 @@ calculateDMRs <- function(qseaSet, variable = NULL,
           "Calculating {nrow(contrastsToDo)} possible contrasts on the {variable} column."
         )
       )
-    }
-
-
-    if (contrastsToDo %in% c("First", "first")) {
+    } else if (contrastsToDo %in% c("First", "first")) {
         contrastsToDo <- makeAllContrasts(qseaSet, variable)[1, ]
         message(glue::glue(
           "Calculating the first possible contrast on the {variable} column."
         ))
-    }
-
-
-
-
-    if (stringr::str_detect(contrastsToDo,"All_vs_")){
+    } else if (stringr::str_detect(contrastsToDo,"All_vs_")){
 
         value2 = contrastsToDo %>% stringr::str_remove("All_vs_")
         contrastsToDo <- tibble::tibble(sample1 = qseaSet %>% pullQset(variable) %>% unique() %>% setdiff(value2),

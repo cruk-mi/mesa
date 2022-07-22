@@ -119,7 +119,7 @@ selectQset <- function(qseaSet, ...){
 #' @return A vector with the contents of the column of the sample table that was extracted.
 #' @export pull.qseaSet
 #' @export
-pull.qseaSet <- function(.data, var = -1, name = NULL, ...){pullQset(.data, ...)}
+pull.qseaSet <- function(.data, var = -1, name = NULL, ...){pullQset(.data, var = var, name = name)}
 
 
 #' This function takes a qseaSet and pulls a column from its sampleTable based on a call to dplyr::pull
