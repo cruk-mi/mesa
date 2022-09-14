@@ -21,12 +21,7 @@ filterQset <- function(qseaSet, ...){
     dplyr::filter(...) %>%
     dplyr::pull(sample_name)
 
-  if ("PooledControl" %in% qsea::getSampleNames(qseaSet)) {
-    namesToKeep <- union(namesToKeep, "PooledControl")
-  }
-
-  subsetQset(qseaSet, samplesToKeep = namesToKeep) %>%
-    return()
+  return(subsetQset(qseaSet, samplesToKeep = namesToKeep))
 }
 
 #' This function extends the dplyr function mutate to act on qseaSet sampleTable.

@@ -9,6 +9,7 @@ plotGeneHeatmap(
   gene,
   normMethod = "beta",
   annotationCol = NULL,
+  minDensity = 0,
   minEnrichment = 3,
   maxScale = 1,
   clusterNum = 2,
@@ -30,6 +31,8 @@ plotGeneHeatmap(
 
 \item{annotationCol}{A data frame with annotations for the samples.}
 
+\item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
+
 \item{minEnrichment}{Minimum enrichment factor for beta values, will give NAs below this.}
 
 \item{maxScale}{The maximum of the scale, not used when plotting beta values.}
@@ -47,6 +50,8 @@ plotGeneHeatmap(
 \item{mart}{A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.}
 
 \item{downstreamDist}{Number of basepairs downstream of the gene to include.}
+
+\item{...}{Additional arguments to pass to pheatmap.}
 }
 \value{
 A qseaSet object with the sampleTable enhanced with the information on number of reads etc

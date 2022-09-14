@@ -145,7 +145,7 @@ removeWindowsOverCutoff <- function(qseaSet, samplesToFilterOut, maxValue, normM
 
   groupNames <- qsea::getSampleGroups(qseaSet)[unlist(lapply(qsea::getSampleGroups(qseaSet), function(x) any(samplesToFilterOut %in% x)))]
 
-  dataTable <- suppressMessages(qsea::makeTable(qseaSet %>% dropPooledControl(), norm_methods = normMethod,
+  dataTable <- suppressMessages(qsea::makeTable(qseaSet, norm_methods = normMethod,
                                groupMeans = groupNames
     ))
 
@@ -221,7 +221,6 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
   message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
 
   countMat <- qseaSet %>%
-    dropPooledControl() %>%
     qsea::getCounts()
 
   if (is.null(numWindows)) {
@@ -537,7 +536,6 @@ getAnnotationDataFrameIndividual <- function(qseaSet, ...){
 
   qseaSet %>%
     qsea::getSampleTable() %>%
-    dplyr::filter(!stringr::str_detect(sample_name,"PooledControl")) %>%
     dplyr::distinct(sample_name,...) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("sample_name") %>%
@@ -558,7 +556,6 @@ getAnnotationDataFrame <- function(qseaSet, ...){
 
   qseaSet %>%
     qsea::getSampleTable() %>%
-    dplyr::filter(!stringr::str_detect(sample_name,"PooledControl")) %>%
     dplyr::group_by(group) %>%
     dplyr::mutate(total_fragments = mean(total_fragments),
            relH = mean(relH)) %>%
@@ -587,8 +584,6 @@ getPCAwithBatch <- function(qs, chr = qsea::getChrNames(qs), minRowSum = 20, min
                             normMethod = "beta",
                             topVar = 1000, samples = qsea::getSampleNames(qs),
                             batchVariable = NULL){
-
-  qs <- qs %>% dropPooledControl()
 
   if( is.null(samples)) { samples =  qsea::getSampleNames(qs)}
 
@@ -695,7 +690,6 @@ countWindowsOverCutoff <- function(qseaSet, GRanges, samples = NULL,
 makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
   qseaSet %>%
-    dropPooledControl() %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
     dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", ""))  %>%
     dplyr::select(-CpG_density) %>%
@@ -720,7 +714,6 @@ getCountTable <- function(qseaSet, groupMeans = FALSE){
   if(groupMeans){
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "counts") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_counts_means", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -730,7 +723,6 @@ getCountTable <- function(qseaSet, groupMeans = FALSE){
   } else {
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = "counts") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_counts", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -752,7 +744,6 @@ getNRPMTable <- function(qseaSet, groupMeans = FALSE){
   if(groupMeans){
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "nrpm") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm_means", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -762,7 +753,6 @@ getNRPMTable <- function(qseaSet, groupMeans = FALSE){
   } else {
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = "nrpm") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -783,7 +773,6 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
   if(groupMeans){
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "beta") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_beta_means", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -793,7 +782,6 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
   } else {
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = "beta") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_beta", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -934,7 +922,6 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE){
   if(groupMeans){
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod) %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -944,7 +931,6 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE){
   } else {
 
     qseaSet %>%
-      dropPooledControl() %>%
       qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
@@ -968,17 +954,14 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", groupMeans = 
   dir.create(folderName, showWarnings = FALSE)
 
   dataTable <- qseaSet %>%
-    dropPooledControl() %>%
     getDataTable(normMethod = normMethod, groupMeans = groupMeans)
 
   if(!groupMeans) {
     mapNames <- qseaSet %>%
-      dropPooledControl() %>%
       qsea::getSampleNames()
 
   } else {
     mapNames <- qseaSet %>%
-      dropPooledControl() %>%
       qsea::getSampleGroups()
 
   }

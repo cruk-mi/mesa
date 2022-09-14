@@ -37,22 +37,6 @@ qseaTableToChrGRanges <- function(dataTable) {
   return(outGRanges)
 }
 
-#' This function drops the PooledControl sample from the qseaSet, if it is present.
-#' @param qseaSet A qseaSet object to drop the PooledControl sample from
-#' @export
-#'
-dropPooledControl <- function(qseaSet) {
-
-  if ("PooledControl" %in% qsea::getSampleNames(qseaSet)) {
-    qseaSet %>%
-      subsetQset(samplesToDrop = "PooledControl") %>%
-      return()
-  } else {
-    return(qseaSet)
-  }
-
-}
-
 #' This function returns the window names from a data frame with DMR windows
 #' @param dataTable A data frame to return the window names from
 #' @export

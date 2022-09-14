@@ -63,7 +63,6 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
     qsea::makeTable(., groupMeans = qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
     dplyr::filter(CpG_density >= minDensity) %>%
     dplyr::select(tidyselect::matches(normMethod)) %>%
-    dplyr::select(-tidyselect::matches("PooledControl")) %>%
     dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
     clipFn(a = 0, b = clip) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) %>%
@@ -287,8 +286,6 @@ plotQseaPCA <- function(qseaSet,
                         returnDataOnly = FALSE
 ){
 
-  qseaSet <- dropPooledControl(qseaSet)
-
   if (!is.null(signatureGR)) {
     qseaSet <- filterByOverlaps(qseaSet, signatureGR)
   }
@@ -406,7 +403,6 @@ plotCorrelationMatrix <- function(qseaSet, ..., normMethod = "nrpm", annotationC
   annotationCol = getAnnotationDataFrameIndividual(qseaSet, ...)
 
   qseaSet %>%
-    dropPooledControl() %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
     dplyr::select(tidyselect::matches(normMethod)) %>%
     dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm")) %>%

@@ -264,9 +264,8 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 #' @export
 #'
 makeAllContrasts <- function(qseaSet, variable){
-  #TODO remove the message about new names by intercepting the
+  #TODO remove the message about new names by intercepting it
   contrastsToDo <- qseaSet %>%
-    dropPooledControl() %>%
     qsea::getSampleTable() %>%
     tidyr::drop_na(variable) %>%
     dplyr::pull(variable) %>%

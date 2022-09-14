@@ -251,7 +251,6 @@ plotCNVheatmap <- function(qseaSet,
   CNVmatrix <- qseaSet %>%
     qsea::getCNV() %>%
     tibble::as_tibble() %>%
-    dplyr::select(-tidyselect::matches("PooledControl")) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%

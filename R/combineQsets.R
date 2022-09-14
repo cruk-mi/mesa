@@ -83,13 +83,11 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
 
   commonNames <- intersect(sampleNames1,sampleNames2)
 
-  commonNamesNoControl <- setdiff(commonNames,"PooledControl")
-
-  if (length(commonNamesNoControl) > 0 & !dropDuplicates) {
+  if (length(commonNames) > 0 & !dropDuplicates) {
     message(glue::glue("Samples exist with the same name, adding _Dup to their name"))
-    message(glue::glue("{commonNamesNoControl} "))
+    message(glue::glue("{commonNames} "))
 
-    for (i in commonNamesNoControl) {
+    for (i in commonNames) {
       qseaSet2 <- renameQsetNames(qseaSet2, paste0("^",i,"$"), paste0(i,"_Dup"))
       sampleNames2 <- qsea::getSampleNames(qseaSet2)
       commonNames <- intersect(sampleNames1,sampleNames2)
@@ -122,10 +120,6 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     qseaSet2 <-
       subsetQset(qseaSet2, samplesToDrop = commonNames)
   }
-
-  # if (length(setdiff(commonNames,commonNamesNoControl)) > 0 ) {
-  #   qseaSet2 <- subsetQset(qseaSet2,samplesToDrop = c("PooledControl"))
-  # }
 
   slots1 <- methods::slotNames(qseaSet1)
   slots2 <- methods::slotNames(qseaSet2)

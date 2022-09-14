@@ -9,7 +9,7 @@ filterByOverlaps(qseaSet, windowsToKeep)
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{windowsToKeep}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end, or a numeric vector.}
+\item{windowsToKeep}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
 }
 \value{
 A qseaSet object, with only a subset of the windows.
