@@ -3,24 +3,32 @@
 #' This function takes a qseaSet and keeps only a set of regions from it. Either specified as a GRanges object or an index vector of which regions.
 #'
 #' @param qseaSet The qseaSet object.
-#' @param windowsToKeep A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end, or a numeric vector.
+#' @param windowsToKeep A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
 filterByOverlaps <- function(qseaSet, windowsToKeep){
 
-  if (intersect(class(windowsToKeep),c("integer", "numeric")) %>% length() > 0) {
-    qseaSet@regions <- qseaSet@regions[windowsToKeep]
-    qseaSet@count_matrix <- qseaSet@count_matrix[windowsToKeep, ,drop = FALSE]
-  } else if ("GRanges" %in% class(windowsToKeep)) {
-    qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,windowsToKeep) > 0), , drop = FALSE]
-    qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(windowsToKeep)
-  } else if ("seqnames" %in% colnames(windowsToKeep)) {
-    windowsToKeep <- plyranges::as_granges(windowsToKeep)
-    qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,windowsToKeep) > 0), ,drop = FALSE]
-    qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(windowsToKeep)
-  }else {
-    stop("windowsToKeep not numeric or a GRanges object.")
+  if(is.data.frame(windowsToKeep) & ("seqnames" %in% colnames(windowsToKeep)) &
+     ("start" %in% colnames(windowsToKeep)) & ("end" %in% colnames(windowsToKeep))){
+    stop("windowsToKeep must be a GRanges object or a dataframe with seqnames, start and end.")
   }
+
+  windowsToKeep <- plyranges::as_granges(windowsToKeep)
+
+  qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- windowsToKeep %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+
+  if(qseaSetChr & !windowsChr){
+    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+  }
+
+  if(!qseaSetChr & windowsChr){
+    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
+  }
+
+  qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,windowsToKeep) > 0), , drop = FALSE]
+  qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(windowsToKeep)
+
   return(qseaSet)
 }
 
@@ -33,6 +41,24 @@ filterByOverlaps <- function(qseaSet, windowsToKeep){
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
 filterByNonOverlaps <- function(qseaSet, windowsToKeep){
+
+  if(is.data.frame(windowsToKeep) & ("seqnames" %in% colnames(windowsToKeep)) &
+     ("start" %in% colnames(windowsToKeep)) & ("end" %in% colnames(windowsToKeep))){
+    stop("windowsToKeep must be a GRanges object or a dataframe with seqnames, start and end.")
+  }
+
+  windowsToKeep <- plyranges::as_granges(windowsToKeep)
+
+  qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- windowsToKeep %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+
+  if(qseaSetChr & !windowsChr){
+    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+  }
+
+  if(!qseaSetChr & windowsChr){
+    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
+  }
 
   GRangesToKeep <- qsea::getRegions(qseaSet) %>%
     plyranges::filter_by_non_overlaps(plyranges::as_granges(windowsToKeep))

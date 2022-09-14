@@ -102,6 +102,7 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 #' @param annotationCol A data frame with annotations for the samples.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
 #' @param clusterCols Whether to cluster the columns or not.
+#' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
 #' @param upstreamDist Number of basepairs upstream of the gene to include.
 #' @param downstreamDist Number of basepairs downstream of the gene to include.
@@ -109,11 +110,12 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 #' @param scaleRows Whether to scale the rows of the heatmap
 #' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
 #' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
+#' @param ... Additional arguments to pass to pheatmap.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
-                             annotationCol = NULL,
+                             annotationCol = NULL, minDensity = 0,
                              minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
                              upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
                              downstreamDist = 1000, ...){
@@ -144,10 +146,18 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                                  attributes = c('hgnc_symbol', 'description', 'chromosome_name',
                                                 'start_position', 'end_position', 'strand','ensembl_gene_id'),
                                  filters = idType,
-                                 values = gene)
+                                 values = gene) %>%
+    dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
+
+  qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- gene_details %>% pull(seqnames) %>% stringr::str_detect("chr") %>% any()
+
+  if(qseaSetChr & !windowsChr){
+    gene_details <- gene_details %>%
+      dplyr::mutate(seqnames = paste0("chr", seqnames))
+  }
 
   gene_details_gr <- gene_details %>%
-    dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position) %>%
     plyranges::as_granges()
 
   if(nrow(gene_details) != 1){
@@ -155,7 +165,6 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   }
 
   geneGR <- gene_details %>%
-    dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position) %>%
     plyranges::as_granges() %>%
     plyranges::anchor_start() %>%
     plyranges::stretch(upstreamDist) %>%
@@ -171,6 +180,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     filterByOverlaps(windowsToKeep = geneGR) %>%
     qsea::makeTable(., groupMeans = qsea::getSampleGroups(.),
                     norm_methods = normMethod, minEnrichment = minEnrichment) %>%
+    dplyr::filter(CpG_density >= minDensity) %>%
     dplyr::mutate(window = paste0(chr, ":", window_start, "-", window_end))
 
   geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
@@ -179,19 +189,19 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
     dplyr::select(seqnames, start, end, CpG_density, window) %>%
     plyranges::as_granges() %>%
-    plyranges::mutate(annotation = dplyr::case_when(plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "+" ~ "Start",
-                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "-" ~ "End",
-                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "+" ~ "End",
-                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "-" ~ "Start",
-                                  plyranges::count_overlaps(., gene_details_gr) > 0 ~ "GeneBody",
-                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_upstream(upstreamDist)) > 0 ~ "Upstream",
-                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_downstream(downstreamDist)) > 0 ~ "Downstream"
-    )
+    plyranges::mutate(annotation = dplyr::case_when(
+      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "+" ~ "Start",
+      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "-" ~ "End",
+      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "+" ~ "End",
+      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "-" ~ "Start",
+      plyranges::count_overlaps(., gene_details_gr) > 0 ~ "GeneBody",
+      plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_upstream(upstreamDist)) > 0 ~ "Upstream",
+      plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_downstream(downstreamDist)) > 0 ~ "Downstream"
+      )
     ) %>%
     as.data.frame() %>%
     dplyr::select(window, CpG_density, annotation) %>%
     tibble::column_to_rownames("window")
-
 
   if (scaleRows) {
     scaleRows <- "row"
@@ -234,7 +244,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                        treeheight_row = 0,
                        clustering_method = "ward.D2",
                        cutree_cols = clusterNum,
-                       main = glue::glue("{str_to_title(normMethod)} values for {gene}.")
+                       main = glue::glue("{str_to_title(normMethod)} values for {gene}."),
+                       ...
     )
 
   return(invisible(dat))
