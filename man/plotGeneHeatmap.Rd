@@ -12,17 +12,19 @@ plotGeneHeatmap(
   minEnrichment = 3,
   maxScale = 1,
   clusterNum = 2,
-  annotationColors = NA,
+  annotationColors = NULL,
   upstreamDist = 3000,
   scaleRows = FALSE,
   clusterCols = TRUE,
-  downstreamDist = 1000
+  mart = NULL,
+  downstreamDist = 1000,
+  ...
 )
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{gene}{A gene to plot. Currently as a gene id only, in a dubious way.}
+\item{gene}{A gene to plot. Either a gene symbol or an ensembl ID.}
 
 \item{normMethod}{Whether to plot nrpm values or beta values.}
 
@@ -41,6 +43,8 @@ plotGeneHeatmap(
 \item{scaleRows}{Whether to scale the rows of the heatmap}
 
 \item{clusterCols}{Whether to cluster the columns or not.}
+
+\item{mart}{A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.}
 
 \item{downstreamDist}{Number of basepairs downstream of the gene to include.}
 }

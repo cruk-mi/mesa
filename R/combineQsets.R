@@ -55,7 +55,7 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     }
   }
 
-  if (!class(qseaSet1) == "qseaSet") {
+  if (!is.qseaSet(qseaSet1)) {
     stop("Please supply a qseaSet object in the first position.")
   }
 
@@ -63,14 +63,14 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     qseaSet1 <- qseaSet1 %>% filterByOverlaps(regionsToKeep)
   }
 
-  if (class(qseaSet2) == "character") {
+  if (is.qseaSet(qseaSet2)) {
     if(length(qseaSet2) == 1 & tools::file_ext(qseaSet2) == "rds") {#has to be after first if, else errors if it is a qseaSet
       message(glue::glue("Character string given, loading {qseaSet2}"))
       qseaSet2 <- readr::read_rds(qseaSet2)
     }
   }
 
-  if (!class(qseaSet2) == "qseaSet") {
+  if (!is.qseaSet(qseaSet2)) {
     stop("Please supply a qseaSet object in the second position.")
   }
 

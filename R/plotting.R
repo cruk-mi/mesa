@@ -66,7 +66,7 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
     dplyr::select(-tidyselect::matches("PooledControl")) %>%
     dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
     clipFn(a = 0, b = clip) %>%
-    dplyr::mutate_all( ~ case_when(!is.nan(.x) ~ .x)) %>%
+    dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%
     janitor::remove_empty(which = "rows", quiet = FALSE)
 
@@ -97,7 +97,7 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 
 #' This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
 #' @param qseaSet The qseaSet object.
-#' @param gene A gene to plot. Currently as a gene id only, in a dubious way.
+#' @param gene A gene to plot. Either a gene symbol or an ensembl ID.
 #' @param normMethod Whether to plot nrpm values or beta values.
 #' @param annotationCol A data frame with annotations for the samples.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
@@ -108,43 +108,55 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
 #' @param scaleRows Whether to scale the rows of the heatmap
 #' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
+#' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 
-plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta", annotationCol = NULL,
-                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NA,
-                            upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE,
-                            downstreamDist = 1000){
+plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
+                             annotationCol = NULL,
+                             minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
+                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
+                             downstreamDist = 1000, ...){
 
-  if (is.null(annotationCol) & ("type" %in% (qseaSet %>% qsea::getSampleTable() %>% colnames()))) {
-    annotationCol <- getAnnotationDataFrame(qseaSet, type)
+  if (!is.null(annotationCol) & !is.data.frame(annotationCol) & all(is.character(annotationCol))) {
+    annotationCol <- getAnnotationDataFrame(qseaSet, !!!rlang::syms(annotationCol))
+  } else if (is.null(annotationCol) ){
+    annotationCol <- NA
   }
 
-  # if (typeof(annotationCol) == "character") {
-  #   annotationCol <- getAnnotationDataFrame(qseaSet, annotationCol)
-  # }
+  if(!is.null(getMart(qseaSet))){ mart <- getMart(qseaSet) }
 
-
-  if (!is.list(annotationColors)) {
-
-    namesVec <- names(annotationColors)
-    names(namesVec) <- namesVec
-
-    purrr::map(namesVec, function(x){
-      usedValues <- qseaSet %>%
-        qsea::getSampleTable() %>%
-        dplyr::pull(x) %>%
-        unique()
-      return(x = annotationColors[[x]][usedValues])
-    }
-    )
-
+  if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg38|GRCh38")){
+    mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl')
+  } else if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg19|GRCh37")) {
+    mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl', host = "https://feb2014.archive.ensembl.org")
+  } else if(is.null(mart)){
+    stop("Please specify a mart object for biomaRt.")
   }
 
+  if(stringr::str_detect(gene,"^ENSG0")){
+    idType <- "ensembl_gene_id"
+  } else{
+    idType <- "hgnc_symbol"
+  }
 
+  gene_details <- biomaRt::getBM(mart = mart,
+                                 attributes = c('hgnc_symbol', 'description', 'chromosome_name',
+                                                'start_position', 'end_position', 'strand','ensembl_gene_id'),
+                                 filters = idType,
+                                 values = gene)
 
-  geneGR <- mesa::GRCh38.99.gtf %>%
-    dplyr::filter(type == "gene", gene_name == gene) %>%
+  gene_details_gr <- gene_details %>%
+    dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position) %>%
+    plyranges::as_granges()
+
+  if(nrow(gene_details) != 1){
+    stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart}."))
+  }
+
+  geneGR <- gene_details %>%
+    dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position) %>%
+    plyranges::as_granges() %>%
     plyranges::anchor_start() %>%
     plyranges::stretch(upstreamDist) %>%
     plyranges::anchor_end() %>%
@@ -155,50 +167,31 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta", annotationCol = 
 
   if (normMethod == "beta") {maxScale = 1}
 
-  # fivePrimes <- GRCh38.99.gtf %>%
-  #   filter(gene_name == gene, type == "five_prime_utr",  tag == "basic")
-  #
-  # threePrimes <- GRCh38.99.gtf %>%
-  #   filter(gene_name == gene, type == "three_prime_utr",  tag == "basic")
-  #
-  # exons <- GRCh38.99.gtf %>%
-  #   filter(gene_name == gene, type == "exon",  tag == "basic")
-  #
-  # genebody <- GRCh38.99.gtf %>%
-  #   filter(gene_name == gene, type == "gene",  tag == "basic")
-  #
-  # annotatedData2 <- qseaSet %>%
-  #   filterByOverlaps(windowsToKeep = geneGR) %>%
-  #   qsea::makeTable(., groupMeans = qsea::getSampleGroups(.),
-  #                   norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-  #   mutate(seqnames = chr, start = window_start, end = window_end) %>%
-  #   plyranges::as_granges() %>%
-  #   plyranges::mutate(fivePrime = plyranges::count_overlaps(.,fivePrimes),
-  #                     threePrime = plyranges::count_overlaps(.,threePrimes),
-  #                     exon = plyranges::count_overlaps(.,exons),
-  #                     genebody = plyranges::count_overlaps(.,genebody)) %>%
-  #   as_tibble() %>%
-  #   dplyr::mutate(position = if_else(genebody > 0 , "intron", ""),
-  #          position = if_else(exon > 0, "exon", position),
-  #          position = if_else(threePrime > 0, "3'UTR", position),
-  #          position = if_else(fivePrime > 0, "5'UTR", position)
-  #         )
-
-  annotatedData <- qseaSet %>%
+  dataTable <- qseaSet %>%
     filterByOverlaps(windowsToKeep = geneGR) %>%
     qsea::makeTable(., groupMeans = qsea::getSampleGroups(.),
                     norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-    annotateData() %>%
     dplyr::mutate(window = paste0(chr, ":", window_start, "-", window_end))
 
-  annoRow <- annotatedData %>%
-    #dplyr::select(window, CpG_density) %>%
+  geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
+
+  annoRow <- dataTable %>%
+    dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+    dplyr::select(seqnames, start, end, CpG_density, window) %>%
+    plyranges::as_granges() %>%
+    plyranges::mutate(annotation = dplyr::case_when(plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "+" ~ "Start",
+                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "-" ~ "End",
+                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "+" ~ "End",
+                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "-" ~ "Start",
+                                  plyranges::count_overlaps(., gene_details_gr) > 0 ~ "GeneBody",
+                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_upstream(upstreamDist)) > 0 ~ "Upstream",
+                                  plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_downstream(downstreamDist)) > 0 ~ "Downstream"
+    )
+    ) %>%
+    as.data.frame() %>%
     dplyr::select(window, CpG_density, annotation) %>%
-    dplyr::mutate(annotation = stringr::str_replace(annotation, "Exon .*", "Exon")) %>%
-    dplyr::mutate(annotation = stringr::str_replace(annotation, "Intron .*", "Intron")) %>%
-    tibble::remove_rownames() %>%
-    tibble::column_to_rownames("window") %>%
-    as.data.frame()
+    tibble::column_to_rownames("window")
+
 
   if (scaleRows) {
     scaleRows <- "row"
@@ -210,13 +203,25 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta", annotationCol = 
     breaks <- seq(0, maxScale, length.out = 10)
   }
 
-  annotatedData %>%
+  dat <- dataTable %>%
     dplyr::select(window, dplyr::matches(normMethod)) %>%
-    dplyr::select(-dplyr::matches("PooledControl")) %>%
     dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
-    janitor::remove_empty(which = "cols", quiet = FALSE) %>%
+    janitor::remove_empty(which = "cols", quiet = FALSE)
+
+  # remove_almost_empty_cols <- function(dat)  {
+  #   mask_keep <- colSums(is.na(dat)) != (nrow(dat) - 1)
+  #   janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
+  #   return(dat[, mask_keep, drop = FALSE])
+  # }
+  #
+  # if(clusterCols) {
+  #   dat <- remove_almost_empty_cols(dat)
+  # }
+  #
+
+  dat %>%
     pheatmap::pheatmap(annotation_col = annotationCol,
                        annotation_row = annoRow,
                        annotation_colors = annotationColors,
@@ -229,7 +234,10 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta", annotationCol = 
                        treeheight_row = 0,
                        clustering_method = "ward.D2",
                        cutree_cols = clusterNum,
-                       main = glue::glue("Heatmap of {normMethod} values for {gene}."))
+                       main = glue::glue("{str_to_title(normMethod)} values for {gene}.")
+    )
+
+  return(invisible(dat))
 
 }
 

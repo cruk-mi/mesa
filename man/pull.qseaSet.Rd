@@ -7,7 +7,7 @@
 \method{pull}{qseaSet}(.data, var = -1, name = NULL, ...)
 }
 \arguments{
-\item{.data}{A qseaSet to pull a column from the sampleTable of.s}
+\item{.data}{A qseaSet to pull a column from the sampleTable of.}
 
 \item{var}{A variable specified as a column name or an integer (negative counting from right)}
 

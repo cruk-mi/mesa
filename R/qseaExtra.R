@@ -15,6 +15,18 @@ is.qseaSet <- function(x){
   return(inherits(x,"qseaSet"))
   }
 
+
+setGeneric('setMart', function(object,...) standardGeneric('setMart'))
+setMethod('setMart', 'qseaSet', function(object, martName){
+  object@parameters$mart = martName
+  object
+})
+
+setGeneric('getMart', function(object,...) standardGeneric('getMart'))
+setMethod('getMart', 'qseaSet', function(object)
+  object@parameters$mart
+)
+
 #' Add annotation onto a data table
 #'
 #' This function extracts the information from one contrast into a wide table
@@ -140,7 +152,7 @@ removeWindowsOverCutoff <- function(qseaSet, samplesToFilterOut, maxValue, normM
   keep <- dataTable %>%
     as.data.frame() %>%
     tibble::rowid_to_column(var = ".rowID") %>%
-    dplyr::select(matches("_means")) %>%
+    dplyr::select(tidyselect::matches("_means")) %>%
     apply(1,max) %>%
     {which(. <= maxValue)}
 
@@ -292,7 +304,6 @@ mixArrayWithQset <- function(qseaSet, arrayReadTable, arraySample, qseaSample, n
   qseaSetFiltered <- qseaSet %>%
     filterByOverlaps(arrayReadTable %>% tidyr::drop_na())
 
-
   message(newName)
 
   if(is.null(groupName)) { groupName <- newName }
@@ -337,7 +348,7 @@ mixArrayWithQset <- function(qseaSet, arrayReadTable, arraySample, qseaSample, n
   windows2 <- sample(rep(1:nrow(counts), counts[,qseaSample]), replace = FALSE, size = nReads2 * onTargetFrac)
 
   newCounts <- c(windows1, windows2) %>%
-    enframe(name = NULL, value = "window") %>%
+    tibble::enframe(name = NULL, value = "window") %>%
     dplyr::count(window, name = "n") %>%
     dplyr::left_join(tibble::tibble(window = 1:nrow(counts)),., copy = TRUE, by = "window") %>%
     dplyr::mutate(n = tidyr::replace_na(n,0)) %>%

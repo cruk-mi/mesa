@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -57,8 +57,8 @@ Imports:
     tools,
     ComplexHeatmap,
     readr,
-    qsea,
-    memoise
+    memoise,
+    biomaRt
 Depends:
     qsea,
     R (>= 4.1.0),
