@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
       </span>
     </div>
 
@@ -41,6 +41,9 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -55,7 +58,25 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-Analysis tools for methylation enrichment sequencing data (MBD-seq or MEDIP-seq), building off the qsea package.
+<div class="section level1">
+<div class="page-header"><h1 id="mesa">mesa<a class="anchor" aria-label="anchor" href="#mesa"></a>
+</h1></div>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>mesa is an R package for Methylation Enrichment Sequencing Analysis, to investigate sequencing data that has been enriched for regions of CG methylation. This includes both MEDIP-Seq (Methylated DNA immunoprecipitation sequencing) or MBD-seq (methyl-CpG binding domain protein enriched sequencing).</p>
+<p>This package builds off the qsea package (<a href="https://github.com/MatthiasLienhard/qsea" class="external-link uri">https://github.com/MatthiasLienhard/qsea</a>), using the qseaSet as the object that holds the data. One of the most useful features of the package is in defining tidyverse verbs for the</p>
+<p>The package is under active development with plans to submit to BioConductor. There isn’t currently a vignette, although that is high on the to-do list. If you are interested in using the package, we’re happy to hear from you.</p>
+<p>A previous version was used in a Nature Cancer paper, cfDNA methylome profiling for detection and subtyping of small cell lung cancers (<a href="https://www.nature.com/articles/s43018-022-00415-9" class="external-link uri">https://www.nature.com/articles/s43018-022-00415-9</a>).</p>
+</div>
+<div class="section level2">
+<h2 id="install-the-package">Install the package<a class="anchor" aria-label="anchor" href="#install-the-package"></a>
+</h2>
+<p>The easiest way to install the package is with devtools:</p>
+<pre class="{r}"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"cruk-mi/mesa"</span><span class="op">)</span></span></code></pre>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -101,7 +122,7 @@ Analysis tools for methylation enrichment sequencing data (MBD-seq or MEDIP-seq)
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
