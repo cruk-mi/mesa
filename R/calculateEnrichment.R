@@ -249,13 +249,21 @@ addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NU
 
   pulldownFileNames <- qsea::getSampleTable(qseaSet) %>% dplyr::pull(file_name)
 
-  enrichDataMeCap <- parallel::mclapply(pulldownFileNames,
-                                        function(x){
-                                          calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
-                                                                 extend = extend, shift = shift, uniq = uniq,
-                                                                 chr.select = chr.select, paired = paired)
-                                        }, mc.cores = nCores) %>%
-    do.call(rbind, . )
+  #enrichDataMeCap <- parallel::mclapply(pulldownFileNames,
+  #                                      function(x){
+  #                                        calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
+  #                                                               extend = extend, shift = shift, uniq = uniq,
+  #                                                               chr.select = chr.select, paired = paired)
+  #                                     }, mc.cores = nCores) %>%
+  #  do.call(rbind, . )
+
+    enrichDataMeCap <- lapply(pulldownFileNames,
+                                         function(x){
+                                           calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
+                                                                  extend = extend, shift = shift, uniq = uniq,
+                                                                  chr.select = chr.select, paired = paired)
+                                         }) %>% do.call(rbind, . )
+   
 
   # inputFileNames <- getSampleTable(qseaSet) %>% pull(input_file)
   # enrichDataInput <- parallel::mclapply(inputFileNames ,
@@ -266,7 +274,16 @@ addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NU
   #                                    }, mc.cores = nCores) %>%
   #   do.call(rbind, . )
 
-  qseaSet@sampleTable <- qsea::getSampleTable(qseaSet) %>%
+  # enrichDataInput <- parallel::lapply(inputFileNames ,
+  #                                  function(x){
+  #                   calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
+  #                                      extend = extend, shift = shift, uniq = uniq,
+  #                                      chr.select = chr.select, paired = paired)
+  #                                    }, mc.cores = nCores) %>%
+  #   do.call(rbind, . )
+
+
+  qseaSet@sampleTable <- as.data.frame(qsea::getSampleTable(qseaSet)) %>%
     dplyr::bind_cols(dplyr::select(enrichDataMeCap,-file))
 
   return(qseaSet)
