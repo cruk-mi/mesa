@@ -43,7 +43,6 @@ env:
 
 jobs:
   r-build-and-check:
-    if: false
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
     container: ${{ matrix.config.cont }}
