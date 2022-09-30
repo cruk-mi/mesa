@@ -12,17 +12,6 @@ test_that("Filtering Qset works", {
                  length(), 8)
   })
 
-test_that("Dropping Pooled Control works", {
-
-  randomSet <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000) %>%
-    renameQsetNames("Sim3N", "PooledControl")
-
-  expect_true("PooledControl" %in% qsea::getSampleNames(randomSet))
-
-  expect_false("PooledControl" %in% qsea::getSampleNames(dropPooledControl(randomSet)))
-
-})
-
 test_that("Reducing Qset Windows", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
@@ -132,7 +121,5 @@ test_that("is.qseaSet", {
   expect_false(is.qseaSet("string"))
   expect_false(is.qseaSet(2))
   expect_false(is.qseaSet(1:10))
-
-
 
 })

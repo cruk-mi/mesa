@@ -32,6 +32,49 @@ test_that("Making a hg19 qseaSet", {
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
+  expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
+
+})
+
+test_that("Making a hg19 qseaSet with qsea coverage method", {
+
+  if(!rlang::is_installed("MEDIPSData")){
+    skip("MEDIPSData Not installed")
+  }
+
+  sampleTable <- data.frame(sample_name = c("Test1","Test2"),
+                            group = c("Test1","Test2"),
+                            file_name = c(system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+                                          system.file("extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)),
+                            input_file = c(system.file("extdata", "NSCLC_MeDIP_3N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+                                           system.file("extdata", "NSCLC_MeDIP_3T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE))
+                            )
+
+  testSet <- makeQset(sampleTable,
+                      BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+                      chrSelect = paste0("chr",22),
+                      windowSize = 300,
+                      CNVwindowSize = 1000000,
+                      fragmentType = "Sheared",
+                      CNVmethod = "None",
+                      coverageMethod = "qseaPaired",
+                      minMapQual = 10,
+                      minInsertSize = 70,
+                      maxInsertSize = 1000,
+                      minReferenceLength = 30,
+                      badRegions = NULL,
+                      properPairsOnly = FALSE)
+
+  expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
+  expect_equal(testSet %>% qsea::getChrNames() %>% length(), 3)
+  expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
+  expect_equal(testSet %>% qsea::getCounts() %>% colSums() %>% unname(), testSet %>% qsea::getLibSize())
+  expect_equal(testSet %>% qsea::getRegions() %>% length(), 541532)
+
+  expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
+
+  expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
+
 })
 
 test_that("Making a GRCh38 qseaSet", {
@@ -103,5 +146,16 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
   expect_equal(GRCh38testSet %>% getRegions() %>% length(), 809861) #number of windows
 
   expect_true("relH" %in% (GRCh38testSet %>% addLibraryInformation() %>% getSampleTable() %>% colnames()))
+
+})
+
+test_that("CalculateCpGEnrichment works", {
+
+calculateCpGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+                       BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+                       exportPath = NULL,
+                       extend = 0, shift = 0, uniq = 0,
+                       chr.select = "chr22", paired = TRUE)
+
 
 })

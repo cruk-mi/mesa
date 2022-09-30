@@ -90,7 +90,7 @@ test_that("Analysing DMRs", {
 })
 
 test_that("Multiple DMRs", {
-  DMRs <- examplePairedTumourQset %>%
+  expect_no_error(DMRs <- examplePairedTumourQset %>%
     calculateDMRs(variable = "type",
-                  contrastsToDo = "all")
+                  contrastsToDo = "all"))
 })
