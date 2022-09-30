@@ -63,7 +63,7 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     qseaSet1 <- qseaSet1 %>% filterByOverlaps(regionsToKeep)
   }
 
-  if (is.qseaSet(qseaSet2)) {
+  if (!is.qseaSet(qseaSet2)) {
     if(length(qseaSet2) == 1 & tools::file_ext(qseaSet2) == "rds") {#has to be after first if, else errors if it is a qseaSet
       message(glue::glue("Character string given, loading {qseaSet2}"))
       qseaSet2 <- readr::read_rds(qseaSet2)
@@ -106,17 +106,15 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     return(qseaSet2)
   }
 
-
-
-
   if (length(commonNames) > 0) {
-    if (length(commonNamesNoControl) > 0 & dropDuplicates) {
+    if (dropDuplicates) {
       message(
         glue::glue(
-          "Dropping {length(commonNamesNoControl)} common names (use dropDuplicates=FALSE to stop this)"
+          "Dropping {length(commonNames)} common names (use dropDuplicates=FALSE to stop this)"
         )
       )
     }
+
     qseaSet2 <-
       subsetQset(qseaSet2, samplesToDrop = commonNames)
   }
@@ -129,7 +127,6 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
 
   parameters1 <- tibble::as_tibble(qseaSet1@parameters) %>% dplyr::select(order(colnames(.)))
   parameters2 <- tibble::as_tibble(qseaSet2@parameters) %>% dplyr::select(order(colnames(.)))
-
 
   if (!all(identical(GenomeInfoDb::seqnames(qseaSet1@regions),
                      GenomeInfoDb::seqnames(qseaSet2@regions)),

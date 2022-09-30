@@ -221,7 +221,6 @@ calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, c
 
 #' This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.
 #' @param qseaSet The cutoff to use on the windows for each sample
-#' @param BSgenome Name of BSgenome package
 #' @param exportPath Folder to export files
 #' @param extend,shift,uniq,chr.select,paired Options to feed into medips::getGRange or medips::getPairedGRange
 #' @param file_name Column of the sampleTable which contains the file_name.

@@ -156,12 +156,16 @@ removeWindowsOverCutoff <- function(qseaSet, samplesToFilterOut, maxValue, normM
     apply(1,max) %>%
     {which(. <= maxValue)}
 
+  regionsToKeep <- dataTable[keep,, drop = FALSE] %>%
+    dplyr::select(seqnames = chr, start = window_start, end = window_end) %>%
+    plyranges::as_granges()
+
   if(!.swap){
      message(glue::glue("Removing {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} remaining"))
   }else{
     message(glue::glue("Keeping {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} removed"))
   }
-  return(invisible(filterByOverlaps(qseaSet, keep)))
+  return(invisible(filterByOverlaps(qseaSet, regionsToKeep)))
 
 }
 

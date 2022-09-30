@@ -6,7 +6,6 @@
 \usage{
 addMedipsEnrichmentFactors(
   qseaSet,
-  BSgenome = NULL,
   exportPath = NULL,
   extend = 0,
   shift = 0,
@@ -19,8 +18,6 @@ addMedipsEnrichmentFactors(
 }
 \arguments{
 \item{qseaSet}{The cutoff to use on the windows for each sample}
-
-\item{BSgenome}{Name of BSgenome package}
 
 \item{exportPath}{Folder to export files}
 

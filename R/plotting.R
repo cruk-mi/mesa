@@ -243,7 +243,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                        treeheight_row = 0,
                        clustering_method = "ward.D2",
                        cutree_cols = clusterNum,
-                       main = glue::glue("{str_to_title(normMethod)} values for {gene}."),
+                       main = glue::glue("{stringr::str_to_title(normMethod)} values for {gene}."),
                        ...
     )
 

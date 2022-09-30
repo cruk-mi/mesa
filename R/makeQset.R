@@ -121,6 +121,8 @@ makeQset <- function(sampleTable,
   # store the extra blacklist file location
   #qseaSet@parameters$badRegions2 <- blacklistBed
 
+  #TODO add a single-end coverage method.
+
   if (coverageMethod == "qseaPaired") {
 
     #load the coverage from each bam file, using qsea default method
@@ -132,6 +134,7 @@ makeQset <- function(sampleTable,
     )
 
     #this is included in the PairedAndR1s method more efficiently, don't need to call it there.
+    #note this also adds the input relH if input files provided.
     qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = BiocParallel::bpworkers())
 
   } else if (coverageMethod == "PairedAndR1s") {
@@ -155,6 +158,7 @@ makeQset <- function(sampleTable,
   qseaSet@parameters$minMapQual <- minMapQual
 
   numEmpty <- qseaSet@libraries$file_name %>%
+    as.data.frame() %>%
     dplyr::select(total_fragments) %>%
     dplyr::filter(total_fragments == 0)
 
