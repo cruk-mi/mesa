@@ -76,6 +76,8 @@ calculateCpGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NU
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+  } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
+    genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
   } else {
     genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
   }
@@ -226,11 +228,13 @@ calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, c
 #' @param nCores Number of cores to use for parallelisation
 #' @return A qseaSet supplemented with more columns on the sampleTable, related to enrichment.
 #' @export
-addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NULL,
+addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL,
                                        extend = 0, shift = 0, uniq = 0,
                                        chr.select = NULL, paired = TRUE,
                                        file_name = "file_name",
                                        nCores = 1){
+
+  BSgenome = qseaSet %>% qsea:::getGenome()
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -244,30 +248,40 @@ addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NU
   colsToCheck <- c("relH","GoGe","nReads","nReadsWithoutPattern","n100bpReadsWithoutPattern")
 
   if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
-    stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))])} already in sampleTable!"))
+    stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))]} already in sampleTable!
+                    "))
   }
 
   pulldownFileNames <- qsea::getSampleTable(qseaSet) %>% dplyr::pull(file_name)
 
   enrichDataMeCap <- parallel::mclapply(pulldownFileNames,
                                         function(x){
-                                          calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
+                                          calculateCpGEnrichment(x, BSgenome = BSgenome, exportPath = exportPath,
                                                                  extend = extend, shift = shift, uniq = uniq,
                                                                  chr.select = chr.select, paired = paired)
                                         }, mc.cores = nCores) %>%
     do.call(rbind, . )
 
-  # inputFileNames <- getSampleTable(qseaSet) %>% pull(input_file)
-  # enrichDataInput <- parallel::mclapply(inputFileNames ,
-  #                                  function(x){
-  #                   calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
-  #                                      extend = extend, shift = shift, uniq = uniq,
-  #                                      chr.select = chr.select, paired = paired)
-  #                                    }, mc.cores = nCores) %>%
-  #   do.call(rbind, . )
+  qseaSet@libraries$file_name <- qseaSet@libraries$file_name %>%
+    cbind(dplyr::select(enrichDataMeCap,-file))
 
-  qseaSet@sampleTable <- qsea::getSampleTable(qseaSet) %>%
-    dplyr::bind_cols(dplyr::select(enrichDataMeCap,-file))
+  if("input_file" %in% colnames(qsea::getSampleTable(qseaSet))){
+
+  message(glue::glue("Adding Medips Enrichment factors for {length(getSampleNames(qseaSet))} Input samples, using {nCores} cores."))
+
+  inputFileNames <- qsea::getSampleTable(qseaSet) %>% pull(input_file)
+  enrichDataInput <- parallel::mclapply(inputFileNames ,
+                                   function(x){
+                    calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
+                                       extend = extend, shift = shift, uniq = uniq,
+                                       chr.select = chr.select, paired = paired)
+                                     }, mc.cores = nCores) %>%
+    do.call(rbind, . )
+
+  qseaSet@libraries$input_file <- qseaSet@libraries$input_file %>%
+    cbind(dplyr::select(enrichDataInput,-file))
+
+  }
 
   return(qseaSet)
 }
