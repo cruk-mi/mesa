@@ -18,12 +18,14 @@ before_script:
 devtools-check:
   stage: test
   tags:
-    - methylationprojects
+    - methylationprojects_docker
   script:
     - R -e 'devtools::check()'
 
 pages:
   stage: build
+  tags:
+    - methylationprojects_docker
   # image: alpine:latest
   script:
     - R -e 'devtools::install()'
