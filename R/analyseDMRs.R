@@ -82,14 +82,14 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     return()
 }
 
-#' This function summarises a data frame by gene (using annotateData)
+#' This function summarises a data frame by gene (using annotateWindows)
 #' @param DMRtable A data frame or GRanges object, may already be annotated
 #' @export
 #'
 summariseDMRsByGene <- function(DMRtable){
 
   if(!("ENSEMBL" %in% colnames(DMRtable))){
-    DMRtable <- DMRtable %>% annotateData()
+    DMRtable <- DMRtable %>% annotateWindows()
   }
 
   DMRtable %>%

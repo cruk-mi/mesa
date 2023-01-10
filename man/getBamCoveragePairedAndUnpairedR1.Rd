@@ -23,7 +23,7 @@ getBamCoveragePairedAndUnpairedR1(
 
 \item{regions}{GRanges object with the regions to calculate the coverage for.}
 
-\item{fragmentLength}{Length to extend unpaired reads to}
+\item{fragmentLength}{Length to extend unpaired reads to.}
 
 \item{minMapQual}{Minimum mapping quality to include a read (on either end if proper pair)}
 
@@ -36,7 +36,7 @@ getBamCoveragePairedAndUnpairedR1(
 \item{properPairsOnly}{Whether to only keep proper pairs, else high quality R1s are kept. Also rescues pairs that are almost proper pairs.}
 }
 \value{
-A table
+A list with two elements, the first containing the genomic regions with read numbers, the second the distribution related parameters.
 }
 \description{
 This function takes a bam file and gets the coverage over a set of regions. It keeps pairs or high quality R1s.
