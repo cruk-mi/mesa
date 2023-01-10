@@ -134,8 +134,7 @@ makeQset <- function(sampleTable,
     )
 
     #this is included in the PairedAndR1s method more efficiently, don't need to call it there.
-    #note this also adds the input relH if input files provided.
-    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = BiocParallel::bpworkers())
+    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = BiocParallel::bpworkers(), nonEnrich = FALSE)
 
   } else if (coverageMethod == "PairedAndR1s") {
 
@@ -177,6 +176,10 @@ makeQset <- function(sampleTable,
                             parallel = TRUE,
                             MeDIP = FALSE
     )
+
+    #this is included in the addHMMcopyCNV method more efficiently, don't need to call it there.
+    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = BiocParallel::bpworkers(), nonEnrich = TRUE)
+
   } else if (CNVmethod == "HMMdefault") {
 
     # use HMMCopy directly, with default settings
@@ -200,6 +203,9 @@ makeQset <- function(sampleTable,
                             parallel = TRUE,
                             MeDIP = TRUE
     )
+
+    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = BiocParallel::bpworkers(), nonEnrich = TRUE)
+
 
   } else if (CNVmethod == "None") {
     message("No CNV being calculated")
