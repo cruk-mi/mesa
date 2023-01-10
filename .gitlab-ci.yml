@@ -15,25 +15,25 @@ before_script:
   - R CMD check "${PKG_FILE_NAME}" --no-build-vignettes --no-manual
 
 
-devtools-check:
-  stage: test
-  tags:
-    - methylationprojects_docker
-  script:
-    - R -e 'devtools::check()'
+#devtools-check:
+#  stage: test
+#  tags:
+#    - methylationprojects_docker
+#  script:
+#    - R -e 'devtools::check()'
 
-pages:
-  stage: build
-  tags:
-    - methylationprojects_docker
-  # image: alpine:latest
-  script:
-    - R -e 'devtools::install()'
-    - R -e 'pkgdown::build_site();'
-    - mkdir public/img
-    - cp img/hex-logo.png public/img/hex-logo.png
-  artifacts:
-    paths:
-    - public
-  only:
-  - prod
+#pages:
+#  stage: build
+#  tags:
+#    - methylationprojects_docker
+#  # image: alpine:latest
+#  script:
+#    - R -e 'devtools::install()'
+#    - R -e 'pkgdown::build_site();'
+#    - mkdir public/img
+#    - cp img/hex-logo.png public/img/hex-logo.png
+#  artifacts:
+#    paths:
+#    - public
+#  only:
+#  - prod
