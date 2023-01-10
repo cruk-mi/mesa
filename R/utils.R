@@ -59,11 +59,11 @@ remove_almost_empty_cols <- function(dat, prop)  {
   return(dat[,mask_keep, drop = FALSE])
 }
 
-#' This function skips long running tests unless options(run_long_checks = TRUE) has been set
+#' This function skips long running tests if options(skip_long_checks = TRUE) has been set
 skip_long_checks <- function() {
-  if (identical(options("run_long_checks"), TRUE)) {
+  if (!identical(options("skip_long_checks"), TRUE)) {
     return(invisible(TRUE))
   }
 
-  testthat::skip("Slow checks skipped unless options(run_long_checks = TRUE) has been set")
+  testthat::skip("Slow checks skipped when options(skip_long_checks = TRUE) has been set")
 }
