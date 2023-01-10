@@ -17,6 +17,8 @@ before_script:
 
 devtools-check:
   stage: test
+  tags:
+    - methylationprojects
   script:
     - R -e 'devtools::check()'
 
