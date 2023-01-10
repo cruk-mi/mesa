@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{dropAvgFragDetails}
 \alias{dropAvgFragDetails}
-\title{This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet}
+\title{This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet if present.}
 \usage{
 dropAvgFragDetails(qseaSet)
 }
@@ -10,5 +10,5 @@ dropAvgFragDetails(qseaSet)
 \item{qseaSet}{A qseaSet object to drop the columns from the regions.}
 }
 \description{
-This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet
+This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet if present.
 }

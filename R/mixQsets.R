@@ -110,7 +110,7 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 
 
 
-#' This function takes a qseaSet and makes a new sample by mixing three samples
+#' This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
 #' @param qseaSet The qseaSet object.
 #' @param sample1 First sample name, from which to take proportion of samples
 #' @param sample2 Second sample name
@@ -123,7 +123,6 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #' @param onlyNew Whether to only return the new sample.
 #' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
 #' @return A qseaSet object with an extra
-#' @export
 #'
 mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal, proportion1, proportion2, newName = NULL, groupName = NULL,
                                 onlyNew = FALSE,

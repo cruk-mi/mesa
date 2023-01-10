@@ -54,7 +54,7 @@ plotGeneHeatmap(
 \item{...}{Additional arguments to pass to pheatmap.}
 }
 \value{
-A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+A heatmap showing the methylation patterns across the gene of interest.
 }
 \description{
 This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap

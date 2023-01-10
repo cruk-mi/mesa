@@ -1,6 +1,5 @@
-#' This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet
+#' This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet if present.
 #' @param qseaSet A qseaSet object to drop the columns from the regions.
-#' @export
 #'
 dropAvgFragDetails <- function(qseaSet) {
   qseaSet@regions <- qseaSet@regions %>%

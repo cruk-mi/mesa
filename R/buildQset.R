@@ -2,15 +2,13 @@
 #' @param fileName Path to the bam file
 #' @param BSgenome String denoting the BSgenome to be used.
 #' @param regions GRanges object with the regions to calculate the coverage for.
-#' @param fragmentLength Length to extend unpaired reads to
+#' @param fragmentLength Length to extend unpaired reads to.
 #' @param minMapQual Minimum mapping quality to include a read (on either end if proper pair)
 #' @param maxInsertSize Maximum insert size for a proper paired read
 #' @param minInsertSize Minimum insert size for a proper paired read
 #' @param properPairsOnly Whether to only keep proper pairs, else high quality R1s are kept. Also rescues pairs that are almost proper pairs.
 #' @param minReferenceLength Minimum length on the reference coordinates for a non-paired read to be included
-#' @return A table
-#' @export
-#'
+#' @return A list with two elements, the first containing the genomic regions with read numbers, the second the distribution related parameters.
 #'
 getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, regions = NULL, fragmentLength = NULL,
                                               minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,

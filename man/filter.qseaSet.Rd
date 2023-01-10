@@ -21,5 +21,5 @@ This function extends the dplyr function filter to act on qseaSet, subseting sam
 }
 \examples{
 filter(exampleTumourNormal, type == "LUAD")
-filter(qsea::getExampleQseaSet(), str_detect(sample_name,"Sim1"))
+filter(qsea::getExampleQseaSet(), stringr::str_detect(sample_name,"Sim1"))
 }

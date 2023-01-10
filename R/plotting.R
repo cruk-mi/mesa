@@ -110,7 +110,7 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 #' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
 #' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
 #' @param ... Additional arguments to pass to pheatmap.
-#' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+#' @return A heatmap showing the methylation patterns across the gene of interest.
 #' @export
 
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
@@ -128,7 +128,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   if(!is.null(getMart(qseaSet))){ mart <- getMart(qseaSet) }
 
   if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg38|GRCh38")){
-    mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl')
+    mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl', host = "https://jul2022.archive.ensembl.org")
   } else if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg19|GRCh37")) {
     mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl', host = "https://feb2014.archive.ensembl.org")
   } else if(is.null(mart)){

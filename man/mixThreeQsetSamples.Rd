@@ -2,7 +2,7 @@
 % Please edit documentation in R/mixQsets.R
 \name{mixThreeQsetSamples}
 \alias{mixThreeQsetSamples}
-\title{This function takes a qseaSet and makes a new sample by mixing three samples}
+\title{This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.}
 \usage{
 mixThreeQsetSamples(
   qseaSet,
@@ -45,5 +45,5 @@ mixThreeQsetSamples(
 A qseaSet object with an extra
 }
 \description{
-This function takes a qseaSet and makes a new sample by mixing three samples
+This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
 }
