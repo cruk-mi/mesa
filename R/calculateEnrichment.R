@@ -2,7 +2,6 @@
 #'
 #' @param BSgenome The BSgenome object.
 #' @return A data frame with two entries, genome.relH and genome.GoGe
-#' @export
 calculateGenomicCGDistribution <- function(BSgenome){
   dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
@@ -24,11 +23,11 @@ calculateGenomicCGDistribution <- function(BSgenome){
 #'
 #' @param file The path to the bam file
 #' @param BSgenome Which BSGenome to use (GRCh38 is cached for speed)
-#' @param exportPath Location to save a plot and data object into.
+#' @param exportPath Location to save a plot and data object into. This contains a histogram of fragment length distribution and a rds file containing the
 #' @param extend,shift,uniq,chr.select,paired Options to feed into MEDIPS::getGRange or MEDIPS::getPairedGRange
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
-calculateCpGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
+calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
                                    extend = 0, shift = 0, uniq = 0,
                                    chr.select = NULL, paired = TRUE){
 
@@ -148,7 +147,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #' @param chr.select Which chromosomes to use in global calculation
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
-calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
+calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -279,7 +278,7 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
 
   enrichData <- parallel::mclapply(fileNames,
                                         function(x){
-                                          calculateCpGEnrichment(x, BSgenome = BSgenome, exportPath = exportPath,
+                                          calculateCGEnrichment(x, BSgenome = BSgenome, exportPath = exportPath,
                                                                  extend = extend, shift = shift, uniq = uniq,
                                                                  chr.select = chr.select, paired = paired)
                                         }, mc.cores = nCores) %>%

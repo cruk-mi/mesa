@@ -97,7 +97,6 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     dplyr::filter(strand == "+") %>% # keep only the part of the pair that is on the positive strand
     dplyr::mutate(seqnames = rname, start = pos, end = pos + isize - 1) %>%
     plyranges::as_granges() %>%
-    #plyranges::filter_by_non_overlaps(mesa::encodeBlacklist) %>%
     dplyr::filter(MQ >= minMapQual | mapq >= minMapQual)
 
     message(glue::glue("Rescued {length(shouldBeProperPairsGRanges)} paired reads that met all but the length criteria of being proper paired reads (but 70-1000bp)"))
@@ -193,7 +192,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     #dplyr::mutate(nProperPairs = tidyr::replace_na(nProperPairs, 0) ) %>%
     plyranges::as_granges()
 
-  enrichment = calculateCpGEnrichmentGRanges(readGRanges,
+  enrichment = calculateCGEnrichmentGRanges(readGRanges,
                                              BSgenome,
                                              chr.select = regions %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames())
 
@@ -313,29 +312,28 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 
 
 
-#' This function takes a qseaSet and adds several normalisation steps
+#' This function takes a qseaSet and adds several normalisation steps from qsea, with default values
 #' @param qseaSet The qseaSet object.
 #' @param enrichmentMethod What method to use to calculate the enrichment step
-#' @param maxPatternDensity Maximum CG density in a window to consider it for the background calculation
-#' @param noTMM Whether to normalise
-#' @return A qseaSet object with the samples merged together.
+#' @param maxPatternDensity Maximum pattern density in a window to consider it for the background calculation
+#' @return A qseaSet object with the
+#' @examples
+#' getExampleQseaSet(expSamplingDepth = 100000) %>% addNormalisation(maxPatternDensity = 0.5)
 #' @export
 #'
-addQseaNormalisationSteps <- function(qseaSet,
-                                      enrichmentMethod = "blind1-15",
-                                      maxPatternDensity = 0.05,
-                                      noTMM = TRUE){
-  # do not set the
+addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15", maxPatternDensity = 0.05){
+
+  # do not calculate the TMM normalisation, set all to be 0.
   qseaSet <- qsea::addLibraryFactors(qseaSet, factors = 1)
 
-  qseaSet <- qsea::addOffset(qseaSet, enrichmentPattern = "CpG", maxPatternDensity = maxPatternDensity)
+  qseaSet <- qsea::addOffset(qseaSet, enrichmentPattern = getPattern(qseaSet), maxPatternDensity = maxPatternDensity)
 
   wd <- which(qsea::getRegions(qseaSet)$CpG_density >= 1 &
                 qsea::getRegions(qseaSet)$CpG_density <= 15)
   signal <- (15 - qsea::getRegions(qseaSet)$CpG_density[wd])*.55/15 + .25
 
   qseaSet <- qsea::addEnrichmentParameters(qseaSet,
-                                           enrichmentPattern = "CpG",
+                                           enrichmentPattern = getPattern(qseaSet),
                                            windowIdx = wd,
                                            signal = signal,
                                            min_wd = 5,

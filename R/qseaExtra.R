@@ -394,7 +394,7 @@ mixArrayWithQset <- function(qseaSet, arrayReadTable, arraySample, qseaSample, n
   rownames(newSet@libraries$file_name) <- newName
 
   # if(renormalise){
-  #   newSet <- addQseaNormalisationSteps(newSet, enrichmentMethod = "blind1-15")
+  #   newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")
   # }
 
   if (onlyNew) {
@@ -416,7 +416,7 @@ mixArrayWithQset <- function(qseaSet, arrayReadTable, arraySample, qseaSample, n
 #' @return A qseaSet object with the reads downsampled.
 #' @export
 #'
-downsampleQsea <- function(qseaSet, nReads, renormalise = TRUE){
+downSample <- function(qseaSet, nReads, renormalise = TRUE){
   counts <- qseaSet@count_matrix
 
   if (min(colSums(counts)) < nReads) {
@@ -445,7 +445,7 @@ downsampleQsea <- function(qseaSet, nReads, renormalise = TRUE){
   qseaSet@libraries$file_name[,"offset"] <- rep(NA, ncol(counts))
   qseaSet@libraries$file_name[,"library_factor"] <- rep(NA, ncol(counts))
 
-  if (renormalise) {   qseaSet <- addQseaNormalisationSteps(qseaSet)  }
+  if (renormalise) {   qseaSet <- addNormalisation(qseaSet)  }
 
   return(qseaSet)
 }
@@ -486,7 +486,7 @@ getNormalisedReadSum <- function(qseaSet, GRanges, samples = NULL, subtractLevel
 #' @param qseaSet qseaSet object to calculate the probe beta values for
 #' @export
 #'
-calculateArrayBetas <- function(qseaSet) {
+convertToArrayBetaTable <- function(qseaSet) {
 
   qseaSet %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = mesa::hg38_450kArrayGR) %>%
@@ -657,7 +657,7 @@ getPCAwithBatch <- function(qs, chr = qsea::getChrNames(qs), minRowSum = 20, min
 #' @return A table
 #' @export
 #'
-countWindowsOverCutoff <- function(qseaSet, GRanges, samples = NULL,
+countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
                                    cutoff = 0, normMethod = "nrpm"){
 
   if (is.null(samples)) {

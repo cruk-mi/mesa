@@ -37,14 +37,46 @@ qseaTableToChrGRanges <- function(dataTable) {
   return(outGRanges)
 }
 
-#' This function returns the window names from a data frame with DMR windows
-#' @param dataTable A data frame to return the window names from
+#' This function returns a vector of window names from a qseaSet or a data frame.
+#' @param x A data frame or qseaSet to return the window names of
 #' @export
 #'
-getWindowNames <- function(dataTable) {
-  dataTable %>%
-    dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
-    dplyr::pull(window) %>%
+getWindowNames <- function(x) {
+
+  if(is.qseaSet(x)){
+    x %>%
+      qsea::getRegions() %>%
+      tibble::as_tibble() %>%
+      dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+      dplyr::pull(window) %>%
+      return()
+  }
+
+  if(is.data.frame(x) ){
+    #TODO check that seqnames, start, end are present.
+    x %>%
+      tibble::as_tibble() %>%
+      dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+      dplyr::pull(window) %>%
+      return()
+  }
+  #TODO method for GRanges object.
+  else {stop("Unknown data type!")}
+}
+
+#' This function returns the name of the pattern added by addPatternDensity, e.g. "CpG"
+#' @param qseaSet A qseaSet with pattern details added by addPatternDensity
+#' @export
+#' @examples
+#' getPattern(exampleTumourNormal)
+#'
+getPattern <- function(qseaSet) {
+  qseaSet %>%
+    qsea::getRegions() %>%
+    GenomicRanges::mcols() %>%
+    colnames() %>%
+    stringr::str_subset("_density$") %>%
+    stringr::str_remove("_density$") %>%
     return()
 }
 

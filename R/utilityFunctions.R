@@ -11,7 +11,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                        "gc_hg38_1000kb","gc_hg38_50kb","gc_hg38_500kb","gc_hg38_10kb","score",
                        "log2FC","sample1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
                        "afterOverBackNum","initialOverBackNum", "qname","inOut","nSign","nStrands",
-                       "chromosome_name","start_position","end_position"))
+                       "chromosome_name","start_position","end_position", "input_file"))
 
 #' This function takes a genomic ranges object or data frame, and lifts over from hg19 to hg38.
 #'
@@ -19,7 +19,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #' @return A genomic ranges object object with coordinates in hg38.
 #' @export
 
-liftOverhg19 <- function(grOrDf){
+liftOverHg19 <- function(grOrDf){
 
   if (!requireNamespace("rtracklayer", quietly = TRUE)) {
     stop(

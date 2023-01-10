@@ -86,7 +86,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 #' @param DMRtable A data frame or GRanges object, may already be annotated
 #' @export
 #'
-summariseByGene <- function(DMRtable){
+summariseDMRsByGene <- function(DMRtable){
 
   if(!("ENSEMBL" %in% colnames(DMRtable))){
     DMRtable <- DMRtable %>% annotateData()
@@ -111,7 +111,7 @@ summariseByGene <- function(DMRtable){
 #' @param fdrThres FDR rate threshold to apply to each contrast
 #' @return Returns the original table invisibly, so can be used in a pipe.
 #' @export
-qseaWriteDMRsExcel <- function(dataTable, path, fdrThres = 0.05) {
+writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
     stop(
@@ -153,7 +153,7 @@ qseaWriteDMRsExcel <- function(dataTable, path, fdrThres = 0.05) {
 #' @param fdrThres FDR rate threshold to apply to each contrast
 #' @return Returns the original table invisibly, so can be used in a pipe.
 #' @export
-qseaWriteDMRsBeds <- function(dataTable, folder, fdrThres = 0.05) {
+writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 
   dir.create(folder, showWarnings = TRUE, recursive = TRUE)
 

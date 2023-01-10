@@ -424,7 +424,7 @@ plotCorrelationMatrix <- function(qseaSet, ..., normMethod = "nrpm", annotationC
 #' @return A table
 #' @export
 #'
-plotDMRUpSet <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...){
+plotDMRUpset <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...){
 
   if (!requireNamespace("UpSetR", quietly = TRUE)) {
     stop(

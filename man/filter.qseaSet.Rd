@@ -2,20 +2,24 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{filter.qseaSet}
 \alias{filter.qseaSet}
-\title{This function extends the dplyr function filter to act on qseaSet sampleTable.}
+\title{This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.}
 \usage{
 \method{filter}{qseaSet}(.data, ..., .preserve = FALSE)
 }
 \arguments{
-\item{.data}{A qseaSet to filter on}
+\item{.data}{A qseaSet to filter, based on the sampleTable}
 
 \item{...}{Other arguments to pass to dplyr::filter}
 
-\item{.preserve}{Not implemented as irrelevant for qseaSet}
+\item{.preserve}{Not implemented as grouping not available  for qseaSet}
 }
 \value{
-A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+A qseaSet object, with only samples that are selected by the filtering operation.
 }
 \description{
-This function extends the dplyr function filter to act on qseaSet sampleTable.
+This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
+}
+\examples{
+filter(exampleTumourNormal, type == "LUAD")
+filter(qsea::getExampleQseaSet(), str_detect(sample_name,"Sim1"))
 }

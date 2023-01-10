@@ -97,13 +97,13 @@ test_that("addLibraryInformation", {
 })
 
 
-test_that("relabelQset", {
+test_that("renameSamples", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000) %>%
     mutate(new_column = LETTERS[1:16])
 
   renamedSet <- randomSet %>%
-    relabelQset("new_column")
+    renameSamples("new_column")
 
   expect_true(all(getSampleNames(renamedSet)  ==  LETTERS[1:16]))
 

@@ -159,9 +159,9 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 
 })
 
-test_that("CalculateCpGEnrichment works", {
+test_that("calculateCGEnrichment works", {
 
-enr <- calculateCpGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
                        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
                        exportPath = NULL,
                        extend = 0, shift = 0, uniq = 0,

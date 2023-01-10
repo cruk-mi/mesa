@@ -1,28 +1,25 @@
-#' This function extends the dplyr function filter to act on qseaSet sampleTable.
+#' This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
 #' @method filter qseaSet
 #' @importFrom dplyr filter
-#' @param .data A qseaSet to filter on
+#' @param .data A qseaSet to filter, based on the sampleTable
 #' @param ... Other arguments to pass to dplyr::filter
-#' @param .preserve Not implemented as irrelevant for qseaSet
-#' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
-#' @export filter.qseaSet
+#' @param .preserve Not implemented as grouping not available  for qseaSet
+#' @return A qseaSet object, with only samples that are selected by the filtering operation.
+#' @examples
+#' filter(exampleTumourNormal, type == "LUAD")
+#' filter(qsea::getExampleQseaSet(), stringr::str_detect(sample_name,"Sim1"))
 #' @export
-filter.qseaSet <- function(.data, ..., .preserve = FALSE){filterQset(.data, ...)}
+filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 
-#' This function takes a qseaSet and filters the samples in it based on a call to dplyr::filter on the sampleTable.
-#' @param qseaSet The qseaSet object.
-#' @param ... Other arguments to pass to dplyr::filter
-#' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
-#' @export
-filterQset <- function(qseaSet, ...){
-  namesToKeep <- qseaSet %>%
+  namesToKeep <- .data %>%
     qsea::getSampleTable() %>%
     tibble::rownames_to_column() %>%
     dplyr::filter(...) %>%
     dplyr::pull(sample_name)
 
-  return(subsetQset(qseaSet, samplesToKeep = namesToKeep))
-}
+  return(subsetQset(.data, samplesToKeep = namesToKeep))
+
+  }
 
 #' This function extends the dplyr function mutate to act on qseaSet sampleTable.
 #' @method mutate qseaSet
@@ -32,23 +29,15 @@ filterQset <- function(qseaSet, ...){
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::mutate
 #' @export mutate.qseaSet
 #' @export
-mutate.qseaSet <- function(.data, ...){mutateQset(.data, ...)}
+mutate.qseaSet <- function(.data, ...){
 
-
-#' This function takes a qseaSet and mutates its sampleTable based on a call to dplyr::mutate.
-#' @param qseaSet The qseaSet object.
-#' @param ... Other arguments to pass to dplyr::mutate
-#' @return A qseaSet object with the sampleTable mutated as specified.
-#' @export
-mutateQset <- function(qseaSet, ...){
-  qseaSet@sampleTable <- qseaSet %>%
+  .data@sampleTable <- .data %>%
     qsea::getSampleTable() %>%
-    tibble::rownames_to_column("rownameCol") %>%
+    tibble::rownames_to_column(".rownameCol") %>%
     dplyr::mutate(...) %>%
-    tibble::column_to_rownames("rownameCol")
+    tibble::column_to_rownames(".rownameCol")
 
-  return(qseaSet)
-}
+  return(.data)}
 
 #' This function extends the dplyr function left_join to act on qseaSet sampleTable.
 #' @method left_join qseaSet
@@ -63,23 +52,15 @@ mutateQset <- function(qseaSet, ...){
 #' @param keep Should the join keys from both x and y be preserved in the output?
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::left_join
 #' @export
-left_join.qseaSet <- function(x, y, by = NULL, copy, suffix, ..., keep){leftJoinQset(qseaSet = x, newData = y, ...)}
+left_join.qseaSet <- function(x, y, by = NULL, copy, suffix, ..., keep){
 
-#' This function takes a qseaSet and appends data to its sampleTable based on a call to dplyr::left_join
-#' @param qseaSet The qseaSet object.
-#' @param newData The new data frame to join the sampleTable on.
-#' @param ... Other arguments to pass to dplyr::left_join. Can include "by" to specify which columns to join on
-#' @return A qseaSet object with the sampleTable appended to as specified.
-#' @export
-leftJoinQset <- function(qseaSet, newData, ...){
-  qseaSet@sampleTable <- qseaSet %>%
+  x@sampleTable <- x %>%
     qsea::getSampleTable() %>%
     tibble::rownames_to_column("rownameCol") %>%
-    dplyr::left_join(newData,...) %>%
+    dplyr::left_join(y,...) %>%
     tibble::column_to_rownames("rownameCol")
 
-  return(qseaSet)
-}
+  return(x)}
 
 #' This function extends the dplyr function select to act on qseaSet sampleTable. Can also be used to rename columns.
 #' @method select qseaSet
@@ -137,22 +118,16 @@ pullQset <- function(qseaSet, ...){
 #' @param decreasing Whether to order the qseaSet in reverse alphabetical order
 #' @param ... Other arguments to pass to gtools::mixedsort
 #' @return A qseaSet with the sample names reordered alphabetically
-#' @export sort.qseaSet
+#' #' @examples
+#' sort(exampleTumourNormal, decreasing = TRUE)
 #' @export
-sort.qseaSet <- function(x, decreasing = FALSE, ...){sortQset(x, decreasing = decreasing, ...)}
+sort.qseaSet <- function(x, decreasing = FALSE, ...){
 
-
-#' This function takes a qseaSet and sorts the samples in it, so they are in alphabetical order (with numbers increasing via mixedsort)
-#' @param qseaSet The qseaSet object.
-#' @param decreasing Whether to order the qseaSet in reverse alphabetical order
-#' @return A qseaSet object with the objects sorted
-#' @export
-sortQset <- function(qseaSet, decreasing = FALSE){
-  qseaSet %>%
-    subsetQset(samplesToKeep = (qseaSet %>% qsea::getSampleNames() %>% gtools::mixedsort(decreasing = decreasing))) %>%
+  x %>%
+    subsetQset(samplesToKeep = (x %>% qsea::getSampleNames() %>% gtools::mixedsort(decreasing = decreasing))) %>%
     return()
 
-}
+  }
 
 #' This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.
 #' @param qseaSet The qseaSet object.
@@ -182,25 +157,18 @@ filterRegions <- function(qseaSet, ...){
 #' @return A qseaSet with the sample names reordered according to a column of the sampleTable.
 #' @export arrange.qseaSet
 #' @export
-arrange.qseaSet <- function(.data, ..., .by_group = FALSE){arrangeQset(.data, ..., .by_group)}
+arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
 
-#' This function takes a qseaSet and sorts the samples inside it using dplyr::arrange, using a column(s) of the sample table. Can also use desc() to reverse sort, as in dplyr::arrange.
-#' @param qseaSet The qseaSet object.
-#' @param ... Other arguments to pass to dplyr::arrange
-#' @param .by_group Not implemented as qsea requires a data frame not a tibble for the sampleTable.
-#' @return A qseaSet object with the samples sorted according to the column(s) selected.
-#' @export
-arrangeQset <- function (qseaSet, ..., .by_group = FALSE) {
-
-  sampleOrder <- qseaSet %>%
+  sampleOrder <- .data %>%
     qsea::getSampleTable() %>%
     dplyr::arrange(...) %>%
     dplyr::pull(sample_name)
 
-  qseaSet %>%
+  .data %>%
     subsetQset(samplesToKeep = sampleOrder) %>%
     return()
-}
+
+  }
 
 #' This function extends the base function length to return the number of samples in the qseaSet
 #' @method colnames qseaSet

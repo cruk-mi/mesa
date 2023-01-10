@@ -11,7 +11,7 @@
 #' @return A qseaSet object with an extra
 #' @export
 #'
-mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
+mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
                            onlyNew = FALSE,
                            renormalise = TRUE){
 
@@ -97,7 +97,7 @@ mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, n
   rownames(newSet@libraries$file_name) <- newName
 
   if(renormalise){
-    newSet <- addQseaNormalisationSteps(newSet, enrichmentMethod = "blind1-15")
+    newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")
   }
 
   if (onlyNew) {
@@ -233,7 +233,7 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
   rownames(newSet@libraries$file_name) <- newName
 
   if(renormalise){
-    newSet <- addQseaNormalisationSteps(newSet, enrichmentMethod = "blind1-15")
+    newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")
   }
 
   if (onlyNew) {
