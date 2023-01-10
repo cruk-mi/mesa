@@ -2,13 +2,13 @@
 % Please edit documentation in R/utils.R
 \name{getWindowNames}
 \alias{getWindowNames}
-\title{This function returns the window names from a data frame with DMR windows}
+\title{This function returns a vector of window names from a qseaSet or a data frame.}
 \usage{
-getWindowNames(dataTable)
+getWindowNames(x)
 }
 \arguments{
-\item{dataTable}{A data frame to return the window names from}
+\item{x}{A data frame or qseaSet to return the window names of}
 }
 \description{
-This function returns the window names from a data frame with DMR windows
+This function returns a vector of window names from a qseaSet or a data frame.
 }

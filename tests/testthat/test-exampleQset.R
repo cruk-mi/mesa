@@ -1,44 +1,44 @@
 test_that("Testing hg38 related annotation/plotting functions", {
-  expect_no_error(examplePairedTumourQset %>%
+  expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10"))
 
-  expect_no_error(examplePairedTumourQset %>%
+  expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm"))
 
-  expect_no_error(examplePairedTumourQset %>%
+  expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3))
 
-  expect_no_error(examplePairedTumourQset %>%
+  expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
                                     annotationCol = getAnnotationDataFrame(., "tumour") ))
 
-  expect_no_error(examplePairedTumourQset %>%
+  expect_no_error(exampleTumourNormal %>%
                     plotCNVheatmap(tumour))
 
-  expect_equal(examplePairedTumourQset %>%
+  expect_equal(exampleTumourNormal %>%
                  removeWindowsOverCutoff(samplesToFilterOut = "_N$",
                                         maxValue = 1,
                                         normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 601)
 
-  expect_equal(examplePairedTumourQset %>%
+  expect_equal(exampleTumourNormal %>%
                  removeWindowsOverCutoff(samplesToFilterOut = c("Colon1_T","Colon2_T"),
                                         maxValue = 1,
                                         normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 604)
 
-  expect_equal(examplePairedTumourQset %>%
+  expect_equal(exampleTumourNormal %>%
                  keepWindowsOverCutoff(samplesToFilterOn = c("Colon1_T","Colon2_T"),
                                         minValue = 1,
                                         normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 215)
 
-  expect_equal(examplePairedTumourQset %>%
+  expect_equal(exampleTumourNormal %>%
                  getNormalisedReadSum(GRanges = getRegions(.)) %>%
-                 nrow(), examplePairedTumourQset %>% getSampleNames() %>% length())
+                 nrow(), exampleTumourNormal %>% getSampleNames() %>% length())
 
 })
 
@@ -64,7 +64,7 @@ test_that("Testing general functionality", {
 
 test_that("Analysing DMRs", {
 
-  expect_no_error(DMRs <- examplePairedTumourQset %>%
+  expect_no_error(DMRs <- exampleTumourNormal %>%
     calculateDMRs(variable = "type",
                   contrastsToDo = tibble::tibble(sample1 = c("LUAD","LUSC","CRC"),
                                                  sample2 = c("NormalLung","NormalLung","NormalColon"))))
@@ -84,13 +84,13 @@ test_that("Analysing DMRs", {
 
   expect_equal(DMRs %>%
                  pivotDMRsLonger() %>%
-                 summariseByGene() %>%
+                 summariseDMRsByGene() %>%
                  dim(),c(28,8))
 
 })
 
 test_that("Multiple DMRs", {
-  expect_no_error(DMRs <- examplePairedTumourQset %>%
+  expect_no_error(DMRs <- exampleTumourNormal %>%
     calculateDMRs(variable = "type",
                   contrastsToDo = "all"))
 })

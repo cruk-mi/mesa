@@ -207,7 +207,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' @return A qseaSet object with the samples merged together.
 #' @export
 
-mergeQsetSamples <- function(qseaSet, mergeString){
+poolSamples <- function(qseaSet, mergeString){
 
   ##TODO rewrite this function to use a column.
 
@@ -320,7 +320,7 @@ mergeQsetSamples <- function(qseaSet, mergeString){
     subsetQset(samplesToDrop = samplesToMerge)
 
   finalSet <-  combineQsets(oldSet, newSet) %>%
-    addQseaNormalisationSteps(enrichmentMethod = "blind1-15")
+    addNormalisation(enrichmentMethod = "blind1-15")
 
   return(finalSet)
 
@@ -332,7 +332,7 @@ mergeQsetSamples <- function(qseaSet, mergeString){
 #' @return A qseaSet object with the samples renamed.
 #' @export
 
-relabelQset <- function(qseaSet, newNameColumn){
+renameSamples <- function(qseaSet, newNameColumn){
 
   newNameColumn <- rlang::enquo(newNameColumn)
 
