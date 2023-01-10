@@ -3,20 +3,11 @@ variables:
   _R_CHECK_FORCE_SUGGESTS_: "true"
   APT_PKGS: "libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev zlib1g-dev git libv8-dev"
 
-image: tiagochst/bioc_libs:latest
-
-before_script:
-  - apt-get update
-  - apt-get install -y --no-install-recommends ${APT_PKGS}
-  - apt-get install --yes --no-install-recommends r-cran-testthat r-cran-devtools
-  - R -e "devtools::install_deps(dependencies = TRUE)"
-  - R CMD build . --no-build-vignettes --no-manual
-  - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
-  - R CMD check "${PKG_FILE_NAME}" --no-build-vignettes --no-manual
+image: bioconductor/bioconductor_docker:devel
 
 devtools-check:
   stage: test
   tags:
     - methylationprojects_docker
   script:
-    - echo hostname
+    - R -e 'devtools::check()'
