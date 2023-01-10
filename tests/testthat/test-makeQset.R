@@ -1,5 +1,8 @@
 test_that("Making a hg19 qseaSet", {
 
+  #skip check unless options(run_long_checks = TRUE)
+  skip_long_checks()
+
   if(!rlang::is_installed("MEDIPSData")){
     skip("MEDIPSData Not installed")
   }
@@ -37,6 +40,9 @@ test_that("Making a hg19 qseaSet", {
 })
 
 test_that("Making a hg19 qseaSet with qsea coverage method", {
+
+  #skip check unless options(run_long_checks = TRUE)
+  skip_long_checks()
 
   if(!rlang::is_installed("MEDIPSData")){
     skip("MEDIPSData Not installed")
@@ -80,6 +86,8 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 test_that("Making a GRCh38 qseaSet", {
 
   skip_on_ci()
+  #skip check unless options(run_long_checks = TRUE)
+  skip_long_checks()
 
   if(!rlang::is_installed("MEDIPSData")){
     skip("MEDIPSData Not installed")
@@ -116,6 +124,8 @@ test_that("Making a GRCh38 qseaSet", {
 test_that("Making a GRCh38 qseaSet proper pairs only", {
 
   skip_on_ci()
+  #skip check unless options(run_long_checks = TRUE)
+  skip_long_checks()
 
   if(!rlang::is_installed("MEDIPSData")){
     skip("MEDIPSData Not installed")
@@ -151,11 +161,14 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 
 test_that("CalculateCpGEnrichment works", {
 
-calculateCpGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+enr <- calculateCpGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
                        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
                        exportPath = NULL,
                        extend = 0, shift = 0, uniq = 0,
                        chr.select = "chr22", paired = TRUE)
 
+expect_equal(enr$nReads, 636130)
+expect_equal(enr$relH, 3.353462, tolerance = 5)
+expect_equal(enr$GoGe, 1.631612, tolerance = 5)
 
 })

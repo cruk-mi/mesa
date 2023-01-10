@@ -52,7 +52,6 @@ getWindowNames <- function(dataTable) {
 #' Based off the janitor::remove_empty_cols function.
 #' @param dat A data frame to filter almost empty columns from
 #' @param prop A proportion of NAs in each column to allow
-#' @export
 #'
 remove_almost_empty_cols <- function(dat, prop)  {
   mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
@@ -60,4 +59,11 @@ remove_almost_empty_cols <- function(dat, prop)  {
   return(dat[,mask_keep, drop = FALSE])
 }
 
+#' This function skips long running tests unless options(run_long_checks = TRUE) has been set
+skip_long_checks <- function() {
+  if (identical(options("run_long_checks"), TRUE)) {
+    return(invisible(TRUE))
+  }
 
+  testthat::skip("Slow checks skipped unless options(run_long_checks = TRUE) has been set")
+}

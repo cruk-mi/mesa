@@ -7,6 +7,7 @@ CHANGES
 * Various R CMD check warning issues fixed.
 * `filterByOverlaps` no longer allows the option to take a list of window ID numbers.
 * Fixed `addMedipsEnrichmentFactors` function inside `makeQset` when using the `"qseaPaired"` coverageMethod. 
+* Fixed tests for `addMedipsEnrichmentFactors`
 
 # mesa 0.2.2
 

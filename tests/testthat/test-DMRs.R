@@ -47,3 +47,5 @@ test_that("plotting DMRs", {
                   plotGRangesHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE) , NA)
   })
+
+addMedipsEnrichmentFactors
