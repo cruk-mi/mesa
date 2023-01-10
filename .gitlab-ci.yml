@@ -13,3 +13,10 @@ before_script:
   - R CMD build . --no-build-vignettes --no-manual
   - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
   - R CMD check "${PKG_FILE_NAME}" --no-build-vignettes --no-manual
+
+devtools-check:
+  stage: test
+  tags:
+    - methylationprojects_docker
+  script:
+    - echo hostname
