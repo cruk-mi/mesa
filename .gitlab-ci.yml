@@ -5,6 +5,10 @@ variables:
 
 image: bioconductor/bioconductor_docker:devel
 
+before_script:
+  - apt-get update
+  - RUN Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); BiocManager::install(ask=FALSE)"
+
 devtools-check:
   stage: test
   tags:
