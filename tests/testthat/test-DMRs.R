@@ -13,7 +13,7 @@ test_that("Calculating DMRs", {
 
   expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
 
-  expect_error( annotatedData <- DMRdata  %>% annotateData(), NA) #expect no error!
+  expect_error(annotatedData <- DMRdata  %>% annotateWindows(), NA) #expect no error!
 
   expect_true(annotatedData %>% tibble::has_name(c("SYMBOL","annotation","geneId","geneChr")) %>% all())
 

@@ -39,7 +39,7 @@ setMethod('getMart', 'qseaSet', function(object)
 #' @param FantomRegionsGR A GRanges object giving Fantom enhancer regions
 #' @return A tibble with the data, augmented with ChIPseeker region location and CpG island information.
 #' @export
-annotateData <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL, CpGislandsGR = NULL,
+annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL, CpGislandsGR = NULL,
                          FantomRegionsGR = NULL) {
 
   if(genome %in% c("hg38","GRCh38") & is.null(TxDb)) {
@@ -726,7 +726,7 @@ getBetaMeans <- function(qseaSet, GRanges = NULL, naMethod = "impute", minEnrich
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
   temp <- qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-    annotateData()
+    annotateWindows()
 
   nWindows <- temp %>%
     dplyr::group_by(landscape) %>%

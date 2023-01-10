@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByGene}
 \alias{summariseDMRsByGene}
-\title{This function summarises a data frame by gene (using annotateData)}
+\title{This function summarises a data frame by gene (using annotateWindows)}
 \usage{
 summariseDMRsByGene(DMRtable)
 }
@@ -10,5 +10,5 @@ summariseDMRsByGene(DMRtable)
 \item{DMRtable}{A data frame or GRanges object, may already be annotated}
 }
 \description{
-This function summarises a data frame by gene (using annotateData)
+This function summarises a data frame by gene (using annotateWindows)
 }
