@@ -698,7 +698,7 @@ summariseAcrossWindows <- function(qseaSet,
 
                    }
     ) %>%
-      purrr::reduce(full_join, by = "sample_name")
+      purrr::reduce(dplyr::full_join, by = "sample_name")
 
     if(addSampleTable) {
       map_out <- map_out %>%
