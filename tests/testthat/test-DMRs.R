@@ -26,14 +26,22 @@ test_that("Calculating DMRs", {
   expect_no_error(summariseDefault <- randomSet %>% summariseAcrossWindows(DMRdata))
 
   expect_true("group" %in% colnames(summariseDefault))
-  expect_true("beta_mean" %in% colnames(summarise2))
-  expect_true("nrpm_mean" %in% colnames(summarise2))
+  expect_true("beta_mean" %in% colnames(summariseDefault))
+  expect_true("nrpm_mean" %in% colnames(summariseDefault))
 
-  expect_no_error(summarise2 <- randomSet %>% summariseAcrossWindows(DMRdata, fn = "median", normMethod = "counts", addSampleTable = FALSE))
+  expect_no_error(summarise2 <- randomSet %>% summariseAcrossWindows(DMRdata, fn = median, normMethod = "counts", addSampleTable = FALSE))
 
   expect_false("group" %in% colnames(summarise2))
   expect_true("counts_median" %in% colnames(summarise2))
   expect_false("nrpm_mean" %in% colnames(summarise2))
+
+  expect_no_error(setWithSummary <- randomSet %>%
+                    addSummaryAcrossWindows(DMRdata, fn = median, normMethod = "beta") %>%
+                    addSummaryAcrossWindows(DMRdata %>% filter(Tumor_vs_Normal_log2FC >= 2), fn = max, normMethod = "nrpm", prefix = "highest_only"))
+
+  expect_true(setWithSummary %>% is.qseaSet())
+  expect_true("beta_median" %in% colnames(getSampleTable(setWithSummary)))
+  expect_true("highest_only_nrpm_max" %in% colnames(getSampleTable(setWithSummary)))
 
 })
 
