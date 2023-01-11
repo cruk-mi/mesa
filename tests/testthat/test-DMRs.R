@@ -1,31 +1,35 @@
 test_that("Calculating DMRs", {
 
+  BiocParallel::SerialParam()
+
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
-    mutateQset(patient = stringr::str_remove(sample_name,"[TN]$"),
+    mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
                variableWithOneLevel = "Test",
                experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
                experimentConfounded = ifelse( stringr::str_detect(sample_name,"[1234]N"),"A","B"),
                )
 
-  expect_error( DMRdata <- randomSet %>%
+  expect_no_error( DMRdata <- randomSet %>%
                  calculateDMRs(variable = "group",
-                               contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")), NA) #expect no error!
+                               contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
 
   expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
 
-  expect_error(annotatedData <- DMRdata  %>% annotateWindows(), NA) #expect no error!
+  expect_no_error(annotatedData <- DMRdata  %>% annotateWindows()) #expect no error!
 
   expect_true(annotatedData %>% tibble::has_name(c("SYMBOL","annotation","geneId","geneChr")) %>% all())
 
-  expect_error(DMRdata <- randomSet %>%
+  expect_no_error(DMRdata <- randomSet %>%
                   calculateDMRs(variable = "group", covariates = "patient",
-                                contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")), NA) #expect no error!
+                                contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
 })
 
 test_that("plotting DMRs", {
 
+  BiocParallel::SerialParam()
+
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
-    mutateQset(patient = stringr::str_remove(sample_name,"[TN]$"),
+    mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
                variableWithOneLevel = "Test",
                experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
                experimentConfounded = ifelse( stringr::str_detect(sample_name,"[1234]N"),"A","B"),
@@ -36,14 +40,14 @@ test_that("plotting DMRs", {
                                 contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal"))
 
 
-  expect_error( randomSet %>%
-    plotGRangesHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) ) , NA) #expect no error
+  expect_no_error( randomSet %>%
+    plotGRangesHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) )) #expect no error
 
-  expect_error( randomSet %>%
+  expect_no_error( randomSet %>%
                   plotGRangesHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
-                                     normMethod = "beta") , NA)
+                                     normMethod = "beta"))
 
-  expect_error( randomSet %>%
+  expect_no_error( randomSet %>%
                   plotGRangesHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
-                                     clusterRows = TRUE) , NA)
+                                     clusterRows = TRUE))
   })

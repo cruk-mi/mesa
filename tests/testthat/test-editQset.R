@@ -3,11 +3,11 @@ test_that("Filtering Qset works", {
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000)
 
   expect_equal(randomSet %>%
-                 filterQset(stringr::str_detect(sample_name, "Sim7")) %>%
+                 filter(stringr::str_detect(sample_name, "Sim7")) %>%
                  qsea::getSampleNames(), c("Sim7T","Sim7N"))
 
   expect_equal(randomSet %>%
-                 filterQset(group == "Tumor") %>%
+                 filter(group == "Tumor") %>%
                  qsea::getSampleNames() %>%
                  length(), 8)
   })
@@ -28,8 +28,8 @@ test_that("Reducing Qset Windows", {
 test_that("Mutating Qset works", {
 
   sampTab <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000) %>%
-    mutateQset(newCol = ifelse(stringr::str_detect(sample_name,"Sim1"),"fish","duck")) %>%
-    mutateQset(repNum = stringr::str_remove(sample_name,"Sim")) %>%
+    mutate(newCol = ifelse(stringr::str_detect(sample_name,"Sim1"),"fish","duck")) %>%
+    mutate(repNum = stringr::str_remove(sample_name,"Sim")) %>%
     qsea::getSampleTable()
 
   expect_equal(
@@ -47,7 +47,7 @@ test_that("Sorting Qsets", {
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
 
   sortedSet <- randomSet %>%
-    sortQset()
+    sort()
 
   expect_equal(randomSet %>% getSampleNames() %>% sort() , sortedSet %>% getSampleNames())
 
@@ -57,10 +57,10 @@ test_that("Combining Qsets", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
 
-  splitSet <- filterQset(randomSet, group == "Tumor") %>%
-    combineQsets(filterQset(randomSet, group != "Tumor"))
+  splitSet <- filter(randomSet, group == "Tumor") %>%
+    combineQsets(filter(randomSet, group != "Tumor"))
 
-  expect_equal(splitSet %>% sortQset(), randomSet %>% sortQset() )
+  expect_equal(splitSet %>% sort(), randomSet %>% sort() )
 
 })
 
@@ -72,12 +72,12 @@ test_that("filterByOverlaps", {
 
   expect_equal(randomSet %>%
     filterByOverlaps(reducedGRanges) %>%
-    getRegions() %>%
+    qsea::getRegions() %>%
     length(), 2000)
 
   expect_equal(randomSet %>%
                  filterByNonOverlaps(reducedGRanges) %>%
-                 getRegions() %>%
+                 qsea::getRegions() %>%
                  length(), 8000)
 
 })
@@ -88,7 +88,7 @@ test_that("addLibraryInformation", {
 
   colNames <- randomSet %>%
     addLibraryInformation() %>%
-    getSampleTable() %>%
+    qsea::getSampleTable() %>%
     colnames()
 
   expect_true("fragment_length" %in% colNames)
