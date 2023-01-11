@@ -17,11 +17,7 @@ build:
   script:
     - echo "Do your build here"
     - pwd && ls -lah
-    - cat "FROM bioconductor/bioconductor_docker:devel" > Dockerfile
-    - cat "WORKDIR /home/rstudio" >> Dockerfile
-    - cat "COPY --chown=rstudio:rstudio . /home/rstudio/" >> Dockerfile
-    - cat "RUN Rscript installDependencies.R" >> Dockerfile
-    - docker build -t crukmi/mesa_dependencies .
+    - docker build -t crukmi/mesa_dependencies -f Dockerfile_dependencies_only .
 
 devtools-check:
   stage: test
