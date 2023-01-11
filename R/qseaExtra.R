@@ -313,45 +313,12 @@ downSample <- function(qseaSet, nReads, renormalise = TRUE){
   qseaSet@libraries$file_name[,"offset"] <- rep(NA, ncol(counts))
   qseaSet@libraries$file_name[,"library_factor"] <- rep(NA, ncol(counts))
 
-  if (renormalise) {   qseaSet <- addNormalisation(qseaSet)  }
 
   return(qseaSet)
 }
 
-#' This function takes a qseaSet and sums over nrpm within a GRanges object
-#' @param qseaSet The qseaSet object.
-#' @param GRanges A GRanges object to sum over
-#' @param samples What samples to use
-#' @param subtractLevel A value to subtract from the nrpm for each window before summing over them. Maybe useful to remove background noise.
-#' @return A table
-#' @export
-#'
-getNormalisedReadSum <- function(qseaSet, GRanges, samples = NULL, subtractLevel = 0){
-
-  if (is.null(samples)) {
-    samples <- qsea::getSampleNames(qseaSet)
-  }
-
-  clip <- function(x, a, b) {
-    a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)
-  }
-
-  qseaSet %>%
-    filterByOverlaps(GRanges) %>%
-    qsea::makeTable(norm_methods = "nrpm", samples = samples) %>%
-    dplyr::select(dplyr::matches("nrpm")) %>%
-    dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
-    {clip(. - subtractLevel, a = 0, b = 1000000)} %>%
-    colSums() %>%
-    tibble::enframe(name = "sample_name", value = "nrpmSum") %>%
-    dplyr::left_join(qsea::getSampleTable(qseaSet))
-
-}
-
-
-
 #' This function calculates the beta values for the windows covering the hg38 array probes.
-#' @param qseaSet qseaSet object to calculate the probe beta values for
+#' @param qseaSet qseaSet object to calculate approximate beta values for the probes
 #' @export
 #'
 convertToArrayBetaTable <- function(qseaSet) {
@@ -663,56 +630,76 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
 
 }
 
-#' This function takes a qseaSet and calculates the mean of the nrpm and beta values over the windows given by GRanges.
+#' This function takes a qseaSet and calculates a summary statistic across the windows.
 #' @param qseaSet The qseaSet object.
-#' @param GRanges A GRanges object with which windows to take the average of. If missing, all the regions in the qseaSet.
-#' @param naMethod What method to use to deal with NA values for the beta values
-#' @param minEnrichment The minimum number of reads for a window to be fully methylated, else replace with NA
-#' @return A table of data, one row per window
+#' @param GRanges A GRanges object containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
+#' @param fn A function to apply across the windows. e.g. mean, median, sd.
+#' @param addSampleTable A boolean with whether to add the sampleTable on to the output table
+#' @param normMethod One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").
+#' @param naMethod What method to use to deal with NA values (for beta values). Options are "drop" or "impute".
+#' @param minEnrichment For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
+#' @return A table of data, one row per sample, with columns indicating the application of the summary statistic to the
 #' @export
 #'
-getBetaMeans <- function(qseaSet, GRanges = NULL, naMethod = "impute", minEnrichment = 3){
+summariseAcrossWindows <- function(qseaSet,
+                                   GRanges = NULL,
+                                   fn = mean,
+                                   addSampleTable = TRUE,
+                                   normMethod = c("nrpm", "beta"),
+                                   naMethod = "impute",
+                                   minEnrichment = 3) {
+    #TODO: Can we get multiple summary statistics in one go?
 
-  if(is.null(GRanges)){
-    GRanges <- qsea::getRegions(qseaSet)
-  }
+    fnName = as.character(substitute(fn, env = environment()))
 
-  samples <- qsea::getSampleNames(qseaSet)
+    if(is.null(GRanges)){
+      GRanges <- qsea::getRegions(qseaSet)
+    }
 
-  dataMat <- qseaSet %>%
-    filterByOverlaps(GRanges) %>%
-    qsea::makeTable(norm_methods = c("nrpm","beta"), samples = samples, minEnrichment = minEnrichment)
+    dataMat <- qseaSet %>%
+      filterByOverlaps(GRanges) %>%
+      qsea::makeTable(norm_methods = normMethod,
+                      samples = qsea::getSampleNames(qseaSet),
+                      minEnrichment = minEnrichment)
 
-  nrpmMat <- dataMat %>%
-    dplyr::select(dplyr::matches("nrpm$")) %>%
-    dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means"))
+    if(naMethod == "drop"){
 
-  betaMat <- dataMat %>%
-    dplyr::select(dplyr::matches("beta$")) %>%
-    dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means"))
+      message("Dropping rows with any NA values")
 
-  if(naMethod == "drop"){
-    nrpmMat <- nrpmMat %>%
-      tidyr::drop_na()
+      dataMat <- dataMat %>%
+        tidyr::drop_na()
 
-    betaMat <- betaMat %>%
-      tidyr::drop_na()
-  }
+    }
 
-  if(naMethod == "impute"){
-    message("Imputing NAs by the mean")
-  }
+    if(naMethod == "impute"){
+      message("Removing NA values on a per-sample basis")
+    }
 
-  betaMat %>%
-    colMeans(na.rm = TRUE) %>%
-    tibble::enframe(name = "sample_name", value = "betaMean") %>%
-    dplyr::left_join(nrpmMat %>%
-                       colMeans(na.rm = TRUE) %>%
-                       tibble::enframe(name = "sample_name", value = "nrpmMean")) %>%
-    dplyr::left_join(qsea::getSampleTable(qseaSet)) %>%
-    dplyr::mutate(nRegions = nrow(betaMat))
+    map_out <- purrr::map(normMethod,
+                   function(normType){
+                     temp <- dataMat %>%
+                       dplyr::select(dplyr::matches(paste0("_", normType,"$"))) %>%
+                       dplyr::rename_with(~ stringr::str_remove_all(.x, paste0("_", normType, "$")))
+
+                     out <- temp %>%
+                       apply(2, fn, na.rm = TRUE) %>%
+                       tibble::enframe(name = "sample_name", value = paste0(normType, "_", fnName)) %>%
+                       dplyr::mutate(nRegions = temp %>% apply(2,function(x) !is.na(x)) %>% colSums()) %>%
+                       dplyr::rename_with(~stringr::str_replace(.x, "nRegions", paste0("nRegions_", normType)))
+
+                   }
+    ) %>%
+      purrr::reduce(full_join, by = "sample_name")
+
+    if(addSampleTable) {
+      map_out <- map_out %>%
+        dplyr::left_join(qsea::getSampleTable(qseaSet), by = "sample_name")
+    }
+
+    return(map_out)
 
 }
+
 
 
 #' This function takes a qseaSet and calculates some stats as to which genomic regions the reads lie.
@@ -777,7 +764,7 @@ getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nr
 
 }
 
-setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames is not defined on a data frame!")})
+setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames is not defined on a data frame, only on a qseaSet.")})
 
 
 
