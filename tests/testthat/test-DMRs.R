@@ -37,11 +37,11 @@ test_that("Calculating DMRs", {
 
   expect_no_error(setWithSummary <- randomSet %>%
                     addSummaryAcrossWindows(DMRdata, fn = median, normMethod = "beta") %>%
-                    addSummaryAcrossWindows(DMRdata %>% filter(Tumor_vs_Normal_log2FC >= 2), fn = max, normMethod = "nrpm", prefix = "highest_only"))
+                    addSummaryAcrossWindows(DMRdata %>% filter(Tumor_vs_Normal_log2FC >= 2), fn = max, normMethod = "nrpm", suffix = "highest_only"))
 
   expect_true(setWithSummary %>% is.qseaSet())
   expect_true("beta_median" %in% colnames(getSampleTable(setWithSummary)))
-  expect_true("highest_only_nrpm_max" %in% colnames(getSampleTable(setWithSummary)))
+  expect_true("nrpm_max_highest_only" %in% colnames(getSampleTable(setWithSummary)))
 
 })
 

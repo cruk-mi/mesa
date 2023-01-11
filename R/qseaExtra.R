@@ -634,10 +634,10 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
 #' @param qseaSet The qseaSet object.
 #' @param windowsToUse A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
-#' @param prefix A prefix for adding to the new columns of data, to clarify what regions for instance.
+#' @param suffix A suffix for adding to the new columns of data, to clarify what regions for instance.
 #' @param addSampleTable A boolean with whether to add the sampleTable on to the output table
 #' @param normMethod One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").
-#' @param naMethod What method to use to deal with NA values (for beta values). Options are "drop" or "impute".
+#' @param naMethod What method to use to deal with NA values (for beta values). Options are "drop" or "na.rm" (default).
 #' @param minEnrichment For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
 #' @param fnName Name of the function. Should only be necessary to use if you are doing something unusual, otherwise detected automatically.
 #' @return A table of data, one row per sample, with columns indicating the application of the summary statistic to the
@@ -648,9 +648,9 @@ summariseAcrossWindows <- function(qseaSet,
                                    fn = mean,
                                    addSampleTable = TRUE,
                                    normMethod = c("nrpm", "beta"),
-                                   naMethod = "impute",
+                                   naMethod = "na.rm",
                                    minEnrichment = 3,
-                                   prefix = "",
+                                   suffix = "",
                                    fnName = NULL) {
     #TODO: Can we get multiple summary statistics in one go?
 
@@ -658,8 +658,8 @@ summariseAcrossWindows <- function(qseaSet,
     fnName = as.character(substitute(fn, env = environment()))
   }
 
-    #if prefix doesn't end in "_" then add that to the string
-    prefix = ifelse(stringr::str_detect(prefix, "_$") | nchar(prefix) == 0 ,prefix,paste0(prefix,"_"))
+    #if suffix doesn't start with "_" then add that to the string
+    suffix = ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
 
     if(is.null(windowsToUse)){
       windowsToUse <- qsea::getRegions(qseaSet)
@@ -673,14 +673,14 @@ summariseAcrossWindows <- function(qseaSet,
 
     if(naMethod == "drop"){
 
-      message("Dropping rows with any NA values")
+      message("Dropping rows with an NA value in any sample")
 
       dataMat <- dataMat %>%
         tidyr::drop_na()
 
     }
 
-    if(naMethod == "impute"){
+    if(naMethod == "na.rm"){
       message("Removing NA values on a per-sample basis")
     }
 
@@ -692,9 +692,9 @@ summariseAcrossWindows <- function(qseaSet,
 
                      out <- temp %>%
                        apply(2, fn, na.rm = TRUE) %>%
-                       tibble::enframe(name = "sample_name", value = paste0(prefix, normType, "_", fnName)) %>%
-                       dplyr::mutate(nRegions = temp %>% apply(2,function(x) !is.na(x)) %>% colSums()) %>%
-                       dplyr::rename_with(~stringr::str_replace(.x, "nRegions", paste0(prefix, "nRegions_", normType)))
+                       tibble::enframe(name = "sample_name", value = paste0(normType, "_", fnName, suffix)) %>%
+                       dplyr::mutate(num_windows = temp %>% apply(2,function(x) !is.na(x)) %>% colSums()) %>%
+                       dplyr::rename_with(~stringr::str_replace(.x, "num_windows", paste0(normType, "_num_windows", suffix)))
 
                    }
     ) %>%
@@ -713,7 +713,7 @@ summariseAcrossWindows <- function(qseaSet,
 #' @param qseaSet The qseaSet object.
 #' @param windowsToUse A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
-#' @param prefix A prefix for adding to the new columns of data, to clarify where the regions came from for instance.
+#' @param suffix A suffix for adding to the new columns of data, to clarify where the regions came from for instance.
 #' @param normMethod One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").
 #' @param naMethod What method to use to deal with NA values (for beta values). Options are "drop" or "impute".
 #' @param minEnrichment For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
@@ -723,7 +723,7 @@ summariseAcrossWindows <- function(qseaSet,
 addSummaryAcrossWindows <- function(qseaSet,
                                     windowsToUse = NULL,
                                     fn = mean,
-                                    prefix = "",
+                                    suffix = "",
                                     normMethod = c("nrpm", "beta"),
                                     naMethod = "impute",
                                     minEnrichment = 3) {
@@ -734,7 +734,7 @@ addSummaryAcrossWindows <- function(qseaSet,
   summaryTable <- summariseAcrossWindows(qseaSet,
                                          windowsToUse = windowsToUse,
                                          fn = fn,
-                         prefix = prefix, addSampleTable = FALSE,
+                                         suffix = suffix, addSampleTable = FALSE,
                          normMethod = normMethod,
                          naMethod = naMethod,
                          minEnrichment = minEnrichment,

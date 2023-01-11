@@ -8,7 +8,7 @@ addSummaryAcrossWindows(
   qseaSet,
   windowsToUse = NULL,
   fn = mean,
-  prefix = "",
+  suffix = "",
   normMethod = c("nrpm", "beta"),
   naMethod = "impute",
   minEnrichment = 3
@@ -21,7 +21,7 @@ addSummaryAcrossWindows(
 
 \item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
 
-\item{prefix}{A prefix for adding to the new columns of data, to clarify where the regions came from for instance.}
+\item{suffix}{A suffix for adding to the new columns of data, to clarify where the regions came from for instance.}
 
 \item{normMethod}{One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").}
 

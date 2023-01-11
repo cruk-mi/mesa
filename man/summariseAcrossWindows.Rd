@@ -10,9 +10,9 @@ summariseAcrossWindows(
   fn = mean,
   addSampleTable = TRUE,
   normMethod = c("nrpm", "beta"),
-  naMethod = "impute",
+  naMethod = "na.rm",
   minEnrichment = 3,
-  prefix = "",
+  suffix = "",
   fnName = NULL
 )
 }
@@ -27,11 +27,11 @@ summariseAcrossWindows(
 
 \item{normMethod}{One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").}
 
-\item{naMethod}{What method to use to deal with NA values (for beta values). Options are "drop" or "impute".}
+\item{naMethod}{What method to use to deal with NA values (for beta values). Options are "drop" or "na.rm" (default).}
 
 \item{minEnrichment}{For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.}
 
-\item{prefix}{A prefix for adding to the new columns of data, to clarify what regions for instance.}
+\item{suffix}{A suffix for adding to the new columns of data, to clarify what regions for instance.}
 
 \item{fnName}{Name of the function. Should only be necessary to use if you are doing something unusual, otherwise detected automatically.}
 }
