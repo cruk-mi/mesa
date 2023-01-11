@@ -10,6 +10,19 @@ before_script:
   - Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); BiocManager::install(ask=FALSE)"
   - Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); devtools::install('.', dependencies=TRUE, build_vignettes=TRUE, repos = BiocManager::repositories())"
 
+build:
+  stage: build
+  tags: 
+    - methylationprojects
+  script:
+    - echo "Do your build here"
+    - pwd && ls -lah
+    - cat "FROM bioconductor/bioconductor_docker:devel" > Dockerfile
+    - cat "WORKDIR /home/rstudio" >> Dockerfile
+    - cat "COPY --chown=rstudio:rstudio . /home/rstudio/" >> Dockerfile
+    - cat "RUN Rscript installDependencies.R" >> Dockerfile
+    - docker build -t crukmi/mesa_dependencies .
+
 devtools-check:
   stage: test
   tags:
