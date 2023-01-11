@@ -1,22 +1,22 @@
-library(tidyverse)
+remotes::install_cran(c("tibble","dplyr","stringr"))
 
 lines_df <- readLines("DESCRIPTION") %>%
-  enframe()
+  tibble::enframe()
 
 import_line <- lines_df %>%
-  filter(value == "Imports:") %>%
-  pull(name)
+  dplyr::filter(value == "Imports:") %>%
+  dplyr::pull(name)
 
 biocViews_line <- lines_df %>%
-  filter(str_detect(value,"biocViews:")) %>%
-  pull(name)
+  dplyr::filter(stringr::str_detect(value,"biocViews:")) %>%
+  dplyr::pull(name)
 
 requiredPackages <- lines_df %>%
-  filter(name > import_line, name < biocViews_line) %>%
-  filter(!str_detect(value,"Depends:|^R\\(")) %>%
-  mutate(value = str_remove_all(value, " |,"),
-         value = str_remove_all(value,"\\(.*|VignetteBuilder:")) %>%
-  filter(value != "R") %>%
-  pull(value)
+  dplyr::filter(name > import_line, name < biocViews_line) %>%
+  dplyr::filter(!stringr::str_detect(value,"Depends:|^R\\(")) %>%
+  dplyr::mutate(value = stringr::str_remove_all(value, " |,"),
+         value = stringr::str_remove_all(value,"\\(.*|VignetteBuilder:")) %>%
+  dplyr::filter(value != "R") %>%
+  dplyr::pull(value)
 
 remotes::install_cran(requiredPackages, repos = BiocManager::repositories())
