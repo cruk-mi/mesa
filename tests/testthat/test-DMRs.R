@@ -62,13 +62,13 @@ test_that("plotting DMRs", {
 
 
   expect_no_error( randomSet %>%
-    plotGRangesHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) )) #expect no error
+    plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) )) #expect no error
 
   expect_no_error( randomSet %>%
-                  plotGRangesHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                  plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      normMethod = "beta"))
 
   expect_no_error( randomSet %>%
-                  plotGRangesHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                  plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE))
   })

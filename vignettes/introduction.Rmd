@@ -354,18 +354,18 @@ This function works on any data frame with the columns `seqnames`, `start` and `
 
 ### Plotting DMRs
 
-We can use the `plotGRangesHeatmap` function to plot a heatmap of these 15 windows. This takes a qseaSet as the first argument, and either a GRanges object or a data frame with columns `seqnames`, `start` and `end` as the second argument. 
+We can use the `plotRegionsHeatmap` function to plot a heatmap of these 15 windows. This takes a qseaSet as the first argument, and either a GRanges object or a data frame with columns `seqnames`, `start` and `end` as the second argument. 
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(DMRsCovariatePatient)
+  plotRegionsHeatmap(DMRsCovariatePatient)
 ```
 
 The default is to plot this with the beta values, but you can change that via the `normMethod` option, to get normalised reads per million:
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, normMethod = "nrpm", clusterRows = TRUE)
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, normMethod = "nrpm", clusterRows = TRUE)
 ```
 
 This `normMethod` option occurs in a number of functions, with the common choices of `counts`, `nrpm` or `beta` (other options exist within `qsea`).
@@ -374,7 +374,7 @@ To add an annotation bar on the top, we can pass the `getAnnotationDataFrame` fu
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type))
 ```
 
@@ -385,13 +385,13 @@ annotColours <- list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"),
      type = c("CRC" = "orange","LUAD" = "lightgreen", "LUSC" = "darkgreen", "NormalColon" = "tan", "NormalLung" = "grey"))
 
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRs, 
+  plotRegionsHeatmap(regionsToOverlap = DMRs, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))
                      )
 
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRs, 
+  plotRegionsHeatmap(regionsToOverlap = DMRs, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = annotColours
                      )
@@ -401,7 +401,7 @@ The heatmap also takes a `description` argument, which is added to the top of th
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient"
@@ -412,7 +412,7 @@ Rows can be clustered using the `clusterRows = TRUE` option:
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient",
@@ -425,7 +425,7 @@ The number of clusters to break the column dendogram into can be controlled usin
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient",

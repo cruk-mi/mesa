@@ -18,7 +18,7 @@
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 
-plotGRangesHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
+plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
                                annotationCol = NULL,
                                annotationColors = NA, clusterRows = FALSE, clusterCols = TRUE,
                                minEnrichment = 3, maxScale = 5, clusterNum = 2, description = "",
