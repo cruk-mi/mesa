@@ -146,14 +146,14 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
     pb$tick()
     print("")
-    if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.1 & checkPVals) {
+    if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.2 & checkPVals) {
 
       if(is.null(covariates)){
-        warning("Warning! More than 10% of windows have p-values of exactly 0, possibly something has gone wrong! \n
-           Set checkPVals = FALSE to ignore this if sure.")
+        warning("Warning! More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
+           Set checkPVals = FALSE to ignore this.")
       } else {
 
-      stop("Error! More than 10% of windows have p-values of exactly 0, possibly an error! \n
+      stop("Error! More than 20% of windows have p-values of exactly 0, possibly an error! \n
            Try not including covariates in the model if included, or set checkPVals = FALSE to ignore this if sure.")
       }
     }
@@ -293,12 +293,11 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param formula Alternative formula mode for calculating DMRs (not recommended)
 #' @param minNRPM A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).
 #' @param minReadCount A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.
-#' @param sampleNames Which samples to return the information for.
 #' @param fdrThres False discovery rate threshold.
 #' @param keepData Whether to keep the individual data columns in the output
 #' @param keepGroupMeans Whether to keep the group means in the output
 #' @param keepPvals Whether to keep the unadjusted p-values in the output
-#' @param checkPVals Whether to check that the p-values aren't all zero to avoid a bug with covariates, only turn this off if you are very sure what you are doing!
+#' @param checkPVals Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!
 #' @param direction Whether to keep regions that are up/down/both.
 #' @return A tibble with the data
 #' @export
@@ -370,7 +369,7 @@ calculateDMRs <- function(qseaSet,
                         minNRPM = minNRPM,
                         checkPVals = checkPVals, formula = formula)
 
-  dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = getSampleNames(qseaSet),
+  dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = qsea::getSampleNames(qseaSet),
                            fdrThres = fdrThres, keepPvals = keepPvals, keepData = keepData,
                            keepGroupMeans = keepGroupMeans,
                            variable = variable,

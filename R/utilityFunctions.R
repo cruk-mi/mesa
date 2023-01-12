@@ -2,7 +2,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                          "ROI_start","ROI_end","value","window_start","window_end","window","sample_name",
                          "width","group","relH","CpG_density","strand","state","gene_name","map","CNV",
                          "EMSEMBL","SYMBOL","GENENAME","geneChr","geneStart","geneEnd","geneLength","n",
-                         "adjPval","group1","sample2",".up","hyperStableFractionp8","hyperStableFractionp9","hyperStableEdgar",
+                         "adjPval","group1","group2","sample1","sample2",".up","hyperStableFractionp8","hyperStableFractionp9","hyperStableEdgar",
                          "isProperPair","isUnmappedQuery","isSupplementaryAlignment","isDuplicate","hasUnmappedMate",
                        "isNotPassingQualityControls","rname","pos","isize","MQ","mapq","isFirstMateRead","isPaired",
                        "cigar", ".rowID", "feature","annoShort","type",".comparison",".ext",".value","total_fragments",
@@ -55,7 +55,7 @@ liftOverHg19 <- function(grOrDf){
 setMesaGenome <- function(genome){
   options("mesa_genome" = genome)
 
-  return(invisible())
+  return(invisible(TRUE))
 }
 
 expect_no_error <- function(object) {
