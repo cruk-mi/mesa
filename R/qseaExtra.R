@@ -317,11 +317,12 @@ downSample <- function(qseaSet, nReads, renormalise = TRUE){
   return(qseaSet)
 }
 
-#' This function calculates the beta values for the windows covering the hg38 array probes.
-#' @param qseaSet qseaSet object to calculate approximate beta values for the probes
+#' This function calculates the beta values for the windows covering probes from a methylation array.
+#' @param qseaSet qseaSet object to calculate approximate beta values for
+#' @param arrayDetails Either a
 #' @export
 #'
-convertToArrayBetaTable <- function(qseaSet) {
+convertToArrayBetaTable <- function(qseaSet, arrayType = "Infinium405k") {
 
   qseaSet %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = mesa::hg38_450kArrayGR) %>%

@@ -2,13 +2,15 @@
 % Please edit documentation in R/qseaExtra.R
 \name{convertToArrayBetaTable}
 \alias{convertToArrayBetaTable}
-\title{This function calculates the beta values for the windows covering the hg38 array probes.}
+\title{This function calculates the beta values for the windows covering probes from a methylation array.}
 \usage{
-convertToArrayBetaTable(qseaSet)
+convertToArrayBetaTable(qseaSet, arrayType = "Infinium405k")
 }
 \arguments{
-\item{qseaSet}{qseaSet object to calculate approximate beta values for the probes}
+\item{qseaSet}{qseaSet object to calculate approximate beta values for}
+
+\item{arrayDetails}{Either a}
 }
 \description{
-This function calculates the beta values for the windows covering the hg38 array probes.
+This function calculates the beta values for the windows covering probes from a methylation array.
 }

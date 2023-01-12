@@ -85,32 +85,30 @@ selectQset <- function(qseaSet, ...){
   return(qseaSet)
 }
 
-#' This function extends the dplyr function pull to act on qseaSet sampleTable.
+#' This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.
 #' @method pull qseaSet
 #' @importFrom dplyr pull
-#' @param .data A qseaSet to pull a column from the sampleTable of.
+#' @param .data A qseaSet.
 #' @param var A variable specified as a column name or an integer (negative counting from right)
 #' @param name An optional parameter that specifies the column to be used as names for a named vector. Specified in a similar manner as var.
 #' @param ... Other arguments to pass to dplyr::pull (column name to extract)
-#' @return A vector with the contents of the column of the sample table that was extracted.
+#' @return A vector the same size as the number of samples in the qseaSet.
 #' @export pull.qseaSet
 #' @export
 pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
-  stop("This S3 method function is not currently working, please use pullQset directly instead.")
-  pullQset(.data, var = var, name = name, ...)}
 
+  .data <- .data %>% qsea::getSampleTable()
 
-#' This function takes a qseaSet and pulls a column from its sampleTable based on a call to dplyr::pull
-#' @param qseaSet The qseaSet object.
-#' @param ... Other arguments to pass to dplyr::pull
-#' @return A column of the sampleTable as a vector
-#' @export
-pullQset <- function(qseaSet, ...){
-  qseaSet %>%
-    qsea::getSampleTable() %>%
-    dplyr::pull(...) %>%
-    return()
-}
+  #code copied directly from dplyr::pull
+  var <- tidyselect::vars_pull(names(.data), !!rlang::enquo(var))
+  name <- rlang::enquo(name)
+  if (rlang::quo_is_null(name)) {
+    return(.data[[var]])
+  }
+  name <- tidyselect::vars_pull(names(.data), !!name)
+  rlang::set_names(.data[[var]], nm = .data[[name]])
+
+  }
 
 #' This function extends the function sort to act on qseaSet, to reorder the names. It uses gtools::mixedsort to sort numbers correctly (i.e. 10 does not come before 2).
 #' @method sort qseaSet
