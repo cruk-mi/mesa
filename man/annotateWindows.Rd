@@ -14,7 +14,7 @@ annotateWindows(
 )
 }
 \arguments{
-\item{dataTable}{The output of makeTable}
+\item{dataTable}{A data frame which can be coerced into a GRanges object or a GRanges object directly.}
 
 \item{genome}{A genome string to set the rest of the parameters (currently only hg38/GRCh38 supported)}
 
@@ -30,5 +30,6 @@ annotateWindows(
 A tibble with the data, augmented with ChIPseeker region location and CpG island information.
 }
 \description{
-This function extracts the information from one contrast into a wide table
+This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
+Defaults to being hg38, unless
 }

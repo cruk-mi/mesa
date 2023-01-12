@@ -29,9 +29,10 @@ setMethod('getMart', 'qseaSet', function(object)
 
 #' Add annotation onto a data table
 #'
-#' This function extracts the information from one contrast into a wide table
+#' This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
+#' Defaults to being hg38, unless
 #'
-#' @param dataTable The output of makeTable
+#' @param dataTable A data frame which can be coerced into a GRanges object or a GRanges object directly.
 #' @param genome A genome string to set the rest of the parameters (currently only hg38/GRCh38 supported)
 #' @param TxDb A TxDb database object (unquoted) to pass to ChIPseeker::annotatePeak
 #' @param annoDb A string giving a Bioconductor annotation package, such as "org.Hs.eg.db"
@@ -60,15 +61,22 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
         call. = FALSE
       )
     }
-
-    annoDb = "org.Hs.eg.db" }
+    annoDb = "org.Hs.eg.db"
+    }
 
   if(genome  %in% c("hg38","GRCh38") & is.null(CpGislandsGR)) { CpGislandsGR = mesa::hg38CpGIslands }
 
   if(genome  %in% c("hg38","GRCh38") & is.null(FantomRegionsGR)) { FantomRegionsGR = mesa::FantomRegions %>% plyranges::as_granges()}
 
-  chipseekerData <- dataTable %>%
-    qseaTableToChrGRanges() %>%
+
+  if(is(dataTable,"GRanges")) {
+    GRangesObject <- dataTable
+  } else{
+    GRangesObject <- dataTable %>%
+      qseaTableToChrGRanges()
+  }
+
+  chipseekerData <- GRangesObject %>%
     ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
                              level = "transcript", # changed from gene to transcript to stop it outputting some genes as being >10Mb long
                              TxDb = TxDb,
@@ -342,7 +350,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
     else {stop("Only Infinium450k implemented currently as a string.")}
 
   } else {
-    arrayObject <- asValidGranges(object)
+    arrayObject <- asValidGranges(arrayDetails)
   }
 
   if(!("ID" %in% colnames(GenomicRanges::mcols(arrayObject)))){

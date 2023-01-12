@@ -40,10 +40,23 @@ liftOverHg19 <- function(grOrDf){
   return(unlist(liftover_result))
 }
 
-.getGenome <- function() {
+.getMesaGenome <- function() {
   getOption("mesa_genome", default="hg38")
 }
 
+#' This function sets a default genome for the annotateWindows to use
+#'
+#' Currently supporting "hg38" and "GRCh38", this sets the TxDb and annoDb options to appropriate files.
+#'
+#' @param genome String corresponding to a genome.
+#' @return None
+#' @export
+
+setMesaGenome <- function(genome){
+  options("mesa_genome" = genome)
+
+  return(invisible())
+}
 
 expect_no_error <- function(object) {
   testthat::expect_error({{ object }}, NA)
