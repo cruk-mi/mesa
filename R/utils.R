@@ -76,6 +76,20 @@ getPattern <- function(qseaSet) {
     return()
 }
 
+#' Extract the windows used inside the qseaSet.
+#'
+#' This function is just a renaming wrapper of the getRegions function from qsea.
+#' @param qseaSet A qseaSet
+#' @export
+#' @examples
+#' getWindows(exampleTumourNormal)
+#'
+getWindows <- function(qseaSet) {
+  qseaSet %>%
+    qsea::getRegions() %>%
+    return()
+}
+
 #' This function removes columns that are mostly NA (with some proportion)
 #' Based off the janitor::remove_empty_cols function.
 #' @param dat A data frame to filter almost empty columns from
