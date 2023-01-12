@@ -4,5 +4,5 @@ WORKDIR /home/rstudio
 
 COPY --chown=rstudio:rstudio . /home/rstudio/
 
-apt-get install qpdf -y
+apt-get install -y qpdf
 RUN Rscript installDependencies.R
