@@ -6,36 +6,36 @@
 #' @param variable The variable to treat as the independent variable between samples in the linear model
 #' @param covariates A vector including any additional covariates to include in the model
 #' @param formula A formula to use
-#' @param contrastsToDo A data frame with the comparisons to do
+#' @param contrasts A data frame with the comparisons to do
 #' @param keepIndex A vector of indices to keep, overwrites minReadCount.
 #' @param minReadCount A minimum read count for a row to be considered, in the qseaSet as provided.
 #' @param minNRPM A minimum normalised reads per million to apply
 #' @param checkPVals Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.
 #' @return A qseaGLM object
 fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
-                       contrastsToDo = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
+                       contrasts = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
                        checkPVals = TRUE, formula = NULL){
 
   sampleTable <- qsea::getSampleTable(qseaSet)
 
-  if (!is.null(contrastsToDo)) {
-    nContrasts <- nrow(contrastsToDo)
+  if (!is.null(contrasts)) {
+    nContrasts <- nrow(contrasts)
   }else{
     nContrasts <- 0
   }
 
-  if (nContrasts > 0 & is.null(variable) & is.data.frame(contrastsToDo)) {
+  if (nContrasts > 0 & is.null(variable) & is.data.frame(contrasts)) {
 
-    if ("variable" %in% colnames(contrastsToDo)) {
+    if ("variable" %in% colnames(contrasts)) {
 
-      variablesInTable <- contrastsToDo %>%
+      variablesInTable <- contrasts %>%
         dplyr::pull(variable) %>%
         unique()
 
       if (length(variablesInTable) == 1) {
         variable <- variablesInTable
       } else {
-        stop(glue::glue("Multiple variables present in contrastsToDo: {variablesInTable} "))
+        stop(glue::glue("Multiple variables present in contrasts: {variablesInTable} "))
       }
 
     } else if (!is.null(formula)) {
@@ -61,9 +61,18 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   # make a design object based on the formula
   design <- stats::model.matrix(formula, sampleTable)
 
-  valuesInContrasts <- contrastsToDo %>%
-    tidyr::pivot_longer(tidyselect::starts_with("sample"), names_to = "name", values_to = "sample") %>%
-    dplyr::pull(sample)
+  contrasts <- contrasts %>%
+    dplyr::select(-tidyselect::matches("^variable$"))
+
+  if( ncol(contrasts) == 2){
+    colnames(contrasts) <- c("group1", "group2")
+  } else {
+    colnames(contrasts)[1:2] <- c("group1", "group2")
+  }
+
+  valuesInContrasts <- contrasts %>%
+    tidyr::pivot_longer(tidyselect::starts_with("group"), names_to = "name", values_to = "group") %>%
+    dplyr::pull(group)
 
   samplesInContrasts <- sampleTable %>%
     dplyr::filter(!!rlang::sym(variable) %in% valuesInContrasts) %>%
@@ -77,7 +86,8 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
     keepIndex <- qseaSet %>%
       qsea::makeTable(samples = samplesInContrasts,
-                      norm_methods = "nrpm", chunksize = 1000000) %>%
+                      norm_methods = "nrpm",
+                      chunksize = 1000000) %>%
       dplyr::select(tidyselect::matches("nrpm")) %>%
       apply(1,max) %>%
       {which(. >= minNRPM)}
@@ -101,20 +111,20 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
   # Yes, a for loop. The issue is that it adds repeatedly to the qseaGLM object, so can't be vectorised easily.
   print("Starting contrasts")
-  for (i in seq_along(1:nrow(contrastsToDo))) {
+  for (i in seq_along(1:nrow(contrasts))) {
 
-    conName <- paste0(variable, contrastsToDo[i,"sample1"], "-", variable, contrastsToDo[i,"sample2"])
+    conName <- paste0(variable, contrasts[i,"group1"], "-", variable, contrasts[i,"group2"])
 
-    if (!(contrastsToDo[i,"sample1"] %in% sampleTable[,variable])) {
-      stop(glue::glue("value {contrastsToDo[i,]$sample1} not found in column {variable} of the sampleTable!"))
+    if (!(contrasts[i,"group1"] %in% sampleTable[,variable])) {
+      stop(glue::glue("value {contrasts[i,]$group1} not found in column {variable} of the sampleTable!"))
     }
 
-    if (!(contrastsToDo[i,"sample2"] %in% sampleTable[,variable])) {
-      stop(glue::glue("value {contrastsToDo[i,]$sample2} not found in column {variable} of the sampleTable!"))
+    if (!(contrasts[i,"group2"] %in% sampleTable[,variable])) {
+      stop(glue::glue("value {contrasts[i,]$group2} not found in column {variable} of the sampleTable!"))
     }
 
-    if ("name" %in% colnames(contrastsToDo)) {
-      conNameClean <- contrastsToDo[i,"name"] %>% dplyr::pull()
+    if ("name" %in% colnames(contrasts)) {
+      conNameClean <- contrasts[i,"name"] %>% dplyr::pull()
     }else{
       # Remove the hyphen from the name, because it messes up things later.
       # Also remove the variable name (whatever it is)
@@ -172,9 +182,7 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
                         fdrThres = 0.05, keepPvals = FALSE, keepFragmentInfo = FALSE,
                         direction = "both"){
 
-  #if (is.null(sampleTable)) {
   sampleTable <- qsea::getSampleTable(qseaSet)
-  #}
 
   if (is.null(sampleNames)){
     if(keepData) {
@@ -252,30 +260,26 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
   return(dataTable)
 }
 
-#' Make a full set of contrasts
+#' Make a full set of possible contrasts for calculating DMRs on.
 #'
-#' This function fits a GLM and returns the resulting data table
+#' This function returns a set of all possible contrasts
 #'
 #' @param qseaSet The qseaSet object
 #' @param variable Which variable to use to calculate the DMRs between
-#' @return A tibble with the data
+#' @return A tibble with two columns, each row with a pair of contrasts
 #' @export
 #'
 makeAllContrasts <- function(qseaSet, variable){
-  #TODO remove the message about new names by intercepting it
-  contrastsToDo <- qseaSet %>%
+  vals <- qseaSet %>%
     qsea::getSampleTable() %>%
-    tidyr::drop_na(variable) %>%
+    tidyr::drop_na(tidyselect::all_of(variable)) %>%
     dplyr::pull(variable) %>%
     unique() %>%
-    gtools::mixedsort() %>%
-    utils::combn(2) %>%
-    t()  %>%
-    tibble::as_tibble(.name_repair = "unique") %>%
-    stats::setNames(c("sample1","sample2")) %>%
-    dplyr::filter(sample1 != sample2)
+    gtools::mixedsort()
 
-  return(contrastsToDo)
+  tidyr::expand_grid(group1 = vals, group2 = vals) %>%
+    filter(group1 < group2) %>%
+    return()
 }
 
 #' Fit the GLM and return the data
@@ -285,7 +289,7 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param qseaSet The qseaSet object
 #' @param variable Which variable to use to calculate the DMRs between
 #' @param covariates Any variables to use as covariates, for instance patient in a paired analysis
-#' @param contrastsToDo A data frame with two columns, sample1 and sample2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted
+#' @param contrasts A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted
 #' @param formula Alternative formula mode for calculating DMRs (not recommended)
 #' @param minNRPM A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).
 #' @param minReadCount A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.
@@ -299,10 +303,10 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @return A tibble with the data
 #' @export
 #'
-calculateDMRs <- function(qseaSet, variable = NULL,
-                          sampleNames = NULL,
+calculateDMRs <- function(qseaSet,
+                          variable = NULL,
                           covariates = NULL,
-                          contrastsToDo = NULL,
+                          contrasts = NULL,
                           minReadCount = 0,
                           minNRPM = 1,
                           checkPVals = TRUE,
@@ -315,48 +319,68 @@ calculateDMRs <- function(qseaSet, variable = NULL,
 
   if (is.null(variable)) {stop("variable must be specified!")}
 
-  if (!is.data.frame(contrastsToDo)) {
-    if (contrastsToDo %in% c("All", "all")) {
-      contrastsToDo <- makeAllContrasts(qseaSet, variable)
+  if (!is.data.frame(contrasts)) {
+    if (contrasts %in% c("All", "all")) {
+      contrasts <- makeAllContrasts(qseaSet, variable)
       message(
         glue::glue(
-          "Calculating {nrow(contrastsToDo)} possible contrasts on the {variable} column."
+          "Calculating {nrow(contrasts)} possible contrasts on the {variable} column."
         )
       )
-    } else if (contrastsToDo %in% c("First", "first")) {
-        contrastsToDo <- makeAllContrasts(qseaSet, variable)[1, ]
+    } else if (contrasts %in% c("First", "first")) {
+        contrasts <- makeAllContrasts(qseaSet, variable)[1, ]
         message(glue::glue(
           "Calculating the first possible contrast on the {variable} column."
         ))
-    } else if (stringr::str_detect(contrastsToDo,"All_vs_")){
+    } else if (stringr::str_detect(contrasts,"All_vs_|all_vs_")){
 
-        value2 = contrastsToDo %>% stringr::str_remove("All_vs_")
-        contrastsToDo <- tibble::tibble(sample1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
-                                        sample2 = value2)
+        value2 = contrasts %>% stringr::str_remove("All_vs_|all_vs_")
+        contrasts <- tibble::tibble(group1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
+                                        group2 = value2)
+        message(glue::glue(
+          "Calculating all ({nrow(contrasts)}) possible contrasts against {value2} on the {variable} column."
+        ))
+    } else if (stringr::str_detect(contrasts,"_vs_All")){
+
+      value1 = contrasts %>% stringr::str_remove("_vs_All|_vs_all")
+      contrasts <- tibble::tibble(group1 = value1,
+                                  group2 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value1))
+      message(glue::glue(
+        "Calculating all ({nrow(contrasts)}) possible contrasts between {value1} and the rest of {variable} column."
+      ))
+    } else {
+      stop("String {contrasts} not recognised.")
     }
 
   }
 
+  contrasts <- contrasts %>%
+    dplyr::select(-tidyselect::matches("^variable$"))
 
+  if( ncol(contrasts) == 2){
+    colnames(contrasts) <- c("group1", "group2")
+  } else {
+    stop("Contrasts data frame should contain columns group1 and group2 (or exactly two columns).")
+  }
 
-  if(is.null(contrastsToDo)){stop("No contrasts specified!")}
+  if(is.null(contrasts)){stop("No contrasts specified!")}
 
   qseaGLM <- fitQseaGLM(qseaSet, variable = variable,  covariates = covariates,
-                        contrastsToDo = contrastsToDo,  minReadCount = minReadCount,
+                        contrasts = contrasts,  minReadCount = minReadCount,
                         minNRPM = minNRPM,
                         checkPVals = checkPVals, formula = formula)
 
-  dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = sampleNames,
+  dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = getSampleNames(qseaSet),
                            fdrThres = fdrThres, keepPvals = keepPvals, keepData = keepData,
                            keepGroupMeans = keepGroupMeans,
                            variable = variable,
                            direction = direction) %>%
     dplyr::rename(seqnames = chr, start = window_start, end = window_end)
 
-  deltas  <- purrr::map_dfc(1:nrow(contrastsToDo),
+  deltas  <- purrr::map_dfc(1:nrow(contrasts),
                             function(x){
-                              name1 <- contrastsToDo[x,]$sample1
-                              name2 <- contrastsToDo[x,]$sample2
+                              name1 <- contrasts[x,]$group1
+                              name2 <- contrasts[x,]$group2
                               (dataTable[,paste0(name1,"_beta_means")] - dataTable[,paste0(name2,"_beta_means")]) %>%
                                 tibble::enframe(name = "rowIndex", value = paste0(name1,"_vs_",name2,"_betaDelta")) %>%
                                 dplyr::select(-rowIndex)

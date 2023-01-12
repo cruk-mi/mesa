@@ -11,7 +11,7 @@ test_that("Calculating DMRs", {
 
   expect_no_error( DMRdata <- randomSet %>%
                  calculateDMRs(variable = "group",
-                               contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
+                               contrasts = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
 
   expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
 
@@ -21,7 +21,7 @@ test_that("Calculating DMRs", {
 
   expect_no_error(DMRdata <- randomSet %>%
                   calculateDMRs(variable = "group", covariates = "patient",
-                                contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
+                                contrasts = tibble::tibble(group1 = "Tumor", group2 = "Normal")))
 
   expect_no_error(summariseDefault <- randomSet %>% summariseAcrossWindows(DMRdata))
 
@@ -58,7 +58,7 @@ test_that("plotting DMRs", {
 
   DMRdata <- randomSet %>%
                   calculateDMRs(variable = "group",
-                                contrastsToDo = tibble::tibble(sample1 = "Tumor", sample2 = "Normal"))
+                                contrasts = tibble::tibble(sample1 = "Tumor", sample2 = "Normal"))
 
 
   expect_no_error( randomSet %>%
