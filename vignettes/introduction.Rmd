@@ -231,11 +231,6 @@ There are also three other slots of the qseaSet, where it stores internal inform
 
 # Quality Control
 
-```{r}
-qseaSet %>%
-  
-```
-
 # Differentially Methylated Regions
 ## Introduction
 One very important question in analysis of ME-Seq is the calculation of differentially methylated regions. This requires looking over the windows and asking whether there is a change in the amount of methylation between certain conditions.
