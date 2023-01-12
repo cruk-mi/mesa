@@ -387,9 +387,15 @@ calculateDMRs <- function(qseaSet,
                             }
   )
 
-  dataTable %>%
+  dataTable <- dataTable %>%
     dplyr::bind_cols(deltas) %>%
-    tibble::as_tibble() %>%
-    return()
+    tibble::as_tibble()
+
+    # ewww, a for loop. Moves the betaDelta columns around.
+    for(adjPvalString in (dataTable %>% colnames() %>% stringr::str_subset("_adjPval$"))){
+      dataTable <- dataTable %>% dplyr::relocate(stringr::str_replace(adjPvalString, "_adjPval$","_betaDelta"), .after = !!adjPvalString)
+    }
+
+    return(dataTable)
 
 }

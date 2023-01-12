@@ -235,18 +235,21 @@ There are also three other slots of the qseaSet, where it stores internal inform
 ## Introduction
 One very important question in analysis of ME-Seq is the calculation of differentially methylated regions. This requires looking over the windows and asking whether there is a change in the amount of methylation between certain conditions.
 
-To calculate these, `mesa` wraps several functions from `qsea` into a single function, called `calculateDMRs`. The arguments to this are which variable to make comparisons on, for instance we can ask what is differentially methylated between the different states of the `tumour` variable in the sampleTable. These comparisons are called "contrasts". The option `contrasts` controls what contrasts (comparisons) to perform. This takes either a string, such as "first" or "all", or a dataframe/tibble with columns `sample1` and `sample2`.
+To calculate these, `mesa` wraps several functions from `qsea` into a single function, called `calculateDMRs`. The mandatory arguments for this are which `variable` to make comparisons on (as a string), and what `contrasts` (comparisons) to perform.
+For instance, we can ask which windows are differentially methylated between the different states of the `tumour` column in the sampleTable. The `contrasts` option can be a few string settings, such as `"all"` or `"first"`:
 
 ```{r}
 qseaSet %>%
   calculateDMRs(variable = "tumour",
-                contrasts = "all") %>%
-  as_tibble()
+                contrasts = "all") 
+```
 
+Or we can provide a dataframe containing the contrasts that we wish to perform:
+
+```{r}
 qseaSet %>%
   calculateDMRs(variable = "tumour",
-                contrasts = tibble(sample1 = "Tumour", sample2 = "Normal")) %>%
-  as_tibble()
+                contrasts = tibble(group1 = "Tumour", group2 = "Normal")) 
 ```
 
 The output of this function is a dataframe. Each row corresponds to a window which was considered to be differentially methylated at the False Discovery Rate (FDR) threshold applied to the adjusted p-values. The first four columns include the window information: `seqnames` (chromosome), `start` and `end` of the window and the CpG_density. The next columns are related to the contrasts undertaken, giving the log2 fold change, `Tumour_vs_Normal_log2FC`, and the adjusted p-value, `Tumour_vs_Normal_adjPval`, respectively.
