@@ -331,7 +331,7 @@ calculateDMRs <- function(qseaSet, variable = NULL,
     } else if (stringr::str_detect(contrastsToDo,"All_vs_")){
 
         value2 = contrastsToDo %>% stringr::str_remove("All_vs_")
-        contrastsToDo <- tibble::tibble(sample1 = qseaSet %>% pullQset(variable) %>% unique() %>% setdiff(value2),
+        contrastsToDo <- tibble::tibble(sample1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
                                         sample2 = value2)
     }
 

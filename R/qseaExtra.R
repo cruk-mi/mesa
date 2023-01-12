@@ -317,20 +317,43 @@ downSample <- function(qseaSet, nReads, renormalise = TRUE){
   return(qseaSet)
 }
 
-#' This function calculates the beta values for the windows covering probes from a methylation array.
-#' @param qseaSet qseaSet object to calculate approximate beta values for
-#' @param arrayDetails Either a
+#' Calculate beta values for the windows covering probes from a methylation array.
+#'
+#' This function returns a wide data frame with beta values corresponding to overlapping probes from a methylation array.
+#' This is suitable for input into tools in other packages that are designed for tables of array beta values.
+#' Currently only "Infinium450k" is recognised, and only for GRCh38.
+#'
+#' @param qseaSet qseaSet object to calculate approximate beta values.
+#' @param arrayDetails Either a recognised string or a GRanges object with an ID column.
+#' @return A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
+#' @examples
+#' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
+#' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
 #' @export
 #'
-convertToArrayBetaTable <- function(qseaSet, arrayType = "Infinium405k") {
+convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
+
+  if(is.character(arrayDetails)){
+    if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38"){
+      arrayObject <- mesa::hg38_450kArrayGR
+    } else if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38"){
+      arrayObject <- mesa::hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+    }
+    else {stop("Only Infinium450k implemented currently as a string.")}
+
+  } else {
+    arrayObject <- asValidGranges(object)
+  }
+
+  if(!("ID" %in% colnames(GenomicRanges::mcols(arrayObject)))){
+    stop("No ID column found in object")
+  }
 
   qseaSet %>%
-    qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = mesa::hg38_450kArrayGR) %>%
+    qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = arrayObject) %>%
     dplyr::select(-tidyselect::matches("ROI_start|ROI_end|ROI_chr")) %>%
     dplyr::rename(ID = ROI_ID) %>%
     dplyr::select(ID, tidyselect::matches("beta")) %>%
-    dplyr::select_if(function(x){!all(is.na(x))}) %>%
-    dplyr::rename_with( ~ stringr::str_remove(., "_means"), tidyselect::matches("_means")) %>%
     dplyr::rename_with( ~ stringr::str_remove(., "_beta"), tidyselect::matches("_beta"))
 
 }
@@ -405,84 +428,6 @@ getAnnotationDataFrame <- function(qseaSet, ...){
     tibble::column_to_rownames("group") %>%
     return()
 }
-
-
-
-#' This function edits the getPCA function from qsea to allow for batch effect correction
-#' @param qs A qseaSet object
-#' @param chr Which chromosomes to use
-#' @param minRowSum Minimum number of reads in a window across all the samples to keep it
-#' @param minEnrichment Minimal number of expected reads for a fully methylated window (for transformation to absolute methylation level)
-#' @param keep a vector of row indices to keep (optional)
-#' @param normMethod What normalisation method to use
-#' @param topVar Number of most variable windows to keep
-#' @param samples Which samples to use
-#' @param batchVariable A variable in the sampleTable to batch correct for, using limma::removeBatchEffect
-#' @export
-#'
-getPCAwithBatch <- function(qs, chr = qsea::getChrNames(qs), minRowSum = 20, minEnrichment = 3, keep,
-                            normMethod = "beta",
-                            topVar = 1000, samples = qsea::getSampleNames(qs),
-                            batchVariable = NULL){
-
-  if( is.null(samples)) { samples =  qsea::getSampleNames(qs)}
-
-  samples = qsea:::checkSamples(qs, samples)
-
-  if( missing(keep)) {
-    keep = which(rowSums(qsea::getCounts(qs)) >= minRowSum )
-  }
-  else {
-    keep = intersect(keep, which(rowSums(qsea::getCounts(qs)) >= minRowSum ))
-  }
-
-  if (methods::is(normMethod, "character")) {
-    normMethod = qsea::normMethod(normMethod)
-  }
-
-  if( !all( qsea::getChrNames(qs) %in% chr )){
-    keep = keep[as.character(GenomeInfoDb::seqnames(qsea::getRegions(qs)[keep])) %in% chr]}
-
-  if( length(keep) <= 10) {
-    stop("not enough regions left:",length(keep)," Regions, minimum is 10")
-  }
-
-  vals = qsea:::getNormalizedValues(qs, methods = normMethod, minEnrichment = minEnrichment,
-                                    windows = keep, samples = samples)
-
-  missing = rowSums(is.na(vals)) > 0
-  vals = vals[!missing,] - rowMeans(vals[!missing,])
-  if ( any(!is.finite(vals))) {
-    stop("Infinite values due to log or logit transformation. ",
-         "Please specify minVal and maxVal.")
-  }
-  if ( !is.null(topVar) && nrow(vals) > topVar) {
-    #rv=apply(vals,1,var) #this is slow
-    #rv=rowSums((vals - rowMeans(vals))^2)/(dim(vals)[2] - 1)
-    #since only the order matters:
-    rv = rowSums((vals - rowMeans(vals))^2)
-    th = sort(rv,decreasing = TRUE)[topVar]
-    vals = vals[rv >= th,]
-    keep = keep[rv >= th]
-  }
-  #make names for the selected regions
-  names = paste0(GenomeInfoDb::seqnames(qsea::getRegions(qs)[keep]), ":",
-                 IRanges::start(qsea::getRegions(qs)[keep]), "-", IRanges::end(qsea::getRegions(qs)[keep]))
-
-  if ( !is.null(batchVariable)) {
-
-    numBatches <- qs %>% pullQset(batchVariable) %>% unique()
-
-    if (length(numBatches) > 1) {
-      message(glue::glue("Normalising PCA based on {length(numBatches)} values of {batchVariable}"))
-      vals <- vals %>% limma::removeBatchEffect(batch = dplyr::pull(qsea::getSampleTable(qs), batchVariable))
-    }
-  }
-
-  svdVals = svd(vals)
-  methods::new('qseaPCA', svd = svdVals, sample_names = samples, factor_names = as.character(names))
-}
-
 
 #' This function takes a qseaSet and sums over nrpm within a GRanges object
 #' @param qseaSet The qseaSet object.

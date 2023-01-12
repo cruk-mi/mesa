@@ -4,12 +4,12 @@
 \alias{convertToArrayBetaTable}
 \title{This function calculates the beta values for the windows covering probes from a methylation array.}
 \usage{
-convertToArrayBetaTable(qseaSet, arrayType = "Infinium405k")
+convertToArrayBetaTable(qseaSet, arrayDetails = "Infinium450k")
 }
 \arguments{
 \item{qseaSet}{qseaSet object to calculate approximate beta values for}
 
-\item{arrayDetails}{Either a}
+\item{arrayDetails}{Either a recognised string or a GRanges object with an ID column.}
 }
 \description{
 This function calculates the beta values for the windows covering probes from a methylation array.

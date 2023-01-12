@@ -1,15 +1,21 @@
 # dev
 
+BUG FIXES
+* Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (fixes #1).
+* Fixed `pull.qseaSet` to work directly.
+
 CHANGES
 * Renamed many functions throughout the package
-* Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (fixes #1).
+* Removed `mutateQset`, `filterQset`, `arrangeQset`, `sortQset`, `pullQset`, `leftJoinQset` as these just work on the dplyr verbs directly.
 * Combined `getBetaMeans` and `getNormalisedReadSum` into new function called `summariseAcrossWindows`.
+
+
 
 # mesa 0.2.3
 
 CHANGES
 * `plotGeneHeatmap` now uses `bioMaRt` to find the gene details, based on the genome or mart supplied.
-* `filterByOverlaps` now works when the qseaSet regions contains "chr" but the regions to filter by do not.
+* `filterByOverlaps` now works when the qseaSet regions contains "chr" but the regions to filter by do not or vice versa.
 * Removed all references to `PooledControl` sample (previously suggested for normalisation).
 * Various R CMD check warning issues fixed.
 * `filterByOverlaps` no longer allows the option to take a list of window ID numbers.
