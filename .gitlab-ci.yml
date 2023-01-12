@@ -4,6 +4,7 @@ variables:
   APT_PKGS: "libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev zlib1g-dev git libv8-dev"
 
 stages:
+  - build
   - test
 
 build:
@@ -15,6 +16,10 @@ build:
     - pwd && ls -lah
     - docker build -t crukmi/mesa_dependencies -f Dockerfile_dependencies_only .
     - docker push crukmi/mesa_dependencies:latest
+
+  rules:
+    - changes:  # Include the job and set to when:manual if any of the follow paths match a modified file.
+        - DESCRIPTION
 
 devtools-check:
   image: crukmi/mesa_dependencies:latest
