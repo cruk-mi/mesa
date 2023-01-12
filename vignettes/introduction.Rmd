@@ -247,34 +247,34 @@ qseaSet %>%
 Or we can provide a dataframe containing the contrasts that we wish to perform:
 
 ```{r}
-qseaSet %>%
+DMRs <- qseaSet %>%
   calculateDMRs(variable = "tumour",
                 contrasts = tibble(group1 = "Tumour", group2 = "Normal")) 
+
+DMRs
 ```
 
-The output of this function is a dataframe. Each row corresponds to a window which was considered to be differentially methylated at the False Discovery Rate (FDR) threshold applied to the adjusted p-values. The first four columns include the window information: `seqnames` (chromosome), `start` and `end` of the window and the CpG_density. The next columns are related to the contrasts undertaken, giving the log2 fold change, `Tumour_vs_Normal_log2FC`, and the adjusted p-value, `Tumour_vs_Normal_adjPval`, respectively.
-This block of columns also includes the average beta and nrpm values for the values of the variable under consideration, e.g. `Tumour_nrpm_means`. Finally, there is another contrast related column, which is the difference in the average beta values for the samples with each different type, known as `Tumour_vs_Normal_betaDelta`.
+The output of this function is a dataframe. Each row corresponds to a window which was considered to be differentially methylated at the False Discovery Rate (FDR) threshold applied to the adjusted p-values. The first four columns include the window information: `seqnames` (chromosome), `start` and `end` of the window and the CpG_density. The next columns are related to the contrasts undertaken, giving the log2 fold change, `Tumour_vs_Normal_log2FC`, the adjusted p-value, `Tumour_vs_Normal_adjPval`, and the difference in average beta values for the samples with each different type, `Tumour_vs_Normal_betaDelta`. This is repeated if multiple contrasts are calculated in one call to `calculateDMRs`. Then there are a block of columns also includes the average beta and nrpm values for the values of the variable under consideration, e.g. `Tumour_nrpm_means`. 
 
 ```{r}
 qseaSet %>%
   calculateDMRs(variable = "tumour",
-                contrasts = tibble(sample1 = "Tumour", sample2 = "Normal")) %>%
+                contrasts = tibble(group1 = "Tumour", group2 = "Normal")) %>%
   colnames()
 ```
 
-We can also get the individual data values for each window, by setting `keepData = TRUE` and/or `keepGroupMeans = TRUE` options inside `calculateDMRs`, but I find this is often unnecessary (and makes massive objects when there are a lot of contrasts).
+We can also get the individual data values for each differentially methylated window, by setting `keepData = TRUE` and/or `keepGroupMeans = TRUE` options inside `calculateDMRs`, but this is often unnecessary (and makes massive objects when there are a lot of contrasts), so they are set off by default. "Group" means are 
 
 ```{r}
-DMRs <- qseaSet %>%
+qseaSet %>%
   calculateDMRs(variable = "tumour",
-                contrasts = tibble(sample1 = "Tumour", sample2 = "Normal"),
-                keepData = FALSE,
-                keepGroupMeans = FALSE) %>%
-  as_tibble()
+                contrasts = tibble(group1 = "Tumour", group2 = "Normal"),
+                keepData = TRUE,
+                keepGroupMeans = FALSE) 
 
-DMRs
-  
 ```
+
+
 
 We can incorporate a covariate into the DMR generation process, such as which tissue the samples came from:
 
@@ -282,13 +282,13 @@ We can incorporate a covariate into the DMR generation process, such as which ti
 DMRsCovariateTissue <- qseaSet %>%
   calculateDMRs(variable = "tumour",
                 covariates = "tissue",
-                contrasts = tibble(sample1 = "Tumour", sample2 = "Normal")) %>%
+                contrasts = tibble(group1 = "Tumour", group2 = "Normal")) %>%
   as_tibble()
 
 DMRsCovariateTissue
 ```
 
-We can see that having included the tissue covariate we now have `DMRsCovariateTissue %>% nrow()` DMRs, rather than the `DMRs %>% nrow()` we had before. This is because we are now looking at which regions have changed, taking into account that some samples are from the lung and some are from the colon. We can go further, and incorporate the individual patient levels, as for each patient the baseline value in each window might be different (more than just the tissue type). This will for instance highlight windows that were already high in one patient but are now even higher. 
+We can see that having included the tissue covariate we now have `DMRsCovariateTissue %>% nrow()` DMRs, rather than the `DMRs %>% nrow()` we had before. This is because we are now looking at which regions have changed, taking into account that some samples are from the lung and some are from the colon. We can go further, and incorporate the individual patient levels, as for each patient the baseline value in each window might be different (more than just the tissue type). This will for instance highlight windows that were already high in one patient but are now even higher. This is analogous to using a paired t-test for multiple samples taken from the same individual, and increases statistical power.
 
 ```{r}
 DMRsCovariatePatient <- qseaSet %>%
@@ -307,23 +307,22 @@ qseaSet %>%
   calculateDMRs(variable = "tumour",
                 covariates = "patient", 
                 contrasts = tibble(sample1 = "Tumour", sample2 = "Normal"),
-                keepPvals = TRUE, 
                 fdrThres = 0.001)
 ```
 
 ### Annotation
 
-We can then annotate these regions, by using the function `annotateData`, annotating each window with its nearest gene, and returning information about this gene. The result is a data frame with all the previous columns, augmented with some columns generated by the `ChIPseeker` package and some custom columns.
+We can then annotate these regions, by using the function `annotateWindows`, annotating each window with its nearest gene, and returning information about this gene. The result is a data frame with all the previous columns, augmented with some columns generated by the `ChIPseeker` package and some custom columns. By default this will assume that the windows are aligned to the GRCh38/hg38 human genome. This may be overridden by giving the `TxDb` and `annoDb` arguments, see the documentation for `ChIPseeker::annotatePeak` for details. 
 
 ```{r}
 annoDMRs <- DMRs %>%
-  annotateData()
+  annotateWindows()
 
 annoDMRs %>% 
   colnames()
 ```
 
-The output includes which gene was assigned to that window, with an `ENSEMBL` ID column, a `SYMBOL` column for a name associated with that gene, and a (confusingly named) `GENENAME` column with a long-form expansion of that name. The `distanceToTSS` column gives how far the query window is away from the Transcriptional Start Site of the gene. It is  worth noting this can be positive or negative, depending on which strand the gene is on, and that some genes are very large. 
+The output includes which gene was assigned to that window, with an `ENSEMBL` ID column, a `SYMBOL` column for a name associated with that gene, and a (confusingly named) `GENENAME` column with a long-form expansion of that name. The `distanceToTSS` column gives how far the query window is away from the Transcriptional Start Site of the gene. It is worth noting this can be positive or negative, depending on which strand the gene is on, and that some genes are very large. 
 
 ```{r}
 annoDMRs %>% 
@@ -344,12 +343,9 @@ annoDMRs %>%
   dplyr::select(geneChr, geneStart, geneEnd, geneLength, geneStrand, geneId, transcriptId)
 ```
 
-Finally, the function also returns several columns regarding whether the region lies within a CpG "island" (characterised regions of the genome with high numbers of CGs), as well as the "shores" that are 2000bp each side of the "island", and "shelves" (a further 2000bp around these). It is possible for a region to be in multiple islands/shores/shelves simultaneously, so these columns give how many of these that they overlap.
+Finally, for hg38, the function also returns several columns regarding whether the region lies within a CpG "island" (characterised regions of the genome with high numbers of CGs), as well as the "shores" that are 2000bp each side of the "island", and "shelves" (a further 2000bp around these). It is possible for a region to be in multiple islands/shores/shelves simultaneously, so these columns give how many of these that they overlap.
 
 ```{r}
-annoDMRs %>% 
-  dplyr::select(seqnames, start, end, nIslands, nShore, nShelf, inFantom)
-
 annoDMRs %>%
   dplyr::select(seqnames, start, end, nIslands, nShore, nShelf, inFantom, landscape)
 ```
@@ -369,14 +365,16 @@ The default is to plot this with the beta values, but you can change that via th
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(DMRsCovariatePatient, normMethod = "nrpm", clusterRows = TRUE)
+  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, normMethod = "nrpm", clusterRows = TRUE)
 ```
+
+This `normMethod` option occurs in a number of functions, with the common choices of `counts`, `nrpm` or `beta` (other options exist within `qsea`).
 
 To add an annotation bar on the top, we can pass the `getAnnotationDataFrame` function to the `annotationCol` (column annotation) option. This function takes a qseaSet as the first argument, and then any number of columns which occur in the sample table as the other arguments. For instance, to use it to add an annotation bar with `tumour` and `type`. Note that to provide the `qseaSet` as the first argument we can make use of the fact that when you use a pipe (`%>%`) the left-hand part of the pipe can be accessed using `.`. This is a standard way to annotate the heatmaps in `mesa`, but does require some remembering! 
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(DMRsCovariatePatient, 
+  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type))
 ```
 
@@ -387,13 +385,13 @@ annotColours <- list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"),
      type = c("CRC" = "orange","LUAD" = "lightgreen", "LUSC" = "darkgreen", "NormalColon" = "tan", "NormalLung" = "grey"))
 
 qseaSet %>%
-  plotGRangesHeatmap(DMRs, 
+  plotGRangesHeatmap(regionsToOverlap = DMRs, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))
                      )
 
 qseaSet %>%
-  plotGRangesHeatmap(DMRs, 
+  plotGRangesHeatmap(regionsToOverlap = DMRs, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = annotColours
                      )
@@ -403,7 +401,7 @@ The heatmap also takes a `description` argument, which is added to the top of th
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(DMRsCovariatePatient, 
+  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient"
@@ -414,7 +412,7 @@ Rows can be clustered using the `clusterRows = TRUE` option:
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(DMRsCovariatePatient, 
+  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient",
@@ -427,7 +425,7 @@ The number of clusters to break the column dendogram into can be controlled usin
 
 ```{r}
 qseaSet %>%
-  plotGRangesHeatmap(DMRsCovariatePatient, 
+  plotGRangesHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      annotationCol = getAnnotationDataFrame(., tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient",
@@ -437,35 +435,35 @@ qseaSet %>%
 
 The default clustering method to use for the dendogram is set as `clusterMethod = "ward.D2"`; other options could be used but this is a good default in my opinion.
 
-## Combining qseaSets
-We can use the `combineQsets` 
+<!-- ## Combining qseaSets -->
+<!-- We can use the `combineQsets`  -->
 
-```{r}
-qseaSetWithNCC <- qseaSet %>%
-  combineQsets("/data/cep/Methylation/pipelineOutput/combined/NCC01/qseaSets/NCC01_FantomPlusDense_min50_max1000_w300_q10.rds")
-```
+<!-- ```{r} -->
+<!-- qseaSetWithNCC <- qseaSet %>% -->
+<!--   combineQsets("/data/cep/Methylation/pipelineOutput/combined/NCC01/qseaSets/NCC01_FantomPlusDense_min50_max1000_w300_q10.rds") -->
+<!-- ``` -->
 
-```{r}
-qseaSetWithNCC %>%
-  getSampleTable() 
+<!-- ```{r} -->
+<!-- qseaSetWithNCC %>% -->
+<!--   getSampleTable()  -->
 
-qseaSetWithNCC %>%
-  mutate(type = ifelse(str_detect(sample_name,"NCC"),"NCC", type)) %>%
-  getSampleTable()
+<!-- qseaSetWithNCC %>% -->
+<!--   mutate(type = ifelse(str_detect(sample_name,"NCC"),"NCC", type)) %>% -->
+<!--   getSampleTable() -->
 
-qseaSetWithNCC %>%
-  mutate(type = replace_na(type,"NCC")) %>%
-  getSampleTable()
-```
+<!-- qseaSetWithNCC %>% -->
+<!--   mutate(type = replace_na(type,"NCC")) %>% -->
+<!--   getSampleTable() -->
+<!-- ``` -->
 
-```{r}
-contrasts <- tibble(sample1 = c("LUAD","LUSC","CRC"), sample2 = "NCC")
+<!-- ```{r} -->
+<!-- contrasts <- tibble(sample1 = c("LUAD","LUSC","CRC"), sample2 = "NCC") -->
 
-NCCdmrs <- qseaSetWithNCC %>%
-  mutate(type = ifelse(str_detect(sample_name,"NCC"),"NCC", type)) %>%
-  calculateDMRs(variable = "type",
-                contrasts = contrasts)
-```
+<!-- NCCdmrs <- qseaSetWithNCC %>% -->
+<!--   mutate(type = ifelse(str_detect(sample_name,"NCC"),"NCC", type)) %>% -->
+<!--   calculateDMRs(variable = "type", -->
+<!--                 contrasts = contrasts) -->
+<!-- ``` -->
 
 
 
