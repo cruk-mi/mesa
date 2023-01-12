@@ -2,13 +2,24 @@
 % Please edit documentation in R/qseaExtra.R
 \name{convertToArrayBetaTable}
 \alias{convertToArrayBetaTable}
-\title{This function calculates the beta values for the windows covering the hg38 array probes.}
+\title{Calculate beta values for the windows covering probes from a methylation array.}
 \usage{
-convertToArrayBetaTable(qseaSet)
+convertToArrayBetaTable(qseaSet, arrayDetails = "Infinium450k")
 }
 \arguments{
-\item{qseaSet}{qseaSet object to calculate approximate beta values for the probes}
+\item{qseaSet}{qseaSet object to calculate approximate beta values.}
+
+\item{arrayDetails}{Either a recognised string or a GRanges object with an ID column.}
+}
+\value{
+A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
 }
 \description{
-This function calculates the beta values for the windows covering the hg38 array probes.
+This function returns a wide data frame with beta values corresponding to overlapping probes from a methylation array.
+This is suitable for input into tools in other packages that are designed for tables of array beta values.
+Currently only "Infinium450k" is recognised, and only for GRCh38.
+}
+\examples{
+convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
+convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
 }

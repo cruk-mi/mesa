@@ -251,9 +251,6 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
 }
 
-
-
-
 #' This function takes a qseaSet and plots a PCA
 #' @param qseaSet The qseaSet object.
 #' @param signatureGR A GRanges (or data frame coercible to one) with a subset of windows to calculate the PCA on.
@@ -317,23 +314,23 @@ plotQseaPCA <- function(qseaSet,
   if(returnDataOnly){return(plotData)}
 
   p <- ggplot2::ggplot(plotData, ggplot2::aes_string("x", "y",
-                                                label = "sample_name",
-                                                colour = plotColour,
-                                                shape = plotShape)) +
+                                                     label = "sample_name",
+                                                     colour = plotColour,
+                                                     shape = plotShape)) +
     ggplot2::geom_point() +
     ggplot2::xlab(glue::glue("PC{pc1} ({propVar[pc1]}%)")) +
     ggplot2::ylab(glue::glue("PC{pc2} ({propVar[pc2]}%)")) #+
-    #ggplot2::ggtitle(glue::glue("{plotTitle}"),
-    #                 subtitle = glue::glue("{batchTitleString}PCA on {length(pca@factor_names)} windows, using {normMethod} values."))
+  #ggplot2::ggtitle(glue::glue("{plotTitle}"),
+  #                 subtitle = glue::glue("{batchTitleString}PCA on {length(pca@factor_names)} windows, using {normMethod} values."))
 
   if (showNames) {
 
-      if (!requireNamespace("ggrepel", quietly = TRUE)) {
-        message("Package \"ggrepel\" is recommended to repel labels. Using default method.")
-        p <- p + ggplot2::geom_text()
-      }
-      p <- p + ggrepel::geom_text_repel()
+    if (!requireNamespace("ggrepel", quietly = TRUE)) {
+      message("Package \"ggrepel\" is recommended to repel labels. Using default method.")
+      p <- p + ggplot2::geom_text()
     }
+    p <- p + ggrepel::geom_text_repel()
+  }
 
   p
 }

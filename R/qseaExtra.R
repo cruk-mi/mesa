@@ -29,9 +29,10 @@ setMethod('getMart', 'qseaSet', function(object)
 
 #' Add annotation onto a data table
 #'
-#' This function extracts the information from one contrast into a wide table
+#' This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
+#' Defaults to being hg38, unless
 #'
-#' @param dataTable The output of makeTable
+#' @param dataTable A data frame which can be coerced into a GRanges object or a GRanges object directly.
 #' @param genome A genome string to set the rest of the parameters (currently only hg38/GRCh38 supported)
 #' @param TxDb A TxDb database object (unquoted) to pass to ChIPseeker::annotatePeak
 #' @param annoDb A string giving a Bioconductor annotation package, such as "org.Hs.eg.db"
@@ -60,15 +61,22 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
         call. = FALSE
       )
     }
-
-    annoDb = "org.Hs.eg.db" }
+    annoDb = "org.Hs.eg.db"
+    }
 
   if(genome  %in% c("hg38","GRCh38") & is.null(CpGislandsGR)) { CpGislandsGR = mesa::hg38CpGIslands }
 
   if(genome  %in% c("hg38","GRCh38") & is.null(FantomRegionsGR)) { FantomRegionsGR = mesa::FantomRegions %>% plyranges::as_granges()}
 
-  chipseekerData <- dataTable %>%
-    qseaTableToChrGRanges() %>%
+
+  if(is(dataTable,"GRanges")) {
+    GRangesObject <- dataTable
+  } else{
+    GRangesObject <- dataTable %>%
+      qseaTableToChrGRanges()
+  }
+
+  chipseekerData <- GRangesObject %>%
     ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
                              level = "transcript", # changed from gene to transcript to stop it outputting some genes as being >10Mb long
                              TxDb = TxDb,
@@ -317,19 +325,43 @@ downSample <- function(qseaSet, nReads, renormalise = TRUE){
   return(qseaSet)
 }
 
-#' This function calculates the beta values for the windows covering the hg38 array probes.
-#' @param qseaSet qseaSet object to calculate approximate beta values for the probes
+#' Calculate beta values for the windows covering probes from a methylation array.
+#'
+#' This function returns a wide data frame with beta values corresponding to overlapping probes from a methylation array.
+#' This is suitable for input into tools in other packages that are designed for tables of array beta values.
+#' Currently only "Infinium450k" is recognised, and only for GRCh38.
+#'
+#' @param qseaSet qseaSet object to calculate approximate beta values.
+#' @param arrayDetails Either a recognised string or a GRanges object with an ID column.
+#' @return A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
+#' @examples
+#' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
+#' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
 #' @export
 #'
-convertToArrayBetaTable <- function(qseaSet) {
+convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
+
+  if(is.character(arrayDetails)){
+    if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38"){
+      arrayObject <- mesa::hg38_450kArrayGR
+    } else if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38"){
+      arrayObject <- mesa::hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+    }
+    else {stop("Only Infinium450k implemented currently as a string.")}
+
+  } else {
+    arrayObject <- asValidGranges(arrayDetails)
+  }
+
+  if(!("ID" %in% colnames(GenomicRanges::mcols(arrayObject)))){
+    stop("No ID column found in object")
+  }
 
   qseaSet %>%
-    qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = mesa::hg38_450kArrayGR) %>%
+    qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = arrayObject) %>%
     dplyr::select(-tidyselect::matches("ROI_start|ROI_end|ROI_chr")) %>%
     dplyr::rename(ID = ROI_ID) %>%
     dplyr::select(ID, tidyselect::matches("beta")) %>%
-    dplyr::select_if(function(x){!all(is.na(x))}) %>%
-    dplyr::rename_with( ~ stringr::str_remove(., "_means"), tidyselect::matches("_means")) %>%
     dplyr::rename_with( ~ stringr::str_remove(., "_beta"), tidyselect::matches("_beta"))
 
 }
@@ -406,7 +438,6 @@ getAnnotationDataFrame <- function(qseaSet, ...){
 }
 
 
-
 #' This function edits the getPCA function from qsea to allow for batch effect correction
 #' @param qs A qseaSet object
 #' @param chr Which chromosomes to use
@@ -470,7 +501,7 @@ getPCAwithBatch <- function(qs, chr = qsea::getChrNames(qs), minRowSum = 20, min
 
   if ( !is.null(batchVariable)) {
 
-    numBatches <- qs %>% pullQset(batchVariable) %>% unique()
+    numBatches <- qs %>% pull(batchVariable) %>% unique()
 
     if (length(numBatches) > 1) {
       message(glue::glue("Normalising PCA based on {length(numBatches)} values of {batchVariable}"))
@@ -481,7 +512,6 @@ getPCAwithBatch <- function(qs, chr = qsea::getChrNames(qs), minRowSum = 20, min
   svdVals = svd(vals)
   methods::new('qseaPCA', svd = svdVals, sample_names = samples, factor_names = as.character(names))
 }
-
 
 #' This function takes a qseaSet and sums over nrpm within a GRanges object
 #' @param qseaSet The qseaSet object.

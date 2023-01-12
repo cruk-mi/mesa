@@ -51,16 +51,13 @@ getWindowNames <- function(x) {
       return()
   }
 
-  if(is.data.frame(x) ){
-    #TODO check that seqnames, start, end are present.
-    x %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
-      dplyr::pull(window) %>%
-      return()
-  }
-  #TODO method for GRanges object.
-  else {stop("Unknown data type!")}
+  asValidGranges(x) %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+    dplyr::pull(window) %>%
+    return()
+
+  stop("Unknown data type!")
 }
 
 #' This function returns the name of the pattern added by addPatternDensity, e.g. "CpG"
@@ -97,4 +94,31 @@ skip_long_checks <- function() {
   }
 
   testthat::skip("Slow checks skipped when options(skip_long_checks = TRUE) has been set")
+}
+
+#' This function checks that an object can be coerced into a GRanges object and does so if possible
+#' @param object An object that may be a GRanges object.
+#'
+asValidGranges <- function(object){
+
+  if("GRanges" %in% class(object)){
+    return(object)
+  }
+
+  if(is.data.frame(object)){
+    if(length(intersect(colnames(object),c("seqnames","start","end"))) == 3){
+      return(object %>% plyranges::as_granges())
+    } else  if(length(intersect(colnames(object),c("chr","start","end"))) == 3){
+      return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges() )
+    } else  if(length(intersect(colnames(object),c("chr","window_start","window_end"))) == 3){
+      return(object %>%
+               dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+               plyranges::as_granges() )
+    } else {
+      stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
+    }
+  }
+
+  stop("Object can not be coerced to a GRanges object")
+
 }

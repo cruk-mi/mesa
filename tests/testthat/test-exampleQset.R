@@ -40,6 +40,10 @@ test_that("Testing hg38 related annotation/plotting functions", {
                  summariseAcrossWindows(windowsToUse = getRegions(.)) %>%
                  nrow(), exampleTumourNormal %>% getSampleNames() %>% length())
 
+  expect_equal(exampleTumourNormal %>% pull(group) %>% length(), exampleTumourNormal %>% getSampleNames() %>% length())
+  expect_equal(exampleTumourNormal %>% pull(tumour) %>% unique(), c("Normal", "Tumour"))
+  expect_equal(exampleTumourNormal %>% pull(type) %>% unique() %>% length(), 5)
+
 })
 
 test_that("Testing general functionality", {

@@ -9,13 +9,17 @@ stages:
 
 build:
   stage: build
-  tags: 
+  tags:
     - methylationprojects
   script:
     - echo "Do your build here"
     - pwd && ls -lah
     - docker build -t crukmi/mesa_dependencies -f Dockerfile_dependencies_only .
     - docker push crukmi/mesa_dependencies:latest
+
+  rules:
+    - changes:  # Include the job and set to when:manual if any of the follow paths match a modified file.
+        - DESCRIPTION
 
 devtools-check:
   image: crukmi/mesa_dependencies:latest
