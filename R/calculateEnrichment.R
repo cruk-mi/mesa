@@ -135,7 +135,6 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
 #' @param BSgenome Which BSgenome to use
 #' @param chr.select Which chromosomes to use
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
-#' @export
 getCGPositions <- function(BSgenome, chr.select){
   MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
 }

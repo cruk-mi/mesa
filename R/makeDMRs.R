@@ -12,7 +12,6 @@
 #' @param minNRPM A minimum normalised reads per million to apply
 #' @param checkPVals Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.
 #' @return A qseaGLM object
-#' @export
 fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                        contrastsToDo = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
                        checkPVals = TRUE, formula = NULL){
@@ -169,7 +168,6 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 #' @param keepFragmentInfo Whether to keep information on the average fragment length and MAPQ (if present)
 #' @param direction Whether to use regions that are up/down/both.
 #' @return A tibble with the data
-#' @export
 getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, keepData = TRUE, keepGroupMeans = TRUE,
                         fdrThres = 0.05, keepPvals = FALSE, keepFragmentInfo = FALSE,
                         direction = "both"){
