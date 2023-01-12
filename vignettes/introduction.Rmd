@@ -38,6 +38,7 @@ library(dplyr)
 library(stringr)
 library(ggplot2)
 library(qsea)
+library(mesa)
 qseaSet <- exampleTumourNormal
 ```
 
