@@ -1,3 +1,10 @@
+# dev
+
+CHANGES
+* Renamed many functions throughout the package
+* Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (fixes #1).
+* Combined `getBetaMeans` and `getNormalisedReadSum` into new function called `summariseAcrossWindows`.
+
 # mesa 0.2.3
 
 CHANGES
