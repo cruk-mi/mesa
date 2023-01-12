@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotDMRUpset}
 \alias{plotDMRUpset}
-\title{This function takes a DMRtable as output by calculateDMRs (possibly after any filtering), and generates an upset plot}
+\title{This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot}
 \usage{
 plotDMRUpset(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...)
 }
@@ -18,8 +18,8 @@ plotDMRUpset(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...)
 \item{...}{Other arguments to be passed to upset}
 }
 \value{
-A table
+An UpSet plot
 }
 \description{
-This function takes a DMRtable as output by calculateDMRs (possibly after any filtering), and generates an upset plot
+This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot
 }

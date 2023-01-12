@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDMRs.R
 \name{makeAllContrasts}
 \alias{makeAllContrasts}
-\title{Make a full set of contrasts}
+\title{Make a full set of possible contrasts for calculating DMRs on.}
 \usage{
 makeAllContrasts(qseaSet, variable)
 }
@@ -12,8 +12,8 @@ makeAllContrasts(qseaSet, variable)
 \item{variable}{Which variable to use to calculate the DMRs between}
 }
 \value{
-A tibble with the data
+A tibble with two columns, each row with a pair of contrasts
 }
 \description{
-This function fits a GLM and returns the resulting data table
+This function returns a set of all possible contrasts
 }

@@ -7,9 +7,8 @@
 calculateDMRs(
   qseaSet,
   variable = NULL,
-  sampleNames = NULL,
   covariates = NULL,
-  contrastsToDo = NULL,
+  contrasts = NULL,
   minReadCount = 0,
   minNRPM = 1,
   checkPVals = TRUE,
@@ -26,17 +25,15 @@ calculateDMRs(
 
 \item{variable}{Which variable to use to calculate the DMRs between}
 
-\item{sampleNames}{Which samples to return the information for.}
-
 \item{covariates}{Any variables to use as covariates, for instance patient in a paired analysis}
 
-\item{contrastsToDo}{A data frame with two columns, sample1 and sample2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted}
+\item{contrasts}{A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted}
 
 \item{minReadCount}{A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.}
 
 \item{minNRPM}{A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).}
 
-\item{checkPVals}{Whether to check that the p-values aren't all zero to avoid a bug with covariates, only turn this off if you are very sure what you are doing!}
+\item{checkPVals}{Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!}
 
 \item{fdrThres}{False discovery rate threshold.}
 

@@ -3,10 +3,11 @@
 #' @param qseaSet The qseaSet object.
 #' @param regionsToOverlap A genomic ranges to plot.
 #' @param normMethod Whether to plot nrpm values or beta values.
-#' @param annotationCol A data frame with annotations for the samples.
+#' @param useGroups Whether to average samples over the group column (i.e. combine replicates)
+#' @param sampleAnnotation A character vector with names of columns from the sampleTable to use as annotation, or a pre-defined annotation data frame.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
-#' @param clip A level to clip the data at, anything higher than this is replaced with the clip value.
+#' @param clip An upper level to clip the data at, anything higher than this is replaced with the clip value.
 #' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param clusterRows Whether to cluster the rows or not.
 #' @param clusterCols Whether to cluster the columns or not.
@@ -18,14 +19,22 @@
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 
-plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
-                               annotationCol = NULL,
-                               annotationColors = NA, clusterRows = FALSE, clusterCols = TRUE,
-                               minEnrichment = 3, maxScale = 5, clusterNum = 2, description = "",
-                               clip = 1000000000, minDensity = 0,
+plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
+                               normMethod = "beta",
+                               sampleAnnotation = NULL,
+                               annotationColors = NA,
+                               useGroups = FALSE,
+                               clusterRows = FALSE,
+                               clusterCols = TRUE,
+                               minEnrichment = 3,
+                               maxScale = 5,
+                               clusterNum = 2,
+                               description = "",
+                               clip = 1000000000,
+                               minDensity = 0,
                                clusterMethod = "ward.D2", ...){
 
-  regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
+  regionsToOverlap <- asValidGranges(regionsToOverlap)
 
   if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
@@ -51,21 +60,32 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
 
   }
 
+  # define a function that removes rows that have 1 row.
   remove_almost_empty_rows <- function(dat)  {
     mask_keep <- rowSums(is.na(dat)) != (ncol(dat) - 1)
     janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "rows", reason = "almost empty")
     return(dat[mask_keep, , drop = FALSE])
   }
 
-
   dataTab <- qseaSet %>%
     filterByOverlaps(windowsToKeep = regionsToOverlap) %>%
-    qsea::makeTable(., groupMeans = qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-    dplyr::filter(CpG_density >= minDensity) %>%
-    dplyr::select(tidyselect::matches(normMethod)) %>%
-    dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
+    filterWindows(CpG_density >= minDensity) %>%
+    getDataTable(normMethod = normMethod,
+                 groupMeans = useGroups
+                 #minEnrichment = minEnrichment
+    ) %>%
+    dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
+    dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
+
+  if(useGroups){
+    colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% unlist()
+  } else {
+    colsToFind <- qseaSet %>% qsea::getSampleNames()
+  }
+
+  numData <- dataTab %>%
+    dplyr::select(tidyselect::all_of(colsToFind)) %>%
     clipFn(a = 0, b = clip) %>%
-    dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%
     janitor::remove_empty(which = "rows", quiet = FALSE)
 
@@ -77,8 +97,40 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
     dataTab <- remove_almost_empty_rows(dataTab)
   }
 
-  dataTab %>%
-    pheatmap::pheatmap(annotation_col = annotationCol,
+  if(!is.data.frame(sampleAnnotation) & !useGroups) {
+    annotationColDf <- qseaSet %>%
+      qsea::getSampleTable() %>%
+      dplyr::select(!!!rlang::syms(sampleAnnotation))
+  } else if(!is.data.frame(sampleAnnotation) & !useGroups){
+    groupSampleTab <- qseaSet %>%
+      qsea::getSampleTable() %>%
+      dplyr::select(group, !!!rlang::syms(sampleAnnotation))
+
+
+    distinctGroupTab <- groupSampleTab %>%
+      tibble::remove_rownames() %>%
+      dplyr::distinct(group, !!!rlang::syms(sampleAnnotation))
+
+    if(nrow(distinctGroupTab) != (qseaSet %>% qsea::getSampleGroups() %>% length())){
+      problemGroups <- distinctGroupTab %>% dplyr::count(group) %>% filter(n>1) %>% pull(group) %>% paste(., collapse = "; ")
+      stop(glue::glue("Grouped annotation contains differing annotation in {problemGroups}"))
+    }
+
+    annotationColDf <- distinctGroupTab %>%
+      tibble::column_to_rownames("group") %>%
+      as.data.frame()
+
+  }
+
+  if(is.null(sampleAnnotation)) {
+    annotationColDf <- NA
+  } else if(ncol(annotationColDf) == 0){
+    annotationColDf <- NA
+  }
+
+  on.exit(dev.off()) # prevent pheatmap from leaving an open connection if it crashes
+  numData %>%
+    pheatmap::pheatmap(annotation_col = annotationColDf,
                        annotation_colors = annotationColors,
                        breaks = seq(0, maxScale, length.out = 10),
                        color = colour_palette,
@@ -88,9 +140,9 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
                        treeheight_row = 0,
                        clustering_method = clusterMethod,
                        cutree_cols = clusterNum,
-                       main = glue::glue("{normMethod} values for {description}."),
                        ...)
 
+  on.exit()
 
 }
 
@@ -114,10 +166,10 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
 #' @export
 
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
-                             annotationCol = NULL, minDensity = 0,
-                             minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
-                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
-                             downstreamDist = 1000, ...){
+                            annotationCol = NULL, minDensity = 0,
+                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
+                            upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
+                            downstreamDist = 1000, ...){
 
   if (!is.null(annotationCol) & !is.data.frame(annotationCol) & all(is.character(annotationCol))) {
     annotationCol <- getAnnotationDataFrame(qseaSet, !!!rlang::syms(annotationCol))
@@ -196,7 +248,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
       plyranges::count_overlaps(., gene_details_gr) > 0 ~ "GeneBody",
       plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_upstream(upstreamDist)) > 0 ~ "Upstream",
       plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_downstream(downstreamDist)) > 0 ~ "Downstream"
-      )
+    )
     ) %>%
     as.data.frame() %>%
     dplyr::select(window, CpG_density, annotation) %>%
@@ -253,7 +305,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
 #' This function takes a qseaSet and plots a PCA
 #' @param qseaSet The qseaSet object.
-#' @param regionsToOverlap A GRanges (or data frame coercible to one) with a subset of windows to calculate the PCA on.
+#' @param signatureGR A GRanges (or data frame coercible to one) with a subset of windows to calculate the PCA on.
 #' @param plotComponents Which of the PCA components to plot default c(1,2)
 #' @param plotColour Column of the sampleTable to use to set the colour of the points
 #' @param plotShape Column of the sampleTable to use to set the shape of the points
@@ -269,7 +321,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 #' @export
 #'
 plotQseaPCA <- function(qseaSet,
-                        regionsToOverlap = NULL,
+                        signatureGR = NULL,
                         plotComponents = c(1,2),
                         plotColour = "type",
                         plotShape = "experiment",
@@ -283,8 +335,8 @@ plotQseaPCA <- function(qseaSet,
                         returnDataOnly = FALSE
 ){
 
-  if (!is.null(regionsToOverlap)) {
-    qseaSet <- filterByOverlaps(qseaSet, regionsToOverlap)
+  if (!is.null(signatureGR)) {
+    qseaSet <- filterByOverlaps(qseaSet, signatureGR)
   }
 
   pc1 <- plotComponents[1]
@@ -412,13 +464,13 @@ plotCorrelationMatrix <- function(qseaSet, ..., normMethod = "nrpm", annotationC
                        annotation_colors = annotationColors)
 }
 
-#' This function takes a DMRtable as output by calculateDMRs (possibly after any filtering), and generates an upset plot
+#' This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot
 #' @param DMRtable The data frame containing the differentially methylated regions.
 #' @param string A string to subset the columns based on (always requires adjPval)
 #' @param removeVS Whether to remove the string "_vs_" and everything after from the column names. For instance if all comparisons are against the same sample(s)
 #' @param minAdjPval A minimum adjusted P value to consider the window as present
 #' @param ... Other arguments to be passed to upset
-#' @return A table
+#' @return An UpSet plot
 #' @export
 #'
 plotDMRUpset <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...){
@@ -435,7 +487,7 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 
     {if (removeVS) {dplyr::rename_with(., ~stringr::str_remove(.,"_vs_.*")) } else .} %>%
     {if (!is.null(string)) {dplyr::select(., tidyselect::matches(string))} else . }
 
-  if (ncol(temp) < 2) {stop(glue::glue("Only {ncol(temp)} column remaining"))}
+  if (ncol(temp) < 2) {stop(glue::glue("Only {ncol(temp)} column remaining, nothing to plot!"))}
 
   purrr::map(stats::setNames(colnames(temp),colnames(temp)),function(x){  which(temp[,x,drop = FALSE] <= minAdjPval)}) %>%
     UpSetR::fromList() %>%

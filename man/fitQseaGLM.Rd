@@ -8,7 +8,7 @@ fitQseaGLM(
   qseaSet,
   variable = NULL,
   covariates = NULL,
-  contrastsToDo = NULL,
+  contrasts = NULL,
   keepIndex = NULL,
   minReadCount = 0,
   minNRPM = 1,
@@ -23,7 +23,7 @@ fitQseaGLM(
 
 \item{covariates}{A vector including any additional covariates to include in the model}
 
-\item{contrastsToDo}{A data frame with the comparisons to do}
+\item{contrasts}{A data frame with the comparisons to do}
 
 \item{keepIndex}{A vector of indices to keep, overwrites minReadCount.}
 
