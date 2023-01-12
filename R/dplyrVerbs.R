@@ -132,7 +132,7 @@ sort.qseaSet <- function(x, decreasing = FALSE, ...){
 #' @param ... Additional arguments to be used to filter the regions ONLY, as if they were a data frame.
 #' @return A qseaSet object, with the regions filtered appropriately.
 #' @export
-filterRegions <- function(qseaSet, ...){
+filterWindows <- function(qseaSet, ...){
 
   reducedRegions <- qseaSet %>%
     qsea::getRegions() %>%

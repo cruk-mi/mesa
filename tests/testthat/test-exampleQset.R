@@ -70,7 +70,7 @@ test_that("Analysing DMRs", {
 
   expect_no_error(DMRs <- exampleTumourNormal %>%
     calculateDMRs(variable = "type",
-                  contrastsToDo = tibble::tibble(sample1 = c("LUAD","LUSC","CRC"),
+                  contrasts = tibble::tibble(sample1 = c("LUAD","LUSC","CRC"),
                                                  sample2 = c("NormalLung","NormalLung","NormalColon"))))
 
   expect_equal(DMRs %>%
@@ -96,5 +96,5 @@ test_that("Analysing DMRs", {
 test_that("Multiple DMRs", {
   expect_no_error(DMRs <- exampleTumourNormal %>%
     calculateDMRs(variable = "type",
-                  contrastsToDo = "all"))
+                  contrasts = "all"))
 })

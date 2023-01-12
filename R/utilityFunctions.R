@@ -2,14 +2,14 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                          "ROI_start","ROI_end","value","window_start","window_end","window","sample_name",
                          "width","group","relH","CpG_density","strand","state","gene_name","map","CNV",
                          "EMSEMBL","SYMBOL","GENENAME","geneChr","geneStart","geneEnd","geneLength","n",
-                         "adjPval","sample1","sample2",".up","hyperStableFractionp8","hyperStableFractionp9","hyperStableEdgar",
+                         "adjPval","group1","group2","sample1","sample2",".up","hyperStableFractionp8","hyperStableFractionp9","hyperStableEdgar",
                          "isProperPair","isUnmappedQuery","isSupplementaryAlignment","isDuplicate","hasUnmappedMate",
                        "isNotPassingQualityControls","rname","pos","isize","MQ","mapq","isFirstMateRead","isPaired",
                        "cigar", ".rowID", "feature","annoShort","type",".comparison",".ext",".value","total_fragments",
                        "isSecondaryAlignment","ROI_ID","ID","ENSEMBL","betaDelta",
                        "map_hg38_1000kb", "map_hg38_10kb", "map_hg38_50kb", "map_hg38_500kb",
                        "gc_hg38_1000kb","gc_hg38_50kb","gc_hg38_500kb","gc_hg38_10kb","score",
-                       "log2FC","sample1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
+                       "log2FC","group1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
                        "afterOverBackNum","initialOverBackNum", "qname","inOut","nSign","nStrands",
                        "chromosome_name","start_position","end_position", "input_file"))
 
@@ -55,7 +55,7 @@ liftOverHg19 <- function(grOrDf){
 setMesaGenome <- function(genome){
   options("mesa_genome" = genome)
 
-  return(invisible())
+  return(invisible(TRUE))
 }
 
 expect_no_error <- function(object) {

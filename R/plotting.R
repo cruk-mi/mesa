@@ -1,7 +1,7 @@
 
 #' This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap
 #' @param qseaSet The qseaSet object.
-#' @param signatureGR A genomic ranges to plot.
+#' @param regionsToOverlap A genomic ranges to plot.
 #' @param normMethod Whether to plot nrpm values or beta values.
 #' @param annotationCol A data frame with annotations for the samples.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
@@ -18,16 +18,16 @@
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 
-plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
+plotRegionsHeatmap <- function(qseaSet, regionsToOverlap, normMethod = "beta",
                                annotationCol = NULL,
                                annotationColors = NA, clusterRows = FALSE, clusterCols = TRUE,
                                minEnrichment = 3, maxScale = 5, clusterNum = 2, description = "",
                                clip = 1000000000, minDensity = 0,
                                clusterMethod = "ward.D2", ...){
 
-  signatureGR <- plyranges::as_granges(signatureGR)
+  regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
 
-  if (length(signatureGR) == 0) {stop("No genomic regions given!")}
+  if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
   if (normMethod == "beta") {maxScale = min(clip,1)}
 
@@ -59,7 +59,7 @@ plotGRangesHeatmap <- function(qseaSet, signatureGR, normMethod = "beta",
 
 
   dataTab <- qseaSet %>%
-    filterByOverlaps(windowsToKeep = signatureGR) %>%
+    filterByOverlaps(windowsToKeep = regionsToOverlap) %>%
     qsea::makeTable(., groupMeans = qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
     dplyr::filter(CpG_density >= minDensity) %>%
     dplyr::select(tidyselect::matches(normMethod)) %>%
@@ -253,7 +253,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
 #' This function takes a qseaSet and plots a PCA
 #' @param qseaSet The qseaSet object.
-#' @param signatureGR A GRanges (or data frame coercible to one) with a subset of windows to calculate the PCA on.
+#' @param regionsToOverlap A GRanges (or data frame coercible to one) with a subset of windows to calculate the PCA on.
 #' @param plotComponents Which of the PCA components to plot default c(1,2)
 #' @param plotColour Column of the sampleTable to use to set the colour of the points
 #' @param plotShape Column of the sampleTable to use to set the shape of the points
@@ -269,7 +269,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 #' @export
 #'
 plotQseaPCA <- function(qseaSet,
-                        signatureGR = NULL,
+                        regionsToOverlap = NULL,
                         plotComponents = c(1,2),
                         plotColour = "type",
                         plotShape = "experiment",
@@ -283,8 +283,8 @@ plotQseaPCA <- function(qseaSet,
                         returnDataOnly = FALSE
 ){
 
-  if (!is.null(signatureGR)) {
-    qseaSet <- filterByOverlaps(qseaSet, signatureGR)
+  if (!is.null(regionsToOverlap)) {
+    qseaSet <- filterByOverlaps(qseaSet, regionsToOverlap)
   }
 
   pc1 <- plotComponents[1]

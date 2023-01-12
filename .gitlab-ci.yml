@@ -18,8 +18,9 @@ build:
     - docker push crukmi/mesa_dependencies:latest
 
   rules:
-    - changes:  # Include the job and set to when:manual if any of the follow paths match a modified file.
+    - changes:  # Run the job if any of these files changes
         - DESCRIPTION
+        - Dockerfile_dependencies_only
 
 devtools-check:
   image: crukmi/mesa_dependencies:latest

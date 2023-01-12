@@ -69,7 +69,7 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
   if(genome  %in% c("hg38","GRCh38") & is.null(FantomRegionsGR)) { FantomRegionsGR = mesa::FantomRegions %>% plyranges::as_granges()}
 
 
-  if(is(dataTable,"GRanges")) {
+  if(methods::is(dataTable,"GRanges")) {
     GRangesObject <- dataTable
   } else{
     GRangesObject <- dataTable %>%
