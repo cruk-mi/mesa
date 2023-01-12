@@ -7,7 +7,7 @@
 convertToArrayBetaTable(qseaSet)
 }
 \arguments{
-\item{qseaSet}{qseaSet object to calculate the probe beta values for}
+\item{qseaSet}{qseaSet object to calculate approximate beta values for the probes}
 }
 \description{
 This function calculates the beta values for the windows covering the hg38 array probes.

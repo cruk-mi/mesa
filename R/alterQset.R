@@ -8,9 +8,10 @@
 #' @export
 filterByOverlaps <- function(qseaSet, windowsToKeep){
 
-  if(is.data.frame(windowsToKeep) & ("seqnames" %in% colnames(windowsToKeep)) &
-     ("start" %in% colnames(windowsToKeep)) & ("end" %in% colnames(windowsToKeep))){
-    stop("windowsToKeep must be a GRanges object or a dataframe with seqnames, start and end.")
+  if(is.data.frame(windowsToKeep)) {
+    if(length(intersect(colnames(windowsToKeep),c("seqnames","start","end"))) != 3){
+      stop("windowsToKeep must be a GRanges object or a dataframe with seqnames, start and end.")
+    }
   }
 
   windowsToKeep <- plyranges::as_granges(windowsToKeep)

@@ -3,6 +3,8 @@ test_that("Making a hg19 qseaSet", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
+  BiocParallel::SerialParam()
+
   if(!rlang::is_installed("MEDIPSData")){
     skip("MEDIPSData Not installed")
   }
@@ -72,14 +74,14 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
                       properPairsOnly = FALSE)
 
   expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
-  expect_equal(testSet %>% qsea::getChrNames() %>% length(), 3)
+  expect_equal(testSet %>% qsea::getChrNames() %>% length(), 1)
   expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
   expect_equal(testSet %>% qsea::getCounts() %>% colSums() %>% unname(), testSet %>% qsea::getLibSize())
-  expect_equal(testSet %>% qsea::getRegions() %>% length(), 541532)
+  expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
-  expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
+  expect_no_error(testSet %>% plotGeneHeatmap("EWSR1"))
 
 })
 

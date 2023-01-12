@@ -3,35 +3,24 @@ variables:
   _R_CHECK_FORCE_SUGGESTS_: "true"
   APT_PKGS: "libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev zlib1g-dev git libv8-dev"
 
-image: rocker/tidyverse
+stages:
+  - build
+  - test
 
-before_script:
-  - apt-get update
-  - apt-get install -y --no-install-recommends ${APT_PKGS}
-  - apt-get install --yes --no-install-recommends r-cran-testthat r-cran-devtools
-  - R -e "devtools::install_deps(dependencies = TRUE)"
-  - R CMD build . --no-build-vignettes --no-manual
-  - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
-  - R CMD check "${PKG_FILE_NAME}" --no-build-vignettes --no-manual
-
-
-devtools-check:
-  stage: test
-  tags:
+build:
+  stage: build
+  tags: 
     - methylationprojects
   script:
-    - R -e 'devtools::check()'
+    - echo "Do your build here"
+    - pwd && ls -lah
+    - docker build -t crukmi/mesa_dependencies -f Dockerfile_dependencies_only .
+    - docker push crukmi/mesa_dependencies:latest
 
-pages:
-  stage: build
-  # image: alpine:latest
+devtools-check:
+  image: crukmi/mesa_dependencies:latest
+  stage: test
+  tags:
+    - methylationprojects_docker
   script:
-    - R -e 'devtools::install()'
-    - R -e 'pkgdown::build_site();'
-    - mkdir public/img
-    - cp img/hex-logo.png public/img/hex-logo.png
-  artifacts:
-    paths:
-    - public
-  only:
-  - prod
+    - R -e 'devtools::check()'

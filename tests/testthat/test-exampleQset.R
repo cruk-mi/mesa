@@ -37,14 +37,14 @@ test_that("Testing hg38 related annotation/plotting functions", {
                  length(), 215)
 
   expect_equal(exampleTumourNormal %>%
-                 getNormalisedReadSum(GRanges = getRegions(.)) %>%
+                 summariseAcrossWindows(windowsToUse = getRegions(.)) %>%
                  nrow(), exampleTumourNormal %>% getSampleNames() %>% length())
 
 })
 
 test_that("Testing general functionality", {
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
-    mutateQset(patient = stringr::str_remove(sample_name,"[TN]$"),
+    mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
                variableWithOneLevel = "Test",
                experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
                experimentConfounded = ifelse( stringr::str_detect(sample_name,"[1234]N"),"A","B"),
