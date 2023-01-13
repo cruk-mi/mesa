@@ -127,6 +127,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
 #' @param clusterCols Whether to cluster the columns or not.
 #' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
+#' @param useGroups Whether to use the group variable to collapse replicates.
 #' @param upstreamDist Number of basepairs upstream of the gene to include.
 #' @param downstreamDist Number of basepairs downstream of the gene to include.
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
