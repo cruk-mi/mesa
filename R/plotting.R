@@ -273,7 +273,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                        ...
     )
 
-  return(invisible(dat))
+  return(invisible(numData))
 
 }
 
