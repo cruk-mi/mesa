@@ -60,7 +60,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
   expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
-                                    annotationCol = getAnnotationDataFrame(., "tumour") ))
+                                    annotationCol = "tumour" ))
 
   expect_no_error(exampleTumourNormal %>%
                     plotCNVheatmap(tumour))
