@@ -8,7 +8,8 @@ plotGeneHeatmap(
   qseaSet,
   gene,
   normMethod = "beta",
-  annotationCol = NULL,
+  useGroups = FALSE,
+  sampleAnnotation = NULL,
   minDensity = 0,
   minEnrichment = 3,
   maxScale = 1,
@@ -29,7 +30,7 @@ plotGeneHeatmap(
 
 \item{normMethod}{Whether to plot nrpm values or beta values.}
 
-\item{annotationCol}{A data frame with annotations for the samples.}
+\item{sampleAnnotation}{A data frame with annotations for the samples.}
 
 \item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
 

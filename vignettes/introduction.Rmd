@@ -358,7 +358,7 @@ We can use the `plotRegionsHeatmap` function to plot a heatmap of these 15 windo
 
 ```{r}
 qseaSet %>%
-  plotRegionsHeatmap(DMRsCovariatePatient)
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient)
 ```
 
 The default is to plot this with the beta values, but you can change that via the `normMethod` option, to get normalised reads per million:
@@ -368,17 +368,36 @@ qseaSet %>%
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, normMethod = "nrpm", clusterRows = TRUE)
 ```
 
-This `normMethod` option occurs in a number of functions, with the common choices of `counts`, `nrpm` or `beta` (other options exist within `qsea`).
+This `normMethod` option occurs in a number of functions throughout the package, with the typical choices of `counts`, `nrpm` or `beta` (other options exist within `qsea`).
 
-To add an annotation bar on the top, we can pass the `getAnnotationDataFrame` function to the `annotationCol` (column annotation) option. This function takes a qseaSet as the first argument, and then any number of columns which occur in the sample table as the other arguments. For instance, to use it to add an annotation bar with `tumour` and `type`. Note that to provide the `qseaSet` as the first argument we can make use of the fact that when you use a pipe (`%>%`) the left-hand part of the pipe can be accessed using `.`. This is a standard way to annotate the heatmaps in `mesa`, but does require some remembering! 
+To add an annotation bar on the top, we can pass a `sampleAnnotation` argument This function takes a qseaSet as the first argument, and then any number of columns which occur in the sample table as the other arguments. For instance, to use it to add an annotation bar with `tumour` and `type`:
 
 ```{r}
 qseaSet %>%
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     annotationCol = getAnnotationDataFrame(., tumour, type))
+                     sampleAnnotation = c("tumour", "type"))
 ```
 
-Annotation colours can be chosen, with again rather an unusual syntax. This is a list, with named elements (for some/all annotation columns), each containing a named vector, names being the levels of the annotation and values being the colours. 
+Note that the annotation option allows for tidy evaluation, so we can also specify the columns unquoted:
+
+```{r}
+qseaSet %>%
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+                     sampleAnnotation = c(tumour, type))
+```
+
+Annotation colours can be chosen, with a rather specific requirement. This is a list, with named elements (for some/all annotation columns), each containing a named vector, names being the levels of the annotation and values being the colours. 
+We can specify colours for just one variable (with the second being chosen automatically):
+
+```{r}
+qseaSet %>%
+  plotRegionsHeatmap(regionsToOverlap = DMRs, 
+                     sampleAnnotation = c(tumour, type),
+                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))
+                     )
+```
+
+Or both variables:
 
 ```{r}
 annotColours <- list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"),
@@ -386,13 +405,7 @@ annotColours <- list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"),
 
 qseaSet %>%
   plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                     annotationCol = getAnnotationDataFrame(., tumour, type),
-                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))
-                     )
-
-qseaSet %>%
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                     annotationCol = getAnnotationDataFrame(., tumour, type),
+                     sampleAnnotation = c(tumour, type),
                      annotationColors = annotColours
                      )
 ```
@@ -402,7 +415,7 @@ The heatmap also takes a `description` argument, which is added to the top of th
 ```{r}
 qseaSet %>%
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     annotationCol = getAnnotationDataFrame(., tumour, type),
+                     sampleAnnotation = c(tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient"
                      )
@@ -413,20 +426,20 @@ Rows can be clustered using the `clusterRows = TRUE` option:
 ```{r}
 qseaSet %>%
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     annotationCol = getAnnotationDataFrame(., tumour, type),
+                     sampleAnnotation = c(tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient",
                      clusterRows = TRUE,
                      )
 ```
 
-While the columns can be controlled with `clusterRows = FALSE`. By default the columns are clustered but the rows not.
+While the columns can be controlled with `clusterCols`. By default the columns are clustered but the rows not.
 The number of clusters to break the column dendogram into can be controlled using `clusterNum` (set to 1 to have no breaks):
 
 ```{r}
 qseaSet %>%
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     annotationCol = getAnnotationDataFrame(., tumour, type),
+                     sampleAnnotation = c(tumour, type),
                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
                      description = "Tumour/Normal DMRs, adjusting for patient",
                      clusterNum = 3

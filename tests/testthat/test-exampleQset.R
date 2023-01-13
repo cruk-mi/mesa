@@ -1,4 +1,54 @@
+test_that("Annotation getting works", {
+
+  expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = tumour, useGroups = FALSE) %>% dim(),c(10,1))
+  expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = "tumour", useGroups = FALSE) %>% dim(), c(10,1))
+  expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = c("tumour","type"),  useGroups = FALSE)  %>% dim(), c(10,2))
+  expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = c(tumour,type), useGroups = FALSE)  %>% dim(), c(10,2))
+
+  expect_equal(getAnnotation(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = tumour, useGroups = TRUE)  %>% dim(), c(2,1))
+  expect_equal(getAnnotation(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = "tumour", useGroups = TRUE)  %>% dim(), c(2,1))
+
+  expect_error(getAnnotation(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = c("tumour","type"), useGroups = TRUE)  %>% dim())
+  expect_error(getAnnotation(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = c(tumour,type), useGroups = TRUE)  %>% dim())
+
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = tumour, useGroups = FALSE))
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = "tumour", useGroups = FALSE))
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = c("tumour","type"),  useGroups = FALSE))
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = c(tumour,type), useGroups = FALSE))
+
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = tumour, useGroups = TRUE))
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = "tumour", useGroups = TRUE))
+
+  expect_error(plotCorrelationMatrix(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = c("tumour","type"), useGroups = TRUE))
+  expect_error(plotCorrelationMatrix(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = c(tumour,type), useGroups = TRUE))
+
+  regions <- getRegions(exampleTumourNormal)[1:10]
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal, regionsToOverlap = regions, sampleAnnotation = tumour, useGroups = FALSE))
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal, regionsToOverlap = regions, sampleAnnotation = "tumour", useGroups = FALSE))
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal, regionsToOverlap = regions, sampleAnnotation = c("tumour","type"),  useGroups = FALSE))
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal, regionsToOverlap = regions, sampleAnnotation = c(tumour,type), useGroups = FALSE))
+
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = tumour, useGroups = TRUE))
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = "tumour", useGroups = TRUE))
+
+  expect_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c("tumour","type"), useGroups = TRUE))
+  expect_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type), useGroups = TRUE))
+}
+)
+
 test_that("Testing hg38 related annotation/plotting functions", {
+
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroups = FALSE))
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroups = FALSE))
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c("tumour","type"),  useGroups = FALSE))
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroups = FALSE))
+
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroups = TRUE))
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroups = TRUE))
+
+  expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroups = TRUE))
+  expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroups = TRUE))
+
   expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10"))
 
@@ -10,7 +60,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
   expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
-                                    annotationCol = getAnnotationDataFrame(., "tumour") ))
+                                    sampleAnnotation = "tumour" ))
 
   expect_no_error(exampleTumourNormal %>%
                     plotCNVheatmap(tumour))
