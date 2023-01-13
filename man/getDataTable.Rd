@@ -4,7 +4,12 @@
 \alias{getDataTable}
 \title{This function takes a qseaSet and generates a table of data containing data for each sample}
 \usage{
-getDataTable(qseaSet, normMethod = "nrpm", groupMeans = FALSE)
+getDataTable(
+  qseaSet,
+  normMethod = "nrpm",
+  groupMeans = FALSE,
+  minEnrichment = 3
+)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
@@ -12,6 +17,8 @@ getDataTable(qseaSet, normMethod = "nrpm", groupMeans = FALSE)
 \item{normMethod}{What normalisation method to use (nrpm or beta)}
 
 \item{groupMeans}{Number of reads required for a fully methylated region to not be masked (put NA) beta values only.}
+
+\item{minEnrichment}{Minimum number of reads for beta values to not give NA}
 }
 \value{
 A table of data, with a column for each individual sample

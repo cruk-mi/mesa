@@ -840,22 +840,20 @@ getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nr
 
 setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames is not defined on a data frame, only on a qseaSet.")})
 
-
-
-
 #' This function takes a qseaSet and generates a table of data containing data for each sample
 #' @param qseaSet The qseaSet object.
 #' @param normMethod What normalisation method to use (nrpm or beta)
 #' @param groupMeans Number of reads required for a fully methylated region to not be masked (put NA) beta values only.
+#' @param minEnrichment Minimum number of reads for beta values to not give NA
 #' @return A table of data, with a column for each individual sample
 #' @export
 #'
-getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE){
+getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEnrichment = 3){
 
   if(groupMeans){
 
     qseaSet %>%
-      qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod) %>%
+      qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble() %>%
@@ -864,7 +862,7 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE){
   } else {
 
     qseaSet %>%
-      qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
+      qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble() %>%
