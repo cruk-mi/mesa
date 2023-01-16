@@ -33,5 +33,5 @@ subsetWindowsOverBackground(
 A qseaSet object, with only a subset of the windows.
 }
 \description{
-This function takes a qseaSet and finds which windows have more reads than would be expected if the reads followed a Poisson distribution over the whole genome.
+#' Moved to internal function as of January 2023, think whether want to keep it or not.
 }
