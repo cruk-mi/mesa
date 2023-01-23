@@ -43,19 +43,17 @@ qseaTableToChrGRanges <- function(dataTable) {
 getWindowNames <- function(x) {
 
   if(is.qseaSet(x)){
-    x %>%
+    return(x %>%
       qsea::getRegions() %>%
       tibble::as_tibble() %>%
       dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
-      dplyr::pull(window) %>%
-      return()
+      dplyr::pull(window))
   }
 
-  asValidGranges(x) %>%
+  return(asValidGranges(x) %>%
     tibble::as_tibble() %>%
     dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
-    dplyr::pull(window) %>%
-    return()
+    dplyr::pull(window))
 
   stop("Unknown data type!")
 }
