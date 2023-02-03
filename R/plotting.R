@@ -19,39 +19,48 @@
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 
-plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
-                               normMethod = "beta",
-                               sampleAnnotation = NULL,
-                               annotationColors = NA,
-                               useGroups = FALSE,
-                               clusterRows = FALSE,
-                               clusterCols = TRUE,
-                               minEnrichment = 3,
-                               maxScale = 5,
-                               clusterNum = 2,
-                               description = "",
-                               clip = 1000000000,
-                               minDensity = 0,
-                               clusterMethod = "ward.D2", ...){
 
+plotRegionsHeatmap=function(qseaSet, regionsToOverlap,
+                                normMethod = "beta",
+                                sampleAnnotation = NULL,
+                                annotationColors = NA,
+                                useGroups = FALSE,
+                                clusterRows = FALSE,
+                                clusterCols = TRUE,
+                                minEnrichment = 3,
+                                maxScale = 5,
+                                clusterNum = 2,
+                                description = "",
+                                clip = 1000000000,
+                                minDensity = 0,
+                                clusterMethod = "ward.D2", ...){
+  
   #build the column annotation. Need the {{ }} to parse either strings or tidy selections
-  annotationColDf <- getAnnotation(qseaSet, useGroups = useGroups, sampleAnnotation = {{sampleAnnotation}})
-
+  #annotationColDf <- getAnnotation(qseaSet, useGroups = useGroups, sampleAnnotation = {{sampleAnnotation}})
+  if(!is.null(sampleAnnotation)){
+    colAnnot=MakeCNVHeatmapAnnotaton(qseaSet, 
+                                     orientation = "column", 
+                                     sampleAnnot=sampleAnnotation)
+  } else {
+    columnannot=NULL
+  }
+  
+  
   regionsToOverlap <- asValidGranges(regionsToOverlap)
-
+  
   if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
-
+  
   if (normMethod == "beta") {maxScale = min(clip,1)}
-
+  
   colour_palette <- RColorBrewer::brewer.pal(name = "YlOrRd", n = 9)
-
+  
   clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
-
+  
   if (!is.list(annotationColors)) {
-
+    
     namesVec <- names(annotationColors)
     names(namesVec) <- namesVec
-
+    
     purrr::map(namesVec, function(x){
       usedValues <- qseaSet %>%
         qsea::getSampleTable() %>%
@@ -60,16 +69,16 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
       return(x = annotationColors[[x]][usedValues])
     }
     )
-
+    
   }
-
+  
   # define a function that removes rows that have 1 row.
   remove_almost_empty_rows <- function(dat)  {
     mask_keep <- rowSums(is.na(dat)) != (ncol(dat) - 1)
     janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "rows", reason = "almost empty")
     return(dat[mask_keep, , drop = FALSE])
   }
-
+  
   dataTab <- qseaSet %>%
     filterByOverlaps(windowsToKeep = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
@@ -79,43 +88,120 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
-
+  
   if(useGroups){
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
   }
-
+  
   numData <- dataTab %>%
     dplyr::select(tidyselect::all_of(colsToFind)) %>%
     clipFn(a = 0, b = clip) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%
     janitor::remove_empty(which = "rows", quiet = FALSE)
-
+  
   if(ncol(dataTab) == 1) {
     clusterCols <- FALSE
   }
-
+  
   if(clusterRows) {
     dataTab <- remove_almost_empty_rows(dataTab)
   }
-
-  on.exit(dev.off()) # prevent pheatmap from leaving an open connection if it crashes
+  
   numData %>%
-    pheatmap::pheatmap(annotation_col = annotationColDf,
-                       annotation_colors = annotationColors,
-                       breaks = seq(0, maxScale, length.out = 10),
-                       color = colour_palette,
-                       cluster_rows = clusterRows,
-                       cluster_cols = clusterCols,
-                       show_rownames = FALSE,
-                       treeheight_row = 0,
-                       clustering_method = clusterMethod,
-                       cutree_cols = clusterNum,
-                       ...)
+    as.matrix %>%
+    ComplexHeatmap::Heatmap(name="Beta value", cluster_rows = FALSE, cluster_columns = TRUE, 
+                            show_row_names = F, col = colour_palette, clustering_method_rows = clusterMethod, clustering_method_columns = clusterMethod, 
+                            heatmap_legend_param = list(legend_direction = "horizontal", at = seq(0, maxScale, length.out = 6) %>% round(1)), column_split = clusterNum, top_annotation = colAnnot) %>% 
+    ComplexHeatmap::draw(heatmap_legend_side = "bottom",
+                         annotation_legend_side = "bottom")
+}
 
-  on.exit()
 
+
+#This function makes a HeatmapAnnotation object, and is a helper function for plotRegionsHeatmap and plotCNV
+
+makeHeatmapAnnotation <- function(qseaSet,
+                                  orientation,
+                                  sampleAnnotation = NULL){
+  
+  annotationColDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = FALSE) %>%
+    dplyr::mutate_if(is.character, as.factor)
+  
+  #Get all levels of all categorical variables and convert to color list
+  levs <- annotationColDf %>%
+    dplyr::select_if(is.factor) %>%
+    purrr::map(function(x) levels(as.factor(x)))
+  
+  col_list_cat <- levs %>%
+    unlist() %>%
+    length() %>%
+    hues::iwanthue(plot=FALSE) %>%
+    purrr::set_names(levs %>% unlist()) %>%
+    utils::relist(levs) %>%
+    purrr::map2(levs, purrr::set_names)
+  
+  #Make colour vectors for continuous variables
+  annotationCol_numeric <- annotationColDf %>%
+    dplyr::select_if(is.numeric)
+  
+  #Splitting into numeric variables with all non-negative values and those with negative values
+  annotationCol_numeric_min_positive <- annotationCol_numeric %>% 
+    dplyr::select_if(function(x) min(x)>=0)
+  
+  annotationCol_numeric_min_negative <- annotationCol_numeric %>% 
+    dplyr::select_if(function(x) min(x)<0)
+  
+  colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuOr","Blues","Purples") %>%
+    purrr::set_names(., nm = .) %>%
+    map(function(pal){
+      RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+        {c(dplyr::first(.), dplyr::last(.))}
+    }
+    )
+  
+  colvecs_zerocenter <- c("BrBG","PiYG","PuOr","PRGn","RdGy") %>%
+    purrr::set_names(., nm = .) %>%
+    map(function(pal){
+      RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+        {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
+    }
+    )
+  
+  col_list_num_min_positive <- annotationCol_numeric_min_positive %>%
+    purrr::map2(colvecs_binary[1:ncol(.)], function(val, cols){
+      circlize::colorRamp2(c(min(val, na.rm = TRUE), 
+                             max(val, na.rm = TRUE)),
+                           cols)
+    }
+    )   
+  
+  col_list_num_min_negative <- annotationCol_numeric_min_negative %>%
+    purrr::map2(colvecs_zerocenter[1:ncol(.)], function(val, cols){
+      circlize::colorRamp2(c(min(val, na.rm = TRUE), 
+                             0,
+                             max(val, na.rm = TRUE)),
+                           cols)
+    }
+    )   
+  
+  annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
+  
+  annotation_legend_param_ls <- annotationColDf %>%
+    colnames() %>%
+    purrr::set_names(., nm = .) %>%
+    map(function(x){
+      list(name = list(direction = "horizontal"))
+    }) 
+  
+  annot <- ComplexHeatmap::HeatmapAnnotation(which = orientation, 
+                                             df    = annotationColDf, 
+                                             col   = annotationColors, 
+                                             annotation_legend_param = annotation_legend_param_ls, 
+                                             show_annotation_name    = FALSE)
+  
+  return(annot)
 }
 
 #' This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
@@ -138,17 +224,17 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
 #' @return A heatmap showing the methylation patterns across the gene of interest.
 #' @export
 
-plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
-                            useGroups = FALSE,
-                            sampleAnnotation = NULL, minDensity = 0,
-                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
-                            upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
-                            downstreamDist = 1000, ...){
-
+plotGeneHeatmap=function(qseaSet, gene, normMethod = "beta",
+                           useGroups = FALSE,
+                           sampleAnnotation = NULL, minDensity = 0,
+                           minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
+                           upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
+                           downstreamDist = 1000, ...){
+  
   annotationColDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = useGroups)
-
+  
   if(!is.null(getMart(qseaSet))){ mart <- getMart(qseaSet) }
-
+  
   if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg38|GRCh38")){
     mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl', host = "https://jul2022.archive.ensembl.org")
   } else if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg19|GRCh37")) {
@@ -156,47 +242,47 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   } else if(is.null(mart)){
     stop("Please specify a mart object for biomaRt.")
   }
-
+  
   if(stringr::str_detect(gene,"^ENSG0")){
     idType <- "ensembl_gene_id"
   } else{
     idType <- "hgnc_symbol"
   }
-
+  
   gene_details <- biomaRt::getBM(mart = mart,
                                  attributes = c('hgnc_symbol', 'description', 'chromosome_name',
                                                 'start_position', 'end_position', 'strand','ensembl_gene_id'),
                                  filters = idType,
                                  values = gene) %>%
     dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
-
+  
   qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
   windowsChr <- gene_details %>% pull(seqnames) %>% stringr::str_detect("chr") %>% any()
-
+  
   if(qseaSetChr & !windowsChr){
     gene_details <- gene_details %>%
       dplyr::mutate(seqnames = paste0("chr", seqnames))
   }
-
+  
   gene_details_gr <- gene_details %>%
     plyranges::as_granges()
-
+  
   if(nrow(gene_details) != 1){
     stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart}."))
   }
-
+  
   geneGR <- gene_details %>%
     plyranges::as_granges() %>%
     plyranges::anchor_start() %>%
     plyranges::stretch(upstreamDist) %>%
     plyranges::anchor_end() %>%
     plyranges::stretch(downstreamDist)
-
+  
   if (length(geneGR) == 0) {stop("No genomic region found!")}
   if (length(geneGR) > 1) {stop("Multiple genomic regions found!")}
-
+  
   if (normMethod == "beta") {maxScale = 1}
-
+  
   dataTable <- qseaSet %>%
     filterByOverlaps(windowsToKeep = geneGR) %>%
     filterWindows(CpG_density >= minDensity) %>%
@@ -206,20 +292,20 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
-
+  
   if(useGroups){
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
   }
-
+  
   numData <- dataTable %>%
     tibble::column_to_rownames("window") %>%
     dplyr::select(tidyselect::all_of(colsToFind)) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE)
-
+  
   geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
-
+  
   annoRow <- dataTable %>%
     dplyr::select(seqnames, start, end, CpG_density, window) %>%
     plyranges::as_granges() %>%
@@ -236,47 +322,115 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     as.data.frame() %>%
     dplyr::select(window, CpG_density, annotation) %>%
     tibble::column_to_rownames("window")
-
-  if (scaleRows) {
-    scaleRows <- "row"
-    colour_palette <- RColorBrewer::brewer.pal(name = "RdBu", n = 9)
-    breaks <- seq(-3, 3, length.out = 10)
-  } else{
-    scaleRows <- "none"
-    colour_palette <- RColorBrewer::brewer.pal(name = "YlOrRd", n = 9)
-    breaks <- seq(0, maxScale, length.out = 10)
+  
+  #Make rowannoation object
+  rowAnnot=makeGeneHeatmapRowAnnotation(annoRow)
+  
+  #Set the cell border line width depending on the number of rows or columns, as pheatmap does. 
+  #Can't have gridlines for genes with too many windows, as the resulting heatmap is just grey (i.e., all you see is borders)
+  if (nrow(numData) > 100 || ncol(numData) > 100) {
+    rectGpParam=grid::gpar(col = "grey", lwd = 0) 
+  } else {
+    rectGpParam = grid::gpar(col = "grey", lwd = 1)
   }
-  # remove_almost_empty_cols <- function(dat)  {
-  #   mask_keep <- colSums(is.na(dat)) != (nrow(dat) - 1)
-  #   janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
-  #   return(dat[, mask_keep, drop = FALSE])
-  # }
-  #
-  # if(clusterCols) {
-  #   dat <- remove_almost_empty_cols(dat)
-  # }
-  #
-
+  
+  #Setting a colour palette for beta-values. Could make this optional I guess
+  colour_palette <- RColorBrewer::brewer.pal(name = "YlOrRd", n = 9)
+  
   numData %>%
-    pheatmap::pheatmap(annotation_col = annotationColDf,
-                       annotation_row = annoRow,
-                       annotation_colors = annotationColors,
-                       breaks = breaks,
-                       color = colour_palette,
-                       cluster_rows = FALSE,
-                       cluster_cols = clusterCols,
-                       scale = scaleRows,
-                       show_rownames = FALSE,
-                       treeheight_row = 0,
-                       clustering_method = "ward.D2",
-                       cutree_cols = clusterNum,
-                       main = glue::glue("{stringr::str_to_title(normMethod)} values for {gene}."),
-                       ...
-    )
-
+    as.matrix %>%
+    ComplexHeatmap::Heatmap(rect_gp = rectGpParam, name="Beta value", cluster_rows = FALSE, cluster_columns = clusterCols, left_annotation = rowAnnot, col = colour_palette, show_row_names = F, clustering_method_rows = "ward.D2", clustering_method_columns = "ward.D2", 
+                            column_split = clusterNum, na_col = "lightgrey", heatmap_legend_param = list(legend_direction = "vertical", at = seq(0, maxScale, length.out = 6) %>% round(1))) %>% 
+    ComplexHeatmap::draw(heatmap_legend_side = "right",annotation_legend_side = "right", column_title = glue::glue("{stringr::str_to_title(normMethod)} values for {gene}."))
+  
   return(invisible(numData))
-
 }
+
+#' This function makes a row annotation object for the gene heatmap, which hows information about gene regions and CpG density. It is a helper function for plotGeneHeatmap 
+#' @param rowAnnotationDF A dataframe of variables that provide information about the gene regions, which will be used to annotate windows within the heatmap 
+
+makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
+  
+  annotationColDf <- rowAnnotationDF %>%
+    dplyr::mutate_if(is.character, as.factor)
+  
+  #Get all levels of all categorical variables and convert to color list
+  levs <- annotationColDf %>%
+    dplyr::select_if(is.factor) %>%
+    purrr::map(function(x) levels(as.factor(x)))
+  
+  col_list_cat <- levs %>%
+    unlist() %>%
+    length() %>%
+    hues::iwanthue(plot=FALSE) %>%
+    purrr::set_names(levs %>% unlist()) %>%
+    utils::relist(levs) %>%
+    purrr::map2(levs, purrr::set_names)
+  
+  #Make colour vectors for continuous variables
+  annotationCol_numeric <- annotationColDf %>%
+    dplyr::select_if(is.numeric)
+  
+  #Splitting into numeric variables with all non-negative values and those with negative values
+  annotationCol_numeric_min_positive <- annotationCol_numeric %>% 
+    dplyr::select_if(function(x) min(x)>=0)
+  
+  annotationCol_numeric_min_negative <- annotationCol_numeric %>% 
+    dplyr::select_if(function(x) min(x)<0)
+  
+  if(is.null())
+    
+    colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuOr","Blues","Purples") %>%
+    purrr::set_names(., nm = .) %>%
+    map(function(pal){
+      RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+        {c(dplyr::first(.), dplyr::last(.))}
+    }
+    )
+  
+  colvecs_zerocenter <- c("BrBG","PiYG","PuOr","PRGn","RdGy") %>%
+    purrr::set_names(., nm = .) %>%
+    map(function(pal){
+      RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+        {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
+    }
+    )
+  
+  col_list_num_min_positive <- annotationCol_numeric_min_positive %>%
+    purrr::map2(colvecs_binary[1:ncol(.)], function(val, cols){
+      circlize::colorRamp2(c(min(val, na.rm = TRUE), 
+                             max(val, na.rm = TRUE)),
+                           cols)
+    }
+    )   
+  
+  col_list_num_min_negative <- annotationCol_numeric_min_negative %>%
+    purrr::map2(colvecs_zerocenter[1:ncol(.)], function(val, cols){
+      circlize::colorRamp2(c(min(val, na.rm = TRUE), 
+                             0,
+                             max(val, na.rm = TRUE)),
+                           cols)
+    }
+    )   
+  
+  annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
+  
+  annotation_legend_param_ls <- annotationColDf %>%
+    colnames() %>%
+    purrr::set_names(., nm = .) %>%
+    map(function(x){
+      list(name = list(direction = "horizontal"))
+    }) 
+  
+  annot <- ComplexHeatmap::HeatmapAnnotation(which = "row", 
+                                             df    = annotationColDf, 
+                                             col   = annotationColors, 
+                                             annotation_legend_param = annotation_legend_param_ls, 
+                                             show_annotation_name    = FALSE)
+  
+  return(annot)
+}
+
 
 #' This function takes a qseaSet and plots a PCA
 #' @param qseaSet The qseaSet object.

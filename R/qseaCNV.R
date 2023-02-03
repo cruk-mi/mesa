@@ -195,87 +195,64 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' @return A heatmap with the calculated number of chromosomes for each samples
 #' @export
 #'
+
 plotCNVheatmap <- function(qseaSet,
-                           ...,
-                           annotationCol = NULL,
-                           annotationColors = NA,
-                           clusterRows = TRUE){
-
-  if(is.null(annotationCol)){
-    annotationCol = getAnnotationDataFrameIndividual(qseaSet, ...)
+                    sampleAnnotation = NULL,
+                    annotationColors = NA,
+                    clusterRows = TRUE){
+  
+  #try to make it flexible to change to top annotation 
+  if(!is.null(sampleAnnotation)){
+    rowAnnot <- makeHeatmapAnnotation(qseaSet, 
+                                      orientation = "row",
+                                      sampleAnnot = sampleAnnotation)
+  } else {
+    rowAnnot=NULL
   }
-
-  # if the annotation is empty then set to NA else pheatmap complains
-  if(ncol(annotationCol) == 0){
-    annotationCol <- NA
-  }
-
-  if (is.list(annotationColors)) {
-
-    namesVec <- names(annotationColors)
-    names(namesVec) <- namesVec
-
-    annotationColors <- purrr::map(namesVec,
-      function(x){
-        usedValues <- qseaSet %>%
-          qsea::getSampleTable() %>%
-          dplyr::pull(x) %>%
-          unique()
-        return(x = annotationColors[[x]][usedValues])
-      }
-    )
-
-    if(!("chr" %in% names(annotationColors))){
-      annotationColors$chr <- c("1" = "black", "0" = "darkgrey")
-    }
-
-  }
-
-
-
-  # Take the CNV and generate a data frame with the annotation
-  rowAnno <- qseaSet %>%
+  
+  chr <- qseaSet %>%
     qsea::getCNV() %>%
     tibble::as_tibble() %>%
-    dplyr::mutate(seqnames = factor(seqnames,
-                                    levels = sort(as.numeric(levels(seqnames))))) %>%
+    dplyr::mutate(seqnames = factor(seqnames, levels = gtools::mixedsort(levels(seqnames)))) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
-    #dplyr::mutate(seqnames = factor(seqnames, levels = c(1:22))) %>%
-    dplyr::mutate(chr = as.numeric(seqnames) %% 2 ) %>%
-    dplyr::mutate(chr = factor(chr,levels = c(1,0))) %>%
     dplyr::arrange(seqnames) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
-    dplyr::select(chr)
-
+    dplyr::pull(seqnames)
+  
+  chr.levs <- chr %>% levels()
+  chr.cols <- list(chr = rep(c("black","grey"), length(chr.levs) ) %>% 
+                     head(length(chr.levs)) %>% 
+                     purrr::set_names(chr.levs))
+  
+  #Make top_annotation bar indicating chromosomes
+  topAnnot <- ComplexHeatmap::HeatmapAnnotation(chr = chr, col = chr.cols, show_legend = FALSE, show_annotation_name = FALSE)
+  
   CNVmatrix <- qseaSet %>%
     qsea::getCNV() %>%
-    tibble::as_tibble() %>%
+    tibble::as_tibble(rownames = NULL) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
-    tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
-    dplyr::select(-seqnames, -start, -end, -width, -strand) %>%
+    dplyr::select(all_of(qseaSet %>% getSampleNames())) %>%
     as.matrix() %>%
     t()
-    #{2*(2^.)} %>%
-
-  minmax <- max(max(CNVmatrix),abs(min(CNVmatrix)),1)
-
+  
   CNVmatrix %>%
-    ComplexHeatmap::pheatmap(cluster_rows = clusterRows,
-                       cluster_cols = FALSE,
-                       show_colnames = FALSE,
-                       annotation_row = annotationCol,
-                       annotation_colors = annotationColors,
-                       #breaks = 2*(2^seq(from = 0, to = 4, length.out = 12)),
-                       breaks = seq(from = -minmax, to = minmax, length.out = 12),
-                       #labels_row = stringr::str_remove(rownames(.), "_.*"),
-                       annotation_col = rowAnno,
-                       gaps_col = rowAnno %>% dplyr::pull(chr) %>% diff() %>% {which(. != 0)},
-                       color = rev(RColorBrewer::brewer.pal(name = "RdBu", n = 11))
-    )
-
+    ComplexHeatmap::Heatmap(cluster_rows = clusterRows,
+                            cluster_columns = FALSE,
+                            show_column_names = FALSE,
+                            left_annotation = rowAnnot,
+                            top_annotation = topAnnot,
+                            name = "Copy number",
+                            row_title = "Samples",
+                            column_title = "Chromosome",
+                            column_title_side = "top",
+                            heatmap_legend_param = list(legend_direction = "horizontal")) %>%
+    ComplexHeatmap::draw(heatmap_legend_side = "bottom",
+                         annotation_legend_side = "right")
+  
 }
+
 
 #' This function takes a qseaSet and removes the CNV data.
 #' @param qseaSet The qseaSet object.
