@@ -38,7 +38,7 @@ plotRegionsHeatmap=function(qseaSet, regionsToOverlap,
   #build the column annotation. Need the {{ }} to parse either strings or tidy selections
   #annotationColDf <- getAnnotation(qseaSet, useGroups = useGroups, sampleAnnotation = {{sampleAnnotation}})
   if(!is.null(sampleAnnotation)){
-    colAnnot=MakeCNVHeatmapAnnotaton(qseaSet, 
+    colAnnot=makeHeatmapAnnotation(qseaSet, 
                                      orientation = "column", 
                                      sampleAnnot=sampleAnnotation)
   } else {
@@ -155,7 +155,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   
   colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuOr","Blues","Purples") %>%
     purrr::set_names(., nm = .) %>%
-    map(function(pal){
+    purrr::map(function(pal){
       RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
         {c(dplyr::first(.), dplyr::last(.))}
     }
@@ -163,7 +163,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   
   colvecs_zerocenter <- c("BrBG","PiYG","PuOr","PRGn","RdGy") %>%
     purrr::set_names(., nm = .) %>%
-    map(function(pal){
+    purrr::map(function(pal){
       RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
         {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
     }
@@ -191,7 +191,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   annotation_legend_param_ls <- annotationColDf %>%
     colnames() %>%
     purrr::set_names(., nm = .) %>%
-    map(function(x){
+    purrr::map(function(x){
       list(name = list(direction = "horizontal"))
     }) 
   
@@ -382,7 +382,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
     
     colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuOr","Blues","Purples") %>%
     purrr::set_names(., nm = .) %>%
-    map(function(pal){
+    purrr::map(function(pal){
       RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
         {c(dplyr::first(.), dplyr::last(.))}
     }
@@ -390,7 +390,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
   
   colvecs_zerocenter <- c("BrBG","PiYG","PuOr","PRGn","RdGy") %>%
     purrr::set_names(., nm = .) %>%
-    map(function(pal){
+    purrr::map(function(pal){
       RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
         {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
     }
@@ -418,7 +418,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
   annotation_legend_param_ls <- annotationColDf %>%
     colnames() %>%
     purrr::set_names(., nm = .) %>%
-    map(function(x){
+    purrr::map(function(x){
       list(name = list(direction = "horizontal"))
     }) 
   
