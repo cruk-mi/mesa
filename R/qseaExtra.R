@@ -528,14 +528,14 @@ getPCA <- function(qseaSet,
   if (!is.null(regionsToOverlap)) {
     regionsToOverlap <- regionsToOverlap %>% 
       tibble::as_tibble() %>% 
-      dplyr::select(any_of(c("seqnames", "start", "end", "CpG_density"))) %>%  # keep only minimum columns necessary
+      dplyr::select(tidyselect::any_of(c("seqnames", "start", "end", "CpG_density"))) %>%  # keep only minimum columns necessary
       asValidGranges()
     
     if (is.null(dataTable)) {
       qseaSet <- qseaSet %>% 
         filterByOverlaps(windowsToKeep = regionsToOverlap)
       
-      numWindowsRemovedRegionOverlap <- initialNumWindows - length(getRegions(qseaSet))
+      numWindowsRemovedRegionOverlap <- initialNumWindows - length(getWindows(qseaSet))
       message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(getRegions(qseaSet))} windows remaining."))
       
     } else {
