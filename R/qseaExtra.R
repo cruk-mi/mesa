@@ -864,31 +864,45 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 
 #' This function takes a qseaSet and generates a table of data containing data for each sample
 #' @param qseaSet The qseaSet object.
-#' @param normMethod What normalisation method to use (nrpm or beta)
+#' @param normMethod What normalisation method to use (nrpm or beta), can be given multiple.
 #' @param groupMeans Number of reads required for a fully methylated region to not be masked (put NA) beta values only.
 #' @param minEnrichment Minimum number of reads for beta values to not give NA
+#' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
 #' @return A table of data, with a column for each individual sample
 #' @export
 #'
-getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEnrichment = 3){
+getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE){
 
   if(groupMeans){
 
-    qseaSet %>%
+    tab <- qseaSet %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
+      tibble::as_tibble()
+
+    if(length(normMethod) == 1 & !addMethodSuffix) {
+      tab <- tab %>%
+        dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), ""))
+    } else {
+      tab <- tab %>%
+        dplyr::rename_with(~ stringr::str_replace_all(.x, "_means$", ""))
+    }
+
+    return(tab)
 
   } else {
 
-    qseaSet %>%
+    tab <- qseaSet %>%
       qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
+      tibble::as_tibble()
+
+    if(length(normMethod) == 1 & !addMethodSuffix) {
+      tab <- tab %>%
+        dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), ""))
+    }
+
+    return(tab)
   }
 
 }
