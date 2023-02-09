@@ -129,14 +129,14 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
 #' @param aboveThreshold A logical value indicating whether to keep the windows with `fn` output value above or equal to `threshold` (TRUE), or below `threshold` (FALSE).
 #' @param samples A set of sample names to filter on, or a string to match in the sample names.
 #' @param normMethod The type of normalisation method to use (e.g. nrpm, beta, counts).
-#' @param useGroups Whether to use the group argument of the sample table to collapse replicates.
+#' @param useGroupMeans Whether to use the group argument of the sample table to collapse replicates.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroups = FALSE){
+subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
 
   fnName <- as.character(substitute(fn, env = environment()))
   
-  if (!useGroups) {
+  if (!useGroupMeans) {
     qseaSamples <- qsea::getSampleNames(qseaSet)
     groupString <- ""
   } else {
@@ -167,10 +167,10 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     stop(glue::glue("normMethod should be a single valid option for qsea::normMethod"))
   }
 
-  if (!useGroups) {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, groupMeans = useGroups)
+  if (!useGroupMeans) {
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, groupMeans = useGroupMeans)
   } else {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, groupMeans = useGroups)
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, groupMeans = useGroupMeans)
   }
 
   #TODO think about catching the warnings more specifically. Mostly we want to catch the "no non-missing arguments to max; returning -Inf"
