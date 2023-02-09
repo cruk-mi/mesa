@@ -67,27 +67,27 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
   expect_equal(exampleTumourNormal %>%
                  subsetWindowsBySignal(samples = "_N$",
-                                        fn = max,
-                                        threshold = 1,
-                                       keepTrue = FALSE,
-                                        normMethod = "nrpm") %>%
+                                       fn = max,
+                                       threshold = 1,
+                                       aboveThreshold = FALSE,
+                                       normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 601)
-
+  
   expect_equal(exampleTumourNormal %>%
                  subsetWindowsBySignal(samples = c("Colon1_T","Colon2_T"),
                                        fn = max,
                                        threshold = 1,
-                                       keepTrue = FALSE,
-                                      normMethod = "nrpm") %>%
+                                       aboveThreshold = FALSE,
+                                       normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 604)
-
+  
   expect_equal(exampleTumourNormal %>%
                  subsetWindowsBySignal(samples = c("Colon1_T","Colon2_T"),
                                        fn = max,
                                        threshold = 1,
-                                       keepTrue = TRUE,
+                                       aboveThreshold = TRUE,
                                        normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 215)
