@@ -656,7 +656,7 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
 
 #' This function takes a qseaSet and calculates a summary statistic across the windows.
 #' @param qseaSet The qseaSet object.
-#' @param windowsToUse A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
+#' @param regionsToOverlap A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
 #' @param suffix A suffix for adding to the new columns of data, to clarify what regions for instance.
 #' @param addSampleTable A boolean with whether to add the sampleTable on to the output table
@@ -668,7 +668,7 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
 #' @export
 #'
 summariseAcrossWindows <- function(qseaSet,
-                                   windowsToUse = NULL,
+                                   regionsToOverlap = NULL,
                                    fn = mean,
                                    addSampleTable = TRUE,
                                    normMethod = c("nrpm", "beta"),
@@ -685,12 +685,12 @@ summariseAcrossWindows <- function(qseaSet,
     #if suffix doesn't start with "_" then add that to the string
     suffix = ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
 
-    if(is.null(windowsToUse)) {
-      windowsToUse <- qsea::getRegions(qseaSet)
+    if(is.null(regionsToOverlap)) {
+      regionsToOverlap <- qsea::getRegions(qseaSet)
     }
 
     dataMat <- qseaSet %>%
-      filterByOverlaps(windowsToUse) %>%
+      filterByOverlaps(regionsToOverlap) %>%
       qsea::makeTable(norm_methods = normMethod,
                       samples = qsea::getSampleNames(qseaSet),
                       minEnrichment = minEnrichment)
@@ -735,7 +735,7 @@ summariseAcrossWindows <- function(qseaSet,
 
 #' This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.
 #' @param qseaSet The qseaSet object.
-#' @param windowsToUse A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
+#' @param regionsToOverlap A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
 #' @param suffix A suffix for adding to the new columns of data, to clarify where the regions came from for instance.
 #' @param normMethod One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").
@@ -745,7 +745,7 @@ summariseAcrossWindows <- function(qseaSet,
 #' @export
 #'
 addSummaryAcrossWindows <- function(qseaSet,
-                                    windowsToUse = NULL,
+                                    regionsToOverlap = NULL,
                                     fn = mean,
                                     suffix = "",
                                     normMethod = c("nrpm", "beta"),
@@ -756,7 +756,7 @@ addSummaryAcrossWindows <- function(qseaSet,
   fnName = as.character(substitute(fn, env = environment()))
 
   summaryTable <- summariseAcrossWindows(qseaSet,
-                                         windowsToUse = windowsToUse,
+                                         regionsToOverlap = regionsToOverlap,
                                          fn = fn,
                                          suffix = suffix, addSampleTable = FALSE,
                          normMethod = normMethod,
