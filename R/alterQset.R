@@ -3,32 +3,32 @@
 #' This function takes a qseaSet and keeps only a set of regions from it. Either specified as a GRanges object or an index vector of which regions.
 #'
 #' @param qseaSet The qseaSet object.
-#' @param windowsToKeep A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
+#' @param regionsToOverlap A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-filterByOverlaps <- function(qseaSet, windowsToKeep){
+filterByOverlaps <- function(qseaSet, regionsToOverlap){
 
-  if(is.data.frame(windowsToKeep)) {
-    if(length(intersect(colnames(windowsToKeep),c("seqnames","start","end"))) != 3){
-      stop("windowsToKeep must be a GRanges object or a dataframe with seqnames, start and end.")
+  if(is.data.frame(regionsToOverlap)) {
+    if(length(intersect(colnames(regionsToOverlap),c("seqnames","start","end"))) != 3){
+      stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
     }
   }
 
-  windowsToKeep <- plyranges::as_granges(windowsToKeep)
+  regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
 
   qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
-  windowsChr <- windowsToKeep %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- regionsToOverlap %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
 
   if(qseaSetChr & !windowsChr){
-    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
   }
 
   if(!qseaSetChr & windowsChr){
-    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
   }
 
-  qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,windowsToKeep) > 0), , drop = FALSE]
-  qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(windowsToKeep)
+  qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,regionsToOverlap) > 0), , drop = FALSE]
+  qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(regionsToOverlap)
 
   return(qseaSet)
 }
@@ -38,31 +38,31 @@ filterByOverlaps <- function(qseaSet, windowsToKeep){
 #' This function takes a qseaSet and removes a set of regions from it. Either specified as a GRanges object or a table that can be coerced to one.
 #'
 #' @param qseaSet The qseaSet object.
-#' @param windowsToKeep A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
+#' @param regionsToOverlap A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-filterByNonOverlaps <- function(qseaSet, windowsToKeep){
+filterByNonOverlaps <- function(qseaSet, regionsToOverlap){
 
-  if(is.data.frame(windowsToKeep) & ("seqnames" %in% colnames(windowsToKeep)) &
-     ("start" %in% colnames(windowsToKeep)) & ("end" %in% colnames(windowsToKeep))){
-    stop("windowsToKeep must be a GRanges object or a dataframe with seqnames, start and end.")
+  if(is.data.frame(regionsToOverlap) & ("seqnames" %in% colnames(regionsToOverlap)) &
+     ("start" %in% colnames(regionsToOverlap)) & ("end" %in% colnames(regionsToOverlap))){
+    stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
   }
 
-  windowsToKeep <- plyranges::as_granges(windowsToKeep)
+  regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
 
   qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
-  windowsChr <- windowsToKeep %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- regionsToOverlap %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
 
   if(qseaSetChr & !windowsChr){
-    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
   }
 
   if(!qseaSetChr & windowsChr){
-    windowsToKeep <- windowsToKeep %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
   }
 
   GRangesToKeep <- qsea::getRegions(qseaSet) %>%
-    plyranges::filter_by_non_overlaps(plyranges::as_granges(windowsToKeep))
+    plyranges::filter_by_non_overlaps(plyranges::as_granges(regionsToOverlap))
 
   qseaSet %>%
     filterByOverlaps(GRangesToKeep) %>%
