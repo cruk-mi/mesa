@@ -3,7 +3,7 @@
 #' @param qseaSet The qseaSet object.
 #' @param regionsToOverlap A genomic ranges to plot.
 #' @param normMethod Whether to plot nrpm values or beta values.
-#' @param useGroups Whether to average samples over the group column (i.e. combine replicates)
+#' @param useGroupMeans Whether to average samples over the group column (i.e. combine replicates)
 #' @param sampleAnnotation A character vector with names of columns from the sampleTable to use as annotation, or a pre-defined annotation data frame.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
@@ -23,7 +23,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
                                normMethod = "beta",
                                sampleAnnotation = NULL,
                                annotationColors = NA,
-                               useGroups = FALSE,
+                               useGroupMeans = FALSE,
                                clusterRows = FALSE,
                                clusterCols = TRUE,
                                minEnrichment = 3,
@@ -35,7 +35,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
                                clusterMethod = "ward.D2", ...){
 
   #build the column annotation. Need the {{ }} to parse either strings or tidy selections
-  annotationColDf <- getAnnotation(qseaSet, useGroups = useGroups, sampleAnnotation = {{sampleAnnotation}})
+  annotationColDf <- getAnnotation(qseaSet, useGroupMeans = useGroupMeans, sampleAnnotation = {{sampleAnnotation}})
 
   regionsToOverlap <- asValidGranges(regionsToOverlap)
 
@@ -74,13 +74,13 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     filterByOverlaps(windowsToKeep = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroups,
+                 groupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-  if(useGroups){
+  if(useGroupMeans){
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
@@ -127,7 +127,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
 #' @param clusterCols Whether to cluster the columns or not.
 #' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
-#' @param useGroups Whether to use the group variable to collapse replicates.
+#' @param useGroupMeans Whether to use the group variable to collapse replicates.
 #' @param upstreamDist Number of basepairs upstream of the gene to include.
 #' @param downstreamDist Number of basepairs downstream of the gene to include.
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
@@ -139,13 +139,13 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
 #' @export
 
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
-                            useGroups = FALSE,
+                            useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
                             minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
                             downstreamDist = 1000, ...){
 
-  annotationColDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = useGroups)
+  annotationColDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
 
   if(!is.null(getMart(qseaSet))){ mart <- getMart(qseaSet) }
 
@@ -201,13 +201,13 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     filterByOverlaps(windowsToKeep = geneGR) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroups,
+                 groupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-  if(useGroups){
+  if(useGroupMeans){
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
@@ -418,7 +418,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' @param qseaSet The qseaSet object.
 #' @param regionsToOverlap Regions to overlap
 #' @param sampleAnnotation Columns of the sampleTable to use to annotate the heatmap
-#' @param useGroups Whether to use the replicate information or not (group column)
+#' @param useGroupMeans Whether to use the replicate information or not (group column)
 #' @param normMethod What normalisation method to use
 #' @param annotationColors A list of custom colours to use for the annotation
 #' @param minDensity Minimum CpG density to keep
@@ -427,7 +427,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' @return A table
 #' @export
 #'
-plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroups = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
+plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
                                   minEnrichment = 3, annotationColors = NA, minDensity = 0, ...){
 
   if(!is.null(regionsToOverlap)){
@@ -439,18 +439,18 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroups = 
       filterByOverlaps(windowsToKeep = regionsToOverlap)
   }
 
-  annotationDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = useGroups)
+  annotationDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
 
   dataTab <- qseaSet %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroups,
+                 groupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-  if(useGroups){
+  if(useGroupMeans){
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
@@ -508,19 +508,19 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 
 #' Note that sampleAnnotation must be enclosed within double curly brackets when used.
 #'
 #' @param qseaSet A qseaSet
-#' @param useGroups Whether to use the "group" variable to collapse replicates
+#' @param useGroupMeans Whether to use the "group" variable to collapse replicates
 #' @param sampleAnnotation Columns of the sampleTable to use
 #'
 #' @return A data frame containing the annotation columns, ready for use in
-getAnnotation <- function(qseaSet, useGroups = FALSE, sampleAnnotation = NULL){
+getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL){
 
   annotationColDf <- data.frame()
 
-  if(!useGroups) {
+  if(!useGroupMeans) {
     annotationColDf <- qseaSet %>%
       qsea::getSampleTable() %>%
       dplyr::select(!!!rlang::enquos(sampleAnnotation))
-  } else if(useGroups){
+  } else if(useGroupMeans){
     groupSampleTab <- qseaSet %>%
       qsea::getSampleTable() %>%
       dplyr::select(group, !!!rlang::enquos(sampleAnnotation))
