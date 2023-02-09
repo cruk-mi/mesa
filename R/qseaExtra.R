@@ -117,88 +117,111 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
   return(dfAnno)
 }
 
-#' This function takes a qseaSet and filters out windows which have expression in a defined set of samples
+#' Filter windows from a qseaSet based on expression in a subset of samples
+#'
+#' This function is designed to take a qseaSet and filter the windows by applying a function to each window, followed by thresholding either windows above or below that cutoff.
+#' For instance, we can keep only regions that have a median normalised reads per million value above 1, or those where the minimum beta value is below 0.5.
+#' Which samples to apply the filter based on can be specified with the `samples` argument, either as a list of samples or a string.
 #'
 #' @param qseaSet The qseaSet object.
-#' @param samplesToFilterOut A set of sample names to filter out, or a string to match in the sample names
-#' @param maxValue The maximum value to allow in any of the samples
-#' @param normMethod The type of normalisation method to use (nrpm, beta, count)
-#' @param .swap Whether to change the printed messages as we are actually going to be keeping these windows rather than filtering them.
+#' @param fn A function that takes a row of data and returns a single value.
+#' @param threshold The value to threshold the data rows on
+#' @param keepTrue Whether to keep the windows passing the function, or to filter these out
+#' @param samples A set of sample names to filter on, or a string to match in the sample names
+#' @param normMethod The type of normalisation method to use (e.g. nrpm, beta, counts)
+#' @param useGroups Whether to use the group argument of the sample_name to collapse replicates.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-removeWindowsOverCutoff <- function(qseaSet, samplesToFilterOut, maxValue, normMethod, .swap = FALSE){
+subsetWindowsBySignal <- function(qseaSet, fn, threshold, keepTrue, samples = NULL, normMethod = "nrpm", useGroups = FALSE){
+
+  fnName <- as.character(substitute(fn, env = environment()))
+
+  if (!useGroups) {
+    samplesNotInQset <- setdiff(samples, qsea::getSampleNames(qseaSet))
+
+    if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
+      sampleNameString <- samples
+      samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
+      message(glue::glue("Considering {length(samples)} samples containing {sampleNameString} in the name."))
+    } else if (length(samplesNotInQset) > 0 ) {
+      stop(glue::glue("Sample {samplesNotInQset} not present in the qseaSet!"))
+    }
+
+    if (is.null(samples)) {
+      samples <- qsea::getSampleNames(qseaSet)
+      message(glue::glue("Considering all {length(samples)} samples."))
+    }
+
+  } else {
+
+    samplesNotInQset <- setdiff(samples, names(qsea::getSampleGroups(qseaSet)))
+
+    if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
+      sampleNameString <- samples
+      samples <- stringr::str_subset(names(qsea::getSampleGroups(qseaSet)), samples)
+      message(glue::glue("Considering {length(samples)} samples containing {sampleNameString} in the name."))
+    } else if (length(samplesNotInQset) > 0 ) {
+      stop(glue::glue("Sample {samplesNotInQset} not present in the qseaSet!"))
+    }
+
+    if (is.null(samples)) {
+      samples <- names(qsea::getSampleGroups(qseaSet))
+      message(glue::glue("Considering all {length(samples)} sample groups."))
+    }
+
+  }
+
+  if (length(samples) == 0) {
+    stop("No samples selected.")
+  }
 
   rowAny <- function(x) {rowSums(x) > 0}
 
-  if (!(normMethod %in% c("beta","nrpm","counts"))) {
-    stop(glue::glue("normMethod must be either beta, nrpm or counts, not {normMethod}"))
+  if (!length(normMethod(normMethod)) == 1) {
+    stop(glue::glue("normMethod should be a single valid option for qsea::normMethod"))
   }
 
-  ##TODO Make work for beta values
-  if (normMethod == "beta") {
-    stop(glue::glue("normMethod of beta doesn't currently work, need to deal with NAs."))
+  if (!useGroups) {
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, groupMeans = useGroups)
+  } else {
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, groupMeans = useGroups)
   }
 
-  samplesNotInSet <- setdiff(samplesToFilterOut, qsea::getSampleNames(qseaSet))
+  dataTable <- dataTable %>%
+    dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
+    tibble::column_to_rownames("window") %>%
+    dplyr::select(tidyselect::all_of(!!samples))
 
-  if (length(samplesToFilterOut) == 1 & length(samplesNotInSet) > 0 & is.character(samplesToFilterOut)) {
-    sampleNameString <- samplesToFilterOut
-    samplesToFilterOut <- stringr::str_subset(qsea::getSampleNames(qseaSet), samplesToFilterOut)
-    message(glue::glue("Considering {length(samplesToFilterOut)} samples containing {sampleNameString} in the name."))
-  } else if (length(samplesNotInSet) > 0 ) {
-    stop(glue::glue("Sample {samplesNotInSet} not present in the qseaSet!
+  #TODO think about catching the warnings more specifically. Mostly we want to catch the "no non-missing arguments to max; returning -Inf"
+  valueTable <- suppressWarnings(apply(dataTable, 1,fn, na.rm = TRUE))
 
-                    "))
+  if (keepTrue) {
+    windowsToKeep <- which(valueTable >= threshold)
+    keepString <- "above"
+  } else {
+    windowsToKeep <- which(valueTable < threshold)
+    keepString <- "below"
   }
 
-  groupNames <- qsea::getSampleGroups(qseaSet)[unlist(lapply(qsea::getSampleGroups(qseaSet), function(x) any(samplesToFilterOut %in% x)))]
-
-  dataTable <- suppressMessages(qsea::makeTable(qseaSet, norm_methods = normMethod,
-                               groupMeans = groupNames
-    ))
-
-  keep <- dataTable %>%
-    as.data.frame() %>%
-    tibble::rowid_to_column(var = ".rowID") %>%
-    dplyr::select(tidyselect::matches("_means")) %>%
-    apply(1,max) %>%
-    {which(. <= maxValue)}
-
-  regionsToKeep <- dataTable[keep,, drop = FALSE] %>%
-    dplyr::select(seqnames = chr, start = window_start, end = window_end) %>%
+  regionsToKeep <- windowsToKeep %>%
+    names() %>%
+    tibble::enframe(name = NULL, value = "window") %>%
+    tidyr::separate(window, into = c("seqnames", "start", "end")) %>%
+    dplyr::mutate(start = as.numeric(start), end = as.numeric(end)) %>%
     plyranges::as_granges()
 
-  if(!.swap){
-     message(glue::glue("Removing {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} remaining"))
-  }else{
-    message(glue::glue("Keeping {nrow(dataTable) - length(keep)} windows based on {length(samplesToFilterOut)} samples, {length(keep)} removed"))
-  }
-  return(invisible(filterByOverlaps(qseaSet, regionsToKeep)))
+  groupString <- ifelse(useGroups, "groups","samples")
+
+  message(glue::glue("Keeping {length(windowsToKeep)} windows with {fnName} {keepString} {threshold} over {length(samples)} {groupString}."))
+
+  qseaSet <- filterByOverlaps(qseaSet, regionsToKeep)
+  return(qseaSet)
 
 }
-
-
-#' This function takes a qseaSet and keeps the windows which have expression above a cutoff in a defined set of samples
-#'
-#' @param qseaSet The qseaSet object.
-#' @param samplesToFilterOn A set of sample names to keep, or a string to match in the sample names
-#' @param minValue The minimum value to require in any of the samples
-#' @param normMethod The type of normalisation method to use (nrpm, beta, count)
-#' @return A qseaSet object, with only a subset of the windows.
-#' @export
-keepWindowsOverCutoff <- function(qseaSet, samplesToFilterOn, minValue, normMethod){
-
-  # find which regions would be removed by removeWindowsOverCutoff and keep the opposite set!
-  qseaSet %>%
-    removeWindowsOverCutoff(samplesToFilterOut = samplesToFilterOn, maxValue = minValue, normMethod = normMethod, .swap = TRUE) %>%
-    qsea::getRegions() %>%
-    filterByNonOverlaps(qseaSet, .) %>%
-    return()
-}
-
 
 #' This function takes a qseaSet and finds which windows have more reads than would be expected if the reads followed a Poisson distribution over the whole genome.
 #'
+#'#' Moved to internal function as of January 2023, think whether want to keep it or not.
 #'
 #' @param qseaSet The qseaSet object.
 #' @param keepAbove Boolean, if true, then keep only the windows that are above the background, if false then remove them.
@@ -209,7 +232,6 @@ keepWindowsOverCutoff <- function(qseaSet, samplesToFilterOn, minValue, normMeth
 #' @param numAbove How many samples need to be above the background level in a window to keep/remove it.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @importFrom rlang :=
-#' @export
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NULL, numWindows = NULL,
                                         recalculateNumWindows = TRUE, fdrThres = 0.01, numAbove = 1){
 
@@ -1081,14 +1103,14 @@ summariseAcrossWindows <- function(qseaSet,
                                    fnName = NULL) {
     #TODO: Can we get multiple summary statistics in one go?
 
-  if(is.null(fnName)){
+  if(is.null(fnName)) {
     fnName = as.character(substitute(fn, env = environment()))
   }
 
     #if suffix doesn't start with "_" then add that to the string
     suffix = ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
 
-    if(is.null(windowsToUse)){
+    if(is.null(windowsToUse)) {
       windowsToUse <- qsea::getRegions(qseaSet)
     }
 
@@ -1239,31 +1261,45 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 
 #' This function takes a qseaSet and generates a table of data containing data for each sample
 #' @param qseaSet The qseaSet object.
-#' @param normMethod What normalisation method to use (nrpm or beta)
+#' @param normMethod What normalisation method to use (nrpm or beta), can be given multiple.
 #' @param groupMeans Number of reads required for a fully methylated region to not be masked (put NA) beta values only.
 #' @param minEnrichment Minimum number of reads for beta values to not give NA
+#' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
 #' @return A table of data, with a column for each individual sample
 #' @export
 #'
-getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEnrichment = 3){
+getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE){
 
   if(groupMeans){
 
-    qseaSet %>%
+    tab <- qseaSet %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
+      tibble::as_tibble()
+
+    if(length(normMethod) == 1 & !addMethodSuffix) {
+      tab <- tab %>%
+        dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), ""))
+    } else {
+      tab <- tab %>%
+        dplyr::rename_with(~ stringr::str_replace_all(.x, "_means$", ""))
+    }
+
+    return(tab)
 
   } else {
 
-    qseaSet %>%
+    tab <- qseaSet %>%
       qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
+      tibble::as_tibble()
+
+    if(length(normMethod) == 1 & !addMethodSuffix) {
+      tab <- tab %>%
+        dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), ""))
+    }
+
+    return(tab)
   }
 
 }

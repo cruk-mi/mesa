@@ -66,23 +66,29 @@ test_that("Testing hg38 related annotation/plotting functions", {
                     plotCNVheatmap(tumour))
 
   expect_equal(exampleTumourNormal %>%
-                 removeWindowsOverCutoff(samplesToFilterOut = "_N$",
-                                        maxValue = 1,
+                 subsetWindowsBySignal(samples = "_N$",
+                                        fn = max,
+                                        threshold = 1,
+                                       keepTrue = FALSE,
                                         normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 601)
 
   expect_equal(exampleTumourNormal %>%
-                 removeWindowsOverCutoff(samplesToFilterOut = c("Colon1_T","Colon2_T"),
-                                        maxValue = 1,
-                                        normMethod = "nrpm") %>%
+                 subsetWindowsBySignal(samples = c("Colon1_T","Colon2_T"),
+                                       fn = max,
+                                       threshold = 1,
+                                       keepTrue = FALSE,
+                                      normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 604)
 
   expect_equal(exampleTumourNormal %>%
-                 keepWindowsOverCutoff(samplesToFilterOn = c("Colon1_T","Colon2_T"),
-                                        minValue = 1,
-                                        normMethod = "nrpm") %>%
+                 subsetWindowsBySignal(samples = c("Colon1_T","Colon2_T"),
+                                       fn = max,
+                                       threshold = 1,
+                                       keepTrue = TRUE,
+                                       normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 215)
 
