@@ -4,12 +4,12 @@
 \alias{getAnnotation}
 \title{Get an annotation data frame, for use in heatmap plotting functions}
 \usage{
-getAnnotation(qseaSet, useGroups = FALSE, sampleAnnotation = NULL)
+getAnnotation(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL)
 }
 \arguments{
 \item{qseaSet}{A qseaSet}
 
-\item{useGroups}{Whether to use the "group" variable to collapse replicates}
+\item{useGroupMeans}{Whether to use the "group" variable to collapse replicates}
 
 \item{sampleAnnotation}{Columns of the sampleTable to use}
 }

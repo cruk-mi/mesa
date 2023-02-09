@@ -8,10 +8,10 @@ subsetWindowsBySignal(
   qseaSet,
   fn,
   threshold,
-  keepTrue,
+  aboveThreshold,
   samples = NULL,
   normMethod = "nrpm",
-  useGroups = FALSE
+  useGroupMeans = FALSE
 )
 }
 \arguments{
@@ -19,15 +19,15 @@ subsetWindowsBySignal(
 
 \item{fn}{A function that takes a row of data and returns a single value.}
 
-\item{threshold}{The value to threshold the data rows on}
+\item{threshold}{The value to threshold the \code{fn} output value on.}
 
-\item{keepTrue}{Whether to keep the windows passing the function, or to filter these out}
+\item{aboveThreshold}{A logical value indicating whether to keep the windows with \code{fn} output value above or equal to \code{threshold} (TRUE), or below \code{threshold} (FALSE).}
 
-\item{samples}{A set of sample names to filter on, or a string to match in the sample names}
+\item{samples}{A set of sample names to filter on, or a string to match in the sample names.}
 
-\item{normMethod}{The type of normalisation method to use (e.g. nrpm, beta, counts)}
+\item{normMethod}{The type of normalisation method to use (e.g. nrpm, beta, counts).}
 
-\item{useGroups}{Whether to use the group argument of the sample_name to collapse replicates.}
+\item{useGroupMeans}{Whether to use the group argument of the sample table to collapse replicates.}
 }
 \value{
 A qseaSet object, with only a subset of the windows.

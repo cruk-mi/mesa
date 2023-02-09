@@ -8,17 +8,20 @@ getDataTable(
   qseaSet,
   normMethod = "nrpm",
   groupMeans = FALSE,
-  minEnrichment = 3
+  minEnrichment = 3,
+  addMethodSuffix = FALSE
 )
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{normMethod}{What normalisation method to use (nrpm or beta)}
+\item{normMethod}{What normalisation method to use (nrpm or beta), can be given multiple.}
 
 \item{groupMeans}{Number of reads required for a fully methylated region to not be masked (put NA) beta values only.}
 
 \item{minEnrichment}{Minimum number of reads for beta values to not give NA}
+
+\item{addMethodSuffix}{Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.}
 }
 \value{
 A table of data, with a column for each individual sample

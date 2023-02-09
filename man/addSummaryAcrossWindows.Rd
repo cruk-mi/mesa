@@ -6,7 +6,7 @@
 \usage{
 addSummaryAcrossWindows(
   qseaSet,
-  windowsToUse = NULL,
+  regionsToOverlap = NULL,
   fn = mean,
   suffix = "",
   normMethod = c("nrpm", "beta"),
@@ -17,7 +17,7 @@ addSummaryAcrossWindows(
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{windowsToUse}{A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
+\item{regionsToOverlap}{A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
 
 \item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
 
