@@ -359,8 +359,18 @@ We can use the `plotRegionsHeatmap` function to plot a heatmap of these 15 windo
 ```{r}
 qseaSet %>%
   addLibraryInformation() %>% 
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, sampleAnnotation = c("group", "valid_fragments"))
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient)
 ```
+
+We can add sample annotation bars to the top of the heatmap by using the sampleAnnotation option: 
+
+```{r}
+qseaSet %>%
+  addLibraryInformation() %>% 
+  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient,
+                     sampleAnnotation = tumour)
+```
+
 
 The default is to plot this with the beta values, but you can change that via the `normMethod` option, to get normalised reads per million:
 

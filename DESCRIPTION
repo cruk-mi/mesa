@@ -58,7 +58,8 @@ Imports:
     ComplexHeatmap,
     readr,
     memoise,
-    biomaRt
+    biomaRt,
+    hues
 Depends:
     qsea,
     R (>= 4.1.0),

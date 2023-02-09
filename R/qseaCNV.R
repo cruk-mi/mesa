@@ -200,16 +200,11 @@ plotCNVheatmap <- function(qseaSet,
                     sampleAnnotation = NULL,
                     annotationColors = NA,
                     clusterRows = TRUE){
-  
-  #try to make it flexible to change to top annotation 
-  if(!is.null(sampleAnnotation)){
-    rowAnnot <- makeHeatmapAnnotation(qseaSet, 
-                                      orientation = "row",
-                                      sampleAnnot = sampleAnnotation)
-  } else {
-    rowAnnot=NULL
-  }
-  
+
+  rowAnnot <- makeHeatmapAnnotation(qseaSet,
+                                    orientation = "row",
+                                    sampleAnnotation = {{sampleAnnotation}} )
+
   chr <- qseaSet %>%
     qsea::getCNV() %>%
     tibble::as_tibble() %>%
@@ -219,24 +214,24 @@ plotCNVheatmap <- function(qseaSet,
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
     dplyr::pull(seqnames)
-  
+
   chr.levs <- chr %>% levels()
-  chr.cols <- list(chr = rep(c("black","grey"), length(chr.levs) ) %>% 
-                     head(length(chr.levs)) %>% 
+  chr.cols <- list(chr = rep(c("black","grey"), length(chr.levs) ) %>%
+                     head(length(chr.levs)) %>%
                      purrr::set_names(chr.levs))
-  
+
   #Make top_annotation bar indicating chromosomes
   topAnnot <- ComplexHeatmap::HeatmapAnnotation(chr = chr, col = chr.cols, show_legend = FALSE, show_annotation_name = FALSE)
-  
+
   CNVmatrix <- qseaSet %>%
     qsea::getCNV() %>%
     tibble::as_tibble(rownames = NULL) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     tibble::column_to_rownames("window") %>%
-    dplyr::select(all_of(qseaSet %>% getSampleNames())) %>%
+    dplyr::select(tidyselect::all_of(qseaSet %>% getSampleNames())) %>%
     as.matrix() %>%
     t()
-  
+
   CNVmatrix %>%
     ComplexHeatmap::Heatmap(cluster_rows = clusterRows,
                             cluster_columns = FALSE,
@@ -250,7 +245,7 @@ plotCNVheatmap <- function(qseaSet,
                             heatmap_legend_param = list(legend_direction = "horizontal")) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
                          annotation_legend_side = "right")
-  
+
 }
 
 
