@@ -126,10 +126,10 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
 
 makeHeatmapAnnotation <- function(qseaSet,
                                   orientation,
-                                  useGroups = FALSE,
+                                  useGroupMeans = FALSE,
                                   sampleAnnotation = NULL){
 
-  annotationColDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = useGroups)
+  annotationColDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
 
   if (is.null(annotationColDf)) {
     return(NULL)
