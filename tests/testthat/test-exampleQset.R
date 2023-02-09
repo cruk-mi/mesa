@@ -69,7 +69,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
                  subsetWindowsBySignal(samples = "_N$",
                                         fn = max,
                                         threshold = 1,
-                                       keepTrue = FALSE,
+                                       aboveThreshold = FALSE,
                                         normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 601)
