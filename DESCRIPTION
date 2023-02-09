@@ -59,7 +59,8 @@ Imports:
     readr,
     memoise,
     biomaRt,
-    hues
+    hues,
+    circlize
 Depends:
     qsea,
     R (>= 4.1.0),

@@ -36,6 +36,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
   #build the column annotation. Need the {{ }} to parse either strings or tidy selections
   colAnnot <- makeHeatmapAnnotation(qseaSet,
                                     orientation = "column",
+                                    useGroups = useGroups,
                                     sampleAnnotation = {{sampleAnnotation}} )
 
   regionsToOverlap <- asValidGranges(regionsToOverlap)
@@ -102,7 +103,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
   }
 
   numData %>%
-    as.matrix %>%
+    as.matrix() %>%
     ComplexHeatmap::Heatmap(name = "Beta value",
                             cluster_rows = FALSE,
                             cluster_columns = TRUE,
@@ -125,9 +126,10 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
 
 makeHeatmapAnnotation <- function(qseaSet,
                                   orientation,
+                                  useGroups = FALSE,
                                   sampleAnnotation = NULL){
 
-  annotationColDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = FALSE)
+  annotationColDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroups = useGroups)
 
   if (is.null(annotationColDf)) {
     return(NULL)

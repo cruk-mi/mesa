@@ -188,9 +188,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
 #' This function takes a qseaSet and plots a heatmap of the calculated CNV
 #' @param qseaSet The qseaSet object.
-#' @param ... A list of columns to use to annotate the samples with.
-#' @param annotationCol A data frame with annotations for the samples (can be made with getAnnotationDataFrameIndividual)
-#' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
+#' @param sampleAnnotation Columns of the sampleTable to use to annotation the plot with.
 #' @param clusterRows Whether to cluster the rows of the heatmap
 #' @return A heatmap with the calculated number of chromosomes for each samples
 #' @export
@@ -198,7 +196,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
 plotCNVheatmap <- function(qseaSet,
                     sampleAnnotation = NULL,
-                    annotationColors = NA,
                     clusterRows = TRUE){
 
   rowAnnot <- makeHeatmapAnnotation(qseaSet,
@@ -217,7 +214,7 @@ plotCNVheatmap <- function(qseaSet,
 
   chr.levs <- chr %>% levels()
   chr.cols <- list(chr = rep(c("black","grey"), length(chr.levs) ) %>%
-                     head(length(chr.levs)) %>%
+                     utils::head(length(chr.levs)) %>%
                      purrr::set_names(chr.levs))
 
   #Make top_annotation bar indicating chromosomes
@@ -228,7 +225,7 @@ plotCNVheatmap <- function(qseaSet,
     tibble::as_tibble(rownames = NULL) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     tibble::column_to_rownames("window") %>%
-    dplyr::select(tidyselect::all_of(qseaSet %>% getSampleNames())) %>%
+    dplyr::select(tidyselect::all_of(qseaSet %>% qsea::getSampleNames())) %>%
     as.matrix() %>%
     t()
 
