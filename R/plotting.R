@@ -71,7 +71,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
   }
 
   dataTab <- qseaSet %>%
-    filterByOverlaps(windowsToKeep = regionsToOverlap) %>%
+    filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
                  groupMeans = useGroupMeans,
@@ -198,7 +198,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   if (normMethod == "beta") {maxScale = 1}
 
   dataTable <- qseaSet %>%
-    filterByOverlaps(windowsToKeep = geneGR) %>%
+    filterByOverlaps(regionsToOverlap = geneGR) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
                  groupMeans = useGroupMeans,
@@ -436,7 +436,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
     if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
     qseaSet <- qseaSet %>%
-      filterByOverlaps(windowsToKeep = regionsToOverlap)
+      filterByOverlaps(regionsToOverlap = regionsToOverlap)
   }
 
   annotationDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
