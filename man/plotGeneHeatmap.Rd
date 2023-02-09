@@ -30,6 +30,8 @@ plotGeneHeatmap(
 
 \item{normMethod}{Whether to plot nrpm values or beta values.}
 
+\item{useGroups}{Whether to use the group variable to collapse replicates.}
+
 \item{sampleAnnotation}{A data frame with annotations for the samples.}
 
 \item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
