@@ -251,10 +251,15 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 
   if (parallel) {
     BPPARAM = BiocParallel::bpparam()
-    message(glue::glue("Scanning {BiocParallel::bpnworkers(BPPARAM)} files in parallel"))
-  } else {BPPARAM = BiocParallel::SerialParam()}
+    message(glue::glue("Scanning {BiocParallel::bpnworkers(BPPARAM)} files in parallel. Use e.g. register(MulticoreParam(workers = 4)) to constrain."))
+  } else {
+    BPPARAM = BiocParallel::SerialParam()
+    message("Scanning one file at a time.")
+    }
 
-  getCGPositions(qsea:::getGenome(qs), qs %>% qsea::getRegions()  %>% GenomeInfoDb::seqnames() %>% levels()) #memoise this once, for using in all the getBamCoveragePairedAndUnpairedR1 function.
+  getCGPositions(qsea:::getGenome(qs), qs %>% qsea::getRegions()  %>%
+                   GenomeInfoDb::seqnames() %>%
+                   levels()) #memoise this once, for using in all the getBamCoveragePairedAndUnpairedR1 function.
 
   bamOutList <- BiocParallel::bplapply(X = sampleTable[, "file_name"],
                                        FUN = getBamCoveragePairedAndUnpairedR1,
