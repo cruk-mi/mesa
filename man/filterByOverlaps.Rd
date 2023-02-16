@@ -4,12 +4,12 @@
 \alias{filterByOverlaps}
 \title{Filter a qseaSet by overlaps with a GRanges object or table that can be coerced to one}
 \usage{
-filterByOverlaps(qseaSet, windowsToKeep)
+filterByOverlaps(qseaSet, regionsToOverlap)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{windowsToKeep}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
+\item{regionsToOverlap}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
 }
 \value{
 A qseaSet object, with only a subset of the windows.

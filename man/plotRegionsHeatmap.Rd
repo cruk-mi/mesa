@@ -10,15 +10,15 @@ plotRegionsHeatmap(
   normMethod = "beta",
   sampleAnnotation = NULL,
   annotationColors = NA,
-  useGroups = FALSE,
+  useGroupMeans = FALSE,
   clusterRows = FALSE,
   clusterCols = TRUE,
   minEnrichment = 3,
   maxScale = 5,
   clusterNum = 2,
-  description = "",
   clip = 1e+09,
   minDensity = 0,
+  annotationPosition = "right",
   clusterMethod = "ward.D2",
   ...
 )
@@ -34,7 +34,7 @@ plotRegionsHeatmap(
 
 \item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
 
-\item{useGroups}{Whether to average samples over the group column (i.e. combine replicates)}
+\item{useGroupMeans}{Whether to average samples over the group column (i.e. combine replicates)}
 
 \item{clusterRows}{Whether to cluster the rows or not.}
 
@@ -46,11 +46,11 @@ plotRegionsHeatmap(
 
 \item{clusterNum}{A number of clusters to break the column dendrogram into.}
 
-\item{description}{A string to include as part of the title.}
-
 \item{clip}{An upper level to clip the data at, anything higher than this is replaced with the clip value.}
 
 \item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
+
+\item{annotationPosition}{Where to put the annotation for the samples, e.g. "bottom" or "right".}
 
 \item{clusterMethod}{What method to use to cluster the dendrograms.}
 

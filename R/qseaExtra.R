@@ -125,96 +125,68 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
 #'
 #' @param qseaSet The qseaSet object.
 #' @param fn A function that takes a row of data and returns a single value.
-#' @param threshold The value to threshold the data rows on
-#' @param keepTrue Whether to keep the windows passing the function, or to filter these out
-#' @param samples A set of sample names to filter on, or a string to match in the sample names
-#' @param normMethod The type of normalisation method to use (e.g. nrpm, beta, counts)
-#' @param useGroups Whether to use the group argument of the sample_name to collapse replicates.
+#' @param threshold The value to threshold the `fn` output value on.
+#' @param aboveThreshold A logical value indicating whether to keep the windows with `fn` output value above or equal to `threshold` (TRUE), or below `threshold` (FALSE).
+#' @param samples A set of sample names to filter on, or a string to match in the sample names.
+#' @param normMethod The type of normalisation method to use (e.g. nrpm, beta, counts).
+#' @param useGroupMeans Whether to use the group argument of the sample table to collapse replicates.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
-subsetWindowsBySignal <- function(qseaSet, fn, threshold, keepTrue, samples = NULL, normMethod = "nrpm", useGroups = FALSE){
+subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
 
   fnName <- as.character(substitute(fn, env = environment()))
-
-  if (!useGroups) {
-    samplesNotInQset <- setdiff(samples, qsea::getSampleNames(qseaSet))
-
-    if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
-      sampleNameString <- samples
-      samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
-      message(glue::glue("Considering {length(samples)} samples containing {sampleNameString} in the name."))
-    } else if (length(samplesNotInQset) > 0 ) {
-      stop(glue::glue("Sample {samplesNotInQset} not present in the qseaSet!"))
-    }
-
-    if (is.null(samples)) {
-      samples <- qsea::getSampleNames(qseaSet)
-      message(glue::glue("Considering all {length(samples)} samples."))
-    }
-
+  
+  if (!useGroupMeans) {
+    qseaSamples <- qsea::getSampleNames(qseaSet)
+    groupString <- ""
   } else {
-
-    samplesNotInQset <- setdiff(samples, names(qsea::getSampleGroups(qseaSet)))
-
-    if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
-      sampleNameString <- samples
-      samples <- stringr::str_subset(names(qsea::getSampleGroups(qseaSet)), samples)
-      message(glue::glue("Considering {length(samples)} samples containing {sampleNameString} in the name."))
-    } else if (length(samplesNotInQset) > 0 ) {
-      stop(glue::glue("Sample {samplesNotInQset} not present in the qseaSet!"))
-    }
-
-    if (is.null(samples)) {
-      samples <- names(qsea::getSampleGroups(qseaSet))
-      message(glue::glue("Considering all {length(samples)} sample groups."))
-    }
-
+    qseaSamples <- names(qsea::getSampleGroups(qseaSet))
+    groupString <- " group"
+  }
+  
+  samplesNotInQset <- setdiff(samples, qseaSamples)
+  
+  if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
+    sampleNameString <- samples
+    samples <- stringr::str_subset(qseaSamples, samples)
+    message(glue::glue("Considering {length(samples)} sample{groupString}s containing \"{sampleNameString}\" in the name."))
+  } else if (length(samplesNotInQset) > 0 ) {
+    stop(glue::glue("Sample{groupString}(s) {paste0(samplesNotInQset, collapse = ', ')} not present in the qseaSet!"))
+  }
+  
+  if (is.null(samples)) {
+    samples <- qseaSamples
+    message(glue::glue("Considering all {length(samples)} sample{groupString}s."))
   }
 
   if (length(samples) == 0) {
     stop("No samples selected.")
   }
 
-  rowAny <- function(x) {rowSums(x) > 0}
-
   if (!length(normMethod(normMethod)) == 1) {
     stop(glue::glue("normMethod should be a single valid option for qsea::normMethod"))
   }
 
-  if (!useGroups) {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, groupMeans = useGroups)
+  if (!useGroupMeans) {
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, groupMeans = useGroupMeans)
   } else {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, groupMeans = useGroups)
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, groupMeans = useGroupMeans)
   }
-
-  dataTable <- dataTable %>%
-    dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
-    tibble::column_to_rownames("window") %>%
-    dplyr::select(tidyselect::all_of(!!samples))
 
   #TODO think about catching the warnings more specifically. Mostly we want to catch the "no non-missing arguments to max; returning -Inf"
-  valueTable <- suppressWarnings(apply(dataTable, 1,fn, na.rm = TRUE))
+  dataTable <- suppressWarnings(dataTable %>% dplyr::mutate(fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)))
 
-  if (keepTrue) {
-    windowsToKeep <- which(valueTable >= threshold)
-    keepString <- "above"
+  if (aboveThreshold) {
+    dataTable <- dataTable %>% dplyr::filter(fnValue >= !!threshold)
+    keepString <- "above (or equal to)"
   } else {
-    windowsToKeep <- which(valueTable < threshold)
+    dataTable <- dataTable %>% dplyr::filter(fnValue < !!threshold)
     keepString <- "below"
   }
-
-  regionsToKeep <- windowsToKeep %>%
-    names() %>%
-    tibble::enframe(name = NULL, value = "window") %>%
-    tidyr::separate(window, into = c("seqnames", "start", "end")) %>%
-    dplyr::mutate(start = as.numeric(start), end = as.numeric(end)) %>%
-    plyranges::as_granges()
-
-  groupString <- ifelse(useGroups, "groups","samples")
-
-  message(glue::glue("Keeping {length(windowsToKeep)} windows with {fnName} {keepString} {threshold} over {length(samples)} {groupString}."))
-
-  qseaSet <- filterByOverlaps(qseaSet, regionsToKeep)
+  
+  message(glue::glue("Keeping {nrow(dataTable)} windows with {fnName} {keepString} {threshold} over {length(samples)} sample{groupString}s."))
+  
+  qseaSet <- filterByOverlaps(qseaSet, dataTable)
   return(qseaSet)
 
 }
@@ -1081,7 +1053,7 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
 
 #' This function takes a qseaSet and calculates a summary statistic across the windows.
 #' @param qseaSet The qseaSet object.
-#' @param windowsToUse A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
+#' @param regionsToOverlap A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
 #' @param suffix A suffix for adding to the new columns of data, to clarify what regions for instance.
 #' @param addSampleTable A boolean with whether to add the sampleTable on to the output table
@@ -1093,7 +1065,7 @@ getBetaTable <- function(qseaSet, groupMeans = FALSE){
 #' @export
 #'
 summariseAcrossWindows <- function(qseaSet,
-                                   windowsToUse = NULL,
+                                   regionsToOverlap = NULL,
                                    fn = mean,
                                    addSampleTable = TRUE,
                                    normMethod = c("nrpm", "beta"),
@@ -1110,12 +1082,12 @@ summariseAcrossWindows <- function(qseaSet,
     #if suffix doesn't start with "_" then add that to the string
     suffix = ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
 
-    if(is.null(windowsToUse)) {
-      windowsToUse <- qsea::getRegions(qseaSet)
+    if(is.null(regionsToOverlap)) {
+      regionsToOverlap <- qsea::getRegions(qseaSet)
     }
 
     dataMat <- qseaSet %>%
-      filterByOverlaps(windowsToUse) %>%
+      filterByOverlaps(regionsToOverlap) %>%
       qsea::makeTable(norm_methods = normMethod,
                       samples = qsea::getSampleNames(qseaSet),
                       minEnrichment = minEnrichment)
@@ -1160,7 +1132,7 @@ summariseAcrossWindows <- function(qseaSet,
 
 #' This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.
 #' @param qseaSet The qseaSet object.
-#' @param windowsToUse A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
+#' @param regionsToOverlap A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
 #' @param suffix A suffix for adding to the new columns of data, to clarify where the regions came from for instance.
 #' @param normMethod One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").
@@ -1170,7 +1142,7 @@ summariseAcrossWindows <- function(qseaSet,
 #' @export
 #'
 addSummaryAcrossWindows <- function(qseaSet,
-                                    windowsToUse = NULL,
+                                    regionsToOverlap = NULL,
                                     fn = mean,
                                     suffix = "",
                                     normMethod = c("nrpm", "beta"),
@@ -1181,7 +1153,7 @@ addSummaryAcrossWindows <- function(qseaSet,
   fnName = as.character(substitute(fn, env = environment()))
 
   summaryTable <- summariseAcrossWindows(qseaSet,
-                                         windowsToUse = windowsToUse,
+                                         regionsToOverlap = regionsToOverlap,
                                          fn = fn,
                                          suffix = suffix, addSampleTable = FALSE,
                          normMethod = normMethod,

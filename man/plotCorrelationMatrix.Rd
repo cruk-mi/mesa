@@ -7,7 +7,7 @@
 plotCorrelationMatrix(
   qseaSet,
   regionsToOverlap = NULL,
-  useGroups = FALSE,
+  useGroupMeans = FALSE,
   sampleAnnotation = NULL,
   normMethod = "nrpm",
   minEnrichment = 3,
@@ -21,7 +21,7 @@ plotCorrelationMatrix(
 
 \item{regionsToOverlap}{Regions to overlap}
 
-\item{useGroups}{Whether to use the replicate information or not (group column)}
+\item{useGroupMeans}{Whether to use the replicate information or not (group column)}
 
 \item{sampleAnnotation}{Columns of the sampleTable to use to annotate the heatmap}
 

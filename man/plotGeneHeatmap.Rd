@@ -8,7 +8,7 @@ plotGeneHeatmap(
   qseaSet,
   gene,
   normMethod = "beta",
-  useGroups = FALSE,
+  useGroupMeans = FALSE,
   sampleAnnotation = NULL,
   minDensity = 0,
   minEnrichment = 3,
@@ -30,7 +30,7 @@ plotGeneHeatmap(
 
 \item{normMethod}{Whether to plot nrpm values or beta values.}
 
-\item{useGroups}{Whether to use the group variable to collapse replicates.}
+\item{useGroupMeans}{Whether to use the group variable to collapse replicates.}
 
 \item{sampleAnnotation}{A data frame with annotations for the samples.}
 
