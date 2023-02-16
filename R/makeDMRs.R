@@ -347,8 +347,12 @@ calculateDMRs <- function(qseaSet,
       message(glue::glue(
         "Calculating all ({nrow(contrasts)}) possible contrasts between {value1} and the rest of {variable} column."
       ))
+    } else if (stringr::str_detect(contrasts,"_vs_")){
+      value1 <- stringr::str_remove(contrasts,"_vs_.*")
+      value2 <- stringr::str_remove(contrasts,".*_vs_")
+      contrasts <- tibble::tibble(group1 = value1, group2 = value2)
     } else {
-      stop("String {contrasts} not recognised.")
+      stop(glue::glue("String {contrasts} not recognised."))
     }
 
   }

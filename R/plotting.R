@@ -15,7 +15,8 @@
 #' @param annotationColors A list specifying some or all of the colours to use for the annotations.
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
 #' @param annotationPosition Where to put the annotation for the samples, e.g. "bottom" or "right".
-#' @param ... Other arguments to pass to pheatmap.
+#' @param title A title to add to the top of the plot.
+#' @param ... Other arguments to pass to ComplexHeatmap.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
@@ -31,6 +32,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 clip = 1000000000,
                                 minDensity = 0,
                                 annotationPosition = "right",
+                                title = NULL,
                                 clusterMethod = "ward.D2", ...) {
 
   #build the column annotation. Need the {{ }} to parse either strings or tidy selections
@@ -133,7 +135,10 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             column_title = NULL,
                             top_annotation = colAnnot) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
-                         annotation_legend_side = annotationPosition)
+                         annotation_legend_side = annotationPosition,
+                         column_title = title,
+                         column_title_gp = grid::gpar(fontsize = 16))
+
 }
 
 
