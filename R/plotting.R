@@ -733,8 +733,8 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   if (!useGroupMeans) {
     annotationColDf <- qseaSet %>%
       qsea::getSampleTable() %>%
-      arrange(sample_name) %>%
-      dplyr::select(rlang::enquos(sampleAnnotation))
+      dplyr::arrange(sample_name) %>%
+      dplyr::select(!!!rlang::enquos(sampleAnnotation))
 
   } else if (useGroupMeans) {
     groupSampleTab <- qseaSet %>%
