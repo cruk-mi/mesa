@@ -135,7 +135,7 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
 subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
 
   fnName <- as.character(substitute(fn, env = environment()))
-  
+
   if (!useGroupMeans) {
     qseaSamples <- qsea::getSampleNames(qseaSet)
     groupString <- ""
@@ -143,9 +143,9 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     qseaSamples <- names(qsea::getSampleGroups(qseaSet))
     groupString <- " group"
   }
-  
+
   samplesNotInQset <- setdiff(samples, qseaSamples)
-  
+
   if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qseaSamples, samples)
@@ -153,7 +153,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
   } else if (length(samplesNotInQset) > 0 ) {
     stop(glue::glue("Sample{groupString}(s) {paste0(samplesNotInQset, collapse = ', ')} not present in the qseaSet!"))
   }
-  
+
   if (is.null(samples)) {
     samples <- qseaSamples
     message(glue::glue("Considering all {length(samples)} sample{groupString}s."))
@@ -168,9 +168,9 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
   }
 
   if (!useGroupMeans) {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, groupMeans = useGroupMeans)
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
   } else {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, groupMeans = useGroupMeans)
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
   }
 
   #TODO think about catching the warnings more specifically. Mostly we want to catch the "no non-missing arguments to max; returning -Inf"
@@ -183,9 +183,9 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     dataTable <- dataTable %>% dplyr::filter(fnValue < !!threshold)
     keepString <- "below"
   }
-  
+
   message(glue::glue("Keeping {nrow(dataTable)} windows with {fnName} {keepString} {threshold} over {length(samples)} sample{groupString}s."))
-  
+
   qseaSet <- filterByOverlaps(qseaSet, dataTable)
   return(qseaSet)
 
@@ -568,13 +568,13 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
 #' This function takes a qseaSet and makes a table of nrpm values
 #' @param qseaSet The qseaSet object.
-#' @param groupMeans Whether to give means of the group column, rather than individual samples.
+#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.
 #' @return A table of data, one row per window
 #' @export
 #'
-getCountTable <- function(qseaSet, groupMeans = FALSE){
+getCountTable <- function(qseaSet, useGroupMeans = FALSE){
 
-  if(groupMeans){
+  if(useGroupMeans){
 
     qseaSet %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "counts") %>%
@@ -598,13 +598,13 @@ getCountTable <- function(qseaSet, groupMeans = FALSE){
 
 #' This function takes a qseaSet and makes a table of nrpm values
 #' @param qseaSet The qseaSet object.
-#' @param groupMeans Whether to give means of the group column, rather than individual samples.
+#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.
 #' @return A table of data, one row per window
 #' @export
 #'
-getNRPMTable <- function(qseaSet, groupMeans = FALSE){
+getNRPMTable <- function(qseaSet, useGroupMeans = FALSE){
 
-  if(groupMeans){
+  if(useGroupMeans){
 
     qseaSet %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "nrpm") %>%
@@ -627,13 +627,13 @@ getNRPMTable <- function(qseaSet, groupMeans = FALSE){
 
 #' This function takes a qseaSet and makes a table of beta values
 #' @param qseaSet The qseaSet object.
-#' @param groupMeans Whether to give means of the group column, rather than individual samples.
+#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.
 #' @return A table of data, one row per window
 #' @export
 #'
-getBetaTable <- function(qseaSet, groupMeans = FALSE){
+getBetaTable <- function(qseaSet, useGroupMeans = FALSE){
 
-  if(groupMeans){
+  if(useGroupMeans){
 
     qseaSet %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "beta") %>%
@@ -837,15 +837,15 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 #' This function takes a qseaSet and generates a table of data containing data for each sample
 #' @param qseaSet The qseaSet object.
 #' @param normMethod What normalisation method to use (nrpm or beta), can be given multiple.
-#' @param groupMeans Number of reads required for a fully methylated region to not be masked (put NA) beta values only.
+#' @param useGroupMeans Whether to use the group column to average over replicates.
 #' @param minEnrichment Minimum number of reads for beta values to not give NA
 #' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
 #' @return A table of data, with a column for each individual sample
 #' @export
 #'
-getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE){
+getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE){
 
-  if(groupMeans){
+  if(useGroupMeans){
 
     tab <- qseaSet %>%
       qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
@@ -883,19 +883,19 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", groupMeans = FALSE, minEn
 #' @param qseaSet The qseaSet object.
 #' @param folderName A folder to save the output bigWig files into
 #' @param normMethod What normalisation method to use (e.g. nrpm or beta)
-#' @param groupMeans Whether to average over the replicates in the group
+#' @param useGroupMeans Whether to average over the replicates in the group
 #' @param naVal A value to replace NA values with (for beta values).
 #' @return A set of bigWig files for each sample in the qseaSet, with coverage over all the windows in the qseaSet
 #' @export
 #'
-writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", groupMeans = FALSE, naVal = -1){
+writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){
 
   dir.create(folderName, showWarnings = FALSE)
 
   dataTable <- qseaSet %>%
-    getDataTable(normMethod = normMethod, groupMeans = groupMeans)
+    getDataTable(normMethod = normMethod, useGroupMeans = useGroupMeans)
 
-  if(!groupMeans) {
+  if(!useGroupMeans) {
     mapNames <- qseaSet %>%
       qsea::getSampleNames()
 

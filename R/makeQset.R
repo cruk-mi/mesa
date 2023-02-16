@@ -18,6 +18,7 @@
 #' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param badRegions A GRanges object containing regions to filter out from the result.
+#' @param parallel Whether to read in files by using each core in parallel. Control number of calls by calling e.g. BiocParallel::register(BiocParallel::MulticoreParam(4)) beforehand.
 #' @return A qseaSet object, containing all the information required.
 #' @export
 makeQset <- function(sampleTable,
@@ -35,7 +36,8 @@ makeQset <- function(sampleTable,
                      maxInsertSize = 1000,
                      minReferenceLength = 30,
                      badRegions = NULL,
-                     properPairsOnly = FALSE) {
+                     properPairsOnly = FALSE,
+                     parallel = TRUE) {
 
   if (!is.null(fragmentType)) {
     if (fragmentType %in% c("Sheared","sheared") ) {
@@ -129,7 +131,7 @@ makeQset <- function(sampleTable,
     qseaSet <- qsea::addCoverage(qseaSet,
                                  uniquePos = FALSE,
                                  paired = TRUE,
-                                 parallel = TRUE,
+                                 parallel = parallel,
                                  minMapQual = minMapQual
     )
 
@@ -141,7 +143,7 @@ makeQset <- function(sampleTable,
     # load the coverage from each bam file, including using R1s from high MAPQ reads that aren't in perfect pairs.
     qseaSet <- addBamCoveragePairedAndUnpaired(qseaSet,
                                                fragmentLength = fragmentLength,
-                                               parallel = TRUE,
+                                               parallel = parallel,
                                                minMapQual = minMapQual,
                                                minReferenceLength = minReferenceLength,
                                                maxInsertSize = maxInsertSize,

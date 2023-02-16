@@ -8,7 +8,7 @@ writeBigWigs(
   qseaSet,
   folderName,
   normMethod = "nrpm",
-  groupMeans = FALSE,
+  useGroupMeans = FALSE,
   naVal = -1
 )
 }
@@ -19,7 +19,7 @@ writeBigWigs(
 
 \item{normMethod}{What normalisation method to use (e.g. nrpm or beta)}
 
-\item{groupMeans}{Whether to average over the replicates in the group}
+\item{useGroupMeans}{Whether to average over the replicates in the group}
 
 \item{naVal}{A value to replace NA values with (for beta values).}
 }

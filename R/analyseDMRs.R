@@ -16,17 +16,17 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
     tidyr::pivot_wider(names_from = .ext,
                        values_from = .value) %>%
     dplyr::filter(adjPval <= FDRthres) %>%
-    tidyr::separate(.comparison, into = c("group1","sample2"), sep = "_vs_")
+    tidyr::separate(.comparison, into = c("group1","group2"), sep = "_vs_")
 
   if(makePositive){
     pivotedDMRs <- pivotedDMRs %>%
-      dplyr::mutate(group1new = ifelse(log2FC < 0, sample2, group1),
-                    sample2new = ifelse(log2FC < 0, group1, sample2),
+      dplyr::mutate(group1new = ifelse(log2FC < 0, group2, group1),
+                    group2new = ifelse(log2FC < 0, group1, group2),
                     betaDelta = sign(log2FC)*betaDelta,
                     log2FC = sign(log2FC)*log2FC,
       ) %>%
-      dplyr::select(-group1, -sample2) %>%
-      dplyr::rename(group1 = group1new, sample2 = sample2new)
+      dplyr::select(-group1, -group2) %>%
+      dplyr::rename(group1 = group1new, group2 = group2new)
   }
 
   pivotedDMRs %>%
@@ -49,8 +49,8 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
       colnames() %>%
       stringr::str_subset(".*_vs_.*_adjPval$") %>%
       tibble::enframe(name = NULL) %>%
-      tidyr::separate(value, into = c("group1","sample2",NA), sep = "_vs_|_adjPval") %>%
-      dplyr::arrange(group1, sample2)
+      tidyr::separate(value, into = c("group1","group2",NA), sep = "_vs_|_adjPval") %>%
+      dplyr::arrange(group1, group2)
 
     DMRtable <- DMRtable %>%
       dplyr::select(-tidyselect::matches("nrpm|beta$|means")) %>%
@@ -58,8 +58,8 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 
   } else {
     contrastsDF <- DMRtable %>%
-      dplyr::distinct(group1, sample2) %>%
-      dplyr::arrange(group1, sample2)
+      dplyr::distinct(group1, group2) %>%
+      dplyr::arrange(group1, group2)
   }
 
   DMRsummary <- DMRtable %>%
@@ -69,7 +69,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
                   abs(betaDelta) >= betaDeltaThres,
                   ) %>%
     dplyr::mutate(.up = ifelse(log2FC > 0, "nUp","nDown")) %>%
-    dplyr::group_by(group1, sample2, .up) %>%
+    dplyr::group_by(group1, group2, .up) %>%
     dplyr::tally() %>%
     tidyr::pivot_wider(names_from = .up, values_from = n, values_fill = 0) %>%
     dplyr::ungroup()
@@ -78,7 +78,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     dplyr::left_join(DMRsummary) %>%
     dplyr::mutate(nDown = tidyr::replace_na(nDown, 0),
            nUp = tidyr::replace_na(nUp, 0)) %>%
-    dplyr::select(group1, sample2, nUp, nDown) %>%
+    dplyr::select(group1, group2, nUp, nDown) %>%
     return()
 }
 

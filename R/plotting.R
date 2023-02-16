@@ -15,10 +15,11 @@
 #' @param annotationColors A list specifying some or all of the colours to use for the annotations.
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
 #' @param annotationPosition Where to put the annotation for the samples, e.g. "bottom" or "right".
-#' @param ... Other arguments to pass to pheatmap.
+#' @param title A title to add to the top of the plot.
+#' @param ... Other arguments to pass to ComplexHeatmap.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
-plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
+plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
                                 annotationColors = NA,
@@ -31,6 +32,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
                                 clip = 1000000000,
                                 minDensity = 0,
                                 annotationPosition = "right",
+                                title = NULL,
                                 clusterMethod = "ward.D2", ...) {
 
   #build the column annotation. Need the {{ }} to parse either strings or tidy selections
@@ -39,7 +41,14 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
                                     useGroupMeans = useGroupMeans,
                                     sampleAnnotation = {{sampleAnnotation}} )
 
+  if (is.null(regionsToOverlap)) {
+    regionsToOverlap <- qseaSet %>%
+      qsea::getRegions()
+  }
+
   regionsToOverlap <- asValidGranges(regionsToOverlap)
+
+  if (length(regionsToOverlap) > 20000) {stop("More than 20000 regions requested.")}
 
   if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
@@ -72,17 +81,19 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     return(dat[mask_keep, , drop = FALSE])
   }
 
+
+
   dataTab <- qseaSet %>%
     filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroupMeans,
+                 useGroupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-  if(useGroupMeans){
+  if (useGroupMeans) {
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
@@ -102,22 +113,32 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     dataTab <- remove_almost_empty_rows(dataTab)
   }
 
+  if (clusterCols) {
+    colSplit <- clusterNum
+  } else {
+    colSplit <- NULL
+  }
+
+
   numData %>%
     as.matrix() %>%
     ComplexHeatmap::Heatmap(name = "Beta value",
-                            cluster_rows = FALSE,
-                            cluster_columns = TRUE,
+                            cluster_rows = clusterRows,
+                            cluster_columns = clusterCols,
                             show_row_names = FALSE,
                             col = colour_palette,
                             clustering_method_rows = clusterMethod,
                             clustering_method_columns = clusterMethod,
                             heatmap_legend_param = list(legend_direction = "horizontal",
                                                         at = seq(0, maxScale, length.out = 6) %>% round(1)),
-                            column_split = clusterNum,
+                            column_split = colSplit,
                             column_title = NULL,
                             top_annotation = colAnnot) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
-                         annotation_legend_side = annotationPosition)
+                         annotation_legend_side = annotationPosition,
+                         column_title = title,
+                         column_title_gp = grid::gpar(fontsize = 16))
+
 }
 
 
@@ -143,6 +164,9 @@ makeHeatmapAnnotation <- function(qseaSet,
     dplyr::select_if(is.factor) %>%
     purrr::map(function(x) levels(as.factor(x)))
 
+  if (length(unlist(levs)) > 0) {
+
+
   col_list_cat <- levs %>%
     unlist() %>%
     length() %>%
@@ -150,6 +174,9 @@ makeHeatmapAnnotation <- function(qseaSet,
     purrr::set_names(levs %>% unlist()) %>%
     utils::relist(levs) %>%
     purrr::map2(levs, purrr::set_names)
+  } else {
+    col_list_cat <- list()
+  }
 
   #Make colour vectors for continuous variables
   annotationCol_numeric <- annotationColDf %>%
@@ -305,7 +332,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     filterByOverlaps(regionsToOverlap = geneGR) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroupMeans,
+                 useGroupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
@@ -632,7 +659,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
   dataTab <- qseaSet %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroupMeans,
+                 useGroupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
@@ -711,7 +738,9 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   if (!useGroupMeans) {
     annotationColDf <- qseaSet %>%
       qsea::getSampleTable() %>%
+      dplyr::arrange(sample_name) %>%
       dplyr::select(!!!rlang::enquos(sampleAnnotation))
+
   } else if (useGroupMeans) {
     groupSampleTab <- qseaSet %>%
       qsea::getSampleTable() %>%
@@ -731,6 +760,7 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
     }
 
     annotationColDf <- distinctGroupTab %>%
+      arrange(group) %>%
       tibble::column_to_rownames("group") %>%
       as.data.frame()
   }
