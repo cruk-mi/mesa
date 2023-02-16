@@ -85,7 +85,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroupMeans,
+                 useGroupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
@@ -327,7 +327,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     filterByOverlaps(regionsToOverlap = geneGR) %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroupMeans,
+                 useGroupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
@@ -654,7 +654,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
   dataTab <- qseaSet %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,
-                 groupMeans = useGroupMeans,
+                 useGroupMeans = useGroupMeans,
                  minEnrichment = minEnrichment
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%

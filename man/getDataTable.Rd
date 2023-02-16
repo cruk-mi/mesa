@@ -7,7 +7,7 @@
 getDataTable(
   qseaSet,
   normMethod = "nrpm",
-  groupMeans = FALSE,
+  useGroupMeans = FALSE,
   minEnrichment = 3,
   addMethodSuffix = FALSE
 )
@@ -17,7 +17,7 @@ getDataTable(
 
 \item{normMethod}{What normalisation method to use (nrpm or beta), can be given multiple.}
 
-\item{groupMeans}{Number of reads required for a fully methylated region to not be masked (put NA) beta values only.}
+\item{useGroupMeans}{Whether to use the group column to average over replicates.}
 
 \item{minEnrichment}{Minimum number of reads for beta values to not give NA}
 
