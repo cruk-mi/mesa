@@ -18,7 +18,7 @@
 #' @param ... Other arguments to pass to pheatmap.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
-plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
+plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
                                 annotationColors = NA,
@@ -39,7 +39,14 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
                                     useGroupMeans = useGroupMeans,
                                     sampleAnnotation = {{sampleAnnotation}} )
 
+  if (is.null(regionsToOverlap)) {
+    regionsToOverlap <- qseaSet %>%
+      qsea::getRegions()
+  }
+
   regionsToOverlap <- asValidGranges(regionsToOverlap)
+
+  if (length(regionsToOverlap) > 20000) {stop("More than 20000 regions requested.")}
 
   if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
@@ -72,6 +79,8 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     return(dat[mask_keep, , drop = FALSE])
   }
 
+
+
   dataTab <- qseaSet %>%
     filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
@@ -82,7 +91,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-  if(useGroupMeans){
+  if (useGroupMeans) {
     colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
@@ -102,18 +111,25 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap,
     dataTab <- remove_almost_empty_rows(dataTab)
   }
 
+  if (clusterCols) {
+    colSplit <- clusterNum
+  } else {
+    colSplit <- NULL
+  }
+
+
   numData %>%
     as.matrix() %>%
     ComplexHeatmap::Heatmap(name = "Beta value",
-                            cluster_rows = FALSE,
-                            cluster_columns = TRUE,
+                            cluster_rows = clusterRows,
+                            cluster_columns = clusterCols,
                             show_row_names = FALSE,
                             col = colour_palette,
                             clustering_method_rows = clusterMethod,
                             clustering_method_columns = clusterMethod,
                             heatmap_legend_param = list(legend_direction = "horizontal",
                                                         at = seq(0, maxScale, length.out = 6) %>% round(1)),
-                            column_split = clusterNum,
+                            column_split = colSplit,
                             column_title = NULL,
                             top_annotation = colAnnot) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
@@ -143,6 +159,9 @@ makeHeatmapAnnotation <- function(qseaSet,
     dplyr::select_if(is.factor) %>%
     purrr::map(function(x) levels(as.factor(x)))
 
+  if (length(unlist(levs)) > 0) {
+
+
   col_list_cat <- levs %>%
     unlist() %>%
     length() %>%
@@ -150,6 +169,9 @@ makeHeatmapAnnotation <- function(qseaSet,
     purrr::set_names(levs %>% unlist()) %>%
     utils::relist(levs) %>%
     purrr::map2(levs, purrr::set_names)
+  } else {
+    col_list_cat <- list()
+  }
 
   #Make colour vectors for continuous variables
   annotationCol_numeric <- annotationColDf %>%
@@ -711,7 +733,9 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   if (!useGroupMeans) {
     annotationColDf <- qseaSet %>%
       qsea::getSampleTable() %>%
-      dplyr::select(!!!rlang::enquos(sampleAnnotation))
+      arrange(sample_name) %>%
+      dplyr::select(rlang::enquos(sampleAnnotation))
+
   } else if (useGroupMeans) {
     groupSampleTab <- qseaSet %>%
       qsea::getSampleTable() %>%
@@ -731,6 +755,7 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
     }
 
     annotationColDf <- distinctGroupTab %>%
+      arrange(group) %>%
       tibble::column_to_rownames("group") %>%
       as.data.frame()
   }
