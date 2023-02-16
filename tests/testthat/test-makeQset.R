@@ -3,8 +3,6 @@ test_that("Making a hg19 qseaSet", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
-  BiocParallel::register(BiocParallel::MulticoreParam(workers = 1))
-
   if (!rlang::is_installed("MEDIPSData")) {
     skip("MEDIPSData Not installed")
   }
