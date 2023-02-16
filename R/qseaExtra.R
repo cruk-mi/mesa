@@ -431,13 +431,13 @@ getAnnotationDataFrame <- function(qseaSet, ...){
     return()
 }
 
-#' This function is a modified version of the getPCA function from qsea
+#' This function is a modified version of the [qsea::getPCA()] function
 #' @param qseaSet A qseaSet object.
 #' @param dataTable A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()]. It must have seqnames, start and end columns. Can also be a [GenomicRanges::GRanges()] object with normalised values in the metadata columns.
 #' @param regionsToOverlap Optional. Only windows in x overlapping `regionsToOverlap` will be considered. A [GenomicRanges::GRanges()] object or a data frame which can be coerced into a [GenomicRanges::GRanges()] object.
 #' @param normMethod What normalisation method to use. Typically a character giving name of predefined normalisation method (e.g. "beta" or "nrpm"). See [qsea::normMethod()].
 #' @param minEnrichment Minimum number of reads for beta values to not give NA. Passed to [getDataTable()].
-#' @param useGroups Whether to average samples over the group column (i.e. combine replicates)
+#' @param useGroupMeans Whether to average samples over the group column (i.e. combine replicates)
 #' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param topVarNum Number of most variable windows to keep. Defaults to 1000. If value is NA, NULL, Inf or is at least as big as the available number of windows, then all available windows are used for the PCA. Can also be a vector, in which case PCA is performed for each component.
 #' @param topVarSamples Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case PCA is performed for each list component. If `length(topVarNum) > 1`, list should be same length as `topVarNum` and each component will be matched with corresponding component of `topVarNum`.
@@ -459,7 +459,7 @@ getPCA <- function(qseaSet,
                    regionsToOverlap = NULL, 
                    normMethod = "beta", 
                    minEnrichment = 3,
-                   useGroups = FALSE,
+                   useGroupMeans = FALSE,
                    minDensity = 0,
                    topVarNum = 1000,
                    topVarSamples = NULL,
@@ -476,7 +476,7 @@ getPCA <- function(qseaSet,
       dplyr::select(-tidyselect::any_of(c("seqnames", "start", "end", "width", "strand", "CpG_density"))) %>% 
       colnames()
     
-    if (useGroups) {
+    if (useGroupMeans) {
       if (!all(samples %in% names(qsea::getSampleGroups(qseaSet)))) {
         stop("At least one sample group name in dataTable does not have a matching sample group name in qseaSet.")
       }
@@ -495,7 +495,7 @@ getPCA <- function(qseaSet,
     testValues <- getDataTable(qseaSet %>% 
                                  filter(sample_name %in% testSamples) %>% 
                                  filterByOverlaps(testWindows),
-                               normMethod, groupMeans = useGroups) %>% 
+                               normMethod, useGroupMeans = useGroupMeans) %>% 
       dplyr::arrange(seqnames, start, end)
     
     if (!isTRUE(all.equal(testValues, testWindows %>% 
@@ -508,7 +508,7 @@ getPCA <- function(qseaSet,
     initialNumWindows <- length(dataTable)
   } else {
     
-    if (useGroups) {
+    if (useGroupMeans) {
       samples <- names(qsea::getSampleGroups(qseaSet))
     } else {
       samples <- qsea::getSampleNames(qseaSet)
@@ -547,7 +547,7 @@ getPCA <- function(qseaSet,
     message("-----------")
     dataTable <- qseaSet %>%
       filterWindows(CpG_density >= minDensity) %>%
-      getDataTable(normMethod = normMethod, groupMeans = useGroups)
+      getDataTable(normMethod = normMethod, useGroupMeans = useGroupMeans)
     message("-----------")
     
     if (minDensity > 0) {
@@ -593,7 +593,7 @@ getPCA <- function(qseaSet,
             \n"))
   }  
   
-  if (useGroups) {
+  if (useGroupMeans) {
     sampleStr <- "sample group"
   } else {
     sampleStr <- "sample"
@@ -815,7 +815,7 @@ getPCA <- function(qseaSet,
               params = list(regionsToOverlap = regionsToOverlap,
                             normMethod = normMethod,
                             minEnrichment = minEnrichment,
-                            useGroups = useGroups,
+                            useGroupMeans = useGroupMeans,
                             minDensity = minDensity,
                             topVar = topVar,
                             windowSdThreshold = th,
