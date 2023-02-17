@@ -44,7 +44,7 @@ test_that("Calculating DMRs", {
   expect_true("nrpm_max_highest_only" %in% colnames(getSampleTable(setWithSummary)))
 
   expect_equal( exampleTumourNormal %>%
-                  mutate(group = str_remove(group,"\\d")) %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
                   calculateDMRs(variable = "tumour",
                                 contrasts = "Tumour_vs_Normal",
                                 keepContrastMeans = TRUE,
@@ -53,7 +53,7 @@ test_that("Calculating DMRs", {
                   ncol(), 11)
 
   expect_equal( exampleTumourNormal %>%
-                  mutate(group = str_remove(group,"\\d")) %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
                      calculateDMRs(variable = "tumour",
                                    contrasts = "Tumour_vs_Normal",
                                    keepContrastMeans = TRUE,
@@ -62,7 +62,7 @@ test_that("Calculating DMRs", {
                      ncol(), 31)
 
   expect_equal( exampleTumourNormal %>%
-                  mutate(group = str_remove(group,"\\d")) %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
                      calculateDMRs(variable = "tumour",
                                    contrasts = "Tumour_vs_Normal",
                                    keepContrastMeans = TRUE,
@@ -71,7 +71,7 @@ test_that("Calculating DMRs", {
                      ncol(), 19)
 
   expect_equal(exampleTumourNormal %>%
-                 mutate(group = str_remove(group,"\\d")) %>%
+                 mutate(group = stringr::str_remove(group,"\\d")) %>%
                      calculateDMRs(variable = "tumour",
                                    contrasts = "Tumour_vs_Normal",
                                    keepContrastMeans = TRUE,
@@ -80,7 +80,7 @@ test_that("Calculating DMRs", {
                     ncol(), 39)
 
   expect_equal( exampleTumourNormal %>%
-                  mutate(group = str_remove(group,"\\d")) %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
                   calculateDMRs(variable = "tumour",
                                 contrasts = "Tumour_vs_Normal",
                                 keepContrastMeans = FALSE,
@@ -89,7 +89,7 @@ test_that("Calculating DMRs", {
                   ncol(), 7)
 
   expect_equal( exampleTumourNormal %>%
-                  mutate(group = str_remove(group,"\\d")) %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
                   calculateDMRs(variable = "tumour",
                                 contrasts = "Tumour_vs_Normal",
                                 keepContrastMeans = FALSE,
@@ -98,7 +98,7 @@ test_that("Calculating DMRs", {
                   ncol(), 27)
 
   expect_equal( exampleTumourNormal %>%
-                  mutate(group = str_remove(group,"\\d")) %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
                   calculateDMRs(variable = "tumour",
                                 contrasts = "Tumour_vs_Normal",
                                 keepContrastMeans = FALSE,
@@ -107,7 +107,7 @@ test_that("Calculating DMRs", {
                   ncol(), 15)
 
   expect_equal(exampleTumourNormal %>%
-                 mutate(group = str_remove(group,"\\d")) %>%
+                 mutate(group = stringr::str_remove(group,"\\d")) %>%
                  calculateDMRs(variable = "tumour",
                                contrasts = "Tumour_vs_Normal",
                                keepContrastMeans = FALSE,
