@@ -496,7 +496,9 @@ getPCA <- function(qseaSet,
     
     if (all(normMethodSuffixDetected)) {
       samples <- stringr::str_remove(samples, glue::glue("_{normMethod}$"))
-      dataTable <- removeNormMethodSuffix(dataTable, normMethod)
+      dataTable <- removeNormMethodSuffix(dataTable %>% tidyr::as_tibble(), 
+                                          normMethod) %>% 
+        asValidGranges()
     } else if (any(normMethodSuffixDetected)) {
       stop(glue::glue("normMethod suffix '_{normMethod}' is present for some but not all of the {groupString} column names in dataTable."))
     }
@@ -523,8 +525,7 @@ getPCA <- function(qseaSet,
                                  filter(sample_name %in% testSamples) %>% 
                                  filterByOverlaps(inputValues),
                                normMethod, 
-                               useGroupMeans = useGroupMeans, 
-                               addMethodSuffix = TRUE) %>% 
+                               useGroupMeans = useGroupMeans) %>% 
       dplyr::arrange(seqnames, start, end)
     
     if (!isTRUE(all.equal(testValues, inputValues %>% 
