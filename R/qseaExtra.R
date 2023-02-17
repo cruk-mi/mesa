@@ -431,6 +431,16 @@ getAnnotationDataFrame <- function(qseaSet, ...){
     return()
 }
 
+#' This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values
+#' @param dataTable  A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()].
+#' @param normMethod A character giving the normalisation method used (e.g. "beta" or "nrpm").
+#' @return The dataTable with the normMethod suffix "_{normMethod}" removed from sample (or sample group) column names.
+#' @export
+#'
+removeNormMethodSuffix <- function(dataTable, normMethod) {
+  dplyr::rename_with(dataTable, ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$")))
+}
+
 #' This function is a modified version of the [qsea::getPCA()] function
 #' @param qseaSet A qseaSet object.
 #' @param dataTable A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()]. It must have seqnames, start and end columns. Can also be a [GenomicRanges::GRanges()] object with normalised values in the metadata columns.
@@ -468,6 +478,12 @@ getPCA <- function(qseaSet,
                    nPC = 5,
                    returnDataTable = FALSE) {
   
+  if (useGroupMeans) {
+    groupString <- "sample group"
+  } else {
+    groupString <- "sample"
+  }
+  
   if (!is.null(dataTable)) {
     dataTable <- asValidGranges(dataTable)
     
@@ -476,13 +492,24 @@ getPCA <- function(qseaSet,
       dplyr::select(-tidyselect::any_of(c("seqnames", "start", "end", "width", "strand", "CpG_density"))) %>% 
       colnames()
     
+    normMethodSuffixDetected <- stringr::str_detect(samples, glue::glue("_{normMethod}$"))
+    
+    if (all(normMethodSuffixDetected)) {
+      samples <- stringr::str_remove(samples, glue::glue("_{normMethod}$"))
+      dataTable <- removeNormMethodSuffix(dataTable, normMethod)
+    } else if (any(normMethodSuffixDetected)) {
+      stop(glue::glue("normMethod suffix '_{normMethod}' is present for some but not all of the {groupString} column names in dataTable."))
+    }
+    
     if (useGroupMeans) {
       if (!all(samples %in% names(qsea::getSampleGroups(qseaSet)))) {
-        stop("At least one sample group name in dataTable does not have a matching sample group name in qseaSet.")
+        stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
+             (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
       }
     } else {
       if (!all(samples %in% qsea::getSampleNames(qseaSet))) {
-        stop("At least one sample name in dataTable does not have a matching sample name in qseaSet.")
+        stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
+             (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
       }
     }
     
@@ -491,14 +518,16 @@ getPCA <- function(qseaSet,
     }
     
     testSamples <- samples[1:min(5, length(samples))]
-    testWindows <- dataTable[1:min(50, length(dataTable)), ]
+    inputValues <- dataTable[1:min(50, length(dataTable)), ]
     testValues <- getDataTable(qseaSet %>% 
                                  filter(sample_name %in% testSamples) %>% 
-                                 filterByOverlaps(testWindows),
-                               normMethod, useGroupMeans = useGroupMeans) %>% 
+                                 filterByOverlaps(inputValues),
+                               normMethod, 
+                               useGroupMeans = useGroupMeans, 
+                               addMethodSuffix = TRUE) %>% 
       dplyr::arrange(seqnames, start, end)
     
-    if (!isTRUE(all.equal(testValues, testWindows %>% 
+    if (!isTRUE(all.equal(testValues, inputValues %>% 
                           tidyr::as_tibble() %>% 
                           dplyr::select(tidyselect::all_of(colnames(testValues))) %>% 
                           dplyr::arrange(seqnames, start, end)))) {
@@ -592,12 +621,7 @@ getPCA <- function(qseaSet,
             ------------------------------
             \n"))
   }  
-  
-  if (useGroupMeans) {
-    sampleStr <- "sample group"
-  } else {
-    sampleStr <- "sample"
-  }
+
   
   if (is.null(topVarNum)) {
     topVarNum <- NA
@@ -630,12 +654,12 @@ getPCA <- function(qseaSet,
     
     if (!is.null(tVS)) {
       if (!is.vector(tVS, mode = "character")) {
-        stop(glue::glue("topVarSamples should be NULL, a character vector of {sampleStr} names or a regular expression (or a list of these)."))
+        stop(glue::glue("topVarSamples should be NULL, a character vector of {groupString} names or a regular expression (or a list of these)."))
         
       } else if (length(tVS) > 1) { # character vector of sample (group) names
         notInSamples <- setdiff(tVS, samples)
         if (length(notInSamples) > 0) {
-          stop(glue::glue("topVarSamples contains {sampleStr} names that are not in the qseaSet and/or dataTable:
+          stop(glue::glue("topVarSamples contains {groupString} names that are not in the qseaSet and/or dataTable:
                         {paste0(notInSamples, collapse = ', ')}."))
         }
         
@@ -694,19 +718,19 @@ getPCA <- function(qseaSet,
       purrr::imap(function(tVS, nm) {
         
         if (length(setdiff(samples, tVS)) == 0) {
-          message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {sampleStr}s:
+          message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {groupString}s:
                            {paste0(tVS, collapse = ', ')}.
                            -> column name {nm}.
                            \n"))
         } else {
-          message(glue::glue("Calculating standard deviation for each window across {length(tVS)} of {length(samples)} {sampleStr}s:
+          message(glue::glue("Calculating standard deviation for each window across {length(tVS)} of {length(samples)} {groupString}s:
                            {paste0(tVS, collapse = ', ')}.
                            -> column name {nm}.
                            \n"))
         }
         
         if (length(tVS) <= 2) {
-          stop(glue::glue("Standard deviation calculated on less than 3 {sampleStr} names. Insufficent number of {sampleStr}s to calculate variance."))
+          stop(glue::glue("Standard deviation calculated on less than 3 {groupString} names. Insufficent number of {groupString}s to calculate variance."))
         }
         
         dataTable <- dataTable %>%  
@@ -742,12 +766,12 @@ getPCA <- function(qseaSet,
           if (length(topVarSamples) == length(samples)) {
             
             message(glue::glue("------------------------------\n
-                             Filtering windows based on standard deviation across all {length(topVarSamples)} {sampleStr}s ({windowSdName}). 
+                             Filtering windows based on standard deviation across all {length(topVarSamples)} {groupString}s ({windowSdName}). 
                              Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows.
                              \n"))
           } else {
             message(glue::glue("------------------------------\n
-                             Filtering windows based on standard deviation across {length(topVarSamples)} {sampleStr}s ({windowSdName}). 
+                             Filtering windows based on standard deviation across {length(topVarSamples)} {groupString}s ({windowSdName}). 
                              Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows.
                              \n"))
           }
@@ -766,7 +790,7 @@ getPCA <- function(qseaSet,
           tibble::column_to_rownames("window") %>% 
           dplyr::select(tidyr::all_of(samples))
         
-        message(glue::glue("Performing PCA with {ncol(dataTable)} {sampleStr}s and {nrow(dataTable)} windows
+        message(glue::glue("Performing PCA with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
                            -> {pcaName}.
                              \n"))
         
