@@ -3,9 +3,7 @@ test_that("Making a hg19 qseaSet", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
-  BiocParallel::SerialParam()
-
-  if(!rlang::is_installed("MEDIPSData")){
+  if (!rlang::is_installed("MEDIPSData")) {
     skip("MEDIPSData Not installed")
   }
 
@@ -27,7 +25,8 @@ test_that("Making a hg19 qseaSet", {
                        maxInsertSize = 1000,
                        minReferenceLength = 30,
                        badRegions = NULL,
-                       properPairsOnly = FALSE)
+                       properPairsOnly = FALSE,
+                      parallel = FALSE)
 
   expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
   expect_equal(testSet %>% qsea::getChrNames() %>% length(), 3)

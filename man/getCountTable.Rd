@@ -4,12 +4,12 @@
 \alias{getCountTable}
 \title{This function takes a qseaSet and makes a table of nrpm values}
 \usage{
-getCountTable(qseaSet, groupMeans = FALSE)
+getCountTable(qseaSet, useGroupMeans = FALSE)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{groupMeans}{Whether to give means of the group column, rather than individual samples.}
+\item{useGroupMeans}{Whether to give means of the group column, rather than individual samples.}
 }
 \value{
 A table of data, one row per window

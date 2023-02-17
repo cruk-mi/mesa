@@ -6,7 +6,7 @@
 \usage{
 plotRegionsHeatmap(
   qseaSet,
-  regionsToOverlap,
+  regionsToOverlap = NULL,
   normMethod = "beta",
   sampleAnnotation = NULL,
   annotationColors = NA,

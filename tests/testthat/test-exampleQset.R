@@ -73,7 +73,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
                                        normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 601)
-  
+
   expect_equal(exampleTumourNormal %>%
                  subsetWindowsBySignal(samples = c("Colon1_T","Colon2_T"),
                                        fn = max,
@@ -82,7 +82,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
                                        normMethod = "nrpm") %>%
                  getRegions() %>%
                  length(), 604)
-  
+
   expect_equal(exampleTumourNormal %>%
                  subsetWindowsBySignal(samples = c("Colon1_T","Colon2_T"),
                                        fn = max,
@@ -112,11 +112,11 @@ test_that("Testing general functionality", {
 
   expect_equal(randomSet %>% getBetaTable() %>% nrow(), randomSet %>% getRegions() %>% length())
   expect_equal(randomSet %>% getBetaTable() %>% dplyr::select(matches("Sim")) %>% ncol(), randomSet %>% getSampleNames() %>% length())
-  expect_equal(randomSet %>% getBetaTable(groupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups() %>% length())
+  expect_equal(randomSet %>% getBetaTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups() %>% length())
 
   expect_equal(randomSet %>% getNRPMTable() %>% nrow(), randomSet %>% getRegions() %>% length())
   expect_equal(randomSet %>% getNRPMTable() %>% dplyr::select(matches("Sim")) %>% ncol(), randomSet %>% getSampleNames() %>% length())
-  expect_equal(randomSet %>% getNRPMTable(groupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups() %>% length())
+  expect_equal(randomSet %>% getNRPMTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups() %>% length())
 
 
 })
