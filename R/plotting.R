@@ -695,7 +695,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 #' @return An UpSet plot
 #' @export
 #'
-plotDMRUpset <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...){
+plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...){
 
   if (!requireNamespace("UpSetR", quietly = TRUE)) {
     stop(
@@ -706,7 +706,7 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 
 
   temp <- DMRtable %>%
     dplyr::select(tidyselect::matches("adjPval")) %>%
-    {if (removeVS) {dplyr::rename_with(., ~stringr::str_remove(.,"_vs_.*")) } else .} %>%
+    {if (removeVS) {dplyr::rename_with(., ~stringr::str_remove(.,"_vs_.*")) } else {dplyr::rename_with(., ~stringr::str_remove(.,"_adjPval$"))}} %>%
     {if (!is.null(string)) {dplyr::select(., tidyselect::matches(string))} else . }
 
   if (ncol(temp) < 2) {stop(glue::glue("Only {ncol(temp)} column remaining, nothing to plot!"))}
