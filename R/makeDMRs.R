@@ -48,7 +48,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   # Make a progress bar
   pb <- progress::progress_bar$new(total = (nContrasts + 1))
 
-  message("Fitting full GLM w/ adjustments")
+  #message("Fitting full GLM w/ adjustments")
 
   if (is.null(formula)) {
     formula <- stats::as.formula(paste0("~", paste(c(variable, covariates), collapse = "+"), " + 0"))
@@ -87,7 +87,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     keepIndex <- qseaSet %>%
       qsea::makeTable(samples = samplesInContrasts,
                       norm_methods = "nrpm",
-                      chunksize = 1000000) %>%
+                      chunksize = 1000000, verbose = FALSE) %>%
       dplyr::select(tidyselect::matches("nrpm")) %>%
       apply(1,max) %>%
       {which(. >= minNRPM)}
@@ -96,7 +96,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
   }
 
-  print("Fitting initial GLM")
+  message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))
   qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
                                              design,
                                              keep = keepIndex,
@@ -107,10 +107,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
   pb$tick()
 
-
-
   # Yes, a for loop. The issue is that it adds repeatedly to the qseaGLM object, so can't be vectorised easily.
-  print("Starting contrasts")
   for (i in seq_along(1:nrow(contrasts))) {
 
     conName <- paste0(variable, contrasts[i,"group1"], "-", variable, contrasts[i,"group2"])
@@ -133,7 +130,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
         stringr::str_remove_all(variable)
     }
 
-    print(glue::glue("Performing contrast {conNameClean}"))
+    message(glue::glue("Performing contrast {conNameClean}"))
 
     limContrast <- limma::makeContrasts(contrasts = conName, levels = design)
 
@@ -145,7 +142,6 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                                                   verbose = FALSE))
 
     pb$tick()
-    print("")
     if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.2 & checkPVals) {
 
       if(is.null(covariates)){
@@ -158,7 +154,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
       }
     }
   }
-  print("Contrasts Complete")
+  message("Contrasts Complete")
   return(qseaGLM)
 }
 
@@ -178,7 +174,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 #' @param keepFragmentInfo Whether to keep information on the average fragment length and MAPQ (if present)
 #' @param direction Whether to use regions that are up/down/both.
 #' @return A tibble with the data
-getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, keepData = TRUE, keepGroupMeans = TRUE,
+getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, keepData = FALSE, keepGroupMeans = FALSE,
                         fdrThres = 0.05, keepPvals = FALSE, keepFragmentInfo = FALSE,
                         direction = "both"){
 
@@ -200,14 +196,14 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 
   #TODO Quick hack to stop error when a contrast has one or no significantly varying windows
   hack <- FALSE
-  if (length(sigIndex) ==0 ) {
+  if (length(sigIndex) == 0 ) {
     print("No windows found, using hack to return, needs testing")
     sigIndex <- 1
     hack <- TRUE
   }
 
-  if (length(sigIndex) ==1 ) {
-    print("One windows found, using hack to return, needs testing")
+  if (length(sigIndex) == 1 ) {
+    print("One window found, using hack to return, needs testing")
     sigIndex <- c(sigIndex,sigIndex)
     hack <- TRUE
   }
@@ -226,7 +222,7 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 
   }
 
-  if(keepGroupMeans & variable != "group"){
+  if (keepGroupMeans & variable != "group") {
 
     groupMeansList <- qsea::getSampleGroups(qseaSet)[names(qsea::getSampleGroups(qseaSet)) %in% unique(sampleTable$group)] %>%
       c(contrastMeansList)
@@ -235,12 +231,12 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
     groupMeansList <- contrastMeansList
   }
 
+    dataTable <- qsea::makeTable(qseaSet, qseaGLM,
+                                 keep = sigIndex,
+                                 norm_methods = c("beta","nrpm"),
+                                 samples = if (keepData) {sampleNames} else{NULL},
+                                 groupMeans = groupMeansList, verbose = FALSE)
 
-  dataTable <- qsea::makeTable(qseaSet, qseaGLM,
-                               keep = sigIndex,
-                               norm_methods = c("beta","nrpm"),
-                               samples = sampleNames,
-                               groupMeans = groupMeansList)
 
   if (!keepPvals) {
     dataTable <- dataTable %>%
@@ -294,6 +290,7 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param minNRPM A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).
 #' @param minReadCount A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.
 #' @param fdrThres False discovery rate threshold.
+#' @param keepContrastMeans Whether to keep the columns containing the means of the contrasts in the output
 #' @param keepData Whether to keep the individual data columns in the output
 #' @param keepGroupMeans Whether to keep the group means in the output
 #' @param keepPvals Whether to keep the unadjusted p-values in the output
@@ -312,6 +309,7 @@ calculateDMRs <- function(qseaSet,
                           fdrThres = 0.05,
                           keepPvals = FALSE,
                           formula = NULL,
+                          keepContrastMeans = TRUE,
                           keepData = FALSE,
                           keepGroupMeans = FALSE,
                           direction = "both"){
@@ -399,6 +397,15 @@ calculateDMRs <- function(qseaSet,
       dataTable <- dataTable %>% dplyr::relocate(stringr::str_replace(adjPvalString, "_adjPval$","_betaDelta"), .after = !!adjPvalString)
     }
 
-    return(dataTable)
+  if (!keepContrastMeans) {
+
+    contrastNames <- contrasts %>% {c(pull(.,group1), pull(.,group2))}
+    colsToRemove <- paste0(contrastNames, rep(c("_beta_means","_nrpm_means"),rep(length(contrastNames),2)))
+
+    dataTable <- dataTable %>%
+      dplyr::select(-tidyselect::all_of(colsToRemove))
+  }
+
+  return(dataTable)
 
 }

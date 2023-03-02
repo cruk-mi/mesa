@@ -43,6 +43,81 @@ test_that("Calculating DMRs", {
   expect_true("beta_median" %in% colnames(getSampleTable(setWithSummary)))
   expect_true("nrpm_max_highest_only" %in% colnames(getSampleTable(setWithSummary)))
 
+  expect_equal( exampleTumourNormal %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
+                  calculateDMRs(variable = "tumour",
+                                contrasts = "Tumour_vs_Normal",
+                                keepContrastMeans = TRUE,
+                                keepData = FALSE,
+                                keepGroupMeans = FALSE) %>%
+                  ncol(), 11)
+
+  expect_equal( exampleTumourNormal %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
+                     calculateDMRs(variable = "tumour",
+                                   contrasts = "Tumour_vs_Normal",
+                                   keepContrastMeans = TRUE,
+                                   keepData = TRUE,
+                                   keepGroupMeans = FALSE) %>%
+                     ncol(), 31)
+
+  expect_equal( exampleTumourNormal %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
+                     calculateDMRs(variable = "tumour",
+                                   contrasts = "Tumour_vs_Normal",
+                                   keepContrastMeans = TRUE,
+                                   keepData = FALSE,
+                                   keepGroupMeans = TRUE) %>%
+                     ncol(), 19)
+
+  expect_equal(exampleTumourNormal %>%
+                 mutate(group = stringr::str_remove(group,"\\d")) %>%
+                     calculateDMRs(variable = "tumour",
+                                   contrasts = "Tumour_vs_Normal",
+                                   keepContrastMeans = TRUE,
+                                   keepData = TRUE,
+                                   keepGroupMeans = TRUE) %>%
+                    ncol(), 39)
+
+  expect_equal( exampleTumourNormal %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
+                  calculateDMRs(variable = "tumour",
+                                contrasts = "Tumour_vs_Normal",
+                                keepContrastMeans = FALSE,
+                                keepData = FALSE,
+                                keepGroupMeans = FALSE) %>%
+                  ncol(), 7)
+
+  expect_equal( exampleTumourNormal %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
+                  calculateDMRs(variable = "tumour",
+                                contrasts = "Tumour_vs_Normal",
+                                keepContrastMeans = FALSE,
+                                keepData = TRUE,
+                                keepGroupMeans = FALSE) %>%
+                  ncol(), 27)
+
+  expect_equal( exampleTumourNormal %>%
+                  mutate(group = stringr::str_remove(group,"\\d")) %>%
+                  calculateDMRs(variable = "tumour",
+                                contrasts = "Tumour_vs_Normal",
+                                keepContrastMeans = FALSE,
+                                keepData = FALSE,
+                                keepGroupMeans = TRUE) %>%
+                  ncol(), 15)
+
+  expect_equal(exampleTumourNormal %>%
+                 mutate(group = stringr::str_remove(group,"\\d")) %>%
+                 calculateDMRs(variable = "tumour",
+                               contrasts = "Tumour_vs_Normal",
+                               keepContrastMeans = FALSE,
+                               keepData = TRUE,
+                               keepGroupMeans = TRUE) %>%
+                 ncol(), 35)
+
+  expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
+
+
 })
 
 test_that("plotting DMRs", {
