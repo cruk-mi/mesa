@@ -42,6 +42,24 @@ test_that("Mutating Qset works", {
 
 })
 
+
+test_that("Join works", {
+
+  qseaSet <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000)
+
+  expect_true(
+    "new" %in% (colnames(qseaSet %>% left_join(tibble(group = c("Tumor","Normal"), new = 1:2)) %>% getSampleTable()))
+  )
+
+  expect_true(
+    "new" %in% (colnames(qseaSet %>% left_join(tibble(not_group = c("Tumor","Normal"),
+                                                      new = 1:2),
+                                               by = c("group" = "not_group")) %>% getSampleTable()))
+  )
+
+})
+
+
 test_that("Sorting Qsets", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
