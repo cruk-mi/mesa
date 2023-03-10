@@ -140,7 +140,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     qseaSamples <- qsea::getSampleNames(qseaSet)
     groupString <- ""
   } else {
-    qseaSamples <- names(qsea::getSampleGroups(qseaSet))
+    qseaSamples <- names(getSampleGroups2(qseaSet))
     groupString <- " group"
   }
 
@@ -577,7 +577,7 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE){
   if(useGroupMeans){
 
     qseaSet %>%
-      qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "counts") %>%
+      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = "counts") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_counts_means", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble() %>%
@@ -607,7 +607,7 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE){
   if(useGroupMeans){
 
     qseaSet %>%
-      qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "nrpm") %>%
+      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = "nrpm") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm_means", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble() %>%
@@ -636,7 +636,7 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE){
   if(useGroupMeans){
 
     qseaSet %>%
-      qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = "beta") %>%
+      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = "beta") %>%
       dplyr::rename_with(~ stringr::str_replace_all(.x, "_beta_means", "")) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble() %>%
@@ -834,6 +834,25 @@ getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nr
 
 setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames is not defined on a data frame, only on a qseaSet.")})
 
+#' This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting
+#' @param qseaSet The qseaSet object.
+#' @return A named list, where each element contains the vector of sample_names that are in that group.
+#'
+getSampleGroups2 <- function(qseaSet){
+  qseaSet %>%
+    qsea::getSampleTable() %>%
+    pull(group) %>%
+    unique() %>%
+    rlang::set_names(., nm = .) %>%
+    purrr::map(function(x){
+      qseaSet %>%
+        qsea::getSampleTable() %>%
+        filter(group == !!x) %>%
+        pull(sample_name)
+    })
+}
+
+
 #' This function takes a qseaSet and generates a table of data containing data for each sample
 #' @param qseaSet The qseaSet object.
 #' @param normMethod What normalisation method to use (nrpm or beta), can be given multiple.
@@ -848,7 +867,7 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
   if(useGroupMeans){
 
     tab <- qseaSet %>%
-      qsea::makeTable(groupMeans =  qsea::getSampleGroups(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
+      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble()
 
@@ -901,7 +920,7 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
 
   } else {
     mapNames <- qseaSet %>%
-      qsea::getSampleGroups()
+      getSampleGroups2()
 
   }
 

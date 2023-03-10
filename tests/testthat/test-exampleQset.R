@@ -112,11 +112,11 @@ test_that("Testing general functionality", {
 
   expect_equal(randomSet %>% getBetaTable() %>% nrow(), randomSet %>% getRegions() %>% length())
   expect_equal(randomSet %>% getBetaTable() %>% dplyr::select(matches("Sim")) %>% ncol(), randomSet %>% getSampleNames() %>% length())
-  expect_equal(randomSet %>% getBetaTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups() %>% length())
+  expect_equal(randomSet %>% getBetaTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups2() %>% length())
 
   expect_equal(randomSet %>% getNRPMTable() %>% nrow(), randomSet %>% getRegions() %>% length())
   expect_equal(randomSet %>% getNRPMTable() %>% dplyr::select(matches("Sim")) %>% ncol(), randomSet %>% getSampleNames() %>% length())
-  expect_equal(randomSet %>% getNRPMTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups() %>% length())
+  expect_equal(randomSet %>% getNRPMTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups2() %>% length())
 
 
 })
