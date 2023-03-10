@@ -52,12 +52,12 @@ mutate.qseaSet <- function(.data, ...){
 #' @param keep Should the join keys from both x and y be preserved in the output?
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::left_join
 #' @export
-left_join.qseaSet <- function(x, y, by = NULL, copy, suffix, ..., keep){
+left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y"), keep = NULL, ...){
 
   x@sampleTable <- x %>%
     qsea::getSampleTable() %>%
     tibble::rownames_to_column("rownameCol") %>%
-    dplyr::left_join(y,...) %>%
+    dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep,...) %>%
     tibble::column_to_rownames("rownameCol")
 
   return(x)}

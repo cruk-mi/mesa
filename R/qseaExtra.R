@@ -765,7 +765,7 @@ addSummaryAcrossWindows <- function(qseaSet,
                          fnName = fnName)
 
   qseaSet <- qseaSet %>%
-    left_join(summaryTable, by = sample_name)
+    left_join(summaryTable, by = "sample_name")
 
   return(qseaSet)
 
