@@ -794,7 +794,7 @@ plotPCA <- function(object,
         ggplot2::ggtitle(glue::glue("PCA for {length(object$samples)} samples using {titleString}."),
                          subtitle = subtitleString) +
         ggplot2::theme_bw() +
-        theme(plot.title = element_text(size = 12.5))
+        ggplot2::theme(plot.title = ggplot2::element_text(size = 12.5))
       
       if (showSampleNames) {
         if (!requireNamespace("ggrepel", quietly = TRUE)) {
