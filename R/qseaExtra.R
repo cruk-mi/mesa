@@ -811,7 +811,7 @@ getPCA <- function(qseaSet,
         }
         
         prcompObj <- dataTable %>% 
-          prcomp(center = center, scale. = scale, rank. = nPC)
+          stats::prcomp(center = center, scale. = scale, rank. = nPC)
         
         return(list(prcompObj = prcompObj, th = th))
         
