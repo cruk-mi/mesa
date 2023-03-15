@@ -557,7 +557,7 @@ getPCA <- function(qseaSet,
     
     if (is.null(dataTable)) {
       qseaSet <- qseaSet %>% 
-        filterByOverlaps(windowsToKeep = regionsToOverlap)
+        filterByOverlaps(regionsToOverlap = regionsToOverlap)
       
       numWindowsRemovedRegionOverlap <- initialNumWindows - length(getWindows(qseaSet))
       message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(getRegions(qseaSet))} windows remaining."))
