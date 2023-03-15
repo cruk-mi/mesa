@@ -12,7 +12,8 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                        "log2FC","group1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
                        "afterOverBackNum","initialOverBackNum", "qname","inOut","nSign","nStrands",
                        "chromosome_name","start_position","end_position", "input_file", 
-                       "topVarNumInput", "windowSdName", "pcaName"))
+                       "topVarNumInput", "windowSdName", "pcaName",
+                       "fnValue", "group2new"))
 
 #' This function takes a genomic ranges object or data frame, and lifts over from hg19 to hg38.
 #'
