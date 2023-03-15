@@ -4,7 +4,7 @@
 \alias{plotDMRUpset}
 \title{This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot}
 \usage{
-plotDMRUpset(DMRtable, string = NULL, removeVS = TRUE, minAdjPval = 0.05, ...)
+plotDMRUpset(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...)
 }
 \arguments{
 \item{DMRtable}{The data frame containing the differentially methylated regions.}

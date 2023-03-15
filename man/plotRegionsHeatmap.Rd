@@ -19,6 +19,7 @@ plotRegionsHeatmap(
   clip = 1e+09,
   minDensity = 0,
   annotationPosition = "right",
+  title = NULL,
   clusterMethod = "ward.D2",
   ...
 )
@@ -52,9 +53,11 @@ plotRegionsHeatmap(
 
 \item{annotationPosition}{Where to put the annotation for the samples, e.g. "bottom" or "right".}
 
+\item{title}{A title to add to the top of the plot.}
+
 \item{clusterMethod}{What method to use to cluster the dendrograms.}
 
-\item{...}{Other arguments to pass to pheatmap.}
+\item{...}{Other arguments to pass to ComplexHeatmap.}
 }
 \value{
 A qseaSet object with the sampleTable enhanced with the information on number of reads etc
