@@ -224,7 +224,7 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 
   if (keepGroupMeans & variable != "group") {
 
-    groupMeansList <- qsea::getSampleGroups(qseaSet)[names(qsea::getSampleGroups(qseaSet)) %in% unique(sampleTable$group)] %>%
+    groupMeansList <- getSampleGroups2(qseaSet)[names(getSampleGroups2(qseaSet)) %in% unique(sampleTable$group)] %>%
       c(contrastMeansList)
 
   } else {

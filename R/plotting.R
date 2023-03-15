@@ -14,6 +14,7 @@
 #' @param clusterMethod What method to use to cluster the dendrograms.
 #' @param annotationColors A list specifying some or all of the colours to use for the annotations.
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
+#' @param showSampleNames Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.
 #' @param annotationPosition Where to put the annotation for the samples, e.g. "bottom" or "right".
 #' @param title A title to add to the top of the plot.
 #' @param ... Other arguments to pass to ComplexHeatmap.
@@ -33,13 +34,8 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 minDensity = 0,
                                 annotationPosition = "right",
                                 title = NULL,
+                                showSampleNames = NULL,
                                 clusterMethod = "ward.D2", ...) {
-
-  #build the column annotation. Need the {{ }} to parse either strings or tidy selections
-  colAnnot <- makeHeatmapAnnotation(qseaSet,
-                                    orientation = "column",
-                                    useGroupMeans = useGroupMeans,
-                                    sampleAnnotation = {{sampleAnnotation}} )
 
   if (is.null(regionsToOverlap)) {
     regionsToOverlap <- qseaSet %>%
@@ -54,7 +50,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 
   if (normMethod == "beta") {maxScale = min(clip,1)}
 
-  colour_palette <- RColorBrewer::brewer.pal(name = "YlOrRd", n = 9)
+  col_fun = circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
   clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
 
@@ -81,8 +77,6 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     return(dat[mask_keep, , drop = FALSE])
   }
 
-
-
   dataTab <- qseaSet %>%
     filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
     filterWindows(CpG_density >= minDensity) %>%
@@ -94,7 +88,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
   if (useGroupMeans) {
-    colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
+    colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
   }
@@ -104,6 +98,22 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     clipFn(a = 0, b = clip) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%
     janitor::remove_empty(which = "rows", quiet = FALSE)
+
+  if (!useGroupMeans) {
+
+    colAnnot <- qseaSet %>%
+      filter(sample_name %in% !!(colnames(numData))) %>%
+      makeHeatmapAnnotation(orientation = "column",
+                            useGroupMeans = useGroupMeans,
+                            sampleAnnotation = {{sampleAnnotation}} )
+
+  } else {
+    colAnnot <- qseaSet %>%
+      filter(group %in% !!(colnames(numData))) %>%
+      makeHeatmapAnnotation(orientation = "column",
+                            useGroupMeans = useGroupMeans,
+                            sampleAnnotation = {{sampleAnnotation}} )
+  }
 
   if (ncol(dataTab) == 1) {
     clusterCols <- FALSE
@@ -119,14 +129,26 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     colSplit <- NULL
   }
 
+  annotName <- dplyr::case_when(normMethod == "beta" ~ "Beta value",
+                                normMethod == "nrpm" ~ "NRPM",
+                                TRUE ~ stringr::str_to_title(normMethod)
+  )
+
+  if (is.null(showSampleNames)) {
+    if (ncol(numData) > 50) {
+      showSampleNames <- FALSE
+    }  else {
+      showSampleNames <- TRUE
+    }
+  }
 
   numData %>%
     as.matrix() %>%
-    ComplexHeatmap::Heatmap(name = "Beta value",
+    ComplexHeatmap::Heatmap(name = annotName,
                             cluster_rows = clusterRows,
                             cluster_columns = clusterCols,
                             show_row_names = FALSE,
-                            col = colour_palette,
+                            col = col_fun,
                             clustering_method_rows = clusterMethod,
                             clustering_method_columns = clusterMethod,
                             heatmap_legend_param = list(legend_direction = "horizontal",
@@ -255,6 +277,7 @@ makeHeatmapAnnotation <- function(qseaSet,
 #' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
 #' @param scaleRows Whether to scale the rows of the heatmap
 #' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
+#' @param showSampleNames Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.
 #' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
 #' @param ... Additional arguments to pass to pheatmap.
 #' @return A heatmap showing the methylation patterns across the gene of interest.
@@ -265,9 +288,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             sampleAnnotation = NULL, minDensity = 0,
                             minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
+                            showSampleNames = NULL,
                             downstreamDist = 1000, ...){
-
-  annotationColDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
 
   if (!is.null(getMart(qseaSet))) { mart <- getMart(qseaSet) }
 
@@ -309,12 +331,17 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
       dplyr::mutate(seqnames = paste0("chr", seqnames))
   }
 
-  gene_details_gr <- gene_details %>%
-    plyranges::as_granges()
+  if (nrow(gene_details) > 1) {
+    gene_details <- gene_details %>%
+      filter(seqnames %in% GenomeInfoDb::seqlevels(qseaSet@regions))
+  }
 
   if (nrow(gene_details) != 1) {
-    stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart}."))
+    stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart@biomart}."))
   }
+
+  gene_details_gr <- gene_details %>%
+    plyranges::as_granges()
 
   geneGR <- gene_details %>%
     plyranges::as_granges() %>%
@@ -338,8 +365,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-  if(useGroupMeans){
-    colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
+  if (useGroupMeans) {
+    colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
   }
@@ -348,6 +375,22 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     tibble::column_to_rownames("window") %>%
     dplyr::select(tidyselect::all_of(colsToFind)) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE)
+
+  if (!useGroupMeans) {
+
+    colAnnot <- qseaSet %>%
+      filter(sample_name %in% !!(colnames(numData))) %>%
+      makeHeatmapAnnotation(orientation = "column",
+                          useGroupMeans = useGroupMeans,
+                          sampleAnnotation = {{sampleAnnotation}} )
+
+  } else {
+    colAnnot <- qseaSet %>%
+      filter(group %in% !!(colnames(numData))) %>%
+      makeHeatmapAnnotation(orientation = "column",
+                            useGroupMeans = useGroupMeans,
+                            sampleAnnotation = {{sampleAnnotation}} )
+  }
 
   geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
 
@@ -368,6 +411,13 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     dplyr::select(window, CpG_density, annotation) %>%
     tibble::column_to_rownames("window")
 
+  windowSize <- qseaSet %>% qsea::getWindowSize()
+
+  rowSplit <- dataTable %>%
+    tibble::as_tibble() %>%
+    mutate(gap = cumsum(ifelse(start - tidyr::replace_na(dplyr::lag(start),0) > !!windowSize,1,0))) %>%
+    pull(gap)
+
   #Make rowannoation object
   rowAnnot <- makeGeneHeatmapRowAnnotation(annoRow)
 
@@ -380,20 +430,44 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   }
 
   #Setting a colour palette for beta-values. Could make this optional I guess
-  colour_palette <- RColorBrewer::brewer.pal(name = "YlOrRd", n = 9)
+  col_fun = circlize::colorRamp2(seq(0, maxScale, length.out = 9),
+                                 RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
-  numData %>%
-    as.matrix() %>%
-    ComplexHeatmap::Heatmap(rect_gp = rectGpParam,
-                            name = "Beta value",
+  if (clusterCols) {
+    colSplit <- clusterNum
+  } else {
+    colSplit <- NULL
+  }
+
+
+  if (is.null(showSampleNames)) {
+    if (ncol(numData) > 50) {
+      showSampleNames <- FALSE
+    }  else {
+      showSampleNames <- TRUE
+    }
+  }
+
+  annotName <- dplyr::case_when(normMethod == "beta" ~ "Beta value",
+                         normMethod == "nrpm" ~ "NRPM",
+                         TRUE ~ stringr::str_to_title(normMethod)
+  )
+
+  ComplexHeatmap::Heatmap(matrix = as.matrix(numData),
+                            rect_gp = rectGpParam,
+                            name = annotName,
                             cluster_rows = FALSE,
                             cluster_columns = clusterCols,
                             left_annotation = rowAnnot,
-                            col = colour_palette,
-                            show_row_names = F,
+                            top_annotation = colAnnot,
+                            col = col_fun,
+                            show_row_names = FALSE,
+                            show_column_names = showSampleNames,
                             clustering_method_rows = "ward.D2",
                             clustering_method_columns = "ward.D2",
-                            column_split = clusterNum,
+                            row_split = rowSplit,
+                            row_title = NULL,
+                            column_split = colSplit,
                             column_title = NULL,
                             na_col = "lightgrey",
                             heatmap_legend_param = list(legend_direction = "vertical",
@@ -401,7 +475,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             ) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "right",
                          annotation_legend_side = "right",
-                         column_title = glue::glue("{stringr::str_to_title(normMethod)} values for {gene}"))
+                         column_title = glue::glue("{annotName} for {gene}"))
 
   return(invisible(numData))
 }
@@ -666,7 +740,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
   if(useGroupMeans){
-    colsToFind <- qseaSet %>% qsea::getSampleGroups() %>% names()
+    colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
   }
@@ -738,7 +812,7 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   if (!useGroupMeans) {
     annotationColDf <- qseaSet %>%
       qsea::getSampleTable() %>%
-      dplyr::arrange(sample_name) %>%
+      #dplyr::arrange(sample_name) %>%
       dplyr::select(!!!rlang::enquos(sampleAnnotation))
 
   } else if (useGroupMeans) {
@@ -750,7 +824,7 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
       tibble::remove_rownames() %>%
       dplyr::distinct()
 
-    if (nrow(distinctGroupTab) != (qseaSet %>% qsea::getSampleGroups() %>% length())) {
+    if (nrow(distinctGroupTab) != (qseaSet %>% getSampleGroups2() %>% length())) {
       problemGroups <- distinctGroupTab %>%
         dplyr::count(group) %>%
         filter(n > 1) %>%
@@ -760,7 +834,7 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
     }
 
     annotationColDf <- distinctGroupTab %>%
-      arrange(group) %>%
+      #arrange(group) %>%
       tibble::column_to_rownames("group") %>%
       as.data.frame()
   }
