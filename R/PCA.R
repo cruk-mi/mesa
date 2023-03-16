@@ -432,7 +432,7 @@ getPCA <- function(qseaSet,
       }
     }
 
-    if (length(setdiff(dataTable, getWindows(qseaSet))) > 0) {
+    if (length(plyranges::setdiff_ranges(dataTable, getWindows(qseaSet))) > 0) {
       stop("At least one window in dataTable does not have a matching window in qseaSet.")
     }
 
