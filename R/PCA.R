@@ -32,7 +32,8 @@ plotPCA <- function(object,
                     shapePalette = NULL,
                     NAshape = NULL,
                     showSampleNames = FALSE,
-                    pointSize = 2
+                    pointSize = 2,
+                    plotlyAnnotations = ""
 ){
 
   if (!("pcas" %in% names(object))) {
@@ -45,6 +46,12 @@ plotPCA <- function(object,
 
   if (!is.list(components)) {
     components <- list(components)
+  }
+
+  if (length(plotlyAnnotations) > 1) {
+    plotlyAnnotations <- plotlyAnnotations %>% purrr::set_names(., nm = .)
+  } else if (plotlyAnnotations != "") {
+    plotlyAnnotations <- plotlyAnnotations %>% purrr::set_names(., nm = .)
   }
 
   components <- components %>% purrr::set_names(purrr::map(components, ~ glue::glue("PC{.x}") %>% glue::glue_collapse("vs")))
@@ -282,6 +289,7 @@ plotPCA <- function(object,
       env <- new.env(parent = globalenv())
       env$plotData <- plotData
       env$PCs <- PCs
+      env$plotlyAnnotations <- plotlyAnnotations
 
       topVarInfo <- object$params$topVar %>% filter(pcaName == !!pcaName)
 
@@ -300,8 +308,11 @@ plotPCA <- function(object,
 
       ggp <- with(env, {
         ggplot2::ggplot(plotData,
-                        ggplot2::aes(!!rlang::sym(glue::glue("PC{PCs[1]}")), !!rlang::sym(glue::glue("PC{PCs[2]}")),
-                                     label = sample_name))
+                        ggplot2::aes(!!rlang::sym(glue::glue("PC{PCs[1]}")),
+                                     !!rlang::sym(glue::glue("PC{PCs[2]}")),
+                                     label = sample_name,
+                                     !!!rlang::syms(plotlyAnnotations)
+                                     ))
       }) +
         my_geom_point +
         my_scale_colour +

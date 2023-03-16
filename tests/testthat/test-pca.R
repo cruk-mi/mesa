@@ -26,11 +26,14 @@ test_that("PCAs", {
   expect_no_error(plots1 <- plotPCA(obj1, exampleTumourNormal))
   expect_no_error(plots6 <- plotPCA(obj6, exampleTumourNormal))
 
-  expect_no_error(plotPCA(obj1, exampleTumourNormal, colourVar = "type"))
-  expect_no_error(plotPCA(obj1, exampleTumourNormal, colourVar = "age"))
-  expect_no_error(plotPCA(obj1, exampleTumourNormal, colourVar = "gender"))
-  expect_no_error(plotPCA(obj1, exampleTumourNormal %>% mutate(diver = seq(-4,5)), colourVar = "diver"))
-  expect_no_error(plotPCA(obj1, exampleTumourNormal, shapeVar = "type"))
+  expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "type"))
+  expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "age"))
+  expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "gender"))
+  expect_no_error(plotPCA(obj1, exampleTumourNormal %>% mutate(diver = seq(-4,5)), colour = "diver"))
+  expect_no_error(plotPCA(obj1, exampleTumourNormal, shape = "type"))
+
+  expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
+  expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
   expect_equal(length(plots1), 1)
   expect_equal(length(plots6), 3)
