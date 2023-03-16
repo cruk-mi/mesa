@@ -18,6 +18,7 @@
 #' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
 #' @param showSampleNames Logical indicating whether to show the sample names.
 #' @param pointSize Numeric value to set the size of the points
+#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A ggplot object or list of ggplot objects
 #' @export
 #'
