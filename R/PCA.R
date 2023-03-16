@@ -2,20 +2,20 @@
 #' @param object The output from [getPCA()].
 #' @param qseaSet The qseaSet object used to generate `object`.
 #' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3.
-#' @param colourVar Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
-#' @param colours Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
-#' @param NAcolour Colour to use for NA values in the `colourVar` variable. Default is "grey50".
+#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
+#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
+#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
 #' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
-#' @param shapeVar Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
-#' @param shapes Shapes to use for the points (samples) for each category of the `shapeVar` variable. Can be one of the following options:
+#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
+#' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
 #' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
 #' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
 #'     * "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
 #'     * "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
 #'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
-#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shapeVar` variable).
+#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
 #' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
-#' @param NAshape Shape to use for NA values in the `shapeVar` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
+#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
 #' @param showSampleNames Logical indicating whether to show the sample names.
 #' @param pointSize Numeric value to set the size of the points
 #' @return A ggplot object or list of ggplot objects
@@ -23,17 +23,29 @@
 #'
 plotPCA <- function(object,
                     qseaSet,
-                    components = list(c(1, 2), c(2, 3)),
-                    colourVar = NULL,
-                    colours = NULL,
+                    components = list(c(1, 2)),
+                    colour = NULL,
+                    colourPalette = NULL,
                     NAcolour = "grey50",
                     symDivColourScale = FALSE,
-                    shapeVar = NULL,
-                    shapes = NULL,
+                    shape = NULL,
+                    shapePalette = NULL,
                     NAshape = NULL,
                     showSampleNames = FALSE,
                     pointSize = 2
 ){
+
+  if (!("pcas" %in% names(object))) {
+    stop("First argument should be a pca object from getPCA")
+  }
+
+  if (!is.qseaSet(qseaSet)) {
+    stop("Second argument should be a qseaSet")
+  }
+
+  if (!is.list(components)) {
+    components <- list(components)
+  }
 
   components <- components %>% purrr::set_names(purrr::map(components, ~ glue::glue("PC{.x}") %>% glue::glue_collapse("vs")))
 
@@ -46,127 +58,127 @@ plotPCA <- function(object,
       tibble::as_tibble(rownames = "sample_name") %>%
       dplyr::left_join(qsea::getSampleTable(qseaSet))
 
-    if (!is.null(colours) & is.null(colourVar)) {
-      stop("`colours` argument is non-NULL, but `colourVar` argument is NULL.")
+    if (!is.null(colourPalette) & is.null(colour)) {
+      stop("`colourPalette` argument is non-NULL, but `colour` argument is NULL.")
     }
 
-    if (!is.null(shapes) & is.null(shapeVar)) {
-      stop("`shapes` argument is non-NULL, but `shapeVar` argument is NULL.")
+    if (!is.null(shapePalette) & is.null(shape)) {
+      stop("`shapePalette` argument is non-NULL, but `shape` argument is NULL.")
     }
 
-    if (!is.null(shapeVar) & length(shapeVar) > 1) {
-      stop("Argument `shapeVar` can only be of length one.")
+    if (!is.null(shape) & length(shape) > 1) {
+      stop("Argument `shape` can only be of length one.")
     }
 
-    if (is.null(shapeVar)) {
+    if (is.null(shape)) {
       plotData <- plotData %>%
         dplyr::mutate(NULLshape = 16)
 
-      shapeVar <- "NULLshape"
+      shape <- "NULLshape"
     }
 
-    if (is.null(colourVar)) {
+    if (is.null(colour)) {
       plotData <- plotData %>%
         dplyr::mutate(NULLcol = "black")
 
-      colourVar <- "NULLcol"
+      colour <- "NULLcol"
     }
 
-    getShapeScale <- function(plotData, shapeVar, shapes, colourScaleType = NULL) {
+    getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL) {
 
       if (is.null(NAshape)) {
         NAshape <- 7
       }
 
-      if (shapeVar == "NULLshape") {
+      if (shape == "NULLshape") {
         my_scale_shape <- ggplot2::scale_shape_identity(na.value = NAshape)
 
       } else {
 
-        nShape <- plotData %>% pull(shapeVar) %>% setdiff(NA) %>%  unique() %>% length()
+        nShape <- plotData %>% pull(shape) %>% setdiff(NA) %>%  unique() %>% length()
 
-        if (is.null(shapes)) {
+        if (is.null(shapePalette)) {
           if (!is.null(colourScaleType) && colourScaleType == "diverging") {
-            if (any(is.na(plotData %>% pull(shapeVar)))) {
-              shapes <- c(21, 24, 22, 23)
+            if (any(is.na(plotData %>% pull(shape)))) {
+              shapePalette <- c(21, 24, 22, 23)
               NAshape <- 25
             } else {
-              shapes <- c(21, 24, 22, 23, 25)
+              shapePalette <- c(21, 24, 22, 23, 25)
             }
-            if (nShape > length(shapes)) {
-              stop(glue::glue("`shapeVar` variable '{shapeVar}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapes)} unique values."))
+            if (nShape > length(shapePalette)) {
+              stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
             }
 
           } else {
-            shapes <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
-            if (nShape > length(shapes)) {
-              stop(glue::glue("`shapeVar` variable '{shapeVar}' has {nShape} unique values; the maximum allowed by default is {length(shapes)} unique values."))
+            shapePalette <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
+            if (nShape > length(shapePalette)) {
+              stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
             }
           }
 
-        } else if (is.numeric(shapes)) {
-          if (nShape > length(shapes)) {
-            stop(glue::glue("`shapeVar` variable '{shapeVar}' has {nShape} unique values; the `shapes` argument only has {length(shapes)} unique values."))
+        } else if (is.numeric(shapePalette)) {
+          if (nShape > length(shapePalette)) {
+            stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the `shapePalette` argument only has {length(shapePalette)} unique values."))
           }
-          if (any(0:20 %in% shapes) & any(21:25 %in% shapes)) {
-            stop("'shapes' argument can either contain integers between 0 and 20 (line or filled shapes), or between 21 and 25 (filled shapes with borders), but not both.")
+          if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
+            stop("'shapePalette' argument can either contain integers between 0 and 20 (line or filled shapes), or between 21 and 25 (filled shapes with borders), but not both.")
           }
-          if (any(21:25 %in% shapes)) {
+          if (any(21:25 %in% shapePalette)) {
             NAshape <- 25
           }
 
-        } else if (is.character(shapes)) {
-          shapesInput <- shapes
-          if (shapes == "filled+border") {
-            if (any(is.na(plotData %>% pull(shapeVar)))) {
-              shapes <- c(21, 24, 22, 23)
+        } else if (is.character(shapePalette)) {
+          shapesInput <- shapePalette
+          if (shapePalette == "filled+border") {
+            if (any(is.na(plotData %>% pull(shape)))) {
+              shapePalette <- c(21, 24, 22, 23)
               NAshape <- 25
             } else {
-              shapes <- c(21, 24, 22, 23, 25)
+              shapePalette <- c(21, 24, 22, 23, 25)
             }
           } else {
-            if (shapes == "line-first") {
-              shapes <- c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18)
-            } else if (shapes == "filled-first") {
-              shapes <- c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12)
-            } else if (shapes == "mixture") {
-              shapes <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
+            if (shapePalette == "line-first") {
+              shapePalette <- c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18)
+            } else if (shapePalette == "filled-first") {
+              shapePalette <- c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12)
+            } else if (shapePalette == "mixture") {
+              shapePalette <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
             } else {
-              stop("`shapes` argument can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
+              stop("`shapePalette` argument can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
             }
 
             if (colourScaleType == "diverging") {
               warning(glue::glue("Using the '{shapesInput}' colour scale with a divergent colour scale may lead to points around zero on the colour scale being almost invisible."))
             }
           }
-          if (nShape > length(shapes)) {
-            stop(glue::glue("`shapeVar` variable '{shapeVar}' has {nShape} unique values; there are only {length(shapes)} shapes available with argument `shapes` = '{shapesInput}'."))
+          if (nShape > length(shapePalette)) {
+            stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; there are only {length(shapePalette)} shapes available with argument `shapePalette` = '{shapesInput}'."))
           }
         } else {
-          stop("`shapes` argument is not in a valid format. It can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
+          stop("`shapePalette` argument is not in a valid format. It can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
         }
 
-        if (NAshape %in% shapes[1:nShape] & any(is.na(plotData %>% pull(shapeVar)))) {
-          stop(glue::glue("NA shape value (={NAshape}) is already being used for a '{shapeVar}' category. Values in use: {paste0(shapes[1:nShape], collapse = ', ')}."))
+        if (NAshape %in% shapePalette[1:nShape] & any(is.na(plotData %>% pull(shape)))) {
+          stop(glue::glue("NA shape value (={NAshape}) is already being used for a '{shape}' category. Values in use: {paste0(shapePalette[1:nShape], collapse = ', ')}."))
         }
 
-        my_scale_shape <- ggplot2::scale_shape_manual(values = shapes, na.value = NAshape)
+        my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
       }
 
       return(my_scale_shape)
 
     }
 
-    getGeomPoint <- function(cV, shapeVar, my_scale_shape) {
+    getGeomPoint <- function(cV, shape, my_scale_shape) {
 
       filledShapes <- ifelse(my_scale_shape$scale_name == "manual" & any(my_scale_shape$palette(1) %in% 21:25),
                              TRUE, FALSE)
 
       if (filledShapes) {
-        my_geom_point <- ggplot2::geom_point(ggplot2::aes(fill = !!rlang::sym(cV), shape = !!rlang::sym(shapeVar)),
+        my_geom_point <- ggplot2::geom_point(ggplot2::aes(fill = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
                                              colour = "black", size = pointSize)
       } else {
-        my_geom_point <- ggplot2::geom_point(ggplot2::aes(colour = !!rlang::sym(cV), shape = !!rlang::sym(shapeVar)),
+        my_geom_point <- ggplot2::geom_point(ggplot2::aes(colour = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
                                              size = pointSize)
       }
 
@@ -199,7 +211,7 @@ plotPCA <- function(object,
             ggplot2::scale_colour_viridis_c(direction = -1, na.value = NAcolour)
           }
         } else if (colourScaleType == "diverging") {
-          cols <- RColorBrewer::brewer.pal(9, "RdBu")
+          cols <- RColorBrewer::brewer.pal(9, "RdBu") %>% rev()
           cols[5] <- "grey90"
         }
 
@@ -207,7 +219,7 @@ plotPCA <- function(object,
         if (colourScaleType == "qualitative") {
           nCol <- plotData %>% pull(cV) %>% setdiff(NA) %>% unique() %>% length()
           if (nCol > length(cols)) {
-            stop(glue::glue("`colourVar` variable '{cV}' has {nCol} unique values; the `colours` argument only has {length(cols)} unique values."))
+            stop(glue::glue("`colour` variable '{cV}' has {nCol} unique values; the `colourPalette` argument only has {length(cols)} unique values."))
           }
           my_scale_colour <- if (filledShapes) {
             ggplot2::scale_fill_manual(values = cols, na.value = NAcolour)
@@ -313,11 +325,11 @@ plotPCA <- function(object,
       return(ggp)
     }
 
-    if (length(colourVar) == 1 && colourVar == "NULLcol") {
+    if (length(colour) == 1 && colour == "NULLcol") {
 
-      my_scale_shape <- getShapeScale(plotData, shapeVar, shapes)
+      my_scale_shape <- getShapeScale(plotData, shape, shapePalette)
 
-      my_geom_point <- getGeomPoint(colourVar, shapeVar, my_scale_shape)
+      my_geom_point <- getGeomPoint(colour, shape, my_scale_shape)
 
       my_scale_colour <- ggplot2::scale_colour_identity()
 
@@ -327,7 +339,7 @@ plotPCA <- function(object,
 
     } else {
 
-      ggp <- purrr::map2(purrr::set_names(colourVar), list(colours), function(cV, cols) {
+      ggp <- purrr::map2(purrr::set_names(colour), list(colourPalette), function(cV, cols) {
 
         cVdat <- plotData[[cV]]
 
@@ -340,9 +352,9 @@ plotPCA <- function(object,
           stop(glue::glue("The variable `{cV}` can not be mapped to a colour scale."))
         }
 
-        my_scale_shape <- getShapeScale(plotData, shapeVar, shapes, colourScaleType)
+        my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType)
 
-        my_geom_point <- getGeomPoint(cV, shapeVar, my_scale_shape)
+        my_geom_point <- getGeomPoint(cV, shape, my_scale_shape)
 
         my_scale_colour <- getColourScale(plotData, cV, cols, colourScaleType, my_scale_shape)
 
