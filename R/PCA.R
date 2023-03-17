@@ -436,7 +436,7 @@ getPCA <- function(qseaSet,
 #'
 plotPCA <- function(object,
                     qseaSet,
-                    components = list(c(1, 2)),
+                    components = list(c(1, 2), c(2, 3)),
                     colour = NULL,
                     colourPalette = NULL,
                     NAcolour = "grey50",
