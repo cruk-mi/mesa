@@ -431,7 +431,7 @@ getPCA <- function(qseaSet,
 #' @param showSampleNames Logical indicating whether to show the sample names.
 #' @param pointSize Numeric value to set the size of the points
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
-#' @return A ggplot object or list of ggplot objects
+#' @return A list of ggplot objects: one for each combination of `object$pcas`, `colour` and `components`.
 #' @export
 #'
 plotPCA <- function(object,
