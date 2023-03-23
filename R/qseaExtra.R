@@ -431,80 +431,14 @@ getAnnotationDataFrame <- function(qseaSet, ...){
     return()
 }
 
-
-#' This function edits the getPCA function from qsea to allow for batch effect correction
-#' @param qs A qseaSet object
-#' @param chr Which chromosomes to use
-#' @param minRowSum Minimum number of reads in a window across all the samples to keep it
-#' @param minEnrichment Minimal number of expected reads for a fully methylated window (for transformation to absolute methylation level)
-#' @param keep a vector of row indices to keep (optional)
-#' @param normMethod What normalisation method to use
-#' @param topVar Number of most variable windows to keep
-#' @param samples Which samples to use
-#' @param batchVariable A variable in the sampleTable to batch correct for, using limma::removeBatchEffect
+#' This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values
+#' @param dataTable  A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()].
+#' @param normMethod A character giving the normalisation method used (e.g. "beta" or "nrpm").
+#' @return The dataTable with the normMethod suffix "_{normMethod}" removed from sample (or sample group) column names.
 #' @export
 #'
-getPCAwithBatch <- function(qs, chr = qsea::getChrNames(qs), minRowSum = 20, minEnrichment = 3, keep,
-                            normMethod = "beta",
-                            topVar = 1000, samples = qsea::getSampleNames(qs),
-                            batchVariable = NULL){
-
-  if( is.null(samples)) { samples =  qsea::getSampleNames(qs)}
-
-  samples = qsea:::checkSamples(qs, samples)
-
-  if( missing(keep)) {
-    keep = which(rowSums(qsea::getCounts(qs)) >= minRowSum )
-  }
-  else {
-    keep = intersect(keep, which(rowSums(qsea::getCounts(qs)) >= minRowSum ))
-  }
-
-  if (methods::is(normMethod, "character")) {
-    normMethod = qsea::normMethod(normMethod)
-  }
-
-  if( !all( qsea::getChrNames(qs) %in% chr )){
-    keep = keep[as.character(GenomeInfoDb::seqnames(qsea::getRegions(qs)[keep])) %in% chr]}
-
-  if( length(keep) <= 10) {
-    stop("not enough regions left:",length(keep)," Regions, minimum is 10")
-  }
-
-  vals = qsea:::getNormalizedValues(qs, methods = normMethod, minEnrichment = minEnrichment,
-                                    windows = keep, samples = samples)
-
-  missing = rowSums(is.na(vals)) > 0
-  vals = vals[!missing,] - rowMeans(vals[!missing,])
-  if ( any(!is.finite(vals))) {
-    stop("Infinite values due to log or logit transformation. ",
-         "Please specify minVal and maxVal.")
-  }
-  if ( !is.null(topVar) && nrow(vals) > topVar) {
-    #rv=apply(vals,1,var) #this is slow
-    #rv=rowSums((vals - rowMeans(vals))^2)/(dim(vals)[2] - 1)
-    #since only the order matters:
-    rv = rowSums((vals - rowMeans(vals))^2)
-    th = sort(rv,decreasing = TRUE)[topVar]
-    vals = vals[rv >= th,]
-    keep = keep[rv >= th]
-  }
-  #make names for the selected regions
-  names = paste0(GenomeInfoDb::seqnames(qsea::getRegions(qs)[keep]), ":",
-                 IRanges::start(qsea::getRegions(qs)[keep]), "-", IRanges::end(qsea::getRegions(qs)[keep]))
-
-  if ( !is.null(batchVariable)) {
-
-    numBatches <- qs %>% pull(batchVariable) %>% unique()
-
-    if (length(numBatches) > 1) {
-      message(glue::glue("Normalising PCA based on {length(numBatches)} values of {batchVariable}"))
-      vals <- vals %>% limma::removeBatchEffect(batch = dplyr::pull(qsea::getSampleTable(qs), batchVariable))
-    }
-  }
-
-  svdVals = svd(vals)
-  methods::new('qseaPCA', svd = svdVals, sample_names = samples, factor_names = as.character(names))
+removeNormMethodSuffix <- function(dataTable, normMethod) {
+  dplyr::rename_with(dataTable, ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$")))
 }
 
 #' This function takes a qseaSet and sums over nrpm within a GRanges object

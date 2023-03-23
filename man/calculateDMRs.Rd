@@ -15,6 +15,7 @@ calculateDMRs(
   fdrThres = 0.05,
   keepPvals = FALSE,
   formula = NULL,
+  keepContrastMeans = TRUE,
   keepData = FALSE,
   keepGroupMeans = FALSE,
   direction = "both"
@@ -40,6 +41,8 @@ calculateDMRs(
 \item{keepPvals}{Whether to keep the unadjusted p-values in the output}
 
 \item{formula}{Alternative formula mode for calculating DMRs (not recommended)}
+
+\item{keepContrastMeans}{Whether to keep the columns containing the means of the contrasts in the output}
 
 \item{keepData}{Whether to keep the individual data columns in the output}
 
