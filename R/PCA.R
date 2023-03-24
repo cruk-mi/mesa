@@ -1,7 +1,7 @@
 #' This function is a modified version of the [qsea::getPCA()] function
 #' @param qseaSet A qseaSet object.
 #' @param dataTable A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()]. It must have seqnames, start and end columns. Can also be a [GenomicRanges::GRanges()] object with normalised values in the metadata columns.
-#' @param regionsToOverlap Optional. Only windows in x overlapping `regionsToOverlap` will be considered. A [GenomicRanges::GRanges()] object or a data frame which can be coerced into a [GenomicRanges::GRanges()] object.
+#' @param regionsToOverlap Optional. Only windows in `qseaSet` overlapping `regionsToOverlap` will be considered. A [GenomicRanges::GRanges()] object or a data frame which can be coerced into a [GenomicRanges::GRanges()] object.
 #' @param normMethod What normalisation method to use. Typically a character giving name of predefined normalisation method (e.g. "beta" or "nrpm"). See [qsea::normMethod()].
 #' @param minEnrichment Minimum number of reads for beta values to not give NA. Passed to [getDataTable()].
 #' @param useGroupMeans Whether to average samples over the group column (i.e. combine replicates)
