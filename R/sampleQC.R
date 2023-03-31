@@ -44,11 +44,6 @@ getSampleQCSummary <- function(qseaSet){
       addLibraryInformation()
   }
 
-  if (!("hyperStableFractionp8" %in% colnames(qsea::getSampleTable(qseaSet)))) {
-    qseaSet <- qseaSet %>%
-      addHyperStableFraction()
-  }
-
   qseaSet %>%
     qsea::getSampleTable() %>%
     dplyr::select(sample_name, tidyselect::matches("valid_fragment|relH|hyperStable|ichorTumo")) %>%
