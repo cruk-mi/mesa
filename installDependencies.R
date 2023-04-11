@@ -21,4 +21,5 @@ requiredPackages <- lines_df |>
 
 detach("package:tibble")
 detach("package:stringr")
+detach("package:dplyr")
 remotes::install_cran(requiredPackages, repos = BiocManager::repositories())
