@@ -19,4 +19,6 @@ requiredPackages <- lines_df |>
   dplyr::filter(value != "R") |>
   dplyr::pull(value)
 
+detach("package:tibble")
+detach("package:stringr")
 remotes::install_cran(requiredPackages, repos = BiocManager::repositories())
