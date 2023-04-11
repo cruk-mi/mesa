@@ -20,6 +20,7 @@ plotRegionsHeatmap(
   minDensity = 0,
   annotationPosition = "right",
   title = NULL,
+  showSampleNames = NULL,
   clusterMethod = "ward.D2",
   ...
 )
@@ -54,6 +55,8 @@ plotRegionsHeatmap(
 \item{annotationPosition}{Where to put the annotation for the samples, e.g. "bottom" or "right".}
 
 \item{title}{A title to add to the top of the plot.}
+
+\item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
 
 \item{clusterMethod}{What method to use to cluster the dendrograms.}
 
