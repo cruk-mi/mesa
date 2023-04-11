@@ -867,7 +867,7 @@ getDimRed <- function(qseaSet,
 
       }) %>%
       purrr::reduce(dplyr::left_join) %>%
-      dplyr::left_join(dataTable, ., by = "sample_name")
+      dplyr::left_join(dataTable, .)
   }
 
   pca <- topVar %>%
