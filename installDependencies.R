@@ -1,4 +1,4 @@
-remotes::install_cran(c("tibble","dplyr","stringr"))
+install.packages(c("tibble","dplyr","stringr"))
 
 lines_df <- readLines("DESCRIPTION") |>
   tibble::enframe()
