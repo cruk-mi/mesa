@@ -17,7 +17,7 @@ requiredPackages <- lines_df |>
   dplyr::mutate(value = stringr::str_remove_all(value, " |,"),
          value = stringr::str_remove_all(value,"\\(.*|VignetteBuilder:")) |>
   dplyr::filter(value != "R") |>
-  dplyr::pull(value) %>%
+  dplyr::pull(value) |>
   setdiff(c("tibble","dplyr","stringr","generics", "rlang", "tidyselect", "vctrs"))
 
 remotes::install_cran(requiredPackages, repos = BiocManager::repositories())
