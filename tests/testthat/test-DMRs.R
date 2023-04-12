@@ -117,7 +117,18 @@ test_that("Calculating DMRs", {
 
   expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
 
-
+  testWithFilter <- exampleTumourNormal %>%
+    filter(type %in% c("LUAD", "NormalLung")) %>%
+    calculateDMRs(variable = "type", 
+                  contrasts = "LUAD_vs_NormalLung")
+  
+  testNoFilter <- exampleTumourNormal %>%
+    calculateDMRs(variable = "type", 
+                  contrasts = "LUAD_vs_NormalLung")
+  
+  expect_equal(testWithFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")), 
+               testNoFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")))
+  
 })
 
 test_that("plotting DMRs", {
