@@ -49,7 +49,7 @@ getPCA(
 }
 \value{
 A list with the following components:
-\item{pcas}{A named list of objects of class prcomp. List names correspond to entries in the \code{params$topVar} component of the output.}
+\item{fit}{A named list of objects of class prcomp. List names correspond to entries in the \code{params$topVar} component of the output.}
 \item{samples}{Names of the samples analysed.}
 \item{windows}{A list of names of the windows analysed. List names correspond to entries in the \code{params$topVar} component of the output.}
 \item{dataTable}{If \code{returnDataTable = TRUE}, the table of normalised values. The table will contain windows after filtering based on \code{regionsToOverlap} and \code{minDensity}, but prior to filtering based on \code{topVarNum}. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the \code{params$topVar} component of the output.}

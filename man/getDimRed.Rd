@@ -18,6 +18,8 @@ getDimRed(
   center = TRUE,
   scale = FALSE,
   nPC = 5,
+  minDist = 0.1,
+  nNeighbours = 5,
   returnDataTable = FALSE,
   ...
 )
