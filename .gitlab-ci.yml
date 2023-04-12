@@ -21,6 +21,7 @@ build:
     - changes:  # Run the job if any of these files changes
         - DESCRIPTION
         - Dockerfile_dependencies_only
+        - installDependencies.R
 
 devtools-check:
   image: crukmi/mesa_dependencies:latest
