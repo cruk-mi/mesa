@@ -189,17 +189,20 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' This function takes a qseaSet and plots a heatmap of the calculated CNV
 #' @param qseaSet The qseaSet object.
 #' @param sampleAnnotation Columns of the sampleTable to use to annotation the plot with.
+#' @param annotationColors A list specifying some or all of the colours to use for the annotations.
 #' @param clusterRows Whether to cluster the rows of the heatmap
 #' @return A heatmap with the calculated number of chromosomes for each samples
 #' @export
 #'
 
 plotCNVheatmap <- function(qseaSet,
-                    sampleAnnotation = NULL,
-                    clusterRows = TRUE){
+                           annotationColors = NA,
+                           sampleAnnotation = NULL,
+                           clusterRows = TRUE){
 
   rowAnnot <- makeHeatmapAnnotation(qseaSet,
                                     orientation = "row",
+                                    specifiedAnnotationColors = annotationColors,
                                     sampleAnnotation = {{sampleAnnotation}} )
 
   chr <- qseaSet %>%
