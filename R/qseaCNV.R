@@ -196,8 +196,8 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #'
 
 plotCNVheatmap <- function(qseaSet,
-                           annotationColors = NA,
                            sampleAnnotation = NULL,
+                           annotationColors = NA,
                            clusterRows = TRUE){
 
   rowAnnot <- makeHeatmapAnnotation(qseaSet,
