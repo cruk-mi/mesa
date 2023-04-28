@@ -307,7 +307,7 @@ makeHeatmapAnnotation <- function(qseaSet,
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
-                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
+                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NA,
                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
                             showSampleNames = NULL,
                             downstreamDist = 1000, ...){
