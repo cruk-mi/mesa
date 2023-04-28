@@ -154,6 +154,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             heatmap_legend_param = list(legend_direction = "horizontal",
                                                         at = seq(0, maxScale, length.out = 6) %>% round(1)),
                             column_split = colSplit,
+                            show_column_names = showSampleNames,
                             column_title = NULL,
                             top_annotation = colAnnot) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
