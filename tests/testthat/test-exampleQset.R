@@ -33,6 +33,13 @@ test_that("Annotation getting works", {
 
   expect_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
   expect_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
+  
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type),
+               annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
+  
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type,age),
+                                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
+  
 }
 )
 
@@ -45,10 +52,15 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE))
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = TRUE))
+  
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE, showSampleNames = FALSE))
 
   expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
   expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
-
+  
+  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
+                               annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
+  
   expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10"))
 
