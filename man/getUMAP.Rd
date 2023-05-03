@@ -36,9 +36,9 @@ getUMAP(
 
 \item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
 
-\item{topVarNum}{Number of most variable windows to keep. Defaults to 1000. If value is NA, NULL, Inf or is at least as big as the available number of windows, then all available windows are used for the PCA. Can also be a vector, in which case PCA is performed for each component.}
+\item{topVarNum}{Number of most variable windows to keep. Defaults to 1000. If value is NA, NULL, Inf or is at least as big as the available number of windows, then all available windows are used for the UMAP. Can also be a vector, in which case UMAP is performed for each component.}
 
-\item{topVarSamples}{Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case PCA is performed for each list component. If \code{length(topVarNum) > 1}, list should be same length as \code{topVarNum} and each component will be matched with corresponding component of \code{topVarNum}.}
+\item{topVarSamples}{Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case UMAP is performed for each list component. If \code{length(topVarNum) > 1}, list should be same length as \code{topVarNum} and each component will be matched with corresponding component of \code{topVarNum}.}
 
 \item{nPC}{Number of components to be calculated. Default is 2.}
 
@@ -52,7 +52,7 @@ getUMAP(
 }
 \value{
 A list with the following components:
-\item{pcas}{A named list of objects of class prcomp. List names correspond to entries in the \code{params$topVar} component of the output.}
+\item{res}{A named list where each componenet is a matrix of coordinates. List names correspond to entries in the \code{params$topVar} component of the output.}
 \item{samples}{Names of the samples analysed.}
 \item{windows}{A list of names of the windows analysed. List names correspond to entries in the \code{params$topVar} component of the output.}
 \item{dataTable}{If \code{returnDataTable = TRUE}, the table of normalised values. The table will contain windows after filtering based on \code{regionsToOverlap} and \code{minDensity}, but prior to filtering based on \code{topVarNum}. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the \code{params$topVar} component of the output.}
