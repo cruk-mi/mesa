@@ -528,21 +528,31 @@ getDimRed <- function(qseaSet,
     windows <- purrr::map(res, ~ rownames(.x$rotation))
   }
   
+  paramList <- list(method = method,
+                    regionsToOverlap = regionsToOverlap,
+                    normMethod = normMethod,
+                    minEnrichment = minEnrichment,
+                    useGroupMeans = useGroupMeans,
+                    minDensity = minDensity,
+                    topVar = topVar,
+                    windowSdThreshold = th,
+                    scale = scale)
+  
+  if (method == "UMAP") {
+    paramList <- c(paramList, list(nUC = nUC,
+                                   minDist = minDist,
+                                   nNeighbours = nNeighbours,
+                                   ...))
+  } else if (method == "PCA") {
+    paramList <- c(paramList, list(center = center,
+                                   nPC = nPC))
+  }
+  
   out <- list(res = res,
               samples = samples,
               windows = windows,
               dataTable = if (returnDataTable) { dataTable } else { NULL },
-              params = list(method = method,
-                            regionsToOverlap = regionsToOverlap,
-                            normMethod = normMethod,
-                            minEnrichment = minEnrichment,
-                            useGroupMeans = useGroupMeans,
-                            minDensity = minDensity,
-                            topVar = topVar,
-                            windowSdThreshold = th,
-                            center = center,
-                            scale = scale,
-                            nPC = nPC),
+              params = paramList,
               windowFiltering = list(initial = initialNumWindows,
                                      notInRegionsToOverlap = numWindowsRemovedRegionOverlap,
                                      belowMinDensity = numWindowsRemovedMinDensity,
