@@ -14,7 +14,8 @@ getUMAP(
   minDensity = 0,
   topVarNum = 1000,
   topVarSamples = NULL,
-  nPC = 2,
+  scale = FALSE,
+  nUC = 2,
   minDist = 0.1,
   nNeighbours = 5,
   returnDataTable = FALSE,
@@ -40,9 +41,11 @@ getUMAP(
 
 \item{topVarSamples}{Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case UMAP is performed for each list component. If \code{length(topVarNum) > 1}, list should be same length as \code{topVarNum} and each component will be matched with corresponding component of \code{topVarNum}.}
 
-\item{nPC}{Number of components to be calculated. Default is 2.}
+\item{scale}{A logical value indicating if windows should be scaled to have unit variance. Default is FALSE.}
 
-\item{minDist}{The effective minimum distance between embedded points. Smaller values will result in a more clustered/clumped embedding where nearby points on the manifold are drawn closer together, while larger values will result on a more even dispersal of points. The value should be set relative to the spread value, which determines the scale at which embedded points will be spread out.}
+\item{nUC}{Number of UMAP components to be calculated. Default is 2.}
+
+\item{minDist}{The effective minimum distance between embedded points. Smaller values will result in a more clustered/clumped embedding, while larger values will result in a more even dispersal of points. See \code{\link[uwot:umap]{uwot::umap()}} documentation for further details (\code{min_dist} argument).}
 
 \item{nNeighbours}{The size of local neighborhood (in terms of number of neighboring sample points) used for manifold approximation. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100.}
 

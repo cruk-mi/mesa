@@ -21,11 +21,11 @@ plotDimRed(
 )
 }
 \arguments{
-\item{object}{The output from \code{\link[=getPCA]{getPCA()}}.}
+\item{object}{The output from \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}}.}
 
 \item{qseaSet}{The qseaSet object used to generate \code{object}.}
 
-\item{components}{Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3.}
+\item{components}{Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.}
 
 \item{colour}{Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.}
 
@@ -59,7 +59,7 @@ plotDimRed(
 \item{plotlyAnnotations}{Vector of columns to annotate for plotly, e.g. c("group","tissue")}
 }
 \value{
-A list of ggplot objects: one for each combination of \code{object$pcas} or \code{object$umaps}, \code{colour} and \code{components}.
+A list of ggplot objects: one for each combination of \code{object$res}, \code{colour} and \code{components}.
 }
 \description{
 This function takes the output of \code{\link[=getPCA]{getPCA()}} and produces PCA plots.
