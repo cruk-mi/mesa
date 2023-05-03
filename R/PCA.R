@@ -62,6 +62,7 @@ getPCA <- function(qseaSet,
 #' @param minDensity A minimum CpG density level to filter out windows with values lower than.
 #' @param topVarNum Number of most variable windows to keep. Defaults to 1000. If value is NA, NULL, Inf or is at least as big as the available number of windows, then all available windows are used for the UMAP. Can also be a vector, in which case UMAP is performed for each component.
 #' @param topVarSamples Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case UMAP is performed for each list component. If `length(topVarNum) > 1`, list should be same length as `topVarNum` and each component will be matched with corresponding component of `topVarNum`.
+#' @param scale A logical value indicating if windows should be scaled to have unit variance. Default is FALSE.
 #' @param minDist The effective minimum distance between embedded points. Smaller values will result in a more clustered/clumped embedding where nearby points on the manifold are drawn closer together, while larger values will result on a more even dispersal of points. The value should be set relative to the spread value, which determines the scale at which embedded points will be spread out.
 #' @param nNeighbours The size of local neighborhood (in terms of number of neighboring sample points) used for manifold approximation. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100.
 #' @param nUC Number of UMAP components to be calculated. Default is 2.
@@ -85,6 +86,7 @@ getUMAP <- function(qseaSet,
                    minDensity = 0,
                    topVarNum = 1000,
                    topVarSamples = NULL,
+                   scale = FALSE,
                    nUC = 2,
                    minDist = 0.1,
                    nNeighbours = 5,
@@ -101,6 +103,7 @@ getUMAP <- function(qseaSet,
             minDensity = minDensity,
             topVarNum = topVarNum,
             topVarSamples = topVarSamples,
+            scale = scale,
             nUC = nUC,
             minDist = minDist,
             nNeighbours = nNeighbours,
