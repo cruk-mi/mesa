@@ -105,6 +105,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
       filter(sample_name %in% !!(colnames(numData))) %>%
       makeHeatmapAnnotation(orientation = "column",
                             useGroupMeans = useGroupMeans,
+                            specifiedAnnotationColors = annotationColors,
                             sampleAnnotation = {{sampleAnnotation}} )
 
   } else {
@@ -112,6 +113,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
       filter(group %in% !!(colnames(numData))) %>%
       makeHeatmapAnnotation(orientation = "column",
                             useGroupMeans = useGroupMeans,
+                            specifiedAnnotationColors = annotationColors,
                             sampleAnnotation = {{sampleAnnotation}} )
   }
 
@@ -154,6 +156,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             heatmap_legend_param = list(legend_direction = "horizontal",
                                                         at = seq(0, maxScale, length.out = 6) %>% round(1)),
                             column_split = colSplit,
+                            show_column_names = showSampleNames,
                             column_title = NULL,
                             top_annotation = colAnnot) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
@@ -169,6 +172,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 
 makeHeatmapAnnotation <- function(qseaSet,
                                   orientation,
+                                  specifiedAnnotationColors = NA, 
                                   useGroupMeans = FALSE,
                                   sampleAnnotation = NULL){
 
@@ -246,6 +250,23 @@ makeHeatmapAnnotation <- function(qseaSet,
 
   annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
 
+  if(!is.na(specifiedAnnotationColors)){
+    if(!is.list(specifiedAnnotationColors)){
+      stop("Provided annotationColors object should be a list.")
+    }
+    
+    commonNames <- intersect(names(annotationColors),
+                             names(specifiedAnnotationColors))
+    
+    if(length(commonNames)) {
+      for (i in commonNames){
+        annotationColors[[i]] = specifiedAnnotationColors[[i]]
+      }    
+    }
+  
+  }
+  
+  
   annotation_legend_param_ls <- annotationColDf %>%
     colnames() %>%
     purrr::set_names(., nm = .) %>%
@@ -286,7 +307,7 @@ makeHeatmapAnnotation <- function(qseaSet,
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
-                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NULL,
+                            minEnrichment = 3, maxScale = 1, clusterNum = 2, annotationColors = NA,
                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
                             showSampleNames = NULL,
                             downstreamDist = 1000, ...){
@@ -382,6 +403,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
       filter(sample_name %in% !!(colnames(numData))) %>%
       makeHeatmapAnnotation(orientation = "column",
                           useGroupMeans = useGroupMeans,
+                          specifiedAnnotationColors = annotationColors,
                           sampleAnnotation = {{sampleAnnotation}} )
 
   } else {
@@ -389,6 +411,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
       filter(group %in% !!(colnames(numData))) %>%
       makeHeatmapAnnotation(orientation = "column",
                             useGroupMeans = useGroupMeans,
+                            specifiedAnnotationColors = annotationColors,
                             sampleAnnotation = {{sampleAnnotation}} )
   }
 
