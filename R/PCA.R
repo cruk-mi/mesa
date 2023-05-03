@@ -375,7 +375,7 @@ getDimRed <- function(qseaSet,
     dplyr::mutate(windowSdName = ifelse(!is.na(topVarNum), glue::glue("windowSd{dplyr::cur_group_id()}"), NA), .before = 1) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(windowSdName, topVarNum) %>%
-    dplyr::mutate(pcaName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) %>%
+    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) %>%
     dplyr::bind_rows(topVar) %>%
     dplyr::distinct(topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, .keep_all = TRUE)
   
@@ -418,7 +418,7 @@ getDimRed <- function(qseaSet,
       dplyr::left_join(dataTable, .)
   }
   
-  pca <- topVar %>%
+  res <- topVar %>%
     dplyr::group_by(windowSdName) %>%
     dplyr::group_map(.keep = TRUE, .f = function(sdGp, sdName) {
       
@@ -427,7 +427,7 @@ getDimRed <- function(qseaSet,
           dplyr::arrange(dplyr::desc(!!dplyr::sym(sdName$windowSdName)))
       }
       
-      purrr::pmap(sdGp, function(pcaName, windowSdName, topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, inputChanged) {
+      purrr::pmap(sdGp, function(resName, windowSdName, topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, inputChanged) {
         
         if (!is.na(windowSdName)) {
           th <- dataTable %>%
@@ -465,7 +465,7 @@ getDimRed <- function(qseaSet,
           dplyr::select(tidyr::all_of(samples))
         
         message(glue::glue("Performing {method} with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
-                           -> {pcaName}.
+                           -> {resName}.
                              \n"))
         
         dataTable <- dataTable %>%
@@ -495,30 +495,30 @@ getDimRed <- function(qseaSet,
           
           colnames(uwotObj) <- paste0("UMAP",seq_along(1:ncol(uwotObj)))
           
-          return(list(prcompObj =  list(x = uwotObj, windows = colnames(dataTable)), th = th))
+          return(list(resObj =  list(x = uwotObj, windows = colnames(dataTable)), th = th))
           
         } else if (method == "PCA") {
           
           prcompObj <- dataTable %>%
             stats::prcomp(center = center, scale. = scale, rank. = nPC)
           
-          return(list(prcompObj = prcompObj, th = th))
+          return(list(resObj = prcompObj, th = th))
           
         } else {
           stop(glue::glue("Method {method} not known! Options are PCA or UMAP."))
         }
         
       }) %>%
-        purrr::set_names(sdGp$pcaName)
+        purrr::set_names(sdGp$resName)
     }) %>%
     purrr::list_flatten()
   
   message("------------------------------")
   
-  th <- purrr::map(pca, "th") %>%
+  th <- purrr::map(res, "th") %>%
     unlist()
   
-  res <- purrr::map(pca, "prcompObj")
+  res <- purrr::map(res, "resObj")
   
   if (method == "UMAP") {
     windows <- purrr::map(res, "windows")
