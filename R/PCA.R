@@ -758,7 +758,7 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 plotPCA <- function(object,
                     qseaSet,
-                    components = list(c(1, 2)),
+                    components = list(c(1, 2), c(2, 3)),
                     colour = NULL,
                     colourPalette = NULL,
                     NAcolour = "grey50",
@@ -864,7 +864,7 @@ plotDimRed <- function(object,
   if (!is.qseaSet(qseaSet)) {
     stop("Second argument should be a qseaSet")
   }
-
+  
   if (!is.list(components)) {
     components <- list(components)
   }
@@ -885,7 +885,7 @@ plotDimRed <- function(object,
 
   components <- components %>% purrr::set_names(purrr::map(components, ~ glue::glue("{columnPrefix}{.x}") %>% glue::glue_collapse("vs")))
 
-  ggp <- purrr::imap(object$res, function(pca, pcaName) {
+  ggp <- purrr::imap(object$res, function(pca, resName) {
 
     propVar <- pca$sdev ^ 2 / sum(pca$sdev ^ 2)
     propVar <- round(propVar * 100, 2)
@@ -920,20 +920,21 @@ plotDimRed <- function(object,
       colour <- "NULLcol"
     }
 
-    makePlot <- function(PCs, plotData, my_geom_point, my_scale_colour, my_scale_shape) {
+    makePlot <- function(components, plotData, my_geom_point, my_scale_colour, my_scale_shape) {
+      
+      env <- new.env(parent = globalenv())
+      env$plotData <- plotData
+      env$columnPrefix <- columnPrefix
+      env$components <- components
+      env$plotlyAnnotations <- plotlyAnnotations
 
-      # env <- new.env(parent = globalenv())
-      # env$plotData <- plotData
-      # env$PCs <- PCs
-      # env$plotlyAnnotations <- plotlyAnnotations
-
-      topVarInfo <- object$params$topVar %>% filter(pcaName == !!pcaName)
+      topVarInfo <- object$params$topVar %>% filter(resName == !!resName)
 
       if (is.na(topVarInfo$topVarNum)) {
-        titleString <- glue::glue("all {length(object$windows[[pcaName]])} windows")
+        titleString <- glue::glue("all {length(object$windows[[resName]])} windows")
         subtitleString <- glue::glue("Using {object$params$normMethod} values.")
       } else {
-        titleString <- glue::glue("top {length(object$windows[[pcaName]])} most variable windows")
+        titleString <- glue::glue("top {length(object$windows[[resName]])} most variable windows")
         if (length(topVarInfo$topVarSamples[[1]]) == length(object$samples)) {
           titleSubstring <- "all "
         } else {
@@ -942,14 +943,14 @@ plotDimRed <- function(object,
         subtitleString <- glue::glue("Using {object$params$normMethod} values and {titleSubstring}{length(topVarInfo$topVarSamples[[1]])} samples to calculate std dev.")
       }
 
-      ggp <- #with(env, {
+      ggp <- with(env, {
         ggplot2::ggplot(plotData,
-                        ggplot2::aes(!!rlang::sym(glue::glue("{columnPrefix}{PCs[1]}")),
-                                     !!rlang::sym(glue::glue("{columnPrefix}{PCs[2]}")),
+                        ggplot2::aes(!!rlang::sym(glue::glue("{columnPrefix}{components[1]}")),
+                                     !!rlang::sym(glue::glue("{columnPrefix}{components[2]}")),
                                      label = sample_name,
                                      !!!rlang::syms(plotlyAnnotations)
-                        )) +
-      #}) +
+                        ))
+      }) +
         my_geom_point +
         my_scale_colour +
         my_scale_shape +
@@ -960,8 +961,8 @@ plotDimRed <- function(object,
 
       if (object$params$method == "PCA") {
         ggp <- ggp +
-          ggplot2::xlab(glue::glue("PC{PCs[1]} ({propVar[PCs[1]]}%)")) +
-          ggplot2::ylab(glue::glue("PC{PCs[2]} ({propVar[PCs[2]]}%)"))
+          ggplot2::xlab(glue::glue("PC{components[1]} ({propVar[components[1]]}%)")) +
+          ggplot2::ylab(glue::glue("PC{components[2]} ({propVar[components[2]]}%)"))
       }
 
       if (showSampleNames) {
