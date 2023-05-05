@@ -10,17 +10,17 @@ test_that("PCAs", {
 
   expect_no_error(obj7 <- exampleTumourNormal %>% getPCA(dataTable = getBetaTable(exampleTumourNormal)) )
 
-  expect_true( isTRUE(all.equal(obj1$fit$pca1$x,obj2$fit$pca1$x)))
-  expect_false(isTRUE(all.equal(obj3$fit$pca1$x,obj4$fit$pca1$x)))
-  expect_false(isTRUE(all.equal(obj1$fit$pca1$x,obj5$fit$pca1$x)))
-  expect_false(isTRUE(all.equal(obj1$fit$pca1$x,obj6$fit$pca1$x)))
-  expect_true( isTRUE(all.equal(obj1$fit$pca1$x,obj7$fit$pca1$x)))
+  expect_true( isTRUE(all.equal(obj1$res$pca1$x,obj2$res$pca1$x)))
+  expect_false(isTRUE(all.equal(obj3$res$pca1$x,obj4$res$pca1$x)))
+  expect_false(isTRUE(all.equal(obj1$res$pca1$x,obj5$res$pca1$x)))
+  expect_false(isTRUE(all.equal(obj1$res$pca1$x,obj6$res$pca1$x)))
+  expect_true( isTRUE(all.equal(obj1$res$pca1$x,obj7$res$pca1$x)))
 
-  expect_equal(length(obj1$fit), 1)
+  expect_equal(length(obj1$res), 1)
 
-  expect_equal(length(obj6$fit), 3)
-  expect_false(isTRUE(all.equal(obj6$fit$pca1$x,obj6$fit$pca2$x)))
-  expect_false(isTRUE(all.equal(obj6$fit$pca1$x,obj6$fit$pca3$x)))
+  expect_equal(length(obj6$res), 3)
+  expect_false(isTRUE(all.equal(obj6$res$pca1$x,obj6$res$pca2$x)))
+  expect_false(isTRUE(all.equal(obj6$res$pca1$x,obj6$res$pca3$x)))
 
   expect_no_error(plots1 <- plotPCA(obj1, exampleTumourNormal))
   expect_no_error(plots6 <- plotPCA(obj6, exampleTumourNormal))
@@ -66,17 +66,17 @@ test_that("UMAPs", {
   set.seed(1)
   expect_no_error(obj7 <- exampleTumourNormal %>% getUMAP(dataTable = getBetaTable(exampleTumourNormal)) )
 
-  expect_true(isTRUE(all.equal(obj1$fit$umap1$x,obj2$fit$umap1$x)))
-  expect_false(isTRUE(all.equal(obj3$fit$umap1$x,obj4$fit$umap1$x)))
-  expect_false(isTRUE(all.equal(obj1$fit$umap1$x,obj5$fit$umap1$x)))
-  expect_false(isTRUE(all.equal(obj1$fit$umap1$x,obj6$fit$umap1$x)))
-  expect_true(isTRUE(all.equal(obj1$fit$umap1$x,obj7$fit$umap1$x)))
+  expect_true(isTRUE(all.equal(obj1$res$umap1$x,obj2$res$umap1$x)))
+  expect_false(isTRUE(all.equal(obj3$res$umap1$x,obj4$res$umap1$x)))
+  expect_false(isTRUE(all.equal(obj1$res$umap1$x,obj5$res$umap1$x)))
+  expect_false(isTRUE(all.equal(obj1$res$umap1$x,obj6$res$umap1$x)))
+  expect_true(isTRUE(all.equal(obj1$res$umap1$x,obj7$res$umap1$x)))
 
-  expect_equal(length(obj1$fit), 1)
+  expect_equal(length(obj1$res), 1)
 
-  expect_equal(length(obj6$fit), 3)
-  expect_false(isTRUE(all.equal(obj6$fit$umap1$x,obj6$fit$umap2$x)))
-  expect_false(isTRUE(all.equal(obj6$fit$umap1$x,obj6$fit$umap3$x)))
+  expect_equal(length(obj6$res), 3)
+  expect_false(isTRUE(all.equal(obj6$res$umap1$x,obj6$res$umap2$x)))
+  expect_false(isTRUE(all.equal(obj6$res$umap1$x,obj6$res$umap3$x)))
 
   expect_no_error(plots1 <- plotUMAP(obj1, exampleTumourNormal))
   expect_no_error(plots6 <- plotUMAP(obj6, exampleTumourNormal))
