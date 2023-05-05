@@ -17,6 +17,7 @@ plotDimRed(
   NAshape = NULL,
   showSampleNames = FALSE,
   pointSize = 2,
+  alpha = 1,
   plotlyAnnotations = ""
 )
 }
@@ -54,7 +55,9 @@ plotDimRed(
 
 \item{showSampleNames}{Logical indicating whether to show the sample names.}
 
-\item{pointSize}{Numeric value to set the size of the points}
+\item{pointSize}{Numeric value to set the size of the points. Default is 2.}
+
+\item{alpha}{Numeric value between 0 and 1 to set alpha of points. Default is 1.}
 
 \item{plotlyAnnotations}{Vector of columns to annotate for plotly, e.g. c("group","tissue")}
 }

@@ -623,17 +623,17 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
 
 }
 
-getGeomPoint <- function(cV, shape, my_scale_shape, pointSize) {
+getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
 
   filledShapes <- ifelse(my_scale_shape$scale_name == "manual" & any(my_scale_shape$palette(1) %in% 21:25),
                          TRUE, FALSE)
 
   if (filledShapes) {
     my_geom_point <- ggplot2::geom_point(ggplot2::aes(fill = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
-                                         colour = "black", size = pointSize)
+                                         colour = "black", size = pointSize, alpha = alpha)
   } else {
     my_geom_point <- ggplot2::geom_point(ggplot2::aes(colour = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
-                                         size = pointSize)
+                                         size = pointSize, alpha = alpha)
   }
 
   return(my_geom_point)
@@ -743,6 +743,7 @@ plotPCA <- function(object,
                     NAshape = NULL,
                     showSampleNames = FALSE,
                     pointSize = 2,
+                    alpha = 1,
                     plotlyAnnotations = "") {
 
   out <- plotDimRed(object = object,
@@ -757,6 +758,7 @@ plotPCA <- function(object,
              NAshape = NAshape,
              showSampleNames = showSampleNames,
              pointSize = pointSize,
+             alpha = alpha,
              plotlyAnnotations = plotlyAnnotations)
 
   return(out)
@@ -774,6 +776,7 @@ plotUMAP <- function(object,
                      NAshape = NULL,
                      showSampleNames = FALSE,
                      pointSize = 2,
+                     alpha = 1,
                      plotlyAnnotations = "") {
 
   out <- plotDimRed(object = object,
@@ -788,6 +791,7 @@ plotUMAP <- function(object,
              NAshape = NAshape,
              showSampleNames = showSampleNames,
              pointSize = pointSize,
+             alpha = alpha,
              plotlyAnnotations = plotlyAnnotations)
 
   return(out)
@@ -812,7 +816,8 @@ plotUMAP <- function(object,
 #' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
 #' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
 #' @param showSampleNames Logical indicating whether to show the sample names.
-#' @param pointSize Numeric value to set the size of the points
+#' @param pointSize Numeric value to set the size of the points. Default is 2.
+#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A list of ggplot objects: one for each combination of `object$res`, `colour` and `components`.
 #' @export
@@ -829,6 +834,7 @@ plotDimRed <- function(object,
                     NAshape = NULL,
                     showSampleNames = FALSE,
                     pointSize = 2,
+                    alpha = 1,
                     plotlyAnnotations = ""
 ){
 
@@ -956,7 +962,7 @@ plotDimRed <- function(object,
 
       my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = NAshape)
 
-      my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize)
+      my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
       my_scale_colour <- ggplot2::scale_colour_identity()
 
@@ -981,7 +987,7 @@ plotDimRed <- function(object,
 
         my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType)
 
-        my_geom_point <- getGeomPoint(cV, shape, my_scale_shape, pointSize = pointSize)
+        my_geom_point <- getGeomPoint(cV, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
         my_scale_colour <- getColourScale(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour = NAcolour, symDivColourScale = symDivColourScale)
 
