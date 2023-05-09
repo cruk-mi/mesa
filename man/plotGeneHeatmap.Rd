@@ -19,6 +19,7 @@ plotGeneHeatmap(
   scaleRows = FALSE,
   clusterCols = TRUE,
   mart = NULL,
+  showSampleNames = NULL,
   downstreamDist = 1000,
   ...
 )
@@ -51,6 +52,8 @@ plotGeneHeatmap(
 \item{clusterCols}{Whether to cluster the columns or not.}
 
 \item{mart}{A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.}
+
+\item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
 
 \item{downstreamDist}{Number of basepairs downstream of the gene to include.}
 
