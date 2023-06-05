@@ -125,7 +125,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     dataTab <- remove_almost_empty_rows(dataTab)
   }
 
-  if (clusterCols & !is.null(clusterNum) & clusterNum > 1) {
+  if (clusterCols && !is.null(clusterNum) && clusterNum > 1) {
     colSplit <- clusterNum
   } else {
     colSplit <- NULL
@@ -456,7 +456,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   col_fun = circlize::colorRamp2(seq(0, maxScale, length.out = 9),
                                  RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
-  if (clusterCols & !is.null(clusterNum) & clusterNum > 1) {
+  if (clusterCols && !is.null(clusterNum) && clusterNum > 1) {
     colSplit <- clusterNum
   } else {
     colSplit <- NULL
