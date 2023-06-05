@@ -1,5 +1,7 @@
 test_that("PCAs", {
     
+    library(rlang)
+
     # Test that getPCA() returns a valid result for various input arguments
     expect_no_error(obj1 <- exampleTumourNormal %>% getPCA())
     expect_no_error(obj2 <- exampleTumourNormal %>% getPCA(returnDataTable = TRUE))
