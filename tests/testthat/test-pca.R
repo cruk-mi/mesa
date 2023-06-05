@@ -29,7 +29,7 @@ test_that("PCAs", {
     expect_equal(dim(obj1$res$pca1$x), dim(obj7$res$pca1$x))
     
     # Test that the variance_explained component is a numeric vector
-    expect_true(is.numeric(obj1$res$pca1$variance_explained))
+    expect_true(is.numeric(obj1$res$pca1$sdev))
     
     # Test that getPCA() returns an error when called with invalid arguments
     expect_error(exampleTumourNormal %>% getPCA("invalid_argument"))
@@ -63,8 +63,8 @@ test_that("PCAs", {
     expect_equal(length(plots6), 3)
     
     # Test that plotPCA() returns a ggplot object
-    expect_equal(class(plots1 <- plotPCA(obj1, exampleTumourNormal)), "ggplot")
-    expect_equal(class(plots6 <- plotPCA(obj6, exampleTumourNormal)), "ggplot")
+    expect_true( "ggplot" %in% class(plots1[[1]][[1]]))
+    expect_true( "ggplot" %in% class(plots6[[1]][[1]]))
     
     # Test other arguments of plotPCA()
     expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "type"))
