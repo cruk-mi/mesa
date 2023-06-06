@@ -731,6 +731,30 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 }
 
+#' This function takes the output of [getPCA()] and produces plots.
+#' @param object The output from [getPCA()].
+#' @param qseaSet The qseaSet object used to generate `object`.
+#' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
+#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
+#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
+#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
+#' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
+#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
+#' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
+#' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
+#' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
+#'     * "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
+#'     * "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
+#'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
+#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
+#' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
+#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
+#' @param showSampleNames Logical indicating whether to show the sample names.
+#' @param pointSize Numeric value to set the size of the points. Default is 2.
+#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
+#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
+#' @return A list of ggplot objects: one for each combination of `object$res`, `colour` and `components`.
+#' @export
 plotPCA <- function(object,
                     qseaSet,
                     components = list(c(1, 2), c(2, 3)),
@@ -764,6 +788,30 @@ plotPCA <- function(object,
   return(out)
 }
 
+#' This function takes the output of [getUMAP()] and produces plots.
+#' @param object The output from [getUMAP()].
+#' @param qseaSet The qseaSet object used to generate `object`.
+#' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
+#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
+#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
+#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
+#' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
+#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
+#' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
+#' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
+#' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
+#'     * "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
+#'     * "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
+#'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
+#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
+#' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
+#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
+#' @param showSampleNames Logical indicating whether to show the sample names.
+#' @param pointSize Numeric value to set the size of the points. Default is 2.
+#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
+#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
+#' @return A list of ggplot objects: one for each combination of `object$res`, `colour` and `components`.
+#'
 plotUMAP <- function(object,
                      qseaSet,
                      components = list(c(1, 2)),
@@ -797,7 +845,7 @@ plotUMAP <- function(object,
   return(out)
 }
 
-#' This function takes the output of [getPCA()] and produces PCA plots.
+#' This function takes the output of [getPCA()] or [getUMAP()] and produces plots.
 #' @param object The output from [getPCA()] or [getUMAP()].
 #' @param qseaSet The qseaSet object used to generate `object`.
 #' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
@@ -820,7 +868,6 @@ plotUMAP <- function(object,
 #' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A list of ggplot objects: one for each combination of `object$res`, `colour` and `components`.
-#' @export
 #'
 plotDimRed <- function(object,
                     qseaSet,

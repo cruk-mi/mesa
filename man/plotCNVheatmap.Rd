@@ -4,12 +4,19 @@
 \alias{plotCNVheatmap}
 \title{This function takes a qseaSet and plots a heatmap of the calculated CNV}
 \usage{
-plotCNVheatmap(qseaSet, sampleAnnotation = NULL, clusterRows = TRUE)
+plotCNVheatmap(
+  qseaSet,
+  sampleAnnotation = NULL,
+  annotationColors = NA,
+  clusterRows = TRUE
+)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
 \item{sampleAnnotation}{Columns of the sampleTable to use to annotation the plot with.}
+
+\item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
 
 \item{clusterRows}{Whether to cluster the rows of the heatmap}
 }
