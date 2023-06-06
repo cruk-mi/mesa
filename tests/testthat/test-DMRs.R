@@ -124,7 +124,7 @@ test_that("plotting DMRs", {
 
   BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 
-  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 10000) %>%
+  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000) %>%
     mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
                variableWithOneLevel = "Test",
                experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
@@ -159,9 +159,9 @@ test_that("plotting DMRs", {
   
   expect_no_error(randomSet %>%
                     plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
-                                       clusterRows = TRUE,
+                                       clusterRows = FALSE,
                                        sampleAnnotation = "experiment",
-                                       windowAnnotation = "Tumor_vs_Normal_log2FC"))
+                                       windowAnnotation = c("CpG_density","Tumor_vs_Normal_log2FC")))
   
   
   })
