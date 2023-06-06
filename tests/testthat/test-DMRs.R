@@ -122,9 +122,9 @@ test_that("Calculating DMRs", {
 
 test_that("plotting DMRs", {
 
-  BiocParallel::SerialParam()
+  BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 
-  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
+  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 10000) %>%
     mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
                variableWithOneLevel = "Test",
                experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
@@ -137,7 +137,7 @@ test_that("plotting DMRs", {
 
 
   expect_no_error( randomSet %>%
-    plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) )) #expect no error
+    plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) )) 
 
   expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
@@ -146,4 +146,22 @@ test_that("plotting DMRs", {
   expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE))
+  
+  expect_no_error(randomSet %>%
+                     plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                                        sampleAnnotation = "experiment",
+                                        windowAnnotation = "Tumor_vs_Normal_log2FC")) 
+  
+  expect_no_error(randomSet %>%
+                     plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) %>% arrange(CpG_density),
+                                        sampleAnnotation = "experiment",
+                                        windowAnnotation = "Tumor_vs_Normal_log2FC")) 
+  
+  expect_no_error(randomSet %>%
+                    plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                                       clusterRows = TRUE,
+                                       sampleAnnotation = "experiment",
+                                       windowAnnotation = "Tumor_vs_Normal_log2FC"))
+  
+  
   })

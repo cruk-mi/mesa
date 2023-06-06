@@ -96,11 +96,20 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
   }
 
   numData <- dataTab %>%
+    tibble::column_to_rownames("window") %>%
     dplyr::select(tidyselect::all_of(colsToFind)) %>%
     clipFn(a = 0, b = clip) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%
     janitor::remove_empty(which = "rows", quiet = FALSE)
 
+  if (clusterRows) {
+    numData <- numData %>% 
+      remove_almost_empty_rows()
+  }
+  
+  dataTab <- dataTab %>%
+    filter(window %in% rownames(numData))
+  
   if (!useGroupMeans) {
 
     colAnnot <- qseaSet %>%
@@ -128,24 +137,30 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                      plyranges::as_granges(),
                                    suffix = c("",".regionsToOverlap")) %>%
       tibble::as_tibble() %>%
-      dplyr::select(window, .rowID, {{windowAnnotation}}) %>%
-      dplyr::arrange(.rowID) %>%
+      dplyr::select(window, .rowID, {{windowAnnotation}})
+    
+    if(!clusterRows) {
+      rowAnnotDf <- rowAnnotDf  %>%
+        dplyr::arrange(.rowID)
+    }
+    
+     rowAnnotDf <- rowAnnotDf %>%
       dplyr::select(-.rowID) %>%
       tibble::column_to_rownames("window")
   
      rowAnnot <- ComplexHeatmap::HeatmapAnnotation(which = "row",
                                                    df    = rowAnnotDf,
                                                    show_annotation_name    = FALSE)
+     
+     numData <- numData[rownames(rowAnnotDf),] 
+
+     
   } else {
     rowAnnot <- NULL
   }
   
   if (ncol(dataTab) == 1) {
     clusterCols <- FALSE
-  }
-
-  if (clusterRows) {
-    dataTab <- remove_almost_empty_rows(dataTab)
   }
 
   if (clusterCols) {
@@ -167,6 +182,13 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     }
   }
 
+  if(clusterRows){
+    if(numData %>% dist() %>% is.na() %>% sum() > 0) {
+      message("Can not cluster rows due to too many missing values, setting clusterRows to be FALSE")
+      clusterRows <- FALSE
+    }
+  }
+  
   numData %>%
     as.matrix() %>%
     ComplexHeatmap::Heatmap(name = annotName,
