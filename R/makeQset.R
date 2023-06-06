@@ -44,7 +44,7 @@ makeQset <- function(sampleTable,
       message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
       parallel = FALSE
     } else {
-      message("Detected parallel setup with {BiocParallel::bpworkers()} workers.")
+      message(glue::glue("Detected parallel setup with {BiocParallel::bpworkers()} workers."))
     }
     
   }
