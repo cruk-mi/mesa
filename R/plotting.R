@@ -23,6 +23,7 @@
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
+                                rowAnnotation = NULL,
                                 annotationColors = NA,
                                 useGroupMeans = FALSE,
                                 clusterRows = FALSE,
@@ -107,7 +108,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             useGroupMeans = useGroupMeans,
                             specifiedAnnotationColors = annotationColors,
                             sampleAnnotation = {{sampleAnnotation}} )
-
+  
   } else {
     colAnnot <- qseaSet %>%
       filter(group %in% !!(colnames(numData))) %>%
@@ -117,6 +118,27 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             sampleAnnotation = {{sampleAnnotation}} )
   }
 
+  if( !is.null(rowAnnotation)) {
+    rowAnnotDf <- dataTab %>% 
+      plyranges::as_granges() %>% 
+      plyranges::join_overlap_left(regionsToOverlap %>% 
+                                     tibble::as_tibble() %>% 
+                                     tibble::rowid_to_column(".rowID") %>% 
+                                     plyranges::as_granges(),
+                                   suffix = c("",".regionsToOverlap")) %>%
+      tibble::as_tibble() %>%
+      dplyr::select(window, .rowID, {{rowAnnotation}}) %>%
+      dplyr::arrange(.rowID) %>%
+      dplyr::select(-.rowID) %>%
+      tibble::column_to_rownames("window")
+  
+     rowAnnot <- ComplexHeatmap::HeatmapAnnotation(which = "row",
+                                                   df    = rowAnnotDf,
+                                                   show_annotation_name    = FALSE)
+  } else {
+    rowAnnot <- NULL
+  }
+  
   if (ncol(dataTab) == 1) {
     clusterCols <- FALSE
   }
@@ -158,7 +180,8 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             column_split = colSplit,
                             show_column_names = showSampleNames,
                             column_title = NULL,
-                            top_annotation = colAnnot) %>%
+                            top_annotation = colAnnot,
+                            left_annotation = rowAnnot) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
                          annotation_legend_side = annotationPosition,
                          column_title = title,
