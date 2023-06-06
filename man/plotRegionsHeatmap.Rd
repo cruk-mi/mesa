@@ -9,6 +9,7 @@ plotRegionsHeatmap(
   regionsToOverlap = NULL,
   normMethod = "beta",
   sampleAnnotation = NULL,
+  windowAnnotation = NULL,
   annotationColors = NA,
   useGroupMeans = FALSE,
   clusterRows = FALSE,
@@ -32,7 +33,9 @@ plotRegionsHeatmap(
 
 \item{normMethod}{Whether to plot nrpm values or beta values.}
 
-\item{sampleAnnotation}{A character vector with names of columns from the sampleTable to use as annotation, or a pre-defined annotation data frame.}
+\item{sampleAnnotation}{A character vector with names of columns from the sampleTable to use as annotation.}
+
+\item{windowAnnotation}{A character vector with names of columns from the qseaSet regions or the regionsToOverlap data, to use as row annotations.}
 
 \item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
 

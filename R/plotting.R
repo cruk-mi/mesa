@@ -4,7 +4,8 @@
 #' @param regionsToOverlap A genomic ranges to plot.
 #' @param normMethod Whether to plot nrpm values or beta values.
 #' @param useGroupMeans Whether to average samples over the group column (i.e. combine replicates)
-#' @param sampleAnnotation A character vector with names of columns from the sampleTable to use as annotation, or a pre-defined annotation data frame.
+#' @param sampleAnnotation A character vector with names of columns from the sampleTable to use as annotation.
+#' @param windowAnnotation A character vector with names of columns from the qseaSet regions or the regionsToOverlap data, to use as row annotations.
 #' @param clusterNum A number of clusters to break the column dendrogram into.
 #' @param maxScale The maximum of the scale, not used when plotting beta values.
 #' @param clip An upper level to clip the data at, anything higher than this is replaced with the clip value.
@@ -23,7 +24,7 @@
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
-                                rowAnnotation = NULL,
+                                windowAnnotation = NULL,
                                 annotationColors = NA,
                                 useGroupMeans = FALSE,
                                 clusterRows = FALSE,
@@ -118,7 +119,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             sampleAnnotation = {{sampleAnnotation}} )
   }
 
-  if( !is.null(rowAnnotation)) {
+  if( !is.null(windowAnnotation)) {
     rowAnnotDf <- dataTab %>% 
       plyranges::as_granges() %>% 
       plyranges::join_overlap_left(regionsToOverlap %>% 
@@ -127,7 +128,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                      plyranges::as_granges(),
                                    suffix = c("",".regionsToOverlap")) %>%
       tibble::as_tibble() %>%
-      dplyr::select(window, .rowID, {{rowAnnotation}}) %>%
+      dplyr::select(window, .rowID, {{windowAnnotation}}) %>%
       dplyr::arrange(.rowID) %>%
       dplyr::select(-.rowID) %>%
       tibble::column_to_rownames("window")
