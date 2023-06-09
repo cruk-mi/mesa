@@ -53,7 +53,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
       dplyr::arrange(group1, group2)
 
     DMRtable <- DMRtable %>%
-      dplyr::select(-tidyselect::matches("nrpm|_beta|means")) %>%
+      dplyr::select(-tidyselect::matches("_nrpm$|_beta$|_means$")) %>%
       pivotDMRsLonger(FDRthres = FDRthres)
 
   } else {
