@@ -244,17 +244,17 @@ addBamCoveragePairedAndUnpaired <- function(qs,
                                             maxInsertSize = 1000,
                                             minInsertSize = 100,
                                             minReferenceLength = 30,
-                                            parallel = FALSE,
+                                            parallel = TRUE,
                                             properPairsOnly = FALSE) {
   sampleTable = qsea::getSampleTable(qs)
   Regions = qsea::getRegions(qs)
 
-  if (parallel) {
+  if (parallel & (BiocParallel::bpworkers() > 1)) {
     BPPARAM = BiocParallel::bpparam()
-    message(glue::glue("Scanning {BiocParallel::bpnworkers(BPPARAM)} files in parallel. Use e.g. register(MulticoreParam(workers = 4)) to constrain."))
+    message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel.")
   } else {
     BPPARAM = BiocParallel::SerialParam()
-    message("Scanning one file at a time.")
+    message("Scanning one file at a time. Use e.g. register(MulticoreParam(workers = 4)) to parallelise this process.")
     }
 
   getCGPositions(qsea:::getGenome(qs), qs %>% qsea::getRegions()  %>%

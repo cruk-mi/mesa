@@ -39,6 +39,16 @@ makeQset <- function(sampleTable,
                      properPairsOnly = FALSE,
                      parallel = TRUE) {
 
+  if(parallel) {
+    if(BiocParallel::bpworkers() == 1){
+      message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
+      parallel = FALSE
+    } else {
+      message(glue::glue("Detected parallel setup with {BiocParallel::bpworkers()} workers."))
+    }
+    
+  }
+  
   if (!is.null(fragmentType)) {
     if (fragmentType %in% c("Sheared","sheared") ) {
       fragmentLength = 213
@@ -81,8 +91,6 @@ makeQset <- function(sampleTable,
       stop(glue::glue("Input file not found for: {dplyr::filter(sampleTable,!file.exists(input_file)) %>% dplyr::pull(input_file)}. "))
     }
   }
-
-
 
   if (is.null(badRegions)) {
     badRegions <- GenomicRanges::GRanges()
@@ -135,7 +143,6 @@ makeQset <- function(sampleTable,
                                  minMapQual = minMapQual
     )
 
-    #this is included in the PairedAndR1s method more efficiently, don't need to call it there.
     qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(is.numeric(BiocParallel::bpworkers()), BiocParallel::bpworkers(), 1), nonEnrich = FALSE)
 
   } else if (coverageMethod == "PairedAndR1s") {
