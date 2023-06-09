@@ -100,12 +100,13 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   
   
   message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))
+  
   qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
                                              design,
                                              keep = keepIndex,
                                              minRowSum = 0,
                                              norm_method = "beta",
-                                             parallel = TRUE,
+                                             parallel = (BiocParallel::bpworkers() > 1),
                                              verbose = FALSE))
   
   pb$tick()

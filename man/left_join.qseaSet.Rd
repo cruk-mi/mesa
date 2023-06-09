@@ -4,7 +4,15 @@
 \alias{left_join.qseaSet}
 \title{This function extends the dplyr function left_join to act on qseaSet sampleTable.}
 \usage{
-\method{left_join}{qseaSet}(x, y, by = NULL, copy, suffix, ..., keep)
+\method{left_join}{qseaSet}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
+  keep = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A qseaSet to join data onto the sampleTable of}
@@ -18,9 +26,9 @@ This allows you to join tables across srcs, but it is a potentially expensive op
 
 \item{suffix}{If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.}
 
-\item{...}{Other arguments to pass to dplyr::left_join}
-
 \item{keep}{Should the join keys from both x and y be preserved in the output?}
+
+\item{...}{Other arguments to pass to dplyr::left_join}
 }
 \value{
 A qseaSet object with the sampleTable changed by a call to dplyr::left_join
