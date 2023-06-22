@@ -250,7 +250,7 @@ makeHeatmapAnnotation <- function(qseaSet,
 
   annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
 
-  if(!is.na(specifiedAnnotationColors)){
+  if(all(!is.na(specifiedAnnotationColors))){
     if(!is.list(specifiedAnnotationColors)){
       stop("Provided annotationColors object should be a list.")
     }
