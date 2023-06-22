@@ -811,6 +811,7 @@ plotPCA <- function(object,
 #' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A list of ggplot objects: one for each combination of `object$res`, `colour` and `components`.
+#' @export
 #'
 plotUMAP <- function(object,
                      qseaSet,
