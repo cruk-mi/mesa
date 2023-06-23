@@ -196,7 +196,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   col_list_cat <- levs %>%
     unlist() %>%
     length() %>%
-    hues::iwanthue(plot=FALSE) %>%
+    hues::iwanthue(plot=FALSE, cmin = 25) %>%
     purrr::set_names(levs %>% unlist()) %>%
     utils::relist(levs) %>%
     purrr::map2(levs, purrr::set_names)
@@ -277,6 +277,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   annot <- ComplexHeatmap::HeatmapAnnotation(which = orientation,
                                              df    = annotationColDf,
                                              col   = annotationColors,
+                                             na_col = "grey50",
                                              annotation_legend_param = annotation_legend_param_ls,
                                              show_annotation_name    = FALSE)
 
