@@ -260,6 +260,9 @@ makeHeatmapAnnotation <- function(qseaSet,
     
     if(length(commonNames)) {
       for (i in commonNames){
+        if(!all(names(annotationColors[[i]]) %in% names(specifiedAnnotationColors[[i]]))){
+          stop(glue::glue("Must provide colours for all levels of annotation \'{i}\'."))
+        }
         annotationColors[[i]] = specifiedAnnotationColors[[i]]
       }    
     }
