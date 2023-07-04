@@ -1,4 +1,3 @@
-
 #' This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap
 #' @param qseaSet The qseaSet object.
 #' @param regionsToOverlap A genomic ranges to plot.
