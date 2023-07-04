@@ -146,4 +146,14 @@ test_that("plotting DMRs", {
   expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE))
+  
+  expect_no_error( randomSet %>% 
+                  plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                                     sampleAnnotation = c("group", "experiment"),
+                                     annotationColors = list(group = c("Tumor" = "blue", "Normal" = "red"))))
+
+  expect_no_error( randomSet %>% 
+                  plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                                     sampleAnnotation = c("group", "experiment"),
+                                     annotationColors = list(group = c("Tumor" = "blue", "Normal" = "red"), experiment = c("A" = "green", "B" = "orange"))))
   })
