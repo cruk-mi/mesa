@@ -18,7 +18,8 @@ calculateDMRs(
   keepContrastMeans = TRUE,
   keepData = FALSE,
   keepGroupMeans = FALSE,
-  direction = "both"
+  direction = "both",
+  shareDispersionOutsideContrasts = FALSE
 )
 }
 \arguments{
@@ -48,7 +49,10 @@ calculateDMRs(
 
 \item{keepGroupMeans}{Whether to keep the group means in the output}
 
-\item{direction}{Whether to keep regions that are up/down/both.}
+\item{direction}{Whether to keep regions that are up/down/both.#'}
+
+\item{shareDispersionOutsideContrasts}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
+Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
 }
 \value{
 A tibble with the data

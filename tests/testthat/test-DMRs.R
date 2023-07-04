@@ -129,6 +129,16 @@ test_that("Calculating DMRs", {
   expect_equal(testWithFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")), 
                testNoFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")))
   
+  testNoFilterShared <- exampleTumourNormal %>%
+    filter(type %in% c("LUAD", "NormalLung")) %>%
+    calculateDMRs(variable = "type", 
+                  contrasts = "LUAD_vs_NormalLung",
+                  shareDispersionOutsideContrasts = TRUE
+                  )  
+  
+  expect_not_equal(testNoFilter %>% nrow(), 
+               testNoFilterShared %>% nrow())
+  
 })
 
 test_that("plotting DMRs", {

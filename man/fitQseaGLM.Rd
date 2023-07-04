@@ -13,7 +13,8 @@ fitQseaGLM(
   minReadCount = 0,
   minNRPM = 1,
   checkPVals = TRUE,
-  formula = NULL
+  formula = NULL,
+  shareDispersionOutsideContrasts = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ fitQseaGLM(
 \item{checkPVals}{Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.}
 
 \item{formula}{A formula to use}
+
+\item{shareDispersionOutsideContrasts}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
+Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
 }
 \value{
 A qseaGLM object
