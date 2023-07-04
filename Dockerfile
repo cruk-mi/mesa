@@ -4,7 +4,7 @@ WORKDIR /home/rstudio
 
 COPY --chown=rstudio:rstudio . /home/rstudio/
 
-install2.r --skipinstalled BiocManager tidymodels xgboost optparse mlbench vip
+RUN install2.r --skipinstalled BiocManager tidymodels xgboost optparse mlbench vip
 
 #RUN Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); BiocManager::install(ask=FALSE)"
 
