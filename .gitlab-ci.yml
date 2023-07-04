@@ -7,14 +7,15 @@ stages:
   - deploy
 
 build:
-  stage: build
+  stage: deploy
   tags:
     - methylationprojects
   script:
-    - echo "Do your build here"
+    - echo "Building container for docker"
     - pwd && ls -lah
-    - docker build -t crukmi/mesa_dependencies -f Dockerfile_dependencies_only .
-    - docker push crukmi/mesa_dependencies:latest
+    - docker build -t mesa_test -f Dockerfile .
+    - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
+    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:0.0.1
 
   rules:
     - changes:  # Run the job if any of these files changes
@@ -30,13 +31,3 @@ devtools-check:
   script:
     - R -e 'devtools::check()'
     
-build:
-  stage: deploy
-  tags:
-    - methylationprojects
-  script:
-    - echo "Building container for docker"
-    - pwd && ls -lah
-    - docker build -t mesa_test -f Dockerfile .
-    - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
-    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:0.0.1
