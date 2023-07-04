@@ -4,8 +4,7 @@ variables:
   APT_PKGS: "libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev zlib1g-dev git libv8-dev"
 
 stages:
-  - build
-  - test
+  - deploy
 
 build:
   stage: build
@@ -30,3 +29,13 @@ devtools-check:
     - methylationprojects_docker
   script:
     - R -e 'devtools::check()'
+    
+deploy:
+  stage: deploy
+  tags:
+    - methylationprojects
+  script:
+    - echo "Building container for docker"
+    - pwd && ls -lah
+    - docker build -t mesa_test -f Dockerfile .
+    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:0.0.1
