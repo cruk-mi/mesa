@@ -139,7 +139,11 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
   newSet@sampleTable <- qseaSet@sampleTable[samplesToKeep,, drop = FALSE]
   newSet@count_matrix <- qseaSet@count_matrix[,samplesToKeep, drop = FALSE]
   newSet@zygosity <- qseaSet@zygosity[samplesToKeep,, drop = FALSE]
-  newSet@cnv <- qseaSet@cnv[,samplesToKeep, drop = FALSE]
+  
+  if(length(qseaSet@cnv) > 0){
+    newSet@cnv <- qseaSet@cnv[,samplesToKeep, drop = FALSE]
+  }
+  
   newSet@libraries$file_name <- qseaSet@libraries$file_name[samplesToKeep,, drop = FALSE]
   newSet@libraries$input_file <- qseaSet@libraries$input_file[samplesToKeep,, drop = FALSE]
   newSet@enrichment$parameters <- qseaSet@enrichment$parameters[samplesToKeep,, drop = FALSE]
