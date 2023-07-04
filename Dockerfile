@@ -1,4 +1,4 @@
-FROM bioconductor/bioconductor_docker:devel
+FROM crukmi/mesa_dependencies:devel
 
 WORKDIR /home/rstudio
 
