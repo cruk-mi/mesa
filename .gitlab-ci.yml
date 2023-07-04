@@ -13,7 +13,7 @@ build:
   script:
     - echo "Building container for docker"
     - ls /etc/docker
-    - cp daemon.json /etc/docker/daemon.json
+    - sudo cp daemon.json /etc/docker/daemon.json
     #- docker build -t mesa_test -f Dockerfile .
     - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
     #- docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:0.0.1
