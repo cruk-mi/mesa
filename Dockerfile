@@ -1,4 +1,4 @@
-FROM crukmi/mesa_dependencies:devel
+FROM crukmi/mesa_dependencies:latest
 
 WORKDIR /home/rstudio
 
