@@ -1,0 +1,9 @@
+{
+
+    "insecure-registries":[
+
+        "sc-docker-registry.scicom.picr.man.ac.uk:5000"
+
+    ]
+
+}
