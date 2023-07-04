@@ -2,18 +2,44 @@ variables:
   _R_CHECK_CRAN_INCOMING_: "false"
   _R_CHECK_FORCE_SUGGESTS_: "true"
   APT_PKGS: "libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev zlib1g-dev git libv8-dev"
-
+  DOCKER_AUTH_CONFIG: "Y3J1a21pOmNydWttaQ=="
+  
 stages:
+  - build
+  - test
   - deploy
 
 build:
+  stage: build
+  tags:
+    - methylationprojects
+  script:
+    - docker build -t mesa_dependencies -f Dockerfile_dependencies_only .
+    - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
+    - docker tag mesa_dependencies sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
+    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
+
+  rules:
+    - changes:  # Run the job if any of these files changes
+        - DESCRIPTION
+        - Dockerfile_dependencies_only
+        - installDependencies.R
+
+devtools-check:
+  image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
+  stage: test
+  tags:
+    - methylationprojects_docker
+  script:
+    - R -e 'devtools::check()'
+
+deploy:
   stage: deploy
   tags:
     - methylationprojects
   script:
-    - echo "Building container for docker"
-    - ls /etc/docker
-    #- docker build -t mesa_test -f Dockerfile .
+    - echo "Building docker container for use in Nextflow"
+    - docker build -t mesa_test -f Dockerfile .
     - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
-    - docker tag mesa_test sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:0.0.1
-    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:0.0.1
+    - docker tag mesa_test sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:${CI_COMMIT_TAG}
+    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:${CI_COMMIT_TAG}
