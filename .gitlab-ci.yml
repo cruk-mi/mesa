@@ -20,5 +20,4 @@ build:
   rules:
     - changes:  # Run the job if any of these files changes
         - DESCRIPTION
-        - Dockerfile_dependencies_only
-        - installDependencies.R
+        - Dockerfile
