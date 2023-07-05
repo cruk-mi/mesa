@@ -133,7 +133,7 @@ test_that("Calculating DMRs", {
     filter(type %in% c("LUAD", "NormalLung")) %>%
     calculateDMRs(variable = "type", 
                   contrasts = "LUAD_vs_NormalLung",
-                  shareDispersionOutsideContrasts = TRUE
+                  calcDispersionAll = TRUE
                   )  
   
   expect_not_equal(testNoFilter %>% nrow(), 

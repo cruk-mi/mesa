@@ -11,7 +11,7 @@ addBamCoveragePairedAndUnpaired(
   maxInsertSize = 1000,
   minInsertSize = 100,
   minReferenceLength = 30,
-  parallel = FALSE,
+  parallel = TRUE,
   properPairsOnly = FALSE
 )
 }

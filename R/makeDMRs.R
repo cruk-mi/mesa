@@ -11,12 +11,12 @@
 #' @param minReadCount A minimum read count for a row to be considered, in the qseaSet as provided.
 #' @param minNRPM A minimum normalised reads per million to apply
 #' @param checkPVals Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.
-#' @param shareDispersionOutsideContrasts Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates. 
+#' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates. 
 #' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across. 
 #' @return A qseaGLM object
 fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                        contrasts = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
-                       checkPVals = TRUE, formula = NULL, shareDispersionOutsideContrasts = FALSE){
+                       checkPVals = TRUE, formula = NULL, calcDispersionAll = FALSE){
   
   if (!is.null(contrasts)) {
     nContrasts <- nrow(contrasts)
@@ -76,7 +76,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     dplyr::filter(!!rlang::sym(variable) %in% valuesInContrasts) %>%
     dplyr::pull(sample_name)
   
-  if(!shareDispersionOutsideContrasts){
+  if(!calcDispersionAll){
     qseaSet <- qseaSet %>%
       filter(sample_name %in% samplesInContrasts)
   } else {
@@ -307,7 +307,7 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param keepPvals Whether to keep the unadjusted p-values in the output
 #' @param checkPVals Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!
 #' @param direction Whether to keep regions that are up/down/both.#' 
-#' @param shareDispersionOutsideContrasts Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates. 
+#' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates. 
 #' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across. 
 #' @return A tibble with the data
 #' @export
@@ -326,7 +326,7 @@ calculateDMRs <- function(qseaSet,
                           keepData = FALSE,
                           keepGroupMeans = FALSE,
                           direction = "both",
-                          shareDispersionOutsideContrasts = FALSE){
+                          calcDispersionAll = FALSE){
   
   if (is.null(variable)) {stop("variable must be specified!")}
   
