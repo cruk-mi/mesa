@@ -6,7 +6,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                          "isProperPair","isUnmappedQuery","isSupplementaryAlignment","isDuplicate","hasUnmappedMate",
                        "isNotPassingQualityControls","rname","pos","isize","MQ","mapq","isFirstMateRead","isPaired",
                        "cigar", ".rowID", "feature","annoShort","type",".comparison",".ext",".value","total_fragments",
-                       "isSecondaryAlignment","ROI_ID","ID","ENSEMBL","betaDelta",
+                       "isSecondaryAlignment","ROI_ID","ID","ENSEMBL","deltaBeta",
                        "map_hg38_1000kb", "map_hg38_10kb", "map_hg38_50kb", "map_hg38_500kb",
                        "gc_hg38_1000kb","gc_hg38_50kb","gc_hg38_500kb","gc_hg38_10kb","score",
                        "log2FC","group1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
