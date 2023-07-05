@@ -397,7 +397,7 @@ calculateDMRs <- function(qseaSet,
                               name1 <- contrasts[x,]$group1
                               name2 <- contrasts[x,]$group2
                               (dataTable[,paste0(name1,"_beta_means")] - dataTable[,paste0(name2,"_beta_means")]) %>%
-                                tibble::enframe(name = "rowIndex", value = paste0(name1,"_vs_",name2,"_betaDelta")) %>%
+                                tibble::enframe(name = "rowIndex", value = paste0(name1,"_vs_",name2,"_deltaBeta")) %>%
                                 dplyr::select(-rowIndex)
                             }
   )
@@ -405,7 +405,7 @@ calculateDMRs <- function(qseaSet,
   dataTable <- dataTable %>%
     dplyr::bind_cols(deltas) %>%
     tibble::as_tibble()
-  
+
   # ewww, a for loop. Moves the betaDelta columns around.
   for(adjPvalString in (dataTable %>% colnames() %>% stringr::str_subset("_adjPval$"))){
     dataTable <- dataTable %>% dplyr::relocate(stringr::str_replace(adjPvalString, "_adjPval$","_betaDelta"), .after = !!adjPvalString)

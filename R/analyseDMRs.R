@@ -8,7 +8,7 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
   pivotedDMRs <- DMRtable %>%
     dplyr::rename_with(~ stringr::str_replace(.x, "_adjPval", ":adjPval")) %>%
     dplyr::rename_with(~ stringr::str_replace(.x, "_log2FC", ":log2FC")) %>%
-    dplyr::rename_with(~ stringr::str_replace(.x, "_betaDelta", ":betaDelta")) %>%
+    dplyr::rename_with(~ stringr::str_replace(.x, "_deltaBeta", ":deltaBeta")) %>%
     tidyr::pivot_longer(tidyselect::matches("_vs_"),
                         names_to = c(".comparison", ".ext"),
                         values_to = ".value",
@@ -22,7 +22,7 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
     pivotedDMRs <- pivotedDMRs %>%
       dplyr::mutate(group1new = ifelse(log2FC < 0, group2, group1),
                     group2new = ifelse(log2FC < 0, group1, group2),
-                    betaDelta = sign(log2FC)*betaDelta,
+                    deltaBeta = sign(log2FC)*deltaBeta,
                     log2FC = sign(log2FC)*log2FC,
       ) %>%
       dplyr::select(-group1, -group2) %>%
@@ -38,10 +38,10 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
 #' @param DMRtable A data frame with multiple comparisons inside
 #' @param FDRthres FDR threshold to apply to each comparison
 #' @param log2FCthres A log2FC threshold to apply to each comparison (absolute)
-#' @param betaDeltaThres A betaDelta threshold to apply to each comparison (absolute)
+#' @param deltaBetaThres A deltaBeta (change in average beta values) threshold to apply to each comparison (absolute)
 #' @export
 #'
-summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, betaDeltaThres = 0){
+summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, deltaBetaThres = 0){
 
   if (!("adjPval" %in% colnames(DMRtable))) {
 
@@ -53,7 +53,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
       dplyr::arrange(group1, group2)
 
     DMRtable <- DMRtable %>%
-      dplyr::select(-tidyselect::matches("nrpm|beta$|means")) %>%
+      dplyr::select(-tidyselect::matches("_nrpm$|_beta$|_means$")) %>%
       pivotDMRsLonger(FDRthres = FDRthres)
 
   } else {
@@ -66,7 +66,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     tibble::as_tibble() %>%
     dplyr::filter(adjPval <= FDRthres,
                   abs(log2FC) >= log2FCthres,
-                  abs(betaDelta) >= betaDeltaThres,
+                  abs(deltaBeta) >= deltaBetaThres,
                   ) %>%
     dplyr::mutate(.up = ifelse(log2FC > 0, "nUp","nDown")) %>%
     dplyr::group_by(group1, group2, .up) %>%

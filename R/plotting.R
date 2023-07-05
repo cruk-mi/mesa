@@ -1,4 +1,3 @@
-
 #' This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap
 #' @param qseaSet The qseaSet object.
 #' @param regionsToOverlap A genomic ranges to plot.
@@ -196,7 +195,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   col_list_cat <- levs %>%
     unlist() %>%
     length() %>%
-    hues::iwanthue(plot=FALSE) %>%
+    hues::iwanthue(plot=FALSE, cmin = 25) %>%
     purrr::set_names(levs %>% unlist()) %>%
     utils::relist(levs) %>%
     purrr::map2(levs, purrr::set_names)
@@ -214,14 +213,14 @@ makeHeatmapAnnotation <- function(qseaSet,
 
   annotationCol_numeric_min_negative <- annotationCol_numeric %>%
     dplyr::select_if(function(x) min(x) < 0)
-
-  colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuOr","Blues","Purples") %>%
-    purrr::set_names(., nm = .) %>%
-    purrr::map(function(pal){
-      RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
-        {c(dplyr::first(.), dplyr::last(.))}
-    }
-    )
+  
+  colvecs_binary <- list(Red = c("#fffcf9", "#ab001f"),
+                         Blue = c("#fdfeff","#0053ab"),
+                         Green = c("#fbfff6","#36ab00"),
+                         Orange = c("#fffdf5","#ab5e00"),
+                         Pink = c("#fffbff", "#ab0075"),
+                         Cyan = c("#f2ffff", "#00aba2"),
+                         Yellow = c("#fffff4","#aba200"))
 
   colvecs_zerocenter <- c("BrBG","PiYG","PuOr","PRGn","RdGy") %>%
     purrr::set_names(., nm = .) %>%
@@ -250,7 +249,7 @@ makeHeatmapAnnotation <- function(qseaSet,
 
   annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
 
-  if(!is.na(specifiedAnnotationColors)){
+  if(all(!is.na(specifiedAnnotationColors))){
     if(!is.list(specifiedAnnotationColors)){
       stop("Provided annotationColors object should be a list.")
     }
@@ -260,6 +259,11 @@ makeHeatmapAnnotation <- function(qseaSet,
     
     if(length(commonNames)) {
       for (i in commonNames){
+        if(!all(names(annotationColors[[i]]) %in% names(specifiedAnnotationColors[[i]]))){
+          missingLevels <- setdiff(names(annotationColors[[i]]), names(specifiedAnnotationColors[[i]])) %>% 
+            paste(collapse="\', \'")
+          stop(glue::glue("Missing colors for level(s): \'{missingLevels}\' of annotation \'{i}\'."))
+        }
         annotationColors[[i]] = specifiedAnnotationColors[[i]]
       }    
     }
@@ -277,6 +281,7 @@ makeHeatmapAnnotation <- function(qseaSet,
   annot <- ComplexHeatmap::HeatmapAnnotation(which = orientation,
                                              df    = annotationColDf,
                                              col   = annotationColors,
+                                             na_col = "grey50",
                                              annotation_legend_param = annotation_legend_param_ls,
                                              show_annotation_name    = FALSE)
 
