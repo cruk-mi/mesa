@@ -43,3 +43,7 @@ deploy:
     - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
     - docker tag mesa_test sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:${CI_COMMIT_TAG}
     - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:${CI_COMMIT_TAG}
+  only:
+    - tags
+  except:
+    - branches
