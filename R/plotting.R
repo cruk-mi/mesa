@@ -416,10 +416,10 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
   geneGR <- gene_details %>%
     plyranges::as_granges() %>%
-    plyranges::anchor_start() %>%
-    plyranges::stretch(upstreamDist) %>%
-    plyranges::anchor_end() %>%
-    plyranges::stretch(downstreamDist)
+    plyranges::anchor_5p() %>%
+    plyranges::stretch(downstreamDist) %>%
+    plyranges::anchor_3p() %>%
+    plyranges::stretch(upstreamDist)
 
   if (length(geneGR) == 0) {stop("No genomic region found!")}
   if (length(geneGR) > 1) {stop("Multiple genomic regions found!")}
@@ -484,6 +484,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     dplyr::select(window, CpG_density, annotation) %>%
     tibble::column_to_rownames("window")
 
+  print(annoRow %>% dplyr::count(annotation))
+  
   windowSize <- qseaSet %>% qsea::getWindowSize()
 
   rowSplit <- dataTable %>%
