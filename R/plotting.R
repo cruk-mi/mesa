@@ -483,8 +483,6 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     as.data.frame() %>%
     dplyr::select(window, CpG_density, annotation) %>%
     tibble::column_to_rownames("window")
-
-  print(annoRow %>% dplyr::count(annotation))
   
   windowSize <- qseaSet %>% qsea::getWindowSize()
 
