@@ -13,7 +13,7 @@ test_that("Calculating DMRs", {
                  calculateDMRs(variable = "group",
                                contrasts = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
 
-  expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
+  expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_deltaBeta")) %>% all())
 
   expect_no_error(annotatedData <- DMRdata  %>% annotateWindows()) #expect no error!
 
@@ -115,7 +115,7 @@ test_that("Calculating DMRs", {
                                keepGroupMeans = TRUE) %>%
                  ncol(), 35)
 
-  expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_betaDelta")) %>% all())
+  expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_deltaBeta")) %>% all())
 
 
 })
@@ -147,6 +147,7 @@ test_that("plotting DMRs", {
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE))
   
+<<<<<<< tests/testthat/test-DMRs.R
   expect_no_error(randomSet %>%
                      plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                         sampleAnnotation = "experiment",
@@ -163,5 +164,14 @@ test_that("plotting DMRs", {
                                        sampleAnnotation = "experiment",
                                        windowAnnotation = c("CpG_density","Tumor_vs_Normal_log2FC")))
   
-  
+  expect_no_error( randomSet %>% 
+                  plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                                     sampleAnnotation = c("group", "experiment"),
+                                     annotationColors = list(group = c("Tumor" = "blue", "Normal" = "red"))))
+
+  expect_no_error( randomSet %>% 
+                  plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
+                                     sampleAnnotation = c("group", "experiment"),
+                                     annotationColors = list(group = c("Tumor" = "blue", "Normal" = "red"), experiment = c("A" = "green", "B" = "orange"))))
+
   })

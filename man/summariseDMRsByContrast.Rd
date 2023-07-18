@@ -9,7 +9,7 @@ summariseDMRsByContrast(
   DMRtable,
   FDRthres = 0.05,
   log2FCthres = 0,
-  betaDeltaThres = 0
+  deltaBetaThres = 0
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ summariseDMRsByContrast(
 
 \item{log2FCthres}{A log2FC threshold to apply to each comparison (absolute)}
 
-\item{betaDeltaThres}{A betaDelta threshold to apply to each comparison (absolute)}
+\item{deltaBetaThres}{A deltaBeta (change in average beta values) threshold to apply to each comparison (absolute)}
 }
 \description{
 This function summarises the number of windows called as up/down in each comparison in a .
