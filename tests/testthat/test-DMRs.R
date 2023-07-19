@@ -147,7 +147,6 @@ test_that("plotting DMRs", {
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE))
   
-<<<<<<< tests/testthat/test-DMRs.R
   expect_no_error(randomSet %>%
                      plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                         sampleAnnotation = "experiment",
