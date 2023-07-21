@@ -108,55 +108,34 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
   
   dataTab <- dataTab %>%
     filter(window %in% rownames(numData))
+
+  windowAnnotationDf <- getWindowAnnotation(dataTab, regions = regionsToOverlap,
+                                            windowAnnotation = {{windowAnnotation}},
+                                            clusterRows = clusterRows)
   
+  # Ensure regions order is maintained if not clustering.
+  numData <- numData[rownames(windowAnnotationDf),] 
+
   if (!useGroupMeans) {
 
-    colAnnot <- qseaSet %>%
+    annots <- qseaSet %>%
       filter(sample_name %in% !!(colnames(numData))) %>%
-      makeHeatmapAnnotation(orientation = "column",
-                            useGroupMeans = useGroupMeans,
-                            specifiedAnnotationColors = annotationColors,
-                            sampleAnnotation = {{sampleAnnotation}} )
+      makeHeatmapAnnotations(useGroupMeans = useGroupMeans,
+                             specifiedAnnotationColors = annotationColors,
+                             sampleAnnotation = {{sampleAnnotation}},
+                             windowAnnotationDf = windowAnnotationDf)
   
   } else {
-    colAnnot <- qseaSet %>%
+    annots <- qseaSet %>%
       filter(group %in% !!(colnames(numData))) %>%
-      makeHeatmapAnnotation(orientation = "column",
-                            useGroupMeans = useGroupMeans,
-                            specifiedAnnotationColors = annotationColors,
-                            sampleAnnotation = {{sampleAnnotation}} )
+      makeHeatmapAnnotations(useGroupMeans = useGroupMeans,
+                             specifiedAnnotationColors = annotationColors,
+                             sampleAnnotation = {{sampleAnnotation}},
+                             windowAnnotationDf = windowAnnotationDf )
   }
 
-  if( !is.null(windowAnnotation)) {
-    rowAnnotDf <- dataTab %>% 
-      plyranges::as_granges() %>% 
-      plyranges::join_overlap_left(regionsToOverlap %>% 
-                                     tibble::as_tibble() %>% 
-                                     tibble::rowid_to_column(".rowID") %>% 
-                                     plyranges::as_granges(),
-                                   suffix = c("",".regionsToOverlap")) %>%
-      tibble::as_tibble() %>%
-      dplyr::select(window, .rowID, {{windowAnnotation}})
-    
-    if(!clusterRows) {
-      rowAnnotDf <- rowAnnotDf  %>%
-        dplyr::arrange(.rowID)
-    }
-    
-     rowAnnotDf <- rowAnnotDf %>%
-      dplyr::select(-.rowID) %>%
-      tibble::column_to_rownames("window")
-  
-     rowAnnot <- ComplexHeatmap::HeatmapAnnotation(which = "row",
-                                                   df    = rowAnnotDf,
-                                                   show_annotation_name    = FALSE)
-     
-     numData <- numData[rownames(rowAnnotDf),] 
-
-     
-  } else {
-    rowAnnot <- NULL
-  }
+  colAnnot <- annots$sample
+  rowAnnot <- annots$window
   
   if (ncol(dataTab) == 1) {
     clusterCols <- FALSE
@@ -216,62 +195,126 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 }
 
 
-
-#This function makes a HeatmapAnnotation object, and is a helper function for plotRegionsHeatmap and plotCNV
-
-makeHeatmapAnnotation <- function(qseaSet,
-                                  orientation,
-                                  specifiedAnnotationColors = NA, 
-                                  useGroupMeans = FALSE,
-                                  sampleAnnotation = NULL){
-
-  annotationColDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
-
-  if (is.null(annotationColDf)) {
-    return(NULL)
+#' Get an annotation data frame for windows, for use in heatmap plotting functions
+#'
+#' Note that windowAnnotation must be enclosed within double curly brackets when used.
+#'
+#' @param qseaSet A qseaSet
+#' @param regions Whether to use the "group" variable to collapse replicates
+#' @param windowAnnotation Columns of the sampleTable to use
+#' @param clusterRows Whether the rows are going to be clustered. If not, ensure the annotation is the correct order.
+#'
+#' @return A data frame containing the annotation columns, ready for use in
+getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clusterRows = FALSE) {
+  rowAnnotDf <- dataTab %>% 
+    plyranges::as_granges() %>% 
+    plyranges::join_overlap_left(regions %>% 
+                                   tibble::as_tibble() %>% 
+                                   tibble::rowid_to_column(".rowID") %>% 
+                                   plyranges::as_granges(),
+                                 suffix = c("",".regionsToOverlap")) %>%
+    tibble::as_tibble() %>%
+    dplyr::select(window, .rowID, {{windowAnnotation}})
+  
+  if(!clusterRows) {
+    rowAnnotDf <- rowAnnotDf  %>%
+      dplyr::arrange(.rowID)
   }
+  
+  rowAnnotDf %>%
+    dplyr::select(-.rowID) %>%
+    tibble::column_to_rownames("window")
+  
+}
 
-  annotationColDf <- annotationColDf %>%
+
+#This function makes a pair of HeatmapAnnotation objects, and is a helper function for plotRegionsHeatmap and plotCNV
+#' @param qseaSet Whether to cluster the rows or not.
+#' @param sampleAnnotation Which columns to use of the sampleTable. 
+#' @param windowAnnotationDf A data frame with the window annotations. This has been generated by getWindowAnnotation.
+#' @param useGroupMeans Whether to average over the "group" column of the qseaSet.
+#' @param specifiedAnnotationColors Allow for overwriting of some of the colours with pre-specified values.
+#' @param windowOrientation Which orientation the window annotation should be.
+#' @param sampleOrientation Which orientation the sample annotation should be.
+
+makeHeatmapAnnotations <- function(qseaSet,
+                                   sampleAnnotation = NULL,
+                                   windowAnnotationDf = NULL,
+                                   useGroupMeans = FALSE,
+                                   specifiedAnnotationColors = NA, 
+                                   windowOrientation = "row",
+                                   sampleOrientation = "column"){
+  
+  sampleAnnotationDf <- getAnnotation(qseaSet, 
+                                      sampleAnnotation = {{sampleAnnotation}}, 
+                                      useGroupMeans = useGroupMeans) %>%
     dplyr::mutate_if(is.character, as.factor)
-
+  
+  if(is.null(windowAnnotationDf)){
+    windowAnnotationDf <- data.frame()
+  }
+  
+  windowAnnotationDf <- windowAnnotationDf %>%
+    dplyr::mutate_if(is.character, as.factor)
+  if (is.null(sampleAnnotationDf) & is.null(windowAnnotationDf)) {
+    return(list(sample = NULL, window = NULL))
+  }
+  
   #Get all levels of all categorical variables and convert to color list
-  levs <- annotationColDf %>%
+  levsSample <- sampleAnnotationDf %>%
     dplyr::select_if(is.factor) %>%
     purrr::map(function(x) levels(as.factor(x)))
-
+  
+  #Get all levels of all categorical variables and convert to color list
+  levsWindow <- windowAnnotationDf %>%
+    dplyr::select_if(is.factor) %>%
+    purrr::map(function(x) levels(as.factor(x))) 
+  
+  levs <- c(levsSample, levsWindow)
+  
   if (length(unlist(levs)) > 0) {
-
-
-  col_list_cat <- levs %>%
-    unlist() %>%
-    length() %>%
-    hues::iwanthue(plot=FALSE, cmin = 25) %>%
-    purrr::set_names(levs %>% unlist()) %>%
-    utils::relist(levs) %>%
-    purrr::map2(levs, purrr::set_names)
+    
+    col_list_cat <- levs %>%
+      unlist() %>%
+      length() %>%
+      hues::iwanthue(plot=FALSE, cmin = 25) %>%
+      purrr::set_names(levs %>% unlist()) %>%
+      utils::relist(levs) %>%
+      purrr::map2(levs, purrr::set_names)
   } else {
     col_list_cat <- list()
   }
-
+  
   #Make colour vectors for continuous variables
-  annotationCol_numeric <- annotationColDf %>%
+  sampleAnnotation_numeric <- sampleAnnotationDf %>%
     dplyr::select_if(is.numeric)
-
+  
   #Splitting into numeric variables with all non-negative values and those with negative values
-  annotationCol_numeric_min_positive <- annotationCol_numeric %>%
+  sampleAnnotation_numeric_min_positive <- sampleAnnotation_numeric %>%
     dplyr::select_if(function(x) min(x) >= 0)
-
-  annotationCol_numeric_min_negative <- annotationCol_numeric %>%
+  
+  sampleAnnotation_numeric_min_negative <- sampleAnnotation_numeric %>%
     dplyr::select_if(function(x) min(x) < 0)
   
-  colvecs_binary <- list(Red = c("#fffcf9", "#ab001f"),
-                         Blue = c("#fdfeff","#0053ab"),
-                         Green = c("#fbfff6","#36ab00"),
+  #Make colour vectors for continuous variables
+  windowAnnotation_numeric <- windowAnnotationDf %>%
+    dplyr::select_if(is.numeric)
+  
+  #Splitting into numeric variables with all non-negative values and those with negative values
+  windowAnnotation_numeric_min_positive <- windowAnnotation_numeric %>%
+    dplyr::select_if(function(x) min(x) >= 0)
+  
+  windowAnnotation_numeric_min_negative <- windowAnnotation_numeric %>%
+    dplyr::select_if(function(x) min(x) < 0)
+  
+  colvecs_binary <- list(Blue = c("#fdfeff","#0053ab"),
                          Orange = c("#fffdf5","#ab5e00"),
                          Pink = c("#fffbff", "#ab0075"),
+                         Green = c("#fbfff6","#36ab00"),
                          Cyan = c("#f2ffff", "#00aba2"),
+                         Red = c("#fffcf9", "#ab001f"),
                          Yellow = c("#fffff4","#aba200"))
-
+  
   colvecs_zerocenter <- c("BrBG","PiYG","PuOr","PRGn","RdGy") %>%
     purrr::set_names(., nm = .) %>%
     purrr::map(function(pal){
@@ -279,26 +322,28 @@ makeHeatmapAnnotation <- function(qseaSet,
         {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
     }
     )
-
-  col_list_num_min_positive <- annotationCol_numeric_min_positive %>%
-    purrr::map2(colvecs_binary[1:ncol(.)], function(val, cols){
+  
+  
+  
+  col_list_num_min_positive <- c(sampleAnnotation_numeric_min_positive, windowAnnotation_numeric_min_positive) %>%
+    purrr::map2(colvecs_binary[seq_along(.)], function(val, cols){
       circlize::colorRamp2(c(min(val, na.rm = TRUE),
                              max(val, na.rm = TRUE)),
                            cols)
     }
     )
-
-  col_list_num_min_negative <- annotationCol_numeric_min_negative %>%
-    purrr::map2(colvecs_zerocenter[1:ncol(.)], function(val, cols){
+  
+  col_list_num_min_negative <- c(sampleAnnotation_numeric_min_negative, windowAnnotation_numeric_min_negative)  %>%
+    purrr::map2(colvecs_zerocenter[seq_along(.)], function(val, cols){
       circlize::colorRamp2(c(min(val, na.rm = TRUE),
                              0,
                              max(val, na.rm = TRUE)),
                            cols)
     }
     )
-
+  
   annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
-
+  
   if(all(!is.na(specifiedAnnotationColors))){
     if(!is.list(specifiedAnnotationColors)){
       stop("Provided annotationColors object should be a list.")
@@ -317,26 +362,52 @@ makeHeatmapAnnotation <- function(qseaSet,
         annotationColors[[i]] = specifiedAnnotationColors[[i]]
       }    
     }
-  
+    
   }
   
   
-  annotation_legend_param_ls <- annotationColDf %>%
+  sampleAnnotation_legend_param_ls <- sampleAnnotationDf %>%
     colnames() %>%
     purrr::set_names(., nm = .) %>%
     purrr::map(function(x){
       list(name = list(direction = "horizontal"))
     })
-
-  annot <- ComplexHeatmap::HeatmapAnnotation(which = orientation,
-                                             df    = annotationColDf,
-                                             col   = annotationColors,
-                                             na_col = "grey50",
-                                             annotation_legend_param = annotation_legend_param_ls,
-                                             show_annotation_name    = FALSE)
-
-  return(annot)
+  
+  windowAnnotation_legend_param_ls <- windowAnnotationDf %>%
+    colnames() %>%
+    purrr::set_names(., nm = .) %>%
+    purrr::map(function(x){
+      list(name = list(direction = "horizontal"))
+    })
+  
+  if(ncol(sampleAnnotationDf) > 0){
+    sampleAnnot <- ComplexHeatmap::HeatmapAnnotation(which = sampleOrientation,
+                                                   df    = sampleAnnotationDf,
+                                                   col   = annotationColors[names(sampleAnnotationDf)],
+                                                   na_col = "grey50",
+                                                   annotation_legend_param = sampleAnnotation_legend_param_ls,
+                                                   show_annotation_name    = FALSE)
+  } else {
+    sampleAnnot <- NULL
+  }
+  
+  if(ncol(windowAnnotationDf) > 0){
+    windowAnnot <- ComplexHeatmap::HeatmapAnnotation(which = windowOrientation,
+                                                     df    = windowAnnotationDf,
+                                                     col   = annotationColors[names(windowAnnotationDf)],
+                                                     na_col = "grey50",
+                                                     annotation_legend_param = windowAnnotation_legend_param_ls,
+                                                     show_annotation_name    = FALSE)
+  } else {
+    windowAnnot <- NULL
+  }
+  
+  
+  return(list(sample = sampleAnnot, window = windowAnnot))
 }
+
+
+
 
 #' This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
 #' @param qseaSet The qseaSet object.
@@ -456,18 +527,20 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     colAnnot <- qseaSet %>%
       filter(sample_name %in% !!(colnames(numData))) %>%
-      makeHeatmapAnnotation(orientation = "column",
-                          useGroupMeans = useGroupMeans,
-                          specifiedAnnotationColors = annotationColors,
-                          sampleAnnotation = {{sampleAnnotation}} )
+      makeHeatmapAnnotations(sampleOrientation = "column",
+                             useGroupMeans = useGroupMeans,
+                             specifiedAnnotationColors = annotationColors,
+                             sampleAnnotation = {{sampleAnnotation}} ) %>%
+      pluck("sample")
 
   } else {
     colAnnot <- qseaSet %>%
       filter(group %in% !!(colnames(numData))) %>%
-      makeHeatmapAnnotation(orientation = "column",
-                            useGroupMeans = useGroupMeans,
-                            specifiedAnnotationColors = annotationColors,
-                            sampleAnnotation = {{sampleAnnotation}} )
+      makeHeatmapAnnotations(sampleOrientation = "column",
+                             useGroupMeans = useGroupMeans,
+                             specifiedAnnotationColors = annotationColors,
+                             sampleAnnotation = {{sampleAnnotation}} ) %>%
+      pluck("sample")
   }
 
   geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
@@ -527,9 +600,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   }
 
   annotName <- dplyr::case_when(normMethod == "beta" ~ "Beta value",
-                         normMethod == "nrpm" ~ "NRPM",
-                         TRUE ~ stringr::str_to_title(normMethod)
-  )
+                                normMethod == "nrpm" ~ "NRPM",
+                                TRUE ~ stringr::str_to_title(normMethod)
+                                )
 
   ComplexHeatmap::Heatmap(matrix = as.matrix(numData),
                             rect_gp = rectGpParam,
@@ -797,7 +870,7 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL){
 
   if (rlang::quo_is_null(rlang::enquo(sampleAnnotation))) {
-    return(NULL)
+    return(data.frame())
   }
 
   annotationColDf <- data.frame()
@@ -833,7 +906,7 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   }
 
   if (ncol(annotationColDf) == 0) {
-    annotationColDf <- NULL
+    annotationColDf <- data.frame()
   }
 
   return(annotationColDf)

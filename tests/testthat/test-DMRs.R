@@ -126,9 +126,11 @@ test_that("plotting DMRs", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000) %>%
     mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
-               variableWithOneLevel = "Test",
-               experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
-               experimentConfounded = ifelse( stringr::str_detect(sample_name,"[1234]N"),"A","B"),
+           variableWithOneLevel = "Test",
+           experiment = ifelse( stringr::str_detect(sample_name,"[1234]"),"A","B"),
+           experimentConfounded = ifelse( stringr::str_detect(sample_name,"[1234]N"),"A","B"),
+           numeric1 = rnorm(16),
+           numeric2 = runif(16),
     )
 
   DMRdata <- randomSet %>%
