@@ -11,7 +11,18 @@ Authors@R: c(
            family = "Hill",
            role = "aut",
            email = "steven.hill@cruk.manchester.ac.uk",
-           comment = c(ORCID = "0000-0002-5909-692X"))     
+           comment = c(ORCID = "0000-0002-5909-692X")),
+    person(given = "Paddy",
+           family = "Harker",
+           role = "ctb",
+           email = "patrick.harker@cruk.manchester.ac.uk")),
+    person(given = "Kevin",
+           family = "Brennan",
+           role = "ctb",
+           email = "kevin.brennan@cruk.manchester.ac.uk")),           
+    person(given = "Katarzyna",
+           family = "Kamieniecka",
+           role = "ctb")    
            )
 Description: Analysis tools for methylation enrichment sequencing data (MBD-seq or MEDIP-seq), building off the qsea package.
 License: GPL-3
