@@ -15,11 +15,11 @@ Authors@R: c(
     person(given = "Paddy",
            family = "Harker",
            role = "ctb",
-           email = "patrick.harker@cruk.manchester.ac.uk")),
+           email = "patrick.harker@cruk.manchester.ac.uk"),
     person(given = "Kevin",
            family = "Brennan",
            role = "ctb",
-           email = "kevin.brennan@cruk.manchester.ac.uk")),           
+           email = "kevin.brennan@cruk.manchester.ac.uk"),           
     person(given = "Katarzyna",
            family = "Kamieniecka",
            role = "ctb")    
