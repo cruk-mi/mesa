@@ -37,13 +37,11 @@ deploy:
   stage: deploy
   tags:
     - methylationprojects
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
   script:
     - echo "Building docker container for use in Nextflow"
     - docker build -t mesa_test -f Dockerfile .
     - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000 -u crukmi -p crukmi
     - docker tag mesa_test sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:${CI_COMMIT_TAG}
     - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_test:${CI_COMMIT_TAG}
-  only:
-    - tags
-  except:
-    - branches
