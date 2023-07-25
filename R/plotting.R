@@ -199,9 +199,9 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 #'
 #' Note that windowAnnotation must be enclosed within double curly brackets when used.
 #'
-#' @param qseaSet A qseaSet
-#' @param regions Whether to use the "group" variable to collapse replicates
-#' @param windowAnnotation Columns of the sampleTable to use
+#' @param dataTab A table with the data generated from the qseaSet
+#' @param regions The regions used to generate the annotation for
+#' @param windowAnnotation Columns of the regions annotation or the dataTab to use
 #' @param clusterRows Whether the rows are going to be clustered. If not, ensure the annotation is the correct order.
 #'
 #' @return A data frame containing the annotation columns, ready for use in
