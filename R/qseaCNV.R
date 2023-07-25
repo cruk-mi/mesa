@@ -200,10 +200,11 @@ plotCNVheatmap <- function(qseaSet,
                            annotationColors = NA,
                            clusterRows = TRUE){
 
-  rowAnnot <- makeHeatmapAnnotation(qseaSet,
-                                    orientation = "row",
+  rowAnnot <- makeHeatmapAnnotations(qseaSet,
+                                    sampleOrientation = "row",
                                     specifiedAnnotationColors = annotationColors,
-                                    sampleAnnotation = {{sampleAnnotation}} )
+                                    sampleAnnotation = {{sampleAnnotation}} ) %>%
+    pluck("row")
 
   chr <- qseaSet %>%
     qsea::getCNV() %>%
