@@ -40,6 +40,16 @@ test_that("Annotation getting works", {
   expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type,age),
                                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
   
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), 
+                                     regionsToOverlap = regions %>% mutate(newCol = rnorm(10)), 
+                                     sampleAnnotation = c(tumour,type,age),
+                                     windowAnnotation = c(CpG_density,newCol),
+                                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
+  
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), 
+                                     regionsToOverlap = regions %>% mutate(newCol = rnorm(10)), 
+                                     windowAnnotation = c(CpG_density, newCol)))
+  
 }
 )
 
