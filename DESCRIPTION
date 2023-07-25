@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.2.3
+Version: 0.4.0
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -19,7 +19,8 @@ Authors@R: c(
     person(given = "Kevin",
            family = "Brennan",
            role = "ctb",
-           email = "kevin.brennan@cruk.manchester.ac.uk"),           
+           email = "kevin.brennan@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0000-0001-9018-9852")),           
     person(given = "Katarzyna",
            family = "Kamieniecka",
            role = "ctb")    
