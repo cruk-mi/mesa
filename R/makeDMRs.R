@@ -79,9 +79,12 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   if(!calcDispersionAll){
     qseaSet <- qseaSet %>%
       filter(sample_name %in% samplesInContrasts)
+
   } else {
     numExtraSamples <- length(setdiff(getSampleNames(qseaSet, samplesInContrasts)))
-    message(glue::glue("Calculating dispersion estimates including {numExtraSamples} that are not being used in contrasts."))
+    if(numExtraSamples > 0){
+        message(glue::glue("Calculating dispersion estimates including {numExtraSamples} that are not being used in contrasts."))
+    }
   }
 
   if (is.null(keepIndex) & minNRPM == 0 ) {
@@ -383,7 +386,8 @@ calculateDMRs <- function(qseaSet,
   qseaGLM <- fitQseaGLM(qseaSet, variable = variable,  covariates = covariates,
                         contrasts = contrasts,  minReadCount = minReadCount,
                         minNRPM = minNRPM,
-                        checkPVals = checkPVals, formula = formula)
+                        checkPVals = checkPVals, formula = formula,
+                        calcDispersionAll = calcDispersionAll)
 
   dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = qsea::getSampleNames(qseaSet),
                            fdrThres = fdrThres, keepPvals = keepPvals, keepData = keepData,

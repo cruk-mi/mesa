@@ -130,7 +130,6 @@ test_that("Calculating DMRs", {
                testNoFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")))
 
   testNoFilterShared <- exampleTumourNormal %>%
-    filter(type %in% c("LUAD", "NormalLung")) %>%
     calculateDMRs(variable = "type",
                   contrasts = "LUAD_vs_NormalLung",
                   calcDispersionAll = TRUE
