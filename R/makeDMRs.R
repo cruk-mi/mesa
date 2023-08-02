@@ -81,7 +81,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
       filter(sample_name %in% samplesInContrasts)
 
   } else {
-    numExtraSamples <- length(setdiff(getSampleNames(qseaSet, samplesInContrasts)))
+    numExtraSamples <- length(setdiff(getSampleNames(qseaSet), samplesInContrasts))
     if(numExtraSamples > 0){
         message(glue::glue("Calculating dispersion estimates including {numExtraSamples} samples that are not being used in contrasts."))
     }
