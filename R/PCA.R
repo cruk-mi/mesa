@@ -562,7 +562,7 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
         }
 
       } else {
-        shapePalette <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
+        shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
         if (nShape > length(shapePalette)) {
           stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
         }
