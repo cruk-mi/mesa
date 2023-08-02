@@ -81,14 +81,14 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
       filter(sample_name %in% samplesInContrasts)
 
   } else {
-    numExtraSamples <- length(setdiff(getSampleNames(qseaSet), samplesInContrasts))
+    numExtraSamples <- length(setdiff(qsea::getSampleNames(qseaSet), samplesInContrasts))
     if(numExtraSamples > 0){
         message(glue::glue("Calculating dispersion estimates including {numExtraSamples} samples that are not being used in contrasts."))
     }
   }
 
   if (is.null(keepIndex) & minNRPM == 0 ) {
-    keepIndex = which(matrixStats::rowMaxs(qsea::getCounts(qseaSet %>% filter(sample_name %in% samplesInContrasts))) >= minReadCount)
+    keepIndex = which(matrixStats::rowMaxs(qsea::getCounts(qseaSet %>% dplyr::filter(sample_name %in% samplesInContrasts))) >= minReadCount)
   }
 
   if (is.null(keepIndex) & minNRPM >= 0) {
