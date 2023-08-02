@@ -83,7 +83,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   } else {
     numExtraSamples <- length(setdiff(getSampleNames(qseaSet, samplesInContrasts)))
     if(numExtraSamples > 0){
-        message(glue::glue("Calculating dispersion estimates including {numExtraSamples} that are not being used in contrasts."))
+        message(glue::glue("Calculating dispersion estimates including {numExtraSamples} samples that are not being used in contrasts."))
     }
   }
 
@@ -309,7 +309,7 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param keepGroupMeans Whether to keep the group means in the output
 #' @param keepPvals Whether to keep the unadjusted p-values in the output
 #' @param checkPVals Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!
-#' @param direction Whether to keep regions that are up/down/both.#'
+#' @param direction Whether to keep regions that are up/down/both.
 #' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
 #' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.
 #' @return A tibble with the data
