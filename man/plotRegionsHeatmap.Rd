@@ -16,7 +16,7 @@ plotRegionsHeatmap(
   clusterCols = TRUE,
   minEnrichment = 3,
   maxScale = 5,
-  clusterNum = 2,
+  clusterNum = NULL,
   clip = 1e+09,
   minDensity = 0,
   annotationPosition = "right",

@@ -13,7 +13,7 @@ plotGeneHeatmap(
   minDensity = 0,
   minEnrichment = 3,
   maxScale = 1,
-  clusterNum = 2,
+  clusterNum = NULL,
   annotationColors = NA,
   upstreamDist = 3000,
   scaleRows = FALSE,

@@ -165,7 +165,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
   }
 
   if(clusterRows){
-    if(numData %>% dist() %>% is.na() %>% sum() > 0) {
+    if(numData %>% stats::dist() %>% is.na() %>% sum() > 0) {
       message("Can not cluster rows due to too many missing values, setting clusterRows to be FALSE")
       clusterRows <- FALSE
     }

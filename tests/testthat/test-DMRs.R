@@ -117,6 +117,25 @@ test_that("Calculating DMRs", {
 
   expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_deltaBeta")) %>% all())
 
+  testWithFilter <- exampleTumourNormal %>%
+    filter(type %in% c("LUAD", "NormalLung")) %>%
+    calculateDMRs(variable = "type",
+                  contrasts = "LUAD_vs_NormalLung")
+
+  testNoFilter <- exampleTumourNormal %>%
+    calculateDMRs(variable = "type",
+                  contrasts = "LUAD_vs_NormalLung")
+
+  expect_equal(testWithFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")),
+               testNoFilter %>% dplyr::select(seqnames, start, end, matches("_vs_")))
+
+  testNoFilterShared <- exampleTumourNormal %>%
+    calculateDMRs(variable = "type",
+                  contrasts = "LUAD_vs_NormalLung",
+                  calcDispersionAll = TRUE
+                  )
+
+  expect_false(nrow(testNoFilter) == nrow(testNoFilterShared))
 
 })
 
@@ -139,7 +158,7 @@ test_that("plotting DMRs", {
 
 
   expect_no_error( randomSet %>%
-    plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) )) 
+    plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) ))
 
   expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
@@ -148,29 +167,29 @@ test_that("plotting DMRs", {
   expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      clusterRows = TRUE))
-  
+
   expect_no_error(randomSet %>%
                      plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                         sampleAnnotation = "experiment",
-                                        windowAnnotation = "Tumor_vs_Normal_log2FC")) 
-  
+                                        windowAnnotation = "Tumor_vs_Normal_log2FC"))
+
   expect_no_error(randomSet %>%
                      plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1) %>% arrange(CpG_density),
                                         sampleAnnotation = "experiment",
-                                        windowAnnotation = "Tumor_vs_Normal_log2FC")) 
-  
+                                        windowAnnotation = "Tumor_vs_Normal_log2FC"))
+
   expect_no_error(randomSet %>%
                     plotRegionsHeatmap(DMRdata %>% filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                        clusterRows = FALSE,
                                        sampleAnnotation = "experiment",
                                        windowAnnotation = c("CpG_density","Tumor_vs_Normal_log2FC")))
-  
-  expect_no_error( randomSet %>% 
+
+  expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      sampleAnnotation = c("group", "experiment"),
                                      annotationColors = list(group = c("Tumor" = "blue", "Normal" = "red"))))
 
-  expect_no_error( randomSet %>% 
+  expect_no_error( randomSet %>%
                   plotRegionsHeatmap(DMRdata %>% dplyr::filter(abs(Tumor_vs_Normal_log2FC) > 1),
                                      sampleAnnotation = c("group", "experiment"),
                                      annotationColors = list(group = c("Tumor" = "blue", "Normal" = "red"), experiment = c("A" = "green", "B" = "orange"))))

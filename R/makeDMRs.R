@@ -11,12 +11,12 @@
 #' @param minReadCount A minimum read count for a row to be considered, in the qseaSet as provided.
 #' @param minNRPM A minimum normalised reads per million to apply
 #' @param checkPVals Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.
+#' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
+#' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.
 #' @return A qseaGLM object
 fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                        contrasts = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
-                       checkPVals = TRUE, formula = NULL){
-
-  sampleTable <- qsea::getSampleTable(qseaSet)
+                       checkPVals = TRUE, formula = NULL, calcDispersionAll = FALSE){
 
   if (!is.null(contrasts)) {
     nContrasts <- nrow(contrasts)
@@ -54,17 +54,14 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     formula <- stats::as.formula(paste0("~", paste(c(variable, covariates), collapse = "+"), " + 0"))
   }
 
-  if (!all(covariates %in% colnames(sampleTable))) {
-    stop(glue::glue("Covariate {setdiff(covariates,colnames(sampleTable))} missing from the sampleTable."))
+  if (!all(covariates %in% colnames( qsea::getSampleTable(qseaSet)))) {
+    stop(glue::glue("Covariate {setdiff(covariates,colnames( qsea::getSampleTable(qseaSet)))} missing from the sampleTable."))
   }
-
-  # make a design object based on the formula
-  design <- stats::model.matrix(formula, sampleTable)
 
   contrasts <- contrasts %>%
     dplyr::select(-tidyselect::matches("^variable$"))
 
-  if( ncol(contrasts) == 2){
+  if ( ncol(contrasts) == 2) {
     colnames(contrasts) <- c("group1", "group2")
   } else {
     colnames(contrasts)[1:2] <- c("group1", "group2")
@@ -74,12 +71,24 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     tidyr::pivot_longer(tidyselect::starts_with("group"), names_to = "name", values_to = "group") %>%
     dplyr::pull(group)
 
-  samplesInContrasts <- sampleTable %>%
+  samplesInContrasts <-  qseaSet %>%
+    qsea::getSampleTable() %>%
     dplyr::filter(!!rlang::sym(variable) %in% valuesInContrasts) %>%
     dplyr::pull(sample_name)
 
+  if(!calcDispersionAll){
+    qseaSet <- qseaSet %>%
+      filter(sample_name %in% samplesInContrasts)
+
+  } else {
+    numExtraSamples <- length(setdiff(qsea::getSampleNames(qseaSet), samplesInContrasts))
+    if(numExtraSamples > 0){
+        message(glue::glue("Calculating dispersion estimates including {numExtraSamples} samples that are not being used in contrasts."))
+    }
+  }
+
   if (is.null(keepIndex) & minNRPM == 0 ) {
-    keepIndex = which(matrixStats::rowMaxs(qsea::getCounts(qseaSet)[,samplesInContrasts]) >= minReadCount)
+    keepIndex = which(matrixStats::rowMaxs(qsea::getCounts(qseaSet %>% dplyr::filter(sample_name %in% samplesInContrasts))) >= minReadCount)
   }
 
   if (is.null(keepIndex) & minNRPM >= 0) {
@@ -96,8 +105,12 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
   }
 
+  # make a design object based on the formula
+  design <- stats::model.matrix(formula, qseaSet %>% qsea::getSampleTable())
+
+
   message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))
-  
+
   qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
                                              design,
                                              keep = keepIndex,
@@ -113,11 +126,11 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
     conName <- paste0(variable, contrasts[i,"group1"], "-", variable, contrasts[i,"group2"])
 
-    if (!(contrasts[i,"group1"] %in% sampleTable[,variable])) {
+    if (!(contrasts[i,"group1"] %in% qsea::getSampleTable(qseaSet)[,variable])) {
       stop(glue::glue("value {contrasts[i,]$group1} not found in column {variable} of the sampleTable!"))
     }
 
-    if (!(contrasts[i,"group2"] %in% sampleTable[,variable])) {
+    if (!(contrasts[i,"group2"] %in% qsea::getSampleTable(qseaSet)[,variable])) {
       stop(glue::glue("value {contrasts[i,]$group2} not found in column {variable} of the sampleTable!"))
     }
 
@@ -150,7 +163,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
            Set checkPVals = FALSE to ignore this.")
       } else {
 
-      stop("Error! More than 20% of windows have p-values of exactly 0, possibly an error! \n
+        stop("Error! More than 20% of windows have p-values of exactly 0, possibly an error! \n
            Try not including covariates in the model if included, or set checkPVals = FALSE to ignore this if sure.")
       }
     }
@@ -232,11 +245,11 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
     groupMeansList <- contrastMeansList
   }
 
-    dataTable <- qsea::makeTable(qseaSet, qseaGLM,
-                                 keep = sigIndex,
-                                 norm_methods = c("beta","nrpm"),
-                                 samples = if (keepData) {sampleNames} else{NULL},
-                                 groupMeans = groupMeansList, verbose = FALSE)
+  dataTable <- qsea::makeTable(qseaSet, qseaGLM,
+                               keep = sigIndex,
+                               norm_methods = c("beta","nrpm"),
+                               samples = if (keepData) {sampleNames} else{NULL},
+                               groupMeans = groupMeansList, verbose = FALSE)
 
 
   if (!keepPvals) {
@@ -297,6 +310,8 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param keepPvals Whether to keep the unadjusted p-values in the output
 #' @param checkPVals Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!
 #' @param direction Whether to keep regions that are up/down/both.
+#' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
+#' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.
 #' @return A tibble with the data
 #' @export
 #'
@@ -313,7 +328,8 @@ calculateDMRs <- function(qseaSet,
                           keepContrastMeans = TRUE,
                           keepData = FALSE,
                           keepGroupMeans = FALSE,
-                          direction = "both"){
+                          direction = "both",
+                          calcDispersionAll = FALSE){
 
   if (is.null(variable)) {stop("variable must be specified!")}
 
@@ -326,18 +342,18 @@ calculateDMRs <- function(qseaSet,
         )
       )
     } else if (contrasts %in% c("First", "first")) {
-        contrasts <- makeAllContrasts(qseaSet, variable)[1, ]
-        message(glue::glue(
-          "Calculating the first possible contrast on the {variable} column."
-        ))
+      contrasts <- makeAllContrasts(qseaSet, variable)[1, ]
+      message(glue::glue(
+        "Calculating the first possible contrast on the {variable} column."
+      ))
     } else if (stringr::str_detect(contrasts,"All_vs_|all_vs_")){
 
-        value2 = contrasts %>% stringr::str_remove("All_vs_|all_vs_")
-        contrasts <- tibble::tibble(group1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
-                                        group2 = value2)
-        message(glue::glue(
-          "Calculating all ({nrow(contrasts)}) possible contrasts against {value2} on the {variable} column."
-        ))
+      value2 = contrasts %>% stringr::str_remove("All_vs_|all_vs_")
+      contrasts <- tibble::tibble(group1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
+                                  group2 = value2)
+      message(glue::glue(
+        "Calculating all ({nrow(contrasts)}) possible contrasts against {value2} on the {variable} column."
+      ))
     } else if (stringr::str_detect(contrasts,"_vs_All")){
 
       value1 = contrasts %>% stringr::str_remove("_vs_All|_vs_all")
@@ -370,7 +386,8 @@ calculateDMRs <- function(qseaSet,
   qseaGLM <- fitQseaGLM(qseaSet, variable = variable,  covariates = covariates,
                         contrasts = contrasts,  minReadCount = minReadCount,
                         minNRPM = minNRPM,
-                        checkPVals = checkPVals, formula = formula)
+                        checkPVals = checkPVals, formula = formula,
+                        calcDispersionAll = calcDispersionAll)
 
   dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = qsea::getSampleNames(qseaSet),
                            fdrThres = fdrThres, keepPvals = keepPvals, keepData = keepData,
@@ -393,10 +410,10 @@ calculateDMRs <- function(qseaSet,
     dplyr::bind_cols(deltas) %>%
     tibble::as_tibble()
 
-    # ewww, a for loop. Moves the deltaBeta columns around.
-    for(adjPvalString in (dataTable %>% colnames() %>% stringr::str_subset("_adjPval$"))){
-      dataTable <- dataTable %>% dplyr::relocate(stringr::str_replace(adjPvalString, "_adjPval$","_deltaBeta"), .after = !!adjPvalString)
-    }
+  # ewww, a for loop. Moves the deltaBeta columns around.
+  for(adjPvalString in (dataTable %>% colnames() %>% stringr::str_subset("_adjPval$"))){
+    dataTable <- dataTable %>% dplyr::relocate(stringr::str_replace(adjPvalString, "_adjPval$","_deltaBeta"), .after = !!adjPvalString)
+  }
 
   if (!keepContrastMeans) {
 
