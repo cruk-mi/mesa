@@ -562,7 +562,7 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
         }
 
       } else {
-        shapePalette <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
+        shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
         if (nShape > length(shapePalette)) {
           stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
         }
@@ -594,7 +594,7 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
         } else if (shapePalette == "filled-first") {
           shapePalette <- c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12)
         } else if (shapePalette == "mixture") {
-          shapePalette <- c(16, 8, 0, 17, 3, 9, 15, 13, 2, 18, 14, 4, 1, 5, 6, 10, 11, 12)
+          shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
         } else {
           stop("`shapePalette` argument can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
         }
