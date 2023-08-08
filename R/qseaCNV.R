@@ -205,7 +205,7 @@ plotCNVheatmap <- function(qseaSet,
                                      sampleOrientation = "row",
                                      specifiedAnnotationColors = annotationColors,
                                      sampleAnnotation = {{sampleAnnotation}} ) %>%
-    pluck("sample")
+    purrr::pluck("sample")
 
   chr <- qseaSet %>%
     qsea::getCNV() %>%
