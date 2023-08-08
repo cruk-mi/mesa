@@ -773,11 +773,11 @@ plotPCA <- function(object,
   out <- plotDimRed(object = object,
              qseaSet = qseaSet,
              components = components,
-             colour = colour,
+             colour = {{colour}},
              colourPalette = colourPalette,
              NAcolour = NAcolour,
              symDivColourScale = symDivColourScale,
-             shape = shape,
+             shape = {{shape}},
              shapePalette = shapePalette,
              NAshape = NAshape,
              showSampleNames = showSampleNames,
@@ -1006,6 +1006,7 @@ plotDimRed <- function(object,
       return(ggp)
     }
 
+    print(colour)
     if (length(colour) == 1 && colour == "NULLcol") {
 
       my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = NAshape)
