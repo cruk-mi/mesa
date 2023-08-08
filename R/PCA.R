@@ -1006,7 +1006,6 @@ plotDimRed <- function(object,
       return(ggp)
     }
 
-    print(colour)
     if (length(colour) == 1 && colour == "NULLcol") {
 
       my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = NAshape)
