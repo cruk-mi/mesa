@@ -62,12 +62,18 @@ setMesaGenome <- function(genome){
 
 #' Toggle whether to use parallelisation or not inside various functions in mesa 
 #'
+#' @param nCores How many cores to set. Assumes you want to use MulticoreParam, to use another architecture use the useParallel argument and specify manually.
 #' @param useParallel Boolean denoting whether or not to use parallelisation for various functions in mesa
 #' @param verbose Boolean to determine whether to print messages or not
 #' @return None
 #' @export
 
-setMesaParallel <- function(useParallel = FALSE, verbose = TRUE){
+setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE){
+  
+  if(!is.null(nCores) && nCores > 1) {
+    useParallel = TRUE
+    BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
+  }
   
   options("mesa_parallel" = useParallel)
   
@@ -78,7 +84,7 @@ setMesaParallel <- function(useParallel = FALSE, verbose = TRUE){
     message("Parallelisation turned off for all functions in the mesa package.")
   }
   
-  return(invisible(TRUE))
+  return(invisible(useParallel))
 }
 
 getMesaParallel <- function(verbose = FALSE) {
