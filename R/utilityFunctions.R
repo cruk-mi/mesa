@@ -63,6 +63,7 @@ setMesaGenome <- function(genome){
 #' Toggle whether to use parallelisation or not inside various functions in mesa 
 #'
 #' @param useParallel Boolean denoting whether or not to use parallelisation for various functions in mesa
+#' @param verbose Boolean to determine whether to print messages or not
 #' @return None
 #' @export
 
