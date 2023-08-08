@@ -420,7 +420,6 @@ getAnnotationDataFrame <- function(qseaSet, ...){
   }
 
   qseaSet %>%
-    qsea::getSampleTable() %>%
     dplyr::group_by(group) %>%
     dplyr::mutate(total_fragments = mean(total_fragments),
            relH = mean(relH)) %>%

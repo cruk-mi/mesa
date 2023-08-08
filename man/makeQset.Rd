@@ -21,7 +21,7 @@ makeQset(
   minReferenceLength = 30,
   badRegions = NULL,
   properPairsOnly = FALSE,
-  parallel = TRUE
+  parallel = getMesaParallel()
 )
 }
 \arguments{

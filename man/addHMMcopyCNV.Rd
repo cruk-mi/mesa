@@ -10,7 +10,7 @@ addHMMcopyCNV(
   windowSize = 1e+06,
   fragmentLength = NULL,
   plotDir = NULL,
-  parallel = TRUE,
+  parallel = getMesaParallel(),
   maxInsertSize = 1000,
   minInsertSize = 50,
   minReferenceLength = 30,
