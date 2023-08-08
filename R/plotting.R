@@ -665,7 +665,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 
   #if(is.null())
 
-  colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuOr","Blues","Purples") %>%
+  colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuRd","Blues","Purples") %>%
       purrr::set_names(., nm = .) %>%
       purrr::map(function(pal){
         RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
