@@ -78,10 +78,12 @@ select.qseaSet <- function(.data, ...){selectQset(.data, ...)}
 #' @return A qseaSet object with the sampleTable selected as specified.
 #' @export
 selectQset <- function(qseaSet, ...){
-  qseaSet@sampleTable <- qseaSet %>%
+  newSampleTable <- qseaSet %>%
     qsea::getSampleTable() %>%
-    dplyr::select(...)
+    dplyr::select(sample_name, group, ...)
 
+  qseaSet@sampleTable <- newSampleTable
+  
   return(qseaSet)
 }
 
