@@ -244,7 +244,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
                                             maxInsertSize = 1000,
                                             minInsertSize = 100,
                                             minReferenceLength = 30,
-                                            parallel = TRUE,
+                                            parallel = getMesaParallel(),
                                             properPairsOnly = FALSE) {
   sampleTable = qsea::getSampleTable(qs)
   Regions = qsea::getRegions(qs)

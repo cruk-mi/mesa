@@ -390,10 +390,10 @@ calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCount
 #' This function generates a data frame to use for the annotation of heatmaps, using Individual sample names not group
 #' @param qseaSet A qseaSet object
 #' @param ... Which columns of the sampleTable to use in the annotation data frame
-#' @export
 #'
 getAnnotationDataFrameIndividual <- function(qseaSet, ...){
 
+  #TODO Can this function be removed?
   if (!("valid_fragments" %in% colnames(qsea::getSampleTable(qseaSet)))) {
     qseaSet <- qseaSet %>%
       addLibraryInformation()
@@ -410,17 +410,16 @@ getAnnotationDataFrameIndividual <- function(qseaSet, ...){
 #' This function generates a data frame to use for the annotation of heatmaps, when using groups
 #' @param qseaSet A qseaSet object
 #' @param ... Which columns of the sampleTable to use in the annotation data frame
-#' @export
 #'
 getAnnotationDataFrame <- function(qseaSet, ...){
 
+  #TODO Can this function be removed?
   if (!("valid_fragments" %in% colnames(qsea::getSampleTable(qseaSet)))) {
     qseaSet <- qseaSet %>%
       addLibraryInformation()
   }
 
   qseaSet %>%
-    qsea::getSampleTable() %>%
     dplyr::group_by(group) %>%
     dplyr::mutate(total_fragments = mean(total_fragments),
            relH = mean(relH)) %>%

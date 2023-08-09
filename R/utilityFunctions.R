@@ -46,7 +46,7 @@ liftOverHg19 <- function(grOrDf){
   getOption("mesa_genome", default="hg38")
 }
 
-#' This function sets a default genome for the annotateWindows to use
+#' This function sets a default genome for the annotateWindows function to use
 #'
 #' Currently supporting "hg38" and "GRCh38", this sets the TxDb and annoDb options to appropriate files.
 #'
@@ -58,6 +58,53 @@ setMesaGenome <- function(genome){
   options("mesa_genome" = genome)
 
   return(invisible(TRUE))
+}
+
+#' Toggle whether to use parallelisation or not inside various functions in mesa 
+#'
+#' @param nCores How many cores to set. Assumes you want to use MulticoreParam, to use another architecture use the useParallel argument and specify manually.
+#' @param useParallel Boolean denoting whether or not to use parallelisation for various functions in mesa
+#' @param verbose Boolean to determine whether to print messages or not
+#' @return None
+#' @export
+
+setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE){
+  
+  if(!is.null(nCores) && nCores > 1) {
+    useParallel = TRUE
+    BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
+  }
+  
+  options("mesa_parallel" = useParallel)
+  
+  if(useParallel & verbose){
+    message(glue::glue("Parallelisation turned on for the functions in the mesa package, currently using {BiocParallel::bpworkers()} cores. 
+                       Control the number of cores by calling BiocParallel::register."))
+  } else if (verbose) {
+    message("Parallelisation turned off for all functions in the mesa package.")
+  }
+  
+  return(invisible(useParallel))
+}
+
+getMesaParallel <- function(verbose = FALSE) {
+  
+  if(verbose) {
+    if (is.null(getOption("mesa_parallel"))) {
+      message("Parallelisation not set, using serial evaluation. Call setMesaParallel to set for all mesa functions.")
+    } else if (getOption("mesa_parallel")) {
+      message(glue::glue("Using parallelisation, over {BiocParallel::bpworkers()} cores."))
+    } else {
+      message("Using serial evaluation")
+    }
+  }
+  
+  if (is.null(getOption("mesa_parallel"))) {
+    return(FALSE)
+  } else {
+    return(getOption("mesa_parallel"))
+  }
+  
 }
 
 expect_no_error <- function(object) {

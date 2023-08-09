@@ -18,7 +18,8 @@
 #' @export
 
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
-                          plotDir = NULL, parallel = TRUE,
+                          plotDir = NULL, 
+                          parallel = getMesaParallel(),
                           maxInsertSize = 1000,
                           minInsertSize = 50,
                           minReferenceLength = 30,
@@ -201,10 +202,10 @@ plotCNVheatmap <- function(qseaSet,
                            clusterRows = TRUE){
 
   rowAnnot <- makeHeatmapAnnotations(qseaSet,
-                                    sampleOrientation = "row",
-                                    specifiedAnnotationColors = annotationColors,
-                                    sampleAnnotation = {{sampleAnnotation}} ) %>%
-    purrr::pluck("row")
+                                     sampleOrientation = "row",
+                                     specifiedAnnotationColors = annotationColors,
+                                     sampleAnnotation = {{sampleAnnotation}} ) %>%
+    purrr::pluck("sample")
 
   chr <- qseaSet %>%
     qsea::getCNV() %>%

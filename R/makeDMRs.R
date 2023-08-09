@@ -105,7 +105,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
   }
 
-  # make a design object based on the formula
+    # make a design object based on the formula
   design <- stats::model.matrix(formula, qseaSet %>% qsea::getSampleTable())
 
 
@@ -116,7 +116,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                                              keep = keepIndex,
                                              minRowSum = 0,
                                              norm_method = "beta",
-                                             parallel = (BiocParallel::bpworkers() > 1),
+                                             parallel = getMesaParallel(),
                                              verbose = FALSE))
 
   pb$tick()
@@ -152,7 +152,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                                                   qseaGLM,
                                                   contrast = limContrast,
                                                   name = conNameClean,
-                                                  parallel = TRUE,
+                                                  parallel = getMesaParallel(),
                                                   verbose = FALSE))
 
     pb$tick()
@@ -250,7 +250,6 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
                                norm_methods = c("beta","nrpm"),
                                samples = if (keepData) {sampleNames} else{NULL},
                                groupMeans = groupMeansList, verbose = FALSE)
-
 
   if (!keepPvals) {
     dataTable <- dataTable %>%

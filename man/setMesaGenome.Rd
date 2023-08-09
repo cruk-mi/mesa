@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{setMesaGenome}
 \alias{setMesaGenome}
-\title{This function sets a default genome for the annotateWindows to use}
+\title{This function sets a default genome for the annotateWindows function to use}
 \usage{
 setMesaGenome(genome)
 }
