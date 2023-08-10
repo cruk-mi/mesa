@@ -20,11 +20,14 @@ build:
     - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
 
   rules:
+    - if: '$CI_COMMIT_BRANCH == null'
+      when: never
     - if: '$CI_COMMIT_BRANCH != null'
-    - changes:  # Run the job if any of these files changes
+      changes:  # Run the job if any of these files changes
         - DESCRIPTION
         - Dockerfile_dependencies_only
         - installDependencies.R
+      allow_failure: true
 
 devtools-check:
   image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
