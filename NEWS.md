@@ -1,3 +1,8 @@
+# mesa 0.4.0
+
+BUG FIXES
+* `mutate` now cannot be used to change the sample_name in the sample table of a qseaSet which breaks the object. `renameQsetNames` or `renameSamples` must be used for this.
+
 # dev
 
 BUG FIXES
