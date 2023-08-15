@@ -1,4 +1,6 @@
 # dev
+BUG FIXES
+* `plotPCA` now works when colouring by a factor variable
 
 BUG FIXES
 * Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (fixes #1).
