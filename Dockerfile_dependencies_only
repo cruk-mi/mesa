@@ -6,4 +6,13 @@ COPY --chown=rstudio:rstudio . /home/rstudio/
 
 RUN apt-get update
 RUN apt-get install -y qpdf
-RUN Rscript installDependencies.R
+
+RUN Rscript -e "install.packages(c('BiocManager','tidyverse', 'janitor', 'testthat', 'remotes'))"
+RUN Rscript -e "remotes::install_cran(c('qsea', 'MEDIPSData'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('BSgenome.Hsapiens.NCBI.GRCh38' , 'TxDb.Hsapiens.UCSC.hg38.knownGene' ,'BSgenome.Hsapiens.UCSC.hg19', 'org.Hs.eg.db'), repos = BiocManager::repositories())"
+RUN Rscript -e "install.packages(c('gtools','knitr', 'uwot', 'memoise', 'rmarkdown', 'hues', 'knitr'))"
+RUN Rscript -e "remotes::install_cran(c('limma','plyranges', 'GenomeInfoDb'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('HMMcopy','ComplexHeatmap', 'Rsamtools'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('ChIPseeker', 'biomaRt'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('workflows', 'pheatmap', 'UpSetR', 'ggrepel', 'openxlsx'), repos = BiocManager::repositories())"
+rm -rf /tmp/downloaded_packages
