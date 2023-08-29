@@ -31,9 +31,6 @@ build:
 devtools-check:
   image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
   stage: test
-  rules:
-  - if: '$CI_COMMIT_BRANCH == null'
-    when: never
   tags:
     - methylationprojects_docker
   script:
