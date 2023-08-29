@@ -1,5 +1,8 @@
 # dev
+BUG FIXES
+* `plotPCA` now works when colouring by a factor variable
 
+#mesa 0.4.0
 BUG FIXES
 * Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (fixes #1).
 * Fixed `pull.qseaSet` to work directly.
@@ -8,8 +11,7 @@ CHANGES
 * Renamed many functions throughout the package
 * Removed `mutateQset`, `filterQset`, `arrangeQset`, `sortQset`, `pullQset`, `leftJoinQset` as these just work on the dplyr verbs directly.
 * Combined `getBetaMeans` and `getNormalisedReadSum` into new function called `summariseAcrossWindows`.
-
-
+* Lots of currently undocumented changes
 
 # mesa 0.2.3
 
