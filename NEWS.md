@@ -5,10 +5,8 @@ editor_options:
 ---
 
 # dev
-
-### BUG FIXES
-
--   `plotPCA` now works when colouring by a factor variable
+BUG FIXES
+* `plotPCA` now works when colouring by a factor variable
 
 # mesa 0.4.0
 
