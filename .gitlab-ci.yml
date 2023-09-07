@@ -15,8 +15,8 @@ build:
   script:
     - docker build -t mesa_dependencies -f Dockerfile_dependencies_only .
     - docker login sc-docker-registry.scicom.picr.man.ac.uk:5000
-    - docker tag mesa_dependencies sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:dev
-    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:dev
+    - docker tag mesa_dependencies sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
+    - docker push sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
 
   rules:
     - if: '$CI_COMMIT_BRANCH == null'
@@ -29,7 +29,7 @@ build:
       allow_failure: false
 
 devtools-check:
-  image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
+  image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:dev
   stage: test
   tags:
     - methylationprojects_docker
