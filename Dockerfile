@@ -14,4 +14,6 @@ RUN Rscript -e "BiocManager::install('BiocParallel')"
 RUN Rscript -e "devtools::install('.', dependencies=TRUE, build_vignettes=TRUE, repos = BiocManager::repositories())" && rm -rf /tmp/downloaded_packages
 
 #install other BSgenomes 
-RUN Rscript -e "BiocManager::install('BSgenome.Mmusculus.UCSC.mm39','BSgenome.Rnorvegicus.UCSC.rn7')"
+RUN Rscript -e "BiocManager::install('BSgenome.Mmusculus.UCSC.mm39')"
+RUN Rscript -e "BiocManager::install('BSgenome.Mmusculus.UCSC.mm10')"
+RUN Rscript -e "BiocManager::install('BSgenome.Rnorvegicus.UCSC.rn7')"
