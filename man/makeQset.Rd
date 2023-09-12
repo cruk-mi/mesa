@@ -21,6 +21,8 @@ makeQset(
   minReferenceLength = 30,
   badRegions = NULL,
   properPairsOnly = FALSE,
+  hmmCopyGC = NULL,
+  hmmCopyMap = NULL,
   parallel = getMesaParallel()
 )
 }
@@ -56,6 +58,10 @@ makeQset(
 \item{badRegions}{A GRanges object containing regions to filter out from the result.}
 
 \item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
+
+\item{hmmCopyGC}{A data frame containing GC content per bin (each with size \code{CNVwindowSize}), only for use with hmmcopy.}
+
+\item{hmmCopyMap}{A data frame containing Mapability content per bin (each with size \code{CNVwindowSize}), only for use with hmmcopy.}
 
 \item{parallel}{Whether to read in files by using each core in parallel. Control number of calls by calling e.g. BiocParallel::register(BiocParallel::MulticoreParam(4)) beforehand.}
 }

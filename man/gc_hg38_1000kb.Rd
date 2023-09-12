@@ -3,7 +3,6 @@
 \docType{data}
 \name{gc_hg38_1000kb}
 \alias{gc_hg38_1000kb}
-\alias{gc_hg38_10kb}
 \alias{gc_hg38_50kb}
 \alias{gc_hg38_500kb}
 \title{GC content across the human genome build hg38/GRCh38}
@@ -12,8 +11,6 @@
 }
 \usage{
 gc_hg38_1000kb
-
-gc_hg38_10kb
 
 gc_hg38_50kb
 
