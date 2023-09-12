@@ -18,6 +18,8 @@
 #' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param badRegions A GRanges object containing regions to filter out from the result.
+#' @param hmmCopyGC A data frame containing GC content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
+#' @param hmmCopyMap A data frame containing Mapability content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
 #' @param parallel Whether to read in files by using each core in parallel. Control number of calls by calling e.g. BiocParallel::register(BiocParallel::MulticoreParam(4)) beforehand.
 #' @return A qseaSet object, containing all the information required.
 #' @export
@@ -37,6 +39,8 @@ makeQset <- function(sampleTable,
                      minReferenceLength = 30,
                      badRegions = NULL,
                      properPairsOnly = FALSE,
+                     hmmCopyGC = NULL,
+                     hmmCopyMap = NULL,
                      parallel = getMesaParallel()) {
 
   if(parallel) {
@@ -46,9 +50,9 @@ makeQset <- function(sampleTable,
     } else {
       message(glue::glue("Detected parallel setup with {BiocParallel::bpworkers()} workers."))
     }
-    
+
   }
-  
+
   if (!is.null(fragmentType)) {
     if (fragmentType %in% c("Sheared","sheared") ) {
       fragmentLength = 213
@@ -191,6 +195,41 @@ makeQset <- function(sampleTable,
 
   } else if (CNVmethod == "HMMdefault") {
 
+    if(is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+
+      if(CNVwindowSize == 1000000) {
+        hmmCopyGC <- gc_hg38_1000kb
+      } else if (CNVwindowSize == 500000) {
+        hmmCopyGC <- gc_hg38_500kb
+      } else if (CNVwindowSize == 50000) {
+        hmmCopyGC <- gc_hg38_50kb
+      } else {
+        stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
+      }
+
+    }
+
+    if(is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+      if(CNVwindowSize == 1000000) {
+        hmmCopyMap <- map_hg38_1000kb
+      } else if (CNVwindowSize == 500000) {
+        hmmCopyMap <- map_hg38_500kb
+      } else if (CNVwindowSize == 50000) {
+        hmmCopyMap <- map_hg38_50kb
+      } else {
+        stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
+      }
+
+    }
+
+      if (is.null(hmmCopyGC)) {
+      stop("No hmmCopy GC content object provided!")
+    }
+
+    if (is.null(hmmCopyMap)) {
+      stop("No hmmCopy Mapability file provided!")
+    }
+
     # use HMMCopy directly, with default settings
     qseaSet <- addHMMcopyCNV(qseaSet,
                              inputColumn = "input_file",
@@ -201,7 +240,9 @@ makeQset <- function(sampleTable,
                              maxInsertSize = maxInsertSize,
                              minInsertSize = minInsertSize,
                              properPairsOnly = properPairsOnly,
-                             parallel = TRUE)
+                             hmmCopyGC = hmmCopyGC,
+                             hmmCopyMap = hmmCopyMap,
+                             parallel = parallel)
   }  else if (CNVmethod == "MeCap") {
     message("Adding CNV using MeCap samples")
 
@@ -209,7 +250,7 @@ makeQset <- function(sampleTable,
                             file_name = "file_name",
                             window_size = CNVwindowSize,
                             paired = FALSE,
-                            parallel = TRUE,
+                            parallel = parallel,
                             MeDIP = TRUE
     )
 

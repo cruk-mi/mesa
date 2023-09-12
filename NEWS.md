@@ -5,8 +5,13 @@ editor_options:
 ---
 
 # dev
-BUG FIXES
+
+### BUG FIXES
 * `plotPCA` now works when colouring by a factor variable
+
+### CHANGES
+* HMMCopy related functions now take explicit input of the GC and mappability tracks, rather than having hardcoded internal hg38 objects, allowing for different genomes.
+* Removed the data objects `gc_hg38_10kb` and `map_hg38_10kb` (GC and mappability tracks for hg38 at 10kb resolution) for package size reasons.
 
 # mesa 0.4.0
 
