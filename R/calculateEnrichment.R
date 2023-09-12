@@ -161,6 +161,11 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 
   chr_lengths = as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
 
+  if (all(is.na(GenomeInfoDb::seqlengths(readGRanges)))) {
+    suppressWarnings(GenomeInfoDb::seqinfo(readGRanges) <- GenomeInfoDb::seqinfo(BSgenome::getBSgenome(BSgenome))[GenomeInfoDb::seqnames(GenomeInfoDb::seqinfo(readGRanges))])
+    readGRanges <- IRanges::trim(readGRanges)
+  }
+
   IRanges::ranges(readGRanges) <- IRanges::restrict(IRanges::ranges(readGRanges), +1)
 
   ##Calculate CpG density for regions
@@ -179,6 +184,10 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+  } else  if (BSgenome == "BSgenome.Mmusculus.UCSC.mm10") {
+    genomicDistribution <- mesa::BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
+  } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
+    genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
   } else {
     genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
   }
