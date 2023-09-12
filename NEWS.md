@@ -3,11 +3,11 @@ editor_options:
   markdown: 
     wrap: sentence
 ---
-
 # dev
 
 ### BUG FIXES
 * `plotPCA` now works when colouring by a factor variable
+* `mutate` now cannot be used to change the sample_name in the sample table of a qseaSet which breaks the object. `renameQsetNames` or `renameSamples` must be used for this.
 
 ### CHANGES
 * HMMCopy related functions now take explicit input of the GC and mappability tracks, rather than having hardcoded internal hg38 objects, allowing for different genomes.
