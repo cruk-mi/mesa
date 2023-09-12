@@ -3,7 +3,7 @@ editor_options:
   markdown: 
     wrap: sentence
 ---
-# dev
+# mesa 0.4.1
 
 ### BUG FIXES
 * `plotPCA` now works when colouring by a factor variable
