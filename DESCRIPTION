@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",

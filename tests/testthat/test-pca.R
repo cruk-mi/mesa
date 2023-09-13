@@ -76,7 +76,9 @@ test_that("PCAs", {
     expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
     expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
-
+    expect_no_error(plotPCA(obj1, exampleTumourNormal %>% mutate(gender = as.factor(gender)), 
+                            colour = "gender", shapePalette = c(2,5), shape = "gender"))
+    
   # randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
   #   mutate(patient = stringr::str_remove(sample_name,"[TN]$"),
   #          variableWithOneLevel = "Test",

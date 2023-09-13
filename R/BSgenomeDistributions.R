@@ -9,3 +9,7 @@
 #' @rdname BSgenome.CpG.distribution
 #' @format A data frame with 1 row and 2 columns
 "BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution"
+
+#' @rdname BSgenome.CpG.distribution
+#' @format A data frame with 1 row and 2 columns
+"BSgenome.Mmusculus.UCSC.mm10.CpG.distribution"

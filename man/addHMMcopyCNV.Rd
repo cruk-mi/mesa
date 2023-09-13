@@ -15,7 +15,9 @@ addHMMcopyCNV(
   minInsertSize = 50,
   minReferenceLength = 30,
   minMapQual = 30,
-  properPairsOnly = FALSE
+  properPairsOnly = FALSE,
+  hmmCopyGC = NULL,
+  hmmCopyMap = NULL
 )
 }
 \arguments{
@@ -40,6 +42,10 @@ addHMMcopyCNV(
 \item{minMapQual}{Minimum mapping quality to include a read (on either end if proper pair)}
 
 \item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
+
+\item{hmmCopyGC}{Object containing GC content per window in the genome, for hmmcopy}
+
+\item{hmmCopyMap}{Object containing mapability content per window in the genome, for hmmcopy}
 }
 \value{
 A qseaGLM object

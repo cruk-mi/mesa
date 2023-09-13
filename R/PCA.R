@@ -1024,10 +1024,10 @@ plotDimRed <- function(object,
 
         cVdat <- plotData[[cV]]
 
-        colourScaleType <- dplyr::case_when(is.factor(cVdat) | is.character(cVdat) ~ "qualitative", # qualitative variable
-                                            is.numeric(cVdat) & min(cVdat, na.rm = TRUE) >= 0 ~ "sequential_non_neg", # non-negative sequential variable
-                                            is.numeric(cVdat) & max(cVdat, na.rm = TRUE) <= 0 ~ "sequential_non_pos", # non-positive sequential variable
-                                            is.numeric(cVdat) & (max(cVdat, na.rm = TRUE) > 0 & min(cVdat, na.rm = TRUE) < 0) ~ "diverging") # diverging variable
+        colourScaleType <- dplyr::case_when(is.factor(cVdat) || is.character(cVdat) ~ "qualitative", # qualitative variable
+                                            is.numeric(cVdat) && min(cVdat, na.rm = TRUE) >= 0 ~ "sequential_non_neg", # non-negative sequential variable
+                                            is.numeric(cVdat) && max(cVdat, na.rm = TRUE) <= 0 ~ "sequential_non_pos", # non-positive sequential variable
+                                            is.numeric(cVdat) && (max(cVdat, na.rm = TRUE) > 0 && min(cVdat, na.rm = TRUE) < 0) ~ "diverging") # diverging variable
 
         if (is.na(colourScaleType)) {
           stop(glue::glue("The variable `{cV}` can not be mapped to a colour scale."))
