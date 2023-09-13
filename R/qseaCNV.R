@@ -14,43 +14,36 @@
 #' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param plotDir A directory to export individual HMMcopy plots to.
+#' @param hmmCopyGC Object containing GC content per window in the genome, for hmmcopy
+#' @param hmmCopyMap Object containing mapability content per window in the genome, for hmmcopy
 #' @return A qseaGLM object
 #' @export
 
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
-                          plotDir = NULL, 
+                          plotDir = NULL,
                           parallel = getMesaParallel(),
                           maxInsertSize = 1000,
                           minInsertSize = 50,
                           minReferenceLength = 30,
                           minMapQual = 30,
-                          properPairsOnly = FALSE
+                          properPairsOnly = FALSE,
+                          hmmCopyGC = NULL,
+                          hmmCopyMap = NULL
                           )
 {
 
+  if (is.null( hmmCopyGC)) {
+    stop("GC track for hmmcopy must be provided.")
+  }
+
+  if (is.null( hmmCopyMap)) {
+    stop("GC track for hmmcopy must be provided.")
+  }
+
+  hmmCopyGC <- asValidGranges(hmmCopyGC)
+  hmmCopyMap <- asValidGranges(hmmCopyMap)
+
   #TODO something with zygosity
-
-  if(windowSize == 1000000) {
-
-    gcGR <- gc_hg38_1000kb
-    mapGR <- map_hg38_1000kb
-
-  } else if (windowSize == 500000) {
-
-    gcGR <- gc_hg38_500kb
-    mapGR <- map_hg38_500kb
-
-  } else if (windowSize == 50000) {
-
-    gcGR <- gc_hg38_50kb
-    mapGR <- map_hg38_50kb
-
-  } else if (windowSize == 10000) {
-
-    gcGR <- gc_hg38_10kb
-    mapGR <- map_hg38_10kb
-
-  } else {stop(glue::glue("Window size must be one of 10000, 50000, 500000 or 1000000 currently."))}
 
   CNV_Regions = qsea:::makeGenomeWindows(qsea:::getGenome(qs), as.character(qsea::getChrNames(qs)), windowSize)
   CpGpos = GenomicRanges::GRanges(seqinfo = GenomicRanges::seqinfo(CNV_Regions))
@@ -91,13 +84,13 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
     warning("Low coverage in CNV files. Consider larger CNV_window_size")
   }
 
+  GenomicRanges::mcols(CNV_Regions) <- tibble::as_tibble(counts)
+
   CNV_RegionsWithReads <- CNV_Regions %>%
+    plyranges::join_overlap_left(hmmCopyGC) %>%
+    plyranges::join_overlap_left(hmmCopyMap)  %>%
     tibble::as_tibble() %>%
     dplyr::rename(chr = seqnames) %>%
-    dplyr::bind_cols(reads = tibble::as_tibble(counts)) %>%
-    dplyr::left_join(gcGR, by = c("chr", "start", "end")) %>%
-    dplyr::left_join(mapGR, by = c("chr", "start", "end")) %>%
-    dplyr::mutate(chr = as.factor(chr)) %>%
     data.table::data.table()
 
   #try saving the raw CNV data in the qseaSet.
@@ -135,7 +128,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
   correctOutput <- CNV_RegionsWithReads %>%
     dplyr::select(chr, start, end, width, strand, gc, map, tidyselect::any_of(colname)) %>%
-    dplyr::rename(reads = colname) %>%
+    dplyr::rename(reads = tidyselect::all_of(colname)) %>%
     HMMcopy::correctReadcount(mappability = 0.9, samplesize = 50000, verbose = FALSE)
 
   initParam <- HMMcopy::HMMsegment(correctOutput, param = NULL, autosomes = NULL,
@@ -150,7 +143,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
   out <- hmmseg$segs %>%
     dplyr::left_join(endMusDf, by = "state") %>%
-    dplyr::mutate(chr = factor(chr, levels = 1:22)) %>%
+    dplyr::mutate(chr = factor(chr, levels = (CNV_RegionsWithReads %>% pull(chr) %>% levels()))) %>%
     dplyr::arrange(chr, start) %>%
     dplyr::rename(seqnames = chr) %>%
     dplyr::select(seqnames, start, end, CNV) %>%

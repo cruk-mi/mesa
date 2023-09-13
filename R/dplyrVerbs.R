@@ -31,11 +31,17 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 #' @export
 mutate.qseaSet <- function(.data, ...){
 
-  .data@sampleTable <- .data %>%
+   newTable <- .data %>%
     qsea::getSampleTable() %>%
     tibble::rownames_to_column(".rownameCol") %>%
     dplyr::mutate(...) %>%
     tibble::column_to_rownames(".rownameCol")
+  
+  if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
+    stop(glue::glue("Error: sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
+  }
+
+  .data@sampleTable <- newTable
 
   return(.data)}
 
