@@ -147,3 +147,14 @@ test_that("is.qseaSet", {
   expect_false(is.qseaSet(1:10))
 
 })
+
+test_that("select.qseaSet", {
+  expect_equal(exampleTumourNormal %>% select(tissue) %>% getSampleTable() %>% colnames(), c("sample_name", "group","tissue"))
+  expect_equal(exampleTumourNormal %>% select(type) %>% getSampleTable() %>% colnames(), c("sample_name", "group","type"))
+  expect_contains(exampleTumourNormal %>% select(-starts_with("t")) %>% getSampleTable() %>% colnames(), c("sample_name","group"))
+  
+  expect_equal(exampleTumourNormal %>% select(-starts_with("t")) %>% getSampleTable() %>% ncol(), 6)
+  expect_equal(exampleTumourNormal %>% select(-age) %>% getSampleTable() %>% ncol(), 8)
+  expect_contains(exampleTumourNormal %>% select(-age) %>% getSampleTable() %>% colnames(), c("sample_name","group"))
+  
+})

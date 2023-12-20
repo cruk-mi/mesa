@@ -140,7 +140,6 @@ test_that("Testing general functionality", {
   expect_equal(randomSet %>% getNRPMTable() %>% dplyr::select(matches("Sim")) %>% ncol(), randomSet %>% getSampleNames() %>% length())
   expect_equal(randomSet %>% getNRPMTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups2() %>% length())
 
-
 })
 
 
