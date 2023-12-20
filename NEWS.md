@@ -3,6 +3,11 @@ editor_options:
   markdown: 
     wrap: sentence
 ---
+# dev
+
+### BUG FIXES
+* `select` now works when dropping a column.
+
 # mesa 0.4.1
 
 ### BUG FIXES

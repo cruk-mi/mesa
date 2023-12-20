@@ -86,10 +86,14 @@ select.qseaSet <- function(.data, ...){selectQset(.data, ...)}
 selectQset <- function(qseaSet, ...){
   newSampleTable <- qseaSet %>%
     qsea::getSampleTable() %>%
-    dplyr::select(sample_name, group, ...)
+    dplyr::select(...)
 
-  qseaSet@sampleTable <- newSampleTable
-  
+  #ensure that the sample_name and group columns are still present at the front of the output
+  qseaSet@sampleTable <- qseaSet %>%
+    qsea::getSampleTable() %>%
+    dplyr::select(sample_name, group) %>%
+    bind_cols(newSampleTable %>% dplyr::select(-matches("^sample_name$|^group$")))
+
   return(qseaSet)
 }
 
