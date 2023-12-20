@@ -6,6 +6,7 @@ editor_options:
 # dev
 
 ### BUG FIXES
+* `poolSamples` now returns data frames instead of matrices in the libraries slot. 
 * `select` now works when dropping a column.
 
 # mesa 0.4.1
