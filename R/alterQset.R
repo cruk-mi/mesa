@@ -318,8 +318,8 @@ poolSamples <- function(qseaSet, mergeString){
   }
   )
 
-  newSet@libraries$file_name <- as.matrix(newLibrariesFile)
-  newSet@libraries$input_file <- as.matrix(newLibrariesInput)
+  newSet@libraries$file_name <- as.data.frame(newLibrariesFile)
+  newSet@libraries$input_file <- as.data.frame(newLibrariesInput)
 
   oldSet <- qseaSet %>%
     subsetQset(samplesToDrop = samplesToMerge)
