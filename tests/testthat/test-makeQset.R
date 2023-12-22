@@ -154,6 +154,11 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 
   expect_true("relH" %in% (GRCh38testSet %>% addLibraryInformation() %>% getSampleTable() %>% colnames()))
 
+  expect_true("hyperStableEdgar" %in% (GRCh38testSet %>% addHyperStableFraction() %>% getSampleTable() %>% colnames()))
+
+  expect_true("relH" %in% (randomSet %>% getSampleQCSummary() %>% colnames()))
+  expect_true("valid_fragment" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
+
 })
 
 test_that("calculateCGEnrichment works", {

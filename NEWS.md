@@ -7,11 +7,13 @@ editor_options:
 
 ### Added
 * Examples added for some functions, and documentation for some related functions merged.
+* Added more tests following inspection of `covr` coverage.
 
 ### BUG FIXES
 * `poolSamples` now returns data frames instead of matrices in the libraries slot. 
 * `select` now works when dropping a column.
-*  PCA/UMAP functiions now give a more informative error if there are insufficient regions or samples.
+*  PCA/UMAP functions now give a more informative error if there are insufficient regions or samples.
+* `downSample` now works correctly again following changes to how `table` and `enframe` interact.
 
 # mesa 0.4.1
 

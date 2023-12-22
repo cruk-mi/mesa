@@ -282,18 +282,17 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
 #' This function takes a qseaSet and downsamples the reads.
 #' @param qseaSet The qseaSet object.
 #' @param nReads How many reads to downsample to.
-#' @param renormalise Whether to renormalise the resulting qseaSet.
 #' @return A qseaSet object with the reads downsampled.
 #' @export
 #'
-downSample <- function(qseaSet, nReads, renormalise = TRUE){
+downSample <- function(qseaSet, nReads){
   counts <- qseaSet@count_matrix
 
   if (min(colSums(counts)) < nReads) {
     stop(glue::glue("Number of reads requested is less than the minimum {min(colSums(counts))}."))
   }
 
-  message(glue::glue("Downsampling all samples to {nReads} each."))
+  message(glue::glue("Downsampling all samples to {nReads} each"))
 
   newCounts <- purrr::map_dfc(colnames(counts), function(colname){
         vec <- counts[,colname]
@@ -301,7 +300,7 @@ downSample <- function(qseaSet, nReads, renormalise = TRUE){
         sample(rep(1:length(vec), vec), replace = FALSE, size = nReads) %>%
           table() %>%
           tibble::enframe(name = "window") %>%
-          dplyr::mutate(window = as.integer(window)) %>%
+          dplyr::mutate(window = as.integer(window), value = as.integer(value)) %>%
           dplyr::left_join(tibble::tibble(window = seq_along(vec)),., copy = TRUE, by = "window") %>%
           dplyr::mutate(value = tidyr::replace_na(value,0)) %>%
           dplyr::select(value) %>%
@@ -314,7 +313,6 @@ downSample <- function(qseaSet, nReads, renormalise = TRUE){
   qseaSet@libraries$file_name[,"valid_fragments"] <- rep(nReads, ncol(counts))
   qseaSet@libraries$file_name[,"offset"] <- rep(NA, ncol(counts))
   qseaSet@libraries$file_name[,"library_factor"] <- rep(NA, ncol(counts))
-
 
   return(qseaSet)
 }

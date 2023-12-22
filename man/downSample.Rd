@@ -4,14 +4,12 @@
 \alias{downSample}
 \title{This function takes a qseaSet and downsamples the reads.}
 \usage{
-downSample(qseaSet, nReads, renormalise = TRUE)
+downSample(qseaSet, nReads)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
 \item{nReads}{How many reads to downsample to.}
-
-\item{renormalise}{Whether to renormalise the resulting qseaSet.}
 }
 \value{
 A qseaSet object with the reads downsampled.
