@@ -33,23 +33,23 @@ test_that("Annotation getting works", {
 
   expect_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
   expect_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
-  
+
   expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type),
                annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
-  
+
   expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), regionsToOverlap = regions, sampleAnnotation = c(tumour,type,age),
                                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
-  
-  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), 
-                                     regionsToOverlap = regions %>% mutate(newCol = rnorm(10)), 
+
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour),
+                                     regionsToOverlap = regions %>% mutate(newCol = rnorm(10)),
                                      sampleAnnotation = c(tumour,type,age),
                                      windowAnnotation = c(CpG_density,newCol),
                                      annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
-  
-  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour), 
-                                     regionsToOverlap = regions %>% mutate(newCol = rnorm(10)), 
+
+  expect_no_error(plotRegionsHeatmap(exampleTumourNormal %>% mutate(group = tumour),
+                                     regionsToOverlap = regions %>% mutate(newCol = rnorm(10)),
                                      windowAnnotation = c(CpG_density, newCol)))
-  
+
 }
 )
 
@@ -62,15 +62,15 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE))
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = TRUE))
-  
+
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE, showSampleNames = FALSE))
 
   expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
   expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
-  
+
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
                                annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
-  
+
   expect_no_error(exampleTumourNormal %>%
                     plotGeneHeatmap(gene = "HOXA10"))
 
@@ -139,6 +139,10 @@ test_that("Testing general functionality", {
   expect_equal(randomSet %>% getNRPMTable() %>% nrow(), randomSet %>% getRegions() %>% length())
   expect_equal(randomSet %>% getNRPMTable() %>% dplyr::select(matches("Sim")) %>% ncol(), randomSet %>% getSampleNames() %>% length())
   expect_equal(randomSet %>% getNRPMTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups2() %>% length())
+
+  expect_equal(randomSet %>% getNRPMTable(useGroupMeans = TRUE) %>% dplyr::select(matches("Tum|Norm")) %>% ncol(), randomSet %>% getSampleGroups2() %>% length())
+
+  expect_true("valid_fragments" %in% (randomSet %>% getSampleQCSummary() %>% colnames()))
 
 })
 

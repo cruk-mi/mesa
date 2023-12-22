@@ -12,7 +12,7 @@ test_that("Filtering Qset works", {
                  length(), 8)
   })
 
-test_that("Reducing Qset Windows", {
+test_that("Changing Qset Windows", {
 
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
 
@@ -22,13 +22,16 @@ test_that("Reducing Qset Windows", {
                  filterByOverlaps(regions) %>%
                  qsea::getRegions() %>% length(), 1000)
 
+  expect_equal(randomSet %>%
+                 filterByNonOverlaps(regions) %>%
+                 qsea::getRegions() %>% length(), 9000)
 })
 
 
 test_that("Mutating Qset works", {
 
   qseaSet <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000)
-  
+
   sampTab <- qseaSet %>%
     mutate(newCol = ifelse(stringr::str_detect(sample_name,"Sim1"),"fish","duck")) %>%
     mutate(repNum = stringr::str_remove(sample_name,"Sim")) %>%
@@ -41,7 +44,7 @@ test_that("Mutating Qset works", {
   expect_equal(
     sampTab %>% pull(repNum), c("1T","2T","3T","1N","2N","3N")
   )
-  
+
   expect_error(
     qseaSet %>% mutate(sample_name = "new_name")
   )
@@ -79,12 +82,18 @@ test_that("Sorting Qsets", {
 
 test_that("Combining Qsets", {
 
-  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
+  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000)
 
   splitSet <- filter(randomSet, group == "Tumor") %>%
     combineQsets(filter(randomSet, group != "Tumor"))
 
+  splitSetList <- list(a = filter(randomSet, group == "Tumor"),
+                       b = filter(randomSet, group != "Tumor")) %>%
+    combineQsetsList()
+
   expect_equal(splitSet %>% sort(), randomSet %>% sort() )
+  expect_equal(splitSetList %>% sort(), randomSet %>% sort() )
+  expect_equal(splitSet %>% sort(), splitSetList %>% sort() )
 
 })
 
@@ -123,13 +132,15 @@ test_that("addLibraryInformation", {
 
 test_that("renameSamples", {
 
-  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000) %>%
+  randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000) %>%
     mutate(new_column = LETTERS[1:16])
 
   renamedSet <- randomSet %>%
     renameSamples("new_column")
 
   expect_true(all(getSampleNames(renamedSet)  ==  LETTERS[1:16]))
+
+  expect_true("Example1T" %in% (randomSet %>% renameQsetNames("Sim","Example") %>% getSampleNames()))
 
 })
 
@@ -152,9 +163,9 @@ test_that("select.qseaSet", {
   expect_equal(exampleTumourNormal %>% select(tissue) %>% getSampleTable() %>% colnames(), c("sample_name", "group","tissue"))
   expect_equal(exampleTumourNormal %>% select(type) %>% getSampleTable() %>% colnames(), c("sample_name", "group","type"))
   expect_contains(exampleTumourNormal %>% select(-starts_with("t")) %>% getSampleTable() %>% colnames(), c("sample_name","group"))
-  
+
   expect_equal(exampleTumourNormal %>% select(-starts_with("t")) %>% getSampleTable() %>% ncol(), 6)
   expect_equal(exampleTumourNormal %>% select(-age) %>% getSampleTable() %>% ncol(), 8)
   expect_contains(exampleTumourNormal %>% select(-age) %>% getSampleTable() %>% colnames(), c("sample_name","group"))
-  
+
 })
