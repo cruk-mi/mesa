@@ -3,11 +3,8 @@
 #' @importFrom dplyr filter
 #' @param .data A qseaSet to filter, based on the sampleTable
 #' @param ... Other arguments to pass to dplyr::filter
-#' @param .preserve Not implemented as grouping not available  for qseaSet
+#' @param .preserve Not implemented as grouping is not available  for qseaSet
 #' @return A qseaSet object, with only samples that are selected by the filtering operation.
-#' @examples
-#' filter(exampleTumourNormal, type == "LUAD")
-#' filter(qsea::getExampleQseaSet(), stringr::str_detect(sample_name,"Sim1"))
 #' @export
 filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 
@@ -27,7 +24,6 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 #' @param .data A qseaSet to mutate
 #' @param ... Other arguments to pass to dplyr::mutate
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::mutate
-#' @export mutate.qseaSet
 #' @export
 mutate.qseaSet <- function(.data, ...){
 

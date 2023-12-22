@@ -19,3 +19,6 @@ A qseaSet object, with only the selected samples inside it.
 \description{
 This function takes a qseaSet and keeps only a subset of the samples from it.
 }
+\examples{
+subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
+}

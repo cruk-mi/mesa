@@ -60,3 +60,8 @@ A tibble with the data
 \description{
 This function fits a GLM and returns the resulting data table
 }
+\examples{
+qseaSet <- mesa::exampleTumourNormal
+calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
+
+}

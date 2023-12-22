@@ -15,3 +15,6 @@ A qseaSet object with the sampleTable enhanced with the information on number of
 \description{
 This function takes a qseaSet and adds the information on the number of reads into the sampleTable for easier access.
 }
+\examples{
+addLibraryInformation(exampleTumourNormal)
+}

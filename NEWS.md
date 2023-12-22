@@ -5,6 +5,9 @@ editor_options:
 ---
 # dev
 
+### Added
+* Examples added for some functions, and documentation for some related functions merged.
+
 ### BUG FIXES
 * `poolSamples` now returns data frames instead of matrices in the libraries slot. 
 * `select` now works when dropping a column.

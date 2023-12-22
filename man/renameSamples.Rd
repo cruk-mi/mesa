@@ -17,3 +17,8 @@ A qseaSet object with the samples renamed.
 \description{
 This function takes a qseaSet and renames the samples based on a column of the sampleTable.
 }
+\examples{
+exampleTumourNormal \%>\%
+mutate(newName = paste("Sample",1:10)) \%>\%
+renameSamples(newNameColumn = 'newName')
+}
