@@ -19,3 +19,6 @@ A qseaSet object, containing all the samples from both qseaSet objects.
 \description{
 This function takes a qseaSet and renames the samples in it.
 }
+\examples{
+renameQsetNames(exampleTumourNormal, pattern = 'T', replacement = 'Tumour' )
+}

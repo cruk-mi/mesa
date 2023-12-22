@@ -11,15 +11,11 @@
 
 \item{...}{Other arguments to pass to dplyr::filter}
 
-\item{.preserve}{Not implemented as grouping not available  for qseaSet}
+\item{.preserve}{Not implemented as grouping is not available  for qseaSet}
 }
 \value{
 A qseaSet object, with only samples that are selected by the filtering operation.
 }
 \description{
 This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
-}
-\examples{
-filter(exampleTumourNormal, type == "LUAD")
-filter(qsea::getExampleQseaSet(), stringr::str_detect(sample_name,"Sim1"))
 }

@@ -313,6 +313,9 @@ makeAllContrasts <- function(qseaSet, variable){
 #' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.
 #' @return A tibble with the data
 #' @export
+#' @examples
+#' qseaSet <- mesa::exampleTumourNormal
+#' calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
 #'
 calculateDMRs <- function(qseaSet,
                           variable = NULL,

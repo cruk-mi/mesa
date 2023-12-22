@@ -2,8 +2,8 @@
 #' @param DMRtable A data frame with multiple comparisons inside
 #' @param FDRthres FDR threshold to apply to each comparison
 #' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast
+#' @seealso [tidyr]{pivot_longer}
 #' @export
-#'
 pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
   pivotedDMRs <- DMRtable %>%
     dplyr::rename_with(~ stringr::str_replace(.x, "_adjPval", ":adjPval")) %>%

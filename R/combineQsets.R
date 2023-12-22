@@ -9,6 +9,7 @@
 #' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
 #' @return A qseaSet object, containing all the samples from both qseaSet objects.
 #' @export
+
 combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
   if (is.character(firstQset)) {
     if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
