@@ -139,23 +139,31 @@ getDimRed <- function(qseaSet,
                       nPC = 5,
                       returnDataTable = FALSE,
                       ...) {
-  
+
+  if (!("qseaSet" %in% class(qseaSet))) {
+    stop("Please provide a qseaSet in the first position.")
+  }
+
+  if (qseaSet %>% getSampleNames() %>% length() <= 2) {
+    stop(glue::glue("Insufficient samples {qseaSet %>% getSampleNames() %>% length()} in provided qseaSet, must be at least 3."))
+  }
+
   if (useGroupMeans) {
     groupString <- "sample group"
   } else {
     groupString <- "sample"
   }
-  
+
   if (!is.null(dataTable)) {
     dataTable <- asValidGranges(dataTable)
-    
+
     samples <- dataTable %>%
       tidyr::as_tibble() %>%
       dplyr::select(-tidyselect::any_of(c("seqnames", "start", "end", "width", "strand", "CpG_density"))) %>%
       colnames()
-    
+
     normMethodSuffixDetected <- stringr::str_detect(samples, glue::glue("_{normMethod}$"))
-    
+
     if (all(normMethodSuffixDetected)) {
       samples <- stringr::str_remove(samples, glue::glue("_{normMethod}$"))
       dataTable <- removeNormMethodSuffix(dataTable %>% tidyr::as_tibble(),
@@ -164,7 +172,7 @@ getDimRed <- function(qseaSet,
     } else if (any(normMethodSuffixDetected)) {
       stop(glue::glue("normMethod suffix '_{normMethod}' is present for some but not all of the {groupString} column names in dataTable."))
     }
-    
+
     if (useGroupMeans) {
       if (!all(samples %in% names(qsea::getSampleGroups(qseaSet)))) {
         stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
@@ -176,11 +184,11 @@ getDimRed <- function(qseaSet,
              (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
       }
     }
-    
+
     if (length(plyranges::setdiff_ranges(dataTable, getWindows(qseaSet))) > 0) {
       stop("At least one window in dataTable does not have a matching window in qseaSet.")
     }
-    
+
     testSamples <- samples[1:min(5, length(samples))]
     inputValues <- dataTable[1:min(50, length(dataTable)), ]
     testValues <- getDataTable(qseaSet %>%
@@ -189,7 +197,7 @@ getDimRed <- function(qseaSet,
                                normMethod,
                                useGroupMeans = useGroupMeans) %>%
       dplyr::arrange(seqnames, start, end)
-    
+
     if (!isTRUE(all.equal(testValues, inputValues %>%
                           tidyr::as_tibble() %>%
                           dplyr::select(tidyselect::all_of(colnames(testValues))) %>%
@@ -199,7 +207,7 @@ getDimRed <- function(qseaSet,
     }
     initialNumWindows <- length(dataTable)
   } else {
-    
+
     if (useGroupMeans) {
       samples <- names(qsea::getSampleGroups(qseaSet))
     } else {
@@ -207,48 +215,48 @@ getDimRed <- function(qseaSet,
     }
     initialNumWindows <- getWindows(qseaSet) %>% length()
   }
-  
+
   message(glue::glue("------------------------------
                      Initial number of windows = {initialNumWindows}."))
-  
+
   if (!is.null(regionsToOverlap)) {
     regionsToOverlap <- regionsToOverlap %>%
       tibble::as_tibble() %>%
       dplyr::select(tidyselect::any_of(c("seqnames", "start", "end", "CpG_density"))) %>%  # keep only minimum columns necessary
       asValidGranges()
-    
+
     if (is.null(dataTable)) {
       qseaSet <- qseaSet %>%
         filterByOverlaps(regionsToOverlap = regionsToOverlap)
-      
+
       numWindowsRemovedRegionOverlap <- initialNumWindows - length(getWindows(qseaSet))
       message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(getRegions(qseaSet))} windows remaining."))
-      
+
     } else {
       dataTable <- dataTable %>%
         plyranges::filter_by_overlaps(y = regionsToOverlap)
-      
+
       numWindowsRemovedRegionOverlap <- initialNumWindows - length(dataTable)
       message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(dataTable)} windows remaining."))
     }
   } else {
     numWindowsRemovedRegionOverlap <- NULL
   }
-  
+
   if (is.null(dataTable)) {
     message("-----------")
     dataTable <- qseaSet %>%
       filterWindows(CpG_density >= minDensity) %>%
       getDataTable(normMethod = normMethod, useGroupMeans = useGroupMeans)
     message("-----------")
-    
+
     if (minDensity > 0) {
       numWindowsRemovedMinDensity <- length(getWindows(qseaSet)) - nrow(dataTable)
       message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
     } else {
       numWindowsRemovedMinDensity <- NULL
     }
-    
+
   } else {
     currentNumWindows <- length(dataTable)
     dataTable <- dataTable %>%
@@ -258,23 +266,23 @@ getDimRed <- function(qseaSet,
                          tidyr::as_tibble() %>%
                          dplyr::select(seqnames, start, end, CpG_density)) %>%
       dplyr::filter(CpG_density >= minDensity)
-    
+
     if (minDensity > 0) {
       numWindowsRemovedMinDensity <- currentNumWindows - nrow(dataTable)
       message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
     } else {
       numWindowsRemovedMinDensity <- NULL
     }
-    
+
   }
-  
+
   currentNumWindows <- nrow(dataTable)
-  
+
   dataTable <- dataTable %>%
     tidyr::drop_na(tidyr::all_of(samples))
-  
+
   numWindowsRemovedMissingVals <- currentNumWindows - nrow(dataTable)
-  
+
   if (numWindowsRemovedMissingVals > 0) {
     message(glue::glue("Filtered out {numWindowsRemovedMissingVals} windows with at least one missing value: {nrow(dataTable)} windows remaining.\n
                        ------------------------------
@@ -284,78 +292,81 @@ getDimRed <- function(qseaSet,
             ------------------------------
             \n"))
   }
-  
-  
+
+  if(nrow(dataTable) <= 2) {
+    stop(glue::glue("Insufficient windows {nrow(dataTable)} remaining after filtering! Have you filtered for poor quality samples?"))
+  }
+
   if (is.null(topVarNum)) {
     topVarNum <- NA
   } else if (!(length(topVarNum) == 1 && is.na(topVarNum)) & !is.vector(topVarNum, mode = "numeric")) {
     stop("topVarNum should be a numeric vector (or NULL")
   }
-  
+
   if (!is.list(topVarSamples)) {
     topVarSamples <- list(topVarSamples)
   }
-  
+
   if (length(topVarNum) > 1 && !(length(topVarSamples) %in% c(1, length(topVarNum)))) {
     stop("If topVarSamples is a list and length(topVarNum) > 1, topVarSamples should be the same length as topVarNum.")
   }
-  
-  
+
+
   # replace NA with NULL
   topVarSamples <- purrr::map(topVarSamples, function(tVS) {
-    
+
     if (length(tVS) == 1 && is.na(tVS)) {
       tVS <- NULL
     }
-    
+
     return(tVS)
   })
-  
+
   topVarSamplesInput <- topVarSamples
-  
+
   topVarSamples <- purrr::map(topVarSamples, function(tVS) {
-    
+
     if (!is.null(tVS)) {
       if (!is.vector(tVS, mode = "character")) {
         stop(glue::glue("topVarSamples should be NULL, a character vector of {groupString} names or a regular expression (or a list of these)."))
-        
+
       } else if (length(tVS) > 1) { # character vector of sample (group) names
         notInSamples <- setdiff(tVS, samples)
         if (length(notInSamples) > 0) {
           stop(glue::glue("topVarSamples contains {groupString} names that are not in the qseaSet and/or dataTable:
                         {paste0(notInSamples, collapse = ', ')}."))
         }
-        
+
       } else { # regular expression to match
         tVS <- stringr::str_subset(samples, tVS)
-        
+
       }
-      
+
     } else {
       tVS <- samples
-      
+
     }
-    
+
     return(tVS)
-    
+
   })
-  
+
   topVar <- tibble::tibble(topVarNum = topVarNum, topVarSamples = topVarSamples, topVarNumInput = topVarNum, topVarSamplesInput = topVarSamplesInput) %>%
     dplyr::mutate(topVarNum = ifelse(topVarNum >= nrow(dataTable), NA, topVarNum),
                   topVarSamples = ifelse(is.na(topVarNum), list(NULL), topVarSamples),
                   inputChanged = !purrr::map2_lgl(topVarNum, topVarNumInput, identical) |
                     !purrr::map2_lgl(topVarSamples, topVarSamplesInput, identical))
-  
+
   if (any(topVar$topVarNumInput > nrow(dataTable), na.rm = TRUE)) {
     message(glue::glue("The following topVarNum values are larger than the number of remaining windows (= {nrow(dataTable)}): {paste0(dplyr::filter(topVar, topVarNumInput > nrow(dataTable)) %>% pull(topVarNumInput) %>% unique(), collapse = ', ')}"))
-    
+
     if (any(is.na(topVar$topVarNumInput) | topVar$topVarNumInput == nrow(dataTable))) {
       message(glue::glue("These values are not used; {method} is already being done with all remaining windows.\n"))
     } else {
       message(glue::glue("These values are not used; {method} will be done with all remaining windows instead.\n"))
     }
   }
-  
+
   topVar <- topVar %>%
     dplyr::distinct(topVarNum, topVarSamples, .keep_all = TRUE) %>%
     dplyr::group_by(topVarSamples) %>%
@@ -365,11 +376,11 @@ getDimRed <- function(qseaSet,
     dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) %>%
     dplyr::bind_rows(topVar) %>%
     dplyr::distinct(topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, .keep_all = TRUE)
-  
+
   rowSds <- function(x) {
     sqrt(rowSums((x - rowMeans(x)) ^ 2) / (ncol(x) - 1))
   }
-  
+
   if (any(!is.na(topVar$windowSdName))) {
     dataTable <- topVar %>%
       tidyr::drop_na(windowSdName) %>%
@@ -378,7 +389,7 @@ getDimRed <- function(qseaSet,
       dplyr::mutate(topVarSamples = purrr::set_names(topVarSamples, windowSdName)) %>%
       dplyr::pull(topVarSamples) %>%
       purrr::imap(function(tVS, nm) {
-        
+
         if (length(setdiff(samples, tVS)) == 0) {
           message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {groupString}s:
                            {paste0(tVS, collapse = ', ')}.
@@ -390,42 +401,42 @@ getDimRed <- function(qseaSet,
                            -> column name {nm}.
                            \n"))
         }
-        
+
         if (length(tVS) <= 2) {
           stop(glue::glue("Standard deviation calculated on less than 3 {groupString} names. Insufficent number of {groupString}s to calculate variance."))
         }
-        
+
         dataTable <- dataTable %>%
           dplyr::mutate({{nm}} := dplyr::select(., tidyr::all_of(tVS)) %>%
                           rowSds()) %>%
           dplyr::select(seqnames, start, end, tidyr::all_of(nm))
-        
+
       }) %>%
       purrr::reduce(dplyr::left_join) %>%
       dplyr::left_join(dataTable, .)
   }
-  
+
   res <- topVar %>%
     dplyr::group_by(windowSdName) %>%
     dplyr::group_map(.keep = TRUE, .f = function(sdGp, sdName) {
-      
+
       if (!is.na(sdName$windowSdName)) {
         dataTable <- dataTable %>%
           dplyr::arrange(dplyr::desc(!!dplyr::sym(sdName$windowSdName)))
       }
-      
+
       purrr::pmap(sdGp, function(resName, windowSdName, topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, inputChanged) {
-        
+
         if (!is.na(windowSdName)) {
           th <- dataTable %>%
             dplyr::pull({{windowSdName}}) %>%
             dplyr::nth(topVarNum)
-          
+
           dataTable <- dataTable %>%
             dplyr::filter(!!dplyr::sym(windowSdName) >= th)
-          
+
           if (length(topVarSamples) == length(samples)) {
-            
+
             message(glue::glue("------------------------------\n
                              Filtering windows based on standard deviation across all {length(topVarSamples)} {groupString}s ({windowSdName}).
                              Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows.
@@ -436,79 +447,79 @@ getDimRed <- function(qseaSet,
                              Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows.
                              \n"))
           }
-          
-          
+
+
         } else {
-          
+
           message(glue::glue("------------------------------\n
                              No filtering of windows based on window standard deviation.
                              \n"))
           th <- NA
         }
-        
+
         dataTable <- dataTable %>%
           dplyr::mutate(window = getWindowNames(.)) %>%
           tibble::column_to_rownames("window") %>%
           dplyr::select(tidyr::all_of(samples))
-        
+
         message(glue::glue("Performing {method} with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
                            -> {resName}.
                              \n"))
-        
+
         dataTable <- dataTable %>%
           t()
-        
+
         if (!is.numeric(dataTable)) {
           stop("Input contains non-numeric values.")
         }
-        
+
         if (any(is.na(dataTable))) {
           stop("Input contains missing values.")
         }
-        
+
         if (any(!is.finite(dataTable))) {
           stop("Input contains infinite values.")
         }
-        
+
         if (method == "UMAP") {
-          
+
           uwotObj <- dataTable %>%
             uwot::umap(...) %>%
             as.data.frame()
-          
+
           colnames(uwotObj) <- paste0("UMAP",seq_along(1:ncol(uwotObj)))
-          
+
           return(list(resObj =  list(x = uwotObj, windows = colnames(dataTable)), th = th))
-          
+
         } else if (method == "PCA") {
-          
+
           prcompObj <- dataTable %>%
             stats::prcomp(center = center, scale. = scale, rank. = nPC)
-          
+
           return(list(resObj = prcompObj, th = th))
-          
+
         } else {
           stop(glue::glue("Method {method} not known! Options are PCA or UMAP."))
         }
-        
+
       }) %>%
         purrr::set_names(sdGp$resName)
     }) %>%
     purrr::list_flatten()
-  
+
   message("------------------------------")
-  
+
   th <- purrr::map(res, "th") %>%
     unlist()
-  
+
   res <- purrr::map(res, "resObj")
-  
+
   if (method == "UMAP") {
     windows <- purrr::map(res, "windows")
   } else if (method == "PCA") {
     windows <- purrr::map(res, ~ rownames(.x$rotation))
   }
-  
+
   paramList <- list(method = method,
                     regionsToOverlap = regionsToOverlap,
                     normMethod = normMethod,
@@ -517,7 +528,7 @@ getDimRed <- function(qseaSet,
                     minDensity = minDensity,
                     topVar = topVar,
                     windowSdThreshold = th)
-  
+
   if (method == "UMAP") {
     paramList <- c(paramList, ...)
   } else if (method == "PCA") {
@@ -525,7 +536,7 @@ getDimRed <- function(qseaSet,
                                    scale = scale,
                                    nPC = nPC))
   }
-  
+
   out <- list(res = res,
               samples = samples,
               windows = windows,
@@ -535,7 +546,7 @@ getDimRed <- function(qseaSet,
                                      notInRegionsToOverlap = numWindowsRemovedRegionOverlap,
                                      belowMinDensity = numWindowsRemovedMinDensity,
                                      containMissingVals = numWindowsRemovedMissingVals))
-  
+
   return(out)
 }
 
@@ -893,7 +904,7 @@ plotDimRed <- function(object,
   if (!is.qseaSet(qseaSet)) {
     stop("Second argument should be a qseaSet")
   }
-  
+
   if (!is.list(components)) {
     components <- list(components)
   }
@@ -950,7 +961,7 @@ plotDimRed <- function(object,
     }
 
     makePlot <- function(components, plotData, my_geom_point, my_scale_colour, my_scale_shape) {
-      
+
       env <- new.env(parent = globalenv())
       env$plotData <- plotData
       env$columnPrefix <- columnPrefix

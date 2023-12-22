@@ -11,6 +11,7 @@ editor_options:
 ### BUG FIXES
 * `poolSamples` now returns data frames instead of matrices in the libraries slot. 
 * `select` now works when dropping a column.
+*  PCA/UMAP functiions now give a more informative error if there are insufficient regions or samples.
 
 # mesa 0.4.1
 
