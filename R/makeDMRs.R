@@ -94,9 +94,8 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   if (is.null(keepIndex) & minNRPM >= 0) {
 
     keepIndex <- qseaSet %>%
-      qsea::makeTable(samples = samplesInContrasts,
-                      norm_methods = "nrpm",
-                      chunksize = 1000000, verbose = FALSE) %>%
+      getDataTable(normMethod = "nrpm", 
+                   addMethodSuffix = TRUE) %>%
       dplyr::select(tidyselect::matches("nrpm")) %>%
       apply(1,max) %>%
       {which(. >= minNRPM)}
@@ -108,9 +107,12 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     # make a design object based on the formula
   design <- stats::model.matrix(formula, qseaSet %>% qsea::getSampleTable())
 
-
-  message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))
-
+  if(getMesaParallel()){
+    message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))    
+  } else {
+    message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, without using parallelisation."))    
+  }
+  
   qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
                                              design,
                                              keep = keepIndex,

@@ -496,93 +496,62 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
 }
 
-
-#' This function takes a qseaSet and makes a table of nrpm values
+#' This function takes a qseaSet and makes a table of counts. A convenience function that wraps getDataTable. 
 #' @param qseaSet The qseaSet object.
-#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.
-#' @return A table of data, one row per window
+#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.#' 
+#' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
+#' @param verbose Whether to suppress messages.
+#' @return A table of counts, one row per window
+#' @describeIn getDataTable 
 #' @export
 #'
-getCountTable <- function(qseaSet, useGroupMeans = FALSE){
-
-  if(useGroupMeans){
-
-    qseaSet %>%
-      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = "counts") %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, "_counts_means", "")) %>%
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
-
-  } else {
-
-    qseaSet %>%
-      qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = "counts") %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, "_counts", "")) %>%
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
-  }
-
+getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
+  tab <- qseaSet %>% 
+    getDataTable(normMethod = "counts", 
+                 useGroupMeans = useGroupMeans, 
+                 addMethodSuffix = addMethodSuffix,
+                 verbose = TRUE)
+  
+  return(tab)
 }
 
-
-#' This function takes a qseaSet and makes a table of nrpm values
+#' A function takes a qseaSet and makes a table of nrpm values. A convenience function that wraps getDataTable. 
 #' @param qseaSet The qseaSet object.
-#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.
+#' @param useGroupMeans Whether to give means of the group column, rather than individual samples.#' 
+#' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
+#' @param verbose Whether to suppress messages.
 #' @return A table of data, one row per window
+#' @describeIn getDataTable 
 #' @export
 #'
-getNRPMTable <- function(qseaSet, useGroupMeans = FALSE){
-
-  if(useGroupMeans){
-
-    qseaSet %>%
-      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = "nrpm") %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm_means", "")) %>%
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
-
-  } else {
-
-    qseaSet %>%
-      qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = "nrpm") %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm", "")) %>%
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
-  }
-
+getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
+  tab <- qseaSet %>% 
+    getDataTable(normMethod = "nrpm", 
+                 useGroupMeans = useGroupMeans, 
+                 addMethodSuffix = addMethodSuffix, 
+                 verbose = TRUE)
+  
+  return(tab)
 }
 
-#' This function takes a qseaSet and makes a table of beta values
+#' A function takes a qseaSet and makes a table of beta values. A convenience function that wraps getDataTable. 
 #' @param qseaSet The qseaSet object.
 #' @param useGroupMeans Whether to give means of the group column, rather than individual samples.
-#' @return A table of data, one row per window
+#' @param minEnrichment The minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
+#' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
+#' @param verbose Whether to suppress messages.
+#' @return A table of beta values, one row per window
+#' @describeIn getDataTable 
 #' @export
 #'
-getBetaTable <- function(qseaSet, useGroupMeans = FALSE){
-
-  if(useGroupMeans){
-
-    qseaSet %>%
-      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = "beta") %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, "_beta_means", "")) %>%
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
-
-  } else {
-
-    qseaSet %>%
-      qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = "beta") %>%
-      dplyr::rename_with(~ stringr::str_replace_all(.x, "_beta", "")) %>%
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble() %>%
-      return()
-  }
-
+getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
+   tab <- qseaSet %>% 
+     getDataTable(normMethod = "beta", 
+                  useGroupMeans = useGroupMeans, 
+                  minEnrichment = minEnrichment, 
+                  addMethodSuffix = addMethodSuffix,
+                  verbose = FALSE)
+  return(tab)
 }
 
 #' This function takes a qseaSet and calculates a summary statistic across the windows.
@@ -622,9 +591,9 @@ summariseAcrossWindows <- function(qseaSet,
 
     dataMat <- qseaSet %>%
       filterByOverlaps(regionsToOverlap) %>%
-      qsea::makeTable(norm_methods = normMethod,
-                      samples = qsea::getSampleNames(qseaSet),
-                      minEnrichment = minEnrichment)
+      getDataTable(normMethod = normMethod,
+                   minEnrichment = minEnrichment,
+                   addMethodSuffix = TRUE)
 
     if(naMethod == "drop"){
 
@@ -711,7 +680,9 @@ addSummaryAcrossWindows <- function(qseaSet,
 #'
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
   temp <- qseaSet %>%
-    qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
+    getDataTable(normMethod = normMethod,
+                 minEnrichment = minEnrichment,
+                 addMethodSuffix = TRUE) %>%
     annotateWindows()
 
   nWindows <- temp %>%
@@ -790,15 +761,19 @@ getSampleGroups2 <- function(qseaSet){
 #' @param useGroupMeans Whether to use the group column to average over replicates.
 #' @param minEnrichment Minimum number of reads for beta values to not give NA
 #' @param addMethodSuffix Whether to include a suffix corresponding to the normalisation method, such as Sample1_beta. This suffix is always present if multiple normalisationMethods are given.
+#' @param verbose Whether to give a message detailing the table being made.
 #' @return A table of data, with a column for each individual sample
 #' @export
 #'
-getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE){
+getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
 
   if(useGroupMeans){
-
+    if(verbose){message(glue::glue("Generating table of {normMethod} values for {qseaSet %>% qsea::getRegions() %>% length()} regions across {qseaSet %>% getSampleGroups2() %>% length()} sample groups."))}
     tab <- qseaSet %>%
-      qsea::makeTable(groupMeans =  getSampleGroups2(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
+      qsea::makeTable(groupMeans =  getSampleGroups2(.), 
+                      norm_methods = normMethod, 
+                      minEnrichment = minEnrichment,
+                      verbose = FALSE) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble()
 
@@ -813,9 +788,12 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
     return(tab)
 
   } else {
-
+    if(verbose){message(glue::glue("Generating table of {normMethod} values for {qseaSet %>% qsea::getRegions() %>% length()} regions across {qseaSet %>% getSampleGroups2() %>% length()} samples."))}
     tab <- qseaSet %>%
-      qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod, minEnrichment = minEnrichment) %>%
+      qsea::makeTable(samples = qsea::getSampleNames(.), 
+                      norm_methods = normMethod, 
+                      minEnrichment = minEnrichment,
+                      verbose = FALSE) %>%
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble()
 
