@@ -8,6 +8,12 @@ editor_options:
 ### Added
 * Examples added for some functions, and documentation for some related functions merged.
 * Added more tests following inspection of `covr` coverage.
+* A new example qseaSet for a small portion of the mouse genome. 
+* Added the ability to specifying a biomaRt object directly on a qseaSet for used for finding gene annotation in `plotGeneHeatmap`. 
+
+### Changes
+* Added functions `setMesaGenome`, `setMesaTxDb` and `setMesaAnnoDb` to set global defaults for the annotation packages required by `annotateWindows`. This has the effect that `annotateWindows` will no longer assume hg38 by default with no arguments.
+* `summariseDMRsByGene` function now requires `annotateWindows` to have already been called on the DMRs (previously it called this internally if necessary). 
 
 ### Changed
 * Reduced the number of messages produced when generating tables of data.

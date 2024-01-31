@@ -144,8 +144,8 @@ getDimRed <- function(qseaSet,
     stop("Please provide a qseaSet in the first position.")
   }
 
-  if (qseaSet %>% getSampleNames() %>% length() <= 2) {
-    stop(glue::glue("Insufficient samples {qseaSet %>% getSampleNames() %>% length()} in provided qseaSet, must be at least 3."))
+  if (qseaSet %>% qsea::getSampleNames() %>% length() <= 2) {
+    stop(glue::glue("Insufficient samples {qseaSet %>% qsea::getSampleNames() %>% length()} in provided qseaSet, must be at least 3."))
   }
 
   if (useGroupMeans) {

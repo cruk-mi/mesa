@@ -17,8 +17,8 @@ is.qseaSet <- function(x){
 
 
 setGeneric('setMart', function(object,...) standardGeneric('setMart'))
-setMethod('setMart', 'qseaSet', function(object, martName){
-  object@parameters$mart = martName
+setMethod('setMart', 'qseaSet', function(object, mart){
+  object@parameters$mart = mart
   object
 })
 
@@ -40,10 +40,23 @@ setMethod('getMart', 'qseaSet', function(object)
 #' @param FantomRegionsGR A GRanges object giving Fantom enhancer regions
 #' @return A tibble with the data, augmented with ChIPseeker region location and CpG island information.
 #' @export
-annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NULL, CpGislandsGR = NULL,
-                         FantomRegionsGR = NULL) {
+annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
+                            annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
+                            FantomRegionsGR = NULL) {
 
-  if(genome %in% c("hg38","GRCh38") & is.null(TxDb)) {
+  if(!is.null(TxDb) & is.character(TxDb)){
+    TxDb <- eval(parse(text=paste0(TxDb,"::", TxDb)))
+  }
+  
+  if(is.null(TxDb) & is.null(genome)) {
+    stop("Please specify a TxDb or genome, this can be set globally using setMesaTxDb and/or setMesaGenome")
+  }
+  
+  if(is.null(genome)){
+    genome <- ""
+  }
+  
+  if(genome %in% c("hg38","GRCh38") && is.null(TxDb)) {
 
     if (!requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
       stop(
@@ -54,7 +67,7 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
     TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
     }
 
-  if(genome  %in% c("hg38","GRCh38") & is.null(annoDb)) {
+  if(genome  %in% c("hg38","GRCh38") && is.null(annoDb)) {
     if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
       stop(
         "Package \"org.Hs.eg.db\" must be installed to use this function. Please install and run again.",
@@ -64,10 +77,13 @@ annotateWindows <- function(dataTable, genome = "hg38", TxDb = NULL, annoDb = NU
     annoDb = "org.Hs.eg.db"
     }
 
-  if(genome  %in% c("hg38","GRCh38") & is.null(CpGislandsGR)) { CpGislandsGR = mesa::hg38CpGIslands }
+  if(is.null(annoDb) && is.null(genome)) {
+    stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
+  }
+  
+  if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR = mesa::hg38CpGIslands }
 
-  if(genome  %in% c("hg38","GRCh38") & is.null(FantomRegionsGR)) { FantomRegionsGR = mesa::FantomRegions %>% plyranges::as_granges()}
-
+  if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR = mesa::FantomRegions %>% plyranges::as_granges()}
 
   if(methods::is(dataTable,"GRanges")) {
     GRangesObject <- dataTable
@@ -767,6 +783,14 @@ getSampleGroups2 <- function(qseaSet){
 #'
 getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
 
+  if(!is.qseaSet(qseaSet)){
+    stop("Please provide a qseaSet as the first argument.")
+  }
+  
+  if(qseaSet %>% qsea::getRegions() %>% length() == 0){
+    stop("Attempting to get data values for a qseaSet with no remaining windows.")
+  }
+  
   if(useGroupMeans){
     if(verbose){message(glue::glue("Generating table of {normMethod} values for {qseaSet %>% qsea::getRegions() %>% length()} regions across {qseaSet %>% getSampleGroups2() %>% length()} sample groups."))}
     tab <- qseaSet %>%

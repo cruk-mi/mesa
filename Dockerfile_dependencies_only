@@ -15,4 +15,8 @@ RUN Rscript -e "remotes::install_cran(c('limma','plyranges', 'GenomeInfoDb'), re
 RUN Rscript -e "remotes::install_cran(c('HMMcopy','ComplexHeatmap', 'Rsamtools'), repos = BiocManager::repositories())"
 RUN Rscript -e "remotes::install_cran(c('ChIPseeker', 'biomaRt'), repos = BiocManager::repositories())"
 RUN Rscript -e "remotes::install_cran(c('workflows', 'pheatmap', 'UpSetR', 'ggrepel', 'openxlsx'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('TxDb.Mmusculus.UCSC.mm10.knownGene' ,'org.Mm.eg.db'), repos = BiocManager::repositories())"
 RUN rm -rf /tmp/downloaded_packages
+RUN Rscript -e "devtools::install_version('dbplyr', version = '2.3.4')"
+RUN Rscript -e "remotes::install_version('irlba', type = 'source')"
+RUN Rscript -e "remotes::install_version('Matrix', type = 'source')"

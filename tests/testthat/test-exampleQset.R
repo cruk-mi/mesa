@@ -169,6 +169,7 @@ test_that("Analysing DMRs", {
 
   expect_equal(DMRs %>%
                  pivotDMRsLonger() %>%
+                 annotateWindows(genome = "hg38") %>%
                  summariseDMRsByGene() %>%
                  dim(),c(28,8))
 

@@ -427,6 +427,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
 #' @param showSampleNames Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.
 #' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
+#' @param idType A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse. 
 #' @param ... Additional arguments to pass to pheatmap.
 #' @return A heatmap showing the methylation patterns across the gene of interest.
 #' @export
@@ -437,7 +438,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             minEnrichment = 3, maxScale = 1, clusterNum = NULL, annotationColors = NA,
                             upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
                             showSampleNames = NULL,
-                            downstreamDist = 1000, ...){
+                            downstreamDist = 1000, 
+                            idType = NULL,
+                            ...){
 
   if (!is.null(getMart(qseaSet))) { mart <- getMart(qseaSet) }
 
@@ -449,10 +452,18 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     stop("Please specify a mart object for biomaRt.")
   }
 
-  if (stringr::str_detect(gene,"^ENSG0")) {
-    idType <- "ensembl_gene_id"
-  } else{
-    idType <- "hgnc_symbol"
+  if(is.null(idType)) {
+    
+    if (stringr::str_detect(gene,"^ENS.*G")) {
+      idType <- "ensembl_gene_id"
+    } else if (stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens")) {
+      idType <- "hgnc_symbol"
+    } else if (stringr::str_detect(qsea:::getGenome(qseaSet), "Mmusculus")) {
+      idType <- "mgi_symbol" 
+    } else {
+      stop("Please specify idType for genomes that are not human or mouse. 
+           This must be a valid attribute for the given mart, see biomaRt::listAttributes.")
+    }
   }
 
   gene_details <- biomaRt::getBM(mart = mart,
@@ -488,6 +499,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart@biomart}."))
   }
 
+  message(glue::glue("Found {gene} on chromosome {gene_details$seqnames}, {gene_details$start} - {gene_details$end}"))
+  
   gene_details_gr <- gene_details %>%
     plyranges::as_granges()
 
