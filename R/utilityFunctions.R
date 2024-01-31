@@ -43,7 +43,19 @@ liftOverHg19 <- function(grOrDf){
 }
 
 .getMesaGenome <- function() {
-  getOption("mesa_genome", default="hg38")
+  getOption("mesa_genome")
+}
+
+.getMesaMart <- function() {
+  getOption("mesa_mart")
+}
+
+.getMesaTxDb <- function() {
+  getOption("mesa_TxDb")
+}
+
+.getMesaAnnoDb <- function() {
+  getOption("mesa_annoDb")
 }
 
 #' This function sets a default genome for the annotateWindows function to use
@@ -56,13 +68,68 @@ liftOverHg19 <- function(grOrDf){
 
 setMesaGenome <- function(genome){
   options("mesa_genome" = genome)
+  return(invisible(TRUE))
+}
 
+#' This function sets a default TxDb for the annotateWindows function to use.
+#'
+#' For instance "TxDb.Hsapiens.UCSC.hg38.knownGene" for human, or "TxDb.Mmusculus.UCSC.mm10.knownGene" for mouse.
+#'
+#' @param TxDb A TxDb package (as a string, or the object itself)
+#' @return None
+#' @export
+#' @seealso The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}
+
+setMesaTxDb <- function(TxDb){
+  
+  if(is.null(TxDb)){
+    options("mesa_TxDb" = NULL)
+    return(invisible(TRUE))
+  }
+  
+  if (!requireNamespace(TxDb, quietly = TRUE)) {
+    stop(
+      glue::glue("Package {TxDb} must exist and be installed to set as default TxDb. Please install or correct and run again."),
+      call. = FALSE
+    )
+  }
+
+  options("mesa_TxDb" = TxDb)
+
+  return(invisible(TRUE))
+}
+
+#' This function sets a default annoDb for the annotateWindows function to use.
+#'
+#' For instance "org.Hs.eg.db" for human, or "org.Mm.eg.db" for mouse.
+#'
+#' @param annoDb An annoDb package (as a string, or the object itself)
+#' @return None
+#' @export
+#' @seealso The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}
+#' 
+setMesaAnnoDb <- function(annoDb){
+  
+  if(is.null(annoDb)){
+    options("mesa_annoDb" = NULL)
+    return(invisible(TRUE))
+  }
+  
+  if (!requireNamespace(annoDb, quietly = TRUE)) {
+    stop(
+      glue::glue("Package {annoDb} must exist and be installed to set as default annoDb. Please install or correct and run again."),
+      call. = FALSE
+    )
+  }
+  
+  options("mesa_annoDb" = annoDb)
+  
   return(invisible(TRUE))
 }
 
 #' Toggle whether to use parallelisation or not inside various functions in mesa
 #'
-#' @param nCores How many cores to set. Assumes you want to use MulticoreParam, to use another architecture use the useParallel argument and specify manually.
+#' @param nCores How many cores to set. Assumes you want to use MulticoreParam, for another architecture use the useParallel argument and specify manually.
 #' @param useParallel Boolean denoting whether or not to use parallelisation for various functions in mesa
 #' @param verbose Boolean to determine whether to print messages or not
 #' @return None

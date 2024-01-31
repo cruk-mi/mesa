@@ -21,3 +21,4 @@ requiredPackages <- lines_df |>
   setdiff(c("tibble","dplyr","stringr","generics", "rlang", "tidyselect", "vctrs"))
 
 remotes::install_cran(requiredPackages, repos = BiocManager::repositories())
+devtools::install_version("dbplyr", version = "2.3.4")

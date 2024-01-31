@@ -90,11 +90,13 @@ Suggests:
     MEDIPS,
     workflows,
     MEDIPSData,
+    uwot,
     BSgenome.Hsapiens.NCBI.GRCh38,
-    TxDb.Hsapiens.UCSC.hg38.knownGene,
     BSgenome.Hsapiens.UCSC.hg19,
     org.Hs.eg.db,
-    uwot
+    org.Mm.eg.db,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    TxDb.Mmusculus.UCSC.mm10.knownGene
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

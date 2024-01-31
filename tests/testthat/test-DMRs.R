@@ -15,8 +15,13 @@ test_that("Calculating DMRs", {
 
   expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC","Tumor_vs_Normal_adjPval","Tumor_vs_Normal_deltaBeta")) %>% all())
 
-  expect_no_error(annotatedData <- DMRdata  %>% annotateWindows()) #expect no error!
+  expect_error(annotatedData <- DMRdata  %>% annotateWindows()) #expect error if no local or global genome specified
+  expect_no_error(annotatedData <- DMRdata  %>% annotateWindows(genome = "hg38")) #expect no error if genome set
 
+  expect_error(annotatedData <- DMRdata  %>% annotateWindows()) #expect error if no local or global genome specified
+  expect_no_error(annotatedData <- DMRdata  %>% annotateWindows(genome = "hg38")) #expect no error if genome set
+  
+  
   expect_true(annotatedData %>% tibble::has_name(c("SYMBOL","annotation","geneId","geneChr")) %>% all())
 
   expect_no_error(DMRdata <- randomSet %>%

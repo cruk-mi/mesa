@@ -89,7 +89,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 summariseDMRsByGene <- function(DMRtable){
 
   if(!("ENSEMBL" %in% colnames(DMRtable))){
-    DMRtable <- DMRtable %>% annotateWindows()
+    stop("Please call annotateWindows first on the DMRs prior to summariseDMRsByGene.")
   }
 
   DMRtable %>%

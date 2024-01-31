@@ -13,4 +13,4 @@ hg38CpGIslands <- regioneR::toGRanges(read.table("/data/cep/Methylation/refData/
                                                  sep = "\t", head = TRUE)) %>%
   dplyr::select(-name)
 
-usethis::use_data(hg38CpGIslands, overwrite = TRUE, internal = TRUE)
+usethis::use_data(hg38CpGIslands, overwrite = TRUE, internal = TRUE, compress = "xz")
