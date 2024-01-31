@@ -9,6 +9,9 @@ editor_options:
 * Examples added for some functions, and documentation for some related functions merged.
 * Added more tests following inspection of `covr` coverage.
 
+### Changed
+* Reduced the number of messages produced when generating tables of data.
+
 ### BUG FIXES
 * `poolSamples` now returns data frames instead of matrices in the libraries slot. 
 * `select` now works when dropping a column.
