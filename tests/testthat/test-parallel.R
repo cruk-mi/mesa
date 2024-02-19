@@ -16,7 +16,7 @@ test_that("Parallelisation works with nCores", {
   
   expect_false(getMesaParallel())
   
-  expect_true(setMesaParallel(nCores = 4))
+  expect_true(setMesaParallel(nCores = 2))
   
   expect_true(getMesaParallel())
   
