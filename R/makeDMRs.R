@@ -94,7 +94,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   if (is.null(keepIndex) & minNRPM >= 0) {
 
     keepIndex <- qseaSet %>%
-      getDataTable(normMethod = "nrpm", 
+      getDataTable(normMethod = "nrpm",
                    addMethodSuffix = TRUE) %>%
       dplyr::select(tidyselect::matches("nrpm")) %>%
       apply(1,max) %>%
@@ -108,11 +108,11 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   design <- stats::model.matrix(formula, qseaSet %>% qsea::getSampleTable())
 
   if(getMesaParallel()){
-    message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))    
+    message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, using {BiocParallel::bpworkers()} cores"))
   } else {
-    message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, without using parallelisation."))    
+    message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, without using parallelisation."))
   }
-  
+
   qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
                                              design,
                                              keep = keepIndex,
@@ -208,22 +208,18 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
     unlist() %>%
     unique()
 
-  if (length(sigIndex) == 0) { print("No windows found.") }
-
-  #TODO Quick hack to stop error when a contrast has one or no significantly varying windows
   hack <- FALSE
-  if (length(sigIndex) == 0 ) {
-    print("No windows found, using hack to return, needs testing")
-    sigIndex <- 1
-    hack <- TRUE
-  }
-
+  # workaround to ensure that qsea doesn't drop the data frame to a vector when it subsets, copied row removed at the end
   if (length(sigIndex) == 1 ) {
-    print("One window found, using hack to return, needs testing")
     sigIndex <- c(sigIndex,sigIndex)
     hack <- TRUE
   }
 
+  # Use the same workaround to ensure that the same columns and types are returned as would be expected if any DMRs were found.
+  if (length(sigIndex) == 0 ) {
+    sigIndex <- 1
+    hack <- TRUE
+  }
 
   if (!is.null(variable)) {
 
@@ -263,7 +259,7 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
       dplyr::select(-tidyselect::matches("avgFragment"))
   }
 
-  # Remove the added window from the hack
+  # Remove the added window from the hacky workaround
   if (hack) {
     dataTable <- dataTable[-1,]
   }
@@ -336,6 +332,7 @@ calculateDMRs <- function(qseaSet,
                           calcDispersionAll = FALSE){
 
   if (is.null(variable)) {stop("variable must be specified!")}
+  if (is.null(contrasts)) {stop("contrasts must be specified!")}
 
   if (!is.data.frame(contrasts)) {
     if (contrasts %in% c("All", "all")) {

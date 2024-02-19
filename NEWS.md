@@ -23,6 +23,7 @@ editor_options:
 * `select` now works when dropping a column.
 *  PCA/UMAP functions now give a more informative error if there are insufficient regions or samples.
 * `downSample` now works correctly again following changes to how `table` and `enframe` interact.
+* `calculateDMRs` now correctly returns an empty data frame if no DMRs are found.
 
 # mesa 0.4.1
 

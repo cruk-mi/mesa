@@ -20,8 +20,8 @@ test_that("Calculating DMRs", {
 
   expect_error(annotatedData <- DMRdata  %>% annotateWindows()) #expect error if no local or global genome specified
   expect_no_error(annotatedData <- DMRdata  %>% annotateWindows(genome = "hg38")) #expect no error if genome set
-  
-  
+
+
   expect_true(annotatedData %>% tibble::has_name(c("SYMBOL","annotation","geneId","geneChr")) %>% all())
 
   expect_no_error(DMRdata <- randomSet %>%
@@ -141,6 +141,29 @@ test_that("Calculating DMRs", {
                   )
 
   expect_false(nrow(testNoFilter) == nrow(testNoFilterShared))
+
+  expect_no_error(twoDMR <- exampleTumourNormal %>%
+                    filterWindows(CpG_density >= 23) %>%
+                    calculateDMRs(variable = "tumour", contrasts = "all")
+  )
+
+  expect_equal(twoDMR %>% dim(), c(2,11))
+
+  expect_no_error(oneDMR <- exampleTumourNormal %>%
+                    filterWindows(CpG_density >= 25) %>%
+                    calculateDMRs(variable = "tumour", contrasts = "all")
+  )
+
+  expect_equal(oneDMR %>% dim(), c(1,11))
+
+  expect_no_error(noDMR <- exampleTumourNormal %>%
+                    filterWindows(CpG_density >= 25) %>%
+                    calculateDMRs(variable = "tissue", contrasts = "all")
+  )
+
+  expect_equal(noDMR %>% dim(), c(0,11))
+
+  expect_no_error(bind_rows(twoDMR, oneDMR, noDMR))
 
 })
 
