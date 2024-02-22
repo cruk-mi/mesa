@@ -6,7 +6,7 @@
 \usage{
 plotUMAP(
   object,
-  qseaSet,
+  qseaSet = NULL,
   components = list(c(1, 2)),
   colour = NULL,
   colourPalette = NULL,
@@ -62,7 +62,7 @@ plotUMAP(
 \item{plotlyAnnotations}{Vector of columns to annotate for plotly, e.g. c("group","tissue")}
 }
 \value{
-A list of ggplot objects: one for each combination of \code{object$res}, \code{colour} and \code{components}.
+A list of ggplot objects: one for each combination of \code{object@res}, \code{colour} and \code{components}.
 }
 \description{
 This function takes the output of \code{\link[=getUMAP]{getUMAP()}} and produces plots.
