@@ -3,7 +3,8 @@ editor_options:
   markdown: 
     wrap: sentence
 ---
-# dev
+
+# mesa 1.0.0
 
 ### Added
 * Examples added for some functions, and documentation for some related functions merged.

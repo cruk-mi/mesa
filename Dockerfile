@@ -15,5 +15,6 @@ RUN Rscript -e "BiocManager::install('BSgenome.Mmusculus.UCSC.mm39')"
 RUN Rscript -e "BiocManager::install('BSgenome.Mmusculus.UCSC.mm10')"
 RUN Rscript -e "BiocManager::install('BSgenome.Rnorvegicus.UCSC.rn7')"
 
-#install the package into the container
-RUN Rscript -e "devtools::install('.', dependencies=TRUE, build_vignettes=TRUE, repos = BiocManager::repositories())" && rm -rf /tmp/downloaded_packages
+#install sesame
+RUN Rscript -e "BiocManager::install('sesame')"
+RUN Rscript -e "sesame::sesameDataCache()"

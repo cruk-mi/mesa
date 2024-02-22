@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.4.1
+Version: 1.0.0
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -26,7 +26,7 @@ Authors@R: c(
            family = "Kamieniecka",
            role = "ctb")    
            )
-Description: Analysis tools for methylation enrichment sequencing data (MBD-seq or MEDIP-seq), building off the qsea package.
+Description: Analysis tools for methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq), building off the qsea package.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

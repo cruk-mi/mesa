@@ -84,6 +84,7 @@ test_that("PCAs", {
                             colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
     expect_no_error(obj1 %>% mutate(newCol = rnorm(10)) %>% plotPCA(colour = "newCol"))
+
 }
 
 )

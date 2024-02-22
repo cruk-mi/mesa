@@ -32,7 +32,7 @@ test_that("Mutating Qset works", {
 
   qseaSet <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000)
 
-  sampTab <- qseaSet %>%
+    sampTab <- qseaSet %>%
     mutate(newCol = ifelse(stringr::str_detect(sample_name,"Sim1"),"fish","duck")) %>%
     mutate(repNum = stringr::str_remove(sample_name,"Sim")) %>%
     qsea::getSampleTable()
@@ -43,6 +43,10 @@ test_that("Mutating Qset works", {
 
   expect_equal(
     sampTab %>% pull(repNum), c("1T","2T","3T","1N","2N","3N")
+  )
+
+  expect_error(
+    qseaSet %>% mutate(sample_name = "new_name")
   )
 
   expect_error(

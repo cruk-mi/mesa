@@ -29,7 +29,7 @@ build:
       allow_failure: false
 
 devtools-check:
-  image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:${CI_COMMIT_BRANCH}
+  image: sc-docker-registry.scicom.picr.man.ac.uk:5000/mesa_dependencies:dev
   stage: test
   tags:
     - methylationprojects_docker
