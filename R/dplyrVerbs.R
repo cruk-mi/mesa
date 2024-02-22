@@ -32,7 +32,7 @@ mutate.qseaSet <- function(.data, ...){
     tibble::rownames_to_column(".rownameCol") %>%
     dplyr::mutate(...) %>%
     tibble::column_to_rownames(".rownameCol")
-  
+
   if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
     stop(glue::glue("Error: sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
   }
