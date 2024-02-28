@@ -615,11 +615,8 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
 
 getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
 
-  message(my_scale_shape)
-  filledShapes <- ifelse(my_scale_shape$scale_name == "manual" & any(my_scale_shape$palette(1) %in% 21:25),
+  filledShapes <- ifelse(my_scale_shape$scale_name == "manual" && any(my_scale_shape$palette(1) %in% 21:25),
                          TRUE, FALSE)
-
-  message(filledShapes)
   
   if (filledShapes) {
     my_geom_point <- ggplot2::geom_point(ggplot2::aes(fill = !!rlang::sym(cV), shape = !!rlang::sym(shape)),

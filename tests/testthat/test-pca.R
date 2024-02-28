@@ -71,16 +71,16 @@ test_that("PCAs", {
     expect_true( "ggplot" %in% class(plots6[[1]][[1]]))
 
     # Test other arguments of plotPCA()
-    expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "type"))
-    expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "age"))
-    expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "gender"))
-    expect_no_error(plotPCA(obj1, exampleTumourNormal %>% mutate(diver = seq(-4,5)), colour = "diver"))
-    expect_no_error(plotPCA(obj1, exampleTumourNormal, shape = "type"))
+    expect_no_error(plotPCA(obj1, colour = "type"))
+    expect_no_error(plotPCA(obj1, colour = "age"))
+    expect_no_error(plotPCA(obj1, colour = "gender"))
+    expect_no_error(plotPCA(obj1 %>% mutate(diver = seq(-4,5)), colour = "diver"))
+    expect_no_error(plotPCA(obj1, shape = "type"))
 
-    expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
-    expect_no_error(plotPCA(obj1, exampleTumourNormal, colour = "gender", shapePalette = c(2,5), shape = "gender"))
+    expect_no_error(plotPCA(obj1, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
+    expect_no_error(plotPCA(obj1, colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
-    expect_no_error(plotPCA(obj1, exampleTumourNormal %>% mutate(gender = as.factor(gender)),
+    expect_no_error(plotPCA(obj1 %>% mutate(gender = as.factor(gender)),
                             colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
     expect_no_error(obj1 %>% mutate(newCol = rnorm(10)) %>% plotPCA(colour = "newCol"))
@@ -122,17 +122,17 @@ test_that("UMAPs", {
   expect_false(isTRUE(all.equal(obj6@res$umap1@points,obj6@res$umap2@points)))
   expect_false(isTRUE(all.equal(obj6@res$umap1@points,obj6@res$umap3@points)))
 
-  expect_no_error(plots1 <- plotUMAP(obj1, exampleTumourNormal))
-  expect_no_error(plots6 <- plotUMAP(obj6, exampleTumourNormal))
+  expect_no_error(plots1 <- plotUMAP(obj1))
+  expect_no_error(plots6 <- plotUMAP(obj6))
 
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal, colour = "type"))
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal, colour = "age"))
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal, colour = "gender"))
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal %>% mutate(diver = seq(-4,5)), colour = "diver"))
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal, shape = "type"))
+  expect_no_error(plotUMAP(obj1, colour = "type"))
+  expect_no_error(plotUMAP(obj1, colour = "age"))
+  expect_no_error(plotUMAP(obj1, colour = "gender"))
+  expect_no_error(plotUMAP(obj1 %>% mutate(diver = seq(-4,5)), colour = "diver"))
+  expect_no_error(plotUMAP(obj1, shape = "type"))
 
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
-  expect_no_error(plotUMAP(obj1, exampleTumourNormal, colour = "gender", shapePalette = c(2,5), shape = "gender"))
+  expect_no_error(plotUMAP(obj1, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
+  expect_no_error(plotUMAP(obj1, colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
   expect_no_error(obj1 %>% mutate(newCol = rnorm(10)) %>% plotUMAP(colour = "newCol"))
 
