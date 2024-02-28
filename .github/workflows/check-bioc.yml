@@ -94,7 +94,7 @@ jobs:
       - name: Query dependencies
         run: |
           install.packages('remotes')
-          RUN Rscript -e "remotes::install_version('dbplyr', version = '2.3.4')"
+          remotes::install_version('dbplyr', version = '2.3.4')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
         shell: Rscript {0}
 
