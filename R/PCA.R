@@ -618,6 +618,10 @@ getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
   filledShapes <- ifelse(my_scale_shape$scale_name == "manual" && any(my_scale_shape$palette(1) %in% 21:25),
                          TRUE, FALSE)
   
+  if(is.null(filledShapes)){
+    filledShapes <- FALSE
+  }
+  
   if (filledShapes) {
     my_geom_point <- ggplot2::geom_point(ggplot2::aes(fill = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
                                          colour = "black", size = pointSize, alpha = alpha)
