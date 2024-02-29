@@ -615,11 +615,10 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
 
 getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
 
-  filledShapes <- FALSE
-  if(my_scale_shape$scale_name == "manual") {
-    if(any(my_scale_shape$palette(1) %in% 21:25)){
-      filledShapes <- TRUE
-    } 
+  if(any(my_scale_shape$palette(1) %in% 21:25)){
+    filledShapes <- TRUE
+  } else {
+    filledShapes <- FALSE 
   }
   
   if (filledShapes) {
@@ -636,11 +635,10 @@ getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
 
 getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour, symDivColourScale) {
 
-  filledShapes <- FALSE
-  if(my_scale_shape$scale_name == "manual") {
-    if(any(my_scale_shape$palette(1) %in% 21:25)){
-      filledShapes <- TRUE
-    } 
+  if(any(my_scale_shape$palette(1) %in% 21:25)){
+    filledShapes <- TRUE
+  } else {
+    filledShapes <- FALSE 
   }
   
   if (is.null(cols)) {
