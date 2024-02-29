@@ -21,6 +21,7 @@ plotGeneHeatmap(
   mart = NULL,
   showSampleNames = NULL,
   downstreamDist = 1000,
+  idType = NULL,
   ...
 )
 }
@@ -56,6 +57,8 @@ plotGeneHeatmap(
 \item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
 
 \item{downstreamDist}{Number of basepairs downstream of the gene to include.}
+
+\item{idType}{A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse.}
 
 \item{...}{Additional arguments to pass to pheatmap.}
 }

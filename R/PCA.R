@@ -639,6 +639,10 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
   filledShapes <- ifelse(my_scale_shape$scale_name == "manual" & any(my_scale_shape$palette(1) %in% 21:25),
                          TRUE, FALSE)
 
+  if(is.null(filledShapes)){
+    filledShapes <- FALSE
+  }
+  
   if (is.null(cols)) {
     if (colourScaleType == "qualitative") {
       my_scale_colour <- if (filledShapes) {

@@ -6,9 +6,9 @@
 \usage{
 annotateWindows(
   dataTable,
-  genome = "hg38",
-  TxDb = NULL,
-  annoDb = NULL,
+  genome = .getMesaGenome(),
+  TxDb = .getMesaTxDb(),
+  annoDb = .getMesaAnnoDb(),
   CpGislandsGR = NULL,
   FantomRegionsGR = NULL
 )
