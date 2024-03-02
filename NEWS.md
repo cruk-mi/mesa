@@ -4,7 +4,7 @@ editor_options:
     wrap: sentence
 ---
 
-# mesa 1.0.0
+# mesa 0.99.0
 
 ### Added
 * Examples added for some functions, and documentation for some related functions merged.
