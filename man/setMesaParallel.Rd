@@ -7,7 +7,7 @@
 setMesaParallel(nCores = NULL, useParallel = FALSE, verbose = TRUE)
 }
 \arguments{
-\item{nCores}{How many cores to set. Assumes you want to use MulticoreParam, to use another architecture use the useParallel argument and specify manually.}
+\item{nCores}{How many cores to set. Assumes you want to use MulticoreParam, for another architecture use the useParallel argument and specify manually.}
 
 \item{useParallel}{Boolean denoting whether or not to use parallelisation for various functions in mesa}
 
