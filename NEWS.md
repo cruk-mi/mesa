@@ -8,7 +8,7 @@ editor_options:
 
 ### BUG FIXES
 * `summariseDMRsByGene` now correctly summarises genes when they have different positions or lengths in different windows. 
-* `plotCorrelationMatrix` no longer crashes no annotation is being used. 
+* `plotCorrelationMatrix` no longer crashes when no annotation is being used. 
 
 # mesa 0.5.0
 
