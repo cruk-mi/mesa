@@ -799,6 +799,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
                                   minEnrichment = 3, annotationColors = NA, minDensity = 0, ...){
 
+  ##TODO: Swap from pheatmap to ComplexHeatmap 
   if (!is.null(regionsToOverlap)) {
     regionsToOverlap <- asValidGranges(regionsToOverlap)
 
@@ -810,6 +811,10 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 
   annotationDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
 
+  if (ncol(annotationDf) == 0) {
+    annotationDf <- NULL
+  }
+  
   dataTab <- qseaSet %>%
     filterWindows(CpG_density >= minDensity) %>%
     getDataTable(normMethod = normMethod,

@@ -4,5 +4,4 @@ map_hg38_10kb <- HMMcopy::wigToRangedData("/data/cep/Methylation/refData/map_hg3
   dplyr::mutate(chr = stringr::str_remove(chr,"chr"), end = end - 1) %>%
   dplyr::rename(map = value)
 
-usethis::use_data(map_hg38_10kb, overwrite = TRUE, compress = "xz")
-file.size("data/map_hg38_10kb.rda")
+usethis::use_data(map_hg38_10kb, overwrite = TRUE, compress = "xz", compression_level = 9)

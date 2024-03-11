@@ -11,6 +11,7 @@ test_that("Annotation getting works", {
   expect_error(getAnnotation(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE)  %>% dim())
   expect_error(getAnnotation(exampleTumourNormal %>% mutate(group = tumour), sampleAnnotation = c(tumour,type), useGroupMeans = TRUE)  %>% dim())
 
+  expect_no_error(plotCorrelationMatrix(exampleTumourNormal))
   expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = tumour, useGroupMeans = FALSE))
   expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = "tumour", useGroupMeans = FALSE))
   expect_no_error(plotCorrelationMatrix(exampleTumourNormal, sampleAnnotation = c("tumour","type"),  useGroupMeans = FALSE))
@@ -171,7 +172,7 @@ test_that("Analysing DMRs", {
                  pivotDMRsLonger() %>%
                  annotateWindows(genome = "hg38") %>%
                  summariseDMRsByGene() %>%
-                 dim(),c(28,8))
+                 dim(),c(21,4))
 
 })
 

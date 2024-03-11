@@ -526,7 +526,7 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
     getDataTable(normMethod = "counts", 
                  useGroupMeans = useGroupMeans, 
                  addMethodSuffix = addMethodSuffix,
-                 verbose = TRUE)
+                 verbose = verbose)
   
   return(tab)
 }
@@ -545,7 +545,7 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
     getDataTable(normMethod = "nrpm", 
                  useGroupMeans = useGroupMeans, 
                  addMethodSuffix = addMethodSuffix, 
-                 verbose = TRUE)
+                 verbose = verbose)
   
   return(tab)
 }
@@ -566,7 +566,7 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
                   useGroupMeans = useGroupMeans, 
                   minEnrichment = minEnrichment, 
                   addMethodSuffix = addMethodSuffix,
-                  verbose = FALSE)
+                  verbose = verbose)
   return(tab)
 }
 
@@ -797,7 +797,7 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
       qsea::makeTable(groupMeans =  getSampleGroups2(.), 
                       norm_methods = normMethod, 
                       minEnrichment = minEnrichment,
-                      verbose = FALSE) %>%
+                      verbose = FALSE) %>% #don't use makeTable's messages as we have a different one above.
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble()
 
@@ -817,7 +817,7 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
       qsea::makeTable(samples = qsea::getSampleNames(.), 
                       norm_methods = normMethod, 
                       minEnrichment = minEnrichment,
-                      verbose = FALSE) %>%
+                      verbose = FALSE) %>% #don't use makeTable's messages as we have a different one above.
       dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
       tibble::as_tibble()
 
