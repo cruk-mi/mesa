@@ -727,7 +727,7 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 }
 
-#' This function takes the output of [getPCA()] and produces plots.
+#' This function takes the `mesaDimRed` object output of [getPCA()] and produces plots.
 #' @param object The output from [getPCA()].
 #' @param qseaSet The qseaSet object used to generate `object`.
 #' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
@@ -751,7 +751,7 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
 #' @export
-plotPCA <- function(object,
+plotPCA.mesaDimRed <- function(object,
                     qseaSet = NULL,
                     components = list(c(1, 2), c(2, 3)),
                     colour = NULL,
