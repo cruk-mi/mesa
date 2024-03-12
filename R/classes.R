@@ -99,7 +99,11 @@ setMethod("plotPCA", "mesaDimRed", function(object) {
   cat("Object containing ", length(object@res)," dimensionality reduction objects for ", length(object@samples), " samples", sep = "")
 })
 
-setMethod("plotPCA", signature(object='mesaDimRed'), plotPCA.mesaDimRed)
+setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
+
+setMethod("getSampleTable", "mesaDimRed", function(object) {
+  object@sampleTable
+})
 
 #' This function extends the dplyr function mutate to act on a mesaDimRed sampleTable.
 #' @method mutate mesaDimRed
