@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.99.0
+Version: 0.5.1
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -32,7 +32,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports:
     plyranges,
     magrittr,

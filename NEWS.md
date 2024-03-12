@@ -4,9 +4,15 @@ editor_options:
     wrap: sentence
 ---
 
-# mesa 0.99.0
+# dev
 
-### Added
+### BUG FIXES
+* `summariseDMRsByGene` now correctly summarises genes when they have different positions or lengths in different windows. 
+* `plotCorrelationMatrix` no longer crashes when no annotation is being used. 
+
+# mesa 0.5.0
+
+### ADDED
 * Examples added for some functions, and documentation for some related functions merged.
 * Added more tests following inspection of `covr` coverage.
 * `getPCA()` and `getUMAP()` now return an object of class `mesaDimRed`, which wraps the previous list based output. This object now contains a copy of the sampleTable, which may be edited using `mutate` and `left_join`.

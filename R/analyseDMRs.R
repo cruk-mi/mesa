@@ -92,12 +92,14 @@ summariseDMRsByGene <- function(DMRtable){
     stop("Please call annotateWindows first on the DMRs prior to summariseDMRsByGene.")
   }
 
-  DMRtable %>%
+  summary <- DMRtable %>%
     tibble::as_tibble() %>%
-    dplyr::group_by(ENSEMBL, SYMBOL, GENENAME, geneChr, geneStart, geneEnd, geneLength) %>%
-    dplyr::summarise(n = length(width)) %>%
-    dplyr::arrange(dplyr::desc(n)) %>%
-    return()
+    dplyr::group_by(ENSEMBL, SYMBOL, GENENAME) %>%
+    dplyr::tally() %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(dplyr::desc(n))
+  
+  return(summary)
 
 }
 
