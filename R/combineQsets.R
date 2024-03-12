@@ -9,6 +9,7 @@
 #' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
 #' @return A qseaSet object, containing all the samples from both qseaSet objects.
 #' @export
+
 combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
   if (is.character(firstQset)) {
     if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
@@ -55,7 +56,7 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     }
   }
 
-  if (!class(qseaSet1) == "qseaSet") {
+  if (!is.qseaSet(qseaSet1)) {
     stop("Please supply a qseaSet object in the first position.")
   }
 
@@ -63,14 +64,14 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     qseaSet1 <- qseaSet1 %>% filterByOverlaps(regionsToKeep)
   }
 
-  if (class(qseaSet2) == "character") {
+  if (!is.qseaSet(qseaSet2)) {
     if(length(qseaSet2) == 1 & tools::file_ext(qseaSet2) == "rds") {#has to be after first if, else errors if it is a qseaSet
       message(glue::glue("Character string given, loading {qseaSet2}"))
       qseaSet2 <- readr::read_rds(qseaSet2)
     }
   }
 
-  if (!class(qseaSet2) == "qseaSet") {
+  if (!is.qseaSet(qseaSet2)) {
     stop("Please supply a qseaSet object in the second position.")
   }
 
@@ -83,13 +84,11 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
 
   commonNames <- intersect(sampleNames1,sampleNames2)
 
-  commonNamesNoControl <- setdiff(commonNames,"PooledControl")
-
-  if (length(commonNamesNoControl) > 0 & !dropDuplicates) {
+  if (length(commonNames) > 0 & !dropDuplicates) {
     message(glue::glue("Samples exist with the same name, adding _Dup to their name"))
-    message(glue::glue("{commonNamesNoControl} "))
+    message(glue::glue("{commonNames} "))
 
-    for (i in commonNamesNoControl) {
+    for (i in commonNames) {
       qseaSet2 <- renameQsetNames(qseaSet2, paste0("^",i,"$"), paste0(i,"_Dup"))
       sampleNames2 <- qsea::getSampleNames(qseaSet2)
       commonNames <- intersect(sampleNames1,sampleNames2)
@@ -108,24 +107,18 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     return(qseaSet2)
   }
 
-
-
-
   if (length(commonNames) > 0) {
-    if (length(commonNamesNoControl) > 0 & dropDuplicates) {
+    if (dropDuplicates) {
       message(
         glue::glue(
-          "Dropping {length(commonNamesNoControl)} common names (use dropDuplicates=FALSE to stop this)"
+          "Dropping {length(commonNames)} common names (use dropDuplicates=FALSE to stop this)"
         )
       )
     }
+
     qseaSet2 <-
       subsetQset(qseaSet2, samplesToDrop = commonNames)
   }
-
-  # if (length(setdiff(commonNames,commonNamesNoControl)) > 0 ) {
-  #   qseaSet2 <- subsetQset(qseaSet2,samplesToDrop = c("PooledControl"))
-  # }
 
   slots1 <- methods::slotNames(qseaSet1)
   slots2 <- methods::slotNames(qseaSet2)
@@ -135,7 +128,6 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
 
   parameters1 <- tibble::as_tibble(qseaSet1@parameters) %>% dplyr::select(order(colnames(.)))
   parameters2 <- tibble::as_tibble(qseaSet2@parameters) %>% dplyr::select(order(colnames(.)))
-
 
   if (!all(identical(GenomeInfoDb::seqnames(qseaSet1@regions),
                      GenomeInfoDb::seqnames(qseaSet2@regions)),
@@ -151,8 +143,13 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     ##TODO Check intersection properly to make sure they are exactly start/end together
     message(glue::glue("Regions are not identical: {length(regions1)} and {length(regions2)} regions.
                            Taking intersection of {length(regions1 %>% plyranges::filter_by_overlaps(regions2))} regions."))
+    
   }
 
+  if(is.character(all.equal(qsea::getRegions(qseaSet1)$CpG_density, qsea::getRegions(qseaSet2)$CpG_density))){
+    warning(glue::glue("CpG densities differ between the two objects. Keeping the density values from the first qseaSet"))
+  }
+  
   if (checkParams) {
 
     if (!all(parameters1 == parameters2)) {stop("Parameters are not the same!")}

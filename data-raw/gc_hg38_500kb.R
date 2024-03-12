@@ -4,4 +4,4 @@ gc_hg38_500kb <- HMMcopy::wigToRangedData("/data/cep/Methylation/refData/gc_hg38
   dplyr::mutate(chr = stringr::str_remove(chr,"chr"), end = end - 1) %>%
   dplyr::rename(gc = value)
 
-usethis::use_data(gc_hg38_500kb, overwrite = TRUE)
+usethis::use_data(gc_hg38_500kb, overwrite = TRUE, compress = "xz")

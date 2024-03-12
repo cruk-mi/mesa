@@ -6,8 +6,7 @@
 \usage{
 plotCNVheatmap(
   qseaSet,
-  ...,
-  annotationCol = NULL,
+  sampleAnnotation = NULL,
   annotationColors = NA,
   clusterRows = TRUE
 )
@@ -15,11 +14,9 @@ plotCNVheatmap(
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{...}{A list of columns to use to annotate the samples with.}
+\item{sampleAnnotation}{Columns of the sampleTable to use to annotation the plot with.}
 
-\item{annotationCol}{A data frame with annotations for the samples (can be made with getAnnotationDataFrameIndividual)}
-
-\item{annotationColors}{A list with the colours to use for the column legend, to pass to pheatmap}
+\item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
 
 \item{clusterRows}{Whether to cluster the rows of the heatmap}
 }

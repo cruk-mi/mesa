@@ -8,25 +8,35 @@ plotGeneHeatmap(
   qseaSet,
   gene,
   normMethod = "beta",
-  annotationCol = NULL,
+  useGroupMeans = FALSE,
+  sampleAnnotation = NULL,
+  minDensity = 0,
   minEnrichment = 3,
   maxScale = 1,
-  clusterNum = 2,
+  clusterNum = NULL,
   annotationColors = NA,
   upstreamDist = 3000,
   scaleRows = FALSE,
   clusterCols = TRUE,
-  downstreamDist = 1000
+  mart = NULL,
+  showSampleNames = NULL,
+  downstreamDist = 1000,
+  idType = NULL,
+  ...
 )
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{gene}{A gene to plot. Currently as a gene id only, in a dubious way.}
+\item{gene}{A gene to plot. Either a gene symbol or an ensembl ID.}
 
 \item{normMethod}{Whether to plot nrpm values or beta values.}
 
-\item{annotationCol}{A data frame with annotations for the samples.}
+\item{useGroupMeans}{Whether to use the group variable to collapse replicates.}
+
+\item{sampleAnnotation}{A data frame with annotations for the samples.}
+
+\item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
 
 \item{minEnrichment}{Minimum enrichment factor for beta values, will give NAs below this.}
 
@@ -42,10 +52,18 @@ plotGeneHeatmap(
 
 \item{clusterCols}{Whether to cluster the columns or not.}
 
+\item{mart}{A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.}
+
+\item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
+
 \item{downstreamDist}{Number of basepairs downstream of the gene to include.}
+
+\item{idType}{A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse.}
+
+\item{...}{Additional arguments to pass to pheatmap.}
 }
 \value{
-A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+A heatmap showing the methylation patterns across the gene of interest.
 }
 \description{
 This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap

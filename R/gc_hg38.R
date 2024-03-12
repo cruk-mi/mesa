@@ -11,10 +11,6 @@
 
 #' @rdname gc_hg38_1000kb
 #' @format NULL
-"gc_hg38_10kb"
-
-#' @rdname gc_hg38_1000kb
-#' @format NULL
 "gc_hg38_50kb"
 
 #' @rdname gc_hg38_1000kb

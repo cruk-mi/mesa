@@ -4,16 +4,36 @@
 \alias{plotCorrelationMatrix}
 \title{This function takes a qseaSet and plots a correlation matrix}
 \usage{
-plotCorrelationMatrix(qseaSet, ..., normMethod = "nrpm", annotationColors = NA)
+plotCorrelationMatrix(
+  qseaSet,
+  regionsToOverlap = NULL,
+  useGroupMeans = FALSE,
+  sampleAnnotation = NULL,
+  normMethod = "nrpm",
+  minEnrichment = 3,
+  annotationColors = NA,
+  minDensity = 0,
+  ...
+)
 }
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{...}{Other arguments for pheatmap}
+\item{regionsToOverlap}{Regions to overlap}
+
+\item{useGroupMeans}{Whether to use the replicate information or not (group column)}
+
+\item{sampleAnnotation}{Columns of the sampleTable to use to annotate the heatmap}
 
 \item{normMethod}{What normalisation method to use}
 
-\item{annotationColors}{A data frame for use of annotation of the rows and columns in pheatmap}
+\item{minEnrichment}{Minimum number of reads for beta values}
+
+\item{annotationColors}{A list of custom colours to use for the annotation}
+
+\item{minDensity}{Minimum CpG density to keep}
+
+\item{...}{Other arguments for pheatmap}
 }
 \value{
 A table

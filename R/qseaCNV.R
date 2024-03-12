@@ -14,42 +14,36 @@
 #' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param plotDir A directory to export individual HMMcopy plots to.
+#' @param hmmCopyGC Object containing GC content per window in the genome, for hmmcopy
+#' @param hmmCopyMap Object containing mapability content per window in the genome, for hmmcopy
 #' @return A qseaGLM object
 #' @export
 
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
-                          plotDir = NULL, parallel = TRUE,
+                          plotDir = NULL,
+                          parallel = getMesaParallel(),
                           maxInsertSize = 1000,
                           minInsertSize = 50,
                           minReferenceLength = 30,
                           minMapQual = 30,
-                          properPairsOnly = FALSE
+                          properPairsOnly = FALSE,
+                          hmmCopyGC = NULL,
+                          hmmCopyMap = NULL
                           )
 {
 
+  if (is.null( hmmCopyGC)) {
+    stop("GC track for hmmcopy must be provided.")
+  }
+
+  if (is.null( hmmCopyMap)) {
+    stop("GC track for hmmcopy must be provided.")
+  }
+
+  hmmCopyGC <- asValidGranges(hmmCopyGC)
+  hmmCopyMap <- asValidGranges(hmmCopyMap)
+
   #TODO something with zygosity
-
-  if(windowSize == 1000000) {
-
-    gcGR <- gc_hg38_1000kb
-    mapGR <- map_hg38_1000kb
-
-  } else if (windowSize == 500000) {
-
-    gcGR <- gc_hg38_500kb
-    mapGR <- map_hg38_500kb
-
-  } else if (windowSize == 50000) {
-
-    gcGR <- gc_hg38_50kb
-    mapGR <- map_hg38_50kb
-
-  } else if (windowSize == 10000) {
-
-    gcGR <- gc_hg38_10kb
-    mapGR <- map_hg38_10kb
-
-  } else {stop(glue::glue("Window size must be one of 10000, 50000, 500000 or 1000000 currently."))}
 
   CNV_Regions = qsea:::makeGenomeWindows(qsea:::getGenome(qs), as.character(qsea::getChrNames(qs)), windowSize)
   CpGpos = GenomicRanges::GRanges(seqinfo = GenomicRanges::seqinfo(CNV_Regions))
@@ -90,13 +84,13 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
     warning("Low coverage in CNV files. Consider larger CNV_window_size")
   }
 
+  GenomicRanges::mcols(CNV_Regions) <- tibble::as_tibble(counts)
+
   CNV_RegionsWithReads <- CNV_Regions %>%
+    plyranges::join_overlap_left(hmmCopyGC) %>%
+    plyranges::join_overlap_left(hmmCopyMap)  %>%
     tibble::as_tibble() %>%
     dplyr::rename(chr = seqnames) %>%
-    dplyr::bind_cols(reads = tibble::as_tibble(counts)) %>%
-    dplyr::left_join(gcGR, by = c("chr", "start", "end")) %>%
-    dplyr::left_join(mapGR, by = c("chr", "start", "end")) %>%
-    dplyr::mutate(chr = as.factor(chr)) %>%
     data.table::data.table()
 
   #try saving the raw CNV data in the qseaSet.
@@ -134,7 +128,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
   correctOutput <- CNV_RegionsWithReads %>%
     dplyr::select(chr, start, end, width, strand, gc, map, tidyselect::any_of(colname)) %>%
-    dplyr::rename(reads = colname) %>%
+    dplyr::rename(reads = tidyselect::all_of(colname)) %>%
     HMMcopy::correctReadcount(mappability = 0.9, samplesize = 50000, verbose = FALSE)
 
   initParam <- HMMcopy::HMMsegment(correctOutput, param = NULL, autosomes = NULL,
@@ -149,7 +143,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
   out <- hmmseg$segs %>%
     dplyr::left_join(endMusDf, by = "state") %>%
-    dplyr::mutate(chr = factor(chr, levels = 1:22)) %>%
+    dplyr::mutate(chr = factor(chr, levels = (CNV_RegionsWithReads %>% pull(chr) %>% levels()))) %>%
     dplyr::arrange(chr, start) %>%
     dplyr::rename(seqnames = chr) %>%
     dplyr::select(seqnames, start, end, CNV) %>%
@@ -188,95 +182,67 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
 #' This function takes a qseaSet and plots a heatmap of the calculated CNV
 #' @param qseaSet The qseaSet object.
-#' @param ... A list of columns to use to annotate the samples with.
-#' @param annotationCol A data frame with annotations for the samples (can be made with getAnnotationDataFrameIndividual)
-#' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
+#' @param sampleAnnotation Columns of the sampleTable to use to annotation the plot with.
+#' @param annotationColors A list specifying some or all of the colours to use for the annotations.
 #' @param clusterRows Whether to cluster the rows of the heatmap
 #' @return A heatmap with the calculated number of chromosomes for each samples
 #' @export
 #'
+
 plotCNVheatmap <- function(qseaSet,
-                           ...,
-                           annotationCol = NULL,
+                           sampleAnnotation = NULL,
                            annotationColors = NA,
                            clusterRows = TRUE){
 
-  if(is.null(annotationCol)){
-    annotationCol = getAnnotationDataFrameIndividual(qseaSet, ...)
-  }
+  rowAnnot <- makeHeatmapAnnotations(qseaSet,
+                                     sampleOrientation = "row",
+                                     specifiedAnnotationColors = annotationColors,
+                                     sampleAnnotation = {{sampleAnnotation}} ) %>%
+    purrr::pluck("sample")
 
-  # if the annotation is empty then set to NA else pheatmap complains
-  if(ncol(annotationCol) == 0){
-    annotationCol <- NA
-  }
-
-  if (is.list(annotationColors)) {
-
-    namesVec <- names(annotationColors)
-    names(namesVec) <- namesVec
-
-    annotationColors <- purrr::map(namesVec,
-      function(x){
-        usedValues <- qseaSet %>%
-          qsea::getSampleTable() %>%
-          dplyr::pull(x) %>%
-          unique()
-        return(x = annotationColors[[x]][usedValues])
-      }
-    )
-
-    if(!("chr" %in% names(annotationColors))){
-      annotationColors$chr <- c("1" = "black", "0" = "darkgrey")
-    }
-
-  }
-
-
-
-  # Take the CNV and generate a data frame with the annotation
-  rowAnno <- qseaSet %>%
+  chr <- qseaSet %>%
     qsea::getCNV() %>%
     tibble::as_tibble() %>%
-    dplyr::mutate(seqnames = factor(seqnames,
-                                    levels = sort(as.numeric(levels(seqnames))))) %>%
+    dplyr::mutate(seqnames = factor(seqnames, levels = gtools::mixedsort(levels(seqnames)))) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
-    #dplyr::mutate(seqnames = factor(seqnames, levels = c(1:22))) %>%
-    dplyr::mutate(chr = as.numeric(seqnames) %% 2 ) %>%
-    dplyr::mutate(chr = factor(chr,levels = c(1,0))) %>%
     dplyr::arrange(seqnames) %>%
     tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
-    dplyr::select(chr)
+    dplyr::pull(seqnames)
+
+  chr.levs <- chr %>% levels()
+  chr.cols <- list(chr = rep(c("black","grey"), length(chr.levs) ) %>%
+                     utils::head(length(chr.levs)) %>%
+                     purrr::set_names(chr.levs))
+
+  #Make top_annotation bar indicating chromosomes
+  topAnnot <- ComplexHeatmap::HeatmapAnnotation(chr = chr, col = chr.cols, show_legend = FALSE, show_annotation_name = FALSE)
 
   CNVmatrix <- qseaSet %>%
     qsea::getCNV() %>%
-    tibble::as_tibble() %>%
-    dplyr::select(-tidyselect::matches("PooledControl")) %>%
+    tibble::as_tibble(rownames = NULL) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
-    tibble::remove_rownames() %>%
     tibble::column_to_rownames("window") %>%
-    dplyr::select(-seqnames, -start, -end, -width, -strand) %>%
+    dplyr::select(tidyselect::all_of(qseaSet %>% qsea::getSampleNames())) %>%
     as.matrix() %>%
     t()
-    #{2*(2^.)} %>%
-
-  minmax <- max(max(CNVmatrix),abs(min(CNVmatrix)),1)
 
   CNVmatrix %>%
-    ComplexHeatmap::pheatmap(cluster_rows = clusterRows,
-                       cluster_cols = FALSE,
-                       show_colnames = FALSE,
-                       annotation_row = annotationCol,
-                       annotation_colors = annotationColors,
-                       #breaks = 2*(2^seq(from = 0, to = 4, length.out = 12)),
-                       breaks = seq(from = -minmax, to = minmax, length.out = 12),
-                       #labels_row = stringr::str_remove(rownames(.), "_.*"),
-                       annotation_col = rowAnno,
-                       gaps_col = rowAnno %>% dplyr::pull(chr) %>% diff() %>% {which(. != 0)},
-                       color = rev(RColorBrewer::brewer.pal(name = "RdBu", n = 11))
-    )
+    ComplexHeatmap::Heatmap(cluster_rows = clusterRows,
+                            cluster_columns = FALSE,
+                            show_column_names = FALSE,
+                            left_annotation = rowAnnot,
+                            top_annotation = topAnnot,
+                            name = "Copy number",
+                            row_title = "Samples",
+                            column_title = "Chromosome",
+                            column_title_side = "top",
+                            heatmap_legend_param = list(legend_direction = "horizontal")) %>%
+    ComplexHeatmap::draw(heatmap_legend_side = "bottom",
+                         annotation_legend_side = "right")
 
 }
+
 
 #' This function takes a qseaSet and removes the CNV data.
 #' @param qseaSet The qseaSet object.

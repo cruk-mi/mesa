@@ -11,10 +11,6 @@
 
 #' @rdname map_hg38_1000kb
 #' @format NULL
-"map_hg38_10kb"
-
-#' @rdname map_hg38_1000kb
-#' @format NULL
 "map_hg38_50kb"
 
 #' @rdname map_hg38_1000kb

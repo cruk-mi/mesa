@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.2.2
+Version: 0.5.1
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -11,15 +11,28 @@ Authors@R: c(
            family = "Hill",
            role = "aut",
            email = "steven.hill@cruk.manchester.ac.uk",
-           comment = c(ORCID = "0000-0002-5909-692X"))     
+           comment = c(ORCID = "0000-0002-5909-692X")),
+    person(given = "Paddy",
+           family = "Harker",
+           role = "ctb",
+           email = "patrick.harker@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0000-0002-2531-8774")),
+    person(given = "Kevin",
+           family = "Brennan",
+           role = "ctb",
+           email = "kevin.brennan@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0000-0001-9018-9852")),           
+    person(given = "Katarzyna",
+           family = "Kamieniecka",
+           role = "ctb")    
            )
-Description: Analysis tools for methylation enrichment sequencing data (MBD-seq or MEDIP-seq), building off the qsea package.
+Description: Analysis tools for methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq), building off the qsea package.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.1
 Imports:
     plyranges,
     magrittr,
@@ -57,8 +70,11 @@ Imports:
     tools,
     ComplexHeatmap,
     readr,
-    qsea,
-    memoise
+    memoise,
+    biomaRt,
+    hues,
+    circlize,
+    scales
 Depends:
     qsea,
     R (>= 4.1.0),
@@ -74,10 +90,13 @@ Suggests:
     MEDIPS,
     workflows,
     MEDIPSData,
+    uwot,
     BSgenome.Hsapiens.NCBI.GRCh38,
-    TxDb.Hsapiens.UCSC.hg38.knownGene,
     BSgenome.Hsapiens.UCSC.hg19,
-    org.Hs.eg.db
+    org.Hs.eg.db,
+    org.Mm.eg.db,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    TxDb.Mmusculus.UCSC.mm10.knownGene
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

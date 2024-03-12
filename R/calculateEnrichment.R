@@ -2,7 +2,6 @@
 #'
 #' @param BSgenome The BSgenome object.
 #' @return A data frame with two entries, genome.relH and genome.GoGe
-#' @export
 calculateGenomicCGDistribution <- function(BSgenome){
   dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
@@ -24,11 +23,11 @@ calculateGenomicCGDistribution <- function(BSgenome){
 #'
 #' @param file The path to the bam file
 #' @param BSgenome Which BSGenome to use (GRCh38 is cached for speed)
-#' @param exportPath Location to save a plot and data object into.
+#' @param exportPath Location to save a plot and data object into. This contains a histogram of fragment length distribution and a rds file containing the
 #' @param extend,shift,uniq,chr.select,paired Options to feed into MEDIPS::getGRange or MEDIPS::getPairedGRange
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
-calculateCpGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
+calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
                                    extend = 0, shift = 0, uniq = 0,
                                    chr.select = NULL, paired = TRUE){
 
@@ -76,6 +75,8 @@ calculateCpGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NU
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+  } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
+    genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
   } else {
     genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
   }
@@ -134,7 +135,6 @@ calculateCpGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NU
 #' @param BSgenome Which BSgenome to use
 #' @param chr.select Which chromosomes to use
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
-#' @export
 getCGPositions <- function(BSgenome, chr.select){
   MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
 }
@@ -146,7 +146,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #' @param chr.select Which chromosomes to use in global calculation
 #' @return A data frame containing the relH, GoGe and number of reads values for the samples
 #' @export
-calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
+calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -160,6 +160,11 @@ calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, c
   chromosomes = gtools::mixedsort(unique(GenomeInfoDb::seqlevels(readGRanges)))
 
   chr_lengths = as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
+
+  if (all(is.na(GenomeInfoDb::seqlengths(readGRanges)))) {
+    suppressWarnings(GenomeInfoDb::seqinfo(readGRanges) <- GenomeInfoDb::seqinfo(BSgenome::getBSgenome(BSgenome))[GenomeInfoDb::seqnames(GenomeInfoDb::seqinfo(readGRanges))])
+    readGRanges <- IRanges::trim(readGRanges)
+  }
 
   IRanges::ranges(readGRanges) <- IRanges::restrict(IRanges::ranges(readGRanges), +1)
 
@@ -179,6 +184,10 @@ calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, c
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+  } else  if (BSgenome == "BSgenome.Mmusculus.UCSC.mm10") {
+    genomicDistribution <- mesa::BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
+  } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
+    genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
   } else {
     genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
   }
@@ -219,18 +228,20 @@ calculateCpGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, c
 
 #' This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.
 #' @param qseaSet The cutoff to use on the windows for each sample
-#' @param BSgenome Name of BSgenome package
 #' @param exportPath Folder to export files
+#' @param nonEnrich Boolean to signify function is being ran on the Input samples
 #' @param extend,shift,uniq,chr.select,paired Options to feed into medips::getGRange or medips::getPairedGRange
 #' @param file_name Column of the sampleTable which contains the file_name.
 #' @param nCores Number of cores to use for parallelisation
 #' @return A qseaSet supplemented with more columns on the sampleTable, related to enrichment.
 #' @export
-addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NULL,
+addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
                                        extend = 0, shift = 0, uniq = 0,
                                        chr.select = NULL, paired = TRUE,
                                        file_name = "file_name",
                                        nCores = 1){
+
+  BSgenome = qseaSet %>% qsea:::getGenome()
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -239,35 +250,56 @@ addMedipsEnrichmentFactors <- function(qseaSet, BSgenome = NULL, exportPath = NU
     )
   }
 
-  message(glue::glue("Adding Medips Enrichment factors to {length(getSampleNames(qseaSet))} samples, using {nCores} cores."))
+  if(nonEnrich){
+    typeString <- "Pulldown"
+  } else {
+    typeString <- "Input"
+  }
+
+  message(glue::glue("Adding Medips Enrichment factors to {length(getSampleNames(qseaSet))} {typeString} samples, using {nCores} cores."))
+
+  if(!nonEnrich){
 
   colsToCheck <- c("relH","GoGe","nReads","nReadsWithoutPattern","n100bpReadsWithoutPattern")
 
   if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
-    stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))])} already in sampleTable!"))
+    stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))]} already in sampleTable!
+                    "))
+     }
+  } else{
+
+    colsToCheck <- c("input_relH","input_GoGe","input_nReads","input_nReadsWithoutPattern","input_n100bpReadsWithoutPattern")
+
+    if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
+      stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))]} already in sampleTable!
+                    "))
+    }
+
   }
 
-  pulldownFileNames <- qsea::getSampleTable(qseaSet) %>% dplyr::pull(file_name)
+  if(!nonEnrich){
+    fileNames <- qsea::getSampleTable(qseaSet) %>% dplyr::pull(file_name)
+  } else {
+    fileNames <- qsea::getSampleTable(qseaSet) %>% dplyr::pull(input_file)
+  }
 
-  enrichDataMeCap <- parallel::mclapply(pulldownFileNames,
+
+  enrichData <- parallel::mclapply(fileNames,
                                         function(x){
-                                          calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
+                                          calculateCGEnrichment(x, BSgenome = BSgenome, exportPath = exportPath,
                                                                  extend = extend, shift = shift, uniq = uniq,
                                                                  chr.select = chr.select, paired = paired)
                                         }, mc.cores = nCores) %>%
     do.call(rbind, . )
 
-  # inputFileNames <- getSampleTable(qseaSet) %>% pull(input_file)
-  # enrichDataInput <- parallel::mclapply(inputFileNames ,
-  #                                  function(x){
-  #                   calculateCpGEnrichment(x, BSgenome, exportPath = exportPath,
-  #                                      extend = extend, shift = shift, uniq = uniq,
-  #                                      chr.select = chr.select, paired = paired)
-  #                                    }, mc.cores = nCores) %>%
-  #   do.call(rbind, . )
+  if(!nonEnrich){
+  qseaSet@libraries$file_name <- qseaSet@libraries$file_name %>%
+    cbind(dplyr::select(enrichData,-file))
 
-  qseaSet@sampleTable <- qsea::getSampleTable(qseaSet) %>%
-    dplyr::bind_cols(dplyr::select(enrichDataMeCap,-file))
+  } else{
+    qseaSet@libraries$input_file <- qseaSet@libraries$input_file %>%
+      cbind(dplyr::select(enrichData,-file))
+  }
 
   return(qseaSet)
 }

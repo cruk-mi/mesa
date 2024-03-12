@@ -2,13 +2,13 @@
 #' @param DMRtable A data frame with multiple comparisons inside
 #' @param FDRthres FDR threshold to apply to each comparison
 #' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast
+#' @seealso [tidyr]{pivot_longer}
 #' @export
-#'
 pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
   pivotedDMRs <- DMRtable %>%
     dplyr::rename_with(~ stringr::str_replace(.x, "_adjPval", ":adjPval")) %>%
     dplyr::rename_with(~ stringr::str_replace(.x, "_log2FC", ":log2FC")) %>%
-    dplyr::rename_with(~ stringr::str_replace(.x, "_betaDelta", ":betaDelta")) %>%
+    dplyr::rename_with(~ stringr::str_replace(.x, "_deltaBeta", ":deltaBeta")) %>%
     tidyr::pivot_longer(tidyselect::matches("_vs_"),
                         names_to = c(".comparison", ".ext"),
                         values_to = ".value",
@@ -16,17 +16,17 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
     tidyr::pivot_wider(names_from = .ext,
                        values_from = .value) %>%
     dplyr::filter(adjPval <= FDRthres) %>%
-    tidyr::separate(.comparison, into = c("sample1","sample2"), sep = "_vs_")
+    tidyr::separate(.comparison, into = c("group1","group2"), sep = "_vs_")
 
   if(makePositive){
     pivotedDMRs <- pivotedDMRs %>%
-      dplyr::mutate(sample1new = ifelse(log2FC < 0, sample2, sample1),
-                    sample2new = ifelse(log2FC < 0, sample1, sample2),
-                    betaDelta = sign(log2FC)*betaDelta,
+      dplyr::mutate(group1new = ifelse(log2FC < 0, group2, group1),
+                    group2new = ifelse(log2FC < 0, group1, group2),
+                    deltaBeta = sign(log2FC)*deltaBeta,
                     log2FC = sign(log2FC)*log2FC,
       ) %>%
-      dplyr::select(-sample1, -sample2) %>%
-      dplyr::rename(sample1 = sample1new, sample2 = sample2new)
+      dplyr::select(-group1, -group2) %>%
+      dplyr::rename(group1 = group1new, group2 = group2new)
   }
 
   pivotedDMRs %>%
@@ -38,10 +38,10 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
 #' @param DMRtable A data frame with multiple comparisons inside
 #' @param FDRthres FDR threshold to apply to each comparison
 #' @param log2FCthres A log2FC threshold to apply to each comparison (absolute)
-#' @param betaDeltaThres A betaDelta threshold to apply to each comparison (absolute)
+#' @param deltaBetaThres A deltaBeta (change in average beta values) threshold to apply to each comparison (absolute)
 #' @export
 #'
-summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, betaDeltaThres = 0){
+summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, deltaBetaThres = 0){
 
   if (!("adjPval" %in% colnames(DMRtable))) {
 
@@ -49,27 +49,27 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
       colnames() %>%
       stringr::str_subset(".*_vs_.*_adjPval$") %>%
       tibble::enframe(name = NULL) %>%
-      tidyr::separate(value, into = c("sample1","sample2",NA), sep = "_vs_|_adjPval") %>%
-      dplyr::arrange(sample1, sample2)
+      tidyr::separate(value, into = c("group1","group2",NA), sep = "_vs_|_adjPval") %>%
+      dplyr::arrange(group1, group2)
 
     DMRtable <- DMRtable %>%
-      dplyr::select(-tidyselect::matches("nrpm|beta$|means")) %>%
+      dplyr::select(-tidyselect::matches("_nrpm$|_beta$|_means$")) %>%
       pivotDMRsLonger(FDRthres = FDRthres)
 
   } else {
     contrastsDF <- DMRtable %>%
-      dplyr::distinct(sample1, sample2) %>%
-      dplyr::arrange(sample1, sample2)
+      dplyr::distinct(group1, group2) %>%
+      dplyr::arrange(group1, group2)
   }
 
   DMRsummary <- DMRtable %>%
     tibble::as_tibble() %>%
     dplyr::filter(adjPval <= FDRthres,
                   abs(log2FC) >= log2FCthres,
-                  abs(betaDelta) >= betaDeltaThres,
+                  abs(deltaBeta) >= deltaBetaThres,
                   ) %>%
     dplyr::mutate(.up = ifelse(log2FC > 0, "nUp","nDown")) %>%
-    dplyr::group_by(sample1, sample2, .up) %>%
+    dplyr::group_by(group1, group2, .up) %>%
     dplyr::tally() %>%
     tidyr::pivot_wider(names_from = .up, values_from = n, values_fill = 0) %>%
     dplyr::ungroup()
@@ -78,26 +78,28 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     dplyr::left_join(DMRsummary) %>%
     dplyr::mutate(nDown = tidyr::replace_na(nDown, 0),
            nUp = tidyr::replace_na(nUp, 0)) %>%
-    dplyr::select(sample1, sample2, nUp, nDown) %>%
+    dplyr::select(group1, group2, nUp, nDown) %>%
     return()
 }
 
-#' This function summarises a data frame by gene (using annotateData)
+#' This function summarises a data frame by gene (using annotateWindows)
 #' @param DMRtable A data frame or GRanges object, may already be annotated
 #' @export
 #'
-summariseByGene <- function(DMRtable){
+summariseDMRsByGene <- function(DMRtable){
 
   if(!("ENSEMBL" %in% colnames(DMRtable))){
-    DMRtable <- DMRtable %>% annotateData()
+    stop("Please call annotateWindows first on the DMRs prior to summariseDMRsByGene.")
   }
 
-  DMRtable %>%
+  summary <- DMRtable %>%
     tibble::as_tibble() %>%
-    dplyr::group_by(ENSEMBL, SYMBOL, GENENAME, geneChr, geneStart, geneEnd, geneLength) %>%
-    dplyr::summarise(n = length(width)) %>%
-    dplyr::arrange(dplyr::desc(n)) %>%
-    return()
+    dplyr::group_by(ENSEMBL, SYMBOL, GENENAME) %>%
+    dplyr::tally() %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(dplyr::desc(n))
+  
+  return(summary)
 
 }
 
@@ -111,7 +113,7 @@ summariseByGene <- function(DMRtable){
 #' @param fdrThres FDR rate threshold to apply to each contrast
 #' @return Returns the original table invisibly, so can be used in a pipe.
 #' @export
-qseaWriteDMRsExcel <- function(dataTable, path, fdrThres = 0.05) {
+writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
     stop(
@@ -153,7 +155,7 @@ qseaWriteDMRsExcel <- function(dataTable, path, fdrThres = 0.05) {
 #' @param fdrThres FDR rate threshold to apply to each contrast
 #' @return Returns the original table invisibly, so can be used in a pipe.
 #' @export
-qseaWriteDMRsBeds <- function(dataTable, folder, fdrThres = 0.05) {
+writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 
   dir.create(folder, showWarnings = TRUE, recursive = TRUE)
 

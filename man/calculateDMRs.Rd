@@ -7,18 +7,19 @@
 calculateDMRs(
   qseaSet,
   variable = NULL,
-  sampleNames = NULL,
   covariates = NULL,
-  contrastsToDo = NULL,
+  contrasts = NULL,
   minReadCount = 0,
   minNRPM = 1,
   checkPVals = TRUE,
   fdrThres = 0.05,
   keepPvals = FALSE,
   formula = NULL,
+  keepContrastMeans = TRUE,
   keepData = FALSE,
   keepGroupMeans = FALSE,
-  direction = "both"
+  direction = "both",
+  calcDispersionAll = FALSE
 )
 }
 \arguments{
@@ -26,17 +27,15 @@ calculateDMRs(
 
 \item{variable}{Which variable to use to calculate the DMRs between}
 
-\item{sampleNames}{Which samples to return the information for.}
-
 \item{covariates}{Any variables to use as covariates, for instance patient in a paired analysis}
 
-\item{contrastsToDo}{A data frame with two columns, sample1 and sample2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted}
+\item{contrasts}{A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted}
 
 \item{minReadCount}{A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.}
 
 \item{minNRPM}{A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).}
 
-\item{checkPVals}{Whether to check that the p-values aren't all zero to avoid a bug with covariates, only turn this off if you are very sure what you are doing!}
+\item{checkPVals}{Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!}
 
 \item{fdrThres}{False discovery rate threshold.}
 
@@ -44,15 +43,25 @@ calculateDMRs(
 
 \item{formula}{Alternative formula mode for calculating DMRs (not recommended)}
 
+\item{keepContrastMeans}{Whether to keep the columns containing the means of the contrasts in the output}
+
 \item{keepData}{Whether to keep the individual data columns in the output}
 
 \item{keepGroupMeans}{Whether to keep the group means in the output}
 
 \item{direction}{Whether to keep regions that are up/down/both.}
+
+\item{calcDispersionAll}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
+Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
 }
 \value{
 A tibble with the data
 }
 \description{
 This function fits a GLM and returns the resulting data table
+}
+\examples{
+qseaSet <- mesa::exampleTumourNormal
+calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
+
 }

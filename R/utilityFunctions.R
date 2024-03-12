@@ -2,15 +2,18 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                          "ROI_start","ROI_end","value","window_start","window_end","window","sample_name",
                          "width","group","relH","CpG_density","strand","state","gene_name","map","CNV",
                          "EMSEMBL","SYMBOL","GENENAME","geneChr","geneStart","geneEnd","geneLength","n",
-                         "adjPval","sample1","sample2",".up","hyperStableFractionp8","hyperStableFractionp9",
+                         "adjPval","group1","group2","sample1","sample2",".up","hyperStableFractionp8","hyperStableFractionp9","hyperStableEdgar",
                          "isProperPair","isUnmappedQuery","isSupplementaryAlignment","isDuplicate","hasUnmappedMate",
                        "isNotPassingQualityControls","rname","pos","isize","MQ","mapq","isFirstMateRead","isPaired",
                        "cigar", ".rowID", "feature","annoShort","type",".comparison",".ext",".value","total_fragments",
-                       "isSecondaryAlignment","ROI_ID","ID","ENSEMBL","betaDelta",
+                       "isSecondaryAlignment","ROI_ID","ID","ENSEMBL","deltaBeta",
                        "map_hg38_1000kb", "map_hg38_10kb", "map_hg38_50kb", "map_hg38_500kb",
                        "gc_hg38_1000kb","gc_hg38_50kb","gc_hg38_500kb","gc_hg38_10kb","score",
-                       "log2FC","sample1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
-                       "afterOverBackNum","initialOverBackNum"))
+                       "log2FC","group1new","sample2new","counts","tumour","rowIndex","nUp","nDown","landscape","shortAnno","nOverCutoff",
+                       "afterOverBackNum","initialOverBackNum", "qname","inOut","nSign","nStrands",
+                       "chromosome_name","start_position","end_position", "input_file",
+                       "topVarNumInput", "windowSdName", "pcaName",
+                       "fnValue", "group2new","gap"))
 
 #' This function takes a genomic ranges object or data frame, and lifts over from hg19 to hg38.
 #'
@@ -18,7 +21,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #' @return A genomic ranges object object with coordinates in hg38.
 #' @export
 
-liftOverhg19 <- function(grOrDf){
+liftOverHg19 <- function(grOrDf){
 
   if (!requireNamespace("rtracklayer", quietly = TRUE)) {
     stop(
@@ -28,7 +31,7 @@ liftOverhg19 <- function(grOrDf){
   }
 
   regions <- grOrDf %>%
-    tibble::as_data_frame() %>%
+    tibble::as_tibble() %>%
     dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames,"chr"), seqnames, paste0("chr", seqnames))) %>%
     plyranges::as_granges()
 
@@ -39,10 +42,137 @@ liftOverhg19 <- function(grOrDf){
   return(unlist(liftover_result))
 }
 
-.getGenome <- function() {
-  getOption("mesa_genome", default="hg38")
+.getMesaGenome <- function() {
+  getOption("mesa_genome")
 }
 
+.getMesaMart <- function() {
+  getOption("mesa_mart")
+}
+
+.getMesaTxDb <- function() {
+  getOption("mesa_TxDb")
+}
+
+.getMesaAnnoDb <- function() {
+  getOption("mesa_annoDb")
+}
+
+#' This function sets a default genome for the annotateWindows function to use
+#'
+#' Currently supporting "hg38" and "GRCh38", this sets the TxDb and annoDb options to appropriate files.
+#'
+#' @param genome String corresponding to a genome.
+#' @return None
+#' @export
+
+setMesaGenome <- function(genome){
+  options("mesa_genome" = genome)
+  return(invisible(TRUE))
+}
+
+#' This function sets a default TxDb for the annotateWindows function to use.
+#'
+#' For instance "TxDb.Hsapiens.UCSC.hg38.knownGene" for human, or "TxDb.Mmusculus.UCSC.mm10.knownGene" for mouse.
+#'
+#' @param TxDb A TxDb package (as a string, or the object itself)
+#' @return None
+#' @export
+#' @seealso The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}
+
+setMesaTxDb <- function(TxDb){
+  
+  if(is.null(TxDb)){
+    options("mesa_TxDb" = NULL)
+    return(invisible(TRUE))
+  }
+  
+  if (!requireNamespace(TxDb, quietly = TRUE)) {
+    stop(
+      glue::glue("Package {TxDb} must exist and be installed to set as default TxDb. Please install or correct and run again."),
+      call. = FALSE
+    )
+  }
+
+  options("mesa_TxDb" = TxDb)
+
+  return(invisible(TRUE))
+}
+
+#' This function sets a default annoDb for the annotateWindows function to use.
+#'
+#' For instance "org.Hs.eg.db" for human, or "org.Mm.eg.db" for mouse.
+#'
+#' @param annoDb An annoDb package (as a string, or the object itself)
+#' @return None
+#' @export
+#' @seealso The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}
+#' 
+setMesaAnnoDb <- function(annoDb){
+  
+  if(is.null(annoDb)){
+    options("mesa_annoDb" = NULL)
+    return(invisible(TRUE))
+  }
+  
+  if (!requireNamespace(annoDb, quietly = TRUE)) {
+    stop(
+      glue::glue("Package {annoDb} must exist and be installed to set as default annoDb. Please install or correct and run again."),
+      call. = FALSE
+    )
+  }
+  
+  options("mesa_annoDb" = annoDb)
+  
+  return(invisible(TRUE))
+}
+
+#' Toggle whether to use parallelisation or not inside various functions in mesa
+#'
+#' @param nCores How many cores to set. Assumes you want to use MulticoreParam, for another architecture use the useParallel argument and specify manually.
+#' @param useParallel Boolean denoting whether or not to use parallelisation for various functions in mesa
+#' @param verbose Boolean to determine whether to print messages or not
+#' @return None
+#' @export
+
+setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE){
+
+  if(!is.null(nCores) && nCores > 1) {
+    useParallel = TRUE
+    BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
+  }
+
+  options("mesa_parallel" = useParallel)
+
+  if(useParallel & verbose){
+    message(glue::glue("Parallelisation turned on for the functions in the mesa package, currently using {BiocParallel::bpworkers()} cores.
+                       Control the number of cores by calling BiocParallel::register."))
+  } else if (verbose) {
+    message("Parallelisation turned off for all functions in the mesa package.")
+  }
+
+  return(invisible(useParallel))
+}
+
+getMesaParallel <- function(verbose = FALSE) {
+
+  if(verbose) {
+    if (is.null(getOption("mesa_parallel"))) {
+      message("Parallelisation not set, using serial evaluation. Call setMesaParallel to set for all mesa functions.")
+    } else if (getOption("mesa_parallel")) {
+      message(glue::glue("Using parallelisation, over {BiocParallel::bpworkers()} cores."))
+    } else {
+      message("Using serial evaluation")
+    }
+  }
+
+  if (is.null(getOption("mesa_parallel"))) {
+    return(FALSE)
+  } else {
+    return(getOption("mesa_parallel"))
+  }
+
+}
 
 expect_no_error <- function(object) {
   testthat::expect_error({{ object }}, NA)

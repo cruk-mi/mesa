@@ -8,12 +8,13 @@ fitQseaGLM(
   qseaSet,
   variable = NULL,
   covariates = NULL,
-  contrastsToDo = NULL,
+  contrasts = NULL,
   keepIndex = NULL,
   minReadCount = 0,
   minNRPM = 1,
   checkPVals = TRUE,
-  formula = NULL
+  formula = NULL,
+  calcDispersionAll = FALSE
 )
 }
 \arguments{
@@ -23,7 +24,7 @@ fitQseaGLM(
 
 \item{covariates}{A vector including any additional covariates to include in the model}
 
-\item{contrastsToDo}{A data frame with the comparisons to do}
+\item{contrasts}{A data frame with the comparisons to do}
 
 \item{keepIndex}{A vector of indices to keep, overwrites minReadCount.}
 
@@ -34,6 +35,9 @@ fitQseaGLM(
 \item{checkPVals}{Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.}
 
 \item{formula}{A formula to use}
+
+\item{calcDispersionAll}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
+Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
 }
 \value{
 A qseaGLM object

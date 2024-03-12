@@ -4,4 +4,4 @@
 
 hg19ToHg38.over.chain <- rtracklayer::import.chain("/data/cep/Methylation/refData/hg19ToHg38.over.chain")
 
-usethis::use_data(hg19ToHg38.over.chain, overwrite = TRUE)
+usethis::use_data(hg19ToHg38.over.chain, overwrite = TRUE, compress = "xz")

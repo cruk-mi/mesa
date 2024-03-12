@@ -2,12 +2,12 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{pull.qseaSet}
 \alias{pull.qseaSet}
-\title{This function extends the dplyr function pull to act on qseaSet sampleTable.}
+\title{This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.}
 \usage{
 \method{pull}{qseaSet}(.data, var = -1, name = NULL, ...)
 }
 \arguments{
-\item{.data}{A qseaSet to pull a column from the sampleTable of.s}
+\item{.data}{A qseaSet.}
 
 \item{var}{A variable specified as a column name or an integer (negative counting from right)}
 
@@ -16,8 +16,8 @@
 \item{...}{Other arguments to pass to dplyr::pull (column name to extract)}
 }
 \value{
-A vector with the contents of the column of the sample table that was extracted.
+A vector the same size as the number of samples in the qseaSet.
 }
 \description{
-This function extends the dplyr function pull to act on qseaSet sampleTable.
+This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.
 }

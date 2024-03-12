@@ -11,7 +11,7 @@
 #' @return A qseaSet object with an extra
 #' @export
 #'
-mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
+mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
                            onlyNew = FALSE,
                            renormalise = TRUE){
 
@@ -81,8 +81,6 @@ mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, n
   newSet@sampleTable <- tibble::tibble(sample_name = newName,
                                        rownameCol = newName,
                                        group = groupName,
-                                       type = qseaSet %>% qsea::getSampleTable() %>% dplyr::filter(sample_name == !!sample1) %>% dplyr::pull(type),
-                                       tumour = qseaSet %>% qsea::getSampleTable() %>% dplyr::filter(sample_name == !!sample1) %>% dplyr::pull(tumour),
                                        sample1 = sample1,
                                        sample2 = sample2,
                                        prop1 = proportion) %>%
@@ -97,7 +95,7 @@ mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, n
   rownames(newSet@libraries$file_name) <- newName
 
   if(renormalise){
-    newSet <- addQseaNormalisationSteps(newSet, enrichmentMethod = "blind1-15")
+    newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")
   }
 
   if (onlyNew) {
@@ -110,7 +108,7 @@ mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, n
 
 
 
-#' This function takes a qseaSet and makes a new sample by mixing three samples
+#' This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
 #' @param qseaSet The qseaSet object.
 #' @param sample1 First sample name, from which to take proportion of samples
 #' @param sample2 Second sample name
@@ -123,7 +121,6 @@ mixQsetSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, n
 #' @param onlyNew Whether to only return the new sample.
 #' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
 #' @return A qseaSet object with an extra
-#' @export
 #'
 mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal, proportion1, proportion2, newName = NULL, groupName = NULL,
                                 onlyNew = FALSE,
@@ -216,8 +213,6 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
   newSet@sampleTable <- tibble::tibble(sample_name = newName,
                                        rownameCol = newName,
                                        group = groupName,
-                                       type = qseaSet %>% qsea::getSampleTable() %>% dplyr::filter(sample_name == !!sample1) %>% dplyr::pull(type),
-                                       tumour = qseaSet %>% qsea::getSampleTable() %>% dplyr::filter(sample_name == !!sample1) %>% dplyr::pull(tumour),
                                        sample1 = sample1,
                                        sample2 = sample2,
                                        prop1 = proportion1,
@@ -233,7 +228,7 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
   rownames(newSet@libraries$file_name) <- newName
 
   if(renormalise){
-    newSet <- addQseaNormalisationSteps(newSet, enrichmentMethod = "blind1-15")
+    newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")
   }
 
   if (onlyNew) {

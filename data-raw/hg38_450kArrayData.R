@@ -9,4 +9,4 @@ hg38_450kArrayGR <- readr::read_tsv("/data/cep/Methylation/refData/hm450.hg38.ma
   dplyr::select(-chr) %>%
   plyranges::as_granges()
 
-usethis::use_data(hg38_450kArrayGR, overwrite = TRUE)
+usethis::use_data(hg38_450kArrayGR, overwrite = TRUE, compress = "xz", compression_level = 9)

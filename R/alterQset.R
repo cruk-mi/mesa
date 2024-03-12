@@ -1,41 +1,68 @@
-#' Filter a qseaSet by overlaps with a GRanges object or table that can be coerced to one
-#'
-#' This function takes a qseaSet and keeps only a set of regions from it. Either specified as a GRanges object or an index vector of which regions.
+#' Filter a qseaSet by overlapping/non-overlapping GRanges object or table that can be coerced to one
 #'
 #' @param qseaSet The qseaSet object.
-#' @param windowsToKeep A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end, or a numeric vector.
+#' @param regionsToOverlap A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
 #' @return A qseaSet object, with only a subset of the windows.
+#' @seealso Check the plyranges documentation on \link[plyranges]{filter_by_overlaps} and \link[plyranges]{filter_by_non_overlaps}
 #' @export
-filterByOverlaps <- function(qseaSet, windowsToKeep){
+#' @examples
+#'
+#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
+#' filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+#' filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+#' @rdname alterQsetOverlap
+filterByOverlaps <- function(qseaSet, regionsToOverlap){
 
-  if (intersect(class(windowsToKeep),c("integer", "numeric")) %>% length() > 0) {
-    qseaSet@regions <- qseaSet@regions[windowsToKeep]
-    qseaSet@count_matrix <- qseaSet@count_matrix[windowsToKeep, ,drop = FALSE]
-  } else if ("GRanges" %in% class(windowsToKeep)) {
-    qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,windowsToKeep) > 0), , drop = FALSE]
-    qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(windowsToKeep)
-  } else if ("seqnames" %in% colnames(windowsToKeep)) {
-    windowsToKeep <- plyranges::as_granges(windowsToKeep)
-    qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,windowsToKeep) > 0), ,drop = FALSE]
-    qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(windowsToKeep)
-  }else {
-    stop("windowsToKeep not numeric or a GRanges object.")
+  if(is.data.frame(regionsToOverlap)) {
+    if(length(intersect(colnames(regionsToOverlap),c("seqnames","start","end"))) != 3){
+      stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
+    }
   }
+
+  regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
+
+  qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- regionsToOverlap %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+
+  if(qseaSetChr & !windowsChr){
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+  }
+
+  if(!qseaSetChr & windowsChr){
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
+  }
+
+  qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,regionsToOverlap) > 0), , drop = FALSE]
+  qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(regionsToOverlap)
+
   return(qseaSet)
 }
 
-#' Filter a qseaSet by non-overlaps with a GRanges object or table that can be coerced to one
-#'
-#' This function takes a qseaSet and removes a set of regions from it. Either specified as a GRanges object or a table that can be coerced to one.
-#'
-#' @param qseaSet The qseaSet object.
-#' @param windowsToKeep A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
-#' @return A qseaSet object, with only a subset of the windows.
 #' @export
-filterByNonOverlaps <- function(qseaSet, windowsToKeep){
+#' @rdname alterQsetOverlap
+filterByNonOverlaps <- function(qseaSet, regionsToOverlap){
+
+  if(is.data.frame(regionsToOverlap)) {
+    if(length(intersect(colnames(regionsToOverlap),c("seqnames","start","end"))) != 3){
+      stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
+    }
+  }
+
+  regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
+
+  qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+  windowsChr <- regionsToOverlap %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+
+  if(qseaSetChr & !windowsChr){
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+  }
+
+  if(!qseaSetChr & windowsChr){
+    regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
+  }
 
   GRangesToKeep <- qsea::getRegions(qseaSet) %>%
-    plyranges::filter_by_non_overlaps(plyranges::as_granges(windowsToKeep))
+    plyranges::filter_by_non_overlaps(plyranges::as_granges(regionsToOverlap))
 
   qseaSet %>%
     filterByOverlaps(GRangesToKeep) %>%
@@ -47,6 +74,8 @@ filterByNonOverlaps <- function(qseaSet, windowsToKeep){
 #' @param qseaSet The qseaSet object.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
+#' @examples
+#' addLibraryInformation(exampleTumourNormal)
 addLibraryInformation <- function(qseaSet){
 
   curColNames <- qseaSet %>%
@@ -86,10 +115,12 @@ addLibraryInformation <- function(qseaSet){
 #' @param samplesToDrop Which samples to drop.
 #' @return A qseaSet object, with only the selected samples inside it.
 #' @export
+#' @examples
+#' subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
 subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
 
   if (length(samplesToKeep) == 0 & length(samplesToDrop) == 0 ) {
-   message("No samples remaining, returning an empty qseaSet.")
+    message("No samples remaining, returning an empty qseaSet.")
   }
 
   if (length(samplesToKeep) > 0 & length(samplesToDrop) > 0 ) {
@@ -112,7 +143,11 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
   newSet@sampleTable <- qseaSet@sampleTable[samplesToKeep,, drop = FALSE]
   newSet@count_matrix <- qseaSet@count_matrix[,samplesToKeep, drop = FALSE]
   newSet@zygosity <- qseaSet@zygosity[samplesToKeep,, drop = FALSE]
-  newSet@cnv <- qseaSet@cnv[,samplesToKeep, drop = FALSE]
+
+  if(length(qseaSet@cnv) > 0){
+    newSet@cnv <- qseaSet@cnv[,samplesToKeep, drop = FALSE]
+  }
+
   newSet@libraries$file_name <- qseaSet@libraries$file_name[samplesToKeep,, drop = FALSE]
   newSet@libraries$input_file <- qseaSet@libraries$input_file[samplesToKeep,, drop = FALSE]
   newSet@enrichment$parameters <- qseaSet@enrichment$parameters[samplesToKeep,, drop = FALSE]
@@ -120,8 +155,6 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
 
   return(newSet)
 }
-
-
 
 #' Rename samples in a qseaSet.
 #'
@@ -132,6 +165,8 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
 #' @param replacement Pattern to replace with in the names of the samples.
 #' @return A qseaSet object, containing all the samples from both qseaSet objects.
 #' @export
+#' @examples
+#' renameQsetNames(exampleTumourNormal, pattern = 'T', replacement = 'Tumour' )
 renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
   renamedNames <- qseaSet %>%
@@ -181,7 +216,8 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' @return A qseaSet object with the samples merged together.
 #' @export
 
-mergeQsetSamples <- function(qseaSet, mergeString){
+
+poolSamples <- function(qseaSet, mergeString){
 
   ##TODO rewrite this function to use a column.
 
@@ -287,14 +323,14 @@ mergeQsetSamples <- function(qseaSet, mergeString){
   }
   )
 
-  newSet@libraries$file_name <- as.matrix(newLibrariesFile)
-  newSet@libraries$input_file <- as.matrix(newLibrariesInput)
+  newSet@libraries$file_name <- as.data.frame(newLibrariesFile)
+  newSet@libraries$input_file <- as.data.frame(newLibrariesInput)
 
   oldSet <- qseaSet %>%
     subsetQset(samplesToDrop = samplesToMerge)
 
   finalSet <-  combineQsets(oldSet, newSet) %>%
-    addQseaNormalisationSteps(enrichmentMethod = "blind1-15")
+    addNormalisation(enrichmentMethod = "blind1-15")
 
   return(finalSet)
 
@@ -305,8 +341,11 @@ mergeQsetSamples <- function(qseaSet, mergeString){
 #' @param newNameColumn A column of the qseaSet to use to rename each sample with.
 #' @return A qseaSet object with the samples renamed.
 #' @export
-
-relabelQset <- function(qseaSet, newNameColumn){
+#' @examples
+#' exampleTumourNormal %>%
+#' mutate(newName = paste("Sample",1:10)) %>%
+#' renameSamples(newNameColumn = 'newName')
+renameSamples <- function(qseaSet, newNameColumn){
 
   newNameColumn <- rlang::enquo(newNameColumn)
 

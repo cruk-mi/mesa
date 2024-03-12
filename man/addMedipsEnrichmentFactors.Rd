@@ -6,8 +6,8 @@
 \usage{
 addMedipsEnrichmentFactors(
   qseaSet,
-  BSgenome = NULL,
   exportPath = NULL,
+  nonEnrich = FALSE,
   extend = 0,
   shift = 0,
   uniq = 0,
@@ -20,9 +20,9 @@ addMedipsEnrichmentFactors(
 \arguments{
 \item{qseaSet}{The cutoff to use on the windows for each sample}
 
-\item{BSgenome}{Name of BSgenome package}
-
 \item{exportPath}{Folder to export files}
+
+\item{nonEnrich}{Boolean to signify function is being ran on the Input samples}
 
 \item{extend, shift, uniq, chr.select, paired}{Options to feed into medips::getGRange or medips::getPairedGRange}
 
