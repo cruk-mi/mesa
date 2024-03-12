@@ -16,6 +16,12 @@ pivotDMRsLonger(DMRtable, FDRthres = 0.05, makePositive = FALSE)
 \description{
 This function transforms a DMR data frame from the wide format to a long format
 }
+\examples{
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all") \%>\%
+  pivotDMRsLonger()
+  
+}
 \seealso{
 [tidyr]{pivot_longer}
 }

@@ -17,3 +17,8 @@ A tibble with two columns, each row with a pair of contrasts
 \description{
 This function returns a set of all possible contrasts
 }
+\examples{
+exampleTumourNormal \%>\% makeAllContrasts(type)
+
+
+}

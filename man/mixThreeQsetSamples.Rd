@@ -42,8 +42,12 @@ mixThreeQsetSamples(
 \item{renormalise}{Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.}
 }
 \value{
-A qseaSet object with an extra
+A qseaSet object containing a new sample, potentially with all the previous samples.
 }
 \description{
-This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
+Perform in silico mixing between two samples, enabling the generation of new synthetic data.
+Note that if the qseaSets have been filtered prior to using this, the fraction of fragments
+present in the current qseaSet is calculated, such that the total number of reads would have been approximately \code{nReadsTotal}.
+E.g. if there are 50\% of the total fragments in the windows present in the current samples,
+0.5*\code{nReadsTotal} fragments will be sampled.
 }

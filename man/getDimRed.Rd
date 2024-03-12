@@ -103,3 +103,12 @@ The functions getPCA() and getUMAP() are dimensionality reduction techniques wit
 \item \code{getUMAP()}: Generate a UMAP from a qseaSet
 
 }}
+\examples{
+exampleTumourNormal \%>\% getPCA()
+# select different numbers of most variable windows
+exampleTumourNormal \%>\% getPCA(topVarNum = c(10,100,500,NA))
+
+qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP()
+# alter the n_neighbors and min_dist parameters
+qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP(n_neighbors = 5, min_dist = 1)
+}

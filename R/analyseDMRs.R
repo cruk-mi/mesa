@@ -4,6 +4,11 @@
 #' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast
 #' @seealso [tidyr]{pivot_longer}
 #' @export
+#' @examples
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type", contrasts = "all") %>%
+#'   pivotDMRsLonger()
+#'   
 pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
   pivotedDMRs <- DMRtable %>%
     dplyr::rename_with(~ stringr::str_replace(.x, "_adjPval", ":adjPval")) %>%
@@ -40,7 +45,10 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
 #' @param log2FCthres A log2FC threshold to apply to each comparison (absolute)
 #' @param deltaBetaThres A deltaBeta (change in average beta values) threshold to apply to each comparison (absolute)
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type", contrasts = "all") %>%
+#'   summariseDMRsByContrast()
 summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, deltaBetaThres = 0){
 
   if (!("adjPval" %in% colnames(DMRtable))) {
@@ -75,17 +83,21 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     dplyr::ungroup()
 
   contrastsDF %>%
-    dplyr::left_join(DMRsummary) %>%
+    dplyr::left_join(DMRsummary, by = join_by(group1, group2)) %>%
     dplyr::mutate(nDown = tidyr::replace_na(nDown, 0),
            nUp = tidyr::replace_na(nUp, 0)) %>%
     dplyr::select(group1, group2, nUp, nDown) %>%
     return()
 }
 
-#' This function summarises a data frame by gene (using annotateWindows)
-#' @param DMRtable A data frame or GRanges object, may already be annotated
+#' This function summarises a data frame by gene 
+#' @param DMRtable A data frame that has already been annotated by annotateWindows
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") %>%
+#'   summariseDMRsByGene()
 summariseDMRsByGene <- function(DMRtable){
 
   if(!("ENSEMBL" %in% colnames(DMRtable))){
@@ -113,6 +125,11 @@ summariseDMRsByGene <- function(DMRtable){
 #' @param fdrThres FDR rate threshold to apply to each contrast
 #' @return Returns the original table invisibly, so can be used in a pipe.
 #' @export
+#' @examples
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") %>%
+#'   writeDMRsToExcel("test.xlsx")
 writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
@@ -146,7 +163,7 @@ writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
   invisible(dataTable)
 }
 
-#' Write the qsea result to a set of bed file
+#' Write one or more DMRs to a set of bed files
 #'
 #' This writes a set of bed files with the results, with one bed file per contrast.
 #'
@@ -155,6 +172,11 @@ writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 #' @param fdrThres FDR rate threshold to apply to each contrast
 #' @return Returns the original table invisibly, so can be used in a pipe.
 #' @export
+#' @examples
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") %>%
+#'   writeDMRsToBed("test_bed")
 writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 
   dir.create(folder, showWarnings = TRUE, recursive = TRUE)
@@ -170,7 +192,7 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
       plyranges::as_granges() %>%
       rtracklayer::export.bed(file = file.path(folder, paste0(contrastName,".bed")))
 
-  }
+    }
   )
 
   invisible(dataTable)

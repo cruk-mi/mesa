@@ -4,6 +4,14 @@ editor_options:
     wrap: sentence
 ---
 
+# dev
+
+### ADDED
+* Many more examples for individual functions on their help pages
+
+### CHANGES
+* Removed `colnames` on a qseaSet, which was not working anyway.
+
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.

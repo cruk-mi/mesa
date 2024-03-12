@@ -67,3 +67,10 @@ A list of ggplot objects: one for each combination of \code{object@res}, \code{c
 \description{
 This function takes the output of \code{\link[=getUMAP]{getUMAP()}} and produces plots.
 }
+\examples{
+umap <- qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP()
+
+plotUMAP(umap)
+plotUMAP(umap, colour = "group")
+plotUMAP(umap, colour = "group", shape = "group")
+}

@@ -61,7 +61,11 @@ A tibble with the data
 This function fits a GLM and returns the resulting data table
 }
 \examples{
-qseaSet <- mesa::exampleTumourNormal
-calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
-
+calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_NormalLung")
+# calculate all possible DMRs on one column 
+calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
+# change the False Discovery Rate threshold
+calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
+# also return all the columns of data for the significant windows
+calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
 }

@@ -17,3 +17,7 @@ A qseaSet object, with the regions filtered appropriately.
 \description{
 This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.
 }
+\examples{
+exampleTumourNormal \%>\% filterWindows(start <= 25020000)
+exampleTumourNormal \%>\% filterWindows(CpG_density > 10)
+}

@@ -15,9 +15,10 @@
 }
 \value{
 A qseaSet with the sample names reordered alphabetically
-#' @examples
-sort(exampleTumourNormal, decreasing = TRUE)
 }
 \description{
 This function extends the function sort to act on qseaSet, to reorder the names. It uses gtools::mixedsort to sort numbers correctly (i.e. 10 does not come before 2).
+}
+\examples{
+sort(exampleTumourNormal, decreasing = TRUE)
 }

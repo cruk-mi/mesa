@@ -20,6 +20,10 @@
 #' @param ... Other arguments to pass to ComplexHeatmap.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
+#' @examples
+#' # plot all the windows in a sufficiently small qseaSet
+#' exampleTumourNormal %>% plotRegionsHeatmap()
+#' 
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,

@@ -19,3 +19,9 @@ Returns the original table invisibly, so can be used in a pipe.
 \description{
 This writes an Excel file with the results, with one sheet per contrast.
 }
+\examples{
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+  writeDMRsToExcel("test.xlsx")
+}

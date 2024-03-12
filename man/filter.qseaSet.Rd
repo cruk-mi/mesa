@@ -19,3 +19,12 @@ A qseaSet object, with only samples that are selected by the filtering operation
 \description{
 This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
 }
+\examples{
+exampleTumourNormal \%>\% filter(tissue == "Colon")
+exampleTumourNormal \%>\% filter(stringr::str_detect(sample_name, "Colon"))
+exampleTumourNormal \%>\% filter(tumour != "Normal")
+exampleTumourNormal \%>\% filter(stringr::str_detect(sample_name, "Lung"), tumour != "Normal")
+#note a message is given if no samples remain, but not an error or warning
+exampleTumourNormal \%>\% filter(tissue == "Liver")
+
+}

@@ -1,5 +1,9 @@
 #' @describeIn getDimRed Generate a PCA from a qseaSet
 #' @export
+#' @examples
+#' exampleTumourNormal %>% getPCA()
+#' # select different numbers of most variable windows
+#' exampleTumourNormal %>% getPCA(topVarNum = c(10,100,500,NA))
 #'
 getPCA <- function(qseaSet,
                    dataTable = NULL,
@@ -34,6 +38,11 @@ getPCA <- function(qseaSet,
 
 #'@describeIn getDimRed Generate a UMAP from a qseaSet
 #'@export
+#'@examples
+#' qsea::getExampleQseaSet(repl = 20) %>% getUMAP()
+#' # alter the n_neighbors and min_dist parameters
+#' qsea::getExampleQseaSet(repl = 20) %>% getUMAP(n_neighbors = 5, min_dist = 1)
+
 getUMAP <- function(qseaSet,
                    dataTable = NULL,
                    regionsToOverlap = NULL,
@@ -751,6 +760,8 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
 #' @export
+#' @examples
+#' exampleTumourNormal %>% getPCA() %>% plotPCA()
 plotPCA <- function(object,
                     qseaSet = NULL,
                     components = list(c(1, 2), c(2, 3)),
@@ -808,7 +819,12 @@ plotPCA <- function(object,
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
 #' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
 #' @export
-#'
+#' @examples
+#' umap <- qsea::getExampleQseaSet(repl = 20) %>% getUMAP()
+#' 
+#' plotUMAP(umap)
+#' plotUMAP(umap, colour = "group")
+#' plotUMAP(umap, colour = "group", shape = "group")
 plotUMAP <- function(object,
                      qseaSet = NULL,
                      components = list(c(1, 2)),

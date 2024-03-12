@@ -1,52 +1,20 @@
-#' Combine two qseaSets
+#' Combine two qseaSets together
 #'
-#' This function takes a list of qseaSets (or strings to read rds files from) and merges them together
-#'
-#' @param qseaSets A list of qseaSet objects or strings to rds files with them in
-#' @param firstQset An first qseaSet object to combine the rest into (optional)
-#' @param dropDuplicates Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.
-#' @param checkParams Whether to verify that all the parameters are identical in both objects
-#' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
-#' @return A qseaSet object, containing all the samples from both qseaSet objects.
-#' @export
-
-combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
-  if (is.character(firstQset)) {
-    if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
-      message(glue::glue("Character string given as firstQset, loading {firstQset}"))
-      firstQset <- readr::read_rds(firstQset)
-    }
-  }
-
-  #TODO catch errors better
-  if(is.null(firstQset) & length(qseaSets) >= 2){
-    message(glue::glue("No initial qseaSet given, using first element as initial qseaSet"))
-    firstQset <- qseaSets[[1]]
-    qseaSets <- utils::tail(qseaSets, n = -1)
-  }
-
-  combinedQset <- firstQset
-
-  for(i in 1:length(qseaSets)){
-    combinedQset <- combineQsets(combinedQset, qseaSets[[i]],
-                                 checkParams = checkParams,
-                                 regionsToKeep = regionsToKeep,
-                                 dropDuplicates = dropDuplicates)
-  }
-  return(combinedQset)
-}
-
-#' Combine two qseaSets
-#'
-#' This function takes two qseaSets and combines them into one.
+#' `combineQsets` takes two qseaSets and combines them into one. 
+#' Note that the CpG_density values will be inherited from the first qseaSet .
+#' If they are different then you should call [addNormalisation()] before going further!
 #'
 #' @param qseaSet1 The first qseaSet object.
 #' @param qseaSet2 The second qseaSet object.
-#' @param checkParams Whether to verify that all the parameters are identical in both objects
+#' @param checkParams Whether to verify that all the parameters are identical in both objects. Defaults to FALSE.
 #' @param dropDuplicates Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.
-#' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
+#' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. 
 #' @return A qseaSet object, containing all the samples from both qseaSet objects.
 #' @export
+#' @examples
+#' tumours <- exampleTumourNormal %>% filter(tumour == "Tumour") 
+#' normals <- exampleTumourNormal %>% filter(tumour == "Normal")
+#' combineQsets(tumours, normals)
 combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep = NULL, dropDuplicates = FALSE) {
 
   if (is.character(qseaSet1)) {
@@ -199,4 +167,42 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
   newQSet@enrichment$factors <- cbind(qseaSet1@enrichment$factors, qseaSet2@enrichment$factors)
 
   return(newQSet)
+}
+
+#' Combine two qseaSets
+#'
+#' `combineQsetsList` takes a list of qseaSets (or strings to read rds files from) and merges them all together in an iterative manner.
+#'
+#' @param qseaSets A list of qseaSet objects or strings to rds files with them in
+#' @param firstQset An first qseaSet object to combine the rest into (optional)
+#' @param dropDuplicates Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.
+#' @param checkParams Whether to verify that all the parameters are identical in both objects
+#' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
+#' @return A qseaSet object, containing all the samples from both qseaSet objects.
+#' @export
+#' @rdname combineQsets
+combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
+  if (is.character(firstQset)) {
+    if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
+      message(glue::glue("Character string given as firstQset, loading {firstQset}"))
+      firstQset <- readr::read_rds(firstQset)
+    }
+  }
+  
+  #TODO catch errors better
+  if(is.null(firstQset) & length(qseaSets) >= 2){
+    message(glue::glue("No initial qseaSet given, using first element as initial qseaSet"))
+    firstQset <- qseaSets[[1]]
+    qseaSets <- utils::tail(qseaSets, n = -1)
+  }
+  
+  combinedQset <- firstQset
+  
+  for(i in 1:length(qseaSets)){
+    combinedQset <- combineQsets(combinedQset, qseaSets[[i]],
+                                 checkParams = checkParams,
+                                 regionsToKeep = regionsToKeep,
+                                 dropDuplicates = dropDuplicates)
+  }
+  return(combinedQset)
 }

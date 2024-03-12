@@ -12,8 +12,17 @@
 \item{...}{Other arguments to pass to dplyr::select}
 }
 \value{
-A qseaSet object with the sampleTable changed by a call to dplyr::select
+A qseaSet object with the sampleTable changed by a call to dplyr::select.
+The sample_name and group columns will always be returned.
 }
 \description{
 This function extends the dplyr function select to act on qseaSet sampleTable. Can also be used to rename columns.
+}
+\examples{
+# select only a few columns
+exampleTumourNormal \%>\% select(type, tumour) \%>\% getSampleTable()
+# select and rename a column
+exampleTumourNormal \%>\% select(age, renamed = tumour) \%>\% getSampleTable()
+# use tidyselect helper functions
+exampleTumourNormal \%>\% select(matches("t")) \%>\% getSampleTable()
 }

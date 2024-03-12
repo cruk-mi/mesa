@@ -2,13 +2,19 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByGene}
 \alias{summariseDMRsByGene}
-\title{This function summarises a data frame by gene (using annotateWindows)}
+\title{This function summarises a data frame by gene}
 \usage{
 summariseDMRsByGene(DMRtable)
 }
 \arguments{
-\item{DMRtable}{A data frame or GRanges object, may already be annotated}
+\item{DMRtable}{A data frame that has already been annotated by annotateWindows}
 }
 \description{
-This function summarises a data frame by gene (using annotateWindows)
+This function summarises a data frame by gene
+}
+\examples{
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+  summariseDMRsByGene()
 }

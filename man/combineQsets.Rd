@@ -2,7 +2,8 @@
 % Please edit documentation in R/combineQsets.R
 \name{combineQsets}
 \alias{combineQsets}
-\title{Combine two qseaSets}
+\alias{combineQsetsList}
+\title{Combine two qseaSets together}
 \usage{
 combineQsets(
   qseaSet1,
@@ -10,6 +11,14 @@ combineQsets(
   checkParams = FALSE,
   regionsToKeep = NULL,
   dropDuplicates = FALSE
+)
+
+combineQsetsList(
+  qseaSets,
+  firstQset = NULL,
+  dropDuplicates = TRUE,
+  checkParams = TRUE,
+  regionsToKeep = NULL
 )
 }
 \arguments{
@@ -22,10 +31,25 @@ combineQsets(
 \item{regionsToKeep}{A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.}
 
 \item{dropDuplicates}{Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.}
+
+\item{qseaSets}{A list of qseaSet objects or strings to rds files with them in}
+
+\item{firstQset}{An first qseaSet object to combine the rest into (optional)}
 }
 \value{
 A qseaSet object, containing all the samples from both qseaSet objects.
+
+A qseaSet object, containing all the samples from both qseaSet objects.
 }
 \description{
-This function takes two qseaSets and combines them into one.
+\code{combineQsets} takes two qseaSets and combines them into one.
+Note that the CpG_density values will be inherited from the first qseaSet .
+If they are different then you should call \code{\link[=addNormalisation]{addNormalisation()}} before going further!
+
+\code{combineQsetsList} takes a list of qseaSets (or strings to read rds files from) and merges them all together in an iterative manner.
+}
+\examples{
+tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
+normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
+combineQsets(tumours, normals)
 }

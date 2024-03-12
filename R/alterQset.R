@@ -75,7 +75,11 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap){
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
 #' @examples
-#' addLibraryInformation(exampleTumourNormal)
+#' #original columns on the sampleTable
+#' colnames(getSampleTable(exampleTumourNormal))
+#' updated <- addLibraryInformation(exampleTumourNormal) 
+#' # now the qseaSet has additional columns from the libraries slot in the qseaSet
+#' colnames(getSampleTable(updated))
 addLibraryInformation <- function(qseaSet){
 
   curColNames <- qseaSet %>%
@@ -117,6 +121,7 @@ addLibraryInformation <- function(qseaSet){
 #' @export
 #' @examples
 #' subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
+#' subsetQset(exampleTumourNormal, samplesToDrop = c('Colon1_T','Colon1_N'))
 subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
 
   if (length(samplesToKeep) == 0 & length(samplesToDrop) == 0 ) {
@@ -208,15 +213,12 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
   return(newQSet)
 }
 
-
-
 #' This function takes a qseaSet and merges samples together into a single sample.
 #' @param qseaSet The qseaSet object.
 #' @param mergeString A string to merge on
 #' @return A qseaSet object with the samples merged together.
 #' @export
-
-
+#' 
 poolSamples <- function(qseaSet, mergeString){
 
   ##TODO rewrite this function to use a column.
@@ -343,8 +345,8 @@ poolSamples <- function(qseaSet, mergeString){
 #' @export
 #' @examples
 #' exampleTumourNormal %>%
-#' mutate(newName = paste("Sample",1:10)) %>%
-#' renameSamples(newNameColumn = 'newName')
+#'   mutate(newName = paste("Sample",1:10)) %>%
+#'   renameSamples(newNameColumn = 'newName')
 renameSamples <- function(qseaSet, newNameColumn){
 
   newNameColumn <- rlang::enquo(newNameColumn)

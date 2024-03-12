@@ -1,16 +1,27 @@
-#' This function takes a qseaSet and makes a new sample by mixing two samples
+#' This function takes a qseaSet and makes a new sample by mixing two samples.
+#' 
+#' Perform in silico mixing between two samples, enabling the generation of new synthetic data.
+#' Note that if the qseaSets have been filtered prior to using this, the fraction of fragments
+#' present in the current qseaSet is calculated, such that the total number of reads would have been approximately `nReadsTotal`.
+#' E.g. if there are 50% of the total fragments in the windows present in the current samples, 
+#' 0.5*`nReadsTotal` fragments will be sampled.
+#' 
 #' @param qseaSet The qseaSet object.
-#' @param sample1 First sample name, from which to take proportion of samples
-#' @param sample2 Second sample name
-#' @param nReadsTotal Number of reads in total to have after mixing
-#' @param proportion The proportion to take from sample1, the rest will come from sample2
-#' @param newName A name to give the new sample
-#' @param groupName A name to use in the group column in the sampleTable
-#' @param onlyNew Whether to only return the new sample.
+#' @param sample1 First sample name, from which to take `proportion` of reads.
+#' @param sample2 Second sample name.
+#' @param nReadsTotal Number of reads in total to have after mixing, potentially adjusted if the regions have been filtered.  
+#' @param proportion The proportion to take from sample1, the rest will come from sample2.
+#' @param newName A name to give the new sample.
+#' @param groupName A name to use in the group column in the sampleTable.
+#' @param onlyNew Whether to only return the new sample, or all the previous samples as well. 
 #' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
-#' @return A qseaSet object with an extra
+#' @return A qseaSet object containing a new sample, potentially with all the previous samples.
 #' @export
-#'
+#' @examples
+#' # give an approximate set of reads as if Colon1_T and Colon1_N were mixed together and sequenced to 100000 total fragments
+#' mixed <- exampleTumourNormal %>% mixSamples("Colon1_T", "Colon1_N", nReadsTotal = 100000, proportion = 0.5, renormalise = FALSE)
+#' # only a few reads are included in this small subset of windows:
+#' mixed %>% getCountTable() %>% pull(Mix_Colon1_T_Colon1_N_0.5) %>% sum()
 mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
                            onlyNew = FALSE,
                            renormalise = TRUE){
@@ -109,6 +120,13 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 
 
 #' This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
+#' 
+#' Perform in silico mixing between two samples, enabling the generation of new synthetic data.
+#' Note that if the qseaSets have been filtered prior to using this, the fraction of fragments
+#' present in the current qseaSet is calculated, such that the total number of reads would have been approximately `nReadsTotal`.
+#' E.g. if there are 50% of the total fragments in the windows present in the current samples, 
+#' 0.5*`nReadsTotal` fragments will be sampled.
+#' 
 #' @param qseaSet The qseaSet object.
 #' @param sample1 First sample name, from which to take proportion of samples
 #' @param sample2 Second sample name
@@ -120,7 +138,7 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #' @param groupName A name to use in the group column in the sampleTable
 #' @param onlyNew Whether to only return the new sample.
 #' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
-#' @return A qseaSet object with an extra
+#' @return A qseaSet object containing a new sample, potentially with all the previous samples.
 #'
 mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal, proportion1, proportion2, newName = NULL, groupName = NULL,
                                 onlyNew = FALSE,
@@ -238,5 +256,3 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
   }
 
 }
-
-

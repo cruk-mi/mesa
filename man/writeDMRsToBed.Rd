@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{writeDMRsToBed}
 \alias{writeDMRsToBed}
-\title{Write the qsea result to a set of bed file}
+\title{Write one or more DMRs to a set of bed files}
 \usage{
 writeDMRsToBed(dataTable, folder, fdrThres = 0.05)
 }
@@ -18,4 +18,10 @@ Returns the original table invisibly, so can be used in a pipe.
 }
 \description{
 This writes a set of bed files with the results, with one bed file per contrast.
+}
+\examples{
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+  writeDMRsToBed("test_bed")
 }
