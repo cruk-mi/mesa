@@ -4,7 +4,9 @@ editor_options:
     wrap: sentence
 ---
 
-# dev
+# mesa 0.5.1
+
+This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
 
 ### BUG FIXES
 * `summariseDMRsByGene` now correctly summarises genes when they have different positions or lengths in different windows. 
