@@ -1,8 +1,8 @@
 ---
-title: "Differentially Methylated Regions and Annotation"
+title: "Differentially Methylated Regions and Annotatation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{differentially-methylated-regions}
+  %\VignetteIndexEntry{Differentially Methylated Regions and Annotatation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
