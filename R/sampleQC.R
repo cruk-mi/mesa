@@ -1,9 +1,17 @@
-#' This function calculates and summarises the proportion of hyperstable regions that are present in each sample, and adds to columns of the sampleTable
+#' Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
+
+#' This function calculates and summarises the proportion of hyperstable regions that are present in each sample, 
+#'   and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of 
+#'   human methylation arrays over a wide range of tissues and diseases by [Edgar et al (2014)](https://pubmed.ncbi.nlm.nih.gov/25493099/)
 #' @param qseaSet A qseaSet object
 #' @export
-#'
+
 addHyperStableFraction <- function(qseaSet){
 
+  if(qsea:::getGenome(exampleTumourNormal) != "BSgenome.Hsapiens.NCBI.GRCh38") {
+    stop("This function is only currently defined for BSgenome.Hsapiens.NCBI.GRCh38.")
+  }
+  
   if ("hyperStableEdgar" %in% colnames(qsea::getSampleTable(qseaSet))) {
     qseaSet <- qseaSet %>%
       selectQset(-tidyselect::matches("^hyperStableEdgar$"))
@@ -32,11 +40,12 @@ addHyperStableFraction <- function(qseaSet){
 
 }
 
-
 #' This function returns the most important columns of a qseaSet with respect to quality controls
 #' @param qseaSet A qseaSet object
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% getSampleQCSummary()
+#' 
 getSampleQCSummary <- function(qseaSet){
 
   if (!("valid_fragments" %in% colnames(qsea::getSampleTable(qseaSet)))) {
@@ -52,4 +61,3 @@ getSampleQCSummary <- function(qseaSet){
     return()
 
 }
-

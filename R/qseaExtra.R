@@ -1,7 +1,3 @@
-# .onAttach <- function(libname, pkgname) {
-#   packageStartupMessage("Welcome to my methtools package!")
-# }
-
 .onLoad <- function(libname, pkgname) {
   getCGPositions <<- memoise::memoise(getCGPositions)
 }
@@ -11,6 +7,9 @@
 #' This function checks that an object is a qseaSet.
 #'
 #' @param x The object
+#' @examples
+#' exampleTumourNormal %>% is("qseaSet")
+#' 
 is.qseaSet <- function(x){
   return(inherits(x,"qseaSet"))
   }
@@ -40,6 +39,20 @@ setMethod('getMart', 'qseaSet', function(object)
 #' @param FantomRegionsGR A GRanges object giving Fantom enhancer regions
 #' @return A tibble with the data, augmented with ChIPseeker region location and CpG island information.
 #' @export
+#' @examples
+#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
+#' # have to specify what species. Genome only recognises hg38
+#' annotateWindows(DMRs, genome = "hg38")
+#' # otherwise we can specify TxDb and annoDb
+#' annotateWindows(DMRs, TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db")
+#' 
+#' # for mouse mm10 genome:
+#' exampleMouse %>% 
+#'   getRegions() %>%  
+#'   annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene", annoDb = "org.Mm.eg.db")
+#'   
+#' # use setMesaTxDb and setMesaAnnoDb to set these databases globally
+#' 
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
                             annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
                             FantomRegionsGR = NULL) {
@@ -148,6 +161,12 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 #' @param useGroupMeans Whether to use the group argument of the sample table to collapse replicates.
 #' @return A qseaSet object, with only a subset of the windows.
 #' @export
+#' @examples
+#' # keep only windows with a mean nrpm value above 1 across all samples
+#' exampleTumourNormal %>% subsetWindowsBySignal(fn = mean, threshold = 1, aboveThreshold = TRUE, normMethod = "nrpm")
+#' # keep only windows with a median beta value below 0.25 in the normal samples
+#' exampleTumourNormal %>% subsetWindowsBySignal(fn = median, threshold = 0.25, aboveThreshold = FALSE, normMethod = "beta", samples = "_N")
+#' 
 subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
 
   fnName <- as.character(substitute(fn, env = environment()))
@@ -295,11 +314,14 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
 
 }
 
-#' This function takes a qseaSet and downsamples the reads.
+#' This function takes a qseaSet and downsamples the reads in the counts matrix.
 #' @param qseaSet The qseaSet object.
 #' @param nReads How many reads to downsample to.
 #' @return A qseaSet object with the reads downsampled.
 #' @export
+#' @examples
+#' new <- exampleTumourNormal %>% downSample(100)
+#' new %>% getCountTable() %>% dplyr::select(matches("_[NT]")) %>% colSums()
 #'
 downSample <- function(qseaSet, nReads){
   counts <- qseaSet@count_matrix
@@ -342,11 +364,11 @@ downSample <- function(qseaSet, nReads){
 #' @param qseaSet qseaSet object to calculate approximate beta values.
 #' @param arrayDetails Either a recognised string or a GRanges object with an ID column.
 #' @return A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
+#' @export
 #' @examples
 #' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
 #' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
-#' @export
-#'
+
 convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
   if(is.character(arrayDetails)){
@@ -374,13 +396,20 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
 }
 
-#' This function calculates the fraction of reads in a qseaSet object which are present in a GRanges object
+#' This function calculates the fraction of total reads in a qseaSet object which are present in a GRanges object
 #' @param qseaSet A qseaSet
-#' @param windowsToConsider Which windows to consider, as a GRanges object
+#' @param regionsToOverlap A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
 #' @param numCountsNeeded Minimum number of reads required to consider that window
-#' @export
-#'
+#' @return Returns a data frame with a `fraction` column detailing the proportion of reads that overlap, as well as the sampleTable
+#' @examples
+#' rgn <- data.frame(seqnames = 7, start = 25000000, end = 26000000)
+#' exampleTumourNormal %>% calculateFractionReadsInGRanges(rgn, 0)
+#' exampleTumourNormal %>% calculateFractionReadsInGRanges(rgn, 5)
+
 calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCountsNeeded) {
+  
+  #TODO: This function seems to be returning the fraction of windows that are above the cutoff, rather than the fraction of reads?
+  
   initialReadTotals <- qseaSet %>%
     qsea::getCounts() %>%
     {. >= numCountsNeeded } %>%
@@ -401,56 +430,20 @@ calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCount
 
 }
 
-#' This function generates a data frame to use for the annotation of heatmaps, using Individual sample names not group
-#' @param qseaSet A qseaSet object
-#' @param ... Which columns of the sampleTable to use in the annotation data frame
-#'
-getAnnotationDataFrameIndividual <- function(qseaSet, ...){
-
-  #TODO Can this function be removed?
-  if (!("valid_fragments" %in% colnames(qsea::getSampleTable(qseaSet)))) {
-    qseaSet <- qseaSet %>%
-      addLibraryInformation()
-  }
-
-  qseaSet %>%
-    qsea::getSampleTable() %>%
-    dplyr::distinct(sample_name,...) %>%
-    tibble::remove_rownames() %>%
-    tibble::column_to_rownames("sample_name") %>%
-    return()
-}
-
-#' This function generates a data frame to use for the annotation of heatmaps, when using groups
-#' @param qseaSet A qseaSet object
-#' @param ... Which columns of the sampleTable to use in the annotation data frame
-#'
-getAnnotationDataFrame <- function(qseaSet, ...){
-
-  #TODO Can this function be removed?
-  if (!("valid_fragments" %in% colnames(qsea::getSampleTable(qseaSet)))) {
-    qseaSet <- qseaSet %>%
-      addLibraryInformation()
-  }
-
-  qseaSet %>%
-    dplyr::group_by(group) %>%
-    dplyr::mutate(total_fragments = mean(total_fragments),
-           relH = mean(relH)) %>%
-    dplyr::ungroup() %>%
-    dplyr::distinct(group,...) %>%
-    tibble::remove_rownames() %>%
-    tibble::column_to_rownames("group") %>%
-    return()
-}
-
 #' This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values
 #' @param dataTable  A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()].
 #' @param normMethod A character giving the normalisation method used (e.g. "beta" or "nrpm").
 #' @return The dataTable with the normMethod suffix "_{normMethod}" removed from sample (or sample group) column names.
 #' @export
-#'
-removeNormMethodSuffix <- function(dataTable, normMethod) {
+#' @examples
+#' exampleTumourNormal %>% getDataTable(addMethodSuffix = TRUE)  %>% removeNormMethodSuffix(normMethod = "nrpm")
+#' 
+removeNormMethodSuffix <- function(dataTable, normMethod = NULL) {
+  
+  if(is.null(normMethod)){
+    stop("Please specify a normMethod suffix to remove, e.g. nrpm or beta.")
+  }
+  
   dplyr::rename_with(dataTable, ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$")))
 }
 
@@ -461,7 +454,6 @@ removeNormMethodSuffix <- function(dataTable, normMethod) {
 #' @param normMethod What normalisation method to use
 #' @param cutoff What cutoff to use to count the windows above
 #' @return A table
-#' @export
 #'
 countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
                                    cutoff = 0, normMethod = "nrpm"){
@@ -490,21 +482,28 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
 }
 
 
-#' This function takes a qseaSet and makes a wide transposed table, suitable for using for machine learning
+#' Generate a wide data table from a qseaSet
+#' 
+#' This function takes a qseaSet and generates a table of data where each row represents one sample and each column represents a genomic window.
+#' Note that 
+#' 
 #' @param qseaSet The qseaSet object.
 #' @param normMethod What normalisation method to use
-#' @param ... Other columns to add from the sampleTable in the output (along with sample_name). Must specify normMethod if using. Can use everything() for all columns.
-#' @return A table
+#' @param ... Other columns to add from the sampleTable in the output (along with sample_name). 
+#'   Must specify normMethod if using. Can use everything() for all columns, or leave blank to just have the sample_name (as the first column).
+#' @return A table where each row represents one sample and each column represents a genomic window.
 #' @export
 #'
 makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
+  #TODO: Rewrite to use getDataTable rather than makeTable.
+  
   qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
     dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", ""))  %>%
     dplyr::select(-CpG_density) %>%
     tidyr::pivot_longer(-c(chr, window_start,window_end), names_to = "sample_name", values_to = "value") %>%
-    dplyr::mutate(chr = paste0("chr",chr)) %>%
+    dplyr::mutate(chr = ifelse(str_detect(chr,"chr"), chr, paste0("chr",chr))) %>%
     tidyr::unite(col = "window", chr, window_start, window_end) %>%
     tidyr::pivot_wider(names_from = window, values_from = value) %>%
     dplyr::left_join(qsea::getSampleTable(qseaSet) %>% dplyr::select(sample_name, ...)) %>%
@@ -520,6 +519,9 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 #' @return A table of counts, one row per window
 #' @describeIn getDataTable 
 #' @export
+#' @examples
+#' exampleTumourNormal %>% getCountTable()
+#' 
 #'
 getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
   tab <- qseaSet %>% 
@@ -539,7 +541,9 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 #' @return A table of data, one row per window
 #' @describeIn getDataTable 
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% getNRPMTable()
+
 getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
   tab <- qseaSet %>% 
     getDataTable(normMethod = "nrpm", 
@@ -558,8 +562,9 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #' @param verbose Whether to suppress messages.
 #' @return A table of beta values, one row per window
 #' @describeIn getDataTable 
-#' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% getNRPMTable()
+
 getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
    tab <- qseaSet %>% 
      getDataTable(normMethod = "beta", 
@@ -572,7 +577,7 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 
 #' This function takes a qseaSet and calculates a summary statistic across the windows.
 #' @param qseaSet The qseaSet object.
-#' @param regionsToOverlap A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
+#' @param regionsToOverlap A GRanges object (or coercible dataframe) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.
 #' @param fn A function to apply across the windows. e.g. mean, median, sd.
 #' @param suffix A suffix for adding to the new columns of data, to clarify what regions for instance.
 #' @param addSampleTable A boolean with whether to add the sampleTable on to the output table
@@ -580,9 +585,16 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #' @param naMethod What method to use to deal with NA values (for beta values). Options are "drop" or "na.rm" (default).
 #' @param minEnrichment For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
 #' @param fnName Name of the function. Should only be necessary to use if you are doing something unusual, otherwise detected automatically.
-#' @return A table of data, one row per sample, with columns indicating the application of the summary statistic to the
+#' @return A table of data, one row per sample, with columns indicating the number of windows considered 
+#'   (which may be less for beta values due to application of NA values), the summary statistic and optionally the sampleTable columns.
 #' @export
-#'
+#' @examples
+#' # median NRPM and beta values across all windows
+#' exampleTumourNormal %>% summariseAcrossWindows(fn = mean)
+#' # maximum NRPM across a smaller region of the genome
+#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900
+#' exampleTumourNormal %>% summariseAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm")
+
 summariseAcrossWindows <- function(qseaSet,
                                    regionsToOverlap = NULL,
                                    fn = mean,
@@ -659,7 +671,16 @@ summariseAcrossWindows <- function(qseaSet,
 #' @param minEnrichment For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
 #' @return A table of data, one row per sample, with columns indicating the application of the summary statistic to the
 #' @export
-#'
+#' # add to the sampleTable the median NRPM and beta values across all windows
+#' exampleTumourNormal %>% addSummaryAcrossWindows(fn = mean) %>% getSampleTable()
+#' # maximum NRPM across a smaller region of the genome
+#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900
+#' exampleTumourNormal %>% addSummaryAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm") %>% getSampleTable()
+#' # can add a suffix and apply repeatedly with different windows
+#' exampleTumourNormal %>% 
+#'   addSummaryAcrossWindows(regionsToOverlap = rgns, fn = median, normMethod = "nrpm", suffix = "subset") %>% 
+#'   addSummaryAcrossWindows(fn = median, normMethod = "nrpm", suffix = "all") %>% 
+#'   getSampleTable()
 addSummaryAcrossWindows <- function(qseaSet,
                                     regionsToOverlap = NULL,
                                     fn = mean,
@@ -692,9 +713,12 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @param normMethod What normalisation method to use (nrpm or beta)
 #' @param minEnrichment Number of reads required for a fully methylated region to not be masked (put NA) beta values only.
 #' @return A table of summarised data, with windows split out into both the landscape (island/shore/shelf) and genomic region (promoter/exon/intron etc)
-#' @export
 #'
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
+  
+  #TODO: This requires the annotateWindows parameters to be exposed to not require setMesaTxDb and setMesaAnnoDb.
+  #TODO: Ensure this works when landscape is not present, as that is optional output from annotateWindows
+  
   temp <- qseaSet %>%
     getDataTable(normMethod = normMethod,
                  minEnrichment = minEnrichment,
@@ -752,10 +776,12 @@ getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nr
 
 setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames is not defined on a data frame, only on a qseaSet.")})
 
-#' This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting
+#' This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.
 #' @param qseaSet The qseaSet object.
 #' @return A named list, where each element contains the vector of sample_names that are in that group.
-#'
+#' @examples
+#' exampleTumourNormal %>% getSampleGroups2()
+
 getSampleGroups2 <- function(qseaSet){
   qseaSet %>%
     qsea::getSampleTable() %>%
@@ -780,7 +806,10 @@ getSampleGroups2 <- function(qseaSet){
 #' @param verbose Whether to give a message detailing the table being made.
 #' @return A table of data, with a column for each individual sample
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% getDataTable()
+#' exampleTumourNormal %>% getDataTable(normMethod = c("nrpm","beta"))
+
 getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
 
   if(!is.qseaSet(qseaSet)){
@@ -839,7 +868,9 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' @param naVal A value to replace NA values with (for beta values).
 #' @return A set of bigWig files for each sample in the qseaSet, with coverage over all the windows in the qseaSet
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% writeBigWigs("temp")
+
 writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){
 
   dir.create(folderName, showWarnings = FALSE)
@@ -876,11 +907,15 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
     })
 }
 
-#' This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.
+#' This function takes a qseaSet and sets all the library factor parts to one, including in the sampleTable if present.
 #' @param qseaSet The qseaSet object.
-#' @return A table of data, with a column for each individual sample
+#' @return A qseaSet, without the library_factor column for each individual sample
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% removeLibraryFactors() %>% addLibraryInformation() %>% pull(library_factor)
+#' # different to previously set library factors:
+#' exampleTumourNormal  %>% addLibraryInformation() %>% pull(library_factor)
+
 removeLibraryFactors <- function(qseaSet){
   qseaSet <- qseaSet %>%
     qsea::addLibraryFactors(1)
@@ -891,4 +926,3 @@ removeLibraryFactors <- function(qseaSet){
   }
 return(qseaSet)
 }
-

@@ -11,6 +11,14 @@ editor_options:
 
 ### CHANGES
 * Removed `colnames` on a qseaSet, which was not working anyway.
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`
+* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
+
+### REMOVED
+* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
+* Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads.
+* Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and documentation. 
+* Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation in `sampleAnnotation` in the plotting functions.
 
 # mesa 0.5.1
 

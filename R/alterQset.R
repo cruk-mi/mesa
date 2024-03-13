@@ -217,11 +217,12 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' @param qseaSet The qseaSet object.
 #' @param mergeString A string to merge on
 #' @return A qseaSet object with the samples merged together.
-#' @export
 #' 
 poolSamples <- function(qseaSet, mergeString){
 
-  ##TODO rewrite this function to use a column.
+  ##TODO: rewrite this function to use a column.
+  ##TODO: check this actually works! 
+  ##TODO: make sure it works in general
 
   samplesToMerge <- qsea::getSampleTable(qseaSet) %>%
     dplyr::pull(sample_name) %>%
