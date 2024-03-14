@@ -896,6 +896,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 #' @param ... Other arguments to be passed to upset
 #' @return An UpSet plot
 #' @export
+#' @examples
 #' DMRs <- calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all_vs_NormalLung")
 #' plotDMRUpset(DMRs)
 #' # remove the "_vs_" part of the set names:

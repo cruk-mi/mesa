@@ -29,3 +29,6 @@ A set of bigWig files for each sample in the qseaSet, with coverage over all the
 \description{
 This function takes a qseaSet and writes individual bigWig files with the coverage over each window.
 }
+\examples{
+exampleTumourNormal \%>\% writeBigWigs("temp")
+}

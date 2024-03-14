@@ -671,6 +671,7 @@ summariseAcrossWindows <- function(qseaSet,
 #' @param minEnrichment For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.
 #' @return A table of data, one row per sample, with columns indicating the application of the summary statistic to the
 #' @export
+#' @examples
 #' # add to the sampleTable the median NRPM and beta values across all windows
 #' exampleTumourNormal %>% addSummaryAcrossWindows(fn = mean) %>% getSampleTable()
 #' # maximum NRPM across a smaller region of the genome
@@ -869,7 +870,8 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' @return A set of bigWig files for each sample in the qseaSet, with coverage over all the windows in the qseaSet
 #' @export
 #' @examples
-#' exampleTumourNormal %>% writeBigWigs("temp")
+#' write bigwigs to a temporary directory
+#' exampleTumourNormal %>% writeBigWigs(tempdir())
 
 writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){
 

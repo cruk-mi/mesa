@@ -2,7 +2,10 @@
 % Please edit documentation in R/sampleQC.R
 \name{addHyperStableFraction}
 \alias{addHyperStableFraction}
-\title{This function calculates and summarises the proportion of hyperstable regions that are present in each sample, and adds to columns of the sampleTable}
+\title{Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
+This function calculates and summarises the proportion of hyperstable regions that are present in each sample,
+and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of
+human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}}
 \usage{
 addHyperStableFraction(qseaSet)
 }
@@ -10,5 +13,8 @@ addHyperStableFraction(qseaSet)
 \item{qseaSet}{A qseaSet object}
 }
 \description{
-This function calculates and summarises the proportion of hyperstable regions that are present in each sample, and adds to columns of the sampleTable
+Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
+This function calculates and summarises the proportion of hyperstable regions that are present in each sample,
+and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of
+human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}
 }

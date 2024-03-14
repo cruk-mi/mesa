@@ -12,3 +12,7 @@ getSampleQCSummary(qseaSet)
 \description{
 This function returns the most important columns of a qseaSet with respect to quality controls
 }
+\examples{
+exampleTumourNormal \%>\% getSampleQCSummary()
+
+}

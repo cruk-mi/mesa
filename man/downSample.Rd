@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{downSample}
 \alias{downSample}
-\title{This function takes a qseaSet and downsamples the reads.}
+\title{This function takes a qseaSet and downsamples the reads in the counts matrix.}
 \usage{
 downSample(qseaSet, nReads)
 }
@@ -15,5 +15,10 @@ downSample(qseaSet, nReads)
 A qseaSet object with the reads downsampled.
 }
 \description{
-This function takes a qseaSet and downsamples the reads.
+This function takes a qseaSet and downsamples the reads in the counts matrix.
+}
+\examples{
+new <- exampleTumourNormal \%>\% downSample(100)
+new \%>\% getCountTable() \%>\% dplyr::select(matches("_[NT]")) \%>\% colSums()
+
 }
