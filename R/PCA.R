@@ -543,8 +543,6 @@ getDimRed <- function(qseaSet,
 
   }
 
-
-
   windowFilteringList <- list(initial = initialNumWindows,
                               notInRegionsToOverlap = numWindowsRemovedRegionOverlap,
                               belowMinDensity = numWindowsRemovedMinDensity,
@@ -565,7 +563,7 @@ getDimRed <- function(qseaSet,
 getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = 7) {
 
   if (shape == "NULLshape") {
-    my_scale_shape <- ggplot2::scale_shape_identity(na.value = NAshape)
+    my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
 
   } else {
 
@@ -584,6 +582,14 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
         }
 
       } else {
+        
+        if (nShape <= 4 && any(is.na(plotData %>% pull(shape)))) {
+          shapePalette <- c(21, 24, 22, 23)
+          NAshape <- 25
+        } else if (nShape <= 5 ) {
+          shapePalette <- c(21, 24, 22, 23, 25)
+        }
+        
         shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
         if (nShape > length(shapePalette)) {
           stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
@@ -792,7 +798,7 @@ plotPCA.mesaDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = NULL,
+                    NAshape = 25,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
@@ -850,7 +856,7 @@ plotUMAP <- function(object,
                      symDivColourScale = FALSE,
                      shape = NULL,
                      shapePalette = NULL,
-                     NAshape = NULL,
+                     NAshape = 25,
                      showSampleNames = FALSE,
                      pointSize = 2,
                      alpha = 1,
@@ -907,7 +913,7 @@ plotDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = NULL,
+                    NAshape = 25,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
@@ -986,18 +992,18 @@ plotDimRed <- function(object,
       stop("`colourPalette` argument is non-NULL, but `colour` argument is NULL.")
     }
 
-    if (!is.null(shapePalette) & is.null(shape)) {
-      stop("`shapePalette` argument is non-NULL, but `shape` argument is NULL.")
-    }
-
     if (!is.null(shape) & length(shape) > 1) {
       stop("Argument `shape` can only be of length one.")
     }
 
     if (is.null(shape)) {
       plotData <- plotData %>%
-        dplyr::mutate(NULLshape = 16)
+        dplyr::mutate(NULLshape = "21")
 
+      if (is.null(shapePalette)){
+        shapePalette = 21
+      }
+      
       shape <- "NULLshape"
     }
 
