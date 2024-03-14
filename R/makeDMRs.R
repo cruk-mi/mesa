@@ -282,7 +282,7 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 makeAllContrasts <- function(qseaSet, variable){
   vals <- qseaSet %>%
     qsea::getSampleTable() %>%
-    tidyr::drop_na({{variable}}) %>%
+    filter(!is.na({{variable}})) %>%
     dplyr::pull({{variable}}) %>%
     unique() %>%
     gtools::mixedsort()

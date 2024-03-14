@@ -10,8 +10,7 @@ editor_options:
 * Many more examples for individual functions on their help pages
 
 ### CHANGES
-* Removed `colnames` on a qseaSet, which was not working anyway.
-* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
 * `writeDMRsToBed` should now correctly export the files.
 
@@ -20,6 +19,7 @@ editor_options:
 * Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads.
 * Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
+* Removed `colnames` function definion on a qseaSet, which was not working anyway.
 
 # mesa 0.5.1
 
