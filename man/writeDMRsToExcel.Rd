@@ -23,5 +23,5 @@ This writes an Excel file with the results, with one sheet per contrast.
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToExcel("test.xlsx")
+  writeDMRsToExcel(paste0(tempdir(),"/test.xlsx"))
 }

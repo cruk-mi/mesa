@@ -23,5 +23,5 @@ This writes a set of bed files with the results, with one bed file per contrast.
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToBed("test_bed")
+  writeDMRsToBed(tempdir())
 }
