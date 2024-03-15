@@ -9,7 +9,12 @@ editor_options:
 ### CHANGES
 * Converted `plotPCA` into a method for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
+* `plotPCA` and `plotUMAP` now default to filled shapes rather than empty shapes if less than 6 shapes are required.
+* `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given.
 * `getSampleTable` is now defined for PCA/UMAP objects.
+
+### BUG FIXES
+* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape` 
 
 # mesa 0.5.1
 
