@@ -90,6 +90,9 @@ makeQset <- function(sampleTable,
     stop("fragmentLength and fragmentSD must be specified, or fragmentType can be specified for some defaults.")
   }
 
+  # convert sampleTable to data.frame as qseaSet doesn't like tibbles.
+  sampleTable <- as.data.frame(sampleTable)
+  
   if (!("sample_name" %in% colnames(sampleTable)))  {
     stop("Required column sample_name not included in the sampleTable.")
   }

@@ -17,3 +17,72 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(mesa)
 ```
+
+# Introduction
+In this vignette we cover the generation of a qseaSet using the functions provided in `mesa`, rather than those in `qsea`. Please see the [`qsea` tutorial](https://bioconductor.org/packages/devel/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html) for more detail, but we will cover much of that here.
+
+## Sample Metadata 
+The first thing to prepare is the `sampleTable`; a dataframe containing metadata for the samples used in the package. This has three required columns:
+* `sample_name` : a name for each sample, which must be unique. This is the primary identifier used to describe each sample, so it is good to be descriptive.
+* `group` : a column to specify a group for each sample, for use inside certain functions for averaging over samples of the same type. We suggest only using this for replicates of the same (or very similar) samples, and adding extra columns for other comparisons that may be of interest.
+* `file_name` : A path to a bam file, containing the aligned, deduplicated, reads mapped to the relevant reference genome, from material which has undergone the methylation enrichment/capture process (e.g. MEDIP-seq or MBD-seq). Ideally `samtools fixmate` has been ran to supply mate information onto the read tags, but filtering for quality is not required.
+
+There are also two more optional fields that may be used during generation:
+* `input_file` : This is a path to a bam file containing aligned, deduplicated reads for material from the same sample, without performing enrichment. This is whole genome sequencing, but may be sequenced at a much lower depth (e.g. ultra-shallow WGS, ~1-2 million reads). If present, this will be used on a sample-by-sample basis to calculate copy number variation, at a chromosome scale, in order to correct for this in the expected read depths. This is most relevant when studying cancer, as particular cancers often show recurrant patterns of copy number changes. 
+
+* `gender` or `sex` : If one of these columns are included, then any chromosome called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for samples with `M`, `m` or `male` in this column. See the [qsea code for details](https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54); within the National Biomarker Centre we only consider the autosomes.
+
+In addition, any further metadata columns may be included as required, and we recommend that anything you might want to query or compare the data on is included here. This includes experimental conditions (tissue, treatment, tumour status) etc.
+
+One thing to note is that we highly recommend the use of the tool [NGSCheckMate](https://github.com/parklab/NGSCheckMate) for verifying that (human) samples come from the same individual or not. This is useful both for ensuring that the enriched and non-enriched samples do indeed come from the same individual, but also to check that paired samples are actually paired (for instance when comparing pre- and post-treatment).
+
+For the example here, we use the example data in the `MEDIPSData` package. This contains pairs of tumour and normal tissue from the same patients, with MEDIP-seq performed as the enrichment step. These bam files are downsampled to only contain chromosomes 20-22, and are aligned to hg19. 
+Note, we highly recommend using the hg38/GRCh38 reference genome rather than hg19!
+
+```{r}
+sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
+    "Normal1", "Normal1", "Normal", "Patient1", system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    "Normal2", "Normal1", "Normal", "Patient2", system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    "Tumour1", "Tumour1", "Tumour", "Patient1", system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    "Tumour2", "Tumour2", "Tumour", "Patient2", system.file("extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)
+    )
+```
+
+
+
+## Making a qseaSet
+The `qsea` tutorial details the steps involved in generating a `qseaSet`. 
+We provide a function, `makeQset`, which wraps these up into one function, although you may still use the rest of the `mesa` functionality with or without using this to create your `qseaSet`.
+
+Before creating the `qseaSet`, you need to have:
+* The `sampleTable` of metadata, including the file paths to the bam files.
+* The genome to which the bam files have been mapped, and the corresponding `BSgenome` package name, and the package to be installed. You can check what BSgenome packages are available on BioConductor via `BSgenome::available.genomes()`, or make your own if necessary (`vignette("BSgenomeForge", package = "BSgenome")`).
+* Whether the aligned reads are paired-end sequencing or not. If single-end sequencing has been used, you need to know the expected DNA fragment length from an experimental measurement, to extend all the reads to this length.
+* An expected fragment length and SD of your DNA fragment size distribution. There are a range of tools that can be used to visualise this on your bam files, for instance [QualiMap](http://qualimap.conesalab.org/), but a rough ballpark should also be experimentally known based on how the DNA material has been processed for sequencing. 
+* What window size to use. In making a `qseaSet`, the genome is split into fixed windows with equal size, and all analysis is performed on these windows as independent units. We generally use 300bp windows, as that is a little bigger than our average DNA fragment sizes, which are in the 150-250bp range. If the DNA is particularly long fragments, a larger bin size may make sense.
+
+For our hg19 example data, we set `BSgenome = "BSgenome.Hsapiens.UCSC.hg19"`, specify the three chromosomes included in the test dataset and give some approximate fragment length and SD values.
+
+```{r}
+makeQset(sampleTable,
+   BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+   chrSelect = paste0("chr",20:22),
+   windowSize = 300,
+   fragmentLength = 200,
+   fragmentSD = 50,
+   CNVmethod = "none")
+```
+
+A range of messages are produced as output during this process. One thing to note is that by default the process is performed without parallelisation, this can be controlled via the `setMesaParallel` function and will vastly speed up the process when multiple cores are available (but use more RAM).
+
+## Coverage-related options
+By default, the coverage is calculated using a custom method called `coverageMethod = PairedAndR1s`. This assumes paired-end sequencing, and will first take all the (high quality) paired-end reads within the bam file, then it will take (high quality) first reads (R1s) whose mate (R2) did not map and extend them to the average fragment size of the paired-end reads. Here, high quality means the MAPQ value is above `minMapQual`, although for paired ends we accept pairs where at least one end has a MAPQ above this value. There are a number of options for controlling this process:
+* `properPairsOnly` - when set to TRUE, only the proper pairs will be included, not the R1s without a mapped mate.
+* `minInsertSize` and `maxInsertSize` control the size distribution of DNA fragments to be included. This enables filtering out of very short fragments, which may be noisy, extremely long fragments, which are likely to be assigned to the wrong bin, and also the prospect of performing in silico size selection, for instance to enrich cell-free DNA for short fragments which are known to be more likely to come from the tumour.
+* `minReferenceLength` - this parameter controls the minimum distance along the reference genome which a read must map to be considered. This helps filter out the 
+
+Note that this method `coverageMethod = PairedAndR1s` option does use more RAM than using the `qsea` method.
+
+
+
+

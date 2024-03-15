@@ -254,7 +254,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel.")
   } else {
     BPPARAM = BiocParallel::SerialParam()
-    message("Scanning one file at a time. Use e.g. register(MulticoreParam(workers = 4)) to parallelise this process.")
+    message("Scanning one file at a time. Use e.g. setMesaParallel(nCores = 4) to parallelise this process.")
     }
 
   getCGPositions(qsea:::getGenome(qs), qs %>% qsea::getRegions()  %>%
