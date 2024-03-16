@@ -10,6 +10,9 @@ editor_options:
 * Many more examples for individual functions on their help pages
 
 ### CHANGES
+* Converted `plotPCA` into a method for the `qsea` defined method.
+* `plotPCA` gains a `verbose` option to turn off most of the messages produced.
+* `getSampleTable` is now defined for PCA/UMAP objects.
 * Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
 * `writeDMRsToBed` should now correctly export the files.
