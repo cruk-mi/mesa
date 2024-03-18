@@ -1,8 +1,8 @@
 ---
-title: "Quality Control"
+title: "Data Tables and Quality Control"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{quality-control}
+  %\VignetteIndexEntry{Data Tables and Quality Control}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,12 +16,108 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(mesa)
+library(dplyr)
+library(ggplot2)
 ```
 
-
-
+# Generating tables of values from a qseaSet
+QSEA has several different types of values that can be returned per window.
+You can get a table of raw counts per window with `getCountTable`:
 
 ```{r}
-
+qseaSet %>%
+  getCountTable()
 ```
 
+but this is not particularly useful, as different samples generally have been sequenced to different read depths. We note that the annotation of the `qseaSet` regions are included in this output, especially the `CpG_density` that is described in `vignette("Generation of qseaSets")`.
+
+The next option is normalised reads per million (NRPM). This normalises the number of reads by the depth of sequencing, as well as copy number variation.
+
+```{r}
+qseaSet %>%
+  getNRPMTable()
+```
+
+Finally, we can request beta values. Beta values are measures of methylation, scaled to lie between 0 and 1, where 0 means that the window is unmethylated and 1 is methylated.
+
+```{r}
+qseaSet %>%
+  getBetaTable()
+```
+
+Note that for some windows an NA value will be returned. This occurs when less than three reads would be required for the window to be fully methylated, at the read depth and enrichment profile calculated per sample. These occur particularly at windows with low CpG_density.
+
+All three of these functions take an option `useGroupMeans` that determine whether to average over the `group` column of the qseaSet sampleTable.
+The example qseaSet has group as the same as sample_name, so we need to change that to see the effect:
+
+```{r}
+qseaSet %>%
+  getBetaTable(useGroupMeans = FALSE)
+
+qseaSet %>%
+  mutate(group = str_remove(sample_name,"\\d")) %>%
+  getBetaTable(useGroupMeans = TRUE) 
+```
+
+Now this table only has two columns (and note that there are no NA values any more due to the increased coverage).
+
+We explicitly note that qsea incorporates the uncertainty of the measurements in its beta value estimations. This means that the values returned as `beta` values are actually the median of this estimate, with an associated confidence interval (which can be queried, see `qsea::makeTable`). In practice, this means that samples with high coverage can return values very close to 0 and 1, but the same sample with less coverage might return 0.1 or 0.9. This can have an effect on clustering and PCAs for example.
+
+# Quality Control
+One extremely important aspect of any sequencing experiment is quality control (QC), and ME-seq is not exception. Alongside the typical QC steps on the bam files themselves (although a raised CG content should obviously be expected following enrichment), there are several methylation-specific steps to consider.
+
+## Relative Enrichment 
+The first metric that we use is a relative enrichment metric, known as `relH`. This was first introduced in the `MEDIPs` package, via the `MEDIPS.CpGenrich()` function, and is a metric to express the proportion of CG dinucleotides, compared to the reference genome.
+The relative enrichment `relH` is calculated in the following way:
+* For each mapped DNA fragment, retrieve the end-to-end DNA spanned on the reference sequence. This is used instead of the reads themselves, as a fragment will often be longer than the read(s) sequenced at its ends, and may therefore contain CGs not covered by the reads.
+* In these sequences, count how many CGs are present in total, and divide by the total number of base pairs covered.
+* Divide by the same ratio, calculated for the entire genome.
+
+This is therefore a measure of how many more CGs are present in the fragments covered within the bam file, compared to the reference genome.
+
+Within `mesa`, this metric is calculated through `makeQset`, as part of the information added to the `libraries` table on the `qseaSet`. 
+For the MBD-Seq data that we have studied, we apply a minimum `relH` of 2.5, with 3 as a higher cutoff. This value is typically around 4-5 in many of our studies.
+
+We can use the `addLibraryInformation` function to add the information in the `libraries` table directly onto the `sampleTable`:
+
+```{r}
+exampleTumourNormal %>% 
+  addLibraryInformation() %>% 
+  getSampleTable() %>% 
+  dplyr::select(sample_name, relH)
+```
+
+When a non-enriched ("Input") sample is used to calculate copy number variation, an equivalent calculation is also performed on these non-enriched fragments. This is also stored in the `libraries` table, in columns starting with `input`:
+
+```{r}
+exampleTumourNormal %>% 
+  addLibraryInformation() %>% 
+  getSampleTable() %>% 
+  dplyr::select(sample_name, input_relH)
+```
+
+We typically see values of the `input_relH` between 1.3-1.6, suggesting that there are more CGs seen in the sequenced fragments than would be expected from the genomic sequence. This is presumably due to the evolutionary suppression of `CG` dinucleotides outside of specific contexts, meaning they are less common in those areas of the genome that are repetitive and hence less easy to map. This is likely to be dependent on the particular sequencing methods and the sample type under consideration. We therefore need to see an increase between the enriched and non-enriched data:
+
+```{r}
+exampleTumourNormal %>% 
+  addLibraryInformation() %>% 
+  getSampleTable() %>% 
+  dplyr::select(sample_name, relH_MeCap = relH, relH_Input = input_relH) %>% 
+  pivot_longer(matches("relH"), 
+               names_prefix = "relH", 
+               names_to = "enrichment", 
+               values_to = "relH") %>%
+  ggplot(aes(x = sample_name, y = relH, col = enrichment)) +
+  geom_point() +
+  theme_bw()
+```
+
+There is a second relative enrichment metric defined by the `MEDIPs` package, known as `GoGe`, that is also calculated globally in a similar way but considers the ratio between the number of `CG`s present in the fragments compared to the number of `C`s and `G`s independently. This is calculated and stored in the `libraries` information alongside the `relH` metric.
+
+## Fragments without pattern
+The `libraries` tab also calculates how many fragments do not contain a CG at all. This can be measure of background noise.
+
+## Hyper-stably methylated regions
+The other metric that we typically use for quality control is to consider windows that are known to be commonly methylated across a range of tissues and diseases. For instance, for the human genome, [Edgar et al (2014)]((https://pubmed.ncbi.nlm.nih.gov/25493099/) identified probes from the Illumina 450k methylation array that were consistently methylated in over 1000 samples. We therefore take the windows covered by these probes, and calculate beta values for them, followed by determining how many of these windows have a calculated beta value above a threshold (e.g. 0.8). As noted above, beta values will not be calculated if a sample does not have sufficient coverage and/or enrichment, meaning this metric incorporates both the coverage depth as well as how well the enrichment has worked. For our samples within the National Biomarker Centre, we currently require at least 40% of the hyperstable windows with a `CpG_density` above 5 to have a beta value above 0.8. Samples with lower enrichment scores (as described by the `relH` score) require a greater coverage depth to reach this threshold.
+
+For hg38, these hyper-stable methylated probes are incorporated in a data object `hg38UltraStableProbes`, and a function `addHyperStableFraction` is provided to calculate this and add as a column to the sampleTable for filtering.

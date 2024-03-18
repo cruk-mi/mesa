@@ -96,7 +96,8 @@ Suggests:
     org.Hs.eg.db,
     org.Mm.eg.db,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
-    TxDb.Mmusculus.UCSC.mm10.knownGene
+    TxDb.Mmusculus.UCSC.mm10.knownGene,
+    plotly
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,
