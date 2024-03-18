@@ -562,6 +562,7 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #' @param verbose Whether to suppress messages.
 #' @return A table of beta values, one row per window
 #' @describeIn getDataTable 
+#' @export
 #' @examples
 #' exampleTumourNormal %>% getNRPMTable()
 

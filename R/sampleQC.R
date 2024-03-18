@@ -4,9 +4,11 @@
 #'   and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of 
 #'   human methylation arrays over a wide range of tissues and diseases by [Edgar et al (2014)](https://pubmed.ncbi.nlm.nih.gov/25493099/)
 #' @param qseaSet A qseaSet object
+#' @param minDensity A value of `CpG_density` to only consider regions above. Defaults to 5.
+#' @param minBeta The minimum beta value to consider a region as being called as methylated. Defaults to 0.8
 #' @export
 
-addHyperStableFraction <- function(qseaSet){
+addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
 
   if(qsea:::getGenome(exampleTumourNormal) != "BSgenome.Hsapiens.NCBI.GRCh38") {
     stop("This function is only currently defined for BSgenome.Hsapiens.NCBI.GRCh38.")
@@ -21,12 +23,12 @@ addHyperStableFraction <- function(qseaSet){
     filterByOverlaps(mesa::hg38UltraStableProbes) %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.)) %>%
     dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-    dplyr::filter(CpG_density >= 5) %>%
+    dplyr::filter(CpG_density >= !!minDensity) %>%
     dplyr::select(tidyselect::matches("beta"))
 
   overp8Fraction <- hyperStableBetaTable %>%
     replace(., is.na(.), 0) %>%
-    {. >= 0.8} %>%
+    {. >= minBeta} %>%
     apply(2,mean,na.rm = TRUE)
 
   newData <- tibble::tibble(sample_name = names(overp8Fraction),

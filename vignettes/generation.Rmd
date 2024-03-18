@@ -1,8 +1,8 @@
 ---
-title: "generation"
+title: "Generation of qseaSets"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{generation}
+  %\VignetteIndexEntry{Generation of qseaSets}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -48,8 +48,6 @@ sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
     )
 ```
 
-
-
 ## Making a qseaSet
 The `qsea` tutorial details the steps involved in generating a `qseaSet`. 
 We provide a function, `makeQset`, which wraps these up into one function, although you may still use the rest of the `mesa` functionality with or without using this to create your `qseaSet`.
@@ -75,14 +73,75 @@ makeQset(sampleTable,
 
 A range of messages are produced as output during this process. One thing to note is that by default the process is performed without parallelisation, this can be controlled via the `setMesaParallel` function and will vastly speed up the process when multiple cores are available (but use more RAM).
 
+This function combines several steps:
+* Creating the windows to consider, controlled by the `BSgenome`, `chrSelect`, `windowSize` and `badRegions` parameters.
+* Adding the coverage on the methylation enriched regions, including calculating global enrichment parameters.
+* Calculating copy number variation over the non-enriched ("Input") sample, if such bam files are provided, including calculating global enrichment parameters.
+* Calculate the average CG density of each window, using the `fragmentLength` and `fragmentSD` parameters to define the expected contribution of fragments to the likelihood that 
+* Calculate the background noise, by looking at how many reads lie within genomic windows with very low density of CGs. 
+* Fit the curve that enables the estimation of "beta values", on a sample by sample basis.
+
+## Selecting the windows
+
+The chosen chromosomes (via `chrSelect`) of the `BSgenome` object will be tiled in `windowSize` windows. These can be filtered for regions which have poor mappability or are overrepresented in non-enriched sequencing, by providing a GRanges object to the `badRegions` option. If provided, this will remove any window which overlaps with the GRanges object; ensuring that the windows remain fixed when this filtering is changed. The 2019 ENCODE exclusion regions are provided as an data object called `ENCODEbadRegions`.
+
 ## Coverage-related options
-By default, the coverage is calculated using a custom method called `coverageMethod = PairedAndR1s`. This assumes paired-end sequencing, and will first take all the (high quality) paired-end reads within the bam file, then it will take (high quality) first reads (R1s) whose mate (R2) did not map and extend them to the average fragment size of the paired-end reads. Here, high quality means the MAPQ value is above `minMapQual`, although for paired ends we accept pairs where at least one end has a MAPQ above this value. There are a number of options for controlling this process:
+By default, the coverage is calculated using a custom method called `coverageMethod = PairedAndR1s`. This assumes paired-end sequencing, and will first take all the (high quality) paired-end reads within the bam file, then it will take (high quality) first reads (R1s) whose mate (R2) did not map and extend them to the average fragment size of the paired-end reads. Here, high quality means the MAPQ value is above `minMapQual`, although for paired ends we accept pairs where at least one end has a MAPQ above this value. 
+
+There are a number of options for controlling this process:
 * `properPairsOnly` - when set to TRUE, only the proper pairs will be included, not the R1s without a mapped mate.
 * `minInsertSize` and `maxInsertSize` control the size distribution of DNA fragments to be included. This enables filtering out of very short fragments, which may be noisy, extremely long fragments, which are likely to be assigned to the wrong bin, and also the prospect of performing in silico size selection, for instance to enrich cell-free DNA for short fragments which are known to be more likely to come from the tumour.
-* `minReferenceLength` - this parameter controls the minimum distance along the reference genome which a read must map to be considered. This helps filter out the 
+* `minReferenceLength` - this parameter controls the minimum distance along the reference genome which a fragment must cover to be considered. This helps filter out some R1s which have only a small portion of the read mapped correctly, and may help with regions with strange artifactual binding (e.g. large insertions), but I don't think it will make much difference if any if `properPairs = TRUE`.
 
-Note that this method `coverageMethod = PairedAndR1s` option does use more RAM than using the `qsea` method.
+Note that this method `coverageMethod = "PairedAndR1s"` option does use more RAM than using the `qsea` method. This can be set via `coverageMethod = "qseaPaired"`; single ended reads are not currently supported.
 
+## Copy Number Variation
 
+The copy number variation is calculated over a set of larger genomic windows as set by `CNVwindowSize`; this is typically much larger than the `windowSize` due to coverage limitations. This will be performed using the same options as the enriched samples.
+Once the coverage is determined, the R package `hmmcopy` will be used, with default parameters, to calculate the copy number variation. The non-enriched (also known as "Input") bam files should be specified by adding a column called `input_file` to the `sampleTable`.
 
+Alternatively, `qsea` provides a method for determining the copy number from the methylation enriched samples, using only reads which do not contain a CG, this may be selected using `CNVmethod = "MeCap"`. We do note that for our MBD-seq experiments we found there was reasonable overall agreement, but this method did give spurious CNV compared to the non-enriched reads, although that may be due to the selectivity of our MBD-seq enrichment step being relatively high.
+
+No copy number variation will be calculated if `CNVmethod = "none`.
+
+## Calculating CpG Density
+One essential part of the `qseaSet` is the `CpG_density` for each region. This is calculated using the genome sequence, alongside an expected fragment size distribution via the `qsea` function `qsea:::estimatePatternDensity()`. 
+
+This process works by first locating all `CG` dinucleotides across the genome, before modelling a distribution around each, representing the likelihood for a fragment including that dinucleotide to reach adjacent positions. This distribution is assumed to be normally distributed, with a mean and standard deviation. Thus each `CG` implies a possibility to impact upon the adjacent base pairs in its surroundings. Finally, these values are averaged across the windows to give a `CpG_density` column on the regions of the `qseaSet`. 
+
+This calculation therefore requires the `fragmentLength` and `fragmentSD` parameters to be specified, to define these normal distributions, and is associated with the whole `qseaSet`. This is therefore not sample dependent, and so if samples have vastly different fragment distributions then there will be some expected variation not captured in this process.
+
+## Offset Reads
+In any ME-seq experiment, there will be off-target fragments sequenced due to the imperfect nature of the enrichment process. These are used to calculate the `offset`; a measure of the background level of fragments in windows that do not contain CGs. The maximum `CpG_density` value for these windows is controlled by `maxPatternDensity`.
+
+## Beta Calculation Fitting
+Finally, the `qsea` beta value calculation is applied. This requires the `CpG_density` and the coverage, as well as some assumption on methylated regions or at least the expected number of them. The [qsea manuscript](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5389680/) details three methods for this assumption, two of which require external data in the form of methylation arrays or bisulphite/enzymatic sequencing. The third method, known as "blind calibration" in the qsea manuscript, is the only one implemented here. This works on a global assumption on the typical methylation levels across the human genome - that the majority of the isolated CGs are methylated while the majority of CpG islands are unmethylated. This blind calibration method therefore assumes that 76% of regions with a `CpG_density` of 1 are expected to be fully methylated ($\beta = 1$), while 25% of regions with a `CpG_density` of 15 are fully unmethylated ($\beta = 0$). A straight line is then fit between these two densities. This method is the only one implemented here, as it does not require additional data. 
+
+We have found this blind calibration sufficient for the human genome, including being able to build classifiers using methylation arrays as our data source.
+
+We do note that if you wish to use array data for normalisation, then [this Biostars post](https://support.bioconductor.org/p/9137187/) may be a good source of information, but we have only used the blind calibration.method. 
+
+## TMM Normalisation
+
+Note, this explicitly does not set the `library_factor` for the `qseaSet`, which suggested to be done in `qsea` via the Trimmed Means of M-values (TMM) method. The way `qsea` does this is to choose one sample (by default the first sample), and use this as the reference sample to calculating a scaling factor to adjust the total fragments by when calculating the NRPM (normalised reads per million) values.
+
+TMM normalisation is a method used in RNA-seq to compensate for genes which are excessively expressed in a particular condition. In RNA-seq, the distribution of read counts varies over ~4 orders of magnitude, with some highly expressed genes having tens of thousands of reads while others have tens or hundreds. 
+If in a particular tissue there are a group of genes which are extremely highly expressed that are not expressed in another tissue, then the total pool of available reads will be dominated by those genes in the first tissue, comparatively depressing the other genes. So just using the total size ends up biasing to these larger genes, and making it look like the other genes are lower expressed, ending up with many more differentially expressed genes that might be actually the case.
+
+e.g. if there are 100 reads in a sample, and 3 genes:
+Sample 1: (70,15,15)
+Sample 2: (0,50,50)
+
+then we want to be careful not to call the last two genes as differentially expressed, when they are really just affected by the lack of gene A. One option could be to normalise with the median of the read distribution, although due to many genes being non-expressed this often is implemented as an upper quartile.
+
+TMM normalisation however takes the some subset of the "genes" (windows in our case), having trimmed off the very high/very low expressed "genes", to calculate this scaling factor for total number of fragments 
+
+However, we find that for methylation, after filtering for excluded regions, extremely few windows in any sample have more than 100 reads. So the distribution of read counts is only actually between 0-100ish, making the main necessity for TMM normalisation rather unnecessary here. 
+
+There are a couple of reasons why we choose not to apply this:
+* When using beta values (including the normalisation adjustment inside the `calculateDMRs` calculation), there is no effect of the `library_factor`, as it is normalised out in the beta value fitting process.
+* The values that we get for the TMM normalisation are typically relatively close to 1, so we don't find it has a big effect on the NRPM values.
+* The TMM normalisation requires a sample to be set as the reference sample; the other samples are normalised against this one in a combined manner (at least in the current implementation in `qsea`. This therefore means that the normalisation of all the samples depends on which other samples they were normalised with, meaning that comparing between batches would need renormalising every time. This would also mean that filtering samples pre- or post-normalisation would give different results.
+
+However, we note that these considerations might not apply for everyone, so you should make your own assessment; the `qsea::addLibraryFactors()` function may be used to apply this normalisation if required.
 

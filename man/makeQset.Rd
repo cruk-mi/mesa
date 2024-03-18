@@ -9,7 +9,7 @@ makeQset(
   BSgenome = NULL,
   chrSelect = 1:22,
   windowSize = 300,
-  CNVwindowSize = 1e+06,
+  CNVwindowSize = 1000000,
   fragmentType = NULL,
   fragmentLength = NULL,
   fragmentSD = NULL,
