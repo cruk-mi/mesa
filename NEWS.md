@@ -7,7 +7,7 @@ editor_options:
 # dev
 
 ### ADDED
-* Many more examples for individual functions on their help pages
+* Many more examples for individual functions on their help pages, as well as a set of vignettes.
 
 ### CHANGES
 * Converted `plotPCA` into a method for the `qsea` defined method.
