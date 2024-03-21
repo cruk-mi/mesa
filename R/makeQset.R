@@ -25,7 +25,7 @@
 #'   the blind calibration method detailed in the qsea paper of fitting of a straight line of decreasing expected average 
 #'   methylation levels from 76% at CpG_density = 1 to 25% at CpG_density = 15.
 #' @param parallel Whether to read in files by using each core in parallel. 
-#'   Control number of calls by calling e.g. BiocParallel::register(BiocParallel::MulticoreParam(4)) beforehand.
+#'   Control number of calls by calling e.g. setMesaParallel(nCores = 4) beforehand.
 #' @return A qseaSet object, containing all the information required.
 #' @export
 #' @examplesIf requireNamespace("MEDIPSData", quietly = TRUE)
@@ -298,8 +298,6 @@ makeQset <- function(sampleTable,
   qseaSet@parameters$fragmentSD <- fragmentSD
 
   #do not set library factors via TMM, just set to be 1. Makes no difference to beta values as gets normalised out anyway, only nrpms are affected.
-  #if you do use TMM, then it depends on the samples in the qseaSet (with one being the reference to compare with)
-  qseaSet <- qsea::addLibraryFactors(qseaSet, factors = 1)
 
   qseaSet <- addNormalisation(qseaSet, enrichmentMethod = enrichmentMethod, maxPatternDensity = maxPatternDensity)
   

@@ -103,7 +103,7 @@ left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y
 #' # select only a few columns
 #' exampleTumourNormal %>% select(type, tumour) %>% getSampleTable()
 #' # select and rename a column
-#' exampleTumourNormal %>% select(age, renamed = tumour) %>% getSampleTable()
+#' exampleTumourNormal %>% select(age, tumour_new = tumour) %>% getSampleTable()
 #' # use tidyselect helper functions
 #' exampleTumourNormal %>% select(matches("t")) %>% getSampleTable()
 
