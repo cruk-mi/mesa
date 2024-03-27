@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeLibraryFactors}
 \alias{removeLibraryFactors}
-\title{This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.}
+\title{This function takes a qseaSet and sets all the library factor parts to one, including in the sampleTable if present.}
 \usage{
 removeLibraryFactors(qseaSet)
 }
@@ -10,8 +10,13 @@ removeLibraryFactors(qseaSet)
 \item{qseaSet}{The qseaSet object.}
 }
 \value{
-A table of data, with a column for each individual sample
+A qseaSet, without the library_factor column for each individual sample
 }
 \description{
-This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.
+This function takes a qseaSet and sets all the library factor parts to one, including in the sampleTable if present.
+}
+\examples{
+exampleTumourNormal \%>\% removeLibraryFactors() \%>\% addLibraryInformation() \%>\% pull(library_factor)
+# different to previously set library factors:
+exampleTumourNormal  \%>\% addLibraryInformation() \%>\% pull(library_factor)
 }

@@ -4,6 +4,26 @@ editor_options:
     wrap: sentence
 ---
 
+# dev
+
+### ADDED
+* Many more examples for individual functions on their help pages, as well as a set of vignettes.
+
+### CHANGES
+* Converted `plotPCA` into a method for the `qsea` defined method.
+* `plotPCA` gains a `verbose` option to turn off most of the messages produced.
+* `getSampleTable` is now defined for PCA/UMAP objects.
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
+* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
+* `writeDMRsToBed` should now correctly export the files.
+
+### REMOVED
+* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
+* Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads.
+* Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
+* Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
+* Removed `colnames` function definion on a qseaSet, which was not working anyway.
+
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.

@@ -60,11 +60,32 @@ plotGeneHeatmap(
 
 \item{idType}{A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse.}
 
-\item{...}{Additional arguments to pass to pheatmap.}
+\item{...}{Additional arguments to pass to ComplexHeatmap}
 }
 \value{
 A heatmap showing the methylation patterns across the gene of interest.
 }
 \description{
 This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
+}
+\examples{
+# plot a gene
+exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9")
+# cluster the rows and add annotation
+exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9", clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+# more complex example
+exampleTumourNormal \%>\% 
+  plotGeneHeatmap(regionsToOverlap = "HOXA9", 
+                   clusterRows = TRUE, 
+                   clusterNum = 2,
+                   sampleAnnotation = tumour,
+                   windowAnnotation = CpG_density,
+                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue")),
+                   upstreamDist = 1000,
+                   downstreamDist = 2000
+                    )
+# example with specifying the mart for mouse data
+plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
+  mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
+  
 }

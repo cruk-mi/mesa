@@ -96,6 +96,12 @@ setMethod("show", "mesaDimRed", function(object) {
 })
 
 
+setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
+
+setMethod("getSampleTable", "mesaDimRed", function(object) {
+  object@sampleTable
+})
+
 #' This function extends the dplyr function mutate to act on a mesaDimRed sampleTable.
 #' @method mutate mesaDimRed
 #' @importFrom dplyr mutate

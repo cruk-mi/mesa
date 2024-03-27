@@ -19,3 +19,8 @@ A qseaSet with the sample names reordered according to a column of the sampleTab
 \description{
 This function extends the function dplyr::arrange to act on qseaSet, to reorder the samples in the qseaSet.
 }
+\examples{
+exampleTumourNormal \%>\% arrange(tissue)
+exampleTumourNormal \%>\% arrange(desc(tissue), tumour)
+
+}

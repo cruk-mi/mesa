@@ -174,6 +174,12 @@ test_that("Analysing DMRs", {
                  summariseDMRsByGene() %>%
                  dim(),c(21,4))
 
+  expect_no_error(DMRs %>% 
+                    writeDMRsToBed(tempdir()))
+  
+  expect_no_error(DMRs %>% 
+                    writeDMRsToExcel(paste0(tempdir(),"/test.xlsx")))
+  
 })
 
 test_that("Multiple DMRs", {
