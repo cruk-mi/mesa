@@ -1,8 +1,8 @@
 ---
-title: "Generation of qseaSets"
+title: "Generating qseaSets"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Generation of qseaSets}
+  %\VignetteIndexEntry{Generating qseaSets}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(mesa)
+library(stringr)
 ```
 
 # Introduction
@@ -23,11 +24,13 @@ In this vignette we cover the generation of a qseaSet using the functions provid
 
 ## Sample Metadata 
 The first thing to prepare is the `sampleTable`; a dataframe containing metadata for the samples used in the package. This has three required columns:
+
 * `sample_name` : a name for each sample, which must be unique. This is the primary identifier used to describe each sample, so it is good to be descriptive.
 * `group` : a column to specify a group for each sample, for use inside certain functions for averaging over samples of the same type. We suggest only using this for replicates of the same (or very similar) samples, and adding extra columns for other comparisons that may be of interest.
 * `file_name` : A path to a bam file, containing the aligned, deduplicated, reads mapped to the relevant reference genome, from material which has undergone the methylation enrichment/capture process (e.g. MEDIP-seq or MBD-seq). Ideally `samtools fixmate` has been ran to supply mate information onto the read tags, but filtering for quality is not required.
 
 There are also two more optional fields that may be used during generation:
+
 * `input_file` : This is a path to a bam file containing aligned, deduplicated reads for material from the same sample, without performing enrichment. This is whole genome sequencing, but may be sequenced at a much lower depth (e.g. ultra-shallow WGS, ~1-2 million reads). If present, this will be used on a sample-by-sample basis to calculate copy number variation, at a chromosome scale, in order to correct for this in the expected read depths. This is most relevant when studying cancer, as particular cancers often show recurrant patterns of copy number changes. 
 
 * `gender` or `sex` : If one of these columns are included, then any chromosome called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for samples with `M`, `m` or `male` in this column. See the [qsea code for details](https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54); within the National Biomarker Centre we only consider the autosomes.
@@ -53,6 +56,7 @@ The `qsea` tutorial details the steps involved in generating a `qseaSet`.
 We provide a function, `makeQset`, which wraps these up into one function, although you may still use the rest of the `mesa` functionality with or without using this to create your `qseaSet`.
 
 Before creating the `qseaSet`, you need to have:
+
 * The `sampleTable` of metadata, including the file paths to the bam files.
 * The genome to which the bam files have been mapped, and the corresponding `BSgenome` package name, and the package to be installed. You can check what BSgenome packages are available on BioConductor via `BSgenome::available.genomes()`, or make your own if necessary (`vignette("BSgenomeForge", package = "BSgenome")`).
 * Whether the aligned reads are paired-end sequencing or not. If single-end sequencing has been used, you need to know the expected DNA fragment length from an experimental measurement, to extend all the reads to this length.
@@ -74,6 +78,7 @@ makeQset(sampleTable,
 A range of messages are produced as output during this process. One thing to note is that by default the process is performed without parallelisation, this can be controlled via the `setMesaParallel` function and will vastly speed up the process when multiple cores are available (but use more RAM).
 
 This function combines several steps:
+
 * Creating the windows to consider, controlled by the `BSgenome`, `chrSelect`, `windowSize` and `badRegions` parameters.
 * Adding the coverage on the methylation enriched regions, including calculating global enrichment parameters.
 * Calculating copy number variation over the non-enriched ("Input") sample, if such bam files are provided, including calculating global enrichment parameters.
@@ -89,6 +94,7 @@ The chosen chromosomes (via `chrSelect`) of the `BSgenome` object will be tiled 
 By default, the coverage is calculated using a custom method called `coverageMethod = PairedAndR1s`. This assumes paired-end sequencing, and will first take all the (high quality) paired-end reads within the bam file, then it will take (high quality) first reads (R1s) whose mate (R2) did not map and extend them to the average fragment size of the paired-end reads. Here, high quality means the MAPQ value is above `minMapQual`, although for paired ends we accept pairs where at least one end has a MAPQ above this value. 
 
 There are a number of options for controlling this process:
+
 * `properPairsOnly` - when set to TRUE, only the proper pairs will be included, not the R1s without a mapped mate.
 * `minInsertSize` and `maxInsertSize` control the size distribution of DNA fragments to be included. This enables filtering out of very short fragments, which may be noisy, extremely long fragments, which are likely to be assigned to the wrong bin, and also the prospect of performing in silico size selection, for instance to enrich cell-free DNA for short fragments which are known to be more likely to come from the tumour.
 * `minReferenceLength` - this parameter controls the minimum distance along the reference genome which a fragment must cover to be considered. This helps filter out some R1s which have only a small portion of the read mapped correctly, and may help with regions with strange artifactual binding (e.g. large insertions), but I don't think it will make much difference if any if `properPairs = TRUE`.
@@ -96,6 +102,7 @@ There are a number of options for controlling this process:
 As part of this process, a number of extra variables are added to the `libraries` slot in the `qseaSet`; here we will explain what these are. If `properPairs = TRUE`, the `r1` columns will not be present. 
 
 The filtering that is undertaken is as follows, if `properPairs = TRUE`:
+
 * All the reads in the bam file are loaded into R using `Rsamtools`. This is given by `qsea_initial_reads`. 
 * The number of "properly paired" reads, including "rescued pairs" (see note below) is given by `qsea_initial_pairs`; all other reads are discarded.
 * For each read pair, it is retained if at least one half of the pair has a mapping quality score (MAPQ) above the `minMapQual` threshold. This therefore allows properly paired reads where one end is multi-mapping. This step is reliant on the presence of the `MQ` tags on the bam file, which are added using the tool `samtools fixmate` during bam file generation. This will be stored as `qsea_mapq_filtered_pairs`.

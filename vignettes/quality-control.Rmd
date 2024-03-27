@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 library(mesa)
 library(dplyr)
 library(ggplot2)
+library(tidyr)
+library(stringr)
 ```
 
 # Generating tables of values from a qseaSet
@@ -25,7 +27,7 @@ QSEA has several different types of values that can be returned per window.
 You can get a table of raw counts per window with `getCountTable`:
 
 ```{r}
-qseaSet %>%
+exampleTumourNormal %>%
   getCountTable()
 ```
 
@@ -34,14 +36,14 @@ but this is not particularly useful, as different samples generally have been se
 The next option is normalised reads per million (NRPM). This normalises the number of reads by the depth of sequencing, as well as copy number variation.
 
 ```{r}
-qseaSet %>%
+exampleTumourNormal %>%
   getNRPMTable()
 ```
 
 Finally, we can request beta values. Beta values are measures of methylation, scaled to lie between 0 and 1, where 0 means that the window is unmethylated and 1 is methylated.
 
 ```{r}
-qseaSet %>%
+exampleTumourNormal %>%
   getBetaTable()
 ```
 
@@ -51,10 +53,10 @@ All three of these functions take an option `useGroupMeans` that determine wheth
 The example qseaSet has group as the same as sample_name, so we need to change that to see the effect:
 
 ```{r}
-qseaSet %>%
+exampleTumourNormal %>%
   getBetaTable(useGroupMeans = FALSE)
 
-qseaSet %>%
+exampleTumourNormal %>%
   mutate(group = str_remove(sample_name,"\\d")) %>%
   getBetaTable(useGroupMeans = TRUE) 
 ```
