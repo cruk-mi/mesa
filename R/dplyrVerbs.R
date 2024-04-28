@@ -100,12 +100,14 @@ left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y
 #' @export select.qseaSet
 #' @export
 #' @examples
-#' # select only a few columns
+#' # select only a few columns, note that sample_name and group are always kept
 #' exampleTumourNormal %>% select(type, tumour) %>% getSampleTable()
 #' # select and rename a column
 #' exampleTumourNormal %>% select(age, tumour_new = tumour) %>% getSampleTable()
-#' # use tidyselect helper functions
-#' exampleTumourNormal %>% select(matches("t")) %>% getSampleTable()
+#' # you can use tidyselect helper functions
+#' exampleTumourNormal %>% select(matches("s")) %>% getSampleTable()
+#' # negative selection also works, but not for `sample_name` and `group`:
+#' exampleTumourNormal %>% select(-matches("s")) %>% getSampleTable()
 
 select.qseaSet <- function(.data, ...){selectQset(.data, ...)}
 
