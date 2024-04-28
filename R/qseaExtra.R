@@ -503,7 +503,7 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
     dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", ""))  %>%
     dplyr::select(-CpG_density) %>%
     tidyr::pivot_longer(-c(chr, window_start,window_end), names_to = "sample_name", values_to = "value") %>%
-    dplyr::mutate(chr = ifelse(str_detect(chr,"chr"), chr, paste0("chr",chr))) %>%
+    dplyr::mutate(chr = ifelse(stringr::str_detect(chr,"chr"), chr, paste0("chr",chr))) %>%
     tidyr::unite(col = "window", chr, window_start, window_end) %>%
     tidyr::pivot_wider(names_from = window, values_from = value) %>%
     dplyr::left_join(qsea::getSampleTable(qseaSet) %>% dplyr::select(sample_name, ...)) %>%
