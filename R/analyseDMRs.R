@@ -83,7 +83,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     dplyr::ungroup()
 
   contrastsDF %>%
-    dplyr::left_join(DMRsummary, by = join_by(group1, group2)) %>%
+    dplyr::left_join(DMRsummary, by = dplyr::join_by(group1, group2)) %>%
     dplyr::mutate(nDown = tidyr::replace_na(nDown, 0),
            nUp = tidyr::replace_na(nUp, 0)) %>%
     dplyr::select(group1, group2, nUp, nDown) %>%
