@@ -66,6 +66,7 @@ calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_Norma
 calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
 # change the False Discovery Rate threshold
 calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
-# also return all the columns of data for the significant windows
+# can also return all the columns of data for the significant windows. 
+# using `contrasts = "first"` will only make the first possible contrast on the tumour column.
 calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
 }

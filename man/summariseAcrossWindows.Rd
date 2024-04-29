@@ -46,6 +46,6 @@ This function takes a qseaSet and calculates a summary statistic across the wind
 # median NRPM and beta values across all windows
 exampleTumourNormal \%>\% summariseAcrossWindows(fn = mean)
 # maximum NRPM across a smaller region of the genome
-rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900
+rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
 exampleTumourNormal \%>\% summariseAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm")
 }

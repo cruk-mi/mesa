@@ -19,10 +19,12 @@ The sample_name and group columns will always be returned.
 This function extends the dplyr function select to act on qseaSet sampleTable. Can also be used to rename columns.
 }
 \examples{
-# select only a few columns
+# select only a few columns, note that sample_name and group are always kept
 exampleTumourNormal \%>\% select(type, tumour) \%>\% getSampleTable()
 # select and rename a column
-exampleTumourNormal \%>\% select(age, renamed = tumour) \%>\% getSampleTable()
-# use tidyselect helper functions
-exampleTumourNormal \%>\% select(matches("t")) \%>\% getSampleTable()
+exampleTumourNormal \%>\% select(age, tumour_new = tumour) \%>\% getSampleTable()
+# you can use tidyselect helper functions
+exampleTumourNormal \%>\% select(matches("s")) \%>\% getSampleTable()
+# negative selection also works, but not for `sample_name` and `group`:
+exampleTumourNormal \%>\% select(-matches("s")) \%>\% getSampleTable()
 }

@@ -9,7 +9,7 @@ makeQset(
   BSgenome = NULL,
   chrSelect = 1:22,
   windowSize = 300,
-  CNVwindowSize = 1000000,
+  CNVwindowSize = 1e+06,
   fragmentType = NULL,
   fragmentLength = NULL,
   fragmentSD = NULL,
@@ -72,7 +72,7 @@ the blind calibration method detailed in the qsea paper of fitting of a straight
 methylation levels from 76\% at CpG_density = 1 to 25\% at CpG_density = 15.}
 
 \item{parallel}{Whether to read in files by using each core in parallel.
-Control number of calls by calling e.g. BiocParallel::register(BiocParallel::MulticoreParam(4)) beforehand.}
+Control number of calls by calling e.g. setMesaParallel(nCores = 4) beforehand.}
 }
 \value{
 A qseaSet object, containing all the information required.

@@ -7,7 +7,7 @@
 addHMMcopyCNV(
   qs,
   inputColumn = "input_file",
-  windowSize = 1000000,
+  windowSize = 1e+06,
   fragmentLength = NULL,
   plotDir = NULL,
   parallel = getMesaParallel(),
