@@ -943,7 +943,7 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' exampleTumourNormal %>% getAnnotation()
 #' exampleTumourNormal %>% getAnnotation(sampleAnnotation = "type")
 #' exampleTumourNormal %>% getAnnotation(sampleAnnotation = c("tumour","type"))
-#' and for asking to use the groups
+#' #and for asking to use the groups
 #' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% getAnnotation(useGroupMeans = TRUE)
 #' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL){
