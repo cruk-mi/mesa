@@ -2,7 +2,7 @@
 title: "Dimensionality Reduction - PCAs and UMAPs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dimensionality-reduction}
+  %\VignetteIndexEntry{Dimensionality Reduction - PCAs and UMAPs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
