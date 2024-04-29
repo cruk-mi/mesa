@@ -677,7 +677,7 @@ summariseAcrossWindows <- function(qseaSet,
 #' # add to the sampleTable the median NRPM and beta values across all windows
 #' exampleTumourNormal %>% addSummaryAcrossWindows(fn = mean) %>% getSampleTable()
 #' # maximum NRPM across a smaller region of the genome
-#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900
+#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
 #' exampleTumourNormal %>% addSummaryAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm") %>% getSampleTable()
 #' # can add a suffix and apply repeatedly with different windows
 #' exampleTumourNormal %>% 
