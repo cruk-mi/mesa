@@ -832,7 +832,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' @examples
 #' # by default uses nrpm
 #' exampleTumourNormal %>% plotCorrelationMatrix()
-#' using beta values often looks quite different
+#' #using beta values often looks quite different
 #' exampleTumourNormal %>% plotCorrelationMatrix(normMethod = "beta", sampleAnnotation = c(tumour,patient))
 
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
