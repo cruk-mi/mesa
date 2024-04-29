@@ -406,7 +406,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' exampleTumourNormal %>% calculateFractionReadsInGRanges(rgn, 0)
 #' exampleTumourNormal %>% calculateFractionReadsInGRanges(rgn, 5)
 
-calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCountsNeeded) {
+calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
   
   #TODO: This function seems to be returning the fraction of windows that are above the cutoff, rather than the fraction of reads?
   
@@ -416,17 +416,18 @@ calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCount
     colSums()
 
   afterSubsetReadTotals <- qseaSet %>%
-    filterByOverlaps(windowsToConsider) %>%
+    filterByOverlaps(regionsToOverlap) %>%
     qsea::getCounts() %>%
     {. >= numCountsNeeded } %>%
     colSums()
 
-  tibble::tibble(sample_name = names(initialReadTotals),
+  out <- tibble::tibble(sample_name = names(initialReadTotals),
          initialOverBackNum = initialReadTotals,
          afterOverBackNum = afterSubsetReadTotals,
          fraction = afterOverBackNum/initialOverBackNum) %>%
-    dplyr::left_join(qsea::getSampleTable(addLibraryInformation(qseaSet))) %>%
-    return()
+    dplyr::left_join(qsea::getSampleTable(addLibraryInformation(qseaSet)))
+  
+  return(out)
 
 }
 
@@ -593,7 +594,7 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #' # median NRPM and beta values across all windows
 #' exampleTumourNormal %>% summariseAcrossWindows(fn = mean)
 #' # maximum NRPM across a smaller region of the genome
-#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900
+#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
 #' exampleTumourNormal %>% summariseAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm")
 
 summariseAcrossWindows <- function(qseaSet,

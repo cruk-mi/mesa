@@ -124,11 +124,15 @@ Having done this there are now `r DMRsCovariatePatient |> nrow()` DMRs instead o
 
 Note that if you try to specify covariates which are entirely correlated with the variable, then you will get an error:
 
-```{r, error=TRUE}
-exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
-                covariates = "type", 
-                contrasts = "first")
+```{r, eval = FALSE}
+# There are no levels of `type` in common between the levels of `tumour`:
+exampleTumourNormal |> getSampleTable() |> dplyr::count(tumour,type)
+
+# so this will fail with an error
+#exampleTumourNormal |>
+#  calculateDMRs(variable = "tumour",
+#                covariates = "type", 
+#                contrasts = "first")
 ```
 
 
