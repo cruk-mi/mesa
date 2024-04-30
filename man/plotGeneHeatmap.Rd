@@ -72,14 +72,12 @@ This function takes a qseaSet and a gene, and plots the expression across the ge
 # plot a gene
 exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9")
 # cluster the rows and add annotation
-exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9", clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 # more complex example
 exampleTumourNormal \%>\% 
-  plotGeneHeatmap(regionsToOverlap = "HOXA9", 
-                   clusterRows = TRUE, 
+  plotGeneHeatmap(gene = "HOXA9", 
                    clusterNum = 2,
                    sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue")),
                    upstreamDist = 1000,
                    downstreamDist = 2000

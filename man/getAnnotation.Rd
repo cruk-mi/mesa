@@ -22,14 +22,14 @@ Note that sampleAnnotation must be enclosed within double curly brackets when us
 \examples{
 
 # works for none, one or more columns:
-exampleTumourNormal \%>\% getAnnotation()
-exampleTumourNormal \%>\% getAnnotation(sampleAnnotation = type)
-exampleTumourNormal \%>\% getAnnotation(sampleAnnotation = c(tumour,type))
+exampleTumourNormal \%>\% mesa:::getAnnotation()
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = type)
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour,type))
 # also works for quoted string names
-exampleTumourNormal \%>\% getAnnotation()
-exampleTumourNormal \%>\% getAnnotation(sampleAnnotation = "type")
-exampleTumourNormal \%>\% getAnnotation(sampleAnnotation = c("tumour","type"))
-and for asking to use the groups
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% getAnnotation(useGroupMeans = TRUE)
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
+exampleTumourNormal \%>\% mesa:::getAnnotation()
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+# and for asking to use the groups
+exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(useGroupMeans = TRUE)
+exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 }

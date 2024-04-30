@@ -246,7 +246,6 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 
 }
 
-
 #' This function makes a pair of HeatmapAnnotation objects, and is a helper function for plotRegionsHeatmap and plotCNV.
 #' @param qseaSet Whether to cluster the rows or not.
 #' @param sampleAnnotation Which columns to use of the sampleTable.
@@ -255,7 +254,6 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #' @param specifiedAnnotationColors Allow for overwriting of some of the colours with pre-specified values.
 #' @param windowOrientation Which orientation the window annotation should be.
 #' @param sampleOrientation Which orientation the sample annotation should be.
-
 #' @return A list containing two annotation objects
 makeHeatmapAnnotations <- function(qseaSet,
                                    sampleAnnotation = NULL,
@@ -451,14 +449,12 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' # plot a gene
 #' exampleTumourNormal %>% plotGeneHeatmap("HOXA9")
 #' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 #' # more complex example
 #' exampleTumourNormal %>% 
-#'   plotGeneHeatmap(regionsToOverlap = "HOXA9", 
-#'                    clusterRows = TRUE, 
+#'   plotGeneHeatmap(gene = "HOXA9", 
 #'                    clusterNum = 2,
 #'                    sampleAnnotation = tumour,
-#'                    windowAnnotation = CpG_density,
 #'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue")),
 #'                    upstreamDist = 1000,
 #'                    downstreamDist = 2000
@@ -618,7 +614,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     mutate(gap = cumsum(ifelse(start - tidyr::replace_na(dplyr::lag(start),0) > !!windowSize,1,0))) %>%
     pull(gap)
 
-  #Make rowannoation object
+  #Make row annotation object
   rowAnnot <- makeGeneHeatmapRowAnnotation(annoRow)
 
   #Set the cell border line width depending on the number of rows or columns, as pheatmap does.
@@ -773,7 +769,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' @return A plot of the distribution
 
 #' @examples
-#' exampleTumourNormal %>% plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+#' exampleTumourNormal %>% mesa:::plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 #' 
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stack", normMethod = "nrpm"){
 
@@ -936,16 +932,16 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' @examples
 #' 
 #' # works for none, one or more columns:
-#' exampleTumourNormal %>% getAnnotation()
-#' exampleTumourNormal %>% getAnnotation(sampleAnnotation = type)
-#' exampleTumourNormal %>% getAnnotation(sampleAnnotation = c(tumour,type))
+#' exampleTumourNormal %>% mesa:::getAnnotation()
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = type)
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c(tumour,type))
 #' # also works for quoted string names
-#' exampleTumourNormal %>% getAnnotation()
-#' exampleTumourNormal %>% getAnnotation(sampleAnnotation = "type")
-#' exampleTumourNormal %>% getAnnotation(sampleAnnotation = c("tumour","type"))
-#' #and for asking to use the groups
-#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% getAnnotation(useGroupMeans = TRUE)
-#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
+#' exampleTumourNormal %>% mesa:::getAnnotation()
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = "type")
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+#' # and for asking to use the groups
+#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% mesa:::getAnnotation(useGroupMeans = TRUE)
+#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL){
 
   if (rlang::quo_is_null(rlang::enquo(sampleAnnotation))) {

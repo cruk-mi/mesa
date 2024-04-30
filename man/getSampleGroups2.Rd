@@ -16,5 +16,5 @@ A named list, where each element contains the vector of sample_names that are in
 This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.
 }
 \examples{
-exampleTumourNormal \%>\% getSampleGroups2()
+exampleTumourNormal \%>\% mesa:::getSampleGroups2()
 }

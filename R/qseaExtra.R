@@ -401,10 +401,6 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' @param regionsToOverlap A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
 #' @param numCountsNeeded Minimum number of reads required to consider that window
 #' @return Returns a data frame with a `fraction` column detailing the proportion of reads that overlap, as well as the sampleTable
-#' @examples
-#' rgn <- data.frame(seqnames = 7, start = 25000000, end = 26000000)
-#' exampleTumourNormal %>% calculateFractionReadsInGRanges(rgn, 0)
-#' exampleTumourNormal %>% calculateFractionReadsInGRanges(rgn, 5)
 
 calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
   
@@ -783,7 +779,7 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 #' @param qseaSet The qseaSet object.
 #' @return A named list, where each element contains the vector of sample_names that are in that group.
 #' @examples
-#' exampleTumourNormal %>% getSampleGroups2()
+#' exampleTumourNormal %>% mesa:::getSampleGroups2()
 
 getSampleGroups2 <- function(qseaSet){
   qseaSet %>%
@@ -872,7 +868,7 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' @return A set of bigWig files for each sample in the qseaSet, with coverage over all the windows in the qseaSet
 #' @export
 #' @examples
-#' write bigwigs to a temporary directory
+#' # write bigwigs to a temporary directory
 #' exampleTumourNormal %>% writeBigWigs(tempdir())
 
 writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){

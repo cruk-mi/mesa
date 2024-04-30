@@ -20,11 +20,12 @@ This function extends the dplyr function select to act on qseaSet sampleTable. C
 }
 \examples{
 # select only a few columns, note that sample_name and group are always kept
-exampleTumourNormal \%>\% select(type, tumour) \%>\% getSampleTable()
+# note here we use the `dplyr::` prefix, to ensure that `AnnotationDbi::select` isn't called. 
+exampleTumourNormal \%>\% dplyr::select(type, tumour) \%>\% getSampleTable()
 # select and rename a column
-exampleTumourNormal \%>\% select(age, tumour_new = tumour) \%>\% getSampleTable()
+exampleTumourNormal \%>\% dplyr::select(age, tumour_new = tumour) \%>\% getSampleTable()
 # you can use tidyselect helper functions
-exampleTumourNormal \%>\% select(matches("s")) \%>\% getSampleTable()
+exampleTumourNormal \%>\% dplyr::select(matches("s")) \%>\% getSampleTable()
 # negative selection also works, but not for `sample_name` and `group`:
-exampleTumourNormal \%>\% select(-matches("s")) \%>\% getSampleTable()
+exampleTumourNormal \%>\% dplyr::select(-matches("s")) \%>\% getSampleTable()
 }

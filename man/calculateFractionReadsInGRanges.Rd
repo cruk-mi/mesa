@@ -19,8 +19,3 @@ Returns a data frame with a \code{fraction} column detailing the proportion of r
 \description{
 This function calculates the fraction of total reads in a qseaSet object which are present in a GRanges object
 }
-\examples{
-rgn <- data.frame(seqnames = 7, start = 25000000, end = 26000000)
-exampleTumourNormal \%>\% calculateFractionReadsInGRanges(rgn, 0)
-exampleTumourNormal \%>\% calculateFractionReadsInGRanges(rgn, 5)
-}

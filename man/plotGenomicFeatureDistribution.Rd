@@ -27,6 +27,6 @@ A plot of the distribution
 This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff
 }
 \examples{
-exampleTumourNormal \%>\% plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+exampleTumourNormal \%>\% mesa:::plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 
 }

@@ -169,7 +169,7 @@ plotPCA(pca1,
         showSampleNames = TRUE) 
 ```
 
-Alternatively, [plotly::ggplotly()] can be used to generate an interactive version of the plot which gives information for each point when you rollover the point with the mouse. The `plotlyAnnotations` argument can be used to specify which variables to display in the pop-up boxes. The sample name will always be displayed, as will any variables being used colour and shape annotations.
+Alternatively, `plotly::ggplotly()` can be used to generate an interactive version of the plot which gives information for each point when you rollover the point with the mouse. The `plotlyAnnotations` argument can be used to specify which variables to display in the pop-up boxes. The sample name will always be displayed, as will any variables being used colour and shape annotations.
 
 ```{r}
 PCAplots3 <- plotPCA(pca1, 

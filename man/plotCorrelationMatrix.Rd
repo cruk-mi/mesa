@@ -44,6 +44,6 @@ This function takes a qseaSet and plots a correlation matrix
 \examples{
 # by default uses nrpm
 exampleTumourNormal \%>\% plotCorrelationMatrix()
-using beta values often looks quite different
+#using beta values often looks quite different
 exampleTumourNormal \%>\% plotCorrelationMatrix(normMethod = "beta", sampleAnnotation = c(tumour,patient))
 }

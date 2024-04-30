@@ -30,6 +30,6 @@ A set of bigWig files for each sample in the qseaSet, with coverage over all the
 This function takes a qseaSet and writes individual bigWig files with the coverage over each window.
 }
 \examples{
-write bigwigs to a temporary directory
+# write bigwigs to a temporary directory
 exampleTumourNormal \%>\% writeBigWigs(tempdir())
 }
