@@ -113,7 +113,7 @@ When `properPairs = FALSE`, the first read will be retained from any read pair t
 
 Note that this method `coverageMethod = "PairedAndR1s"` option does use more RAM than using the `qsea` method. This can be set via `coverageMethod = "qseaPaired"`; single ended reads are not currently supported.
 
-### Proper Pairs
+### Note on Proper Pairs
 "Proper pairs", as determined by the `bwa mem` aligner at any rate, are paired-end sequencing reads where both ends have mapped sufficiently near to each other, and they point towards each other on opposite strands of the chromosome. However, it should be noted that how near is near enough to be called as proper pairs is calculated within `bwa mem` on an individual sample basis. This allowable distance is calculated by determining the mean and standard deviation of the fragment length amongst the mapped reads in that sample, with a cutoff of X standard deviations away from the mean. In general, for sheared genomic DNA this is not a big issue, because the distribution is sufficiently broad that the standard deviation is large enough. However, for circulating cell-free DNA, the distribution of fragment sizes has a very sharp peak at ~167bp, and hence the global fragment standard deviation is quite low. This can lead to read pairs of length ~400bp which otherwise look like they should be "proper pairs" not being called as such by the aligner. We therefore perform a rescuing process, to ensure that we keep these read pairs by finding read pairs that meet the orientation conditions for being proper pairs, but are within `minInsertSize` to `maxInsertSize` in length. This process is computationally expensive, so we only perform it when `properPairs = TRUE`.
 
 ## Copy Number Variation
@@ -123,7 +123,7 @@ Once the coverage is determined, the R package `hmmcopy` will be used, with defa
 
 Alternatively, `qsea` provides a method for determining the copy number from the methylation enriched samples, using only reads which do not contain a CG, this may be selected using `CNVmethod = "MeCap"`. We do note that for our MBD-seq experiments we found there was reasonable overall agreement, but this method did give spurious CNV compared to the non-enriched reads, although that may be due to the selectivity of our MBD-seq enrichment step being relatively high.
 
-No copy number variation will be calculated if `CNVmethod = "none`.
+No copy number variation will be calculated if `CNVmethod = "none"`.
 
 ## Calculating CpG Density
 One essential part of the `qseaSet` is the `CpG_density` for each region. This is calculated using the genome sequence, alongside an expected fragment size distribution via the `qsea` function `qsea:::estimatePatternDensity()`. 
@@ -133,7 +133,7 @@ This process works by first locating all `CG` dinucleotides across the genome, b
 This calculation therefore requires the `fragmentLength` and `fragmentSD` parameters to be specified, to define these normal distributions, and is associated with the whole `qseaSet`. This is therefore not sample dependent, and so if samples have vastly different fragment distributions then there will be some expected variation not captured in this process.
 
 ## Offset Reads
-In any ME-seq experiment, there will be off-target fragments sequenced due to the imperfect nature of the enrichment process. These are used to calculate the `offset`; a measure of the background level of fragments in windows that do not contain CGs. The maximum `CpG_density` value for these windows is controlled by `maxPatternDensity`.
+In any ME-seq experiment, there will be off-target fragments sequenced due to the imperfect nature of the enrichment process. These are used to calculate the `offset`; a measure of the background level of fragments in windows that do not contain CGs. The maximum `CpG_density` value for these windows is controlled by `maxPatternDensity`. If this is set too low, then `qsea` will give a warning saying that the offset can not be calculated.
 
 ## Beta Calculation Fitting
 Finally, the `qsea` beta value calculation is applied. This requires the `CpG_density` and the coverage, as well as some assumption on methylated regions or at least the expected number of them. The [qsea manuscript](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5389680/) details three methods for this assumption, two of which require external data in the form of methylation arrays or bisulphite/enzymatic sequencing. The third method, known as "blind calibration" in the qsea manuscript, is the only one implemented here. This works on a global assumption on the typical methylation levels across the human genome - that the majority of the isolated CGs are methylated while the majority of CpG islands are unmethylated. This blind calibration method therefore assumes that 76% of regions with a `CpG_density` of 1 are expected to be fully methylated ($\beta = 1$), while 25% of regions with a `CpG_density` of 15 are fully unmethylated ($\beta = 0$). A straight line is then fit between these two densities. This method is the only one implemented here, as it does not require additional data. 
@@ -142,27 +142,28 @@ We have found this blind calibration sufficient for the human genome, including 
 
 We do note that if you wish to use array data for normalisation, then [this Biostars post](https://support.bioconductor.org/p/9137187/) may be a good source of information, but we have only used the blind calibration.method. 
 
-## TMM Normalisation
-
-Note, this explicitly does not set the `library_factor` for the `qseaSet`, which suggested to be done in `qsea` via the Trimmed Means of M-values (TMM) method. The way `qsea` does this is to choose one sample (by default the first sample), and use this as the reference sample to calculating a scaling factor to adjust the total fragments by when calculating the NRPM (normalised reads per million) values.
+## Note on TMM Normalisation
+One thing to note is that this function does not set the `library_factor` for the `qseaSet`, which suggested to be done in `qsea` via the Trimmed Means of M-values (TMM) method. The way `qsea` does this is to choose one sample (by default the first sample), and use this as the reference sample to calculating a scaling factor to adjust the total fragments by when calculating the NRPM (normalised reads per million) values.
 
 TMM normalisation is a method used in RNA-seq to compensate for genes which are excessively expressed in a particular condition. In RNA-seq, the distribution of read counts varies over ~4 orders of magnitude, with some highly expressed genes having tens of thousands of reads while others have tens or hundreds. 
 If in a particular tissue there are a group of genes which are extremely highly expressed that are not expressed in another tissue, then the total pool of available reads will be dominated by those genes in the first tissue, comparatively depressing the other genes. So just using the total size ends up biasing to these larger genes, and making it look like the other genes are lower expressed, ending up with many more differentially expressed genes that might be actually the case.
 
-e.g. if there are 100 reads in a sample, and 3 genes:
-Sample 1: (70,15,15)
-Sample 2: (0,50,50)
+e.g. if there are 100 reads in a sample, and 3 genes, with values:
+
+* Sample 1: (70,15,15)
+* Sample 2: (0,50,50)
 
 then we want to be careful not to call the last two genes as differentially expressed, when they are really just affected by the lack of gene A. One option could be to normalise with the median of the read distribution, although due to many genes being non-expressed this often is implemented as an upper quartile.
 
-TMM normalisation however takes the some subset of the "genes" (windows in our case), having trimmed off the very high/very low expressed "genes", to calculate this scaling factor for total number of fragments 
+TMM normalisation however takes the some subset of the "genes" (windows in our case), having trimmed off the very high/very low expressed "genes", to calculate this scaling factor for total number of fragments.
 
 However, we find that for methylation, after filtering for excluded regions, extremely few windows in any sample have more than 100 reads. So the distribution of read counts is only actually between 0-100ish, making the main necessity for TMM normalisation rather unnecessary here. 
 
-There are a couple of reasons why we choose not to apply this:
+There are a couple of reasons why we therefore choose not to apply TMM:
+
 * When using beta values (including the normalisation adjustment inside the `calculateDMRs` calculation), there is no effect of the `library_factor`, as it is normalised out in the beta value fitting process.
 * The values that we get for the TMM normalisation are typically relatively close to 1, so we don't find it has a big effect on the NRPM values.
 * The TMM normalisation requires a sample to be set as the reference sample; the other samples are normalised against this one in a combined manner (at least in the current implementation in `qsea`. This therefore means that the normalisation of all the samples depends on which other samples they were normalised with, meaning that comparing between batches would need renormalising every time. This would also mean that filtering samples pre- or post-normalisation would give different results.
 
-However, we note that these considerations might not apply for everyone, so you should make your own assessment; the `qsea::addLibraryFactors()` function may be used to apply this normalisation if required.
+However, we note that these considerations might not apply for everyone; the `qsea::addLibraryFactors()` function may be used to apply this normalisation if required.
 

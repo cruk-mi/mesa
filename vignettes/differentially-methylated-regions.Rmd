@@ -225,7 +225,7 @@ This function works on any data frame with the columns `seqnames`, `start` and `
 Please note that annotating genomes is a difficult endeavour, with caveats such as the existence of multiple transcripts from each gene, non-canonical start sites and overlapping genes on opposite strands, and so the annotation may not be 100% reliable.
 
 ## Other Genomes
-The underlying function being used here is `annotatePeak` from the `ChIPseeker` package. This requires two databases, a `TxDb` and an `annoDb` datbase. These may be given explicitly using the arguments to `annotateWindows`, as for instance for this example mouse dataset
+The underlying function being used here is `annotatePeak` from the `ChIPseeker` package. This requires two databases, a `TxDb` and an `annoDb` datbase. These may be given explicitly using the arguments to `annotateWindows`, as for instance for this example mouse dataset:
 
 ```{r}
 exampleMouse |>
@@ -291,9 +291,9 @@ allContrasts |>
   summariseDMRsByContrast(FDRthres = 0.001, log2FCthres = 2, deltaBetaThres = 0.2)
 ```
 
-We also provide a function plot an [https://upset.app/](UpSet plot). These are a type of plot useful for showing the intersections between a set of data, in a more generalisable form than a venn diagram.
+We also provide a function plot an [UpSet plot)](https://upset.app/]). These are a type of plot useful for showing the intersections between a set of data, in a more generalisable form than a venn diagram.
 
-```{r}
+```{r, fig.height = 8}
 allContrasts |>
   plotDMRUpset()
 ```
@@ -350,7 +350,8 @@ We can specify colours for just one variable (with the second being chosen autom
 exampleTumourNormal |>
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      sampleAnnotation = c("tumour", "type"),
-                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))
+                     annotationColors = list(tumour = c("Normal" = "blue", 
+                                                        "Tumour" = "firebrick4"))
                      )
 ```
 
@@ -358,7 +359,8 @@ Or both variables:
 
 ```{r}
 annotColours <- list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"),
-     type = c("CRC" = "orange","LUAD" = "lightgreen", "LUSC" = "darkgreen", "NormalColon" = "tan", "NormalLung" = "grey"))
+     type = c("CRC" = "orange","LUAD" = "lightgreen", "LUSC" = "darkgreen", 
+              "NormalColon" = "tan", "NormalLung" = "grey"))
 
 exampleTumourNormal |>
   plotRegionsHeatmap(regionsToOverlap = DMRs, 
@@ -373,7 +375,7 @@ Rows can be clustered using the `clusterRows = TRUE` option:
 exampleTumourNormal |>
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      sampleAnnotation = c("tumour", "type"),
-                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
+                     annotationColors = annotColours,
                      clusterRows = TRUE,
                      )
 ```
@@ -385,7 +387,7 @@ The number of clusters to break the column dendrogram into can be controlled usi
 exampleTumourNormal |>
   plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
                      sampleAnnotation = c("tumour", "type"),
-                     annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")),
+                     annotationColors = annotColours,
                      clusterNum = 3
                      )
 ```
