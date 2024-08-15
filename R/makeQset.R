@@ -6,12 +6,12 @@
 #' @param BSgenome A BSgenome string. See BSgenome::available.genomes() for options.
 #' @param chrSelect Which chromosomes to use (default 1:22).
 #' @param windowSize What window size (in bp) to use in the genome (default 300).
-#' @param fragmentType What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to a default for CBC)
+#' @param fragmentType What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to predefined defaults)
 #' @param fragmentLength Average DNA fragment length. Can be set by fragmentType.
 #' @param fragmentSD Standard deviation of the DNA fragment lengths. Can be set by fragmentType.
 #' @param CNVwindowSize What window size (in bp) to use in the calculation of CNV (default 1000000).
 #' @param CNVmethod Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None"
-#' @param coverageMethod Whether to use custom methtools method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).
+#' @param coverageMethod Whether to use custom method for reading coverage in ("PairedAndR1s"), rather than qsea's ("qseaPaired").
 #' @param minMapQual Minimum MAPQ score for a read to be kept. For PairedAndR1s, will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).
 #' @param minInsertSize For paired reads, only keep them if they are above a minimum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.
 #' @param maxInsertSize For paired reads, only keep them if they are below a maximum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.

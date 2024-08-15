@@ -39,7 +39,7 @@ makeQset(
 
 \item{CNVwindowSize}{What window size (in bp) to use in the calculation of CNV (default 1000000).}
 
-\item{fragmentType}{What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to a default for CBC)}
+\item{fragmentType}{What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to predefined defaults)}
 
 \item{fragmentLength}{Average DNA fragment length. Can be set by fragmentType.}
 
@@ -47,7 +47,7 @@ makeQset(
 
 \item{CNVmethod}{Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None"}
 
-\item{coverageMethod}{Whether to use custom methtools method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).}
+\item{coverageMethod}{Whether to use custom method for reading coverage in ("PairedAndR1s"), rather than qsea's ("qseaPaired").}
 
 \item{minMapQual}{Minimum MAPQ score for a read to be kept. For PairedAndR1s, will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).}
 
