@@ -132,7 +132,7 @@ makeQset <- function(sampleTable,
                                  Regions = windowsWithoutBlacklist,
                                  window_size = windowSize)
 
-  if(genome(getRegions(qseaSet)) != BSgenome) {
+  if(any(genome(getRegions(qseaSet)) != BSgenome)) {
     regions <- qseaSet %>% getRegions() 
     genome(regions) <- BSgenome
     qseaSet@regions <- regions
