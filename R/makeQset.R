@@ -233,6 +233,23 @@ makeQset <- function(sampleTable,
 
     }
 
+    if(is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.UCSC.hg38") {
+      
+      if(CNVwindowSize == 1000000) {
+        hmmCopyGC <- gc_hg38_1000kb %>%
+          chr = dplyr::mutate(paste0("chr",chr))
+      } else if (CNVwindowSize == 500000) {
+        hmmCopyGC <- gc_hg38_500kb %>%
+          chr = dplyr::mutate(paste0("chr",chr))
+      } else if (CNVwindowSize == 50000) {
+        hmmCopyGC <- gc_hg38_50kb %>%
+          chr = dplyr::mutate(paste0("chr",chr))
+      } else {
+        stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
+      }
+      
+    }    
+    
     if(is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
       if(CNVwindowSize == 1000000) {
         hmmCopyMap <- map_hg38_1000kb
@@ -246,6 +263,22 @@ makeQset <- function(sampleTable,
 
     }
 
+    if(is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.UCSC.hg38") {
+      if(CNVwindowSize == 1000000) {
+        hmmCopyMap <- map_hg38_1000kb %>%
+          chr = dplyr::mutate(paste0("chr",chr))
+      } else if (CNVwindowSize == 500000) {
+        hmmCopyMap <- map_hg38_500kb %>%
+          chr = dplyr::mutate(paste0("chr",chr))
+      } else if (CNVwindowSize == 50000) {
+        hmmCopyMap <- map_hg38_50kb %>%
+          chr = dplyr::mutate(paste0("chr",chr))
+      } else {
+        stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
+      }
+      
+    }    
+    
       if (is.null(hmmCopyGC)) {
       stop("No hmmCopy GC content object provided!")
     }
