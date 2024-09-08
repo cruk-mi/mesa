@@ -10,6 +10,7 @@ editor_options:
 * Converted `plotPCA` into a method for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
+* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
 
 # mesa 0.5.1
 
