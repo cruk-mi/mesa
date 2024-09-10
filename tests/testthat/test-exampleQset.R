@@ -173,7 +173,19 @@ test_that("Analysing DMRs", {
                  annotateWindows(genome = "hg38") %>%
                  summariseDMRsByGene() %>%
                  dim(),c(21,4))
-
+  
+  expect_no_error(DMRs <- exampleTumourNormal %>%
+                    filter(type %in% c("LUAD","LUSC","CRC")) %>%
+                    calculateDMRs(variable = "type",
+                                  contrasts = "all"))
+  
+  expect_equal(DMRs %>% sliceDMRs(n = 1) %>% nrow(), 6)
+  expect_equal(DMRs %>% sliceDMRs(n = 2) %>% nrow(), 12)
+  
+  DMRs_log2 <- DMRs %>% sliceDMRs(n = 1, metric = log2FC)
+  DMRs_adjPval <- DMRs %>% sliceDMRs(n = 1, metric = adjPval)
+  DMRs_deltaBeta <- DMRs %>% sliceDMRs(n = 1, metric = deltaBeta)
+  
 })
 
 test_that("Multiple DMRs", {

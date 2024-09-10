@@ -165,6 +165,8 @@ test_that("Calculating DMRs", {
 
   expect_no_error(bind_rows(twoDMR, oneDMR, noDMR))
 
+  
+  
 })
 
 test_that("plotting DMRs", {
