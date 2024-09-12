@@ -186,6 +186,10 @@ test_that("Analysing DMRs", {
   DMRs_adjPval <- DMRs %>% sliceDMRs(n = 1, metric = adjPval)
   DMRs_deltaBeta <- DMRs %>% sliceDMRs(n = 1, metric = deltaBeta)
   
+  expect_false(all(DMRs_log2$start == DMRs_adjPval$start))
+  expect_false(all(DMRs_log2$start == DMRs_deltaBeta$start))
+  expect_false(all(DMRs_adjPval$start == DMRs_deltaBeta$start))
+  
 })
 
 test_that("Multiple DMRs", {

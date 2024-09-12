@@ -182,7 +182,7 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 #' @param n How many DMRs to take of each contrast (if that many exists)
 #' @param FDRthres Threshold on the adjusted p values
 #' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density or any other column in the DMRs. 
-#' If "adjPval", "start" or "seqnames" are used, then the window with the smallest value will be chosen.
+#' If `adjPval`, `start` or `seqnames` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
 #' @param bothWays Whether to take windows that are hyper- and hypo-methylated in the contrast, or only hypermethylated (i.e. more methylated in group A).
 #' @return A data frame with the DMRs with the largest value of the selected metrics
 #' @examples
@@ -202,8 +202,8 @@ sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRt
     pivotDMRsLonger(makePositive = makePositive, FDRthres = FDRthres) %>% 
     dplyr::relocate(tidyselect::matches("means$"), .after = tidyselect::last_col()) %>%
     dplyr::group_by(group1, group2)
-  
-  if(rlang::ensym(metric) %in% c("adjPval", "start", "seqnames")){
+
+  if(deparse(substitute(metric)) %in% c("adjPval", "start", "seqnames")){
     message(glue::glue("Choosing the windows with the smallest value of {rlang::ensym(metric)}"))
     out <- positiveDMRs %>% 
       dplyr::arrange({{metric}}) %>% 
@@ -218,7 +218,3 @@ sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRt
 
   return(out)
 }
-
-
-
-  
