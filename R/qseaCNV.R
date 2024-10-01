@@ -37,7 +37,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   }
 
   if (is.null( hmmCopyMap)) {
-    stop("GC track for hmmcopy must be provided.")
+    stop("Mapability track for hmmcopy must be provided.")
   }
 
   hmmCopyGC <- asValidGranges(hmmCopyGC)
@@ -46,8 +46,25 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   #TODO something with zygosity
 
   CNV_Regions = qsea:::makeGenomeWindows(qsea:::getGenome(qs), as.character(qsea::getChrNames(qs)), windowSize)
-  CpGpos = GenomicRanges::GRanges(seqinfo = GenomicRanges::seqinfo(CNV_Regions))
 
+  # check that the hmmcopy objects are appropriate; each CNV_Region window should
+  # overlap exactly one GC/Map window. 
+  overlappedRegions <- CNV_Regions %>%
+    plyranges::join_overlap_left(hmmCopyGC) %>%
+    plyranges::join_overlap_left(hmmCopyMap)
+  
+  # two conditions should be the same, but really don't want this to happen as it 
+  # leads to exponentially increasing numbers of rows 
+  if(overlappedRegions %>% duplicated() || length(overlappedRegions) != length(CNV_Regions)) {
+    duplicatedRegions <- head(overlappedRegions[overlappedRegions %>% duplicated()])
+    stop(paste(c("CNV regions overlaps with multiple windows from the hmmCopyGC and/or hmmCopyMap objects! 
+    This probably means that your window sizes do not match. 
+    Showing first affected regions: \n", print_and_capture(duplicatedRegions))))
+  }
+  
+  # this object is only used for this sanity check, not used directly again, so clean up
+  rm(overlappedRegions)
+  
   if (parallel) {
     BPPARAM = BiocParallel::bpparam()
     message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel")
@@ -88,7 +105,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 
   CNV_RegionsWithReads <- CNV_Regions %>%
     plyranges::join_overlap_left(hmmCopyGC) %>%
-    plyranges::join_overlap_left(hmmCopyMap)  %>%
+    plyranges::join_overlap_left(hmmCopyMap) %>%
     tibble::as_tibble() %>%
     dplyr::rename(chr = seqnames) %>%
     data.table::data.table()
