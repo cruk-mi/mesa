@@ -251,9 +251,9 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
   }
 
   if(nonEnrich){
-    typeString <- "Pulldown"
+    typeString <- "non-enriched"
   } else {
-    typeString <- "Input"
+    typeString <- "enriched"
   }
 
   message(glue::glue("Adding Medips Enrichment factors to {length(getSampleNames(qseaSet))} {typeString} samples, using {nCores} cores."))

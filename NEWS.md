@@ -10,6 +10,7 @@ editor_options:
 * Converted `plotPCA` into a method for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 
 # mesa 0.5.1
 
