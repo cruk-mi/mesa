@@ -11,6 +11,9 @@ editor_options:
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
 
+### BUG FIXES
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
