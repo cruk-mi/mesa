@@ -10,12 +10,9 @@ editor_options:
 * Many more examples for individual functions on their help pages, as well as a set of vignettes.
 
 ### CHANGES
-* Converted `plotPCA` into a method for the `qsea` defined method.
+* Converted `plotPCA` into a submethod for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
-* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
-* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
-* `writeDMRsToBed` should now correctly export the files.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
@@ -26,6 +23,9 @@ editor_options:
 
 ### BUG FIXES
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
+* `writeDMRsToBed` should now correctly export the files.
 
 # mesa 0.5.1
 
