@@ -275,12 +275,15 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 #' @param variable Which variable to use to calculate the DMRs between
 #' @return A tibble with two columns, each row with a pair of contrasts
 #' @export
+#' @examples
+#' exampleTumourNormal %>% makeAllContrasts(type)
+#' 
 #'
 makeAllContrasts <- function(qseaSet, variable){
   vals <- qseaSet %>%
     qsea::getSampleTable() %>%
-    tidyr::drop_na(tidyselect::all_of(variable)) %>%
-    dplyr::pull(variable) %>%
+    filter(!is.na({{variable}})) %>%
+    dplyr::pull({{variable}}) %>%
     unique() %>%
     gtools::mixedsort()
 
@@ -312,9 +315,14 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @return A tibble with the data
 #' @export
 #' @examples
-#' qseaSet <- mesa::exampleTumourNormal
-#' calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
-#'
+#' calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_NormalLung")
+#' # calculate all possible DMRs on one column 
+#' calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
+#' # change the False Discovery Rate threshold
+#' calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
+#' # can also return all the columns of data for the significant windows. 
+#' # using `contrasts = "first"` will only make the first possible contrast on the tumour column.
+#' calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
 calculateDMRs <- function(qseaSet,
                           variable = NULL,
                           covariates = NULL,

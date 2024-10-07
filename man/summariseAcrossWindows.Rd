@@ -19,7 +19,7 @@ summariseAcrossWindows(
 \arguments{
 \item{qseaSet}{The qseaSet object.}
 
-\item{regionsToOverlap}{A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
+\item{regionsToOverlap}{A GRanges object (or coercible dataframe) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
 
 \item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
 
@@ -36,8 +36,16 @@ summariseAcrossWindows(
 \item{fnName}{Name of the function. Should only be necessary to use if you are doing something unusual, otherwise detected automatically.}
 }
 \value{
-A table of data, one row per sample, with columns indicating the application of the summary statistic to the
+A table of data, one row per sample, with columns indicating the number of windows considered
+(which may be less for beta values due to application of NA values), the summary statistic and optionally the sampleTable columns.
 }
 \description{
 This function takes a qseaSet and calculates a summary statistic across the windows.
+}
+\examples{
+# median NRPM and beta values across all windows
+exampleTumourNormal \%>\% summariseAcrossWindows(fn = mean)
+# maximum NRPM across a smaller region of the genome
+rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
+exampleTumourNormal \%>\% summariseAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm")
 }

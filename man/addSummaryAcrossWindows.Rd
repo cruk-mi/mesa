@@ -35,3 +35,15 @@ A table of data, one row per sample, with columns indicating the application of 
 \description{
 This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.
 }
+\examples{
+# add to the sampleTable the median NRPM and beta values across all windows
+exampleTumourNormal \%>\% addSummaryAcrossWindows(fn = mean) \%>\% getSampleTable()
+# maximum NRPM across a smaller region of the genome
+rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
+exampleTumourNormal \%>\% addSummaryAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm") \%>\% getSampleTable()
+# can add a suffix and apply repeatedly with different windows
+exampleTumourNormal \%>\% 
+  addSummaryAcrossWindows(regionsToOverlap = rgns, fn = median, normMethod = "nrpm", suffix = "subset") \%>\% 
+  addSummaryAcrossWindows(fn = median, normMethod = "nrpm", suffix = "all") \%>\% 
+  getSampleTable()
+}

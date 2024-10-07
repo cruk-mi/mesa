@@ -254,7 +254,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel.")
   } else {
     BPPARAM = BiocParallel::SerialParam()
-    message("Scanning one file at a time. Use e.g. register(MulticoreParam(workers = 4)) to parallelise this process.")
+    message("Scanning one file at a time. Use e.g. setMesaParallel(nCores = 4) to parallelise this process.")
     }
 
   getCGPositions(qsea:::getGenome(qs), qs %>% qsea::getRegions()  %>%
@@ -315,11 +315,14 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 
 
 
-#' This function takes a qseaSet and adds several normalisation steps from qsea, with default values
-#' @param qseaSet The qseaSet object.
-#' @param enrichmentMethod What method to use to calculate the enrichment step
-#' @param maxPatternDensity Maximum pattern density in a window to consider it for the background calculation
-#' @return A qseaSet object with the
+#' This function takes a qseaSet and adds several normalisation steps from qsea, with default values.
+#' @param qseaSet A qseaSet object.
+#' @param enrichmentMethod What method to use to calculate the enrichment step. 
+#'   Currently implemented is the blind1-15, the blind calibration method detailed 
+#'   in the qsea paper of fitting of a straight line of decreasing expected average 
+#'   methylation levels from 76% at CpG_density = 1 to 25% at CpG_density = 15.
+#' @param maxPatternDensity Maximum pattern density in a window to consider it for the background calculation.
+#' @return A qseaSet object with normalisation steps added.
 #' @examples
 #' getExampleQseaSet(expSamplingDepth = 100000) %>% addNormalisation(maxPatternDensity = 0.5)
 #' @export
@@ -331,20 +334,28 @@ addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15", maxPattern
 
   qseaSet <- qsea::addOffset(qseaSet, enrichmentPattern = getPattern(qseaSet), maxPatternDensity = maxPatternDensity)
 
-  wd <- which(qsea::getRegions(qseaSet)$CpG_density >= 1 &
-                qsea::getRegions(qseaSet)$CpG_density <= 15)
-  signal <- (15 - qsea::getRegions(qseaSet)$CpG_density[wd])*.55/15 + .25
+  if(enrichmentMethod == "blind1-15") {
+    
+    wd <- which(qsea::getRegions(qseaSet)$CpG_density >= 1 &
+                  qsea::getRegions(qseaSet)$CpG_density <= 15)
+    signal <- (15 - qsea::getRegions(qseaSet)$CpG_density[wd])*.55/15 + .25
+  
+    qseaSet <- qsea::addEnrichmentParameters(qseaSet,
+                                             enrichmentPattern = getPattern(qseaSet),
+                                             windowIdx = wd,
+                                             signal = signal,
+                                             min_wd = 5,
+                                             bins = seq(.5,40.5,0.5)
+    )
+  
+    # store the enrichment method used
+    qseaSet@parameters$enrichmentMethod <- "blind1-15"
 
-  qseaSet <- qsea::addEnrichmentParameters(qseaSet,
-                                           enrichmentPattern = getPattern(qseaSet),
-                                           windowIdx = wd,
-                                           signal = signal,
-                                           min_wd = 5,
-                                           bins = seq(.5,40.5,0.5)
-  )
-
-  # store the enrichment method used
-  qseaSet@parameters$enrichmentMethod <- "blind1-15"
-
+  } else if (enrichmentMethod == "none") {
+    qseaSet@parameters$enrichmentMethod <- "none" 
+  } else {
+    stop(glue::glue("enrichmentMethod {enrichmentMethod} not implemented!"))
+  }
+    
   return(qseaSet)
 }

@@ -7,13 +7,22 @@
 \method{mutate}{qseaSet}(.data, ...)
 }
 \arguments{
-\item{.data}{A qseaSet to mutate}
+\item{.data}{A qseaSet to mutate the sampleTable of.}
 
-\item{...}{Other arguments to pass to dplyr::mutate}
+\item{...}{Other arguments to pass to dplyr::mutate. Note that you can't alter the sample_name column this way.}
 }
 \value{
 A qseaSet object with the sampleTable changed by a call to dplyr::mutate
 }
 \description{
 This function extends the dplyr function mutate to act on qseaSet sampleTable.
+}
+\examples{
+# add new logical column based on age
+exampleTumourNormal \%>\% mutate(over70 = (age > 70)) \%>\% getSampleTable()
+# change the gender column by replacing (note, better practice would be case_when or str_replace, 
+# this will replace with Male for everything that isn't exactly F)
+exampleTumourNormal \%>\% mutate(gender = ifelse(gender == "F", "Female","Male")) \%>\% getSampleTable()
+# change group by removing the number
+exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% getSampleTable()
 }

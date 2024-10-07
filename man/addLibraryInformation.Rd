@@ -16,5 +16,9 @@ A qseaSet object with the sampleTable enhanced with the information on number of
 This function takes a qseaSet and adds the information on the number of reads into the sampleTable for easier access.
 }
 \examples{
-addLibraryInformation(exampleTumourNormal)
+#original columns on the sampleTable
+colnames(getSampleTable(exampleTumourNormal))
+updated <- addLibraryInformation(exampleTumourNormal) 
+# now the qseaSet has additional columns from the libraries slot in the qseaSet
+colnames(getSampleTable(updated))
 }

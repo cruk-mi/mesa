@@ -21,7 +21,7 @@ getWindowAnnotation(
 \item{clusterRows}{Whether the rows are going to be clustered. If not, ensure the annotation is the correct order.}
 }
 \value{
-A data frame containing the annotation columns, ready for use in
+A data frame containing the annotation columns, ready for use in heatmap functions
 }
 \description{
 Note that windowAnnotation must be enclosed within double curly brackets when used.

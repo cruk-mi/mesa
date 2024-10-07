@@ -2,17 +2,20 @@
 % Please edit documentation in R/qseaExtra.R
 \name{calculateFractionReadsInGRanges}
 \alias{calculateFractionReadsInGRanges}
-\title{This function calculates the fraction of reads in a qseaSet object which are present in a GRanges object}
+\title{This function calculates the fraction of total reads in a qseaSet object which are present in a GRanges object}
 \usage{
-calculateFractionReadsInGRanges(qseaSet, windowsToConsider, numCountsNeeded)
+calculateFractionReadsInGRanges(qseaSet, regionsToOverlap, numCountsNeeded)
 }
 \arguments{
 \item{qseaSet}{A qseaSet}
 
-\item{windowsToConsider}{Which windows to consider, as a GRanges object}
+\item{regionsToOverlap}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
 
 \item{numCountsNeeded}{Minimum number of reads required to consider that window}
 }
+\value{
+Returns a data frame with a \code{fraction} column detailing the proportion of reads that overlap, as well as the sampleTable
+}
 \description{
-This function calculates the fraction of reads in a qseaSet object which are present in a GRanges object
+This function calculates the fraction of total reads in a qseaSet object which are present in a GRanges object
 }

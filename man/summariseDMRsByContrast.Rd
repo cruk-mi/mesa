@@ -25,3 +25,8 @@ summariseDMRsByContrast(
 This function summarises the number of windows called as up/down in each comparison in a .
 Internally transforms the data to a long format. Contrasts with no significant windows will be dropped!
 }
+\examples{
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all") \%>\%
+  summariseDMRsByContrast()
+}

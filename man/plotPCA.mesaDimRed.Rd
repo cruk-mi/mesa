@@ -67,3 +67,6 @@ A list of ggplot objects: one for each combination of \code{object@res}, \code{c
 \description{
 This function takes the \code{mesaDimRed} object output of \code{\link[=getPCA]{getPCA()}} and produces plots.
 }
+\examples{
+exampleTumourNormal \%>\% getPCA() \%>\% plotPCA()
+}

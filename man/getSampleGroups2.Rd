@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getSampleGroups2}
 \alias{getSampleGroups2}
-\title{This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting}
+\title{This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.}
 \usage{
 getSampleGroups2(qseaSet)
 }
@@ -13,5 +13,8 @@ getSampleGroups2(qseaSet)
 A named list, where each element contains the vector of sample_names that are in that group.
 }
 \description{
-This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting
+This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.
+}
+\examples{
+exampleTumourNormal \%>\% mesa:::getSampleGroups2()
 }

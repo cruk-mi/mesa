@@ -21,3 +21,6 @@ A vector the same size as the number of samples in the qseaSet.
 \description{
 This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.
 }
+\examples{
+exampleTumourNormal \%>\% pull(tumour)
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/buildQset.R
 \name{addNormalisation}
 \alias{addNormalisation}
-\title{This function takes a qseaSet and adds several normalisation steps from qsea, with default values}
+\title{This function takes a qseaSet and adds several normalisation steps from qsea, with default values.}
 \usage{
 addNormalisation(
   qseaSet,
@@ -11,17 +11,20 @@ addNormalisation(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A qseaSet object.}
 
-\item{enrichmentMethod}{What method to use to calculate the enrichment step}
+\item{enrichmentMethod}{What method to use to calculate the enrichment step.
+Currently implemented is the blind1-15, the blind calibration method detailed
+in the qsea paper of fitting of a straight line of decreasing expected average
+methylation levels from 76\% at CpG_density = 1 to 25\% at CpG_density = 15.}
 
-\item{maxPatternDensity}{Maximum pattern density in a window to consider it for the background calculation}
+\item{maxPatternDensity}{Maximum pattern density in a window to consider it for the background calculation.}
 }
 \value{
-A qseaSet object with the
+A qseaSet object with normalisation steps added.
 }
 \description{
-This function takes a qseaSet and adds several normalisation steps from qsea, with default values
+This function takes a qseaSet and adds several normalisation steps from qsea, with default values.
 }
 \examples{
 getExampleQseaSet(expSamplingDepth = 100000) \%>\% addNormalisation(maxPatternDensity = 0.5)

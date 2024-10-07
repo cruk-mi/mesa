@@ -6,6 +6,14 @@
 #' @param .preserve Not implemented as grouping is not available  for qseaSet
 #' @return A qseaSet object, with only samples that are selected by the filtering operation.
 #' @export
+#' @examples
+#' exampleTumourNormal %>% filter(tissue == "Colon")
+#' exampleTumourNormal %>% filter(stringr::str_detect(sample_name, "Colon"))
+#' exampleTumourNormal %>% filter(tumour != "Normal")
+#' exampleTumourNormal %>% filter(stringr::str_detect(sample_name, "Lung"), tumour != "Normal")
+#' #note a message is given if no samples remain, but not an error or warning
+#' exampleTumourNormal %>% filter(tissue == "Liver")
+#' 
 filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 
   namesToKeep <- .data %>%
@@ -21,10 +29,18 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 #' This function extends the dplyr function mutate to act on qseaSet sampleTable.
 #' @method mutate qseaSet
 #' @importFrom dplyr mutate
-#' @param .data A qseaSet to mutate
-#' @param ... Other arguments to pass to dplyr::mutate
+#' @param .data A qseaSet to mutate the sampleTable of.
+#' @param ... Other arguments to pass to dplyr::mutate. Note that you can't alter the sample_name column this way.
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::mutate
 #' @export
+#' @examples
+#' # add new logical column based on age
+#' exampleTumourNormal %>% mutate(over70 = (age > 70)) %>% getSampleTable()
+#' # change the gender column by replacing (note, better practice would be case_when or str_replace, 
+#' # this will replace with Male for everything that isn't exactly F)
+#' exampleTumourNormal %>% mutate(gender = ifelse(gender == "F", "Female","Male")) %>% getSampleTable()
+#' # change group by removing the number
+#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% getSampleTable()
 mutate.qseaSet <- function(.data, ...){
 
    newTable <- .data %>%
@@ -60,6 +76,10 @@ mutate.qseaSet <- function(.data, ...){
 #' @param keep Should the join keys from both x and y be preserved in the output?
 #' @return A qseaSet object with the sampleTable changed by a call to dplyr::left_join
 #' @export
+#' @examples
+#' newData <- tibble(patient = c("Colon1","Colon2","Lung1","Lung3"), new = 1:4)
+#' exampleTumourNormal %>% left_join(newData) %>% getSampleTable()
+#' 
 left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y"), keep = NULL, ...){
 
   x@sampleTable <- x %>%
@@ -75,9 +95,21 @@ left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y
 #' @importFrom dplyr select
 #' @param .data A qseaSet to select columns of the sampleTable from
 #' @param ... Other arguments to pass to dplyr::select
-#' @return A qseaSet object with the sampleTable changed by a call to dplyr::select
+#' @return A qseaSet object with the sampleTable changed by a call to dplyr::select. 
+#'   The sample_name and group columns will always be returned.
 #' @export select.qseaSet
 #' @export
+#' @examples
+#' # select only a few columns, note that sample_name and group are always kept
+#' # note here we use the `dplyr::` prefix, to ensure that `AnnotationDbi::select` isn't called. 
+#' exampleTumourNormal %>% dplyr::select(type, tumour) %>% getSampleTable()
+#' # select and rename a column
+#' exampleTumourNormal %>% dplyr::select(age, tumour_new = tumour) %>% getSampleTable()
+#' # you can use tidyselect helper functions
+#' exampleTumourNormal %>% dplyr::select(matches("s")) %>% getSampleTable()
+#' # negative selection also works, but not for `sample_name` and `group`:
+#' exampleTumourNormal %>% dplyr::select(-matches("s")) %>% getSampleTable()
+
 select.qseaSet <- function(.data, ...){selectQset(.data, ...)}
 
 #' This function takes a qseaSet and selects columns from its sampleTable based on a call to dplyr::select
@@ -109,6 +141,8 @@ selectQset <- function(qseaSet, ...){
 #' @return A vector the same size as the number of samples in the qseaSet.
 #' @export pull.qseaSet
 #' @export
+#' @examples 
+#' exampleTumourNormal %>% pull(tumour)
 pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
 
   .data <- .data %>% qsea::getSampleTable()
@@ -130,9 +164,10 @@ pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
 #' @param decreasing Whether to order the qseaSet in reverse alphabetical order
 #' @param ... Other arguments to pass to gtools::mixedsort
 #' @return A qseaSet with the sample names reordered alphabetically
-#' #' @examples
-#' sort(exampleTumourNormal, decreasing = TRUE)
 #' @export
+#' @examples
+#' sort(exampleTumourNormal, decreasing = TRUE)
+
 sort.qseaSet <- function(x, decreasing = FALSE, ...){
 
   x %>%
@@ -146,6 +181,9 @@ sort.qseaSet <- function(x, decreasing = FALSE, ...){
 #' @param ... Additional arguments to be used to filter the regions ONLY, as if they were a data frame.
 #' @return A qseaSet object, with the regions filtered appropriately.
 #' @export
+#' @examples
+#' exampleTumourNormal %>% filterWindows(start <= 25020000)
+#' exampleTumourNormal %>% filterWindows(CpG_density > 10)
 filterWindows <- function(qseaSet, ...){
 
   reducedRegions <- qseaSet %>%
@@ -169,6 +207,10 @@ filterWindows <- function(qseaSet, ...){
 #' @return A qseaSet with the sample names reordered according to a column of the sampleTable.
 #' @export arrange.qseaSet
 #' @export
+#' @examples
+#' exampleTumourNormal %>% arrange(tissue)
+#' exampleTumourNormal %>% arrange(desc(tissue), tumour)
+#' 
 arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
 
   sampleOrder <- .data %>%
@@ -181,11 +223,3 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
     return()
 
   }
-
-#' This function extends the base function length to return the number of samples in the qseaSet
-#' @method colnames qseaSet
-#' @param qseaSet A qseaSet to return the number of samples in
-#' @return The number of samples in the qseaSet
-#' @export colnames.qseaSet
-#' @export
-colnames.qseaSet <- function(qseaSet){colnames(qsea::getSampleTable(qseaSet))}

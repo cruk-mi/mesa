@@ -1,0 +1,174 @@
+---
+title: "Generating qseaSets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generating qseaSets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mesa)
+library(stringr)
+library(tibble)
+```
+
+# Introduction
+In this vignette we cover the generation of a qseaSet using the functions provided in `mesa`, rather than those in `qsea`. Please see the [`qsea` tutorial](https://bioconductor.org/packages/devel/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html) for more detail, but we will cover much of that here.
+
+## Sample Metadata 
+The first thing to prepare is the `sampleTable`; a dataframe containing metadata for the samples used in the package. This has three required columns:
+
+* `sample_name` : a name for each sample, which must be unique. This is the primary identifier used to describe each sample, so it is good to be descriptive.
+* `group` : a column to specify a group for each sample, for use inside certain functions for averaging over samples of the same type. We suggest only using this for replicates of the same (or very similar) samples, and adding extra columns for other comparisons that may be of interest.
+* `file_name` : A path to a bam file, containing the aligned, deduplicated, reads mapped to the relevant reference genome, from material which has undergone the methylation enrichment/capture process (e.g. MEDIP-seq or MBD-seq). Ideally `samtools fixmate` has been ran to supply mate information onto the read tags, but filtering for quality is not required.
+
+There are also two more optional fields that may be used during generation:
+
+* `input_file` : This is a path to an additional bam file containing aligned, deduplicated reads for material from the same sample, without performing enrichment. This is whole genome sequencing, but may be sequenced at a much lower depth (e.g. ultra-shallow WGS, ~1-2 million fragments is sufficient for calling copy number variation at a window size of 1Mb). If present, this will be used on a sample-by-sample basis to calculate copy number variation, at a chromosome scale, in order to correct for this in the expected read depths. This is most relevant when studying cancer, as particular cancers often show recurrent patterns of copy number changes. Note that below ~0.5 million fragments the calculated copy number patterns will become especially noisy (for human samples).
+
+* `gender` or `sex` : If one of these columns are included, then any chromosome called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for samples with `M`, `m` or `male` in this column. See the [qsea code for details](https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54); within the National Biomarker Centre we only consider the autosomes.
+
+In addition, any further metadata columns may be included as required, and we recommend that anything you might want to query or compare the data on is included here. This includes experimental conditions (tissue, treatment, tumour status) etc.
+
+One thing to note is that we highly recommend the use of the tool such as [NGSCheckMate](https://github.com/parklab/NGSCheckMate) for verifying that (human) samples come from the same individual or not. This is useful both for ensuring that the enriched and non-enriched samples do indeed come from the same individual, but also to check that paired samples are actually paired (for instance when comparing pre- and post-treatment).
+
+For the example here, we use the example data in the `MEDIPSData` package. This contains pairs of tumour and normal tissue from the same patients, with MEDIP-seq performed as the enrichment step. These bam files are downsampled to only contain chromosomes 20-22, and are aligned to hg19. 
+Note, we highly recommend using the hg38/GRCh38 reference genome rather than hg19 as used here!
+
+```{r, eval = requireNamespace("MEDIPSData")}
+sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
+    "Normal1", "Normal1", "Normal", "Patient1", system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    "Normal2", "Normal1", "Normal", "Patient2", system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    "Tumour1", "Tumour1", "Tumour", "Patient1", system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    "Tumour2", "Tumour2", "Tumour", "Patient2", system.file("extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)
+    )
+```
+
+## Making a qseaSet
+The `qsea` tutorial details the steps involved in generating a `qseaSet`. 
+We provide a function, `makeQset`, which wraps these up into one function, although you may still use the rest of the `mesa` functionality with or without using this to create your `qseaSet`.
+
+Before creating the `qseaSet`, you need to have:
+
+* The `sampleTable` of metadata, including the file paths to the bam files.
+* The genome to which the bam files have been mapped, and the corresponding `BSgenome` package name, and the package to be installed. You can check what BSgenome packages are available on BioConductor via `BSgenome::available.genomes()`, or make your own if necessary (`vignette("BSgenomeForge", package = "BSgenome")`).
+* Whether the aligned reads are paired-end sequencing or not. If single-end sequencing has been used, you need to know the expected DNA fragment length from an experimental measurement, to extend all the reads to this length.
+* An expected fragment length and SD of your DNA fragment size distribution. There are a range of tools that can be used to visualise this on your bam files, for instance [QualiMap](http://qualimap.conesalab.org/), but a rough ballpark should also be experimentally known based on how the DNA material has been processed for sequencing. 
+* What window size to use. In making a `qseaSet`, the genome is split into fixed windows with equal size, and all analysis is performed on these windows as independent units. We generally use 300bp windows, as that is a little bigger than our average DNA fragment sizes, which are in the 150-250bp range. If the DNA is particularly long fragments, a larger window size may make sense. This should also be informed by your depth of sequencing, as a smaller window size will be more prone to noise. 
+
+For our hg19 example data, we set `BSgenome = "BSgenome.Hsapiens.UCSC.hg19"`, specify the three chromosomes included in the test dataset and give some approximate fragment length and SD values.
+
+```{r, eval = requireNamespace("BSgenome.Hsapiens.UCSC.hg19")}
+makeQset(sampleTable,
+   BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+   chrSelect = paste0("chr",20:22),
+   windowSize = 300,
+   fragmentLength = 200,
+   fragmentSD = 50,
+   CNVmethod = "none")
+```
+
+A range of messages are produced as output during this process. One thing to note is that by default the process is performed without parallelisation, this can be controlled via the `setMesaParallel` function and will vastly speed up the process when multiple cores are available (but use more RAM). 
+
+This function combines several steps:
+
+* Creating the windows to consider, controlled by the `BSgenome`, `chrSelect`, `windowSize` and `badRegions` parameters.
+* Adding the coverage on the methylation enriched regions, including calculating global enrichment parameters.
+* Calculating copy number variation over the non-enriched ("Input") sample, if such bam files are provided, including calculating global enrichment parameters.
+* Calculate the average CG density of each window, using the `fragmentLength` and `fragmentSD` parameters to define the expected contribution of fragments to the likelihood that they overlap the window (see the Calculating CpG Density section below). 
+* Calculate the background noise, by looking at how many reads lie within genomic windows with very low density of CGs. 
+* Fit the curve that enables the estimation of "beta values", on a sample by sample basis.
+
+## Selecting the windows
+
+The chosen chromosomes (via `chrSelect`) of the `BSgenome` object will be tiled in `windowSize` windows. These can be filtered for regions which have poor mappability or are overrepresented in non-enriched sequencing, by providing a GRanges object to the `badRegions` option. If provided, this will remove any window which overlaps with the GRanges object; ensuring that the windows remain fixed when this filtering is changed. The 2019 ENCODE exclusion regions are provided as an data object called `ENCODEbadRegions`.
+
+## Coverage-related options
+By default, the coverage is calculated using a custom method called `coverageMethod = PairedAndR1s`. This assumes paired-end sequencing, and will first take all the (high quality) paired-end reads within the bam file, then it will take (high quality) first reads (R1s) whose mate (R2) did not map and extend them to the average fragment size of the paired-end reads. Here, high quality means the MAPQ value is above `minMapQual`, although for paired ends we accept pairs where at least one end has a MAPQ above this value. 
+
+There are a number of options for controlling this process:
+
+* `properPairsOnly` - when set to TRUE, only the proper pairs will be included, not the R1s without a mapped mate.
+* `minInsertSize` and `maxInsertSize` control the size distribution of DNA fragments to be included. This enables filtering out of very short fragments, which may be noisy, extremely long fragments, which are likely to be assigned to the wrong bin, and also the prospect of performing in silico size selection, for instance to enrich cell-free DNA for short fragments which are known to be more likely to come from the tumour.
+* `minReferenceLength` - this parameter controls the minimum distance along the reference genome which a fragment must cover to be considered. This helps filter out some R1s which have only a small portion of the read mapped correctly, and may help with regions with strange artifactual binding (e.g. large insertions), but I don't think it will make much difference if any if `properPairs = TRUE`.
+
+As part of this process, a number of extra variables are added to the `libraries` slot in the `qseaSet`; here we will explain what these are. If `properPairs = TRUE`, the `r1` columns will not be present. 
+
+The filtering that is undertaken is as follows, if `properPairs = TRUE`:
+
+* All the reads in the bam file are loaded into R using `Rsamtools`. This is given by `qsea_initial_reads`. 
+* The number of "properly paired" reads, including "rescued pairs" (see note below) is given by `qsea_initial_pairs`; all other reads are discarded.
+* For each read pair, it is retained if at least one half of the pair has a mapping quality score (MAPQ) above the `minMapQual` threshold. This therefore allows properly paired reads where one end is multi-mapping. This step is reliant on the presence of the `MQ` tags on the bam file, which are added using the tool `samtools fixmate` during bam file generation. This will be stored as `qsea_mapq_filtered_pairs`.
+* For each read pair, it is retained if the insert size (the calculated end-to-end fragment distance from the aligner) is within `minInsertSize` and `maxInsertSize`; this number is then stored as `qsea_size_filtered_pairs`. This is also stored as `total_fragments` (used in `qsea`).
+* These fragments are overlapped with the generated genomic windows, generated using the chromosomes specified in `chrSelect` with the regions in `badRegions` removed, to give the `valid_fragments`. This is the final number of fragments of DNA that lie within the windows under consideration.
+
+When `properPairs = FALSE`, the first read will be retained from any read pair that is not considered "properly paired"; alongside any R1s whose mate did not match or has been otherwise filtered out. The rescuing process for proper pairs will not be performed (and they will be kept as singleton R1s), and these R1s will be filtered for MAPQ and presence in the windows only. There will be additional columns `qsea_initial_r1s` and `qsea_filtered_r1s`, while `total_fragments` and `valid_fragments` will include both types of fragment.
+
+Note that this method `coverageMethod = "PairedAndR1s"` option does use more RAM than using the `qsea` method. This can be set via `coverageMethod = "qseaPaired"`; single ended reads are not currently supported.
+
+### Note on Proper Pairs
+"Proper pairs", as determined by the `bwa mem` aligner at any rate, are paired-end sequencing reads where both ends have mapped sufficiently near to each other, and they point towards each other on opposite strands of the chromosome. However, it should be noted that how near is near enough to be called as proper pairs is calculated within `bwa mem` on an individual sample basis. This allowable distance is calculated by determining the mean and standard deviation of the fragment length amongst the mapped reads in that sample, with a cutoff of X standard deviations away from the mean. In general, for sheared genomic DNA this is not a big issue, because the distribution is sufficiently broad that the standard deviation is large enough. However, for circulating cell-free DNA, the distribution of fragment sizes has a very sharp peak at ~167bp, and hence the global fragment standard deviation is quite low. This can lead to read pairs of length ~400bp which otherwise look like they should be "proper pairs" not being called as such by the aligner. We therefore perform a rescuing process, to ensure that we keep these read pairs by finding read pairs that meet the orientation conditions for being proper pairs, but are within `minInsertSize` to `maxInsertSize` in length. This process is computationally expensive, so we only perform it when `properPairs = TRUE`.
+
+## Copy Number Variation
+
+The copy number variation is calculated over a set of larger genomic windows as set by `CNVwindowSize`; this is typically much larger than the `windowSize` due to coverage limitations. This will be performed using the same options as the enriched samples.
+Once the coverage is determined, the R package `HMMcopy` will be used, with default parameters, to calculate the copy number variation. The non-enriched (also known as "Input") bam files should be specified by adding a column called `input_file` to the `sampleTable`. To use this you need to provide `HMMcopy` with a pair of data frames containing the GC content and mapability per region you wish to calculate over, as detailed in `vignette("HMMcopy", package = "HMMcopy")`. There is an exception if you are using the human genome `hg38` (or `GRCh38`), in which case files are provided for window sizes of `50kb`, `500kb` or `1000kb`. These are stored in objects called e.g. `gc_hg38_1000kb` and `map_hg38_1000kb`; similar objects need to be generated for other genomes or window sizes using the tools `gcCounter` or `mapCounter` from the [`hmmCopy` suite](https://github.com/shahcompbio/hmmcopy_utils).
+
+Alternatively, copy number variation may be calculated using an external method, for instance using the [`ichorCNA` package](https://github.com/GavinHaLab/ichorCNA). This may then be added to the qseaSet object using the `qsea` function `addCNV`.
+
+As a further option, `qsea` provides a method for determining the copy number from the methylation enriched samples, using only reads which do not contain a CG, this may be selected using `CNVmethod = "MeCap"`. We do note that for our MBD-seq experiments we found there was reasonable overall agreement, but this method did give spurious CNV compared to the non-enriched reads, although that may be due to the selectivity of our MBD-seq enrichment step being relatively high.
+
+No copy number variation will be calculated if `CNVmethod = "none"`.
+
+## Calculating CpG Density
+One essential part of the `qseaSet` is the `CpG_density` for each region. This is calculated using the genome sequence, alongside an expected fragment size distribution via the `qsea` function `qsea:::estimatePatternDensity()`. 
+
+This process works by first locating all `CG` dinucleotides across the genome, before modelling a distribution around each, representing the likelihood for a fragment including that dinucleotide to reach adjacent positions. This distribution is assumed to be normally distributed, with a mean and standard deviation. Thus each `CG` implies a possibility to impact upon the adjacent base pairs in its surroundings. Finally, these values are averaged across the windows to give a `CpG_density` column on the regions of the `qseaSet`. This method is designed to capture the fact that some captured fragments of DNA may be heavily methylated on one end of the fragment, but if the fragment is long it may be counted in an adjacent window.
+
+This calculation therefore requires the `fragmentLength` and `fragmentSD` parameters to be specified, to define these normal distributions, and is associated with the whole `qseaSet`. This is therefore not sample dependent, and so if samples have vastly different fragment distributions then there will be some expected variation not captured in this process. This does have a significant effect on the calculated beta values for each sample, so it is important to set the `fragmentLength` and `fragmentSD` values in an appropriate way. We also provide a `fragmentType` option, which hardcodes these two parameters to values developed on our initial Sheared or cfDNA datasets. When `fragmentType = "Sheared"` is used this sets `fragmentLength = 213, fragmentSD = 60`, while `fragmentType = "cfDNA"` sets `fragmentLength = 167, fragmentSD = 38`, but we do emphasise that you should check your own data.
+
+Please note that these `fragmentLength` and `fragmentSD` parameters are only used for calculating this CG density metric, they are not used to control what reads are included in the coverage calculations.
+
+## Offset Reads
+In any ME-seq experiment, there will be off-target fragments sequenced due to the imperfect nature of the enrichment process. These are used to calculate the `offset`; a measure of the background level of fragments in windows that do not contain CGs. The maximum `CpG_density` value for these windows is controlled by `maxPatternDensity`. If this is set too low, then `qsea` will give a warning saying that the offset can not be calculated.
+
+## Beta Calculation Fitting
+Finally, the `qsea` beta value calculation is applied. This requires the `CpG_density` and the coverage, as well as some assumption on methylated regions or at least the expected number of them. The [qsea manuscript](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5389680/) details three methods for this assumption, two of which require external data in the form of methylation arrays or bisulphite/enzymatic sequencing. The third method, known as "blind calibration" in the qsea manuscript, is the only one implemented here. This works on a global assumption on the typical methylation levels across the human genome - that the majority of the isolated CGs are methylated while the majority of CpG islands are unmethylated. This blind calibration method therefore assumes that 76% of regions with a `CpG_density` of 1 are expected to be fully methylated ($\beta = 1$), while 25% of regions with a `CpG_density` of 15 are fully unmethylated ($\beta = 0$). A straight line is then fit between these two densities. This method is the only one implemented here, as it does not require additional data. 
+
+We have found this blind calibration sufficient for the human genome, including being able to build classifiers using methylation arrays as our data source.
+
+We do note that if you wish to use array data for normalisation, then [this Biostars post](https://support.bioconductor.org/p/9137187/) may be a good source of information, but we have only used the blind calibration.method. 
+
+## Note on TMM Normalisation
+One thing to note is that this function does not set the `library_factor` for the `qseaSet`, which suggested to be done in `qsea` via the Trimmed Means of M-values (TMM) method. The way `qsea` does this is to choose one sample (by default the first sample), and use this as the reference sample to calculating a scaling factor to adjust the total fragments by when calculating the NRPM (normalised reads per million) values.
+
+TMM normalisation is a method used in RNA-seq to compensate for genes which are excessively expressed in a particular condition. In RNA-seq, the distribution of read counts varies over ~4 orders of magnitude, with some highly expressed genes having tens of thousands of reads while others have tens or hundreds. 
+If in a particular tissue there are a group of genes which are extremely highly expressed that are not expressed in another tissue, then the total pool of available reads will be dominated by those genes in the first tissue, comparatively depressing the other genes. So just using the total size ends up biasing to these larger genes, and making it look like the other genes are lower expressed, ending up with many more differentially expressed genes that might be actually the case.
+
+e.g. if there are 100 reads in a sample, and 3 genes, with values:
+
+* Sample 1: (70,15,15)
+* Sample 2: (0,50,50)
+
+then we want to be careful not to call the last two genes as differentially expressed, when they are really just affected by the lack of gene A. One option could be to normalise with the median of the read distribution, although due to many genes being non-expressed this often is implemented as an upper quartile.
+
+TMM normalisation however takes the some subset of the "genes" (windows in our case), having trimmed off the very high/very low expressed "genes", to calculate this scaling factor for total number of fragments.
+
+However, we find that for methylation, after filtering for excluded regions, extremely few windows in any sample have more than 100 reads. So the distribution of read counts is only actually between 0-100ish, making the main necessity for TMM normalisation rather unnecessary here. 
+
+There are a couple of reasons why we therefore choose not to apply TMM:
+
+* When using beta values (including the normalisation adjustment inside the `calculateDMRs` calculation), there is no effect of the `library_factor`, as it is normalised out in the beta value fitting process.
+* The values that we get for the TMM normalisation are typically relatively close to 1, so we don't find it has a big effect on the NRPM values.
+* The TMM normalisation requires a sample to be set as the reference sample; the other samples are normalised against this one in a combined manner (at least in the current implementation in `qsea`. This therefore means that the normalisation of all the samples depends on which other samples they were normalised with, meaning that comparing between batches would need renormalising every time. This would also mean that filtering samples pre- or post-normalisation would give different results.
+
+However, we note that these considerations might not apply for everyone; the `qsea::addLibraryFactors()` function may be used to apply this normalisation if required.
+

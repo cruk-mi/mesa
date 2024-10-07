@@ -26,3 +26,6 @@ A heatmap with the calculated number of chromosomes for each samples
 \description{
 This function takes a qseaSet and plots a heatmap of the calculated CNV
 }
+\examples{
+exampleTumourNormal \%>\% plotCNVheatmap(sampleAnnotation = c(tumour,type))
+}

@@ -15,3 +15,7 @@ A qseaSet with the CNV data removed
 \description{
 This function takes a qseaSet and removes the CNV data.
 }
+\examples{
+new <- exampleTumourNormal \%>\% removeCNV()
+new \%>\% getCNV() \%>\% head()
+}
