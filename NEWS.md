@@ -12,6 +12,9 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 
+### BUG FIXES
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
