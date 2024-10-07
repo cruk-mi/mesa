@@ -24,6 +24,9 @@ editor_options:
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
 * Removed `colnames` function definion on a qseaSet, which was not working anyway.
 
+### BUG FIXES
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
