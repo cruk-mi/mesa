@@ -134,3 +134,8 @@ asValidGranges <- function(object){
   stop("Object can not be coerced to a GRanges object")
 
 }
+
+#' This function captures a printed form of the object x, for use in error messages
+#' Taken from https://stackoverflow.com/a/26083626 by Richie Cotton
+#' @param x An object to capture
+print_and_capture <- function(x) {paste(capture.output(print(x)), collapse = "\n") }

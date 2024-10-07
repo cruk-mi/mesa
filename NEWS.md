@@ -10,6 +10,7 @@ editor_options:
 * Converted `plotPCA` into a method for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
+* Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 
 ### BUG FIXES
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).

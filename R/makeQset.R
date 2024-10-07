@@ -222,12 +222,38 @@ makeQset <- function(sampleTable,
 
     }
 
-      if (is.null(hmmCopyGC)) {
+    if (is.null(hmmCopyGC)) {
       stop("No hmmCopy GC content object provided!")
+      } else {
+        requiredColumns <- c("chr","start","end","gc")
+        columnDiff <- setdiff(colnames(hmmCopyGC), requiredColumns)
+      if(length(columnDiff) > 0) {
+        stop(glue::glue("hmmCopyGC object missing required columns: {paste(columnDiff, collapse = ' ')}"))
+      } 
+      objectWindowSize <- hmmCopyGC %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
+      
+      if(length(objectWindowSize) != 1) {
+        stop(glue::glue("hmmCopyGC object should have constant window size for all windows."))
+      } else if (objectWindowSize != CNVwindowSize) {
+        stop(glue::glue("hmmCopyGC object window size should be the same as the CNVwindowSize."))
+      }
     }
 
     if (is.null(hmmCopyMap)) {
       stop("No hmmCopy Mapability file provided!")
+    } else {
+      requiredColumns <- c("chr","start","end","map")
+      columnDiff <- setdiff(colnames(hmmCopyMap), requiredColumns)
+      if(length(columnDiff) > 0) {
+        stop(glue::glue("hmmCopyMap object missing required columns: {paste(columnDiff, collapse = ' ')}"))
+      } 
+      objectWindowSize <- hmmCopyMap %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
+      
+      if(length(objectWindowSize) != 1) {
+        stop(glue::glue("hmmCopyMap object should have constant window size for all windows."))
+      } else if (objectWindowSize != CNVwindowSize) {
+        stop(glue::glue("hmmCopyMap object window size should be the same as the CNVwindowSize."))
+      }
     }
 
     # use HMMCopy directly, with default settings
