@@ -355,6 +355,17 @@ renameSamples <- function(qseaSet, newNameColumn){
     stop(glue::glue("NAs present in the new sample name column"))
   }
 
+  asValidNames <- base::make.names(renamedNames)
+  
+  if(any(asValidNames != renamedNames)){
+    stop(glue::glue("Sample names must be valid names for columns in R without quoting.
+  See the help for base::make.names, but generally use only letters, numbers, 
+  underscores and dots, and names can't start with a number. 
+  Issues were found with: 
+    {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
+   "))
+  }
+  
   if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
     message("Renaming had no effect!")
     return(qseaSet)

@@ -11,8 +11,10 @@ editor_options:
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
 
+
 ### BUG FIXES
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
 
 # mesa 0.5.1
 
