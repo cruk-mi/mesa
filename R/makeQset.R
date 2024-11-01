@@ -1,6 +1,6 @@
 #' Make the initial qseaSet object from a set of samples
 #'
-#' This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata
+#' This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata. 
 #'
 #' @param sampleTable A data frame with the sample information to be passed to qsea.
 #' @param BSgenome A BSgenome string. See BSgenome::available.genomes() for options.
@@ -10,13 +10,13 @@
 #' @param fragmentLength Average DNA fragment length. Can be set by fragmentType.
 #' @param fragmentSD Standard deviation of the DNA fragment lengths. Can be set by fragmentType.
 #' @param CNVwindowSize What window size (in bp) to use in the calculation of CNV (default 1000000).
-#' @param CNVmethod Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None"
-#' @param coverageMethod Whether to use custom methtools method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).
-#' @param minMapQual Minimum MAPQ score for a read to be kept. For PairedAndR1s, will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).
-#' @param minInsertSize For paired reads, only keep them if they are above a minimum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.
-#' @param maxInsertSize For paired reads, only keep them if they are below a maximum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.
-#' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.
-#' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
+#' @param CNVmethod Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None".
+#' @param coverageMethod Whether to use custom method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).
+#' @param minMapQual Minimum MAPQ score for a read to be kept. For coverageMethod = "PairedAndR1s", will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).
+#' @param minInsertSize For paired reads, only keep them if they are above a minimum length. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.
+#' @param maxInsertSize For paired reads, only keep them if they are below a maximum length. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.
+#' @param properPairsOnly Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.
+#' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.
 #' @param badRegions A GRanges object containing regions to filter out from the result.
 #' @param hmmCopyGC A data frame containing GC content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
 #' @param hmmCopyMap A data frame containing Mapability content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
@@ -131,6 +131,12 @@ makeQset <- function(sampleTable,
                                  chr.select = chrSelect,
                                  Regions = windowsWithoutBlacklist,
                                  window_size = windowSize)
+
+  if(any(genome(getRegions(qseaSet)) != BSgenome)) {
+    regions <- qseaSet %>% getRegions() 
+    genome(regions) <- BSgenome
+    qseaSet@regions <- regions
+  }
 
   # store the extra blacklist file location
   #qseaSet@parameters$badRegions2 <- blacklistBed
@@ -249,12 +255,13 @@ makeQset <- function(sampleTable,
     qseaSet <- qsea::addCNV(qseaSet,
                             file_name = "file_name",
                             window_size = CNVwindowSize,
-                            paired = FALSE,
+                            fragment_length = fragmentLength,
+                            paired = TRUE,
                             parallel = parallel,
                             MeDIP = TRUE
     )
 
-    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
+    #qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
 
 
   } else if (CNVmethod == "None") {
