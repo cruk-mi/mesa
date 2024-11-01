@@ -6,7 +6,7 @@ This includes both MEDIP-Seq (Methylated DNA immunoprecipitation sequencing) or 
 
 This package builds off the [qsea package](https://github.com/MatthiasLienhard/qsea), using the `qseaSet` object type defined in that package as the object that holds the data. One of the most useful features of the package is in defining tidyverse verbs to act on a qseaSet, such as `filter`, `mutate` and `select`, but there also includes a range of functionality for other tasks, such as plotting and quality control.
 
-This package has been used in a Nature Cancer paper, [cfDNA methylome profiling for detection and subtyping of small cell lung cancers] [https://www.nature.com/articles/s43018-022-00415-9), as well as an in [CUPiD: A cfDNA methylation-based tissue-of-origin classifier for Cancers of Unknown Primary](https://assets.researchsquare.com/files/rs-3758456/v1/6f505510-a351-49f3-bba4-882e111be410.pdf).
+This package has been used in two published papers, in [Nature Cancer](https://www.nature.com/articles/s43018-022-00415-9) and [Nature Communications](https://www.nature.com/articles/s41467-024-47195-7).
 
 Development was undertaken internally between September 2022 and March 2024; these commits are now incorporated into this repository. This has involved an extensive rewriting of the package functions, with many function names changing, see [the NEWS.md file for all the details](NEWS.md).
 
