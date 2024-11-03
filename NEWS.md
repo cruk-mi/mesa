@@ -12,8 +12,10 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
 
+
 ### BUG FIXES
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
 
 # mesa 0.5.1
 
