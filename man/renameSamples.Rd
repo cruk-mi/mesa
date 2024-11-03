@@ -19,6 +19,6 @@ This function takes a qseaSet and renames the samples based on a column of the s
 }
 \examples{
 exampleTumourNormal \%>\%
-mutate(newName = paste("Sample",1:10)) \%>\%
+mutate(newName = paste0("Sample",1:10)) \%>\%
 renameSamples(newNameColumn = 'newName')
 }
