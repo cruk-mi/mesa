@@ -81,7 +81,17 @@ makeQset <- function(sampleTable,
     stop("Required column group included in the sampleTable.")
   }
 
-
+  asValidNames <- base::make.names(sampleTable$sample_name)
+  
+  if(any(asValidNames != sampleTable$sample_name)){
+    stop(glue::glue("sample_name column must be valid names for columns in R without quoting.
+  See the help for base::make.names, but generally use only letters, numbers, 
+  underscores and dots, and names can't start with a number. 
+  Issues were found with: 
+    {paste(sampleTable$sample_name[sampleTable$sample_name != asValidNames], collapse = '\n    ')}
+   "))
+  }
+  
   if(!all(file.exists(sampleTable$file_name))){
     stop(glue::glue(" MeCap file not found for: {dplyr::filter(sampleTable,!file.exists(file_name)) %>% dplyr::pull(sample_name)}. "))
   }
