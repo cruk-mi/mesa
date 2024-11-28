@@ -31,7 +31,7 @@ makeQset(
 
 \item{BSgenome}{A BSgenome string. See BSgenome::available.genomes() for options.}
 
-\item{chrSelect}{Which chromosomes to use (default 1:22).}
+\item{chrSelect}{Which chromosomes to use.}
 
 \item{windowSize}{What window size (in bp) to use in the genome (default 300).}
 
@@ -43,7 +43,7 @@ makeQset(
 
 \item{fragmentSD}{Standard deviation of the DNA fragment lengths. Can be set by fragmentType.}
 
-\item{CNVmethod}{Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None".}
+\item{CNVmethod}{Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters), "MeCap" (a \code{qsea} method that uses off-target reads from the MeCap samples to estimate copy number) and "None".}
 
 \item{coverageMethod}{Whether to use custom method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).}
 
