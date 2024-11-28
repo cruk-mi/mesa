@@ -6,8 +6,8 @@
 \usage{
 makeQset(
   sampleTable,
-  BSgenome = NULL,
-  chrSelect = 1:22,
+  BSgenome,
+  chrSelect,
   windowSize = 300,
   CNVwindowSize = 1e+06,
   fragmentType = NULL,

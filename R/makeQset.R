@@ -24,8 +24,8 @@
 #' @return A qseaSet object, containing all the information required.
 #' @export
 makeQset <- function(sampleTable,
-                     BSgenome = NULL,
-                     chrSelect = 1:22,
+                     BSgenome,
+                     chrSelect,
                      windowSize = 300,
                      CNVwindowSize = 1000000,
                      fragmentType = NULL,
@@ -42,7 +42,7 @@ makeQset <- function(sampleTable,
                      hmmCopyGC = NULL,
                      hmmCopyMap = NULL,
                      parallel = getMesaParallel()) {
-
+  
   if(parallel) {
     if(BiocParallel::bpworkers() == 1){
       message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
@@ -69,6 +69,10 @@ makeQset <- function(sampleTable,
     stop("fragmentLength and fragmentSD must be specified, or fragmentType can be specified for some defaults.")
   }
 
+  ## qsea can't handle a tibble, so convert to data frame
+  sampleTable <- sampleTable %>% 
+    as.data.frame()
+  
   if (!("sample_name" %in% colnames(sampleTable)))  {
     stop("Required column sample_name not included in the sampleTable.")
   }
@@ -112,19 +116,43 @@ makeQset <- function(sampleTable,
 
   # Get data from the BSgenome
   refGenome <- BSgenome::getBSgenome(BSgenome)
+  
+  # check that the chromosome names match the BS genome
+  bsNames <- GenomeInfoDb::seqnames(refGenome)
+  unknownChr <- setdiff(chrSelect, bsNames)
+  if (length(unknownChr) > 0) {
+    
+    if(stringr::str_detect(BSgenome,"UCSC") && all(stringr::str_detect(chrSelect,"chr", negate = TRUE))) {
+      stop(glue::glue("UCSC genome requires 'chr' prefixes which were not found. \\
+            Add these or consider swapping to a BSgenome without 'chr', \\
+            e.g. BSgenome.Hsapiens.NCBI.GRCh38"))
+    } 
+    
+    if(stringr::str_detect(BSgenome,"NCBI") && all(stringr::str_detect(chrSelect,"chr"))) {
+      stop(glue::glue("NCBI genome does not use 'chr' prefixes. \\
+            Remove these or consider swapping to e.g. BSgenome.Hsapiens.UCSC.hg38"))
+    }
+      
+    stop(glue::glue(
+    "Chromosomes provided not found in the given BSgenome! \\
+    Showing first errors out of {length(unknownChr)}:
+    {paste(head(unknownChr), collapse = '\n    ')}"
+    ))
+  }
+  
   # chromosome lengths, and then a Seqinfo object with that
-  chr_length <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
-  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chr_length, NA, BSgenome)
+  chrLength <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
+  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chrLength, NA, BSgenome)
 
   # number of windows of size windowSize on each chromosome
-  nr_wd <- floor(chr_length/windowSize)
+  numWindows <- floor(chrLength/windowSize)
 
   # starting point of each window on each chromosome, then make a GRanges object with all those windows
-  wd_start <- unlist(lapply(FUN = seq, X = chr_length - windowSize + 1,
+  windowStart <- unlist(lapply(FUN = seq, X = chrLength - windowSize + 1,
                             from = 1, by = windowSize), FALSE, FALSE)
 
-  windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), nr_wd),
-                                           ranges = IRanges::IRanges(start = wd_start,
+  windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), numWindows),
+                                           ranges = IRanges::IRanges(start = windowStart,
                                                                      width = windowSize),
                                            seqinfo = seqinfo)
 
@@ -142,9 +170,9 @@ makeQset <- function(sampleTable,
                                  Regions = windowsWithoutBlacklist,
                                  window_size = windowSize)
 
-  if(any(genome(getRegions(qseaSet)) != BSgenome)) {
-    regions <- qseaSet %>% getRegions() 
-    genome(regions) <- BSgenome
+  if(any(GenomeInfoDb::genome(qsea::getRegions(qseaSet)) != BSgenome)) {
+    regions <- qseaSet %>% qsea::getRegions() 
+    GenomeInfoDb::genome(regions) <- BSgenome
     qseaSet@regions <- regions
   }
 
