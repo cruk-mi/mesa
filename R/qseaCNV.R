@@ -37,7 +37,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   }
 
   if (is.null( hmmCopyMap)) {
-    stop("Mapability track for hmmcopy must be provided.")
+    stop("Mappability track for hmmcopy must be provided.")
   }
 
   hmmCopyGC <- asValidGranges(hmmCopyGC)
