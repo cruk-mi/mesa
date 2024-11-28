@@ -45,7 +45,7 @@ addHMMcopyCNV(
 
 \item{hmmCopyGC}{Object containing GC content per window in the genome, for hmmcopy}
 
-\item{hmmCopyMap}{Object containing mapability content per window in the genome, for hmmcopy}
+\item{hmmCopyMap}{Object containing mappability content per window in the genome, for hmmcopy}
 }
 \value{
 A qseaGLM object

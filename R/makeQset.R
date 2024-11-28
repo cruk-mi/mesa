@@ -19,7 +19,7 @@
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.
 #' @param badRegions A GRanges object containing regions to filter out from the result.
 #' @param hmmCopyGC A data frame containing GC content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
-#' @param hmmCopyMap A data frame containing Mapability content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
+#' @param hmmCopyMap A data frame containing mappability content per bin (each with size `CNVwindowSize`), only for use with hmmcopy.
 #' @param parallel Whether to read in files by using each core in parallel. Control number of calls by calling e.g. BiocParallel::register(BiocParallel::MulticoreParam(4)) beforehand.
 #' @return A qseaSet object, containing all the information required.
 #' @export
@@ -233,7 +233,7 @@ makeQset <- function(sampleTable,
       } else if (CNVwindowSize == 50000) {
         hmmCopyMap <- map_hg38_50kb
       } else {
-        stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
+        stop("Please supply mappability data for this CNVwindowSize via the hmmCopyGC argument")
       }
 
     }
@@ -243,7 +243,7 @@ makeQset <- function(sampleTable,
     }
 
     if (is.null(hmmCopyMap)) {
-      stop("No hmmCopy Mapability file provided!")
+      stop("No hmmCopy Mappability file provided!")
     }
 
     # use HMMCopy directly, with default settings

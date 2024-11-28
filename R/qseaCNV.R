@@ -15,7 +15,7 @@
 #' @param minReferenceLength A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.
 #' @param plotDir A directory to export individual HMMcopy plots to.
 #' @param hmmCopyGC Object containing GC content per window in the genome, for hmmcopy
-#' @param hmmCopyMap Object containing mapability content per window in the genome, for hmmcopy
+#' @param hmmCopyMap Object containing mappability content per window in the genome, for hmmcopy
 #' @return A qseaGLM object
 #' @export
 
