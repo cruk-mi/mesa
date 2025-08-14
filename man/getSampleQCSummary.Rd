@@ -2,13 +2,38 @@
 % Please edit documentation in R/sampleQC.R
 \name{getSampleQCSummary}
 \alias{getSampleQCSummary}
-\title{This function returns the most important columns of a qseaSet with respect to quality controls}
+\title{Summarise key QC fields per sample}
 \usage{
 getSampleQCSummary(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A qseaSet object}
+\item{qseaSet}{A \code{qseaSet} object.}
+}
+\value{
+A tibble with one row per sample and (at least) the columns:
+\itemize{
+\item \code{sample_name}
+\item any columns matching \code{valid_fragment}, \code{relH}, \code{hyperStable}, or \code{ichorTumo} (if present).
+Rows are ordered by \code{sample_name}.
+}
 }
 \description{
-This function returns the most important columns of a qseaSet with respect to quality controls
+Returns a tidy summary of the most relevant QC fields from a \code{qseaSet} sample table.
+If library metrics are missing, they are added via \code{addLibraryInformation()} before summarising.
+}
+\examples{
+\donttest{
+if (requireNamespace("qsea", quietly = TRUE)) {
+  if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
+    data("exampleTumourNormal", package = "mesa")
+    # Ensure the hyper-stable column exists to demonstrate inclusion
+    qset <- addHyperStableFraction(exampleTumourNormal)
+    qc   <- getSampleQCSummary(qset)
+    qc
+  }
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=addHyperStableFraction]{addHyperStableFraction()}}
 }
