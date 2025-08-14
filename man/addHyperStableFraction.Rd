@@ -4,7 +4,7 @@
 \alias{addHyperStableFraction}
 \title{Summarise the fraction of hyper-stable methylated regions (GRCh38 only)}
 \usage{
-addHyperStableFraction(qseaSet)
+addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 }
 \arguments{
 \item{qseaSet}{A \code{qseaSet} object (must be GRCh38).}

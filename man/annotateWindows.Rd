@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{annotateWindows}
 \alias{annotateWindows}
-\title{Add annotation onto a data table}
+\title{Annotate genomic windows using ChIPseeker (with optional CpG/FANTOM context)}
 \usage{
 annotateWindows(
   dataTable,
@@ -14,22 +14,69 @@ annotateWindows(
 )
 }
 \arguments{
-\item{dataTable}{A data frame which can be coerced into a GRanges object or a GRanges object directly.}
+\item{dataTable}{A data frame coercible to \code{GRanges}, or a \code{GRanges} directly.}
 
-\item{genome}{A genome string to set the rest of the parameters (currently only hg38/GRCh38 supported)}
+\item{genome}{Genome string guiding defaults (currently \code{"hg38"}/\code{"GRCh38"} supported).
+If \code{NULL}, a fully specified \code{TxDb}/\code{annoDb} must be supplied.}
 
-\item{TxDb}{A TxDb database object (unquoted) to pass to ChIPseeker::annotatePeak}
+\item{TxDb}{A TxDb object (unquoted) or a string of the form
+\code{"PkgName::ObjectName"}. If \code{NULL} and \code{genome} is GRCh38, a default TxDb is used.}
 
-\item{annoDb}{A string giving a Bioconductor annotation package, such as "org.Hs.eg.db"}
+\item{annoDb}{A string naming a Bioconductor OrgDb package (e.g., \code{"org.Hs.eg.db"}).
+If \code{NULL} and \code{genome} is GRCh38, \code{"org.Hs.eg.db"} is used if installed.}
 
-\item{CpGislandsGR}{A GRanges object giving locations of CpG islands}
+\item{CpGislandsGR}{Optional \code{GRanges} of CpG islands (if \code{NULL} and GRCh38, uses \code{mesa::hg38CpGIslands} if available).}
 
-\item{FantomRegionsGR}{A GRanges object giving Fantom enhancer regions}
+\item{FantomRegionsGR}{Optional \code{GRanges} of FANTOM enhancers (if \code{NULL} and GRCh38, uses \code{mesa::FantomRegions} if available).}
 }
 \value{
-A tibble with the data, augmented with ChIPseeker region location and CpG island information.
+A tibble with the input windows augmented by ChIPseeker annotations and,
+if provided/available, CpG island landscape and FANTOM overlap counts.
 }
 \description{
-This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
-Defaults to being hg38, unless
+Uses \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}} to assign transcript-relative annotations
+(promoter, exon, intron, intergenic, etc.) to genomic windows in \code{dataTable}.
+If a genome is specified or globally set via \code{\link[=setMesaGenome]{setMesaGenome()}}, defaults and
+convenience datasets are applied for GRCh38. CpG island context and FANTOM
+enhancer overlaps can be added if the corresponding ranges are provided (or
+left \code{NULL} to use mesa defaults for GRCh38).
+}
+\details{
+\itemize{
+\item \strong{Inputs:} \code{dataTable} may be a \code{GRanges}, or a data frame coercible by
+\code{qseaTableToChrGRanges()} (must include \code{seqnames}, \code{start}, \code{end}).
+\item \strong{Genome defaults (GRCh38):} When \code{genome} is \code{"hg38"}/\code{"GRCh38"} and \code{TxDb}
+or \code{annoDb} are \code{NULL}, the function uses
+\code{TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
+and \code{"org.Hs.eg.db"} if installed. For \code{CpGislandsGR} and \code{FantomRegionsGR},
+mesa defaults (\code{hg38CpGIslands}, \code{FantomRegions}) are used if available.
+\item \strong{Seqname style:} The output removes the \code{"chr"} prefix (\code{seqnames} become \verb{"1"…"22","X","Y"}).
+\item \strong{Output columns:} Adds \code{shortAnno} (annotation without the trailing parenthetical),
+optional CpG landscape (\code{landscape} with Island/Shore/Shelf/Open Sea) and
+\code{inFantom} (overlap count with FANTOM enhancers). Width and strand are dropped.
+}
+}
+\examples{
+\donttest{
+ok <- requireNamespace("ChIPseeker", quietly = TRUE) &&
+      requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+      requireNamespace("org.Hs.eg.db", quietly = TRUE)
+if (ok) {
+  # Minimal toy GRanges
+  gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(1e6 + 0:4 * 1000, width = 200))
+
+  # Use GRCh38 defaults (TxDb/org.Hs.eg.db; mesa CpG/FANTOM if available)
+  setMesaGenome("hg38")
+  ann <- annotateWindows(gr)
+  head(ann)
+
+  # Data-frame input also works (coerced internally)
+  df <- data.frame(seqnames = "chr1", start = 2e6, end = 2e6 + 199)
+  annotateWindows(df)
+}
+}
+}
+\seealso{
+\code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
+\code{\link[=liftOverHg19]{liftOverHg19()}}
 }

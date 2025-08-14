@@ -9,6 +9,20 @@ is.qseaSet(x)
 \arguments{
 \item{x}{The object}
 }
+\value{
+Logical scalar: \code{TRUE} if \code{x} is a \code{qseaSet}, \code{FALSE} otherwise.
+}
 \description{
 This function checks that an object is a qseaSet.
+}
+\examples{
+\donttest{
+if (requireNamespace("qsea", quietly = TRUE)) {
+  if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
+    data("exampleTumourNormal", package = "mesa")
+    is.qseaSet(exampleTumourNormal)  # TRUE
+  }
+  is.qseaSet(iris)                    # FALSE
+}
+}
 }

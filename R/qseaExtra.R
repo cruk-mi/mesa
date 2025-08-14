@@ -2,6 +2,9 @@
 #   packageStartupMessage("Welcome to my methtools package!")
 # }
 
+# Internal: memoise on load
+#' @keywords internal
+#' @noRd
 .onLoad <- function(libname, pkgname) {
   getCGPositions <<- memoise::memoise(getCGPositions)
 }
@@ -11,34 +14,129 @@
 #' This function checks that an object is a qseaSet.
 #'
 #' @param x The object
+#' 
+#' @return Logical scalar: `TRUE` if `x` is a `qseaSet`, `FALSE` otherwise.
+#'
+#' @examples
+#' \donttest{
+#' if (requireNamespace("qsea", quietly = TRUE)) {
+#'   if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
+#'     data("exampleTumourNormal", package = "mesa")
+#'     is.qseaSet(exampleTumourNormal)  # TRUE
+#'   }
+#'   is.qseaSet(iris)                    # FALSE
+#' }
+#' }
+#' @export
 is.qseaSet <- function(x){
   return(inherits(x,"qseaSet"))
   }
 
+#' Set or get an Ensembl/Biomart (or other) handle on a qseaSet
+#'
+#' These functions store and retrieve a “mart” object (or string handle) inside a `qseaSet`
+#' for downstream annotation tasks.
+#'
+#' @name setMart
+#' @param object A `qseaSet`.
+#' @param mart   An object or string identifying the mart to use (e.g., an Ensembl/BioMart
+#'   connection or a label you interpret elsewhere).
+#'
+#' @return
+#' - `setMart()` returns the updated `qseaSet` (with `@parameters$mart` set).
+#' - `getMart()` returns the stored mart value.
+#'
+#' @seealso [annotateWindows()], [setMesaGenome()], [setMesaTxDb()], [setMesaAnnoDb()]
+#'
+#' @examples
+#' \donttest{
+#' if (requireNamespace("qsea", quietly = TRUE)) {
+#'   if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
+#'     data("exampleTumourNormal", package = "mesa")
+#'     qs <- setMart(exampleTumourNormal, mart = "ENSEMBL_110")
+#'     getMart(qs)
+#'   }
+#' }
+#' }
+NULL
 
-setGeneric('setMart', function(object,...) standardGeneric('setMart'))
+#' @rdname setMart
+#' @export
+setGeneric('setMart', function(object, ...) standardGeneric('setMart'))
+
+#' @rdname setMart
+#' @export
 setMethod('setMart', 'qseaSet', function(object, mart){
-  object@parameters$mart = mart
+  object@parameters$mart <- mart
   object
 })
 
-setGeneric('getMart', function(object,...) standardGeneric('getMart'))
-setMethod('getMart', 'qseaSet', function(object)
-  object@parameters$mart
-)
+#' @rdname setMart
+#' @export
+setGeneric('getMart', function(object, ...) standardGeneric('getMart'))
 
-#' Add annotation onto a data table
+#' @rdname setMart
+#' @export
+setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
+
+#' Annotate genomic windows using ChIPseeker (with optional CpG/FANTOM context)
 #'
-#' This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
-#' Defaults to being hg38, unless
+#' Uses [ChIPseeker::annotatePeak()] to assign transcript-relative annotations
+#' (promoter, exon, intron, intergenic, etc.) to genomic windows in `dataTable`.
+#' If a genome is specified or globally set via [setMesaGenome()], defaults and
+#' convenience datasets are applied for GRCh38. CpG island context and FANTOM
+#' enhancer overlaps can be added if the corresponding ranges are provided (or
+#' left `NULL` to use mesa defaults for GRCh38).
 #'
-#' @param dataTable A data frame which can be coerced into a GRanges object or a GRanges object directly.
-#' @param genome A genome string to set the rest of the parameters (currently only hg38/GRCh38 supported)
-#' @param TxDb A TxDb database object (unquoted) to pass to ChIPseeker::annotatePeak
-#' @param annoDb A string giving a Bioconductor annotation package, such as "org.Hs.eg.db"
-#' @param CpGislandsGR A GRanges object giving locations of CpG islands
-#' @param FantomRegionsGR A GRanges object giving Fantom enhancer regions
-#' @return A tibble with the data, augmented with ChIPseeker region location and CpG island information.
+#' @details
+#' - **Inputs:** `dataTable` may be a `GRanges`, or a data frame coercible by
+#'   `qseaTableToChrGRanges()` (must include `seqnames`, `start`, `end`).
+#' - **Genome defaults (GRCh38):** When `genome` is `"hg38"`/`"GRCh38"` and `TxDb`
+#'   or `annoDb` are `NULL`, the function uses
+#'   `TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene`
+#'   and `"org.Hs.eg.db"` if installed. For `CpGislandsGR` and `FantomRegionsGR`,
+#'   mesa defaults (`hg38CpGIslands`, `FantomRegions`) are used if available.
+#' - **Seqname style:** The output removes the `"chr"` prefix (`seqnames` become `"1"…"22","X","Y"`).
+#' - **Output columns:** Adds `shortAnno` (annotation without the trailing parenthetical),
+#'   optional CpG landscape (`landscape` with Island/Shore/Shelf/Open Sea) and
+#'   `inFantom` (overlap count with FANTOM enhancers). Width and strand are dropped.
+#'
+#' @param dataTable A data frame coercible to `GRanges`, or a `GRanges` directly.
+#' @param genome Genome string guiding defaults (currently `"hg38"`/`"GRCh38"` supported).
+#'   If `NULL`, a fully specified `TxDb`/`annoDb` must be supplied.
+#' @param TxDb   A TxDb object (unquoted) or a string of the form
+#'   `"PkgName::ObjectName"`. If `NULL` and `genome` is GRCh38, a default TxDb is used.
+#' @param annoDb A string naming a Bioconductor OrgDb package (e.g., `"org.Hs.eg.db"`).
+#'   If `NULL` and `genome` is GRCh38, `"org.Hs.eg.db"` is used if installed.
+#' @param CpGislandsGR Optional `GRanges` of CpG islands (if `NULL` and GRCh38, uses `mesa::hg38CpGIslands` if available).
+#' @param FantomRegionsGR Optional `GRanges` of FANTOM enhancers (if `NULL` and GRCh38, uses `mesa::FantomRegions` if available).
+#'
+#' @return A tibble with the input windows augmented by ChIPseeker annotations and,
+#' if provided/available, CpG island landscape and FANTOM overlap counts.
+#'
+#' @seealso
+#' [ChIPseeker::annotatePeak()], [setMesaGenome()], [setMesaTxDb()], [setMesaAnnoDb()],
+#' [liftOverHg19()]
+#'
+#' @examples
+#' \donttest{
+#' ok <- requireNamespace("ChIPseeker", quietly = TRUE) &&
+#'       requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+#'       requireNamespace("org.Hs.eg.db", quietly = TRUE)
+#' if (ok) {
+#'   # Minimal toy GRanges
+#'   gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(1e6 + 0:4 * 1000, width = 200))
+#'
+#'   # Use GRCh38 defaults (TxDb/org.Hs.eg.db; mesa CpG/FANTOM if available)
+#'   setMesaGenome("hg38")
+#'   ann <- annotateWindows(gr)
+#'   head(ann)
+#'
+#'   # Data-frame input also works (coerced internally)
+#'   df <- data.frame(seqnames = "chr1", start = 2e6, end = 2e6 + 199)
+#'   annotateWindows(df)
+#' }
+#' }
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
                             annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
@@ -374,12 +472,60 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
 }
 
-#' This function calculates the fraction of reads in a qseaSet object which are present in a GRanges object
-#' @param qseaSet A qseaSet
-#' @param windowsToConsider Which windows to consider, as a GRanges object
-#' @param numCountsNeeded Minimum number of reads required to consider that window
-#' @export
+#' Fraction of thresholded windows overlapping a set of regions
 #'
+#' For each sample in a `qseaSet`, compute the proportion of **windows** with
+#' counts ≥ `numCountsNeeded` that overlap `windowsToConsider`, relative to all
+#' windows with counts ≥ `numCountsNeeded` in that sample.
+#'
+#' @details
+#' This function operates on the window-by-sample count matrix from
+#' `qsea::getCounts(qseaSet)`. It first converts counts to a logical indicator
+#' (count ≥ `numCountsNeeded`) and sums these indicators per sample:
+#' - `initialOverBackNum`: number of windows meeting the threshold genome-wide.
+#' - `afterOverBackNum`: number of windows meeting the threshold **within**
+#'   `windowsToConsider` (via `filterByOverlaps()`).
+#' The reported `fraction` is `afterOverBackNum / initialOverBackNum`.
+#'
+#' Note: despite the function name, this is a **window-based** fraction using a
+#' count threshold, not a direct fraction of raw reads. Use accordingly.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param windowsToConsider A `GRanges` of regions to consider/overlap.
+#' @param numCountsNeeded Integer; minimum reads per window for it to be counted.
+#'
+#' @return
+#' A tibble with one row per sample containing:
+#' - `sample_name`
+#' - `initialOverBackNum` — windows ≥ threshold genome-wide
+#' - `afterOverBackNum` — windows ≥ threshold within `windowsToConsider`
+#' - `fraction` — `afterOverBackNum / initialOverBackNum`
+#' followed by columns from the sample table (via a left join on `sample_name`).
+#'
+#' @seealso
+#' [qsea::getCounts()], [qsea::getSampleTable()], [filterByOverlaps()], [hg38UltraStableProbes]
+#'
+#' @examples
+#' \donttest{
+#' if (requireNamespace("qsea", quietly = TRUE)) {
+#'   # Example qseaSet shipped with mesa (if available)
+#'   if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
+#'     data("exampleTumourNormal", package = "mesa")
+#'
+#'     # Use shipped ultra-stable regions (a GRanges) as windowsToConsider
+#'     if (system.file("data", "hg38UltraStableProbes.rda", package = "mesa") != "") {
+#'       data("hg38UltraStableProbes", package = "mesa")
+#'       res <- calculateFractionReadsInGRanges(
+#'         exampleTumourNormal,
+#'         hg38UltraStableProbes,
+#'         numCountsNeeded = 5
+#'       )
+#'       head(res[, c("sample_name", "fraction")])
+#'     }
+#'   }
+#' }
+#' }
+#' @export
 calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCountsNeeded) {
   initialReadTotals <- qseaSet %>%
     qsea::getCounts() %>%
