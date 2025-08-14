@@ -2,7 +2,7 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{left_join.qseaSet}
 \alias{left_join.qseaSet}
-\title{This function extends the dplyr function left_join to act on qseaSet sampleTable.}
+\title{Left join data onto a qseaSet sample table}
 \usage{
 \method{left_join}{qseaSet}(
   x,
@@ -15,24 +15,45 @@
 )
 }
 \arguments{
-\item{x}{A qseaSet to join data onto the sampleTable of}
+\item{x}{A \code{qseaSet} whose \code{sampleTable} will receive new columns.}
 
-\item{y}{A data frame to join with the sampleTable}
+\item{y}{A data frame to join.}
 
-\item{by}{A character vector of variables to join by. If NULL, will perform a join on all common variables.}
+\item{by}{Character or named character vector of join keys (see \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}).
+For \code{qseaSet}, this is typically \code{"sample_name"}. If omitted, dplyr uses the
+intersection of column names; specifying \code{by} explicitly is safer.}
 
-\item{copy}{If x and y are not from the same data source, and copy is TRUE, then y will be copied into the same src as x.
-This allows you to join tables across srcs, but it is a potentially expensive operation so you must opt into it.}
+\item{copy}{Logical; \strong{remote backends only} (e.g., databases via dbplyr).
+When \code{TRUE}, \code{y} is copied into the same data source as \code{x} so the join can run.
+This can be expensive. Ignored for in-memory data frames/tibbles.}
 
-\item{suffix}{If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.}
+\item{suffix}{Length-2 character vector with suffixes appended to non-joined
+duplicate column names from \code{x} and \code{y} (default \code{c(".x", ".y")}).}
 
-\item{keep}{Should the join keys from both x and y be preserved in the output?}
+\item{keep}{Logical; if \code{TRUE}, retain the join keys from both \code{x} and \code{y}
+in the output. If \code{FALSE}, keep only keys from \code{x} (dplyr default).}
 
-\item{...}{Other arguments to pass to dplyr::left_join}
+\item{...}{Additional arguments passed to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}, e.g.
+\code{relationship = "one-to-one"} to assert key uniqueness or
+\code{unmatched = "error"} to fail when keys don’t match (dplyr ≥ 1.1).}
 }
 \value{
-A qseaSet object with the sampleTable changed by a call to dplyr::left_join
+The input \code{qseaSet} with an updated \code{sampleTable}.
 }
 \description{
-This function extends the dplyr function left_join to act on qseaSet sampleTable.
+Extends \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to merge a data frame \code{y} into a \code{qseaSet}'s
+\code{sampleTable}.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  meta <- data.frame(sample_name = qsea::getSampleNames(exampleTumourNormal),
+                     batch = rep(1:2, length.out = length(qsea::getSampleNames(exampleTumourNormal))))
+  exampleTumourNormal \%>\% left_join(meta, by = "sample_name")
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}
 }

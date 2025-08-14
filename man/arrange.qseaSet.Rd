@@ -2,20 +2,32 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{arrange.qseaSet}
 \alias{arrange.qseaSet}
-\title{This function extends the function dplyr::arrange to act on qseaSet, to reorder the samples in the qseaSet.}
+\title{Arrange (reorder) samples in a qseaSet via dplyr syntax}
 \usage{
 \method{arrange}{qseaSet}(.data, ..., .by_group = FALSE)
 }
 \arguments{
-\item{.data}{A qseaSet to reorder the samples in.}
+\item{.data}{A \code{qseaSet}.}
 
-\item{...}{Other arguments to pass to dplyr::arrange}
+\item{...}{Variables to arrange by (passed to \code{\link[dplyr:arrange]{dplyr::arrange()}}).}
 
-\item{.by_group}{Not implemented as qsea requires a data frame not a tibble for the sampleTable.}
+\item{.by_group}{Ignored; grouping is not used for \code{qseaSet}.}
 }
 \value{
-A qseaSet with the sample names reordered according to a column of the sampleTable.
+The input \code{qseaSet} object with sample order updated.
 }
 \description{
-This function extends the function dplyr::arrange to act on qseaSet, to reorder the samples in the qseaSet.
+Extends \code{\link[dplyr:arrange]{dplyr::arrange()}} to reorder \strong{samples} of a \code{qseaSet} based on columns
+in its \code{sampleTable}.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  exampleTumourNormal \%>\% arrange(age)
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=subsetQset]{subsetQset()}}
 }

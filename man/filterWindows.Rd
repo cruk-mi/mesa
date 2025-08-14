@@ -2,18 +2,31 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{filterWindows}
 \alias{filterWindows}
-\title{This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.}
+\title{Filter regions (windows) inside a qseaSet}
 \usage{
 filterWindows(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet}.}
 
-\item{...}{Additional arguments to be used to filter the regions ONLY, as if they were a data frame.}
+\item{...}{Predicates passed to \code{\link[dplyr:filter]{dplyr::filter()}} (applied to the regions).}
 }
 \value{
-A qseaSet object, with the regions filtered appropriately.
+The input \code{qseaSet} object with regions filtered.
 }
 \description{
-This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.
+Filters the \strong{regions} of a \code{qseaSet} using \code{\link[dplyr:filter]{dplyr::filter()}} predicates
+applied to its regions as a data frame, then subsets the object accordingly.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  # keep short windows as a toy example
+  filterWindows(exampleTumourNormal, width < 500)
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}}
 }

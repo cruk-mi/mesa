@@ -2,20 +2,38 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{filter.qseaSet}
 \alias{filter.qseaSet}
-\title{This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.}
+\title{Filter samples in a qseaSet}
 \usage{
 \method{filter}{qseaSet}(.data, ..., .preserve = FALSE)
 }
 \arguments{
-\item{.data}{A qseaSet to filter, based on the sampleTable}
+\item{.data}{A \code{qseaSet} to filter (by rows of its \code{sampleTable}).}
 
-\item{...}{Other arguments to pass to dplyr::filter}
+\item{...}{Predicate expressions passed to \code{\link[dplyr:filter]{dplyr::filter()}}.}
 
-\item{.preserve}{Not implemented as grouping is not available  for qseaSet}
+\item{.preserve}{Ignored; grouping is not implemented for \code{qseaSet}.}
 }
 \value{
-A qseaSet object, with only samples that are selected by the filtering operation.
+The input qseaSet object, with only samples selected by the filtering operation.
 }
 \description{
-This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
+Extends \code{\link[dplyr:filter]{dplyr::filter()}} to subset \strong{samples} in a \code{qseaSet} using
+predicates applied to its \code{sampleTable}.
+}
+\details{
+The filtering is performed on \code{qsea::getSampleTable(.data)}, and the
+selected \code{sample_name}s are used to subset the \code{qseaSet}. Grouped filtering
+is not supported for \code{qseaSet}.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  # keep only older patients
+  exampleTumourNormal \%>\% filter(age >= 70)
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=subsetQset]{subsetQset()}}, \code{\link[=selectQset]{selectQset()}}
 }

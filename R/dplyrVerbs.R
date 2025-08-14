@@ -1,10 +1,30 @@
-#' This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
+#' Filter samples in a qseaSet
+#'
+#' Extends [dplyr::filter()] to subset **samples** in a `qseaSet` using
+#' predicates applied to its `sampleTable`.
+#'
+#' @details
+#' The filtering is performed on `qsea::getSampleTable(.data)`, and the
+#' selected `sample_name`s are used to subset the `qseaSet`. Grouped filtering
+#' is not supported for `qseaSet`.
+#'
 #' @method filter qseaSet
 #' @importFrom dplyr filter
-#' @param .data A qseaSet to filter, based on the sampleTable
-#' @param ... Other arguments to pass to dplyr::filter
-#' @param .preserve Not implemented as grouping is not available  for qseaSet
-#' @return A qseaSet object, with only samples that are selected by the filtering operation.
+#' @param .data A `qseaSet` to filter (by rows of its `sampleTable`).
+#' @param ...  Predicate expressions passed to [dplyr::filter()].
+#' @param .preserve Ignored; grouping is not implemented for `qseaSet`.
+#'
+#' @return The input qseaSet object, with only samples selected by the filtering operation.
+#' @seealso [qsea::getSampleTable()], [subsetQset()], [selectQset()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   # keep only older patients
+#'   exampleTumourNormal %>% filter(age >= 70)
+#' }
+#' }
 #' @export
 filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 
@@ -18,12 +38,31 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 
   }
 
-#' This function extends the dplyr function mutate to act on qseaSet sampleTable.
+#' Mutate columns in a qseaSet sample table
+#'
+#' Extends [dplyr::mutate()] to modify or add columns in a `qseaSet`'s
+#' `sampleTable`.
+#'
+#' @details
+#' The order of samples is preserved. The `sample_name` column **cannot be
+#' changed** here; use `renameQsetNames()`/`renameSamples()` instead.
+#'
 #' @method mutate qseaSet
 #' @importFrom dplyr mutate
-#' @param .data A qseaSet to mutate
-#' @param ... Other arguments to pass to dplyr::mutate
-#' @return A qseaSet object with the sampleTable changed by a call to dplyr::mutate
+#' @param .data A `qseaSet`.
+#' @param ...  Mutations passed to [dplyr::mutate()].
+#'
+#' @return The input `qseaSet` object with an updated `sampleTable`.
+#'
+#' @seealso [qsea::getSampleTable()], [renameSamples()], [renameQsetNames()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   exampleTumourNormal %>% mutate(over70 = age > 70)
+#' }
+#' }
 #' @export
 mutate.qseaSet <- function(.data, ...){
 
@@ -47,18 +86,43 @@ mutate.qseaSet <- function(.data, ...){
 
   return(.data)}
 
-#' This function extends the dplyr function left_join to act on qseaSet sampleTable.
+#' Left join data onto a qseaSet sample table
+#'
+#' Extends [dplyr::left_join()] to merge a data frame `y` into a `qseaSet`'s
+#' `sampleTable`.
+#'
 #' @method left_join qseaSet
 #' @importFrom dplyr left_join
-#' @param x A qseaSet to join data onto the sampleTable of
-#' @param y A data frame to join with the sampleTable
-#' @param by A character vector of variables to join by. If NULL, will perform a join on all common variables.
-#' @param copy If x and y are not from the same data source, and copy is TRUE, then y will be copied into the same src as x.
-#' This allows you to join tables across srcs, but it is a potentially expensive operation so you must opt into it.
-#' @param suffix 	If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.
-#' @param ... Other arguments to pass to dplyr::left_join
-#' @param keep Should the join keys from both x and y be preserved in the output?
-#' @return A qseaSet object with the sampleTable changed by a call to dplyr::left_join
+#' @param x A `qseaSet` whose `sampleTable` will receive new columns.
+#' @param y A data frame to join.
+#' @param by Variables to join by (see [dplyr::left_join()]). If NULL, will perform a join on all common variables.
+#' @param by Character or named character vector of join keys (see [dplyr::left_join()]).
+#'   For `qseaSet`, this is typically `"sample_name"`. If omitted, dplyr uses the
+#'   intersection of column names; specifying `by` explicitly is safer.
+#' @param copy Logical; **remote backends only** (e.g., databases via dbplyr).
+#'   When `TRUE`, `y` is copied into the same data source as `x` so the join can run.
+#'   This can be expensive. Ignored for in-memory data frames/tibbles.
+#' @param suffix Length-2 character vector with suffixes appended to non-joined
+#'   duplicate column names from `x` and `y` (default `c(".x", ".y")`).
+#' @param keep Logical; if `TRUE`, retain the join keys from both `x` and `y`
+#'   in the output. If `FALSE`, keep only keys from `x` (dplyr default).
+#' @param ... Additional arguments passed to [dplyr::left_join()], e.g.
+#'   `relationship = "one-to-one"` to assert key uniqueness or
+#'   `unmatched = "error"` to fail when keys don’t match (dplyr ≥ 1.1).
+#'   
+#' @return The input `qseaSet` with an updated `sampleTable`.
+#'
+#' @seealso [qsea::getSampleTable()], [dplyr::left_join()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   meta <- data.frame(sample_name = qsea::getSampleNames(exampleTumourNormal),
+#'                      batch = rep(1:2, length.out = length(qsea::getSampleNames(exampleTumourNormal))))
+#'   exampleTumourNormal %>% left_join(meta, by = "sample_name")
+#' }
+#' }
 #' @export
 left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y"), keep = NULL, ...){
 
@@ -70,20 +134,53 @@ left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y
 
   return(x)}
 
-#' This function extends the dplyr function select to act on qseaSet sampleTable. Can also be used to rename columns.
+#' Select/rename columns in a qseaSet sample table
+#'
+#' Extends [dplyr::select()] to keep or rename columns in a `qseaSet`'s
+#' `sampleTable`.
+#'
+#' @details
+#' This is a thin wrapper around [selectQset()], which preserves `sample_name`
+#' and `group` at the front of the table if present.
+#'
 #' @method select qseaSet
 #' @importFrom dplyr select
-#' @param .data A qseaSet to select columns of the sampleTable from
-#' @param ... Other arguments to pass to dplyr::select
-#' @return A qseaSet object with the sampleTable changed by a call to dplyr::select
-#' @export select.qseaSet
+#' @param .data A `qseaSet`.
+#' @param ...  Selection helpers passed to [dplyr::select()].
+#'
+#' @return The input `qseaSet` object with an updated `sampleTable`.
+#'
+#' @seealso [selectQset()], [qsea::getSampleTable()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   exampleTumourNormal %>% select(sample_name, group, age)
+#' }
+#' }
 #' @export
 select.qseaSet <- function(.data, ...){selectQset(.data, ...)}
 
-#' This function takes a qseaSet and selects columns from its sampleTable based on a call to dplyr::select
-#' @param qseaSet The qseaSet object.
-#' @param ... Other arguments to pass to dplyr::select
-#' @return A qseaSet object with the sampleTable selected as specified.
+#' Select columns of a qseaSet sample table
+#'
+#' Keeps/renames columns from the `sampleTable` of a `qseaSet`. If present,
+#' `sample_name` and `group` are kept at the front of the table.
+#'
+#' @param qseaSet A `qseaSet`.
+#' @param ...  Selection helpers passed to [dplyr::select()].
+#'
+#' @return The input `qseaSet` object with `sampleTable` updated.
+#'
+#' @seealso [select.qseaSet()], [qsea::getSampleTable()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   selectQset(exampleTumourNormal, sample_name, group)
+#' }
+#' }
 #' @export
 selectQset <- function(qseaSet, ...){
   newSampleTable <- qseaSet %>%
@@ -99,15 +196,28 @@ selectQset <- function(qseaSet, ...){
   return(qseaSet)
 }
 
-#' This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.
+#' Pull a column from a qseaSet sample table
+#'
+#' Extends [dplyr::pull()] to extract a column from the `sampleTable` of a `qseaSet`.
+#'
 #' @method pull qseaSet
 #' @importFrom dplyr pull
-#' @param .data A qseaSet.
-#' @param var A variable specified as a column name or an integer (negative counting from right)
-#' @param name An optional parameter that specifies the column to be used as names for a named vector. Specified in a similar manner as var.
-#' @param ... Other arguments to pass to dplyr::pull (column name to extract)
-#' @return A vector the same size as the number of samples in the qseaSet.
-#' @export pull.qseaSet
+#' @param .data A `qseaSet`.
+#' @param var  Column to extract (name or position). Defaults to last column.
+#' @param name Optional column to use for names in the returned vector.
+#' @param ...  Passed to [dplyr::pull()].
+#'
+#' @return A vector with length equal to the number of samples in the qseaSet.
+#'
+#' @seealso [qsea::getSampleTable()], [dplyr::pull()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   exampleTumourNormal %>% pull(group)
+#' }
+#' }
 #' @export
 pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
 
@@ -124,14 +234,27 @@ pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
 
   }
 
-#' This function extends the function sort to act on qseaSet, to reorder the names. It uses gtools::mixedsort to sort numbers correctly (i.e. 10 does not come before 2).
+#' Sort samples in a qseaSet
+#'
+#' Extends [base::sort()] to reorder the **samples** of a `qseaSet` using
+#' [gtools::mixedsort()] so that numeric parts sort naturally (e.g., `"2"` before `"10"`).
+#'
 #' @method sort qseaSet
-#' @param x A qseaSet to reorder the samples of.
-#' @param decreasing Whether to order the qseaSet in reverse alphabetical order
-#' @param ... Other arguments to pass to gtools::mixedsort
-#' @return A qseaSet with the sample names reordered alphabetically
-#' #' @examples
-#' sort(exampleTumourNormal, decreasing = TRUE)
+#' @param x A `qseaSet` to reorder.
+#' @param decreasing Logical; reverse the order.
+#' @param ... Passed to [gtools::mixedsort()].
+#'
+#' @return The input `qseaSet` object with samples reordered.
+#'
+#' @seealso [qsea::getSampleNames()], [subsetQset()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   sort(exampleTumourNormal, decreasing = TRUE)
+#' }
+#' }
 #' @export
 sort.qseaSet <- function(x, decreasing = FALSE, ...){
 
@@ -141,10 +264,26 @@ sort.qseaSet <- function(x, decreasing = FALSE, ...){
 
   }
 
-#' This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.
-#' @param qseaSet The qseaSet object.
-#' @param ... Additional arguments to be used to filter the regions ONLY, as if they were a data frame.
-#' @return A qseaSet object, with the regions filtered appropriately.
+#' Filter regions (windows) inside a qseaSet
+#'
+#' Filters the **regions** of a `qseaSet` using [dplyr::filter()] predicates
+#' applied to its regions as a data frame, then subsets the object accordingly.
+#'
+#' @param qseaSet A `qseaSet`.
+#' @param ... Predicates passed to [dplyr::filter()] (applied to the regions).
+#'
+#' @return The input `qseaSet` object with regions filtered.
+#'
+#' @seealso [qsea::getRegions()], [filter.qseaSet()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   # keep short windows as a toy example
+#'   filterWindows(exampleTumourNormal, width < 500)
+#' }
+#' }
 #' @export
 filterWindows <- function(qseaSet, ...){
 
@@ -160,14 +299,28 @@ filterWindows <- function(qseaSet, ...){
 
 }
 
-#' This function extends the function dplyr::arrange to act on qseaSet, to reorder the samples in the qseaSet.
+#' Arrange (reorder) samples in a qseaSet via dplyr syntax
+#'
+#' Extends [dplyr::arrange()] to reorder **samples** of a `qseaSet` based on columns
+#' in its `sampleTable`.
+#'
 #' @method arrange qseaSet
 #' @importFrom dplyr arrange
-#' @param .data A qseaSet to reorder the samples in.
-#' @param ... Other arguments to pass to dplyr::arrange
-#' @param .by_group Not implemented as qsea requires a data frame not a tibble for the sampleTable.
-#' @return A qseaSet with the sample names reordered according to a column of the sampleTable.
-#' @export arrange.qseaSet
+#' @param .data A `qseaSet`.
+#' @param ...  Variables to arrange by (passed to [dplyr::arrange()]).
+#' @param .by_group Ignored; grouping is not used for `qseaSet`.
+#'
+#' @return The input `qseaSet` object with sample order updated.
+#'
+#' @seealso [qsea::getSampleTable()], [subsetQset()]
+#'
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   exampleTumourNormal %>% arrange(age)
+#' }
+#' }
 #' @export
 arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
 
@@ -182,10 +335,25 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
 
   }
 
-#' This function extends the base function length to return the number of samples in the qseaSet
-#' @method colnames qseaSet
-#' @param qseaSet A qseaSet to return the number of samples in
-#' @return The number of samples in the qseaSet
-#' @export colnames.qseaSet
+#' Column names of a qseaSet sample table
+#'
+#' S4 method for BiocGenerics::colnames() that returns the column names of a
+#' qseaSet's sample metadata table (qsea::getSampleTable(x)).
+#'
+#' @param x A `qseaSet`.
+#' @return Character vector of column names.
+#' @aliases colnames,qseaSet-method
+#' @importFrom BiocGenerics colnames
+#' @seealso qsea::getSampleTable, qsea::getSampleNames
+#' @examples
+#' \donttest{
+#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#'   data(exampleTumourNormal, package="mesa")
+#'   colnames(exampleTumourNormal)
+#' }
+#' }
 #' @export
-colnames.qseaSet <- function(qseaSet){colnames(qsea::getSampleTable(qseaSet))}
+setMethod("colnames", "qseaSet", function(x) {
+  colnames(qsea::getSampleTable(x))
+})
+

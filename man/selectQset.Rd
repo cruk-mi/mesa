@@ -2,18 +2,30 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{selectQset}
 \alias{selectQset}
-\title{This function takes a qseaSet and selects columns from its sampleTable based on a call to dplyr::select}
+\title{Select columns of a qseaSet sample table}
 \usage{
 selectQset(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet}.}
 
-\item{...}{Other arguments to pass to dplyr::select}
+\item{...}{Selection helpers passed to \code{\link[dplyr:select]{dplyr::select()}}.}
 }
 \value{
-A qseaSet object with the sampleTable selected as specified.
+The input \code{qseaSet} object with \code{sampleTable} updated.
 }
 \description{
-This function takes a qseaSet and selects columns from its sampleTable based on a call to dplyr::select
+Keeps/renames columns from the \code{sampleTable} of a \code{qseaSet}. If present,
+\code{sample_name} and \code{group} are kept at the front of the table.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  selectQset(exampleTumourNormal, sample_name, group)
+}
+}
+}
+\seealso{
+\code{\link[=select.qseaSet]{select.qseaSet()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}
 }

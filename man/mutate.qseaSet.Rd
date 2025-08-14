@@ -2,18 +2,34 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{mutate.qseaSet}
 \alias{mutate.qseaSet}
-\title{This function extends the dplyr function mutate to act on qseaSet sampleTable.}
+\title{Mutate columns in a qseaSet sample table}
 \usage{
 \method{mutate}{qseaSet}(.data, ...)
 }
 \arguments{
-\item{.data}{A qseaSet to mutate}
+\item{.data}{A \code{qseaSet}.}
 
-\item{...}{Other arguments to pass to dplyr::mutate}
+\item{...}{Mutations passed to \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
 }
 \value{
-A qseaSet object with the sampleTable changed by a call to dplyr::mutate
+The input \code{qseaSet} object with an updated \code{sampleTable}.
 }
 \description{
-This function extends the dplyr function mutate to act on qseaSet sampleTable.
+Extends \code{\link[dplyr:mutate]{dplyr::mutate()}} to modify or add columns in a \code{qseaSet}'s
+\code{sampleTable}.
+}
+\details{
+The order of samples is preserved. The \code{sample_name} column \strong{cannot be
+changed} here; use \code{renameQsetNames()}/\code{renameSamples()} instead.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  exampleTumourNormal \%>\% mutate(over70 = age > 70)
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=renameSamples]{renameSamples()}}, \code{\link[=renameQsetNames]{renameQsetNames()}}
 }

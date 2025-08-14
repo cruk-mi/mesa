@@ -2,22 +2,32 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{sort.qseaSet}
 \alias{sort.qseaSet}
-\title{This function extends the function sort to act on qseaSet, to reorder the names. It uses gtools::mixedsort to sort numbers correctly (i.e. 10 does not come before 2).}
+\title{Sort samples in a qseaSet}
 \usage{
 \method{sort}{qseaSet}(x, decreasing = FALSE, ...)
 }
 \arguments{
-\item{x}{A qseaSet to reorder the samples of.}
+\item{x}{A \code{qseaSet} to reorder.}
 
-\item{decreasing}{Whether to order the qseaSet in reverse alphabetical order}
+\item{decreasing}{Logical; reverse the order.}
 
-\item{...}{Other arguments to pass to gtools::mixedsort}
+\item{...}{Passed to \code{\link[gtools:mixedsort]{gtools::mixedsort()}}.}
 }
 \value{
-A qseaSet with the sample names reordered alphabetically
-#' @examples
-sort(exampleTumourNormal, decreasing = TRUE)
+The input \code{qseaSet} object with samples reordered.
 }
 \description{
-This function extends the function sort to act on qseaSet, to reorder the names. It uses gtools::mixedsort to sort numbers correctly (i.e. 10 does not come before 2).
+Extends \code{\link[base:sort]{base::sort()}} to reorder the \strong{samples} of a \code{qseaSet} using
+\code{\link[gtools:mixedsort]{gtools::mixedsort()}} so that numeric parts sort naturally (e.g., \code{"2"} before \code{"10"}).
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  sort(exampleTumourNormal, decreasing = TRUE)
+}
+}
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}}, \code{\link[=subsetQset]{subsetQset()}}
 }

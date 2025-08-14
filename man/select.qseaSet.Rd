@@ -2,18 +2,34 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{select.qseaSet}
 \alias{select.qseaSet}
-\title{This function extends the dplyr function select to act on qseaSet sampleTable. Can also be used to rename columns.}
+\title{Select/rename columns in a qseaSet sample table}
 \usage{
 \method{select}{qseaSet}(.data, ...)
 }
 \arguments{
-\item{.data}{A qseaSet to select columns of the sampleTable from}
+\item{.data}{A \code{qseaSet}.}
 
-\item{...}{Other arguments to pass to dplyr::select}
+\item{...}{Selection helpers passed to \code{\link[dplyr:select]{dplyr::select()}}.}
 }
 \value{
-A qseaSet object with the sampleTable changed by a call to dplyr::select
+The input \code{qseaSet} object with an updated \code{sampleTable}.
 }
 \description{
-This function extends the dplyr function select to act on qseaSet sampleTable. Can also be used to rename columns.
+Extends \code{\link[dplyr:select]{dplyr::select()}} to keep or rename columns in a \code{qseaSet}'s
+\code{sampleTable}.
+}
+\details{
+This is a thin wrapper around \code{\link[=selectQset]{selectQset()}}, which preserves \code{sample_name}
+and \code{group} at the front of the table if present.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  exampleTumourNormal \%>\% select(sample_name, group, age)
+}
+}
+}
+\seealso{
+\code{\link[=selectQset]{selectQset()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}
 }
