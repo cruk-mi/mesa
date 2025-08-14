@@ -2,23 +2,62 @@
 % Please edit documentation in R/sampleQC.R
 \name{addHyperStableFraction}
 \alias{addHyperStableFraction}
-\title{Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
-This function calculates and summarises the proportion of hyperstable regions that are present in each sample,
-and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of
-human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}}
+\title{Summarise the fraction of hyper-stable methylated regions (GRCh38 only)}
 \usage{
 addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 }
 \arguments{
-\item{qseaSet}{A qseaSet object}
+\item{qseaSet}{A \code{qseaSet} object (must be GRCh38).}
 
-\item{minDensity}{A value of \code{CpG_density} to only consider regions above. Defaults to 5.}
+\item{minDensity}{Numeric. Minimum \code{CpG_density} to keep a window (default \code{5}).}
 
-\item{minBeta}{The minimum beta value to consider a region as being called as methylated. Defaults to 0.8}
+\item{minBeta}{Numeric. Beta threshold to call a window methylated (default \code{0.8}).}
+}
+\value{
+The input \code{qseaSet}, with its sample table augmented by a numeric column \code{hyperStableEdgar}
+(range 0–1) giving, per sample, the fraction of hyper-stable regions called methylated.
+The \code{qseaSet} is returned.
 }
 \description{
-Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
-This function calculates and summarises the proportion of hyperstable regions that are present in each sample,
-and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of
-human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}
+Calculates, for each sample in a \code{qseaSet}, the proportion of \emph{Edgar et al.} “ultra-stable”
+regions that are present and clearly methylated (beta ≥ \code{minBeta}) after filtering by CpG
+density (≥ \code{minDensity}). The result is added as the column \code{hyperStableEdgar} in the
+sample table. If that column already exists it will be overwritten.
+}
+\details{
+\itemize{
+\item \strong{Genome restriction:} Only defined for \code{BSgenome.Hsapiens.NCBI.GRCh38}; the function stops otherwise.
+\item \strong{Regions used:} Requires \code{mesa::hg38UltraStableProbes} (GRCh38 “ultra-stable” methylated windows
+derived from array data).
+\item \strong{Computation:} Overlap windows with \code{hg38UltraStableProbes}, build a beta table
+(\code{qsea::makeTable(norm_methods = "beta")}), keep windows with \code{CpG_density >= minDensity},
+treat \code{NA} beta values as 0 for thresholding, and take the fraction ≥ \code{minBeta} per sample.
+}
+}
+\examples{
+\donttest{
+if (requireNamespace("qsea", quietly = TRUE)) {
+  # Example qseaSet shipped with mesa (should be GRCh38)
+  if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
+    data("exampleTumourNormal", package = "mesa")
+
+    # Add the hyper-stable fraction with defaults
+    qset1 <- addHyperStableFraction(exampleTumourNormal)
+    head(qsea::getSampleTable(qset1)$hyperStableEdgar)
+
+    # Stricter thresholds
+    qset2 <- addHyperStableFraction(exampleTumourNormal, minDensity = 10, minBeta = 0.9)
+    summary(qsea::getSampleTable(qset2)$hyperStableEdgar)
+  }
+}
+}
+}
+\references{
+Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
+\emph{A non-tissue-specific DNA methylation signature is hypermethylated in cancer}.
+\url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
+}
+\seealso{
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}}, \link{hg38UltraStableProbes},
+\code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }
