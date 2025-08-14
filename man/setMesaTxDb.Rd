@@ -10,10 +10,17 @@ setMesaTxDb(TxDb)
 \item{TxDb}{A TxDb package (as a string, or the object itself)}
 }
 \value{
-None
+Invisibly returns \code{TRUE} on successful completion.
 }
 \description{
 For instance "TxDb.Hsapiens.UCSC.hg38.knownGene" for human, or "TxDb.Mmusculus.UCSC.mm10.knownGene" for mouse.
+}
+\examples{
+# Set default TxDb for human
+setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene")
+
+# Remove the default TxDb
+setMesaTxDb(NULL)
 }
 \seealso{
 The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}

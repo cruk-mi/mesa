@@ -15,3 +15,24 @@ A genomic ranges object object with coordinates in hg38.
 \description{
 This function takes a genomic ranges object or data frame, and lifts over from hg19 to hg38.
 }
+\examples{
+\donttest{
+# Example 1: liftover from a data.frame (mix of 'chr' and no 'chr')
+df <- data.frame(
+  seqnames = c("1", "chr2"),
+  start    = c(100000, 200000),
+  end      = c(100100, 200100)
+)
+gr_hg38 <- liftOverHg19(df)
+gr_hg38
+GenomeInfoDb::genome(gr_hg38)  # should show "hg38"
+
+# Example 2: GRanges input using the same coordinates as above
+#' # Note: some intervals may not map; that's expected.
+gr <- GenomicRanges::GRanges(df$seqnames, IRanges::IRanges(df$start, df$end))
+liftOverHg19(gr)
+}
+}
+\seealso{
+\code{rtracklayer::liftOver}
+}
