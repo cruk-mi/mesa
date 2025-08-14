@@ -10,10 +10,27 @@ setMesaAnnoDb(annoDb)
 \item{annoDb}{An annoDb package (as a string, or the object itself)}
 }
 \value{
-None
+Invisibly returns \code{TRUE} on successful completion.
 }
 \description{
 For instance "org.Hs.eg.db" for human, or "org.Mm.eg.db" for mouse.
+}
+\examples{
+# Set default annoDb for human (only if the package is installed)
+if (requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+  setMesaAnnoDb("org.Hs.eg.db")
+  getOption("mesa_annoDb")
+}
+
+# Set default annoDb for mouse (only if the package is installed)
+if (requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
+  setMesaAnnoDb("org.Mm.eg.db")
+  getOption("mesa_annoDb")
+}
+
+# Unset the default annoDb
+setMesaAnnoDb(NULL)
+is.null(getOption("mesa_annoDb"))
 }
 \seealso{
 The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}

@@ -10,8 +10,21 @@ setMesaGenome(genome)
 \item{genome}{String corresponding to a genome.}
 }
 \value{
-None
+Invisibly returns \code{TRUE} on successful completion.
 }
 \description{
 Currently supporting "hg38" and "GRCh38", this sets the TxDb and annoDb options to appropriate files.
+}
+\examples{
+# Set the default genome to hg38
+setMesaGenome("hg38")
+getOption("mesa_genome")
+
+# Use the GRCh38 alias
+setMesaGenome("GRCh38")
+getOption("mesa_genome")
+
+# Reset/remove the default genome
+setMesaGenome(NULL)
+is.null(getOption("mesa_genome"))
 }

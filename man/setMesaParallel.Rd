@@ -2,20 +2,64 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{setMesaParallel}
 \alias{setMesaParallel}
-\title{Toggle whether to use parallelisation or not inside various functions in mesa}
+\alias{getMesaParallel}
+\title{Manage mesa parallelisation (set & query)}
 \usage{
 setMesaParallel(nCores = NULL, useParallel = FALSE, verbose = TRUE)
+
+getMesaParallel(verbose = FALSE)
 }
 \arguments{
 \item{nCores}{How many cores to set. Assumes you want to use MulticoreParam, for another architecture use the useParallel argument and specify manually.}
 
-\item{useParallel}{Boolean denoting whether or not to use parallelisation for various functions in mesa}
+\item{useParallel}{Boolean denoting whether or not to use parallelisation for various functions in mesa.}
 
-\item{verbose}{Boolean to determine whether to print messages or not}
+\item{verbose}{Boolean to determine whether to print messages or not.}
 }
 \value{
-None
+\itemize{
+\item \code{setMesaParallel()} — logical scalar (TRUE/FALSE), returned \strong{invisibly}; primarily used for its side effect
+of setting the \code{"mesa_parallel"} option and (optionally) registering a backend.
+\item \code{getMesaParallel()} — logical scalar indicating whether parallelisation is currently enabled; when
+\code{verbose = TRUE}, also prints a status message.
+}
 }
 \description{
-Toggle whether to use parallelisation or not inside various functions in mesa
+\code{setMesaParallel()} enables/disables parallelisation (and may register a backend);
+\code{getMesaParallel()} returns the current setting.
+}
+\section{Functions}{
+\itemize{
+\item \code{getMesaParallel()}: Get whether mesa is using parallelisation.
+
+}}
+\examples{
+# Turn parallelisation OFF (serial evaluation)
+setMesaParallel(useParallel = FALSE, verbose = FALSE)
+getMesaParallel()  # FALSE
+
+# --- Unix/mac (MulticoreParam): enable and use 2 cores ---
+\donttest{
+if (.Platform$OS.type != "windows") {
+  old <- BiocParallel::bpparam()                         # save current backend
+  setMesaParallel(nCores = 2, verbose = FALSE)           # registers MulticoreParam(2)
+  BiocParallel::bpworkers()                               # e.g. 2
+  getMesaParallel()                                       # TRUE
+  BiocParallel::register(old)                             # restore previous backend
+  setMesaParallel(useParallel = FALSE, verbose = FALSE)   # back to serial
+}
+}
+
+# --- Windows: register SnowParam yourself, then enable ---
+\donttest{
+if (.Platform$OS.type == "windows") {
+  old <- BiocParallel::bpparam()
+  BiocParallel::register(BiocParallel::SnowParam(workers = 2))
+  setMesaParallel(useParallel = TRUE, verbose = FALSE)
+  BiocParallel::bpworkers()                               # e.g. 2
+  getMesaParallel()                                       # TRUE
+  BiocParallel::register(old)
+  setMesaParallel(useParallel = FALSE, verbose = FALSE)
+}
+}
 }
