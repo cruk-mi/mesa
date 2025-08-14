@@ -54,7 +54,7 @@ if (requireNamespace("qsea", quietly = TRUE)) {
 }
 \references{
 Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
-\emph{A non-tissue-specific DNA methylation signature is hypermethylated in cancer}.
+\emph{Meta-analysis of human methylomes reveals stably methylated sequences surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{
