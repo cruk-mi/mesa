@@ -2,17 +2,30 @@
 % Please edit documentation in R/utils.R
 \name{remove_almost_empty_cols}
 \alias{remove_almost_empty_cols}
-\title{This function removes columns that are mostly NA (with some proportion)
-Based off the janitor::remove_empty_cols function.}
+\title{Remove almost-empty columns from a data frame}
 \usage{
 remove_almost_empty_cols(dat, prop)
 }
 \arguments{
-\item{dat}{A data frame to filter almost empty columns from}
+\item{dat}{A data frame.}
 
-\item{prop}{A proportion of NAs in each column to allow}
+\item{prop}{Numeric in \verb{[0, 1]}. Keep columns with \code{NA} proportion \verb{<= prop}.}
+}
+\value{
+A data frame with columns failing the threshold removed. The original
+order and row count are preserved.
 }
 \description{
-This function removes columns that are mostly NA (with some proportion)
-Based off the janitor::remove_empty_cols function.
+Drops columns whose proportion of \code{NA} values exceeds a threshold.
+Based on \code{janitor::remove_empty_cols()}, but with a custom \code{prop} cutoff.
+}
+\examples{
+df <- data.frame(a = c(1, NA, 3),
+                 b = c(NA, NA, NA),
+                 c = c(1, 2, NA))
+remove_almost_empty_cols(df, prop = 0.5)  # drops column b
+
+}
+\seealso{
+\code{\link[janitor:remove_empty]{janitor::remove_empty()}}
 }

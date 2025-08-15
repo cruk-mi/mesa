@@ -2,17 +2,30 @@
 % Please edit documentation in R/utils.R
 \name{getPattern}
 \alias{getPattern}
-\title{This function returns the name of the pattern added by addPatternDensity, e.g. "CpG"}
+\title{Infer the pattern name used by addPatternDensity}
 \usage{
 getPattern(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A qseaSet with pattern details added by addPatternDensity}
+\item{qseaSet}{A \code{qseaSet} with pattern density columns (e.g., added by \code{addPatternDensity()}).}
+}
+\value{
+A character vector of pattern names found (possibly length 0 if none).
 }
 \description{
-This function returns the name of the pattern added by addPatternDensity, e.g. "CpG"
+Scans the region metadata of a \code{qseaSet} for columns ending with \code{"_density"}
+and returns the base pattern name (e.g., \code{"CpG"} for \code{"CpG_density"}).
 }
 \examples{
-getPattern(exampleTumourNormal)
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  # Returns character(0) if no *_density columns present
+  getPattern(exampleTumourNormal)
+}
+}
 
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}
 }

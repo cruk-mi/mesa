@@ -2,17 +2,37 @@
 % Please edit documentation in R/utils.R
 \name{qseaTableToChrGRanges}
 \alias{qseaTableToChrGRanges}
-\title{Convert a table from makeTable into a GRanges object}
+\title{Convert a makeTable-like data frame to GRanges (UCSC style)}
 \usage{
 qseaTableToChrGRanges(dataTable)
 }
 \arguments{
-\item{dataTable}{The data frame, generally from qsea::makeTable. Can also be a GRanges object.}
+\item{dataTable}{A data frame (typically from \code{qsea::makeTable()}), or a \code{GRanges}.}
 }
 \value{
-A GenomicRanges object
+A \code{GRanges} with \code{seqnames} in UCSC style (\code{"chr1"}, …). The genome tag
+is not set; set it yourself if needed (e.g., \code{GenomeInfoDb::genome(gr) <- "hg38"}).
 }
 \description{
-This function adds the column names to be able to make the makeTable output into a hg38 GRanges object.
-Basically it converts chr to seqnames, window_start to start, window_end to end, then turns it into a GRanges.
+Coerces a table of windows to \code{GRanges}. Two input formats are supported:
+\itemize{
+\item \code{chr}, \code{window_start}, \code{window_end} (like \code{qsea::makeTable()} output), or
+\item \code{seqnames}, \code{start}, \code{end}.
+If chromosome labels lack \code{"chr"}, the prefix is added.
+}
+}
+\examples{
+# From makeTable-like columns
+df1 <- data.frame(chr = c("1","2"), window_start = c(100, 500), window_end = c(200, 600))
+gr1 <- qseaTableToChrGRanges(df1)
+gr1
+
+# From seqnames/start/end; adds chr prefix if missing
+df2 <- data.frame(seqnames = c("chr3","4"), start = c(1000, 2000), end = c(1100, 2100))
+gr2 <- qseaTableToChrGRanges(df2)
+gr2
+
+}
+\seealso{
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[GenomeInfoDb:seqlevelsStyle]{GenomeInfoDb::seqlevelsStyle()}}
 }

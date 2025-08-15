@@ -2,13 +2,39 @@
 % Please edit documentation in R/utils.R
 \name{dropAvgFragDetails}
 \alias{dropAvgFragDetails}
-\title{This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet if present.}
+\title{Drop fragment detail columns from regions}
 \usage{
 dropAvgFragDetails(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A qseaSet object to drop the columns from the regions.}
+\item{qseaSet}{A \code{qseaSet} object to modify.}
+}
+\value{
+The input \code{qseaSet} with its \code{regions} metadata updated (columns matching
+\code{"avgFragment"} removed if present).
 }
 \description{
-This function removes the avgFragmentLength and avgFragmentMAPQ columns from the regions of the qseaSet if present.
+Removes region metadata columns whose names match \code{"avgFragment"} (e.g.,
+\code{avgFragmentLength}, \code{avgFragmentMAPQ}) from the \code{regions} slot of a \code{qseaSet},
+if present.
+}
+\examples{
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package = "mesa")
+  # Add toy fragment columns, then drop them
+  qs <- exampleTumourNormal
+  r  <- qsea::getRegions(qs)
+  GenomicRanges::mcols(r)$avgFragmentLength <- 150L
+  GenomicRanges::mcols(r)$avgFragmentMAPQ   <- 60L
+  qs@regions <- r
+  qs2 <- dropAvgFragDetails(qs)
+  setdiff(colnames(GenomicRanges::mcols(qs@regions)),
+          colnames(GenomicRanges::mcols(qs2@regions)))
+}
+}
+
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[dplyr:select]{dplyr::select()}}
 }

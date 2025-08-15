@@ -2,13 +2,37 @@
 % Please edit documentation in R/utils.R
 \name{getWindowNames}
 \alias{getWindowNames}
-\title{This function returns a vector of window names from a qseaSet or a data frame.}
+\title{Get window names from a qseaSet or ranges/table}
 \usage{
 getWindowNames(x)
 }
 \arguments{
-\item{x}{A data frame or qseaSet to return the window names of}
+\item{x}{A \code{qseaSet}, a \code{GRanges}, or a data frame coercible to \code{GRanges}
+(must contain \code{seqnames/chr}, \code{start}, \code{end}).}
+}
+\value{
+A character vector of window labels, one per region.
 }
 \description{
-This function returns a vector of window names from a qseaSet or a data frame.
+Returns character labels of the form \code{"seqnames:start-end"} for each window.
+}
+\examples{
+# From a GRanges
+gr <- GenomicRanges::GRanges(c("chr1","chr2"), IRanges::IRanges(c(10,20), c(15,30)))
+getWindowNames(gr)
+
+# From a data frame
+df <- data.frame(seqnames = c("chr1","chr2"), start = c(100,200), end = c(120,220))
+getWindowNames(df)
+
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  head(getWindowNames(exampleTumourNormal))
+}
+}
+
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=asValidGranges]{asValidGranges()}}
 }

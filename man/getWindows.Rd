@@ -2,17 +2,28 @@
 % Please edit documentation in R/utils.R
 \name{getWindows}
 \alias{getWindows}
-\title{Extract the windows used inside the qseaSet.}
+\title{Extract the regions (windows) used in a qseaSet}
 \usage{
 getWindows(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A qseaSet}
+\item{qseaSet}{A \code{qseaSet}.}
+}
+\value{
+A \code{GRanges} of windows.
 }
 \description{
-This function is just a renaming wrapper of the getRegions function from qsea.
+Convenience wrapper for \code{qsea::getRegions()}, returning the genomic windows.
 }
 \examples{
-getWindows(exampleTumourNormal)
+\donttest{
+if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+  data(exampleTumourNormal, package="mesa")
+  getWindows(exampleTumourNormal)
+}
+}
 
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=getWindowNames]{getWindowNames()}}
 }
