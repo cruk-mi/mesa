@@ -42,7 +42,7 @@
 #' # Basic overview
 #' hg38UltraStableProbes
 #' length(hg38UltraStableProbes)             # 974
-#' all(width(hg38UltraStableProbes) == 3)     # TRUE (3-bp windows)
+#' all(GenomicRanges::width(hg38UltraStableProbes) == 3)  # TRUE (3-bp windows)
 #'
 #' # The object uses numeric chromosomes and an unset genome tag
 #' GenomeInfoDb::seqlevels(hg38UltraStableProbes)[1:5]
