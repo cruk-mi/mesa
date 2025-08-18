@@ -1,15 +1,66 @@
-#' This function takes a bam file and gets the coverage over a set of regions. It keeps pairs or high quality R1s.
-#' @param fileName Path to the bam file
-#' @param BSgenome String denoting the BSgenome to be used.
-#' @param regions GRanges object with the regions to calculate the coverage for.
-#' @param fragmentLength Length to extend unpaired reads to.
-#' @param minMapQual Minimum mapping quality to include a read (on either end if proper pair)
-#' @param maxInsertSize Maximum insert size for a proper paired read
-#' @param minInsertSize Minimum insert size for a proper paired read
-#' @param properPairsOnly Whether to only keep proper pairs, else high quality R1s are kept. Also rescues pairs that are almost proper pairs.
-#' @param minReferenceLength Minimum length on the reference coordinates for a non-paired read to be included
-#' @return A list with two elements, the first containing the genomic regions with read numbers, the second the distribution related parameters.
+#' Compute coverage over regions from BAM (pairs and/or high-quality R1)
 #'
+#' Low-level helper that scans a BAM and derives per-region counts using either
+#' proper pairs (with MAPQ filtering and insert-size bounds) and, optionally,
+#' high-quality unpaired R1 reads extended to a fragment length.
+#'
+#' @details
+#' - Proper pairs are retained if either read meets `minMapQual` and the absolute
+#'   insert size lies in `[minInsertSize, maxInsertSize]`. When `properPairsOnly=TRUE`,
+#'   reads that are “almost” proper pairs (right orientation and size) are rescued.
+#' - When `properPairsOnly=FALSE`, unpaired R1 reads are kept if `MAPQ >= minMapQual`
+#'   and reference span `>= minReferenceLength`, then extended from the 5' end by
+#'   `fragmentLength`. If `fragmentLength` is `NULL`, it is estimated as the median
+#'   width of proper pairs (if any).
+#' - Per-region counts are computed using **midpoints** of fragments for consistency
+#'   with qsea.
+#'
+#' @param fileName Character scalar. Path to the BAM file.
+#' @param BSgenome A \pkg{BSgenome} object **or** a character string naming one.
+#' @param regions A \linkS4class{GRanges} with regions to summarise.
+#' @param fragmentLength Integer(1). Length to extend unpaired R1 reads; if `NULL`,
+#'   estimated from proper pairs as median fragment width.
+#' @param minMapQual Integer(1). Minimum MAPQ for either end (proper pairs) or R1 (unpaired).
+#' @param maxInsertSize Integer(1). Maximum absolute insert size for proper pairs.
+#' @param minInsertSize Integer(1). Minimum absolute insert size for proper pairs.
+#' @param minReferenceLength Integer(1). Minimum reference span for R1 (unpaired).
+#' @param properPairsOnly Logical(1). If `TRUE`, ignore unpaired R1 and use proper pairs
+#'   (plus rescued near-proper pairs); if `FALSE`, combine proper pairs with high-quality R1.
+#'
+#' @return A list with two elements:
+#' \describe{
+#'   \item{\code{regionsGR}}{A \linkS4class{GRanges} equal to \code{regions} with an
+#'         extra \code{counts} column containing per-region fragment midpoint counts.}
+#'   \item{\code{library}}{A \code{data.frame} of summary metrics per BAM, including:
+#'         \code{qsea_initial_reads}, \code{qsea_initial_pairs}, \code{qsea_initial_r1s},
+#'         \code{qsea_mapq_filtered_pairs}, \code{qsea_size_filtered_pairs},
+#'         \code{qsea_filtered_r1s}, \code{total_fragments}, \code{valid_fragments},
+#'         \code{fragment_median}, \code{fragment_mean}, \code{fragment_sd},
+#'         and CpG-pattern metrics \code{relH}, \code{GoGe}, \code{fragments_without_pattern},
+#'         \code{prop_without_pattern}.}
+#' }
+#'
+#' @seealso [addBamCoveragePairedAndUnpaired()], [calculateCGEnrichmentGRanges()]
+#' @family coverage
+#'
+#' @examples
+#' \donttest{
+#' # Toy usage (pseudo-code; requires a BAM and a BSgenome):
+#' # library(BSgenome.Hsapiens.UCSC.hg38)
+#' # gr <- GenomicRanges::GRanges("1", IRanges::IRanges(c(1e6,2e6), width=1000))
+#' # out <- getBamCoveragePairedAndUnpairedR1(
+#' #   fileName = "sample.bam",
+#' #   BSgenome = BSgenome.Hsapiens.UCSC.hg38,
+#' #   regions  = gr,
+#' #   minMapQual = 30, minInsertSize = 50, maxInsertSize = 1000,
+#' #   minReferenceLength = 30, properPairsOnly = FALSE
+#' # )
+#' # out$regionsGR
+#' # out$library
+#' }
+#'
+#' @keywords internal
+#' @noRd
 getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, regions = NULL, fragmentLength = NULL,
                                               minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
                                               minReferenceLength = 30, properPairsOnly = FALSE){
@@ -225,19 +276,68 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
 
 
-#' This function adds coverage to the qseaSet, using both paired reads and the high-quality R1s.
-#' @param qs qseaSet object to add coverage to.
-#' @param fragmentLength Length to extend unpaired reads to
-#' @param minMapQual Minimum mapping quality to include a read (on either end if proper pair)
-#' @param maxInsertSize Maximum insert size for a proper paired read
-#' @param minInsertSize Minimum insert size for a proper paired read
-#' @param properPairsOnly Whether to only keep proper pairs, else high quality unpaired R1s are also kept.
-#' @param minReferenceLength Minimum length on the reference coordinates for a non-paired read to be included
-#' @param parallel Whether to use parallelisation
-#' @return A qseaSet with the coverage added.
+#' Add coverage to a qseaSet using proper pairs and/or high-quality R1 reads
+#'
+#' Scans BAM files listed in a \code{qseaSet} and adds per-region counts and library
+#' summaries using proper pairs (with MAPQ and insert-size filters) and, optionally,
+#' high-quality unpaired R1 reads extended to a fragment length. Parallelisation via
+#' \pkg{BiocParallel} is supported.
+#'
+#' @param qs A \code{qseaSet} with valid \code{file_name} in its sample table and
+#'   regions accessible via \code{qsea::getRegions(qs)}.
+#' @param fragmentLength Integer(1) or \code{NULL}. Length to extend unpaired R1 reads;
+#'   if \code{NULL}, estimated as the median proper-pair width (when available).
+#' @param minMapQual Integer(1). Minimum MAPQ for either end (proper pairs) or R1 (unpaired).
+#' @param maxInsertSize,minInsertSize Integer(1). Bounds for absolute insert size of proper pairs.
+#' @param minReferenceLength Integer(1). Minimum reference span for R1s (unpaired).
+#' @param parallel Logical(1). If \code{TRUE} and a multi-core \code{BPPARAM} is registered,
+#'   BAMs are processed in parallel (see \pkg{BiocParallel}).
+#' @param properPairsOnly Logical(1). If \code{TRUE}, only proper pairs (plus rescued near-pairs)
+#'   are used; if \code{FALSE}, combine proper pairs with high-quality unpaired R1 reads.
+#'
+#' @return The input \code{qseaSet} with:
+#' \itemize{
+#'   \item updated count matrix via \code{qsea:::setCounts()}, columns in sample order;
+#'   \item updated library table via \code{qsea:::setLibrary()} with summary metrics;
+#'   \item appended parameter record (MAPQ/size thresholds etc.) via \code{qsea:::addParameters()}.
+#' }
+#'
+#' @details
+#' Per-region counts are computed from fragment midpoints to align with qsea’s counting scheme.
+#' When \code{properPairsOnly=FALSE}, unpaired R1 reads are extended from the 5' end by
+#' \code{fragmentLength}. If \code{fragmentLength} is not supplied, it is estimated from
+#' proper pairs in the same BAM.
+#'
+#' @section Parallelisation:
+#' Parallel execution uses \code{BiocParallel::bplapply()} with the currently registered
+#' backend (see \code{BiocParallel::register()}). Pass \code{parallel=TRUE} and set
+#' a multi-core/cluster backend for speed.
+#'
+#' @seealso [getBamCoveragePairedAndUnpairedR1()] (low-level worker),
+#'   [qsea::getRegions()], [qsea::getSampleTable()], [BiocParallel::register()]
+#' @family coverage
+#' 
+#' @examples
+#' \donttest{
+#' # Load toy qseaSet
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' # Pretend BAM files exist (replace with real file paths in practice)
+#' st <- qsea::getSampleTable(qs)
+#' st$file_name <- tempfile(fileext = ".bam")
+#' file.create(st$file_name)  # create empty placeholder files
+#' qs <- qsea::setSampleTable(qs, st)
+#'
+#' # Run coverage (serial execution for simplicity)
+#' BiocParallel::register(BiocParallel::SerialParam())
+#' qs2 <- addBamCoveragePairedAndUnpaired(qs, properPairsOnly = TRUE)
+#'
+#' # Show updated library table
+#' head(qsea::getLibrary(qs2))
+#' }
+#' 
 #' @export
-#'
-#'
 addBamCoveragePairedAndUnpaired <- function(qs,
                                             fragmentLength = NULL,
                                             minMapQual = 30,
@@ -313,17 +413,43 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 }
 
 
-
-
-#' This function takes a qseaSet and adds several normalisation steps from qsea, with default values
-#' @param qseaSet The qseaSet object.
-#' @param enrichmentMethod What method to use to calculate the enrichment step
-#' @param maxPatternDensity Maximum pattern density in a window to consider it for the background calculation
-#' @return A qseaSet object with the
-#' @examples
-#' getExampleQseaSet(expSamplingDepth = 100000) %>% addNormalisation(maxPatternDensity = 0.5)
-#' @export
+#' Add qsea normalisation steps with defaults
 #'
+#' Applies a set of qsea normalisation steps to a \code{qseaSet}, including
+#' setting library factors to 1 (disabling TMM), adding offsets based on an
+#' enrichment pattern, and configuring enrichment parameters across a CpG-density
+#' window range.
+#'
+#' @param qseaSet A \code{qseaSet} object.
+#' @param enrichmentMethod Character(1). Label recorded in \code{qseaSet@parameters$enrichmentMethod}.
+#'   Currently informational; algorithmic behaviour is controlled by other arguments.
+#' @param maxPatternDensity Numeric(1). Maximum pattern density to consider in background
+#'   calculation passed to \code{qsea::addOffset()}.
+#'
+#' @return A \code{qseaSet} with updated library factors, offsets, enrichment parameters,
+#'   and \code{@parameters$enrichmentMethod} set.
+#'
+#' @details
+#' - Library factors are set to 1 via \code{qsea::addLibraryFactors(qseaSet, factors = 1)}.
+#' - Offsets are added with \code{qsea::addOffset()} using \code{getPattern(qseaSet)} and
+#'   \code{maxPatternDensity}.
+#' - Enrichment parameters are configured over windows with CpG density in \code{[1, 15]} using
+#'   a linear signal schedule and \code{bins = seq(0.5, 40.5, 0.5)}.
+#'
+#' @seealso [qsea::addLibraryFactors()], [qsea::addOffset()], [qsea::addEnrichmentParameters()],
+#'   [getPattern()]
+#'   
+#' @examples
+#' # Run normalisation on a toy qseaSet with ~100k reads
+#' getExampleQseaSet(expSamplingDepth = 100000) %>%
+#'   addNormalisation(maxPatternDensity = 0.5)
+#'
+#' # Lightweight example (step by step)
+#' qs <- getExampleQseaSet(expSamplingDepth = 1e5)
+#' qs2 <- addNormalisation(qs, maxPatternDensity = 0.5)
+#' qs2@parameters$enrichmentMethod
+#' 
+#' @export
 addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15", maxPatternDensity = 0.05){
 
   # do not calculate the TMM normalisation, set all to be 0.
