@@ -352,7 +352,7 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
 #'   colnames(exampleTumourNormal)
 #' }
 #' }
-#' @export
+#' @exportMethod colnames
 setMethod("colnames", "qseaSet", function(x) {
   colnames(qsea::getSampleTable(x))
 })

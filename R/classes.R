@@ -57,7 +57,7 @@ mesaDimRed <-  function(res, sampleTable, samples, params, dataTable = data.fram
 
 #' @rdname mesaDimRed-class
 #' @param object A \linkS4class{mesaDimRed} object.
-#' @export
+#' @exportMethod show
 setMethod("show", "mesaDimRed", function(object) {
   cat("Object containing ", length(object@res),
       " dimensionality reduction objects for ",
@@ -119,7 +119,7 @@ mesaPCA <-  function(prcomp, windows) {
 
 #' @rdname mesaPCA-class
 #' @param object A \linkS4class{mesaPCA} object.
-#' @export
+#' @exportMethod show
 setMethod("show", "mesaPCA", function(object) {
   n <- tryCatch(nrow(object@prcomp$x), error = function(e) NA_integer_)
   cat("PCA result for ", n,
@@ -182,7 +182,7 @@ mesaUMAP <-  function(points, windows) {
 
 #' @rdname mesaUMAP-class
 #' @param object A \linkS4class{mesaUMAP} object.
-#' @export
+#' @exportMethod show
 setMethod("show", "mesaUMAP", function(object) {
   cat("UMAP result for ", nrow(object@points),
       " samples calculated over ", length(object@windows),
