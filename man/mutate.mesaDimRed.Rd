@@ -2,18 +2,28 @@
 % Please edit documentation in R/classes.R
 \name{mutate.mesaDimRed}
 \alias{mutate.mesaDimRed}
-\title{This function extends the dplyr function mutate to act on a mesaDimRed sampleTable.}
+\title{Mutate the sample table of a mesaDimRed}
 \usage{
 \method{mutate}{mesaDimRed}(.data, ...)
 }
 \arguments{
-\item{.data}{A mesaDimRed to mutate}
+\item{.data}{A \linkS4class{mesaDimRed} object.}
 
-\item{...}{Other arguments to pass to dplyr::mutate}
+\item{...}{Arguments passed to \code{dplyr::mutate()}.}
 }
 \value{
-A mesaDimRed object with the sampleTable changed by a call to dplyr::mutate
+A \linkS4class{mesaDimRed} with an updated \code{sampleTable}.
 }
 \description{
-This function extends the dplyr function mutate to act on a mesaDimRed sampleTable.
+Extends \code{dplyr::mutate()} to operate on the \code{sampleTable} slot.
+}
+\examples{
+st <- data.frame(sample_name = c("A","B"),
+                 group = c("X","Y"),
+                 row.names = "sample_name")
+md <- mesaDimRed(res = list(), sampleTable = st,
+                 samples = rownames(st), params = list())
+md2 <- mutate(md, group2 = paste0(group, "_2"))
+stopifnot("group2" \%in\% colnames(md2@sampleTable))
+
 }

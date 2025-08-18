@@ -3,21 +3,59 @@
 \docType{class}
 \name{mesaDimRed-class}
 \alias{mesaDimRed-class}
-\title{The MesaDimRed class}
+\alias{mesaDimRed}
+\alias{show,mesaDimRed-method}
+\title{Dimensionality reduction results container}
+\usage{
+mesaDimRed(res, sampleTable, samples, params, dataTable = data.frame())
+
+\S4method{show}{mesaDimRed}(object)
+}
+\arguments{
+\item{res}{List of DR result objects.}
+
+\item{sampleTable}{Data.frame with sample annotations (row names = sample IDs).}
+
+\item{samples}{Character vector of sample IDs included.}
+
+\item{params}{List of parameters used to compute \code{res}.}
+
+\item{dataTable}{Optional data.frame of the numeric matrix used for DR.}
+
+\item{object}{A \linkS4class{mesaDimRed} object.}
+}
+\value{
+A \linkS4class{mesaDimRed} object.
+}
 \description{
-This is a class for containing the results of a dimensionality reduction on a qseaSet
+Aggregates one or more dimensionality reduction results (e.g., PCA/UMAP)
+computed on a common set of samples.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{res}}{The results, a list containing individual PCA/UMAP objects.}
+\item{\code{res}}{A list of individual DR results (e.g., \linkS4class{mesaPCA},
+\linkS4class{mesaUMAP}, or related objects).}
 
-\item{\code{sampleTable}}{A sampleTable from the qseaSet.}
+\item{\code{sampleTable}}{A data.frame describing samples (row names = sample IDs).}
 
-\item{\code{samples}}{A character vector of the samples used.}
+\item{\code{samples}}{Character vector of sample IDs used.}
 
-\item{\code{params}}{The parameters used during construction.}
+\item{\code{params}}{List of parameters used to generate results in \code{res}.}
 
-\item{\code{dataTable}}{The data used to construct the PCA/UMAP object (optional).}
+\item{\code{dataTable}}{Optional data.frame containing the matrix used to compute DR.}
 }}
 
+\examples{
+st <- data.frame(sample_name = c("S1","S2"),
+                 group = c("A","B"),
+                 row.names = "sample_name")
+md <- mesaDimRed(res = list(), sampleTable = st,
+                 samples = rownames(st), params = list(),
+                 dataTable = data.frame())
+md
+
+}
+\seealso{
+\linkS4class{mesaPCA}, \linkS4class{mesaUMAP}
+}
