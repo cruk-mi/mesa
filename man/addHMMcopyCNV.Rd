@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaCNV.R
 \name{addHMMcopyCNV}
 \alias{addHMMcopyCNV}
-\title{Calculate and add CNV based on HMMcopy, on individual samples}
+\title{Add per-sample CNV calls to a qseaSet using HMMcopy}
 \usage{
 addHMMcopyCNV(
   qs,
@@ -21,36 +21,80 @@ addHMMcopyCNV(
 )
 }
 \arguments{
-\item{qs}{The qseaSet object}
+\item{qs}{A \code{qseaSet} object.}
 
-\item{inputColumn}{Which column of the sample table contains the link to the bam file}
+\item{inputColumn}{Character(1). Column name in the sample table with BAM paths (e.g. \code{"input_file"}).}
 
-\item{windowSize}{What window size to use (only 50000, 500000 or 1000000 work at the moment)}
+\item{windowSize}{Integer(1). Window size in bp; allowed values: 50000, 500000, 1000000.}
 
-\item{fragmentLength}{Fragment length to extend reads to if not paired}
+\item{fragmentLength}{Integer(1) or \code{NULL}. Extend unpaired R1 to this length; if \code{NULL},
+estimate from proper pairs.}
 
-\item{plotDir}{A directory to export individual HMMcopy plots to.}
+\item{plotDir}{Character(1) or \code{NULL}. If given, PDF plots per sample are written here.}
 
-\item{parallel}{Whether to use parallelisation}
+\item{parallel}{Logical(1). Use \pkg{BiocParallel} if a parallel backend is registered.}
 
-\item{maxInsertSize}{For paired reads, only keep them if they are below a maximum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.}
+\item{minInsertSize, maxInsertSize}{Integer(1). Absolute insert-size bounds for proper pairs.}
 
-\item{minInsertSize}{For paired reads, only keep them if they are above a minimum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.}
+\item{minReferenceLength}{Integer(1). Minimum reference span for R1 (unpaired).}
 
-\item{minReferenceLength}{A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.}
+\item{minMapQual}{Integer(1). Minimum MAPQ for either end (pairs) or R1.}
 
-\item{minMapQual}{Minimum mapping quality to include a read (on either end if proper pair)}
+\item{properPairsOnly}{Logical(1). If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine pairs + high‑quality R1.}
 
-\item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
-
-\item{hmmCopyGC}{Object containing GC content per window in the genome, for hmmcopy}
-
-\item{hmmCopyMap}{Object containing mapability content per window in the genome, for hmmcopy}
+\item{hmmCopyGC, hmmCopyMap}{\linkS4class{GRanges}. Precomputed GC and mappability tracks binned at \code{windowSize}.}
 }
 \value{
-A qseaGLM object
+The input \code{qseaSet} with:
+\itemize{
+\item CNV per window stored via \code{qsea:::setCNV()};
+\item \code{@libraries$input_counts} containing raw per-window counts + GC/map;
+\item library table updated via \code{qsea:::setLibrary()}.
+}
 }
 \description{
-This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-Only works for hg38/GRCh38!
+Runs a CNV pipeline on each sample: counts fragments in fixed-size genomic
+windows, normalises for GC and mappability (HMMcopy), segments, and stores
+per-window copy-number in the \code{qseaSet}. Supports parallel execution.
+Only GRCh38/hg38 is currently supported.
 }
+\details{
+For each sample, coverage is computed with
+\code{\link{getBamCoveragePairedAndUnpairedR1}} over genome windows generated
+by \code{qsea:::makeGenomeWindows()}, normalised with HMMcopy
+(\code{HMMcopy::correctReadcount()} + \code{HMMcopy::HMMsegment()}), and the
+resulting CNV tracks are merged across samples into the qseaSet.
+}
+\examples{
+# Example workflow (non-running here; requires BAMs and GC/map tracks)
+# data(exampleTumourNormal, package = "mesa")
+# qs <- exampleTumourNormal
+#
+# # Provide GC and mappability tracks at the desired window size
+# # (e.g. precomputed 1 Mb hg38 tracks as GRanges with columns 'gc' and 'map')
+# gc_track  <- hmmcopy_gc_1Mb_hg38   # user-supplied GRanges
+# map_track <- hmmcopy_map_1Mb_hg38  # user-supplied GRanges
+#
+# # Make sure the sample table has a BAM column (e.g., 'input_file')
+# # st <- qsea::getSampleTable(qs); stopifnot("input_file" \%in\% names(st))
+#
+# BiocParallel::register(BiocParallel::SerialParam())
+# qs2 <- addHMMcopyCNV(
+#   qs, inputColumn = "input_file", windowSize = 1e6,
+#   hmmCopyGC = gc_track, hmmCopyMap = map_track,
+#   properPairsOnly = TRUE, parallel = FALSE, plotDir = tempdir()
+# )
+# # Per-window CNV now available:
+# # qsea::getCNV(qs2)
+
+}
+\seealso{
+\code{\link{runHMMCopy}}, \code{\link{plotCNVheatmap}},
+\code{\link{getBamCoveragePairedAndUnpairedR1}}, \pkg{HMMcopy}
+
+Other CNV: 
+\code{\link{plotCNVheatmap}()},
+\code{\link{removeCNV}()},
+\code{\link{runHMMCopy}()}
+}
+\concept{CNV}

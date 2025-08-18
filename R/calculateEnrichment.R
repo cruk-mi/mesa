@@ -1,7 +1,34 @@
-#' This function takes a BSGenome and returns a data frame with the relH and GoGe parameters used for calculating enrichment
+#' Genome-wide CpG statistics (relH and GoGe)
 #'
-#' @param BSgenome The BSgenome object.
-#' @return A data frame with two entries, genome.relH and genome.GoGe
+#' Compute genome-wide CpG metrics for a given BSgenome: the relative CpG
+#' frequency (\emph{relH}, percent of dinucleotides that are "CG") and the
+#' GoGe statistic \eqn{(nCG * genome_length) / (nC * nG)}. These values are
+#' used as denominators to normalise sample-level CpG enrichment.
+#'
+#' @param BSgenome Character(1). The BSgenome package name, e.g.
+#'   \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
+#'
+#' @return A \code{data.frame} with two columns:
+#' \describe{
+#'   \item{\code{genome.relH}}{Percent of "CG" dinucleotides genome-wide.}
+#'   \item{\code{genome.GoGe}}{GoGe enrichment statistic.}
+#' }
+#'
+#' @details
+#' Chromosomes named \code{"rand"} or \code{"chrUn"} are excluded. The function
+#' loads the BSgenome indicated by \code{BSgenome} and uses \pkg{Biostrings}
+#' and \pkg{BSgenome} utilities to count CG, C, and G across the genome.
+#'
+#' @seealso \code{\link{calculateCGEnrichment}},
+#'   \code{\link{calculateCGEnrichmentGRanges}}, \pkg{BSgenome}, \pkg{Biostrings}
+#'
+#' @examples
+#' \donttest{
+#' # Example: compute genome-wide CpG metrics for GRCh38 (package must be installed)
+#' if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+#'   calculateGenomicCGDistribution("BSgenome.Hsapiens.NCBI.GRCh38")
+#' }
+#' }
 calculateGenomicCGDistribution <- function(BSgenome){
   dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
@@ -19,13 +46,51 @@ calculateGenomicCGDistribution <- function(BSgenome){
 }
 
 
-#' This function takes a path to a bam file and calculates the enrichment scores.
+#' CpG enrichment from a BAM file (MEDIPS-style)
 #'
-#' @param file The path to the bam file
-#' @param BSgenome Which BSGenome to use (GRCh38 is cached for speed)
-#' @param exportPath Location to save a plot and data object into. This contains a histogram of fragment length distribution and a rds file containing the
-#' @param extend,shift,uniq,chr.select,paired Options to feed into MEDIPS::getGRange or MEDIPS::getPairedGRange
-#' @return A data frame containing the relH, GoGe and number of reads values for the samples
+#' Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM,
+#' using \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
+#' interrogate the reference genome. Optionally exports a fragment-length
+#' density plot (PDF) and a serialized RDS with the GRanges of reads.
+#'
+#' @param file Character(1). Path to a BAM file.
+#' @param BSgenome Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
+#'   GRCh38 and hg19 distributions are cached within \pkg{mesa} for speed.
+#' @param exportPath Character(1) or \code{NULL}. Directory to write a fragment-length
+#'   density PDF and an RDS of the read GRanges. If \code{NULL}, no files are written.
+#' @param extend,shift,uniq,chr.select,paired Arguments passed to
+#'   \code{MEDIPS::getGRange()} or \code{MEDIPS::getPairedGRange()}.
+#'
+#' @return A \code{data.frame} with:
+#' \describe{
+#'   \item{\code{file}}{Input BAM path.}
+#'   \item{\code{relH}}{Sample relH normalised by genome relH.}
+#'   \item{\code{GoGe}}{Sample GoGe normalised by genome GoGe.}
+#'   \item{\code{nReads}}{Total reads considered.}
+#'   \item{\code{nReadsWithoutPattern}}{Reads lacking "CG" motif.}
+#'   \item{\code{n100bpReads}}{Reads with length \eqn{\ge} 100 bp.}
+#'   \item{\code{n100bpReadsWithoutPattern}}{Reads \eqn{\ge} 100 bp lacking "CG".}
+#' }
+#'
+#' @details
+#' The function counts exact "CG" matches in read sequences and normalises by
+#' genome-wide CpG metrics (relH, GoGe). For supported genomes, precomputed
+#' distributions bundled in \pkg{mesa} are used; otherwise,
+#' \code{\link{calculateGenomicCGDistribution}} is called.
+#'
+#' @seealso \code{\link{calculateCGEnrichmentGRanges}},
+#'   \code{\link{calculateGenomicCGDistribution}}, \pkg{MEDIPS}, \pkg{BSgenome}
+#'
+#' @examples
+#' \donttest{
+#' # Sketch of usage (requires a real BAM and installed BSgenome):
+#' # calculateCGEnrichment(
+#' #   file = "sample.bam",
+#' #   BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+#' #   exportPath = tempdir(),
+#' #   paired = TRUE
+#' # )
+#' }
 #' @export
 calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
                                    extend = 0, shift = 0, uniq = 0,
@@ -130,21 +195,71 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
                     n100bpReadsWithoutPattern = numWithoutPatternOver100bp
   ))
 }
-#' This function takes a GRanges object and calculates the enrichment scores.
+
+
+#' Genomic positions of a motif (CG) from MEDIPS
 #'
-#' @param BSgenome Which BSgenome to use
-#' @param chr.select Which chromosomes to use
-#' @return A data frame containing the relH, GoGe and number of reads values for the samples
+#' Convenience wrapper that returns genomic positions of the \code{"CG"} motif
+#' for the specified BSgenome and chromosomes, via \code{MEDIPS::MEDIPS.getPositions()}.
+#'
+#' @param BSgenome Character(1). BSgenome package name.
+#' @param chr.select Character vector of chromosome names to include (e.g., \code{paste0("chr", 1:22)}).
+#'
+#' @return A \linkS4class{GRanges} of motif positions.
+#'
+#' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
+#'
+#' @examples
+#' \donttest{
+#' # Requires MEDIPS and a BSgenome package
+#' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+#' #   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = paste0("chr", 1:2))
+#' #   gr
+#' # }
+#' }
 getCGPositions <- function(BSgenome, chr.select){
   MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
 }
 
-#' This function takes a GRanges object and calculates the enrichment scores.
+
+#' CpG enrichment from GRanges of reads (MEDIPS-style)
 #'
-#' @param readGRanges A GRanges object containing the span of each fragment of DNA
-#' @param BSgenome Which BSgenome to use (GRCh38 is cached for speed)
-#' @param chr.select Which chromosomes to use in global calculation
-#' @return A data frame containing the relH, GoGe and number of reads values for the samples
+#' Compute relH and GoGe CpG enrichment metrics from a \linkS4class{GRanges} of
+#' read spans, using the specified BSgenome. Useful when reads are already
+#' represented as genomic ranges rather than a BAM file.
+#'
+#' @param readGRanges \linkS4class{GRanges}. Each range represents a fragment.
+#' @param BSgenome Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
+#' @param chr.select Character vector of chromosomes to restrict the motif positions calculation.
+#'
+#' @return A \code{tibble} with columns:
+#' \code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern},
+#' \code{n100bpReads}, \code{n100bpReadsWithoutPattern}.
+#'
+#' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateGenomicCGDistribution}}
+#'
+#' @examples
+#' \donttest{
+#' # Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
+#' if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+#'   set.seed(1)
+#'   n <- 200
+#'   gr <- GenomicRanges::GRanges(
+#'     seqnames = rep("chr1", n),
+#'     ranges   = IRanges::IRanges(
+#'       start = sample(1e6:2e6, n),
+#'       width = sample(80:180, n, replace = TRUE)
+#'     ),
+#'     strand = "*"
+#'   )
+#'   calculateCGEnrichmentGRanges(
+#'     readGRanges = gr,
+#'     BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
+#'     chr.select  = "chr1"
+#'   )
+#' }
+#' }
+#' 
 #' @export
 calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
 
@@ -226,14 +341,42 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
   )
 }
 
-#' This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.
-#' @param qseaSet The cutoff to use on the windows for each sample
-#' @param exportPath Folder to export files
-#' @param nonEnrich Boolean to signify function is being ran on the Input samples
-#' @param extend,shift,uniq,chr.select,paired Options to feed into medips::getGRange or medips::getPairedGRange
-#' @param file_name Column of the sampleTable which contains the file_name.
-#' @param nCores Number of cores to use for parallelisation
-#' @return A qseaSet supplemented with more columns on the sampleTable, related to enrichment.
+
+#' Add MEDIPS-style enrichment metrics to a qseaSet sample table
+#'
+#' For each sample, compute MEDIPS-style CpG enrichment metrics (relH, GoGe,
+#' and counts) from its BAM, and append the results to the sample table within
+#' the \code{qseaSet}. Supports both pulldown (default) and input libraries.
+#'
+#' @param qseaSet A \code{qseaSet}.
+#' @param exportPath Character(1) or \code{NULL}. Directory to export per-sample
+#'   fragment-length PDFs and read GRanges RDS files (optional).
+#' @param nonEnrich Logical(1). If \code{TRUE}, treat samples as Input; else Pulldown.
+#'   Determines which columns are appended.
+#' @param extend,shift,uniq,chr.select,paired Passed to \pkg{MEDIPS} range extraction.
+#' @param file_name Character(1). Column name in the sample table holding BAM paths
+#'   (used when \code{nonEnrich = FALSE}). For Input, the column \code{input_file} is used.
+#' @param nCores Integer(1). Number of parallel cores for \code{parallel::mclapply()}.
+#'
+#' @return The input \code{qseaSet}, with new columns appended to the corresponding
+#'   \code{@libraries} slot (either \code{$file_name} or \code{$input_file} frame),
+#'   including relH/GoGe and read counts.
+#'
+#' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}
+#'
+#' @examples
+#' \donttest{
+#' # Sketch (requires BAMs and a BSgenome):
+#' # data(exampleTumourNormal, package = "mesa")
+#' # qs <- exampleTumourNormal
+#' # qs <- addMedipsEnrichmentFactors(
+#' #   qs, exportPath = tempdir(), nonEnrich = FALSE,
+#' #   file_name = "file_name", nCores = 1,
+#' #   paired = TRUE, chr.select = paste0("chr", 1:22)
+#' # )
+#' # head(qsea::getSampleTable(qs))
+#' }
+#' 
 #' @export
 addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
                                        extend = 0, shift = 0, uniq = 0,

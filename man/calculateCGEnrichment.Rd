@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{calculateCGEnrichment}
 \alias{calculateCGEnrichment}
-\title{This function takes a path to a bam file and calculates the enrichment scores.}
+\title{CpG enrichment from a BAM file (MEDIPS-style)}
 \usage{
 calculateCGEnrichment(
   file = NULL,
@@ -16,17 +16,53 @@ calculateCGEnrichment(
 )
 }
 \arguments{
-\item{file}{The path to the bam file}
+\item{file}{Character(1). Path to a BAM file.}
 
-\item{BSgenome}{Which BSGenome to use (GRCh38 is cached for speed)}
+\item{BSgenome}{Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
+GRCh38 and hg19 distributions are cached within \pkg{mesa} for speed.}
 
-\item{exportPath}{Location to save a plot and data object into. This contains a histogram of fragment length distribution and a rds file containing the}
+\item{exportPath}{Character(1) or \code{NULL}. Directory to write a fragment-length
+density PDF and an RDS of the read GRanges. If \code{NULL}, no files are written.}
 
-\item{extend, shift, uniq, chr.select, paired}{Options to feed into MEDIPS::getGRange or MEDIPS::getPairedGRange}
+\item{extend, shift, uniq, chr.select, paired}{Arguments passed to
+\code{MEDIPS::getGRange()} or \code{MEDIPS::getPairedGRange()}.}
 }
 \value{
-A data frame containing the relH, GoGe and number of reads values for the samples
+A \code{data.frame} with:
+\describe{
+\item{\code{file}}{Input BAM path.}
+\item{\code{relH}}{Sample relH normalised by genome relH.}
+\item{\code{GoGe}}{Sample GoGe normalised by genome GoGe.}
+\item{\code{nReads}}{Total reads considered.}
+\item{\code{nReadsWithoutPattern}}{Reads lacking "CG" motif.}
+\item{\code{n100bpReads}}{Reads with length \eqn{\ge} 100 bp.}
+\item{\code{n100bpReadsWithoutPattern}}{Reads \eqn{\ge} 100 bp lacking "CG".}
+}
 }
 \description{
-This function takes a path to a bam file and calculates the enrichment scores.
+Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM,
+using \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
+interrogate the reference genome. Optionally exports a fragment-length
+density plot (PDF) and a serialized RDS with the GRanges of reads.
+}
+\details{
+The function counts exact "CG" matches in read sequences and normalises by
+genome-wide CpG metrics (relH, GoGe). For supported genomes, precomputed
+distributions bundled in \pkg{mesa} are used; otherwise,
+\code{\link{calculateGenomicCGDistribution}} is called.
+}
+\examples{
+\donttest{
+# Sketch of usage (requires a real BAM and installed BSgenome):
+# calculateCGEnrichment(
+#   file = "sample.bam",
+#   BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+#   exportPath = tempdir(),
+#   paired = TRUE
+# )
+}
+}
+\seealso{
+\code{\link{calculateCGEnrichmentGRanges}},
+\code{\link{calculateGenomicCGDistribution}}, \pkg{MEDIPS}, \pkg{BSgenome}
 }

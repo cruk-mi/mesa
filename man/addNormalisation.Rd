@@ -2,7 +2,7 @@
 % Please edit documentation in R/buildQset.R
 \name{addNormalisation}
 \alias{addNormalisation}
-\title{This function takes a qseaSet and adds several normalisation steps from qsea, with default values}
+\title{Add qsea normalisation steps with defaults}
 \usage{
 addNormalisation(
   qseaSet,
@@ -11,18 +11,45 @@ addNormalisation(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{enrichmentMethod}{What method to use to calculate the enrichment step}
+\item{enrichmentMethod}{Character(1). Label recorded in \code{qseaSet@parameters$enrichmentMethod}.
+Currently informational; algorithmic behaviour is controlled by other arguments.}
 
-\item{maxPatternDensity}{Maximum pattern density in a window to consider it for the background calculation}
+\item{maxPatternDensity}{Numeric(1). Maximum pattern density to consider in background
+calculation passed to \code{qsea::addOffset()}.}
 }
 \value{
-A qseaSet object with the
+A \code{qseaSet} with updated library factors, offsets, enrichment parameters,
+and \code{@parameters$enrichmentMethod} set.
 }
 \description{
-This function takes a qseaSet and adds several normalisation steps from qsea, with default values
+Applies a set of qsea normalisation steps to a \code{qseaSet}, including
+setting library factors to 1 (disabling TMM), adding offsets based on an
+enrichment pattern, and configuring enrichment parameters across a CpG-density
+window range.
+}
+\details{
+\itemize{
+\item Library factors are set to 1 via \code{qsea::addLibraryFactors(qseaSet, factors = 1)}.
+\item Offsets are added with \code{qsea::addOffset()} using \code{getPattern(qseaSet)} and
+\code{maxPatternDensity}.
+\item Enrichment parameters are configured over windows with CpG density in \code{[1, 15]} using
+a linear signal schedule and \code{bins = seq(0.5, 40.5, 0.5)}.
+}
 }
 \examples{
-getExampleQseaSet(expSamplingDepth = 100000) \%>\% addNormalisation(maxPatternDensity = 0.5)
+# Run normalisation on a toy qseaSet with ~100k reads
+getExampleQseaSet(expSamplingDepth = 100000) \%>\%
+  addNormalisation(maxPatternDensity = 0.5)
+
+# Lightweight example (step by step)
+qs <- getExampleQseaSet(expSamplingDepth = 1e5)
+qs2 <- addNormalisation(qs, maxPatternDensity = 0.5)
+qs2@parameters$enrichmentMethod
+
+}
+\seealso{
+\code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}, \code{\link[qsea:addOffset]{qsea::addOffset()}}, \code{\link[qsea:addEnrichmentParameters]{qsea::addEnrichmentParameters()}},
+\code{\link[=getPattern]{getPattern()}}
 }

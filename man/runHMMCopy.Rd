@@ -2,21 +2,49 @@
 % Please edit documentation in R/qseaCNV.R
 \name{runHMMCopy}
 \alias{runHMMCopy}
-\title{Function to call HMMcopy on the individual reads for a sample}
+\title{Run HMMcopy on per-window reads for a single sample}
 \usage{
 runHMMCopy(CNV_RegionsWithReads, colname, plotDir = NULL)
 }
 \arguments{
-\item{CNV_RegionsWithReads}{Granges object with reads columns}
+\item{CNV_RegionsWithReads}{A \code{data.frame} / \code{data.table} / \linkS4class{GRanges}
+coercible object with columns:
+\code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map},
+and one sample-specific \code{reads} column (passed by name via \code{colname}).}
 
-\item{colname}{Which column of the sample to use}
+\item{colname}{Character(1). The sample column to use as read counts.}
 
-\item{plotDir}{A directory to export individual HMMcopy plots to.}
+\item{plotDir}{Character(1) or \code{NULL}. If provided, writes a PDF plot named \code{<colname>.pdf}.}
 }
 \value{
-A GRanges object with the result of calling HMMcopy.
+A \linkS4class{GRanges} with columns named \code{<colname>} containing
+per-window CNV estimates (HMM state means on the log2 scale).
 }
 \description{
-This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-Only works for hg38/GRCh38!
+Given a table of per-window counts with GC and mappability, run HMMcopy
+correction and segmentation, and return a GRanges of CNV calls for the
+selected sample/column.
 }
+\examples{
+# Minimal skeleton (non-running): build the required table, then call:
+# tbl <- data.frame(
+#   chr = rep(paste0("chr", 1:2), each = 5),
+#   start = seq(1, by = 1e6, length.out = 10),
+#   end   = seq(1e6, by = 1e6, length.out = 10),
+#   width = 1e6, strand = "*",
+#   gc = runif(10, 0.3, 0.7), map = runif(10, 0.8, 1.0),
+#   sampleA = rpois(10, 500)
+# )
+# gr_cnv <- runHMMCopy(tbl, colname = "sampleA", plotDir = tempdir())
+# gr_cnv
+
+}
+\seealso{
+\code{\link{addHMMcopyCNV}}, \pkg{HMMcopy}
+
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{plotCNVheatmap}()},
+\code{\link{removeCNV}()}
+}
+\concept{CNV}

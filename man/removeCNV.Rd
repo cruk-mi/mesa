@@ -2,16 +2,33 @@
 % Please edit documentation in R/qseaCNV.R
 \name{removeCNV}
 \alias{removeCNV}
-\title{This function takes a qseaSet and removes the CNV data.}
+\title{Remove (zero out) CNV data from a qseaSet}
 \usage{
 removeCNV(qseaSet)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet}.}
 }
 \value{
-A qseaSet with the CNV data removed
+A \code{qseaSet} with the CNV assay zeroed.
 }
 \description{
-This function takes a qseaSet and removes the CNV data.
+Sets all per-window CNV values to zero, keeping genomic coordinates intact.
+Useful for resetting CNV prior to recalculation.
 }
+\examples{
+# data(exampleTumourNormal, package = "mesa")
+# qs <- exampleTumourNormal
+# qs <- removeCNV(qs)
+# qsea::getCNV(qs)
+
+}
+\seealso{
+\code{\link{addHMMcopyCNV}}, \code{\link{plotCNVheatmap}}
+
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{plotCNVheatmap}()},
+\code{\link{runHMMCopy}()}
+}
+\concept{CNV}

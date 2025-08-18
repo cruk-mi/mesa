@@ -2,16 +2,41 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{calculateGenomicCGDistribution}
 \alias{calculateGenomicCGDistribution}
-\title{This function takes a BSGenome and returns a data frame with the relH and GoGe parameters used for calculating enrichment}
+\title{Genome-wide CpG statistics (relH and GoGe)}
 \usage{
 calculateGenomicCGDistribution(BSgenome)
 }
 \arguments{
-\item{BSgenome}{The BSgenome object.}
+\item{BSgenome}{Character(1). The BSgenome package name, e.g.
+\code{"BSgenome.Hsapiens.NCBI.GRCh38"}.}
 }
 \value{
-A data frame with two entries, genome.relH and genome.GoGe
+A \code{data.frame} with two columns:
+\describe{
+\item{\code{genome.relH}}{Percent of "CG" dinucleotides genome-wide.}
+\item{\code{genome.GoGe}}{GoGe enrichment statistic.}
+}
 }
 \description{
-This function takes a BSGenome and returns a data frame with the relH and GoGe parameters used for calculating enrichment
+Compute genome-wide CpG metrics for a given BSgenome: the relative CpG
+frequency (\emph{relH}, percent of dinucleotides that are "CG") and the
+GoGe statistic \eqn{(nCG * genome_length) / (nC * nG)}. These values are
+used as denominators to normalise sample-level CpG enrichment.
+}
+\details{
+Chromosomes named \code{"rand"} or \code{"chrUn"} are excluded. The function
+loads the BSgenome indicated by \code{BSgenome} and uses \pkg{Biostrings}
+and \pkg{BSgenome} utilities to count CG, C, and G across the genome.
+}
+\examples{
+\donttest{
+# Example: compute genome-wide CpG metrics for GRCh38 (package must be installed)
+if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+  calculateGenomicCGDistribution("BSgenome.Hsapiens.NCBI.GRCh38")
+}
+}
+}
+\seealso{
+\code{\link{calculateCGEnrichment}},
+\code{\link{calculateCGEnrichmentGRanges}}, \pkg{BSgenome}, \pkg{Biostrings}
 }

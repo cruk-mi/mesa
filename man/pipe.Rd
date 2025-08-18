@@ -9,4 +9,13 @@ lhs \%>\% rhs
 \description{
 See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
 }
+\examples{
+# Basic usage: pipe a vector into sum()
+1:5 \%>\% sum()
+
+# Chain multiple transformations
+1:10 \%>\%
+  mean() \%>\%
+  round(1)
+}
 \keyword{internal}

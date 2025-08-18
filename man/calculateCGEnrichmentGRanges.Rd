@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{calculateCGEnrichmentGRanges}
 \alias{calculateCGEnrichmentGRanges}
-\title{This function takes a GRanges object and calculates the enrichment scores.}
+\title{CpG enrichment from GRanges of reads (MEDIPS-style)}
 \usage{
 calculateCGEnrichmentGRanges(
   readGRanges = NULL,
@@ -11,15 +11,45 @@ calculateCGEnrichmentGRanges(
 )
 }
 \arguments{
-\item{readGRanges}{A GRanges object containing the span of each fragment of DNA}
+\item{readGRanges}{\linkS4class{GRanges}. Each range represents a fragment.}
 
-\item{BSgenome}{Which BSgenome to use (GRCh38 is cached for speed)}
+\item{BSgenome}{Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).}
 
-\item{chr.select}{Which chromosomes to use in global calculation}
+\item{chr.select}{Character vector of chromosomes to restrict the motif positions calculation.}
 }
 \value{
-A data frame containing the relH, GoGe and number of reads values for the samples
+A \code{tibble} with columns:
+\code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern},
+\code{n100bpReads}, \code{n100bpReadsWithoutPattern}.
 }
 \description{
-This function takes a GRanges object and calculates the enrichment scores.
+Compute relH and GoGe CpG enrichment metrics from a \linkS4class{GRanges} of
+read spans, using the specified BSgenome. Useful when reads are already
+represented as genomic ranges rather than a BAM file.
+}
+\examples{
+\donttest{
+# Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
+if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+  set.seed(1)
+  n <- 200
+  gr <- GenomicRanges::GRanges(
+    seqnames = rep("chr1", n),
+    ranges   = IRanges::IRanges(
+      start = sample(1e6:2e6, n),
+      width = sample(80:180, n, replace = TRUE)
+    ),
+    strand = "*"
+  )
+  calculateCGEnrichmentGRanges(
+    readGRanges = gr,
+    BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
+    chr.select  = "chr1"
+  )
+}
+}
+
+}
+\seealso{
+\code{\link{calculateCGEnrichment}}, \code{\link{calculateGenomicCGDistribution}}
 }

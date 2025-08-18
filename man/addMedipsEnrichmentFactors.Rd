@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{addMedipsEnrichmentFactors}
 \alias{addMedipsEnrichmentFactors}
-\title{This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.}
+\title{Add MEDIPS-style enrichment metrics to a qseaSet sample table}
 \usage{
 addMedipsEnrichmentFactors(
   qseaSet,
@@ -18,21 +18,45 @@ addMedipsEnrichmentFactors(
 )
 }
 \arguments{
-\item{qseaSet}{The cutoff to use on the windows for each sample}
+\item{qseaSet}{A \code{qseaSet}.}
 
-\item{exportPath}{Folder to export files}
+\item{exportPath}{Character(1) or \code{NULL}. Directory to export per-sample
+fragment-length PDFs and read GRanges RDS files (optional).}
 
-\item{nonEnrich}{Boolean to signify function is being ran on the Input samples}
+\item{nonEnrich}{Logical(1). If \code{TRUE}, treat samples as Input; else Pulldown.
+Determines which columns are appended.}
 
-\item{extend, shift, uniq, chr.select, paired}{Options to feed into medips::getGRange or medips::getPairedGRange}
+\item{extend, shift, uniq, chr.select, paired}{Passed to \pkg{MEDIPS} range extraction.}
 
-\item{file_name}{Column of the sampleTable which contains the file_name.}
+\item{file_name}{Character(1). Column name in the sample table holding BAM paths
+(used when \code{nonEnrich = FALSE}). For Input, the column \code{input_file} is used.}
 
-\item{nCores}{Number of cores to use for parallelisation}
+\item{nCores}{Integer(1). Number of parallel cores for \code{parallel::mclapply()}.}
 }
 \value{
-A qseaSet supplemented with more columns on the sampleTable, related to enrichment.
+The input \code{qseaSet}, with new columns appended to the corresponding
+\code{@libraries} slot (either \code{$file_name} or \code{$input_file} frame),
+including relH/GoGe and read counts.
 }
 \description{
-This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.
+For each sample, compute MEDIPS-style CpG enrichment metrics (relH, GoGe,
+and counts) from its BAM, and append the results to the sample table within
+the \code{qseaSet}. Supports both pulldown (default) and input libraries.
+}
+\examples{
+\donttest{
+# Sketch (requires BAMs and a BSgenome):
+# data(exampleTumourNormal, package = "mesa")
+# qs <- exampleTumourNormal
+# qs <- addMedipsEnrichmentFactors(
+#   qs, exportPath = tempdir(), nonEnrich = FALSE,
+#   file_name = "file_name", nCores = 1,
+#   paired = TRUE, chr.select = paste0("chr", 1:22)
+# )
+# head(qsea::getSampleTable(qs))
+}
+
+}
+\seealso{
+\code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}
 }

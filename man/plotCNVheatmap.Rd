@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaCNV.R
 \name{plotCNVheatmap}
 \alias{plotCNVheatmap}
-\title{This function takes a qseaSet and plots a heatmap of the calculated CNV}
+\title{Run HMMcopy on per-window reads for a single sample}
 \usage{
 plotCNVheatmap(
   qseaSet,
@@ -12,17 +12,44 @@ plotCNVheatmap(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{CNV_RegionsWithReads}{A \code{data.frame} / \code{data.table} / \linkS4class{GRanges}
+coercible object with columns:
+\code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map},
+and one sample-specific \code{reads} column (passed by name via \code{colname}).}
 
-\item{sampleAnnotation}{Columns of the sampleTable to use to annotation the plot with.}
+\item{colname}{Character(1). The sample column to use as read counts.}
 
-\item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
-
-\item{clusterRows}{Whether to cluster the rows of the heatmap}
+\item{plotDir}{Character(1) or \code{NULL}. If provided, writes a PDF plot named \code{<colname>.pdf}.}
 }
 \value{
-A heatmap with the calculated number of chromosomes for each samples
+A \linkS4class{GRanges} with columns named \code{<colname>} containing
+per-window CNV estimates (HMM state means on the log2 scale).
 }
 \description{
-This function takes a qseaSet and plots a heatmap of the calculated CNV
+Given a table of per-window counts with GC and mappability, run HMMcopy
+correction and segmentation, and return a GRanges of CNV calls for the
+selected sample/column.
 }
+\examples{
+# Minimal skeleton (non-running): build the required table, then call:
+# tbl <- data.frame(
+#   chr = rep(paste0("chr", 1:2), each = 5),
+#   start = seq(1, by = 1e6, length.out = 10),
+#   end   = seq(1e6, by = 1e6, length.out = 10),
+#   width = 1e6, strand = "*",
+#   gc = runif(10, 0.3, 0.7), map = runif(10, 0.8, 1.0),
+#   sampleA = rpois(10, 500)
+# )
+# gr_cnv <- runHMMCopy(tbl, colname = "sampleA", plotDir = tempdir())
+# gr_cnv
+
+}
+\seealso{
+\code{\link{addHMMcopyCNV}}, \pkg{HMMcopy}
+
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{removeCNV}()},
+\code{\link{runHMMCopy}()}
+}
+\concept{CNV}
