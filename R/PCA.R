@@ -1,6 +1,17 @@
-#' @describeIn getDimRed Generate a PCA from a qseaSet
-#' @export
+#' Generate a PCA from a qseaSet
 #'
+#' Convenience wrapper around [getDimRed()] with `method = "PCA"`.
+#'
+#' @inheritParams getDimRed
+#' @describeIn getDimRed Principal component analysis of a qseaSet.
+#' @return A `mesaDimRed` object with embedded `mesaPCA` results.
+#' @family dimred-helpers
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' pca <- getPCA(qs)
+#' pca
+#' @export
 getPCA <- function(qseaSet,
                    dataTable = NULL,
                    regionsToOverlap = NULL,
@@ -32,8 +43,21 @@ getPCA <- function(qseaSet,
 
 }
 
-#'@describeIn getDimRed Generate a UMAP from a qseaSet
-#'@export
+
+#' Generate a UMAP from a qseaSet
+#'
+#' Convenience wrapper around [getDimRed()] with `method = "UMAP"`.
+#'
+#' @inheritParams getDimRed
+#' @describeIn getDimRed Uniform manifold approximation and projection of a qseaSet.
+#' @return A `mesaDimRed` object with embedded `mesaUMAP` results.
+#' @family dimred-helpers
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' umap <- getUMAP(qs)
+#' umap
+#' @export
 getUMAP <- function(qseaSet,
                    dataTable = NULL,
                    regionsToOverlap = NULL,
@@ -61,7 +85,14 @@ getUMAP <- function(qseaSet,
 
 }
 
-#' The functions getPCA() and getUMAP() are dimensionality reduction techniques with a very similar syntax
+
+#' #' Dimensionality reduction for qseaSets
+#'
+#' Run PCA or UMAP on methylation signal matrices extracted from a
+#' [qsea::qseaSet] object.  
+#' This is the core workhorse for dimensionality reduction; wrappers
+#' such as [getPCA()] and [getUMAP()] provide simplified access.
+#' 
 #' @param qseaSet A qseaSet object.
 #' @param dataTable A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()]. It must have seqnames, start and end columns. Can also be a [GenomicRanges::GRanges()] object with normalised values in the metadata columns.
 #' @param method A character specifying method to use. Either "PCA" or "UMAP".
@@ -83,7 +114,23 @@ getUMAP <- function(qseaSet,
 #' \item{dataTable}{If `returnDataTable = TRUE`, the table of normalised values. The table will contain windows after filtering based on `regionsToOverlap` and `minDensity`, but prior to filtering based on `topVarNum`. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the `params$topVar` component of the output.}
 #' \item{params}{A list of the parameters used.}
 #' \item{sampleTable}{A copy of the sampleTable from the qseaSet.}
+#' 
+#' #' @section Details:
+#' - For `method = "PCA"`, the function calls [stats::prcomp()].
+#' - For `method = "UMAP"`, the function calls [uwot::umap()].
+#' - Filtering is applied prior to dimensionality reduction:
+#'   enrichment cutoff (`minEnrichment`), CpG density (`minDensity`),
+#'   and most variable regions (`topVarNum`).
 #'
+#' @family dimred-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' pca <- getDimRed(qs, method = "PCA", nPC = 3)
+#' umap <- getDimRed(qs, method = "UMAP", topVarNum = 500)
+#' 
+#' @export
 getDimRed <- function(qseaSet,
                       dataTable = NULL,
                       method = "PCA",
@@ -784,7 +831,11 @@ plotPCA <- function(object,
   return(out)
 }
 
-#' This function takes the output of [getUMAP()] and produces plots.
+
+#' Plot UMAP results
+#'
+#' Convenience wrapper around [plotDimRed()] for UMAP results.
+#' 
 #' @param object The output from [getUMAP()].
 #' @param qseaSet The qseaSet object used to generate `object`.
 #' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
@@ -806,9 +857,17 @@ plotPCA <- function(object,
 #' @param pointSize Numeric value to set the size of the points. Default is 2.
 #' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
+#' 
 #' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
-#' @export
+#' @family dimred-helpers
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' umap <- getUMAP(qs)
+#' plots <- plotUMAP(umap, qs, colour = "group")
+#' plots[[1]] 
 #'
+#' @export
 plotUMAP <- function(object,
                      qseaSet = NULL,
                      components = list(c(1, 2)),
@@ -842,7 +901,12 @@ plotUMAP <- function(object,
   return(out)
 }
 
-#' This function takes the output of [getPCA()] or [getUMAP()] and produces plots.
+
+#' Plot dimensionality reduction results
+#'
+#' Visualise PCA or UMAP coordinates from a [mesaDimRed] object.  
+#' Wrappers such as [plotPCA()] and [plotUMAP()] provide shortcuts.
+#' 
 #' @param object The output from [getPCA()] or [getUMAP()].
 #' @param qseaSet The qseaSet object used to generate `object`.
 #' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
@@ -864,8 +928,18 @@ plotUMAP <- function(object,
 #' @param pointSize Numeric value to set the size of the points. Default is 2.
 #' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
 #' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
-#' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
+#' @return A list of [ggplot2] objects (one per panel).
 #'
+#' @family dimred-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' pca <- getPCA(qs)
+#' plots <- plotDimRed(pca, qs, colour = "group")
+#' plots[[1]]
+#' 
+#' @export
 plotDimRed <- function(object,
                     qseaSet = NULL,
                     components = list(c(1, 2), c(2, 3)),
