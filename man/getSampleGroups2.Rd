@@ -2,16 +2,35 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getSampleGroups2}
 \alias{getSampleGroups2}
-\title{This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting}
+\title{Sample names per group (order-preserving)}
 \usage{
 getSampleGroups2(qseaSet)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 }
 \value{
-A named list, where each element contains the vector of sample_names that are in that group.
+named list of character vectors.
 }
 \description{
-This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting
+Construct a named list mapping each \code{group} to the vector of \code{sample_name}s
+in that group, preserving original ordering.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+# getSampleGroups2(qs)
+
+}
+\seealso{
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeLibraryFactors}()},
+\code{\link{removeNormMethodSuffix}()}
+}
+\concept{table-helpers}
+\keyword{internal}

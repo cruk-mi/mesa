@@ -2,15 +2,37 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getAnnotationDataFrameIndividual}
 \alias{getAnnotationDataFrameIndividual}
-\title{This function generates a data frame to use for the annotation of heatmaps, using Individual sample names not group}
+\title{Create a heatmap annotation data.frame (individual samples)}
 \usage{
 getAnnotationDataFrameIndividual(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{A qseaSet object}
+\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object.}
 
-\item{...}{Which columns of the sampleTable to use in the annotation data frame}
+\item{...}{One or more unquoted column names from the sample table
+to include in the annotation data.frame.}
+}
+\value{
+A \code{data.frame} with rownames set to \code{sample_name} and
+the requested metadata columns.
 }
 \description{
-This function generates a data frame to use for the annotation of heatmaps, using Individual sample names not group
+Generate an annotation data.frame for use with heatmaps,
+containing metadata columns from the \code{qseaSet} sample table.
+Each row corresponds to an individual sample.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+ann <- getAnnotationDataFrameIndividual(qs, group)
+head(ann)
+
+}
+\seealso{
+\code{\link[=getAnnotationDataFrame]{getAnnotationDataFrame()}} for group-level annotations.
+
+Other heatmap-annotation: 
+\code{\link{getAnnotation}()},
+\code{\link{getAnnotationDataFrame}()}
+}
+\concept{heatmap-annotation}

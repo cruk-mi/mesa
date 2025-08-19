@@ -2,18 +2,35 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeNormMethodSuffix}
 \alias{removeNormMethodSuffix}
-\title{This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values}
+\title{Remove normalisation suffix from column names}
 \usage{
 removeNormMethodSuffix(dataTable, normMethod)
 }
 \arguments{
-\item{dataTable}{A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from \code{\link[=getDataTable]{getDataTable()}}.}
+\item{dataTable}{data.frame with window x sample/group values.}
 
-\item{normMethod}{A character giving the normalisation method used (e.g. "beta" or "nrpm").}
+\item{normMethod}{character(1) normalisation method (e.g., \code{"beta"}, \code{"nrpm"}).}
 }
 \value{
-The dataTable with the normMethod suffix "_{normMethod}" removed from sample (or sample group) column names.
+data.frame with cleaned column names.
 }
 \description{
-This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values
+Drop the \verb{_\{normMethod\}} (and optional \verb{_means}) suffix from sample or
+group mean columns in a wide data table (e.g., from \code{\link[=getDataTable]{getDataTable()}}).
 }
+\examples{
+df <- data.frame(A_beta = 1:3, B_beta_means = 4:6)
+removeNormMethodSuffix(df, "beta")
+
+}
+\seealso{
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeLibraryFactors}()}
+}
+\concept{table-helpers}

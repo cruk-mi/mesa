@@ -2,20 +2,41 @@
 % Please edit documentation in R/qseaExtra.R
 \name{makeTransposedTable}
 \alias{makeTransposedTable}
-\title{This function takes a qseaSet and makes a wide transposed table, suitable for using for machine learning}
+\title{Make a wide sample-by-window table}
 \usage{
 makeTransposedTable(qseaSet, normMethod = "nrpm", ...)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 
-\item{normMethod}{What normalisation method to use}
+\item{normMethod}{character(1) normalisation method (e.g., \code{"nrpm"}).}
 
-\item{...}{Other columns to add from the sampleTable in the output (along with sample_name). Must specify normMethod if using. Can use everything() for all columns.}
+\item{...}{Optional columns from the sample table to append.}
 }
 \value{
-A table
+tibble with one row per sample and one column per genomic window.
 }
 \description{
-This function takes a qseaSet and makes a wide transposed table, suitable for using for machine learning
+Create a wide table suitable for ML/visualisation where rows are samples and
+columns are windows, using a single normalisation method.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+tbl <- makeTransposedTable(qs, normMethod = "nrpm", group)
+dim(tbl)
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}
+
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{removeLibraryFactors}()},
+\code{\link{removeNormMethodSuffix}()}
+}
+\concept{table-helpers}

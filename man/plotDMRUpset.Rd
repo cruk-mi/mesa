@@ -2,24 +2,36 @@
 % Please edit documentation in R/plotting.R
 \name{plotDMRUpset}
 \alias{plotDMRUpset}
-\title{This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot}
+\title{UpSet plot of DMR overlaps}
 \usage{
 plotDMRUpset(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...)
 }
 \arguments{
-\item{DMRtable}{The data frame containing the differentially methylated regions.}
+\item{DMRtable}{data.frame as returned by \code{\link[=calculateDMRs]{calculateDMRs()}} (possibly filtered).}
 
-\item{string}{A string to subset the columns based on (always requires adjPval)}
+\item{string}{optional regex to subset DMR columns (after stripping suffixes).}
 
-\item{removeVS}{Whether to remove the string "\emph{vs}" and everything after from the column names. For instance if all comparisons are against the same sample(s)}
+\item{removeVS}{logical remove \code{"_vs_"} and following text from column names.}
 
-\item{minAdjPval}{A minimum adjusted P value to consider the window as present}
+\item{minAdjPval}{numeric adjusted P-value threshold for inclusion.}
 
-\item{...}{Other arguments to be passed to upset}
+\item{...}{passed to \code{UpSetR::upset()}.}
 }
 \value{
-An UpSet plot
+An UpSet plot (drawn), and the function returns the \code{UpSetR} object.
 }
 \description{
-This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot
+Visualise overlap of significant DMR sets across contrasts from a DMR table
+(columns \verb{*_adjPval}) using an UpSet plot.
 }
+\examples{
+\donttest{
+# Suppose `dmr` is a DMR table from calculateDMRs()
+# plotDMRUpset(dmr, string = "LUAD|LUSC", minAdjPval = 0.05)
+}
+
+}
+\seealso{
+\code{\link[=calculateDMRs]{calculateDMRs()}}
+}
+\concept{dmr-plots}

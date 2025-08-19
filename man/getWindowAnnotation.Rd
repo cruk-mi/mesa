@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{getWindowAnnotation}
 \alias{getWindowAnnotation}
-\title{Get an annotation data frame for windows, for use in heatmap plotting functions}
+\title{Build row annotations for region heatmaps}
 \usage{
 getWindowAnnotation(
   dataTab,
@@ -12,17 +12,41 @@ getWindowAnnotation(
 )
 }
 \arguments{
-\item{dataTab}{A table with the data generated from the qseaSet}
+\item{dataTab}{tibble/data.frame produced by \code{\link[=getDataTable]{getDataTable()}} plus \code{seqnames},
+\code{start}, \code{end}, and a \code{window} column (\code{chr:start-end}).}
 
-\item{regions}{The regions used to generate the annotation for}
+\item{regions}{GenomicRanges::GRanges for overlap-derived annotations
+(e.g., columns already present on \code{regions}).}
 
-\item{windowAnnotation}{Columns of the regions annotation or the dataTab to use}
+\item{windowAnnotation}{tidyselect-style columns (unquoted) to keep as
+annotation (from either \code{dataTab} or \code{regions}).}
 
-\item{clusterRows}{Whether the rows are going to be clustered. If not, ensure the annotation is the correct order.}
+\item{clusterRows}{logical; if \code{FALSE}, preserves genomic order of windows.}
 }
 \value{
-A data frame containing the annotation columns, ready for use in
+\code{data.frame} with row names set to the \code{window} identifiers and the
+requested annotation columns.
 }
 \description{
-Note that windowAnnotation must be enclosed within double curly brackets when used.
+Prepare a data.frame of window-level annotations aligned to rows in the
+heatmap created by \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}.
 }
+\examples{
+# Build a minimal window annotation table from a toy selection
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+regs <- qsea::getRegions(qs)[1:50]
+dt   <- qs |>
+  filterByOverlaps(regs) |>
+  getDataTable(normMethod = "nrpm") |>
+  dplyr::mutate(window = paste0(seqnames, ":", start, "-", end))
+wa <- getWindowAnnotation(dt, regs, windowAnnotation = CpG_density)
+head(wa)
+}
+
+}
+\seealso{
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}
+}
+\keyword{internal}

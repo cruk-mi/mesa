@@ -745,22 +745,26 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
 #' Get counts per window
 #'
-#' Convenience wrapper around [getDataTable()] to extract counts.
+#' Convenience wrapper around [getDataTable()] to extract *counts*.
 #'
-#' @param qseaSet qsea::qseaSet
-#' @param useGroupMeans logical use group means instead of individual samples.
-#' @param addMethodSuffix logical keep method suffix in column names corresponding to the normalisation method, such as Sample1_beta. Suffix always present if multiple normalisationMethods are given.
-#' @param verbose logical print messages.
+#' @param qseaSet qsea::qseaSet object.
+#' @param useGroupMeans logical(1). If `TRUE`, average replicates by the `group`
+#'   column instead of returning per-sample values.
+#' @param addMethodSuffix logical(1). If `TRUE`, keep the method suffix in
+#'   column names (e.g., `Sample1_counts`). The suffix is always kept if
+#'   multiple normalisation methods are requested.
+#' @param verbose logical(1). Print progress/messages.
 #'
-#' @return tibble of counts (one row per window).
-#' @describeIn getDataTable
+#' @return A tibble/data.frame of *counts* (one row per window).
+#' @seealso [getDataTable()]
 #' @family table-helpers
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #' qs <- exampleTumourNormal
 #' head(getCountTable(qs))
-#' 
+#'
+#' @rdname getCountTable
 #' @export
 getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
   tab <- qseaSet %>% 
@@ -775,19 +779,26 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 
 #' Get NRPM per window
 #'
-#' Convenience wrapper around [getDataTable()] to extract NRPM values.
+#' Convenience wrapper around [getDataTable()] to extract *NRPM* values.
 #'
-#' @inheritParams getCountTable
+#' @param qseaSet qsea::qseaSet object.
+#' @param useGroupMeans logical(1). If `TRUE`, average replicates by the `group`
+#'   column instead of returning per-sample values.
+#' @param addMethodSuffix logical(1). If `TRUE`, keep the method suffix in
+#'   column names (e.g., `Sample1_nrpm`). The suffix is always kept if
+#'   multiple normalisation methods are requested.
+#' @param verbose logical(1). Print progress/messages.
 #'
-#' @return tibble of NRPM (one row per window).
-#' @describeIn getDataTable
+#' @return A tibble/data.frame of *NRPM* values (one row per window).
+#' @seealso [getDataTable()]
 #' @family table-helpers
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #' qs <- exampleTumourNormal
 #' head(getNRPMTable(qs))
-#' 
+#'
+#' @rdname getNRPMTable
 #' @export
 getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
   tab <- qseaSet %>% 
@@ -802,20 +813,28 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 
 #' Get beta per window
 #'
-#' Convenience wrapper around [getDataTable()] to extract beta values.
+#' Convenience wrapper around [getDataTable()] to extract *beta* values.
 #'
-#' @param minEnrichment integer(1) minimum reads for non-NA beta (qsea rule).
-#' @inheritParams getCountTable
+#' @param qseaSet qsea::qseaSet object.
+#' @param useGroupMeans logical(1). If `TRUE`, average replicates by the `group`
+#'   column instead of returning per-sample values.
+#' @param minEnrichment integer(1). Minimum number of reads required for a
+#'   window to be considered fully methylated (below this, qsea sets beta to NA).
+#' @param addMethodSuffix logical(1). If `TRUE`, keep the method suffix in
+#'   column names (e.g., `Sample1_beta`). The suffix is always kept if
+#'   multiple normalisation methods are requested.
+#' @param verbose logical(1). Print progress/messages.
 #'
-#' @return tibble of beta values (one row per window).
-#' @describeIn getDataTable
+#' @return A tibble/data.frame of *beta* values (one row per window).
+#' @seealso [getDataTable()]
 #' @family table-helpers
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #' qs <- exampleTumourNormal
 #' head(getBetaTable(qs, minEnrichment = 3))
-#' 
+#'
+#' @rdname getBetaTable
 #' @export
 getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
    tab <- qseaSet %>% 

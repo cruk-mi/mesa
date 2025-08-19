@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{countWindowsAboveCutoff}
 \alias{countWindowsAboveCutoff}
-\title{This function takes a qseaSet and sums over nrpm within a GRanges object}
+\title{Count windows above a cutoff}
 \usage{
 countWindowsAboveCutoff(
   qseaSet,
@@ -13,19 +13,36 @@ countWindowsAboveCutoff(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 
-\item{GRanges}{A GRanges object to sum over}
+\item{GRanges}{GenomicRanges::GRanges windows to filter on.}
 
-\item{samples}{What samples to use}
+\item{samples}{character() sample names to include (default: all).}
 
-\item{cutoff}{What cutoff to use to count the windows above}
+\item{cutoff}{numeric(1) threshold to count windows above.}
 
-\item{normMethod}{What normalisation method to use}
+\item{normMethod}{character(1) normalisation method (\code{"nrpm"} or \code{"beta"}).}
 }
 \value{
-A table
+tibble with columns: \code{sample_name}, \code{numOverCutoff}, \code{totalWindowsUsed},
+plus sample table columns joined from the \code{qseaSet}.
 }
 \description{
-This function takes a qseaSet and sums over nrpm within a GRanges object
+For a set of windows, count how many exceed a cutoff per sample.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+gr <- qsea::getRegions(qs)[1:100]
+out <- countWindowsAboveCutoff(qs, gr, cutoff = 1, normMethod = "nrpm")
+head(out)
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
+
+Other window-summaries: 
+\code{\link{addSummaryAcrossWindows}()},
+\code{\link{summariseAcrossWindows}()}
+}
+\concept{window-summaries}

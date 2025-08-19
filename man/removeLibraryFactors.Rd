@@ -2,16 +2,34 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeLibraryFactors}
 \alias{removeLibraryFactors}
-\title{This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.}
+\title{Set library factors to 1}
 \usage{
 removeLibraryFactors(qseaSet)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 }
 \value{
-A table of data, with a column for each individual sample
+qsea::qseaSet with library factors set to 1.
 }
 \description{
-This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.
+Set all library-factor columns in the qseaSet (and sample table) to one.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+qs2 <- removeLibraryFactors(qs)
+# qsea::getSampleTable(qs2)$library_factor
+
+}
+\seealso{
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeNormMethodSuffix}()}
+}
+\concept{table-helpers}

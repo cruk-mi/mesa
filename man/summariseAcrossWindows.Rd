@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{summariseAcrossWindows}
 \alias{summariseAcrossWindows}
-\title{This function takes a qseaSet and calculates a summary statistic across the windows.}
+\title{Summarise across windows per sample}
 \usage{
 summariseAcrossWindows(
   qseaSet,
@@ -17,27 +17,46 @@ summariseAcrossWindows(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 
-\item{regionsToOverlap}{A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
+\item{regionsToOverlap}{GRanges or data.frame coercible to GRanges; if \code{NULL},
+use all regions in the qseaSet.}
 
-\item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
+\item{fn}{function summary function (e.g., \code{mean}).}
 
-\item{addSampleTable}{A boolean with whether to add the sampleTable on to the output table}
+\item{addSampleTable}{logical whether to join sample table columns.}
 
-\item{normMethod}{One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").}
+\item{normMethod}{character() one or more of \code{"nrpm"}, \code{"beta"}.}
 
-\item{naMethod}{What method to use to deal with NA values (for beta values). Options are "drop" or "na.rm" (default).}
+\item{naMethod}{character(1) \code{"na.rm"} (default) or \code{"drop"} rows with NA.}
 
-\item{minEnrichment}{For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.}
+\item{minEnrichment}{integer(1) minimum reads for non-NA beta.}
 
-\item{suffix}{A suffix for adding to the new columns of data, to clarify what regions for instance.}
+\item{suffix}{character(1) suffix for output columns (e.g., a region label).}
 
-\item{fnName}{Name of the function. Should only be necessary to use if you are doing something unusual, otherwise detected automatically.}
+\item{fnName}{character(1) name of \code{fn} (auto-detected if \code{NULL}).}
 }
 \value{
-A table of data, one row per sample, with columns indicating the application of the summary statistic to the
+tibble with one row per sample and summary columns per method.
 }
 \description{
-This function takes a qseaSet and calculates a summary statistic across the windows.
+Apply a summary function (e.g. mean, median, sd) over windows per sample,
+optionally restricted to a set of regions, and for one or more methods.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+gr <- qsea::getRegions(qs)[1:500]
+sm <- summariseAcrossWindows(qs, regionsToOverlap = gr, fn = mean,
+                             normMethod = c("nrpm","beta"), suffix = "first500")
+head(sm)
+
+}
+\seealso{
+\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
+
+Other window-summaries: 
+\code{\link{addSummaryAcrossWindows}()},
+\code{\link{countWindowsAboveCutoff}()}
+}
+\concept{window-summaries}

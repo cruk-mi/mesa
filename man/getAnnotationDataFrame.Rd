@@ -2,15 +2,36 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getAnnotationDataFrame}
 \alias{getAnnotationDataFrame}
-\title{This function generates a data frame to use for the annotation of heatmaps, when using groups}
+\title{Create a heatmap annotation data.frame (groups)}
 \usage{
 getAnnotationDataFrame(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{A qseaSet object}
+\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object.}
 
-\item{...}{Which columns of the sampleTable to use in the annotation data frame}
+\item{...}{One or more unquoted column names from the sample table
+to include in the annotation data.frame.}
+}
+\value{
+A \code{data.frame} with rownames set to \code{group} and
+the requested metadata columns.
 }
 \description{
-This function generates a data frame to use for the annotation of heatmaps, when using groups
+Generate an annotation data.frame for use with heatmaps,
+aggregating sample information at the group level.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+ann_grp <- getAnnotationDataFrame(qs, disease)
+head(ann_grp)
+
+}
+\seealso{
+\code{\link[=getAnnotationDataFrameIndividual]{getAnnotationDataFrameIndividual()}} for sample-level annotations.
+
+Other heatmap-annotation: 
+\code{\link{getAnnotation}()},
+\code{\link{getAnnotationDataFrameIndividual}()}
+}
+\concept{heatmap-annotation}

@@ -2,20 +2,37 @@
 % Please edit documentation in R/plotting.R
 \name{getAnnotation}
 \alias{getAnnotation}
-\title{Get an annotation data frame, for use in heatmap plotting functions}
+\title{Sample/group annotation data.frame}
 \usage{
 getAnnotation(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL)
 }
 \arguments{
-\item{qseaSet}{A qseaSet}
+\item{qseaSet}{qsea::qseaSet.}
 
-\item{useGroupMeans}{Whether to use the "group" variable to collapse replicates}
+\item{useGroupMeans}{logical build annotations at group level.}
 
-\item{sampleAnnotation}{Columns of the sampleTable to use}
+\item{sampleAnnotation}{tidyselect-style columns to include (unquoted).}
 }
 \value{
-A data frame containing the annotation columns, ready for use in
+data.frame of annotations; rows named by \code{sample_name} (or \code{group}).
 }
 \description{
-Note that sampleAnnotation must be enclosed within double curly brackets when used.
+Select sample-table columns to use as annotations, either per-sample or
+per-group (with consistency checks across replicates). Note that sampleAnnotation
+must be enclosed within double curly brackets when used.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+ann <- getAnnotation(qs, useGroupMeans = FALSE, sampleAnnotation = group)
+head(ann)
+
+}
+\seealso{
+\code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}
+
+Other heatmap-annotation: 
+\code{\link{getAnnotationDataFrame}()},
+\code{\link{getAnnotationDataFrameIndividual}()}
+}
+\concept{heatmap-annotation}

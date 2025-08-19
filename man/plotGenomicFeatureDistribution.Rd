@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotGenomicFeatureDistribution}
 \alias{plotGenomicFeatureDistribution}
-\title{This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it}
+\title{Distribution of windows across genomic features}
 \usage{
 plotGenomicFeatureDistribution(
   qseaSet,
@@ -12,17 +12,33 @@ plotGenomicFeatureDistribution(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet.}
 
-\item{cutoff}{The cutoff to use on the windows for each sample}
+\item{cutoff}{numeric threshold on the chosen \code{normMethod}.}
 
-\item{barType}{What type of bars to use for the plot (stack, dodge, fill)}
+\item{barType}{character(1) \code{"stack"}, \code{"dodge"}, or \code{"fill"}.}
 
-\item{normMethod}{Normalisation method to use}
+\item{normMethod}{character(1) \code{"nrpm"} or \code{"beta"}.}
 }
 \value{
-A plot of the distribution
+A \code{ggplot} object of the distribution
 }
 \description{
-This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it
+Annotate windows (e.g., promoters/exons/introns) and plot the distribution
+per sample as stacked/dodged/filled bars.
 }
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+plotGenomicFeatureDistribution(qs, cutoff = 1, barType = "fill", normMethod = "nrpm")
+}
+
+}
+\seealso{
+\code{\link[=getGenomicFeatureDistribution]{getGenomicFeatureDistribution()}} (tabular summary), \code{\link[=annotateWindows]{annotateWindows()}}
+
+Other annotation-summaries: 
+\code{\link{getGenomicFeatureDistribution}()}
+}
+\concept{annotation-summaries}

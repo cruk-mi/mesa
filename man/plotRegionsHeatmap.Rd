@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotRegionsHeatmap}
 \alias{plotRegionsHeatmap}
-\title{This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap}
+\title{Heatmap of signal across genomic regions}
 \usage{
 plotRegionsHeatmap(
   qseaSet,
@@ -27,47 +27,77 @@ plotRegionsHeatmap(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet.}
 
-\item{regionsToOverlap}{A genomic ranges to plot.}
+\item{regionsToOverlap}{GenomicRanges::GRanges or data frame coercible to GRanges;
+if \code{NULL}, uses all regions in \code{qseaSet}.}
 
-\item{normMethod}{Whether to plot nrpm values or beta values.}
+\item{normMethod}{character(1) normalisation method to plot, typically
+\code{"nrpm"} or \code{"beta"}. Defaults to \code{"beta"}.}
 
-\item{sampleAnnotation}{A character vector with names of columns from the sampleTable to use as annotation.}
+\item{sampleAnnotation}{tidyselect-style columns from the sample table to show
+as annotations (use unquoted names, e.g. \code{group}).}
 
-\item{windowAnnotation}{A character vector with names of columns from the qseaSet regions or the regionsToOverlap data, to use as row annotations.}
+\item{windowAnnotation}{tidyselect-style columns from \code{qseaSet} regions or
+\code{regionsToOverlap} to show as row annotations (unquoted).}
 
-\item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
+\item{annotationColors}{optional \code{list} of colour mappings for annotation
+variables; if omitted, colours are generated.}
 
-\item{useGroupMeans}{Whether to average samples over the group column (i.e. combine replicates)}
+\item{useGroupMeans}{logical(1) whether to average replicates by the \code{group}
+column of the sample table (i.e. combine replicates)}
 
-\item{clusterRows}{Whether to cluster the rows or not.}
+\item{clusterRows, clusterCols}{logical whether to cluster rows/columns.}
 
-\item{clusterCols}{Whether to cluster the columns or not.}
+\item{minEnrichment}{integer(1) minimum reads for non-NA beta (qsea rule).}
 
-\item{minEnrichment}{Minimum enrichment factor for beta values, will give NAs below this.}
+\item{maxScale}{numeric(1) upper bound of colour scale (ignored for \code{"beta"}).}
 
-\item{maxScale}{The maximum of the scale, not used when plotting beta values.}
+\item{clusterNum}{integer(1) optional number of column clusters (if
+\code{clusterCols = TRUE}) to break the column dendrogram into.}
 
-\item{clusterNum}{A number of clusters to break the column dendrogram into.}
+\item{clip}{numeric(1) clip values above this threshold before plotting.}
 
-\item{clip}{An upper level to clip the data at, anything higher than this is replaced with the clip value.}
+\item{minDensity}{numeric(1) minimum CpG density for windows to be kept.}
 
-\item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
+\item{annotationPosition}{character(1) legend side (\code{"right"}, \code{"bottom"}).}
 
-\item{annotationPosition}{Where to put the annotation for the samples, e.g. "bottom" or "right".}
+\item{title}{optional character(1) column title.}
 
-\item{title}{A title to add to the top of the plot.}
+\item{showSampleNames}{logical(1) whether to draw sample names (default
+\code{TRUE} if ≤ 50 samples).}
 
-\item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
+\item{clusterMethod}{character(1) clustering method passed to ComplexHeatmap.}
 
-\item{clusterMethod}{What method to use to cluster the dendrograms.}
-
-\item{...}{Other arguments to pass to ComplexHeatmap.}
+\item{...}{additional arguments passed to \code{ComplexHeatmap::Heatmap()}.}
 }
 \value{
-A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+Invisibly returns the numeric matrix used for plotting; the heatmap
+is drawn to the active graphics device.
 }
 \description{
-This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap
+Plot a heatmap of per-window values (NRPM/beta) for regions of interest,
+optionally adding sample and window annotations and clustering.
 }
+\examples{
+\donttest{
+# Plot beta values for a small subset of windows with sample annotations
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+regs <- qsea::getRegions(qs)[1:400]   # small region subset for speed
+plotRegionsHeatmap(qs, regs, normMethod = "beta",
+                   sampleAnnotation = group,              # add sample group
+                   windowAnnotation = CpG_density,        # row-side CpG info
+                   clusterCols = TRUE, clusterRows = FALSE)
+}
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}},
+\code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}
+
+Other heatmaps: 
+\code{\link{plotCorrelationMatrix}()},
+\code{\link{plotGeneHeatmap}()}
+}
+\concept{heatmaps}

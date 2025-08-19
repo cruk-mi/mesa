@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotCorrelationMatrix}
 \alias{plotCorrelationMatrix}
-\title{This function takes a qseaSet and plots a correlation matrix}
+\title{Sample correlation heatmap}
 \usage{
 plotCorrelationMatrix(
   qseaSet,
@@ -17,27 +17,44 @@ plotCorrelationMatrix(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet.}
 
-\item{regionsToOverlap}{Regions to overlap}
+\item{regionsToOverlap}{optional GRanges to restrict windows.}
 
-\item{useGroupMeans}{Whether to use the replicate information or not (group column)}
+\item{useGroupMeans}{logical average replicates by \code{group}.}
 
-\item{sampleAnnotation}{Columns of the sampleTable to use to annotate the heatmap}
+\item{sampleAnnotation}{tidyselect-style sample-table columns to annotate.}
 
-\item{normMethod}{What normalisation method to use}
+\item{normMethod}{character(1) \code{"nrpm"} or \code{"beta"}.}
 
-\item{minEnrichment}{Minimum number of reads for beta values}
+\item{minEnrichment}{integer minimum reads for non-NA beta.}
 
-\item{annotationColors}{A list of custom colours to use for the annotation}
+\item{annotationColors}{optional list of colours for annotations (pheatmap).}
 
-\item{minDensity}{Minimum CpG density to keep}
+\item{minDensity}{numeric minimum CpG density to keep windows.}
 
-\item{...}{Other arguments for pheatmap}
+\item{...}{passed to \code{pheatmap::pheatmap()}.}
 }
 \value{
-A table
+A \code{pheatmap} object.
 }
 \description{
-This function takes a qseaSet and plots a correlation matrix
+Compute and plot the correlation matrix across samples (or group means)
+using the selected normalisation method and optional region filters.
 }
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+plotCorrelationMatrix(qs, normMethod = "nrpm", sampleAnnotation = group)
+}
+
+}
+\seealso{
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getDataTable]{getDataTable()}}
+
+Other heatmaps: 
+\code{\link{plotGeneHeatmap}()},
+\code{\link{plotRegionsHeatmap}()}
+}
+\concept{heatmaps}

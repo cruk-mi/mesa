@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getGenomicFeatureDistribution}
 \alias{getGenomicFeatureDistribution}
-\title{This function takes a qseaSet and calculates some stats as to which genomic regions the reads lie.}
+\title{Summarise signal by genomic context}
 \usage{
 getGenomicFeatureDistribution(
   qseaSet,
@@ -12,17 +12,33 @@ getGenomicFeatureDistribution(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 
-\item{cutoff}{The value required to call a window as being above that cutoff or not}
+\item{cutoff}{numeric(1) threshold to call window “over cutoff”.}
 
-\item{normMethod}{What normalisation method to use (nrpm or beta)}
+\item{normMethod}{character(1) \code{"nrpm"} or \code{"beta"}.}
 
-\item{minEnrichment}{Number of reads required for a fully methylated region to not be masked (put NA) beta values only.}
+\item{minEnrichment}{integer(1) minimum reads for non-NA beta.}
 }
 \value{
-A table of summarised data, with windows split out into both the landscape (island/shore/shelf) and genomic region (promoter/exon/intron etc)
+tibble with \code{sample_name}, \code{landscape}, \code{shortAnno},
+\code{nWindows}, \code{sum}, \code{nOverCutoff}, and sample metadata columns.
 }
 \description{
-This function takes a qseaSet and calculates some stats as to which genomic regions the reads lie.
+Annotate windows, then summarise signal and counts by CpG landscape
+(island/shore/shelf) and short genomic annotation (e.g. promoter/exon/intron).
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+gfd <- getGenomicFeatureDistribution(qs, cutoff = 1, normMethod = "nrpm")
+head(gfd)
+
+}
+\seealso{
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
+
+Other annotation-summaries: 
+\code{\link{plotGenomicFeatureDistribution}()}
+}
+\concept{annotation-summaries}

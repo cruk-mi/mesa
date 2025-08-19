@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{writeBigWigs}
 \alias{writeBigWigs}
-\title{This function takes a qseaSet and writes individual bigWig files with the coverage over each window.}
+\title{Write bigWig tracks per sample or group}
 \usage{
 writeBigWigs(
   qseaSet,
@@ -13,19 +13,33 @@ writeBigWigs(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 
-\item{folderName}{A folder to save the output bigWig files into}
+\item{folderName}{character(1) output folder.}
 
-\item{normMethod}{What normalisation method to use (e.g. nrpm or beta)}
+\item{normMethod}{character(1) normalisation method (e.g., \code{"nrpm"} or \code{"beta"}).}
 
-\item{useGroupMeans}{Whether to average over the replicates in the group}
+\item{useGroupMeans}{logical export group means instead of samples.}
 
-\item{naVal}{A value to replace NA values with (for beta values).}
+\item{naVal}{numeric(1) value used to replace \code{NA} scores (for beta).}
 }
 \value{
-A set of bigWig files for each sample in the qseaSet, with coverage over all the windows in the qseaSet
+(invisible) \code{NULL}. Files are written to \code{folderName}.
 }
 \description{
-This function takes a qseaSet and writes individual bigWig files with the coverage over each window.
+Export bigWig files with per-window scores for each sample (or group means).
 }
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+td <- tempfile(); dir.create(td)
+writeBigWigs(qs, td, normMethod = "nrpm", useGroupMeans = FALSE)
+list.files(td, pattern = "\\\\.bw$")
+}
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}
+}
+\concept{io}

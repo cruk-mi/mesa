@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotGeneHeatmap}
 \alias{plotGeneHeatmap}
-\title{This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap}
+\title{Heatmap across a single gene locus}
 \usage{
 plotGeneHeatmap(
   qseaSet,
@@ -26,45 +26,66 @@ plotGeneHeatmap(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet.}
 
-\item{gene}{A gene to plot. Either a gene symbol or an ensembl ID.}
+\item{gene}{character(1) HGNC/MGI symbol or Ensembl gene ID.}
 
-\item{normMethod}{Whether to plot nrpm values or beta values.}
+\item{normMethod}{character(1) \code{"nrpm"} or \code{"beta"}.}
 
-\item{useGroupMeans}{Whether to use the group variable to collapse replicates.}
+\item{useGroupMeans}{logical collapse replicates by \code{group}.}
 
-\item{sampleAnnotation}{A data frame with annotations for the samples.}
+\item{sampleAnnotation}{tidyselect-style sample-table columns to annotate.}
 
-\item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
+\item{minDensity}{numeric minimum CpG density.}
 
-\item{minEnrichment}{Minimum enrichment factor for beta values, will give NAs below this.}
+\item{minEnrichment}{integer minimum reads for non-NA beta.}
 
-\item{maxScale}{The maximum of the scale, not used when plotting beta values.}
+\item{maxScale}{numeric upper colour limit (ignored for \code{"beta"}).}
 
-\item{clusterNum}{A number of clusters to break the column dendrogram into.}
+\item{clusterNum}{integer optional number of column clusters.}
 
-\item{annotationColors}{A list with the colours to use for the column legend, to pass to pheatmap}
+\item{annotationColors}{optional list of colours for annotations.}
 
-\item{upstreamDist}{Number of basepairs upstream of the gene to include.}
+\item{upstreamDist, downstreamDist}{integer(1) bp to extend around gene.}
 
-\item{scaleRows}{Whether to scale the rows of the heatmap}
+\item{scaleRows}{logical whether to z-scale rows (not used here; reserved).}
 
-\item{clusterCols}{Whether to cluster the columns or not.}
+\item{clusterCols}{logical cluster columns.}
 
-\item{mart}{A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.}
+\item{mart}{optional biomaRt Mart; if \code{NULL}, a reasonable default is chosen
+for human (hg38/hg19) otherwise \code{idType} must be provided.}
 
-\item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
+\item{showSampleNames}{logical show sample names (default \code{TRUE} if ≤ 50).}
 
-\item{downstreamDist}{Number of basepairs downstream of the gene to include.}
+\item{idType}{character(1) biomaRt attribute for \code{gene} identifiers (e.g.
+\code{"ensembl_gene_id"}, \code{"hgnc_symbol"}, \code{"mgi_symbol"}).}
 
-\item{idType}{A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse.}
-
-\item{...}{Additional arguments to pass to pheatmap.}
+\item{...}{passed to \code{ComplexHeatmap::Heatmap}.}
 }
 \value{
-A heatmap showing the methylation patterns across the gene of interest.
+Invisibly returns the numeric matrix used for plotting; the heatmap
+is drawn to the graphics device.
 }
 \description{
-This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
+Retrieve a gene locus via biomaRt and plot window-level values (NRPM/beta)
+across upstream/gene body/downstream regions with sample annotations.
 }
+\examples{
+\donttest{
+# Plot around a gene symbol (human dataset)
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+plotGeneHeatmap(qs, gene = "TP53", normMethod = "beta",
+                upstreamDist = 3000, downstreamDist = 1000,
+                sampleAnnotation = group, clusterCols = TRUE)
+}
+
+}
+\seealso{
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}
+
+Other heatmaps: 
+\code{\link{plotCorrelationMatrix}()},
+\code{\link{plotRegionsHeatmap}()}
+}
+\concept{heatmaps}

@@ -2,13 +2,26 @@
 % Please edit documentation in R/plotting.R
 \name{makeGeneHeatmapRowAnnotation}
 \alias{makeGeneHeatmapRowAnnotation}
-\title{This function makes a row annotation object for the gene heatmap, which hows information about gene regions and CpG density. It is a helper function for plotGeneHeatmap}
+\title{Row annotations for gene heatmaps}
 \usage{
 makeGeneHeatmapRowAnnotation(rowAnnotationDF)
 }
 \arguments{
-\item{rowAnnotationDF}{A dataframe of variables that provide information about the gene regions, which will be used to annotate windows within the heatmap}
+\item{rowAnnotationDF}{data.frame with row-wise annotation variables
+(e.g., columns \code{annotation}, \code{CpG_density}) indexed by window.}
+}
+\value{
+\code{ComplexHeatmap::HeatmapAnnotation} for the row side.
 }
 \description{
-This function makes a row annotation object for the gene heatmap, which hows information about gene regions and CpG density. It is a helper function for plotGeneHeatmap
+Helper to create a \code{HeatmapAnnotation} for rows showing categorical
+tracks (e.g., region labels) and numeric tracks (e.g., CpG density).
 }
+\examples{
+\donttest{
+df <- data.frame(CpG_density = runif(10), annotation = rep(c("Upstream","GeneBody"),5))
+makeGeneHeatmapRowAnnotation(df)
+}
+
+}
+\keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{addSummaryAcrossWindows}
 \alias{addSummaryAcrossWindows}
-\title{This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.}
+\title{Append window summaries to the sample table}
 \usage{
 addSummaryAcrossWindows(
   qseaSet,
@@ -15,23 +15,42 @@ addSummaryAcrossWindows(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{qsea::qseaSet}
 
-\item{regionsToOverlap}{A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
+\item{regionsToOverlap}{GRanges or data.frame coercible to GRanges; if \code{NULL},
+use all regions in the qseaSet.}
 
-\item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
+\item{fn}{function summary function (e.g., \code{mean}).}
 
-\item{suffix}{A suffix for adding to the new columns of data, to clarify where the regions came from for instance.}
+\item{suffix}{character(1) suffix for output columns (e.g., a region label).}
 
-\item{normMethod}{One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").}
+\item{normMethod}{character() one or more of \code{"nrpm"}, \code{"beta"}.}
 
-\item{naMethod}{What method to use to deal with NA values (for beta values). Options are "drop" or "impute".}
+\item{naMethod}{character(1) \code{"na.rm"} (default) or \code{"drop"} rows with NA.}
 
-\item{minEnrichment}{For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.}
+\item{minEnrichment}{integer(1) minimum reads for non-NA beta.}
 }
 \value{
-A table of data, one row per sample, with columns indicating the application of the summary statistic to the
+qsea::qseaSet with new summary columns in the sample table.
 }
 \description{
-This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.
+Compute per-sample summaries across windows and left-join them to the
+\code{qseaSet} sample table.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+gr <- qsea::getRegions(qs)[1:300]
+qs2 <- addSummaryAcrossWindows(qs, regionsToOverlap = gr, fn = mean,
+                               normMethod = "nrpm", suffix = "first300")
+head(qsea::getSampleTable(qs2))
+
+}
+\seealso{
+\code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
+
+Other window-summaries: 
+\code{\link{countWindowsAboveCutoff}()},
+\code{\link{summariseAcrossWindows}()}
+}
+\concept{window-summaries}
