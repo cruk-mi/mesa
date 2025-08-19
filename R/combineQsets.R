@@ -1,15 +1,36 @@
-#' Combine two qseaSets
+#' Combine multiple qseaSets
 #'
-#' This function takes a list of qseaSets (or strings to read rds files from) and merges them together
+#' Merge a list of qseaSet objects (or `.rds` files containing them) into a
+#' single qseaSet. This is useful when processing tumour/normal cohorts
+#' separately or across sequencing runs, then combining results into one
+#' container.
 #'
-#' @param qseaSets A list of qseaSet objects or strings to rds files with them in
-#' @param firstQset An first qseaSet object to combine the rest into (optional)
-#' @param dropDuplicates Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.
-#' @param checkParams Whether to verify that all the parameters are identical in both objects
-#' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
-#' @return A qseaSet object, containing all the samples from both qseaSet objects.
+#' @param qseaSets `list`. A list of qseaSet objects, or character strings
+#'   giving paths to `.rds` files containing qseaSet objects.
+#' @param firstQset `qseaSet` or `character(1)` (optional). If provided, this
+#'   serves as the initial qseaSet to merge into. If a character string ending
+#'   in `.rds`, it will be loaded via [readr::read_rds()].
+#' @param dropDuplicates `logical(1)`. If `TRUE` (default), drop samples with
+#'   duplicated names across qseaSets. If `FALSE`, duplicates are renamed by
+#'   appending `_Dup`.
+#' @param checkParams `logical(1)`. Whether to verify that global parameters are
+#'   identical across qseaSets (default `TRUE`).
+#' @param regionsToKeep `GRanges` or coercible. If supplied, restricts each
+#'   qseaSet to these genomic regions before combining (reduces memory usage).
+#'
+#' @return A single combined `qseaSet` object containing all samples.
+#' @seealso [combineQsets()] for pairwise merging.
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs1 <- exampleTumourNormal
+#' qs2 <- qs1
+#' qsea::setSampleNames(qs2) <- paste0(qsea::getSampleNames(qs2), "_rep2")
+#'
+#' combined <- combineQsetsList(list(qs1, qs2))
+#' combined
+#' 
 #' @export
-
 combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
   if (is.character(firstQset)) {
     if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
@@ -36,16 +57,33 @@ combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, 
   return(combinedQset)
 }
 
+
 #' Combine two qseaSets
 #'
-#' This function takes two qseaSets and combines them into one.
+#' Merge two qseaSet objects (or `.rds` files containing them) into one.
+#' This is the underlying function called by [combineQsetsList()].
 #'
-#' @param qseaSet1 The first qseaSet object.
-#' @param qseaSet2 The second qseaSet object.
-#' @param checkParams Whether to verify that all the parameters are identical in both objects
-#' @param dropDuplicates Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.
-#' @param regionsToKeep A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.
-#' @return A qseaSet object, containing all the samples from both qseaSet objects.
+#' @param qseaSet1 `qseaSet` or `character(1)` to an `.rds` file.
+#' @param qseaSet2 `qseaSet` or `character(1)` to an `.rds` file.
+#' @param checkParams `logical(1)`. If `TRUE`, enforce identical global
+#'   parameters across qseaSets (default `FALSE`).
+#' @param regionsToKeep `GRanges` or coercible. If supplied, restricts both
+#'   qseaSets to these regions before combining.
+#' @param dropDuplicates `logical(1)`. If `TRUE`, drop duplicate samples across
+#'   qseaSets. If `FALSE` (default), duplicates are renamed with suffix `_Dup`.
+#'
+#' @return A combined `qseaSet` object.
+#' @seealso [combineQsetsList()]
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs1 <- exampleTumourNormal
+#' qs2 <- qs1
+#' qsea::setSampleNames(qs2) <- paste0(qsea::getSampleNames(qs2), "_rep2")
+#'
+#' combined <- combineQsets(qs1, qs2)
+#' combined
+#' 
 #' @export
 combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep = NULL, dropDuplicates = FALSE) {
 
