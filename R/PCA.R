@@ -2,7 +2,6 @@
 #'
 #' Convenience wrapper around [getDimRed()] with `method = "PCA"`.
 #'
-#' @inheritParams getDimRed
 #' @describeIn getDimRed Principal component analysis of a qseaSet.
 #' @return A `mesaDimRed` object with embedded `mesaPCA` results.
 #' @family dimred-helpers
@@ -48,7 +47,6 @@ getPCA <- function(qseaSet,
 #'
 #' Convenience wrapper around [getDimRed()] with `method = "UMAP"`.
 #'
-#' @inheritParams getDimRed
 #' @describeIn getDimRed Uniform manifold approximation and projection of a qseaSet.
 #' @return A `mesaDimRed` object with embedded `mesaUMAP` results.
 #' @family dimred-helpers
@@ -774,15 +772,33 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 }
 
-#' This function takes the output of [getPCA()] and produces plots.
-#' @param object The output from [getPCA()].
-#' @param qseaSet The qseaSet object used to generate `object`.
-#' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
-#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
-#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
-#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
-#' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
-#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
+
+#' Plot principal component analysis (PCA) results
+#'
+#' Generate publication-ready plots from the output of [getPCA()]. 
+#' The function supports flexible visual encoding (colour, shape, size) 
+#' of sample-level metadata and can return multiple plots across 
+#' different combinations of principal components and sample annotations. 
+#'
+#' @param object A `mesaDimRed` object returned by [getPCA()].
+#' @param qseaSet A `qseaSet` used to generate `object`. Required if plotting
+#'   involves variables from the sample table.
+#' @param components Either:
+#'   * a length-2 integer vector specifying which components to plot 
+#'     (e.g. `c(1,2)` for PC1 vs PC2), or
+#'   * a list of such vectors to produce multiple plots.  
+#'   Default: `list(c(1, 2), c(2, 3))`.
+#' @param colour `character` Name(s) of variable(s) in the `qseaSet` sample table 
+#'   used to colour points. A separate plot is produced for each variable.  
+#'   Default: `NULL` (no colouring).
+#' @param colourPalette Optional `character` vector specifying a palette for 
+#'   colouring points. If not supplied, defaults are chosen automatically.
+#' @param NAcolour `character(1)` Colour for missing values in `colour`. 
+#'   Default: `"grey50"`.
+#' @param symDivColourScale `logical(1)` If `TRUE`, diverging colour scales 
+#'   are centred symmetrically around zero. Ignored for non-diverging scales.
+#' @param shape `character(1)` Name of a variable in the `qseaSet` sample table 
+#'   used to map shapes. Only one variable is supported. Default: `NULL`.
 #' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
 #' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
 #' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
@@ -791,12 +807,55 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 #'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
 #'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
 #' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
-#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
-#' @param showSampleNames Logical indicating whether to show the sample names.
-#' @param pointSize Numeric value to set the size of the points. Default is 2.
-#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
-#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
-#' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
+#' @param NAshape Shape used for missing values in `shape`. Default is 7, 
+#'   or 25 if `"filled+border"` shapes are used.
+#' @param showSampleNames `logical(1)` If `TRUE`, overlay sample names on points. 
+#'   Default: `FALSE`.
+#' @param pointSize `numeric(1)` Point size. Default: `2`.
+#' @param alpha `numeric(1)` Transparency of points, between 0 and 1. Default: `1`.
+#' @param plotlyAnnotations `character` Vector of column names from the sample table 
+#'   to use as tooltips when converting plots to interactive `plotly` objects.  
+#'   Default: empty string.
+#'
+#' @return A `list` of `ggplot` objects, one for each combination of components 
+#'   and `colour` variable.
+#'
+#' @details 
+#' Shape defaults:
+#' * `"mixture"` is used for non-diverging or discrete colour scales.
+#' * `"filled+border"` is used for diverging colour scales.  
+#'
+#' These defaults ensure clear separation of categories even with many samples.
+#'
+#' @seealso [getPCA()], [plotUMAP()], [plotDimRed()]
+#' @family dimred-plotting
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' # Run PCA on a qseaSet
+#' pca <- getPCA(qs)
+#'
+#' # Basic PCA plot (PC1 vs PC2)
+#' plots <- plotPCA(pca, qseaSet = qs)
+#' plots[[1]]
+#'
+#' # Colour points by sample group
+#' plots_group <- plotPCA(pca, qseaSet = qs, colour = "group")
+#' plots_group[[1]]
+#'
+#' # Plot PC1 vs PC3 with shape by tissue type
+#' plots_custom <- plotPCA(pca, qseaSet = qs,
+#'                         components = list(c(1,3)),
+#'                         colour = "group", shape = "tissue")
+#' plots_custom[[1]]
+#'
+#' # Enable sample names
+#' plots_names <- plotPCA(pca, qseaSet = qs, colour = "group",
+#'                        showSampleNames = TRUE)
+#' plots_names[[1]]
+#'
 #' @export
 plotPCA <- function(object,
                     qseaSet = NULL,

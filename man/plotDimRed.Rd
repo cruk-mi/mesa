@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotDimRed}
 \alias{plotDimRed}
-\title{This function takes the output of \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}} and produces plots.}
+\title{Plot dimensionality reduction results}
 \usage{
 plotDimRed(
   object,
@@ -62,8 +62,23 @@ plotDimRed(
 \item{plotlyAnnotations}{Vector of columns to annotate for plotly, e.g. c("group","tissue")}
 }
 \value{
-A list of ggplot objects: one for each combination of \code{object@res}, \code{colour} and \code{components}.
+A list of \link{ggplot2} objects (one per panel).
 }
 \description{
-This function takes the output of \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}} and produces plots.
+Visualise PCA or UMAP coordinates from a \link{mesaDimRed} object.
+Wrappers such as \code{\link[=plotPCA]{plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide shortcuts.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+pca <- getPCA(qs)
+plots <- plotDimRed(pca, qs, colour = "group")
+plots[[1]]
+
+}
+\seealso{
+Other dimred-helpers: 
+\code{\link{getPCA}()},
+\code{\link{plotUMAP}()}
+}
+\concept{dimred-helpers}

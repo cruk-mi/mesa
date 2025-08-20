@@ -4,7 +4,7 @@
 \alias{getPCA}
 \alias{getUMAP}
 \alias{getDimRed}
-\title{The functions getPCA() and getUMAP() are dimensionality reduction techniques with a very similar syntax}
+\title{Generate a PCA from a qseaSet}
 \usage{
 getPCA(
   qseaSet,
@@ -86,20 +86,69 @@ getDimRed(
 \item{method}{A character specifying method to use. Either "PCA" or "UMAP".}
 }
 \value{
+A \code{mesaDimRed} object with embedded \code{mesaPCA} results.
+
+A \code{mesaDimRed} object with embedded \code{mesaUMAP} results.
+
 A mesaDimRed object with the following components:
 \item{res}{A named list where each component is a PCA or UMAP object. List names correspond to entries in the \code{params$topVar} component of the output.}
 \item{samples}{Names of the samples analysed.}
 \item{dataTable}{If \code{returnDataTable = TRUE}, the table of normalised values. The table will contain windows after filtering based on \code{regionsToOverlap} and \code{minDensity}, but prior to filtering based on \code{topVarNum}. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the \code{params$topVar} component of the output.}
 \item{params}{A list of the parameters used.}
 \item{sampleTable}{A copy of the sampleTable from the qseaSet.}
+
+#' @section Details:
+\itemize{
+\item For \code{method = "PCA"}, the function calls \code{\link[stats:prcomp]{stats::prcomp()}}.
+\item For \code{method = "UMAP"}, the function calls \code{\link[uwot:umap]{uwot::umap()}}.
+\item Filtering is applied prior to dimensionality reduction:
+enrichment cutoff (\code{minEnrichment}), CpG density (\code{minDensity}),
+and most variable regions (\code{topVarNum}).
+}
 }
 \description{
-The functions getPCA() and getUMAP() are dimensionality reduction techniques with a very similar syntax
+Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{method = "PCA"}.
+
+Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{method = "UMAP"}.
+
+Run PCA or UMAP on methylation signal matrices extracted from a
+\link[qsea:qseaSet-class]{qsea::qseaSet} object.
+This is the core workhorse for dimensionality reduction; wrappers
+such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUMAP()}} provide simplified access.
 }
 \section{Functions}{
 \itemize{
-\item \code{getPCA()}: Generate a PCA from a qseaSet
+\item \code{getPCA()}: Principal component analysis of a qseaSet.
 
-\item \code{getUMAP()}: Generate a UMAP from a qseaSet
+\item \code{getUMAP()}: Uniform manifold approximation and projection of a qseaSet.
 
 }}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+pca <- getPCA(qs)
+pca
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+umap <- getUMAP(qs)
+umap
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+pca <- getDimRed(qs, method = "PCA", nPC = 3)
+umap <- getDimRed(qs, method = "UMAP", topVarNum = 500)
+
+}
+\seealso{
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+}
+\concept{dimred-helpers}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotUMAP}
 \alias{plotUMAP}
-\title{This function takes the output of \code{\link[=getUMAP]{getUMAP()}} and produces plots.}
+\title{Plot UMAP results}
 \usage{
 plotUMAP(
   object,
@@ -65,5 +65,19 @@ plotUMAP(
 A list of ggplot objects: one for each combination of \code{object@res}, \code{colour} and \code{components}.
 }
 \description{
-This function takes the output of \code{\link[=getUMAP]{getUMAP()}} and produces plots.
+Convenience wrapper around \code{\link[=plotDimRed]{plotDimRed()}} for UMAP results.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+umap <- getUMAP(qs)
+plots <- plotUMAP(umap, qs, colour = "group")
+plots[[1]] 
+
+}
+\seealso{
+Other dimred-helpers: 
+\code{\link{getPCA}()},
+\code{\link{plotDimRed}()}
+}
+\concept{dimred-helpers}
