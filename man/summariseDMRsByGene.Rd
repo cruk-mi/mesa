@@ -2,13 +2,29 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByGene}
 \alias{summariseDMRsByGene}
-\title{This function summarises a data frame by gene (using annotateWindows)}
+\title{Summarise DMRs by gene}
 \usage{
 summariseDMRsByGene(DMRtable)
 }
 \arguments{
-\item{DMRtable}{A data frame or GRanges object, may already be annotated}
+\item{DMRtable}{A \code{data.frame} or \code{GRanges} of annotated DMRs.
+Must include columns \code{ENSEMBL}, \code{SYMBOL}, and \code{GENENAME}
+(typically added with \code{\link[=annotateWindows]{annotateWindows()}}).}
+}
+\value{
+A tibble with one row per gene and a count of associated DMRs.
 }
 \description{
-This function summarises a data frame by gene (using annotateWindows)
+Aggregate DMR windows by gene annotation.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
+                     contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
+dmr_annot <- annotateWindows(dmr)  # requires TxDb/annotation
+summariseDMRsByGene(dmr_annot)
+
+}
+\seealso{
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 }

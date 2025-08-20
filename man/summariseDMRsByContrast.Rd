@@ -2,8 +2,7 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByContrast}
 \alias{summariseDMRsByContrast}
-\title{This function summarises the number of windows called as up/down in each comparison in a .
-Internally transforms the data to a long format. Contrasts with no significant windows will be dropped!}
+\title{Summarise DMRs by contrast}
 \usage{
 summariseDMRsByContrast(
   DMRtable,
@@ -13,15 +12,29 @@ summariseDMRsByContrast(
 )
 }
 \arguments{
-\item{DMRtable}{A data frame with multiple comparisons inside}
+\item{DMRtable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.
+If in wide format, it will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
 
-\item{FDRthres}{FDR threshold to apply to each comparison}
+\item{FDRthres}{\code{numeric(1)} False discovery rate threshold.}
 
-\item{log2FCthres}{A log2FC threshold to apply to each comparison (absolute)}
+\item{log2FCthres}{\code{numeric(1)} Absolute log2 fold-change threshold.}
 
-\item{deltaBetaThres}{A deltaBeta (change in average beta values) threshold to apply to each comparison (absolute)}
+\item{deltaBetaThres}{\code{numeric(1)} Absolute delta-beta threshold.}
+}
+\value{
+A tibble with one row per contrast and columns \code{nUp} and \code{nDown}.
 }
 \description{
-This function summarises the number of windows called as up/down in each comparison in a .
-Internally transforms the data to a long format. Contrasts with no significant windows will be dropped!
+Count the number of up- and down-regulated windows per contrast.
+Internally transforms the DMR results to long format.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
+                     contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
+summariseDMRsByContrast(dmr, FDRthres = 0.1)
+
+}
+\seealso{
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}, \code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
 }

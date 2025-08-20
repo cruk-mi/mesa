@@ -2,20 +2,32 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{writeDMRsToBed}
 \alias{writeDMRsToBed}
-\title{Write the qsea result to a set of bed file}
+\title{Write DMR results to BED files}
 \usage{
 writeDMRsToBed(dataTable, folder, fdrThres = 0.05)
 }
 \arguments{
-\item{dataTable}{An (annotated) data table with contrasts}
+\item{dataTable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.}
 
-\item{folder}{The folder to place the bed files.}
+\item{folder}{\code{character(1)} Directory in which to write BED files.}
 
-\item{fdrThres}{FDR rate threshold to apply to each contrast}
+\item{fdrThres}{\code{numeric(1)} False discovery rate threshold for filtering.}
 }
 \value{
-Returns the original table invisibly, so can be used in a pipe.
+Invisibly returns the input \code{dataTable}, enabling use in a pipe.
 }
 \description{
-This writes a set of bed files with the results, with one bed file per contrast.
+Export DMR results to a set of BED files, one file per contrast.
+}
+\examples{
+\dontrun{
+data(exampleTumourNormal, package = "mesa")
+dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
+                     contrasts = "LUAD_vs_NormalLung")
+writeDMRsToBed(dmr, folder = "bed_results")
+}
+
+}
+\seealso{
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }

@@ -2,20 +2,32 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{writeDMRsToExcel}
 \alias{writeDMRsToExcel}
-\title{Write the qsea result to an Excel file}
+\title{Write DMR results to Excel}
 \usage{
 writeDMRsToExcel(dataTable, path, fdrThres = 0.05)
 }
 \arguments{
-\item{dataTable}{An (optionally annotated) data table with contrasts}
+\item{dataTable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.}
 
-\item{path}{The path to write the excel file to.}
+\item{path}{\code{character(1)} File path to write the Excel workbook.}
 
-\item{fdrThres}{FDR rate threshold to apply to each contrast}
+\item{fdrThres}{\code{numeric(1)} False discovery rate threshold for filtering.}
 }
 \value{
-Returns the original table invisibly, so can be used in a pipe.
+Invisibly returns the input \code{dataTable}, enabling use in a pipe.
 }
 \description{
-This writes an Excel file with the results, with one sheet per contrast.
+Export DMR results to an Excel workbook with one sheet per contrast.
+}
+\examples{
+\dontrun{
+data(exampleTumourNormal, package = "mesa")
+dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
+                     contrasts = "LUAD_vs_NormalLung")
+writeDMRsToExcel(dmr, path = "dmr_results.xlsx")
+}
+
+}
+\seealso{
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
 }

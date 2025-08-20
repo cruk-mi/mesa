@@ -2,20 +2,35 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{pivotDMRsLonger}
 \alias{pivotDMRsLonger}
-\title{This function transforms a DMR data frame from the wide format to a long format}
+\title{Transform DMR results to long format}
 \usage{
 pivotDMRsLonger(DMRtable, FDRthres = 0.05, makePositive = FALSE)
 }
 \arguments{
-\item{DMRtable}{A data frame with multiple comparisons inside}
+\item{DMRtable}{A \code{data.frame} of DMR results in wide format, typically the
+output of \code{\link[=calculateDMRs]{calculateDMRs()}}.}
 
-\item{FDRthres}{FDR threshold to apply to each comparison}
+\item{FDRthres}{\code{numeric(1)} False discovery rate threshold to filter significant
+windows.}
 
-\item{makePositive}{Whether to reverse the contrast when the window is hypomethylated in the contrast}
+\item{makePositive}{\code{logical(1)} If \code{TRUE}, reverse the direction of contrasts
+such that all retained windows are positively associated with \code{group1}.}
+}
+\value{
+A tibble in long format with columns including \code{group1}, \code{group2},
+\code{deltaBeta}, \code{log2FC}, and \code{adjPval}.
 }
 \description{
-This function transforms a DMR data frame from the wide format to a long format
+Convert a wide-format DMR results table into a long-format table
+with explicit columns for contrasts, effect sizes, and significance values.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
+                     contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
+head(pivotDMRsLonger(dmr, FDRthres = 0.1))
+
 }
 \seealso{
-[tidyr]{pivot_longer}
+\code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 }
