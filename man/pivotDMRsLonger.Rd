@@ -33,4 +33,11 @@ head(pivotDMRsLonger(dmr, FDRthres = 0.1))
 }
 \seealso{
 \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
+
+Other DMR-helpers: 
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{summariseDMRsByGene}()},
+\code{\link{writeDMRsToBed}()},
+\code{\link{writeDMRsToExcel}()}
 }
+\concept{DMR-helpers}

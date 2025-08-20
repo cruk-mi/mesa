@@ -2,18 +2,35 @@
 % Please edit documentation in R/qseaExtra.R
 \name{downSample}
 \alias{downSample}
-\title{This function takes a qseaSet and downsamples the reads.}
+\title{Downsample reads in a qseaSet}
 \usage{
 downSample(qseaSet, nReads)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{nReads}{How many reads to downsample to.}
+\item{nReads}{\code{integer(1)} Target number of reads to retain per sample.}
 }
 \value{
-A qseaSet object with the reads downsampled.
+A \code{qseaSet} with downsampled counts. Library metadata
+(\code{valid_fragments}, \code{offset}, \code{library_factor}) are updated accordingly.
 }
 \description{
-This function takes a qseaSet and downsamples the reads.
+Randomly subsample reads to a fixed depth across all samples in a \code{qseaSet}.
+This is useful for equalizing library sizes prior to comparison.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+
+## Downsample to 1e5 reads per sample
+ds <- downSample(qs, nReads = 1e5)
+
+}
+\seealso{
+Other window-helpers: 
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{subsetWindowsBySignal}()},
+\code{\link{subsetWindowsOverBackground}()}
+}
+\concept{window-helpers}

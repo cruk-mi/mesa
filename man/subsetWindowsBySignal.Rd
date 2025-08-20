@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{subsetWindowsBySignal}
 \alias{subsetWindowsBySignal}
-\title{Filter windows from a qseaSet based on expression in a subset of samples}
+\title{Subset windows in a qseaSet by signal across samples}
 \usage{
 subsetWindowsBySignal(
   qseaSet,
@@ -15,25 +15,48 @@ subsetWindowsBySignal(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{fn}{A function that takes a row of data and returns a single value.}
+\item{fn}{A function applied row-wise across selected samples (e.g. \code{median},
+\code{min}, \code{max}).}
 
-\item{threshold}{The value to threshold the \code{fn} output value on.}
+\item{threshold}{\code{numeric(1)} Threshold value applied to \code{fn} results.}
 
-\item{aboveThreshold}{A logical value indicating whether to keep the windows with \code{fn} output value above or equal to \code{threshold} (TRUE), or below \code{threshold} (FALSE).}
+\item{aboveThreshold}{\code{logical(1)} If \code{TRUE}, retain windows with values
+\verb{>= threshold}; otherwise, retain windows \verb{< threshold}.}
 
-\item{samples}{A set of sample names to filter on, or a string to match in the sample names.}
+\item{samples}{\code{character()} Sample names to consider, or a string pattern
+matched against sample names. Defaults to all samples.}
 
-\item{normMethod}{The type of normalisation method to use (e.g. nrpm, beta, counts).}
+\item{normMethod}{\code{character(1)} Normalization method, one of \code{"nrpm"},
+\code{"beta"}, or \code{"counts"}.}
 
-\item{useGroupMeans}{Whether to use the group argument of the sample table to collapse replicates.}
+\item{useGroupMeans}{\code{logical(1)} If \code{TRUE}, aggregate replicate samples
+by their \code{group} in the sample table.}
 }
 \value{
-A qseaSet object, with only a subset of the windows.
+A filtered \code{qseaSet} containing only the selected windows.
 }
 \description{
-This function is designed to take a qseaSet and filter the windows by applying a function to each window, followed by thresholding either windows above or below that cutoff.
-For instance, we can keep only regions that have a median normalised reads per million value above 1, or those where the minimum beta value is below 0.5.
-Which samples to apply the filter based on can be specified with the \code{samples} argument, either as a list of samples or a string.
+Filter genomic windows based on a summary function applied to selected
+samples. For example, retain windows with median normalized counts above
+a threshold, or where the minimum beta value is below 0.5.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+
+## Keep windows with median nrpm > 1 across tumour samples
+subsetWindowsBySignal(qs, fn = median, threshold = 1,
+                      aboveThreshold = TRUE, samples = "LUAD")
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}}
+
+Other window-helpers: 
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{downSample}()},
+\code{\link{subsetWindowsOverBackground}()}
+}
+\concept{window-helpers}

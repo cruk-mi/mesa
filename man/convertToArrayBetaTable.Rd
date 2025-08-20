@@ -2,24 +2,43 @@
 % Please edit documentation in R/qseaExtra.R
 \name{convertToArrayBetaTable}
 \alias{convertToArrayBetaTable}
-\title{Calculate beta values for the windows covering probes from a methylation array.}
+\title{Convert qsea beta values to array-like format}
 \usage{
 convertToArrayBetaTable(qseaSet, arrayDetails = "Infinium450k")
 }
 \arguments{
-\item{qseaSet}{qseaSet object to calculate approximate beta values.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{arrayDetails}{Either a recognised string or a GRanges object with an ID column.}
+\item{arrayDetails}{Either a recognized string (currently \code{"Infinium450k"})
+or a \code{GRanges} object with an \code{ID} column of probe identifiers.}
 }
 \value{
-A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
+A \code{data.frame} with rows as probes (including \code{ID} column) and
+columns as samples with corresponding beta values.
 }
 \description{
-This function returns a wide data frame with beta values corresponding to overlapping probes from a methylation array.
-This is suitable for input into tools in other packages that are designed for tables of array beta values.
-Currently only "Infinium450k" is recognised, and only for GRCh38.
+Extract beta values for probes from a methylation array, suitable for use
+with tools expecting array-style beta matrices. Currently supports
+Illumina Infinium450k probes on GRCh38.
 }
 \examples{
-convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
-convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
+data(exampleTumourNormal, package = "mesa")
+
+## Using built-in probe set
+beta_tab <- convertToArrayBetaTable(exampleTumourNormal,
+                                    arrayDetails = "Infinium450k")
+
+## Using a GRanges probe object
+beta_tab2 <- convertToArrayBetaTable(exampleTumourNormal,
+                                     arrayDetails = mesa::hg38_450kArrayGR)
+
 }
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}
+
+Other window-helpers: 
+\code{\link{downSample}()},
+\code{\link{subsetWindowsBySignal}()},
+\code{\link{subsetWindowsOverBackground}()}
+}
+\concept{window-helpers}

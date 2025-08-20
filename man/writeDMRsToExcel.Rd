@@ -30,4 +30,11 @@ writeDMRsToExcel(dmr, path = "dmr_results.xlsx")
 }
 \seealso{
 \code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
+
+Other DMR-helpers: 
+\code{\link{pivotDMRsLonger}()},
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{summariseDMRsByGene}()},
+\code{\link{writeDMRsToBed}()}
 }
+\concept{DMR-helpers}

@@ -30,4 +30,11 @@ writeDMRsToBed(dmr, folder = "bed_results")
 }
 \seealso{
 \code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
+
+Other DMR-helpers: 
+\code{\link{pivotDMRsLonger}()},
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{summariseDMRsByGene}()},
+\code{\link{writeDMRsToExcel}()}
 }
+\concept{DMR-helpers}

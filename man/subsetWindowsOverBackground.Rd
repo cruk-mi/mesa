@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{subsetWindowsOverBackground}
 \alias{subsetWindowsOverBackground}
-\title{This function takes a qseaSet and finds which windows have more reads than would be expected if the reads followed a Poisson distribution over the whole genome.}
+\title{Subset windows above Poisson background}
 \usage{
 subsetWindowsOverBackground(
   qseaSet,
@@ -15,23 +15,48 @@ subsetWindowsOverBackground(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{keepAbove}{Boolean, if true, then keep only the windows that are above the background, if false then remove them.}
+\item{keepAbove}{\code{logical(1)} If \code{TRUE}, retain windows above background;
+if \code{FALSE}, remove them.}
 
-\item{samples}{A vector of samples to remove, or a character string to match and remove.}
+\item{samples}{\code{character()} Vector of sample names to test, or a string
+pattern matched against sample names. Defaults to all samples.}
 
-\item{numWindows}{The number of windows in the whole genome.}
+\item{numWindows}{\code{integer(1)} Number of windows in the genome. If \code{NULL},
+estimated automatically.}
 
-\item{recalculateNumWindows}{Whether to recalculate the number of windows based on the whole genome.}
+\item{recalculateNumWindows}{\code{logical(1)} Whether to recalculate the number
+of windows via \code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}.}
 
-\item{fdrThres}{What FDR p-value to filter windows out based on.}
+\item{fdrThres}{\code{numeric(1)} FDR threshold for significance.}
 
-\item{numAbove}{How many samples need to be above the background level in a window to keep/remove it.}
+\item{numAbove}{\code{integer(1)} Minimum number of samples that must exceed
+background in a window to retain/drop it.}
 }
 \value{
-A qseaSet object, with only a subset of the windows.
+A filtered \code{qseaSet} containing only windows passing the criteria.
 }
 \description{
-#' Moved to internal function as of January 2023, think whether want to keep it or not.
+Identify windows with significantly more reads than expected under a
+Poisson background model, given the total reads per sample and number of
+windows in the genome.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+
+## Keep only windows above Poisson background in at least 2 tumour samples
+subsetWindowsOverBackground(qs, keepAbove = TRUE,
+                            samples = "LUAD", numAbove = 2)
+
+}
+\seealso{
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
+
+Other window-helpers: 
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{downSample}()},
+\code{\link{subsetWindowsBySignal}()}
+}
+\concept{window-helpers}

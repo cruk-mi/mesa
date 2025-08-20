@@ -27,4 +27,11 @@ summariseDMRsByGene(dmr_annot)
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
+
+Other DMR-helpers: 
+\code{\link{pivotDMRsLonger}()},
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{writeDMRsToBed}()},
+\code{\link{writeDMRsToExcel}()}
 }
+\concept{DMR-helpers}

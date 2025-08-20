@@ -235,20 +235,38 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 }
 
 
-#' Filter windows from a qseaSet based on expression in a subset of samples
+#' Subset windows in a qseaSet by signal across samples
 #'
-#' This function is designed to take a qseaSet and filter the windows by applying a function to each window, followed by thresholding either windows above or below that cutoff.
-#' For instance, we can keep only regions that have a median normalised reads per million value above 1, or those where the minimum beta value is below 0.5.
-#' Which samples to apply the filter based on can be specified with the `samples` argument, either as a list of samples or a string.
+#' Filter genomic windows based on a summary function applied to selected
+#' samples. For example, retain windows with median normalized counts above
+#' a threshold, or where the minimum beta value is below 0.5.
 #'
-#' @param qseaSet The qseaSet object.
-#' @param fn A function that takes a row of data and returns a single value.
-#' @param threshold The value to threshold the `fn` output value on.
-#' @param aboveThreshold A logical value indicating whether to keep the windows with `fn` output value above or equal to `threshold` (TRUE), or below `threshold` (FALSE).
-#' @param samples A set of sample names to filter on, or a string to match in the sample names.
-#' @param normMethod The type of normalisation method to use (e.g. nrpm, beta, counts).
-#' @param useGroupMeans Whether to use the group argument of the sample table to collapse replicates.
-#' @return A qseaSet object, with only a subset of the windows.
+#' @param qseaSet A `qseaSet` object.
+#' @param fn A function applied row-wise across selected samples (e.g. `median`,
+#'   `min`, `max`).
+#' @param threshold `numeric(1)` Threshold value applied to `fn` results.
+#' @param aboveThreshold `logical(1)` If `TRUE`, retain windows with values
+#'   `>= threshold`; otherwise, retain windows `< threshold`.
+#' @param samples `character()` Sample names to consider, or a string pattern
+#'   matched against sample names. Defaults to all samples.
+#' @param normMethod `character(1)` Normalization method, one of `"nrpm"`,
+#'   `"beta"`, or `"counts"`.
+#' @param useGroupMeans `logical(1)` If `TRUE`, aggregate replicate samples
+#'   by their `group` in the sample table.
+#'
+#' @return A filtered `qseaSet` containing only the selected windows.
+#'
+#' @seealso [getDataTable()], [filterByOverlaps()]
+#' @family window-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' ## Keep windows with median nrpm > 1 across tumour samples
+#' subsetWindowsBySignal(qs, fn = median, threshold = 1,
+#'                       aboveThreshold = TRUE, samples = "LUAD")
+#'
 #' @export
 subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
 
@@ -310,19 +328,40 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 }
 
 
-#' This function takes a qseaSet and finds which windows have more reads than would be expected if the reads followed a Poisson distribution over the whole genome.
+#' Subset windows above Poisson background
 #'
-#'#' Moved to internal function as of January 2023, think whether want to keep it or not.
+#' Identify windows with significantly more reads than expected under a
+#' Poisson background model, given the total reads per sample and number of
+#' windows in the genome.
 #'
-#' @param qseaSet The qseaSet object.
-#' @param keepAbove Boolean, if true, then keep only the windows that are above the background, if false then remove them.
-#' @param samples A vector of samples to remove, or a character string to match and remove.
-#' @param numWindows The number of windows in the whole genome.
-#' @param recalculateNumWindows Whether to recalculate the number of windows based on the whole genome.
-#' @param fdrThres What FDR p-value to filter windows out based on.
-#' @param numAbove How many samples need to be above the background level in a window to keep/remove it.
-#' @return A qseaSet object, with only a subset of the windows.
+#' @param qseaSet A `qseaSet` object.
+#' @param keepAbove `logical(1)` If `TRUE`, retain windows above background;
+#'   if `FALSE`, remove them.
+#' @param samples `character()` Vector of sample names to test, or a string
+#'   pattern matched against sample names. Defaults to all samples.
+#' @param numWindows `integer(1)` Number of windows in the genome. If `NULL`,
+#'   estimated automatically.
+#' @param recalculateNumWindows `logical(1)` Whether to recalculate the number
+#'   of windows via [qsea::createQseaSet()].
+#' @param fdrThres `numeric(1)` FDR threshold for significance.
+#' @param numAbove `integer(1)` Minimum number of samples that must exceed
+#'   background in a window to retain/drop it.
+#'
+#' @return A filtered `qseaSet` containing only windows passing the criteria.
+#'
+#' @seealso [subsetWindowsBySignal()]
+#' @family window-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' ## Keep only windows above Poisson background in at least 2 tumour samples
+#' subsetWindowsOverBackground(qs, keepAbove = TRUE,
+#'                             samples = "LUAD", numAbove = 2)
+#'
 #' @importFrom rlang :=
+#' @export
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NULL, numWindows = NULL,
                                         recalculateNumWindows = TRUE, fdrThres = 0.01, numAbove = 1){
 
@@ -399,12 +438,27 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
 }
 
 
-#' This function takes a qseaSet and downsamples the reads.
-#' @param qseaSet The qseaSet object.
-#' @param nReads How many reads to downsample to.
-#' @return A qseaSet object with the reads downsampled.
-#' @export
+#' Downsample reads in a qseaSet
 #'
+#' Randomly subsample reads to a fixed depth across all samples in a `qseaSet`.
+#' This is useful for equalizing library sizes prior to comparison.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param nReads `integer(1)` Target number of reads to retain per sample.
+#'
+#' @return A `qseaSet` with downsampled counts. Library metadata
+#' (`valid_fragments`, `offset`, `library_factor`) are updated accordingly.
+#'
+#' @family window-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' ## Downsample to 1e5 reads per sample
+#' ds <- downSample(qs, nReads = 1e5)
+#'
+#' @export
 downSample <- function(qseaSet, nReads){
   counts <- qseaSet@count_matrix
 
@@ -438,20 +492,34 @@ downSample <- function(qseaSet, nReads){
 }
 
 
-#' Calculate beta values for the windows covering probes from a methylation array.
+#' Convert qsea beta values to array-like format
 #'
-#' This function returns a wide data frame with beta values corresponding to overlapping probes from a methylation array.
-#' This is suitable for input into tools in other packages that are designed for tables of array beta values.
-#' Currently only "Infinium450k" is recognised, and only for GRCh38.
+#' Extract beta values for probes from a methylation array, suitable for use
+#' with tools expecting array-style beta matrices. Currently supports
+#' Illumina Infinium450k probes on GRCh38.
 #'
-#' @param qseaSet qseaSet object to calculate approximate beta values.
-#' @param arrayDetails Either a recognised string or a GRanges object with an ID column.
-#' @return A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
+#' @param qseaSet A `qseaSet` object.
+#' @param arrayDetails Either a recognized string (currently `"Infinium450k"`)
+#'   or a `GRanges` object with an `ID` column of probe identifiers.
+#'
+#' @return A `data.frame` with rows as probes (including `ID` column) and
+#'   columns as samples with corresponding beta values.
+#'
+#' @seealso [getDataTable()]
+#' @family window-helpers
+#'
 #' @examples
-#' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
-#' convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
-#' @export
+#' data(exampleTumourNormal, package = "mesa")
 #'
+#' ## Using built-in probe set
+#' beta_tab <- convertToArrayBetaTable(exampleTumourNormal,
+#'                                     arrayDetails = "Infinium450k")
+#'
+#' ## Using a GRanges probe object
+#' beta_tab2 <- convertToArrayBetaTable(exampleTumourNormal,
+#'                                      arrayDetails = mesa::hg38_450kArrayGR)
+#'
+#' @export
 convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
   if(is.character(arrayDetails)){
