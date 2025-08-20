@@ -2,7 +2,7 @@
 % Please edit documentation in R/mixQsets.R
 \name{mixSamples}
 \alias{mixSamples}
-\title{This function takes a qseaSet and makes a new sample by mixing two samples}
+\title{Mix two samples to generate a synthetic qseaSet sample}
 \usage{
 mixSamples(
   qseaSet,
@@ -17,27 +17,61 @@ mixSamples(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{sample1}{First sample name, from which to take proportion of samples}
+\item{sample1}{\code{character(1)} First sample name, contributing
+\code{proportion * nReadsTotal} reads.}
 
-\item{sample2}{Second sample name}
+\item{sample2}{\code{character(1)} Second sample name, contributing the remainder
+of reads.}
 
-\item{nReadsTotal}{Number of reads in total to have after mixing}
+\item{nReadsTotal}{\code{integer(1)} Total number of reads to simulate in the
+new mixed sample.}
 
-\item{proportion}{The proportion to take from sample1, the rest will come from sample2}
+\item{proportion}{\code{numeric(1)} Proportion of reads taken from \code{sample1}.
+Must be between 0 and 1. The remaining reads are taken from \code{sample2}.}
 
-\item{newName}{A name to give the new sample}
+\item{newName}{\code{character(1)} Name for the new synthetic sample. If \code{NULL},
+a name is generated automatically.}
 
-\item{groupName}{A name to use in the group column in the sampleTable}
+\item{groupName}{\code{character(1)} Group name for the new sample in the
+\code{sampleTable}. Defaults to \code{newName}.}
 
-\item{onlyNew}{Whether to only return the new sample.}
+\item{onlyNew}{\code{logical(1)} If \code{TRUE}, return only the synthetic sample.
+If \code{FALSE} (default), return the original \code{qseaSet} combined with the new
+sample.}
 
-\item{renormalise}{Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.}
+\item{renormalise}{\code{logical(1)} Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the
+result. For efficiency, set to \code{FALSE} if repeatedly mixing, and run
+normalisation once at the end.}
 }
 \value{
-A qseaSet object with an extra
+A \code{qseaSet} containing the new synthetic sample. By default, the
+original samples are preserved as well.
 }
 \description{
-This function takes a qseaSet and makes a new sample by mixing two samples
+Create a new synthetic sample in a \code{qseaSet} by mixing reads from two
+existing samples in user-specified proportions. This can be useful for
+benchmarking, downsampling experiments, or simulating mixtures of tumour
+and normal samples.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+
+## Mix two tumour replicates 70/30, keeping original samples
+qs_mix <- mixSamples(qs, "LUAD_1", "LUAD_2", nReadsTotal = 1e5,
+                     proportion = 0.7, newName = "LUAD_mix")
+
+## Return only the synthetic mixture sample
+qs_mix_only <- mixSamples(qs, "LUAD_1", "LUAD_2", nReadsTotal = 5e4,
+                          proportion = 0.5, onlyNew = TRUE)
+
+}
+\seealso{
+\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}
+
+Other sample-simulation: 
+\code{\link{mixThreeQsetSamples}()}
+}
+\concept{sample-simulation}

@@ -1,16 +1,49 @@
-#' This function takes a qseaSet and makes a new sample by mixing two samples
-#' @param qseaSet The qseaSet object.
-#' @param sample1 First sample name, from which to take proportion of samples
-#' @param sample2 Second sample name
-#' @param nReadsTotal Number of reads in total to have after mixing
-#' @param proportion The proportion to take from sample1, the rest will come from sample2
-#' @param newName A name to give the new sample
-#' @param groupName A name to use in the group column in the sampleTable
-#' @param onlyNew Whether to only return the new sample.
-#' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
-#' @return A qseaSet object with an extra
-#' @export
+#' Mix two samples to generate a synthetic qseaSet sample
 #'
+#' Create a new synthetic sample in a `qseaSet` by mixing reads from two
+#' existing samples in user-specified proportions. This can be useful for
+#' benchmarking, downsampling experiments, or simulating mixtures of tumour
+#' and normal samples.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param sample1 `character(1)` First sample name, contributing
+#'   `proportion * nReadsTotal` reads.
+#' @param sample2 `character(1)` Second sample name, contributing the remainder
+#'   of reads.
+#' @param nReadsTotal `integer(1)` Total number of reads to simulate in the
+#'   new mixed sample.
+#' @param proportion `numeric(1)` Proportion of reads taken from `sample1`.
+#'   Must be between 0 and 1. The remaining reads are taken from `sample2`.
+#' @param newName `character(1)` Name for the new synthetic sample. If `NULL`,
+#'   a name is generated automatically.
+#' @param groupName `character(1)` Group name for the new sample in the
+#'   `sampleTable`. Defaults to `newName`.
+#' @param onlyNew `logical(1)` If `TRUE`, return only the synthetic sample.
+#'   If `FALSE` (default), return the original `qseaSet` combined with the new
+#'   sample.
+#' @param renormalise `logical(1)` Whether to run [addNormalisation()] on the
+#'   result. For efficiency, set to `FALSE` if repeatedly mixing, and run
+#'   normalisation once at the end.
+#'
+#' @return A `qseaSet` containing the new synthetic sample. By default, the
+#'   original samples are preserved as well.
+#'
+#' @seealso [mixThreeQsetSamples()], [downSample()]
+#' @family sample-simulation
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' ## Mix two tumour replicates 70/30, keeping original samples
+#' qs_mix <- mixSamples(qs, "LUAD_1", "LUAD_2", nReadsTotal = 1e5,
+#'                      proportion = 0.7, newName = "LUAD_mix")
+#'
+#' ## Return only the synthetic mixture sample
+#' qs_mix_only <- mixSamples(qs, "LUAD_1", "LUAD_2", nReadsTotal = 5e4,
+#'                           proportion = 0.5, onlyNew = TRUE)
+#'
+#' @export
 mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
                            onlyNew = FALSE,
                            renormalise = TRUE){
@@ -107,21 +140,57 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 }
 
 
-
-#' This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
-#' @param qseaSet The qseaSet object.
-#' @param sample1 First sample name, from which to take proportion of samples
-#' @param sample2 Second sample name
-#' @param sample3 Third sample name
-#' @param nReadsTotal Number of reads in total to have after mixing
-#' @param proportion1 The proportion to take from sample1
-#' @param proportion2 The proportion to take from sample2
-#' @param newName A name to give the new sample
-#' @param groupName A name to use in the group column in the sampleTable
-#' @param onlyNew Whether to only return the new sample.
-#' @param renormalise Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.
-#' @return A qseaSet object with an extra
+#' Mix three samples to generate a synthetic qseaSet sample
 #'
+#' Create a new synthetic sample in a `qseaSet` by mixing reads from three
+#' existing samples according to user-specified proportions. This function
+#' is currently intended for internal use and has not been extensively tested.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param sample1, sample2, sample3 `character(1)` Sample names to mix.
+#' @param nReadsTotal `integer(1)` Total number of reads in the new sample.
+#' @param proportion1 `numeric(1)` Proportion of reads taken from `sample1`.
+#'   Must be between 0 and 1.
+#' @param proportion2 `numeric(1)` Proportion of reads taken from `sample2`.
+#'   Must be between 0 and 1.
+#'
+#'   The proportion of reads from `sample3` is computed as
+#'   `1 - proportion1 - proportion2`. The sum of `proportion1 + proportion2`
+#'   must be strictly less than 1.
+#'
+#' @param newName `character(1)` Name for the new synthetic sample. If `NULL`,
+#'   a name is generated automatically.
+#' @param groupName `character(1)` Group name for the new sample in the
+#'   `sampleTable`. Defaults to `newName`.
+#' @param onlyNew `logical(1)` If `TRUE`, return only the synthetic sample.
+#'   If `FALSE` (default), return the original `qseaSet` combined with the new
+#'   sample.
+#' @param renormalise `logical(1)` Whether to run [addNormalisation()] on the
+#'   result. For efficiency, set to `FALSE` if repeatedly mixing, and run
+#'   normalisation once at the end.
+#'
+#' @return A `qseaSet` containing the new synthetic sample.
+#'
+#' @seealso [mixSamples()]
+#' @family sample-simulation
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#'
+#' ## Mix three samples: 50% tumour, 30% normal, 20% third sample
+#' qs_mix3 <- mixThreeQsetSamples(qs, "LUAD_1", "Normal_1", "LUAD_2",
+#'                                nReadsTotal = 1e5,
+#'                                proportion1 = 0.5, proportion2 = 0.3,
+#'                                newName = "ThreeMix")
+#'
+#' ## Only return the synthetic mixture
+#' qs_mix3_only <- mixThreeQsetSamples(qs, "LUAD_1", "Normal_1", "LUAD_2",
+#'                                     nReadsTotal = 5e4,
+#'                                     proportion1 = 0.6, proportion2 = 0.2,
+#'                                     onlyNew = TRUE)
+#'
+#' @keywords internal
 mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal, proportion1, proportion2, newName = NULL, groupName = NULL,
                                 onlyNew = FALSE,
                                 renormalise = TRUE){

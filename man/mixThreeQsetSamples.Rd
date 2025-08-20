@@ -2,7 +2,7 @@
 % Please edit documentation in R/mixQsets.R
 \name{mixThreeQsetSamples}
 \alias{mixThreeQsetSamples}
-\title{This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.}
+\title{Mix three samples to generate a synthetic qseaSet sample}
 \usage{
 mixThreeQsetSamples(
   qseaSet,
@@ -19,31 +19,66 @@ mixThreeQsetSamples(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{sample1}{First sample name, from which to take proportion of samples}
+\item{sample1, }{sample2, sample3 \code{character(1)} Sample names to mix.}
 
-\item{sample2}{Second sample name}
+\item{nReadsTotal}{\code{integer(1)} Total number of reads in the new sample.}
 
-\item{sample3}{Third sample name}
+\item{proportion1}{\code{numeric(1)} Proportion of reads taken from \code{sample1}.
+Must be between 0 and 1.}
 
-\item{nReadsTotal}{Number of reads in total to have after mixing}
+\item{proportion2}{\code{numeric(1)} Proportion of reads taken from \code{sample2}.
+Must be between 0 and 1.
 
-\item{proportion1}{The proportion to take from sample1}
+The proportion of reads from \code{sample3} is computed as
+\code{1 - proportion1 - proportion2}. The sum of \code{proportion1 + proportion2}
+must be strictly less than 1.}
 
-\item{proportion2}{The proportion to take from sample2}
+\item{newName}{\code{character(1)} Name for the new synthetic sample. If \code{NULL},
+a name is generated automatically.}
 
-\item{newName}{A name to give the new sample}
+\item{groupName}{\code{character(1)} Group name for the new sample in the
+\code{sampleTable}. Defaults to \code{newName}.}
 
-\item{groupName}{A name to use in the group column in the sampleTable}
+\item{onlyNew}{\code{logical(1)} If \code{TRUE}, return only the synthetic sample.
+If \code{FALSE} (default), return the original \code{qseaSet} combined with the new
+sample.}
 
-\item{onlyNew}{Whether to only return the new sample.}
-
-\item{renormalise}{Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.}
+\item{renormalise}{\code{logical(1)} Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the
+result. For efficiency, set to \code{FALSE} if repeatedly mixing, and run
+normalisation once at the end.}
 }
 \value{
-A qseaSet object with an extra
+A \code{qseaSet} containing the new synthetic sample.
 }
 \description{
-This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
+Create a new synthetic sample in a \code{qseaSet} by mixing reads from three
+existing samples according to user-specified proportions. This function
+is currently intended for internal use and has not been extensively tested.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+
+## Mix three samples: 50\% tumour, 30\% normal, 20\% third sample
+qs_mix3 <- mixThreeQsetSamples(qs, "LUAD_1", "Normal_1", "LUAD_2",
+                               nReadsTotal = 1e5,
+                               proportion1 = 0.5, proportion2 = 0.3,
+                               newName = "ThreeMix")
+
+## Only return the synthetic mixture
+qs_mix3_only <- mixThreeQsetSamples(qs, "LUAD_1", "Normal_1", "LUAD_2",
+                                    nReadsTotal = 5e4,
+                                    proportion1 = 0.6, proportion2 = 0.2,
+                                    onlyNew = TRUE)
+
+}
+\seealso{
+\code{\link[=mixSamples]{mixSamples()}}
+
+Other sample-simulation: 
+\code{\link{mixSamples}()}
+}
+\concept{sample-simulation}
+\keyword{internal}
