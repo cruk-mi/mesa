@@ -2,23 +2,28 @@
 % Please edit documentation in R/alterQset.R
 \name{subsetQset}
 \alias{subsetQset}
-\title{Subset a qseaSet}
+\title{Subset a qseaSet by samples}
 \usage{
 subsetQset(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL)
 }
 \arguments{
-\item{qseaSet}{The original qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{samplesToKeep}{Which samples to keep. Only one of samplesToKeep or samplesToDrop should be specified.}
+\item{samplesToKeep}{Character vector of sample names to keep. Use \strong{either}
+\code{samplesToKeep} \strong{or} \code{samplesToDrop}.}
 
-\item{samplesToDrop}{Which samples to drop.}
+\item{samplesToDrop}{Character vector of sample names to drop. Use \strong{either}
+\code{samplesToKeep} \strong{or} \code{samplesToDrop}.}
 }
 \value{
-A qseaSet object, with only the selected samples inside it.
+A \code{qseaSet} containing only the selected samples.
 }
 \description{
-This function takes a qseaSet and keeps only a subset of the samples from it.
+Keep only a specified set of samples (or, alternatively, drop a set). All
+internal matrices/slots are subset consistently.
 }
 \examples{
-subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
+data(exampleTumourNormal, package = "mesa")
+subsetQset(exampleTumourNormal, samplesToKeep = c("Colon1_T","Colon1_N"))
+
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotPCA}
 \alias{plotPCA}
-\title{This function takes the output of \code{\link[=getPCA]{getPCA()}} and produces plots.}
+\title{Plot principal component analysis (PCA) results}
 \usage{
 plotPCA(
   object,
@@ -22,21 +22,34 @@ plotPCA(
 )
 }
 \arguments{
-\item{object}{The output from \code{\link[=getPCA]{getPCA()}}.}
+\item{object}{A \code{mesaDimRed} object returned by \code{\link[=getPCA]{getPCA()}}.}
 
-\item{qseaSet}{The qseaSet object used to generate \code{object}.}
+\item{qseaSet}{A \code{qseaSet} used to generate \code{object}. Required if plotting
+involves variables from the sample table.}
 
-\item{components}{Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.}
+\item{components}{Either:
+\itemize{
+\item a length-2 integer vector specifying which components to plot
+(e.g. \code{c(1,2)} for PC1 vs PC2), or
+\item a list of such vectors to produce multiple plots.
+Default: \code{list(c(1, 2), c(2, 3))}.
+}}
 
-\item{colour}{Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.}
+\item{colour}{\code{character} Name(s) of variable(s) in the \code{qseaSet} sample table
+used to colour points. A separate plot is produced for each variable.
+Default: \code{NULL} (no colouring).}
 
-\item{colourPalette}{Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.}
+\item{colourPalette}{Optional \code{character} vector specifying a palette for
+colouring points. If not supplied, defaults are chosen automatically.}
 
-\item{NAcolour}{Colour to use for NA values in the \code{colour} variable. Default is "grey50".}
+\item{NAcolour}{\code{character(1)} Colour for missing values in \code{colour}.
+Default: \code{"grey50"}.}
 
-\item{symDivColourScale}{Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).}
+\item{symDivColourScale}{\code{logical(1)} If \code{TRUE}, diverging colour scales
+are centred symmetrically around zero. Ignored for non-diverging scales.}
 
-\item{shape}{Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.}
+\item{shape}{\code{character(1)} Name of a variable in the \code{qseaSet} sample table
+used to map shapes. Only one variable is supported. Default: \code{NULL}.}
 
 \item{shapePalette}{Shapes to use for the points (samples) for each category of the \code{shape} variable. Can be one of the following options:
 \itemize{
@@ -51,19 +64,67 @@ plotPCA(
 \item NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
 }}
 
-\item{NAshape}{Shape to use for NA values in the \code{shape} variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.}
+\item{NAshape}{Shape used for missing values in \code{shape}. Default is 7,
+or 25 if \code{"filled+border"} shapes are used.}
 
-\item{showSampleNames}{Logical indicating whether to show the sample names.}
+\item{showSampleNames}{\code{logical(1)} If \code{TRUE}, overlay sample names on points.
+Default: \code{FALSE}.}
 
-\item{pointSize}{Numeric value to set the size of the points. Default is 2.}
+\item{pointSize}{\code{numeric(1)} Point size. Default: \code{2}.}
 
-\item{alpha}{Numeric value between 0 and 1 to set alpha of points. Default is 1.}
+\item{alpha}{\code{numeric(1)} Transparency of points, between 0 and 1. Default: \code{1}.}
 
-\item{plotlyAnnotations}{Vector of columns to annotate for plotly, e.g. c("group","tissue")}
+\item{plotlyAnnotations}{\code{character} Vector of column names from the sample table
+to use as tooltips when converting plots to interactive \code{plotly} objects.
+Default: empty string.}
 }
 \value{
-A list of ggplot objects: one for each combination of \code{object@res}, \code{colour} and \code{components}.
+A \code{list} of \code{ggplot} objects, one for each combination of components
+and \code{colour} variable.
 }
 \description{
-This function takes the output of \code{\link[=getPCA]{getPCA()}} and produces plots.
+Generate publication-ready plots from the output of \code{\link[=getPCA]{getPCA()}}.
+The function supports flexible visual encoding (colour, shape, size)
+of sample-level metadata and can return multiple plots across
+different combinations of principal components and sample annotations.
 }
+\details{
+Shape defaults:
+\itemize{
+\item \code{"mixture"} is used for non-diverging or discrete colour scales.
+\item \code{"filled+border"} is used for diverging colour scales.
+}
+
+These defaults ensure clear separation of categories even with many samples.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+
+# Run PCA on a qseaSet
+pca <- getPCA(qs)
+
+# Basic PCA plot (PC1 vs PC2)
+plots <- plotPCA(pca, qseaSet = qs)
+plots[[1]]
+
+# Colour points by sample group
+plots_group <- plotPCA(pca, qseaSet = qs, colour = "group")
+plots_group[[1]]
+
+# Plot PC1 vs PC3 with shape by tissue type
+plots_custom <- plotPCA(pca, qseaSet = qs,
+                        components = list(c(1,3)),
+                        colour = "group", shape = "tissue")
+plots_custom[[1]]
+
+# Enable sample names
+plots_names <- plotPCA(pca, qseaSet = qs, colour = "group",
+                       showSampleNames = TRUE)
+plots_names[[1]]
+
+}
+\seealso{
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}
+}
+\concept{dimred-plotting}

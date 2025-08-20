@@ -3,29 +3,61 @@
 \name{filterByOverlaps}
 \alias{filterByOverlaps}
 \alias{filterByNonOverlaps}
-\title{Filter a qseaSet by overlapping/non-overlapping GRanges object or table that can be coerced to one}
+\title{Subset a qseaSet by overlaps with genomic regions}
 \usage{
 filterByOverlaps(qseaSet, regionsToOverlap)
 
 filterByNonOverlaps(qseaSet, regionsToOverlap)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{regionsToOverlap}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
+\item{regionsToOverlap}{Genomic regions to use for filtering. Either a
+\code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}} or a \code{data.frame} with columns
+\code{seqnames}, \code{start}, and \code{end} (coerced internally to \code{GRanges}).}
 }
 \value{
-A qseaSet object, with only a subset of the windows.
+A filtered \code{qseaSet} containing only windows that overlap
+\code{regionsToOverlap}.
+
+A filtered \code{qseaSet} containing only windows that do \strong{not} overlap
+\code{regionsToOverlap}.
 }
 \description{
-Filter a qseaSet by overlapping/non-overlapping GRanges object or table that can be coerced to one
+Retain only windows that overlap a set of genomic regions. This is a light
+wrapper around \code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_overlaps()}} that also harmonizes
+chromosome naming (with/without \code{"chr"} prefix) between inputs.
+
+Retain only windows that \strong{do not} overlap a set of genomic regions. This is
+a wrapper around \code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_non_overlaps()}} with automatic
+chromosome naming harmonization.
+}
+\details{
+If one input uses \code{chr1} while the other uses \code{1}, the function will adjust
+the region seqnames internally so that overlaps are computed correctly.
 }
 \examples{
+data(exampleTumourNormal, package = "mesa")
 
-rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
-filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
-filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+# Using a data.frame
+rgns <- data.frame(seqnames = 7, start = 25_002_001, end = 25_017_900)
+qs_sub <- filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+qs_sub
+
+# Using a GRanges
+gr <- GenomicRanges::GRanges("chr7", IRanges::IRanges(25_002_001, 25_017_900))
+qs_sub2 <- filterByOverlaps(exampleTumourNormal, regionsToOverlap = gr)
+qs_sub2
+
+data(exampleTumourNormal, package = "mesa")
+rgns <- data.frame(seqnames = 7, start = 25_002_001, end = 25_017_900)
+qs_sub <- filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+qs_sub
+
 }
 \seealso{
-Check the plyranges documentation on \link[plyranges]{filter_by_overlaps} and \link[plyranges]{filter_by_non_overlaps}
+\code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_overlaps()}}, \code{\link[=filterByNonOverlaps]{filterByNonOverlaps()}},
+\code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}}
+
+\code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_non_overlaps()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}}
 }

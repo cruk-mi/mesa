@@ -2,23 +2,28 @@
 % Please edit documentation in R/alterQset.R
 \name{renameQsetNames}
 \alias{renameQsetNames}
-\title{Rename samples in a qseaSet.}
+\title{Rename samples in a qseaSet by regex}
 \usage{
 renameQsetNames(qseaSet, pattern, replacement = "")
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 
-\item{pattern}{Pattern to replace in the names of the samples.}
+\item{pattern}{A regex \code{pattern} to match in sample names.}
 
-\item{replacement}{Pattern to replace with in the names of the samples.}
+\item{replacement}{A replacement string (default: \code{""}).}
 }
 \value{
-A qseaSet object, containing all the samples from both qseaSet objects.
+A \code{qseaSet} with renamed samples.
 }
 \description{
-This function takes a qseaSet and renames the samples in it.
+Apply a regex replacement to sample names and update all relevant slots
+consistently (counts, CNV, enrichment, zygosity, libraries, sampleTable).
 }
 \examples{
-renameQsetNames(exampleTumourNormal, pattern = 'T', replacement = 'Tumour' )
+data(exampleTumourNormal, package = "mesa")
+# Replace "T" with "Tumour" in sample names
+qs2 <- renameQsetNames(exampleTumourNormal, pattern = "T$", replacement = "Tumour")
+head(colnames(qs2@count_matrix))
+
 }

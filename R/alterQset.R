@@ -1,16 +1,40 @@
-#' Filter a qseaSet by overlapping/non-overlapping GRanges object or table that can be coerced to one
+#' Subset a qseaSet by overlaps with genomic regions
 #'
-#' @param qseaSet The qseaSet object.
-#' @param regionsToOverlap A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.
-#' @return A qseaSet object, with only a subset of the windows.
-#' @seealso Check the plyranges documentation on \link[plyranges]{filter_by_overlaps} and \link[plyranges]{filter_by_non_overlaps}
-#' @export
+#' Retain only windows that overlap a set of genomic regions. This is a light
+#' wrapper around [plyranges::filter_by_overlaps()] that also harmonizes
+#' chromosome naming (with/without `"chr"` prefix) between inputs.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param regionsToOverlap Genomic regions to use for filtering. Either a
+#'   [GenomicRanges::GRanges()] or a `data.frame` with columns
+#'   `seqnames`, `start`, and `end` (coerced internally to `GRanges`).
+#'
+#' @return A filtered `qseaSet` containing only windows that overlap
+#'   `regionsToOverlap`.
+#'
+#' @details
+#' If one input uses `chr1` while the other uses `1`, the function will adjust
+#' the region seqnames internally so that overlaps are computed correctly.
+#'
+#' @seealso
+#'   [plyranges::filter_by_overlaps()], [filterByNonOverlaps()],
+#'   [GenomicRanges::GRanges()]
+#'
 #' @examples
+#' data(exampleTumourNormal, package = "mesa")
 #'
-#' rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
-#' filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
-#' filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+#' # Using a data.frame
+#' rgns <- data.frame(seqnames = 7, start = 25_002_001, end = 25_017_900)
+#' qs_sub <- filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+#' qs_sub
+#'
+#' # Using a GRanges
+#' gr <- GenomicRanges::GRanges("chr7", IRanges::IRanges(25_002_001, 25_017_900))
+#' qs_sub2 <- filterByOverlaps(exampleTumourNormal, regionsToOverlap = gr)
+#' qs_sub2
+#'
 #' @rdname alterQsetOverlap
+#' @export
 filterByOverlaps <- function(qseaSet, regionsToOverlap){
 
   if(is.data.frame(regionsToOverlap)) {
@@ -38,8 +62,27 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap){
   return(qseaSet)
 }
 
-#' @export
+
+#' Subset a qseaSet by non‑overlaps with genomic regions
+#'
+#' Retain only windows that **do not** overlap a set of genomic regions. This is
+#' a wrapper around [plyranges::filter_by_non_overlaps()] with automatic
+#' chromosome naming harmonization.
+#'
+#' @return A filtered `qseaSet` containing only windows that do **not** overlap
+#'   `regionsToOverlap`.
+#'
+#' @seealso
+#'   [plyranges::filter_by_non_overlaps()], [filterByOverlaps()]
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' rgns <- data.frame(seqnames = 7, start = 25_002_001, end = 25_017_900)
+#' qs_sub <- filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
+#' qs_sub
+#'
 #' @rdname alterQsetOverlap
+#' @export
 filterByNonOverlaps <- function(qseaSet, regionsToOverlap){
 
   if(is.data.frame(regionsToOverlap)) {
@@ -69,13 +112,23 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap){
     return()
 }
 
-#' This function takes a qseaSet and adds the information on the number of reads into the sampleTable for easier access.
+
+#' Add library metrics into the qseaSet sample table
 #'
-#' @param qseaSet The qseaSet object.
-#' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
-#' @export
+#' Convenience helper to append columns from `qseaSet@libraries$file_name`
+#' (and, when available, from `qseaSet@libraries$input_file` prefixed with
+#' `"input_"`) to the `sampleTable`. Existing columns are not duplicated.
+#'
+#' @param qseaSet A `qseaSet` object.
+#'
+#' @return The same `qseaSet`, with an augmented `sampleTable`.
+#'
 #' @examples
-#' addLibraryInformation(exampleTumourNormal)
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- addLibraryInformation(exampleTumourNormal)
+#' head(qsea::getSampleTable(qs))
+#'
+#' @export
 addLibraryInformation <- function(qseaSet){
 
   curColNames <- qseaSet %>%
@@ -106,17 +159,24 @@ addLibraryInformation <- function(qseaSet){
 }
 
 
-#' Subset a qseaSet
+#' Subset a qseaSet by samples
 #'
-#' This function takes a qseaSet and keeps only a subset of the samples from it.
+#' Keep only a specified set of samples (or, alternatively, drop a set). All
+#' internal matrices/slots are subset consistently.
 #'
-#' @param qseaSet The original qseaSet object.
-#' @param samplesToKeep Which samples to keep. Only one of samplesToKeep or samplesToDrop should be specified.
-#' @param samplesToDrop Which samples to drop.
-#' @return A qseaSet object, with only the selected samples inside it.
-#' @export
+#' @param qseaSet A `qseaSet` object.
+#' @param samplesToKeep Character vector of sample names to keep. Use **either**
+#'   `samplesToKeep` **or** `samplesToDrop`.
+#' @param samplesToDrop Character vector of sample names to drop. Use **either**
+#'   `samplesToKeep` **or** `samplesToDrop`.
+#'
+#' @return A `qseaSet` containing only the selected samples.
+#'
 #' @examples
-#' subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
+#' data(exampleTumourNormal, package = "mesa")
+#' subsetQset(exampleTumourNormal, samplesToKeep = c("Colon1_T","Colon1_N"))
+#'
+#' @export
 subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
 
   if (length(samplesToKeep) == 0 & length(samplesToDrop) == 0 ) {
@@ -156,17 +216,25 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
   return(newSet)
 }
 
-#' Rename samples in a qseaSet.
+
+#' Rename samples in a qseaSet by regex
 #'
-#' This function takes a qseaSet and renames the samples in it.
+#' Apply a regex replacement to sample names and update all relevant slots
+#' consistently (counts, CNV, enrichment, zygosity, libraries, sampleTable).
 #'
-#' @param qseaSet The qseaSet object.
-#' @param pattern Pattern to replace in the names of the samples.
-#' @param replacement Pattern to replace with in the names of the samples.
-#' @return A qseaSet object, containing all the samples from both qseaSet objects.
-#' @export
+#' @param qseaSet A `qseaSet` object.
+#' @param pattern A regex `pattern` to match in sample names.
+#' @param replacement A replacement string (default: `""`).
+#'
+#' @return A `qseaSet` with renamed samples.
+#'
 #' @examples
-#' renameQsetNames(exampleTumourNormal, pattern = 'T', replacement = 'Tumour' )
+#' data(exampleTumourNormal, package = "mesa")
+#' # Replace "T" with "Tumour" in sample names
+#' qs2 <- renameQsetNames(exampleTumourNormal, pattern = "T$", replacement = "Tumour")
+#' head(colnames(qs2@count_matrix))
+#'
+#' @export
 renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
   renamedNames <- qseaSet %>%
@@ -209,14 +277,38 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 }
 
 
-
-#' This function takes a qseaSet and merges samples together into a single sample.
-#' @param qseaSet The qseaSet object.
-#' @param mergeString A string to merge on
-#' @return A qseaSet object with the samples merged together.
+#' Pool (merge) samples that share a common name prefix
+#'
+#' Merge samples whose names share a common prefix by removing a suffix pattern
+#' (`mergeString`) and summing counts across the resulting groups. CNV and
+#' zygosity are combined using fragment‐count weights. A new `qseaSet` is
+#' returned with pooled samples and updated metadata.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param mergeString A regex used to remove the **suffix** that distinguishes
+#'   samples to be merged. The remaining prefix becomes the pooled sample name.
+#'   After removal, pooled names are matched using `startsWith()`.  
+#'   For example, with names like `Patient1_T` and `Patient1_N`, use
+#'   `mergeString = "_[TN]$"` to pool into `Patient1`.
+#'
+#' @return A `qseaSet` with pooled samples.
+#'
+#' @details
+#' Internally, pooled counts are simple sums. CNV values and zygosity are
+#' combined by a weighted average using `total_fragments` from
+#' `@libraries$input_file`. Library statistics are aggregated (sums for counts,
+#' weighted means for rates).
+#'
+#' @examples
+#' \donttest{
+#' data(exampleTumourNormal, package = "mesa")
+#' # Pool Tumour/Normal pairs by patient into a single sample per patient:
+#' # e.g., "Colon1_T","Colon1_N" -> "Colon1"
+#' qs_pool <- poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
+#' qs_pool
+#' }
+#'
 #' @export
-
-
 poolSamples <- function(qseaSet, mergeString){
 
   ##TODO rewrite this function to use a column.
@@ -336,15 +428,26 @@ poolSamples <- function(qseaSet, mergeString){
 
 }
 
-#' This function takes a qseaSet and renames the samples based on a column of the sampleTable.
-#' @param qseaSet The qseaSet object.
-#' @param newNameColumn A column of the qseaSet to use to rename each sample with.
-#' @return A qseaSet object with the samples renamed.
-#' @export
+
+#' Rename samples using a column from the sample table
+#'
+#' Replace sample names with values from a user‑supplied column in
+#' `qseaSet@sampleTable`, updating all dependent slots consistently.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @param newNameColumn Name (unquoted) of a column in the sample table that
+#'   contains the new sample names. Must be unique and contain no `NA`s.
+#'
+#' @return A `qseaSet` with sample names replaced by `newNameColumn`.
+#'
 #' @examples
-#' exampleTumourNormal %>%
-#' mutate(newName = paste("Sample",1:10)) %>%
-#' renameSamples(newNameColumn = 'newName')
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal %>%
+#'   dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(exampleTumourNormal)))))
+#' qs_renamed <- renameSamples(qs, newNameColumn = newName)
+#' head(qsea::getSampleTable(qs_renamed)$sample_name)
+#'
+#' @export
 renameSamples <- function(qseaSet, newNameColumn){
 
   newNameColumn <- rlang::enquo(newNameColumn)

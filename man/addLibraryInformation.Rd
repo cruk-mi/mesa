@@ -2,19 +2,24 @@
 % Please edit documentation in R/alterQset.R
 \name{addLibraryInformation}
 \alias{addLibraryInformation}
-\title{This function takes a qseaSet and adds the information on the number of reads into the sampleTable for easier access.}
+\title{Add library metrics into the qseaSet sample table}
 \usage{
 addLibraryInformation(qseaSet)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{A \code{qseaSet} object.}
 }
 \value{
-A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+The same \code{qseaSet}, with an augmented \code{sampleTable}.
 }
 \description{
-This function takes a qseaSet and adds the information on the number of reads into the sampleTable for easier access.
+Convenience helper to append columns from \code{qseaSet@libraries$file_name}
+(and, when available, from \code{qseaSet@libraries$input_file} prefixed with
+\code{"input_"}) to the \code{sampleTable}. Existing columns are not duplicated.
 }
 \examples{
-addLibraryInformation(exampleTumourNormal)
+data(exampleTumourNormal, package = "mesa")
+qs <- addLibraryInformation(exampleTumourNormal)
+head(qsea::getSampleTable(qs))
+
 }
