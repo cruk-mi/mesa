@@ -2,7 +2,7 @@
 % Please edit documentation in R/combineQsets.R
 \name{combineQsetsList}
 \alias{combineQsetsList}
-\title{Combine two qseaSets}
+\title{Combine multiple qseaSets}
 \usage{
 combineQsetsList(
   qseaSets,
@@ -13,19 +13,42 @@ combineQsetsList(
 )
 }
 \arguments{
-\item{qseaSets}{A list of qseaSet objects or strings to rds files with them in}
+\item{qseaSets}{\code{list}. A list of qseaSet objects, or character strings
+giving paths to \code{.rds} files containing qseaSet objects.}
 
-\item{firstQset}{An first qseaSet object to combine the rest into (optional)}
+\item{firstQset}{\code{qseaSet} or \code{character(1)} (optional). If provided, this
+serves as the initial qseaSet to merge into. If a character string ending
+in \code{.rds}, it will be loaded via \code{\link[readr:read_rds]{readr::read_rds()}}.}
 
-\item{dropDuplicates}{Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.}
+\item{dropDuplicates}{\code{logical(1)}. If \code{TRUE} (default), drop samples with
+duplicated names across qseaSets. If \code{FALSE}, duplicates are renamed by
+appending \verb{_Dup}.}
 
-\item{checkParams}{Whether to verify that all the parameters are identical in both objects}
+\item{checkParams}{\code{logical(1)}. Whether to verify that global parameters are
+identical across qseaSets (default \code{TRUE}).}
 
-\item{regionsToKeep}{A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.}
+\item{regionsToKeep}{\code{GRanges} or coercible. If supplied, restricts each
+qseaSet to these genomic regions before combining (reduces memory usage).}
 }
 \value{
-A qseaSet object, containing all the samples from both qseaSet objects.
+A single combined \code{qseaSet} object containing all samples.
 }
 \description{
-This function takes a list of qseaSets (or strings to read rds files from) and merges them together
+Merge a list of qseaSet objects (or \code{.rds} files containing them) into a
+single qseaSet. This is useful when processing tumour/normal cohorts
+separately or across sequencing runs, then combining results into one
+container.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs1 <- exampleTumourNormal
+qs2 <- qs1
+qsea::setSampleNames(qs2) <- paste0(qsea::getSampleNames(qs2), "_rep2")
+
+combined <- combineQsetsList(list(qs1, qs2))
+combined
+
+}
+\seealso{
+\code{\link[=combineQsets]{combineQsets()}} for pairwise merging.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDMRs.R
 \name{getDMRsData}
 \alias{getDMRsData}
-\title{Extract the data table from all the contrasts}
+\title{Extract DMR-level results from a fitted GLM}
 \usage{
 getDMRsData(
   qseaSet,
@@ -18,29 +18,49 @@ getDMRsData(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object (used for metadata and counts).}
 
-\item{qseaGLM}{A qseaGLM object}
+\item{qseaGLM}{A fitted \link{qseaGLM} object (from \code{\link[=fitQseaGLM]{fitQseaGLM()}}).}
 
-\item{sampleNames}{Which samples to return the information for.}
+\item{sampleNames}{Character vector of sample names to include; if \code{NULL},
+determined by \code{keepData}.}
 
-\item{variable}{Which variable the DMR comparison has been performed on}
+\item{variable}{Variable on which contrasts were based (for group means).}
 
-\item{keepData}{Whether to keep the individual data columns}
+\item{keepData}{Logical. If \code{TRUE}, include per-sample data columns.}
 
-\item{keepGroupMeans}{Whether to keep the group means}
+\item{keepGroupMeans}{Logical. If \code{TRUE}, include group mean columns.}
 
-\item{fdrThres}{False discovery rate threshold.}
+\item{fdrThres}{Numeric(1). FDR threshold for selecting significant regions.}
 
-\item{keepPvals}{Whether to keep the unadjusted p-values in the output}
+\item{keepPvals}{Logical. If \code{TRUE}, include raw (unadjusted) p-values.}
 
-\item{keepFragmentInfo}{Whether to keep information on the average fragment length and MAPQ (if present)}
+\item{keepFragmentInfo}{Logical. If \code{TRUE}, include fragment length / MAPQ info.}
 
-\item{direction}{Whether to use regions that are up/down/both.}
+\item{direction}{Character: \code{"up"}, \code{"down"}, or \code{"both"}. Passed to
+\code{\link[qsea:isSignificant]{qsea::isSignificant()}}.}
 }
 \value{
-A tibble with the data
+A tibble with one row per DMR and columns for statistics,
+adjusted p-values, and (optionally) group means or per-sample values.
 }
 \description{
-This function extracts the information from the DMR contrasts into a wide table
+Given a \link{qseaGLM} object with one or more contrasts, extract a wide table of
+statistics, group means, and (optionally) per-sample values.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
+glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
+dmrTab <- getDMRsData(qs, glmfit, variable = "type", fdrThres = 0.1)
+head(dmrTab)
+
+}
+\seealso{
+Other DMR-detection: 
+\code{\link{calculateDMRs}()},
+\code{\link{fitQseaGLM}()},
+\code{\link{makeAllContrasts}()}
+}
+\concept{DMR-detection}

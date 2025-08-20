@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDMRs.R
 \name{calculateDMRs}
 \alias{calculateDMRs}
-\title{Fit the GLM and return the data}
+\title{Fit GLM and return DMR data in one step}
 \usage{
 calculateDMRs(
   qseaSet,
@@ -23,45 +23,71 @@ calculateDMRs(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object containing counts and sample metadata.}
 
-\item{variable}{Which variable to use to calculate the DMRs between}
+\item{variable}{Character scalar. Column in the sample table used as the
+primary explanatory variable.}
 
-\item{covariates}{Any variables to use as covariates, for instance patient in a paired analysis}
+\item{covariates}{Character vector of additional covariates (e.g. batch,
+patient ID).}
 
-\item{contrasts}{A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted}
+\item{contrasts}{Data frame or string specifying contrasts. If \code{"All"},
+generate all pairwise contrasts via \code{\link[=makeAllContrasts]{makeAllContrasts()}}. Strings of the
+form \code{"A_vs_B"}, \code{"All_vs_X"}, or \code{"X_vs_All"} are also supported.}
 
-\item{minReadCount}{A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.}
+\item{minReadCount}{Minimum raw count required in at least one sample to
+retain a window.}
 
-\item{minNRPM}{A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).}
+\item{minNRPM}{Minimum NRPM required in at least one sample to retain a window.}
 
-\item{checkPVals}{Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!}
+\item{checkPVals}{Logical. If \code{TRUE}, stop or warn if excessive proportions
+of p-values are exactly zero (indicating possible instability).}
 
-\item{fdrThres}{False discovery rate threshold.}
+\item{fdrThres}{Numeric(1). FDR threshold for selecting significant regions.}
 
-\item{keepPvals}{Whether to keep the unadjusted p-values in the output}
+\item{keepPvals}{Logical. If \code{TRUE}, include raw (unadjusted) p-values.}
 
-\item{formula}{Alternative formula mode for calculating DMRs (not recommended)}
+\item{formula}{Optional \code{formula} overriding \code{variable}/\code{covariates}.}
 
-\item{keepContrastMeans}{Whether to keep the columns containing the means of the contrasts in the output}
+\item{keepContrastMeans}{Logical. If \code{FALSE}, remove contrast mean columns
+from the output.}
 
-\item{keepData}{Whether to keep the individual data columns in the output}
+\item{keepData}{Logical. If \code{TRUE}, include per-sample data columns.}
 
-\item{keepGroupMeans}{Whether to keep the group means in the output}
+\item{keepGroupMeans}{Logical. If \code{TRUE}, include group mean columns.}
 
-\item{direction}{Whether to keep regions that are up/down/both.}
+\item{direction}{Character: \code{"up"}, \code{"down"}, or \code{"both"}. Passed to
+\code{\link[qsea:isSignificant]{qsea::isSignificant()}}.}
 
-\item{calcDispersionAll}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
-Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
+\item{calcDispersionAll}{Logical. Whether to use samples that are not present
+in the contrasts to fit the initial generalised linear model, including them
+in the calculation of dispersion estimates. Setting this to be TRUE will mean
+that adding additional samples to the qseaSet will change the calculated DMRs,
+even if they are not being compared across.}
 }
 \value{
-A tibble with the data
+A tibble with one row per significant region, containing DMR
+statistics, adjusted p-values, and delta-beta values for each contrast.
 }
 \description{
-This function fits a GLM and returns the resulting data table
+High-level wrapper that calls \code{\link[=fitQseaGLM]{fitQseaGLM()}} and \code{\link[=getDMRsData]{getDMRsData()}} to produce a
+DMR results table directly.
 }
 \examples{
-qseaSet <- mesa::exampleTumourNormal
-calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+# One contrast
+calculateDMRs(qs, variable = "type", contrasts = "LUAD_vs_NormalLung")
+
+# All pairwise contrasts
+dmrTab <- calculateDMRs(qs, variable = "type", contrasts = "All")
+head(dmrTab)
 
 }
+\seealso{
+Other DMR-detection: 
+\code{\link{fitQseaGLM}()},
+\code{\link{getDMRsData}()},
+\code{\link{makeAllContrasts}()}
+}
+\concept{DMR-detection}

@@ -13,19 +13,36 @@ combineQsets(
 )
 }
 \arguments{
-\item{qseaSet1}{The first qseaSet object.}
+\item{qseaSet1}{\code{qseaSet} or \code{character(1)} to an \code{.rds} file.}
 
-\item{qseaSet2}{The second qseaSet object.}
+\item{qseaSet2}{\code{qseaSet} or \code{character(1)} to an \code{.rds} file.}
 
-\item{checkParams}{Whether to verify that all the parameters are identical in both objects}
+\item{checkParams}{\code{logical(1)}. If \code{TRUE}, enforce identical global
+parameters across qseaSets (default \code{FALSE}).}
 
-\item{regionsToKeep}{A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.}
+\item{regionsToKeep}{\code{GRanges} or coercible. If supplied, restricts both
+qseaSets to these regions before combining.}
 
-\item{dropDuplicates}{Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.}
+\item{dropDuplicates}{\code{logical(1)}. If \code{TRUE}, drop duplicate samples across
+qseaSets. If \code{FALSE} (default), duplicates are renamed with suffix \verb{_Dup}.}
 }
 \value{
-A qseaSet object, containing all the samples from both qseaSet objects.
+A combined \code{qseaSet} object.
 }
 \description{
-This function takes two qseaSets and combines them into one.
+Merge two qseaSet objects (or \code{.rds} files containing them) into one.
+This is the underlying function called by \code{\link[=combineQsetsList]{combineQsetsList()}}.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs1 <- exampleTumourNormal
+qs2 <- qs1
+qsea::setSampleNames(qs2) <- paste0(qsea::getSampleNames(qs2), "_rep2")
+
+combined <- combineQsets(qs1, qs2)
+combined
+
+}
+\seealso{
+\code{\link[=combineQsetsList]{combineQsetsList()}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDMRs.R
 \name{fitQseaGLM}
 \alias{fitQseaGLM}
-\title{Fit a generalised linear model}
+\title{Fit a generalized linear model (GLM) to a qseaSet}
 \usage{
 fitQseaGLM(
   qseaSet,
@@ -18,30 +18,65 @@ fitQseaGLM(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object containing counts and sample metadata.}
 
-\item{variable}{The variable to treat as the independent variable between samples in the linear model}
+\item{variable}{Character scalar. Column in the sample table used as the
+primary explanatory variable.}
 
-\item{covariates}{A vector including any additional covariates to include in the model}
+\item{covariates}{Character vector of additional covariates (e.g. batch,
+patient ID).}
 
-\item{contrasts}{A data frame with the comparisons to do}
+\item{contrasts}{Data frame with columns \code{group1} and \code{group2}, specifying
+contrasts to compute.}
 
-\item{keepIndex}{A vector of indices to keep, overwrites minReadCount.}
+\item{keepIndex}{Optional integer vector of row indices to retain; overrides
+filtering by \code{minReadCount}/\code{minNRPM}.}
 
-\item{minReadCount}{A minimum read count for a row to be considered, in the qseaSet as provided.}
+\item{minReadCount}{Minimum raw count required in at least one sample to
+retain a window.}
 
-\item{minNRPM}{A minimum normalised reads per million to apply}
+\item{minNRPM}{Minimum NRPM required in at least one sample to retain a window.}
 
-\item{checkPVals}{Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.}
+\item{checkPVals}{Logical. If \code{TRUE}, stop or warn if excessive proportions
+of p-values are exactly zero (indicating possible instability).}
 
-\item{formula}{A formula to use}
+\item{formula}{Optional \code{formula} overriding \code{variable}/\code{covariates}.}
 
-\item{calcDispersionAll}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
-Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
+\item{calcDispersionAll}{Logical. Whether to use samples that are not present
+in the contrasts to fit the initial generalised linear model, including them
+in the calculation of dispersion estimates. Setting this to be TRUE will mean
+that adding additional samples to the qseaSet will change the calculated DMRs,
+even if they are not being compared across.}
 }
 \value{
-A qseaGLM object
+A \code{qseaGLM} object with fitted model and contrasts.
 }
 \description{
-This function fits a generalised linear model given a qseaSet, and then add a set of contrasts to it
+Fit a negative-binomial GLM using \code{\link[qsea:fitNBglm]{qsea::fitNBglm()}} on counts from a
+\link[qsea:qseaSet-class]{qsea::qseaSet}, and add one or more contrasts.
+This is the low-level function used by \code{\link[=calculateDMRs]{calculateDMRs()}}.
 }
+\details{
+\itemize{
+\item Dispersion is estimated across all contrasts (or all samples, if
+\code{calcDispersionAll = TRUE}).
+\item Contrasts are added sequentially to the fitted GLM using
+\code{\link[qsea:addContrast]{qsea::addContrast()}}.
+\item By default, beta-normalised counts are used as the outcome.
+}
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+qs <- exampleTumourNormal
+contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
+glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
+glmfit
+
+}
+\seealso{
+Other DMR-detection: 
+\code{\link{calculateDMRs}()},
+\code{\link{getDMRsData}()},
+\code{\link{makeAllContrasts}()}
+}
+\concept{DMR-detection}

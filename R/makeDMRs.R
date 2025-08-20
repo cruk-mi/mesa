@@ -1,19 +1,48 @@
-#' Fit a generalised linear model
+#' Fit a generalized linear model (GLM) to a qseaSet
 #'
-#' This function fits a generalised linear model given a qseaSet, and then add a set of contrasts to it
+#' Fit a negative-binomial GLM using [qsea::fitNBglm()] on counts from a
+#' [qsea::qseaSet], and add one or more contrasts.  
+#' This is the low-level function used by [calculateDMRs()].
 #'
-#' @param qseaSet The qseaSet object
-#' @param variable The variable to treat as the independent variable between samples in the linear model
-#' @param covariates A vector including any additional covariates to include in the model
-#' @param formula A formula to use
-#' @param contrasts A data frame with the comparisons to do
-#' @param keepIndex A vector of indices to keep, overwrites minReadCount.
-#' @param minReadCount A minimum read count for a row to be considered, in the qseaSet as provided.
-#' @param minNRPM A minimum normalised reads per million to apply
-#' @param checkPVals Whether to check excessive numbers of the p-values are exactly zero, to catch a bug in qsea.
-#' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
-#' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.
-#' @return A qseaGLM object
+#' @param qseaSet A [qsea::qseaSet] object containing counts and sample metadata.
+#' @param variable Character scalar. Column in the sample table used as the
+#'   primary explanatory variable.
+#' @param covariates Character vector of additional covariates (e.g. batch,
+#'   patient ID).
+#' @param formula Optional `formula` overriding `variable`/`covariates`.
+#' @param contrasts Data frame with columns `group1` and `group2`, specifying
+#'   contrasts to compute.
+#' @param keepIndex Optional integer vector of row indices to retain; overrides
+#'   filtering by `minReadCount`/`minNRPM`.
+#' @param minReadCount Minimum raw count required in at least one sample to
+#'   retain a window.
+#' @param minNRPM Minimum NRPM required in at least one sample to retain a window.
+#' @param checkPVals Logical. If `TRUE`, stop or warn if excessive proportions
+#'   of p-values are exactly zero (indicating possible instability).
+#' @param calcDispersionAll Logical. Whether to use samples that are not present
+#' in the contrasts to fit the initial generalised linear model, including them 
+#' in the calculation of dispersion estimates. Setting this to be TRUE will mean
+#' that adding additional samples to the qseaSet will change the calculated DMRs,
+#' even if they are not being compared across.
+#' @return A `qseaGLM` object with fitted model and contrasts.
+#'
+#' @details
+#' - Dispersion is estimated across all contrasts (or all samples, if
+#'   `calcDispersionAll = TRUE`).  
+#' - Contrasts are added sequentially to the fitted GLM using
+#'   [qsea::addContrast()].  
+#' - By default, beta-normalised counts are used as the outcome.
+#'
+#' @family DMR-detection
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
+#' glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
+#' glmfit
+#' 
+#' @export
 fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
                        contrasts = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
                        checkPVals = TRUE, formula = NULL, calcDispersionAll = FALSE){
@@ -175,21 +204,38 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 }
 
 
-#' Extract the data table from all the contrasts
+#' Extract DMR-level results from a fitted GLM
 #'
-#' This function extracts the information from the DMR contrasts into a wide table
+#' Given a [qseaGLM] object with one or more contrasts, extract a wide table of
+#' statistics, group means, and (optionally) per-sample values.
 #'
-#' @param qseaSet The qseaSet object
-#' @param qseaGLM A qseaGLM object
-#' @param sampleNames Which samples to return the information for.
-#' @param variable Which variable the DMR comparison has been performed on
-#' @param fdrThres False discovery rate threshold.
-#' @param keepData Whether to keep the individual data columns
-#' @param keepGroupMeans Whether to keep the group means
-#' @param keepPvals Whether to keep the unadjusted p-values in the output
-#' @param keepFragmentInfo Whether to keep information on the average fragment length and MAPQ (if present)
-#' @param direction Whether to use regions that are up/down/both.
-#' @return A tibble with the data
+#' @param qseaSet A [qsea::qseaSet] object (used for metadata and counts).
+#' @param qseaGLM A fitted [qseaGLM] object (from [fitQseaGLM()]).
+#' @param sampleNames Character vector of sample names to include; if `NULL`,
+#'   determined by `keepData`.
+#' @param variable Variable on which contrasts were based (for group means).
+#' @param fdrThres Numeric(1). FDR threshold for selecting significant regions.
+#' @param keepData Logical. If `TRUE`, include per-sample data columns.
+#' @param keepGroupMeans Logical. If `TRUE`, include group mean columns.
+#' @param keepPvals Logical. If `TRUE`, include raw (unadjusted) p-values.
+#' @param keepFragmentInfo Logical. If `TRUE`, include fragment length / MAPQ info.
+#' @param direction Character: `"up"`, `"down"`, or `"both"`. Passed to
+#'   [qsea::isSignificant()].
+#'
+#' @return A tibble with one row per DMR and columns for statistics,
+#'   adjusted p-values, and (optionally) group means or per-sample values.
+#'
+#' @family DMR-detection
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
+#' glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
+#' dmrTab <- getDMRsData(qs, glmfit, variable = "type", fdrThres = 0.1)
+#' head(dmrTab)
+#' 
+#' @export
 getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, keepData = FALSE, keepGroupMeans = FALSE,
                         fdrThres = 0.05, keepPvals = FALSE, keepFragmentInfo = FALSE,
                         direction = "both"){
@@ -267,15 +313,24 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
   return(dataTable)
 }
 
-#' Make a full set of possible contrasts for calculating DMRs on.
+
+#' Generate all possible pairwise contrasts
 #'
-#' This function returns a set of all possible contrasts
+#' Construct a tibble of all pairwise contrasts between levels of a categorical
+#' variable in the sample table of a [qsea::qseaSet].
 #'
-#' @param qseaSet The qseaSet object
-#' @param variable Which variable to use to calculate the DMRs between
-#' @return A tibble with two columns, each row with a pair of contrasts
+#' @param qseaSet A [qsea::qseaSet] object.
+#' @param variable Character scalar. Column in the sample table.
+#'
+#' @return A tibble with columns `group1` and `group2`.
+#'
+#' @family DMR-detection
+#' 
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' makeAllContrasts(exampleTumourNormal, "type")
+#' 
 #' @export
-#'
 makeAllContrasts <- function(qseaSet, variable){
   vals <- qseaSet %>%
     qsea::getSampleTable() %>%
@@ -289,32 +344,36 @@ makeAllContrasts <- function(qseaSet, variable){
     return()
 }
 
-#' Fit the GLM and return the data
+
+#' Fit GLM and return DMR data in one step
 #'
-#' This function fits a GLM and returns the resulting data table
+#' High-level wrapper that calls [fitQseaGLM()] and [getDMRsData()] to produce a
+#' DMR results table directly.
 #'
-#' @param qseaSet The qseaSet object
-#' @param variable Which variable to use to calculate the DMRs between
-#' @param covariates Any variables to use as covariates, for instance patient in a paired analysis
-#' @param contrasts A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted
-#' @param formula Alternative formula mode for calculating DMRs (not recommended)
-#' @param minNRPM A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).
-#' @param minReadCount A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.
-#' @param fdrThres False discovery rate threshold.
-#' @param keepContrastMeans Whether to keep the columns containing the means of the contrasts in the output
-#' @param keepData Whether to keep the individual data columns in the output
-#' @param keepGroupMeans Whether to keep the group means in the output
-#' @param keepPvals Whether to keep the unadjusted p-values in the output
-#' @param checkPVals Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!
-#' @param direction Whether to keep regions that are up/down/both.
-#' @param calcDispersionAll Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
-#' Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.
-#' @return A tibble with the data
-#' @export
+#' @inheritParams fitQseaGLM
+#' @inheritParams getDMRsData
+#' @param contrasts Data frame or string specifying contrasts. If `"All"`,
+#'   generate all pairwise contrasts via [makeAllContrasts()]. Strings of the
+#'   form `"A_vs_B"`, `"All_vs_X"`, or `"X_vs_All"` are also supported.
+#' @param keepContrastMeans Logical. If `FALSE`, remove contrast mean columns
+#'   from the output.
+#'
+#' @return A tibble with one row per significant region, containing DMR
+#'   statistics, adjusted p-values, and delta-beta values for each contrast.
+#'
+#' @family DMR-detection
+#'
 #' @examples
-#' qseaSet <- mesa::exampleTumourNormal
-#' calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
+#' data(exampleTumourNormal, package = "mesa")
+#' qs <- exampleTumourNormal
+#' # One contrast
+#' calculateDMRs(qs, variable = "type", contrasts = "LUAD_vs_NormalLung")
 #'
+#' # All pairwise contrasts
+#' dmrTab <- calculateDMRs(qs, variable = "type", contrasts = "All")
+#' head(dmrTab)
+#' 
+#' @export
 calculateDMRs <- function(qseaSet,
                           variable = NULL,
                           covariates = NULL,

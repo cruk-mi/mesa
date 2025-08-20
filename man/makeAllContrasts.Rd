@@ -2,18 +2,31 @@
 % Please edit documentation in R/makeDMRs.R
 \name{makeAllContrasts}
 \alias{makeAllContrasts}
-\title{Make a full set of possible contrasts for calculating DMRs on.}
+\title{Generate all possible pairwise contrasts}
 \usage{
 makeAllContrasts(qseaSet, variable)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object.}
 
-\item{variable}{Which variable to use to calculate the DMRs between}
+\item{variable}{Character scalar. Column in the sample table.}
 }
 \value{
-A tibble with two columns, each row with a pair of contrasts
+A tibble with columns \code{group1} and \code{group2}.
 }
 \description{
-This function returns a set of all possible contrasts
+Construct a tibble of all pairwise contrasts between levels of a categorical
+variable in the sample table of a \link[qsea:qseaSet-class]{qsea::qseaSet}.
 }
+\examples{
+data(exampleTumourNormal, package = "mesa")
+makeAllContrasts(exampleTumourNormal, "type")
+
+}
+\seealso{
+Other DMR-detection: 
+\code{\link{calculateDMRs}()},
+\code{\link{fitQseaGLM}()},
+\code{\link{getDMRsData}()}
+}
+\concept{DMR-detection}
