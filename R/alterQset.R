@@ -184,6 +184,17 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
     return(qseaSet)
   }
 
+  asValidNames <- base::make.names(renamedNames)
+  
+  if(any(asValidNames != renamedNames)){
+    stop(glue::glue("Sample names must be valid names for columns in R without quoting.
+  See the help for base::make.names, but generally use only letters, numbers, 
+  underscores and dots, and names can't start with a number. 
+  Issues were found with: 
+    {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
+   "))
+  }
+  
   if ( any(duplicated(renamedNames) ) ) {
     stop(glue::glue("Duplicate sample_name now present: {renamedNames[duplicated(renamedNames)]}"))
   }
@@ -346,8 +357,9 @@ poolSamples <- function(qseaSet, mergeString){
 #' @export
 #' @examples
 #' exampleTumourNormal %>%
-#'   mutate(newName = paste("Sample",1:10)) %>%
-#'   renameSamples(newNameColumn = 'newName')
+#' mutate(newName = paste0("Sample",1:10)) %>%
+#' renameSamples(newNameColumn = 'newName')
+
 renameSamples <- function(qseaSet, newNameColumn){
 
   newNameColumn <- rlang::enquo(newNameColumn)
@@ -358,6 +370,17 @@ renameSamples <- function(qseaSet, newNameColumn){
     stop(glue::glue("NAs present in the new sample name column"))
   }
 
+  asValidNames <- base::make.names(renamedNames)
+  
+  if(any(asValidNames != renamedNames)){
+    stop(glue::glue("Sample names must be valid names for columns in R without quoting.
+  See the help for base::make.names, but generally use only letters, numbers, 
+  underscores and dots, and names can't start with a number. 
+  Issues were found with: 
+    {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
+   "))
+  }
+  
   if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
     message("Renaming had no effect!")
     return(qseaSet)

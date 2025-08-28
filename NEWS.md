@@ -22,10 +22,13 @@ editor_options:
 * Removed `colnames` function definion on a qseaSet, which was not working anyway.
 
 ### BUG FIXES
-* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
 * Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
 * `writeDMRsToBed` should now correctly export the files.
+* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 
 # mesa 0.5.1
 
