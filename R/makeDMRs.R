@@ -299,7 +299,14 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param qseaSet The qseaSet object
 #' @param variable Which variable to use to calculate the DMRs between
 #' @param covariates Any variables to use as covariates, for instance patient in a paired analysis
-#' @param contrasts A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted
+#' @param contrasts Either a data frame or a string to specify the contrasts to use.
+#' If using a data frame, it should have two columns, `group1` and `group2`, with the strings to compare between in each. 
+#' Multiple rows means that multiple comparisons will be fitted.
+#' If using a string, then either:
+#' * `"all"` to calculate all possible contrasts on the variable column
+#' * `"first"` to calculate only the first possible contrast on the variable column
+#' * `"<value1>_vs_<value2>"` to calculate the contrast between two specific values in the variable column
+#' * `"all_vs_<value>"` or `"<value>_vs_all"` to calculate all possible contrasts against a specific value in the variable column
 #' @param formula Alternative formula mode for calculating DMRs (not recommended)
 #' @param minNRPM A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).
 #' @param minReadCount A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.

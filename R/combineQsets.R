@@ -181,6 +181,12 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
 #' @return A qseaSet object, containing all the samples from both qseaSet objects.
 #' @export
 #' @rdname combineQsets
+#' @examples
+#' tumours <- exampleTumourNormal %>% filter(tumour == "Tumour") 
+#' normals <- exampleTumourNormal %>% filter(tumour == "Normal")
+#' qsetList <- list(tumours, normals)
+#' combineQsetsList(qsetList)
+
 combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, checkParams = TRUE, regionsToKeep = NULL) {
   if (is.character(firstQset)) {
     if(length(firstQset) == 1 & tools::file_ext(firstQset) == "rds"){#has two be afterwards, else errors if it is a qseaSet
