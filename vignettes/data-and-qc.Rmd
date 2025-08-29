@@ -66,7 +66,7 @@ Now this table only has two columns (and note that there are no NA values any mo
 We explicitly note that qsea incorporates the uncertainty of the measurements in its beta value estimations. This means that the values returned as `beta` values are actually the median of this estimate, with an associated confidence interval (which can be queried, see `qsea::makeTable`). In practice, this means that samples with high coverage can return values very close to 0 and 1, but the same sample with less coverage might return 0.1 or 0.9. This can have an effect on clustering and PCAs for example.
 
 # Quality Control
-One extremely important aspect of any sequencing experiment is quality control (QC), and ME-seq is not exception. Alongside the typical QC steps on the bam files themselves (although a raised CG content should obviously be expected following enrichment), there are several methylation-specific steps to consider.
+One extremely important aspect of any sequencing experiment is quality control (QC), and ME-seq is no exception. Alongside the typical QC steps on the bam files themselves (although a raised CG content should obviously be expected following enrichment), there are several methylation-specific steps to consider.
 
 ## Relative Enrichment 
 The first metric that we use is a relative enrichment metric, known as `relH`. This was first introduced in the `MEDIPs` package, via the `MEDIPS.CpGenrich()` function, and is a metric to express the proportion of CG dinucleotides, compared to the reference genome.

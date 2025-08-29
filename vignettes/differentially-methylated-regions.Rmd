@@ -77,7 +77,7 @@ exampleTumourNormal |>
 ```
 
 ## Output
-The output of `calculateDMRs` is a dataframe, where each row corresponds to a window which was considered to be differentially methylated at the False Discovery Rate (FDR) threshold applied to the adjusted p-values. The first four columns include the window information: `seqnames` (chromosome), `start` and `end` of the window and the CpG_density. The next columns are related to the contrasts undertaken, giving the log2 fold change, `Tumour_vs_Normal_log2FC`, the adjusted p-value, `Tumour_vs_Normal_adjPval`, and the difference in average beta values for the samples with each different type, `Tumour_vs_Normal_deltaBeta`. These additional columns are repeated if multiple contrasts are calculated in one call to `calculateDMRs`. Following these contrast specific columns there is a block of columns also includes the average beta and nrpm values for the values of the variable under consideration, e.g. `Tumour_nrpm_means`. 
+The output of `calculateDMRs` is a dataframe, where each row corresponds to a window which was considered to be differentially methylated at the False Discovery Rate (FDR) threshold applied to the adjusted p-values. The first four columns include the window information: `seqnames` (chromosome), `start` and `end` of the window and the `CpG_density`. The next columns are related to the contrasts undertaken, giving the log2 fold change, `Tumour_vs_Normal_log2FC`, the adjusted p-value, `Tumour_vs_Normal_adjPval`, and the difference in average beta values for the samples with each different type, `Tumour_vs_Normal_deltaBeta`. These additional columns are repeated if multiple contrasts are calculated in one call to `calculateDMRs`. Following these contrast specific columns there is a block of columns that includes the average beta and nrpm values for the values of the variable under consideration, e.g. `Tumour_nrpm_means`. 
 
 ```{r}
 exampleTumourNormal |>
@@ -157,7 +157,7 @@ allWindows |>
        y = "-Log10 Adjusted P Value")
 ```
 
-We can also use the $\Delta \beta$, the difference between the average beta values between the two sets of samples. This can be a more useful metric, as characterises windows that have clearly changed in levels of methylation.
+We can also use the $\Delta \beta$, the difference between the average beta values between the two sets of samples. This can be a more useful metric, as it characterises windows that have clearly changed in levels of methylation.
 
 ```{r}
 allWindows |>
