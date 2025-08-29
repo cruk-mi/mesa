@@ -42,7 +42,7 @@ exampleTumourNormal |>
   dplyr::select(sample_name, tumour)
 ```
 
-We therefore set `variable = "tumour`, to select this column. There are several options we can pass to the `contrasts` option (i.e. the comparisons), in order to specify exactly which comparisons we want to calculate.
+We therefore set `variable = "tumour"`, to select this column. There are several options we can pass to the `contrasts` option (i.e. the comparisons), in order to specify exactly which comparisons we want to calculate.
 
 The `contrasts` option can be a few string settings, such as `"all"` or `"first"`:
 
