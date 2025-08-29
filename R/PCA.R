@@ -581,20 +581,17 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
           stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
         }
 
-      } else {
-        
-        if (nShape <= 4 && any(is.na(plotData %>% pull(shape)))) {
+      } else if (nShape <= 4 && any(is.na(plotData %>% pull(shape)))) {
           shapePalette <- c(21, 24, 22, 23)
           NAshape <- 25
         } else if (nShape <= 5 ) {
           shapePalette <- c(21, 24, 22, 23, 25)
-        }
-        
+        } else {
         shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
+        }
         if (nShape > length(shapePalette)) {
           stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
         }
-      }
 
     } else if (is.numeric(shapePalette)) {
       if (nShape > length(shapePalette)) {
