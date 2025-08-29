@@ -185,10 +185,12 @@ test_that("Analysing DMRs", {
   DMRs_log2 <- DMRs %>% sliceDMRs(n = 1, metric = log2FC)
   DMRs_adjPval <- DMRs %>% sliceDMRs(n = 1, metric = adjPval)
   DMRs_deltaBeta <- DMRs %>% sliceDMRs(n = 1, metric = deltaBeta)
+  DMRs_position <- DMRs %>% sliceDMRs(n = 1, metric = position)
   
   expect_false(all(DMRs_log2$start == DMRs_adjPval$start))
   expect_false(all(DMRs_log2$start == DMRs_deltaBeta$start))
   expect_false(all(DMRs_adjPval$start == DMRs_deltaBeta$start))
+  expect_false(all(DMRs_adjPval$start == DMRs_position$start))
   
 })
 

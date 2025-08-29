@@ -75,7 +75,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
     dplyr::ungroup()
 
   contrastsDF %>%
-    dplyr::left_join(DMRsummary) %>%
+    dplyr::left_join(DMRsummary, by = join_by(group1, group2)) %>%
     dplyr::mutate(nDown = tidyr::replace_na(nDown, 0),
            nUp = tidyr::replace_na(nUp, 0)) %>%
     dplyr::select(group1, group2, nUp, nDown) %>%
@@ -181,7 +181,7 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 #' @param DMRs  A data frame containing the output of calculateDMRs, potentially with multiple contrasts
 #' @param n How many DMRs to take of each contrast (if that many exists)
 #' @param FDRthres Threshold on the adjusted p values
-#' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density or any other column in the DMRs. 
+#' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density or any other column in the data frame. 
 #' If `adjPval`, `start` or `seqnames` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
 #' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast.
 #' @return A data frame with the DMRs with the largest value of the selected metrics
@@ -196,6 +196,8 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 #' DMRs %>% sliceDMRs(n = 1, metric = CpG_density)
 #' # If adjPval is used, then the smallest value is chosen instead:
 #' DMRs %>% sliceDMRs(n = 1, metric = CpG_density)
+#' # If position is used, then the windows are sorted by genomic position:
+#' DMRs %>% sliceDMRs(n = 1, metric = position)
 sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRthres = 0.05) {
   
   positiveDMRs <- DMRs %>% 
@@ -203,7 +205,12 @@ sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRt
     dplyr::relocate(tidyselect::matches("means$"), .after = tidyselect::last_col()) %>%
     dplyr::group_by(group1, group2)
 
-  if(deparse(substitute(metric)) %in% c("adjPval", "start", "seqnames")){
+  if(deparse(substitute(metric)) %in% c("position")){
+    out <- positiveDMRs %>% 
+      dplyr::arrange(seqnames, start) %>% 
+      dplyr::slice(1:(!!n)) %>%
+      dplyr::ungroup()
+  } else if (deparse(substitute(metric)) %in% c("adjPval")){
     message(glue::glue("Choosing the windows with the smallest value of {rlang::ensym(metric)}"))
     out <- positiveDMRs %>% 
       dplyr::arrange({{metric}}) %>% 
