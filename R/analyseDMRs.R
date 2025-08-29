@@ -183,7 +183,7 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 #' @param FDRthres Threshold on the adjusted p values
 #' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density or any other column in the DMRs. 
 #' If `adjPval`, `start` or `seqnames` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
-#' @param bothWays Whether to take windows that are hyper- and hypo-methylated in the contrast, or only hypermethylated (i.e. more methylated in group A).
+#' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast.
 #' @return A data frame with the DMRs with the largest value of the selected metrics
 #' @examples
 #' # calculate some DMRs
