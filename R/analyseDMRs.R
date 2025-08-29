@@ -181,8 +181,8 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
 #' @param DMRs  A data frame containing the output of calculateDMRs, potentially with multiple contrasts
 #' @param n How many DMRs to take of each contrast (if that many exists)
 #' @param FDRthres Threshold on the adjusted p values
-#' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density or any other column in the data frame. 
-#' If `adjPval`, `start` or `seqnames` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
+#' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start columns) or any other column in the data frame. 
+#' If `adjPval` or `position` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
 #' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast.
 #' @return A data frame with the DMRs with the largest value of the selected metrics
 #' @examples
