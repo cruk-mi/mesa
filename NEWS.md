@@ -6,6 +6,9 @@ editor_options:
 
 # dev
 
+### ADDED
+* Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column.
+
 ### CHANGES
 * Converted `plotPCA` into a method for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
