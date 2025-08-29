@@ -169,7 +169,7 @@ allWindows |>
        y = "-Log10 Adjusted P Value")
 ```
 
-These two metrics are correlated, but do sometimes differ, particularly in regions that have methylation values close to 1 in one or both samples. This is not particularly noticeable in this small subset of the data though.
+These two metrics are correlated, but do sometimes differ, particularly in regions that have beta values close to 1 in one or both samples. This is not particularly noticeable in this small subset of the data though.
 
 ```{r}
 allWindows |>
