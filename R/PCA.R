@@ -820,7 +820,7 @@ plotPCA.mesaDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = 25,
+                    NAshape = 7,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
@@ -878,7 +878,7 @@ plotUMAP <- function(object,
                      symDivColourScale = FALSE,
                      shape = NULL,
                      shapePalette = NULL,
-                     NAshape = 25,
+                     NAshape = 7,
                      showSampleNames = FALSE,
                      pointSize = 2,
                      alpha = 1,
@@ -935,7 +935,7 @@ plotDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = NULL,
+                    NAshape = 7,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
@@ -1096,11 +1096,11 @@ plotDimRed <- function(object,
 
     if (length(colour) == 1 && colour == "NULLcol") {
 
-      my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = NAshape)
+      my_scale_shape <- getShapeScale(plotData, shape, shapePalette, NAshape = NAshape)
 
       my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
-      my_scale_colour <- getColourScale(plotData = NULL, colour, cols = NULL, colourScaleType = NULL, my_scale_shape, NAcolour = NULL, symDivColourScale = NULL)
+      my_scale_colour <- getColourScale(cV = colour, my_scale_shape = my_scale_shape)
       
       my_legend_params <- getLegendParams(colour, shape, my_scale_shape)
 
