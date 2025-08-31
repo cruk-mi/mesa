@@ -762,6 +762,37 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 }
 
+getLegendParams <- function(cV, shape, my_scale_shape) {
+
+  if(any(my_scale_shape$palette(1) %in% 21:25)){
+    filledShapes <- TRUE
+  } else {
+    filledShapes <- FALSE 
+  }
+  
+  if (filledShapes) {
+    
+    if (shape == "NULLshape") {
+      shape = "none"
+    } else {
+      shape = NULL
+    }
+    
+    if (length(cV) > 1 || cV != "NULLcol") {
+      fill = guide_legend(override.aes = list(shape = 21, col = "black"))
+    } else {
+      fill = "none"
+    }
+    
+    my_legend_params <- guides(shape = shape,
+                               fill = fill)
+  } else {
+    my_legend_params <- NULL
+  }
+  
+  return(my_legend_params)
+}
+
 #' This function takes the `mesaDimRed` object output of [getPCA()] and produces plots.
 #' @param object The output from [getPCA()].
 #' @param qseaSet The qseaSet object used to generate `object`.
@@ -1011,7 +1042,7 @@ plotDimRed <- function(object,
       colour <- "NULLcol"
     }
 
-    makePlot <- function(components, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape) {
+    makePlot <- function(components, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params) {
 
       env <- new.env(parent = globalenv())
       env$plotData <- plotData
@@ -1045,6 +1076,7 @@ plotDimRed <- function(object,
         my_geom_point +
         my_scale_colour +
         my_scale_shape +
+        my_legend_params +
         ggplot2::ggtitle(glue::glue("{object@params$method} for {length(object@samples)} samples using {titleString}."),
                          subtitle = subtitleString) +
         ggplot2::theme_bw() +
@@ -1075,8 +1107,10 @@ plotDimRed <- function(object,
       my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
       my_scale_colour <- ggplot2::scale_colour_identity()
+      
+      my_legend_params <- getLegendParams(colour, shape, my_scale_shape)
 
-      ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape)
+      ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
 
       return(ggp)
 
@@ -1100,8 +1134,10 @@ plotDimRed <- function(object,
         my_geom_point <- getGeomPoint(cV, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
         my_scale_colour <- getColourScale(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour = NAcolour, symDivColourScale = symDivColourScale)
+        
+        my_legend_params <- getLegendParams(cV, shape, my_scale_shape)
 
-        ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape)
+        ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
 
         return(ggp)
 
