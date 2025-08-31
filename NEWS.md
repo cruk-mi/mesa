@@ -14,7 +14,9 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 
 ### BUG FIXES
-* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape` 
+* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`.
+* When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes.
+* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes.
 
 # mesa 0.5.1
 
