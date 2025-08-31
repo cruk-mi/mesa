@@ -563,7 +563,7 @@ getDimRed <- function(qseaSet,
 getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = 7) {
 
   if (shape == "NULLshape") {
-    my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
+    my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, guide = "none")
 
   } else {
 
@@ -676,84 +676,92 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
     filledShapes <- FALSE 
   }
   
-  if (is.null(cols)) {
-    if (colourScaleType == "qualitative") {
-      my_scale_colour <- if (filledShapes) {
-        hues::scale_fill_iwanthue(na.value = NAcolour)
-      } else {
-        hues::scale_colour_iwanthue(na.value = NAcolour)
-      }
-    } else if (colourScaleType == "sequential_non_neg") {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_viridis_c(na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_viridis_c(na.value = NAcolour)
-      }
-    } else if (colourScaleType == "sequential_non_pos") {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_viridis_c(direction = -1, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_viridis_c(direction = -1, na.value = NAcolour)
-      }
-    } else if (colourScaleType == "diverging") {
-      cols <- RColorBrewer::brewer.pal(9, "RdBu") %>% rev()
-      cols[5] <- "grey90"
-    }
-
-  } else {
-    if (colourScaleType == "qualitative") {
-      nCol <- plotData %>% pull(cV) %>% setdiff(NA) %>% unique() %>% length()
-      if (nCol > length(cols)) {
-        stop(glue::glue("`colour` variable '{cV}' has {nCol} unique values; the `colourPalette` argument only has {length(cols)} unique values."))
-      }
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_manual(values = cols, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_manual(values = cols, na.value = NAcolour)
-      }
-
-    } else if (colourScaleType == "sequential_non_neg" | colourScaleType == "sequential_non_pos") {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_gradientn(colours = cols, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_gradientn(colours = cols, na.value = NAcolour)
-      }
-    }
-  }
-
-  if (colourScaleType == "diverging") {
-
-    cVdat <- plotData[[cV]]
-
-    if (symDivColourScale) {
-      maxCV <- max(cVdat, na.rm = TRUE)
-      minCV <- min(cVdat, na.rm = TRUE)
-      absMinCV <- abs(minCV)
-      if (abs(minCV) < maxCV) {
-        # minimum (negative) value is smaller in magnitude than the largest (positive) value; colour scale needs to be extended beyond the minimum value
-        vals <- scales::rescale(c(-maxCV, 0, maxCV),
-                                to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1))
-      } else {
-        # minimum (negative) value is larger in magnitude than the largest (positive) value; colour scale needs to be extended beyond the maximum value
-        vals <- scales::rescale(c(minCV, 0, -minCV),
-                                to = c(0, 1 +  (absMinCV - maxCV) / (absMinCV + maxCV)))
-      }
-
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_gradientn(colours = cols, values = vals, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_gradientn(colours = cols, values = vals, na.value = NAcolour)
-      }
-
+  if (length(cV) == 1 && cV == "NULLcol") {
+    my_scale_colour <- if (filledShapes) {
+      ggplot2::scale_fill_identity()
     } else {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_gradientn(colours = cols,
-                                      values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
-                                      na.value = NAcolour)
+      ggplot2::scale_colour_identity()
+    }
+  } else {
+    if (is.null(cols)) {
+      if (colourScaleType == "qualitative") {
+        my_scale_colour <- if (filledShapes) {
+          hues::scale_fill_iwanthue(na.value = NAcolour)
+        } else {
+          hues::scale_colour_iwanthue(na.value = NAcolour)
+        }
+      } else if (colourScaleType == "sequential_non_neg") {
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_viridis_c(na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_viridis_c(na.value = NAcolour)
+        }
+      } else if (colourScaleType == "sequential_non_pos") {
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_viridis_c(direction = -1, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_viridis_c(direction = -1, na.value = NAcolour)
+        }
+      } else if (colourScaleType == "diverging") {
+        cols <- RColorBrewer::brewer.pal(9, "RdBu") %>% rev()
+        cols[5] <- "grey90"
+      }
+      
+    } else {
+      if (colourScaleType == "qualitative") {
+        nCol <- plotData %>% pull(cV) %>% setdiff(NA) %>% unique() %>% length()
+        if (nCol > length(cols)) {
+          stop(glue::glue("`colour` variable '{cV}' has {nCol} unique values; the `colourPalette` argument only has {length(cols)} unique values."))
+        }
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_manual(values = cols, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_manual(values = cols, na.value = NAcolour)
+        }
+        
+      } else if (colourScaleType == "sequential_non_neg" | colourScaleType == "sequential_non_pos") {
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_gradientn(colours = cols, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_gradientn(colours = cols, na.value = NAcolour)
+        }
+      }
+    }
+    
+    if (colourScaleType == "diverging") {
+      
+      cVdat <- plotData[[cV]]
+      
+      if (symDivColourScale) {
+        maxCV <- max(cVdat, na.rm = TRUE)
+        minCV <- min(cVdat, na.rm = TRUE)
+        absMinCV <- abs(minCV)
+        if (abs(minCV) < maxCV) {
+          # minimum (negative) value is smaller in magnitude than the largest (positive) value; colour scale needs to be extended beyond the minimum value
+          vals <- scales::rescale(c(-maxCV, 0, maxCV),
+                                  to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1))
+        } else {
+          # minimum (negative) value is larger in magnitude than the largest (positive) value; colour scale needs to be extended beyond the maximum value
+          vals <- scales::rescale(c(minCV, 0, -minCV),
+                                  to = c(0, 1 +  (absMinCV - maxCV) / (absMinCV + maxCV)))
+        }
+        
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_gradientn(colours = cols, values = vals, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_gradientn(colours = cols, values = vals, na.value = NAcolour)
+        }
+        
       } else {
-        ggplot2::scale_colour_gradientn(colours = cols,
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_gradientn(colours = cols,
                                         values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
                                         na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_gradientn(colours = cols,
+                                          values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
+                                          na.value = NAcolour)
+        }
       }
     }
   }
@@ -770,22 +778,8 @@ getLegendParams <- function(cV, shape, my_scale_shape) {
     filledShapes <- FALSE 
   }
   
-  if (filledShapes) {
-    
-    if (shape == "NULLshape") {
-      shape = "none"
-    } else {
-      shape = NULL
-    }
-    
-    if (length(cV) > 1 || cV != "NULLcol") {
-      fill = guide_legend(override.aes = list(shape = 21, col = "black"))
-    } else {
-      fill = "none"
-    }
-    
-    my_legend_params <- guides(shape = shape,
-                               fill = fill)
+  if (filledShapes && (length(cV) > 1 || cV != "NULLcol")) {
+    my_legend_params = ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
   } else {
     my_legend_params <- NULL
   }
@@ -941,7 +935,7 @@ plotDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = 25,
+                    NAshape = NULL,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
@@ -1106,7 +1100,7 @@ plotDimRed <- function(object,
 
       my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
-      my_scale_colour <- ggplot2::scale_colour_identity()
+      my_scale_colour <- getColourScale(plotData = NULL, colour, cols = NULL, colourScaleType = NULL, my_scale_shape, NAcolour = NULL, symDivColourScale = NULL)
       
       my_legend_params <- getLegendParams(colour, shape, my_scale_shape)
 
@@ -1129,7 +1123,7 @@ plotDimRed <- function(object,
           stop(glue::glue("The variable `{cV}` can not be mapped to a colour scale."))
         }
 
-        my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType)
+        my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType, NAshape = NAshape)
 
         my_geom_point <- getGeomPoint(cV, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
