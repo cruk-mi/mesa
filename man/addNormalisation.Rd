@@ -14,9 +14,13 @@ addNormalisation(
 \item{qseaSet}{A qseaSet object.}
 
 \item{enrichmentMethod}{What method to use to calculate the enrichment step.
-Currently implemented is the blind1-15, the blind calibration method detailed
-in the qsea paper of fitting of a straight line of decreasing expected average
-methylation levels from 76\% at CpG_density = 1 to 25\% at CpG_density = 15.}
+Currently implemented are:
+\itemize{
+\item \strong{blind1-15}: the blind calibration method detailed in the qsea paper
+of fitting of a straight line of decreasing expected average methylation
+levels from 76\% at CpG_density = 1 to 25\% at CpG_density = 15.
+\item \strong{none}: no enrichment normalisation is performed.
+}}
 
 \item{maxPatternDensity}{Maximum pattern density in a window to consider it for the background calculation.}
 }

@@ -52,4 +52,8 @@ If they are different then you should call \code{\link[=addNormalisation]{addNor
 tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
 normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
 combineQsets(tumours, normals)
+tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
+normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
+qsetList <- list(tumours, normals)
+combineQsetsList(qsetList)
 }

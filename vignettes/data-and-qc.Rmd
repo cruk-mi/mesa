@@ -40,7 +40,7 @@ exampleTumourNormal %>%
   getNRPMTable()
 ```
 
-Finally, we can request beta values. Beta values are measures of methylation, scaled to lie between 0 and 1, where 0 means that the window is unmethylated and 1 is methylated.
+Finally, we can request beta values. Beta values are measures of methylation, scaled to lie between 0 and 1, where 0 means that the window is unmethylated and 1 is methylated. These are scaled with respect to a further number of metrics, including region CpG_density, background noise and the sample enrichment profile, and are therefore the most useful value to consider when comparing methylation between samples.
 
 ```{r}
 exampleTumourNormal %>%
@@ -49,7 +49,8 @@ exampleTumourNormal %>%
 
 Note that for some windows an NA value will be returned. This occurs when less than three reads would be required for the window to be fully methylated, at the read depth and enrichment profile calculated per sample. These occur particularly at windows with low CpG_density.
 
-All three of these functions take an option `useGroupMeans` that determine whether to average over the `group` column of the qseaSet sampleTable.
+All three of these functions take an option `useGroupMeans` that determine whether to average over the `group` column of the qseaSet `sampleTable`, which can be useful when you have biological or technical replicates for example.
+
 The example qseaSet has group as the same as sample_name, so we need to change that to see the effect:
 
 ```{r}

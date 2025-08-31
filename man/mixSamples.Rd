@@ -33,7 +33,7 @@ mixSamples(
 
 \item{onlyNew}{Whether to only return the new sample, or all the previous samples as well.}
 
-\item{renormalise}{Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.}
+\item{renormalise}{Whether to renormalise the result. Setting to \code{FALSE} speeds up the process when you are repeatedly subsampling, as this is comparatively computationally expensive.}
 }
 \value{
 A qseaSet object containing a new sample, potentially with all the previous samples.

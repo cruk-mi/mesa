@@ -39,9 +39,9 @@ makeQset(
 
 \item{CNVwindowSize}{What window size (in bp) to use in the calculation of CNV (default 1000000).}
 
-\item{fragmentType}{What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to predefined defaults)}
+\item{fragmentType}{What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to some predefined defaults)}
 
-\item{fragmentLength}{Average DNA fragment length. Can be set by fragmentType.}
+\item{fragmentLength}{Average DNA fragment length. Can be set to some defaults by using fragmentType.}
 
 \item{fragmentSD}{Standard deviation of the DNA fragment lengths. Can be set by fragmentType.}
 

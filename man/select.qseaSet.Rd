@@ -26,6 +26,6 @@ exampleTumourNormal \%>\% dplyr::select(type, tumour) \%>\% getSampleTable()
 exampleTumourNormal \%>\% dplyr::select(age, tumour_new = tumour) \%>\% getSampleTable()
 # you can use tidyselect helper functions
 exampleTumourNormal \%>\% dplyr::select(matches("s")) \%>\% getSampleTable()
-# negative selection also works, but not for `sample_name` and `group`:
+# negative selection also works, but not for `sample_name` and `group` which are essential columns:
 exampleTumourNormal \%>\% dplyr::select(-matches("s")) \%>\% getSampleTable()
 }

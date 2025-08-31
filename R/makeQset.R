@@ -6,8 +6,8 @@
 #' @param BSgenome A BSgenome string. See BSgenome::available.genomes() for options.
 #' @param chrSelect Which chromosomes to use (default 1:22).
 #' @param windowSize What window size (in bp) to use in the genome (default 300).
-#' @param fragmentType What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to predefined defaults)
-#' @param fragmentLength Average DNA fragment length. Can be set by fragmentType.
+#' @param fragmentType What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to some predefined defaults)
+#' @param fragmentLength Average DNA fragment length. Can be set to some defaults by using fragmentType.
 #' @param fragmentSD Standard deviation of the DNA fragment lengths. Can be set by fragmentType.
 #' @param CNVwindowSize What window size (in bp) to use in the calculation of CNV (default 1000000).
 #' @param CNVmethod Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None".
@@ -74,7 +74,13 @@ makeQset <- function(sampleTable,
 
   }
 
+
   if (!is.null(fragmentType)) {
+    
+    if(!is.null(fragmentLength)) {
+      stop("Please specify one or the other of fragmentType and fragmentLength.")
+    }
+    
     if (fragmentType %in% c("Sheared","sheared") ) {
       fragmentLength = 213
       fragmentSD = 60
@@ -83,7 +89,6 @@ makeQset <- function(sampleTable,
       fragmentSD = 38
     } else {
       stop("fragmentType should be either Sheared or cfDNA.")}
-
   }
 
   if (is.null(fragmentLength) | is.null(fragmentSD)) {
