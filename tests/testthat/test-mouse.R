@@ -1,4 +1,8 @@
-test_that("Mouse annotation and plotting", {
+test_that("Mouse plotting", {
+  
+  biomart_success <- try(biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org"))
+  biomart_success <- !class(biomart_success) == "try-error"
+  skip_if_not(biomart_success, "mart recieved try-error, biomart is possibly down or there is no internet connection.")
   
   expect_true("Mart" %in% class(exampleMouse %>% getMart()))
 
@@ -18,7 +22,9 @@ test_that("Mouse annotation and plotting", {
   expect_no_error(plotGeneHeatmap(exampleMouse2, 
                                   gene = "Fbxl18")
                   )
-  
+})
+
+test_that("Mouse annotation", {
   
   #expect an error if global settings not set
   setMesaTxDb(NULL)

@@ -43,21 +43,21 @@ makeQset(
 
 \item{fragmentSD}{Standard deviation of the DNA fragment lengths. Can be set by fragmentType.}
 
-\item{CNVmethod}{Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None"}
+\item{CNVmethod}{Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None".}
 
-\item{coverageMethod}{Whether to use custom methtools method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).}
+\item{coverageMethod}{Whether to use custom method for reading coverage in (set to PairedAndR1s), rather than qsea's (qseaPaired).}
 
-\item{minMapQual}{Minimum MAPQ score for a read to be kept. For PairedAndR1s, will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).}
+\item{minMapQual}{Minimum MAPQ score for a read to be kept. For coverageMethod = "PairedAndR1s", will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).}
 
-\item{minInsertSize}{For paired reads, only keep them if they are above a minimum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.}
+\item{minInsertSize}{For paired reads, only keep them if they are above a minimum length. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
 
-\item{maxInsertSize}{For paired reads, only keep them if they are below a maximum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.}
+\item{maxInsertSize}{For paired reads, only keep them if they are below a maximum length. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
 
-\item{minReferenceLength}{A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.}
+\item{minReferenceLength}{A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
 
 \item{badRegions}{A GRanges object containing regions to filter out from the result.}
 
-\item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
+\item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
 
 \item{hmmCopyGC}{A data frame containing GC content per bin (each with size \code{CNVwindowSize}), only for use with hmmcopy.}
 
@@ -69,5 +69,5 @@ makeQset(
 A qseaSet object, containing all the information required.
 }
 \description{
-This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata
+This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata.
 }

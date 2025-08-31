@@ -14,9 +14,13 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 
 ### BUG FIXES
+* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
+* Correct the message produced by `addMedipsEnrichmentFactors`.
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.
 * `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`.
 * When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes.
-* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes.
+* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
 
 # mesa 0.5.1
 
