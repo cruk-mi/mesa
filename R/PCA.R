@@ -560,93 +560,130 @@ getDimRed <- function(qseaSet,
 }
 
 
-getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = 7) {
-
+getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType = NULL, NAshape = NULL) {
+  
   if (shape == "NULLshape") {
-    my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, guide = "none")
-
-  } else {
-
-    nShape <- plotData %>% pull(shape) %>% setdiff(NA) %>%  unique() %>% length()
-
-    if (is.null(shapePalette)) {
-      if (!is.null(colourScaleType) && colourScaleType == "diverging") {
-        if (any(is.na(plotData %>% pull(shape)))) {
-          shapePalette <- c(21, 24, 22, 23)
-          NAshape <- 25
-        } else {
-          shapePalette <- c(21, 24, 22, 23, 25)
-        }
-        if (nShape > length(shapePalette)) {
-          stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
-        }
-
-      } else if (nShape <= 4 && any(is.na(plotData %>% pull(shape)))) {
-          shapePalette <- c(21, 24, 22, 23)
-          NAshape <- 25
-        } else if (nShape <= 5 ) {
-          shapePalette <- c(21, 24, 22, 23, 25)
-        } else {
-        shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
-        }
-        if (nShape > length(shapePalette)) {
-          stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
-        }
-
-    } else if (is.numeric(shapePalette)) {
-      if (nShape > length(shapePalette)) {
-        stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the `shapePalette` argument only has {length(shapePalette)} unique values."))
-      }
-      if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
-        stop("'shapePalette' argument can either contain integers between 0 and 20 (line or filled shapes), or between 21 and 25 (filled shapes with borders), but not both.")
-      }
-      if (any(21:25 %in% shapePalette)) {
-        NAshape <- 25
-      }
-
-    } else if (is.character(shapePalette)) {
-      shapesInput <- shapePalette
-      if (shapePalette == "filled+border") {
-        if (any(is.na(plotData %>% pull(shape)))) {
-          shapePalette <- c(21, 24, 22, 23)
-          NAshape <- 25
-        } else {
-          shapePalette <- c(21, 24, 22, 23, 25)
-        }
-      } else {
-        if (shapePalette == "line-first") {
-          shapePalette <- c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18)
-        } else if (shapePalette == "filled-first") {
-          shapePalette <- c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12)
-        } else if (shapePalette == "mixture") {
-          shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
-        } else {
-          stop("`shapePalette` argument can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
-        }
-
-        if (colourScaleType == "diverging") {
-          warning(glue::glue("Using the '{shapesInput}' colour scale with a divergent colour scale may lead to points around zero on the colour scale being almost invisible."))
-        }
-      }
-      if (nShape > length(shapePalette)) {
-        stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; there are only {length(shapePalette)} shapes available with argument `shapePalette` = '{shapesInput}'."))
-      }
-    } else {
-      stop("`shapePalette` argument is not in a valid format. It can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
-    }
-
-    if(!is.null(NAshape)) {
-      if (NAshape %in% shapePalette[1:nShape] & any(is.na(plotData %>% pull(!!shape)))) {
-        stop(glue::glue("NA shape value (={NAshape}) is already being used for a '{shape}' category. Values in use: {paste0(shapePalette[1:nShape], collapse = ', ')}."))
-      }
-    }
-
-    my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
+    return(ggplot2::scale_shape_manual(values = shapePalette, guide = "none"))
   }
+  
+  shapeVals <- dplyr::pull(plotData, {{shape}})
+  nShape    <- shapeVals %>% setdiff(NA) %>% unique() %>% length()
+  hasNA     <- any(is.na(shapeVals))
+  
+  if (is.null(shapePalette)) {
+    if (!is.null(colourScaleType) && colourScaleType == "diverging") {
+      shapePalette <- if (hasNA) c(21, 24, 22, 23) else c(21, 24, 22, 23, 25)
+      if (nShape > length(shapePalette)) {
+        stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
+      }
 
-  return(my_scale_shape)
-
+    } else if (nShape <= 4 && hasNA) {
+      shapePalette <- c(21, 24, 22, 23)
+    } else if (nShape <= 5 && !hasNA) {
+      shapePalette <- c(21, 24, 22, 23, 25)
+    } else {
+      shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
+    }
+    if (nShape > length(shapePalette)) {
+      stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; max allowed by default is {length(shapePalette)}."))
+    }
+  } else if (is.numeric(shapePalette)) {
+    if (nShape > length(shapePalette)) {
+      stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; `shapePalette` only has {length(shapePalette)} values."))
+    }
+    if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
+      stop("'shapePalette' must contain either 0–20 (unfilled) OR 21–25 (filled), not both.")
+    }
+    
+  } else if (is.character(shapePalette)) {
+    shapesInput <- shapePalette
+    if (shapePalette == "filled+border") {
+      shapePalette <- if (hasNA) c(21, 24, 22, 23) else c(21, 24, 22, 23, 25)
+    } else {
+      shapePalette <- switch(
+        shapePalette,
+        "line-first"   = c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18),
+        "filled-first" = c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12),
+        "mixture"      = c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12),
+        stop("`shapePalette` must be 'line-first', 'filled-first', 'mixture', 'filled+border', numeric, or NULL.")
+      )
+      if (colourScaleType == "diverging") {
+        warning(glue::glue("Using '{shapesInput}' palette with a divergent colour scale may reduce visibility near zero."))
+      }
+    }
+    if (nShape > length(shapePalette)) {
+      stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; only {length(shapePalette)} shapes available with `shapePalette` = '{shapesInput}'."))
+    }
+    
+  } else {
+    stop("`shapePalette` must be 'line-first', 'filled-first', 'mixture', 'filled+border', numeric, or NULL.")
+  }
+  
+  if (hasNA) {
+    usingFilled <- any(21:25 %in% shapePalette)
+    defaultNA   <- if (usingFilled) 25 else 7
+    defaultInUse <- defaultNA %in% shapePalette[1:nShape]
+    
+    if (is.null(NAshape)) {
+      if (defaultInUse) {
+        stop(glue::glue(
+          "The default NAshape = {defaultNA} is already in use within the shapePalette. ",
+          "Specify a different NAshape or remove the default shape from the shapePalette."
+        ))
+      }
+      NAshape <- defaultNA
+      
+    } else if ((!usingFilled && NAshape %in% 21:25) || (usingFilled && NAshape %in% 0:20)) {
+      warning(glue::glue(
+        "'shapePalette' is using {if (usingFilled) 'filled' else 'unfilled'} shapes, ",
+        "but specified NAshape = {NAshape} is from the {if (!usingFilled) 'filled' else 'unfilled'} set. ",
+        "Resetting NAshape to default = {defaultNA} for {if (usingFilled) 'filled' else 'unfilled'} shapes."
+      ))
+      if (defaultInUse) {
+        stop(glue::glue("The default NAshape = {defaultNA} is also already in use within the shapePalette."))
+      }
+      NAshape <- defaultNA
+      
+    } else if (NAshape %in% shapePalette[1:nShape]) {
+      paletteName <- if (exists("shapesInput")) shapesInput else NULL
+      
+      if (!is.null(paletteName) && paletteName %in% c("line-first", "filled-first")) {
+        if (defaultInUse) {
+          stop(glue::glue(
+            "Both the specified NAshape = {NAshape} and the default NAshape = {defaultNA} ",
+            "are already in use within the shapePalette."
+          ))
+        }
+        warning(glue::glue(
+          "Specified NAshape = {NAshape} is already in use in the shapePalette. ",
+          "Because palette = '{paletteName}' has a fixed order, NAshape has been reset to default = {defaultNA}."
+        ))
+        NAshape <- defaultNA
+      } else {
+        if (defaultInUse) {
+          stop(glue::glue(
+            "Both the specified NAshape = {NAshape} and the default NAshape = {defaultNA} ",
+            "are already in use within the shapePalette."
+          ))
+        }
+        warning(glue::glue(
+          "Specified NAshape = {NAshape} is already in use in the shapePalette. ",
+          "Replacing that entry in the shapePalette with the default NAshape = {defaultNA} at the end, ",
+          "and keeping NAshape = {NAshape} for missing values."
+        ))
+        clash_idx <- match(NAshape, shapePalette)
+        shapePalette <- c(shapePalette[-clash_idx], defaultNA)
+      }
+    }
+    
+  } else {
+    NAshape <- NULL
+  }
+  
+  
+  ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
 }
+
 
 getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
 
@@ -820,7 +857,7 @@ plotPCA.mesaDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = 7,
+                    NAshape = NULL,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
@@ -878,7 +915,7 @@ plotUMAP <- function(object,
                      symDivColourScale = FALSE,
                      shape = NULL,
                      shapePalette = NULL,
-                     NAshape = 7,
+                     NAshape = NULL,
                      showSampleNames = FALSE,
                      pointSize = 2,
                      alpha = 1,
@@ -935,7 +972,7 @@ plotDimRed <- function(object,
                     symDivColourScale = FALSE,
                     shape = NULL,
                     shapePalette = NULL,
-                    NAshape = 7,
+                    NAshape = NULL,
                     showSampleNames = FALSE,
                     pointSize = 2,
                     alpha = 1,
