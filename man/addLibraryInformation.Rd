@@ -2,20 +2,26 @@
 % Please edit documentation in R/alterQset.R
 \name{addLibraryInformation}
 \alias{addLibraryInformation}
-\title{Add library metrics into the qseaSet sample table}
+\title{Add library metrics to the qseaSet sample table}
 \usage{
 addLibraryInformation(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing sequencing data.}
 }
 \value{
-The same \code{qseaSet}, with an augmented \code{sampleTable}.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{addLibraryInformation()}: returns the same \code{qseaSet} with its
+\code{sampleTable} augmented by library-level columns.
+}
 }
 \description{
-Convenience helper to append columns from \code{qseaSet@libraries$file_name}
-(and, when available, from \code{qseaSet@libraries$input_file} prefixed with
-\code{"input_"}) to the \code{sampleTable}. Existing columns are not duplicated.
+Append library information to the \code{sampleTable} of a \code{qseaSet}. Columns are
+taken from \code{qseaSet@libraries$file_name}, and when available,
+from \code{qseaSet@libraries$input_file} (prefixed with \code{"input_"}). Existing
+columns are not duplicated.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

@@ -7,23 +7,34 @@
 renameQsetNames(qseaSet, pattern, replacement = "")
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing methylation-enriched sequencing data.}
 
-\item{pattern}{A regex \code{pattern} to match in sample names.}
+\item{pattern}{\code{character(1)}
+Regular expression used to match substrings in sample names.}
 
-\item{replacement}{A replacement string (default: \code{""}).}
+\item{replacement}{\code{character(1)}
+String to replace matches of \code{pattern}. Defaults to \code{""} (empty string).}
 }
 \value{
-A \code{qseaSet} with renamed samples.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{renameQsetNames()}: returns the input \code{qseaSet} with sample names
+updated according to \code{pattern} and \code{replacement}. All dependent slots
+are updated consistently.
+}
 }
 \description{
-Apply a regex replacement to sample names and update all relevant slots
-consistently (counts, CNV, enrichment, zygosity, libraries, sampleTable).
+Apply a regular expression replacement to sample names and update all
+relevant slots consistently (counts, CNV, enrichment, zygosity, libraries,
+and the \code{sampleTable}).
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
+
 # Replace "T" with "Tumour" in sample names
-qs2 <- renameQsetNames(exampleTumourNormal, pattern = "T$", replacement = "Tumour")
-head(colnames(qs2@count_matrix))
+renameQsetNames(exampleTumourNormal, 
+                pattern = "T",
+                replacement = "Tumour")
 
 }

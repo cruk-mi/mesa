@@ -7,23 +7,34 @@
 subsetQset(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing methylation-enriched sequencing data.}
 
-\item{samplesToKeep}{Character vector of sample names to keep. Use \strong{either}
-\code{samplesToKeep} \strong{or} \code{samplesToDrop}.}
+\item{samplesToKeep}{\code{character()}
+Names of samples to retain. Cannot be used together with \code{samplesToDrop}.}
 
-\item{samplesToDrop}{Character vector of sample names to drop. Use \strong{either}
-\code{samplesToKeep} \strong{or} \code{samplesToDrop}.}
+\item{samplesToDrop}{\code{character()}
+Names of samples to remove. Cannot be used together with \code{samplesToKeep}.}
 }
 \value{
-A \code{qseaSet} containing only the selected samples.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{subsetQset()}: returns the input \code{qseaSet} restricted to the
+selected samples.
+}
 }
 \description{
-Keep only a specified set of samples (or, alternatively, drop a set). All
-internal matrices/slots are subset consistently.
+Restrict a \code{qseaSet} to a specified set of samples. All internal
+matrices and slots are subset consistently.
+Use exactly one of \code{samplesToKeep} or \code{samplesToDrop}.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-subsetQset(exampleTumourNormal, samplesToKeep = c("Colon1_T","Colon1_N"))
+
+# Keep only two samples
+subsetQset(exampleTumourNormal, samplesToKeep = c("Colon1_T", "Colon1_N"))
+
+# Drop one sample
+subsetQset(exampleTumourNormal, samplesToDrop = "Lung1_N")
 
 }

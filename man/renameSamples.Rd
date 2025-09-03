@@ -7,23 +7,32 @@
 renameSamples(qseaSet, newNameColumn)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing methylation-enriched sequencing data.}
 
-\item{newNameColumn}{Name (unquoted) of a column in the sample table that
-contains the new sample names. Must be unique and contain no \code{NA}s.}
+\item{newNameColumn}{\code{character(1)}
+The name of a column in the \code{sampleTable} containing new sample names.
+Values must be unique and contain no \code{NA}s.
+(Unquoted column names are supported via tidy evaluation.)}
 }
 \value{
-A \code{qseaSet} with sample names replaced by \code{newNameColumn}.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{renameSamples()}: returns the input \code{qseaSet} with sample names replaced
+by values from \code{newNameColumn}. All associated slots are updated to reflect
+the new naming.
+}
 }
 \description{
-Replace sample names with values from a user‑supplied column in
-\code{qseaSet@sampleTable}, updating all dependent slots consistently.
+Replace sample names with values from a user-supplied column in the
+\code{sampleTable} of a \code{qseaSet}, updating all dependent slots consistently.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal \%>\%
-  dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(exampleTumourNormal)))))
-qs_renamed <- renameSamples(qs, newNameColumn = newName)
-head(qsea::getSampleTable(qs_renamed)$sample_name)
+
+
+exampleTumourNormal \%>\%
+  dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(exampleTumourNormal))))) \%>\% # Add a column with synthetic names
+  renameSamples(qs, newNameColumn = newName) # Rename samples based on that column
 
 }

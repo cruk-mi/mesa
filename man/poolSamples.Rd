@@ -7,22 +7,30 @@
 poolSamples(qseaSet, mergeString)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing methylation-enriched sequencing data.}
 
-\item{mergeString}{A regex used to remove the \strong{suffix} that distinguishes
-samples to be merged. The remaining prefix becomes the pooled sample name.
-After removal, pooled names are matched using \code{startsWith()}.
-For example, with names like \code{Patient1_T} and \code{Patient1_N}, use
-\code{mergeString = "_[TN]$"} to pool into \code{Patient1}.}
+\item{mergeString}{\code{character(1)}
+Regular expression used to remove the \strong{suffix} that distinguishes samples
+to be merged. The remaining prefix becomes the pooled sample name. After
+removal, pooled names are matched using \code{startsWith()}.
+For example, with names like \code{"Patient1_T"} and \code{"Patient1_N"}, use
+\code{mergeString = "_[TN]$"} to pool them into \code{"Patient1"}.}
 }
 \value{
-A \code{qseaSet} with pooled samples.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{poolSamples()}: returns a new \code{qseaSet} where samples with names sharing
+a common prefix (after applying \code{mergeString}) are merged. Counts are summed,
+CNV and zygosity values are combined using weighted averages, and library
+statistics are aggregated.
+}
 }
 \description{
 Merge samples whose names share a common prefix by removing a suffix pattern
 (\code{mergeString}) and summing counts across the resulting groups. CNV and
-zygosity are combined using fragment‐count weights. A new \code{qseaSet} is
-returned with pooled samples and updated metadata.
+zygosity values are combined using fragment‐count weights. The result is a
+new \code{qseaSet} with pooled samples and updated metadata.
 }
 \details{
 Internally, pooled counts are simple sums. CNV values and zygosity are
@@ -35,8 +43,7 @@ weighted means for rates).
 data(exampleTumourNormal, package = "mesa")
 # Pool Tumour/Normal pairs by patient into a single sample per patient:
 # e.g., "Colon1_T","Colon1_N" -> "Colon1"
-qs_pool <- poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
-qs_pool
+poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
 }
 
 }
