@@ -19,7 +19,7 @@
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
+#'                      contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1)
 #' head(pivotDMRsLonger(dmr, FDRthres = 0.1))
 #'
 #' @export
@@ -72,7 +72,7 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
+#'                      contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1)
 #' summariseDMRsByContrast(dmr, FDRthres = 0.1)
 #'
 #' @export
@@ -134,7 +134,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
+#'                      contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1)
 #' dmr_annot <- annotateWindows(dmr)  # requires TxDb/annotation
 #' summariseDMRsByGene(dmr_annot)
 #'
@@ -163,7 +163,7 @@ summariseDMRsByGene <- function(DMRtable){
 #'
 #' @param dataTable A `data.frame` of DMR results, typically from [calculateDMRs()].
 #' @param path `character(1)` File path to write the Excel workbook.
-#' @param fdrThres `numeric(1)` False discovery rate threshold for filtering.
+#' @param FDRthres `numeric(1)` False discovery rate threshold for filtering.
 #'
 #' @return Invisibly returns the input `dataTable`, enabling use in a pipe.
 #'
@@ -179,7 +179,7 @@ summariseDMRsByGene <- function(DMRtable){
 #' }
 #'
 #' @export
-writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
+writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
     stop(
@@ -200,7 +200,7 @@ writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 
     openxlsx::addWorksheet(wb_DMR, sheetName)
     dataTable %>%
-      dplyr::filter(!!dplyr::sym(x) <= fdrThres) %>%
+      dplyr::filter(!!dplyr::sym(x) <= FDRthres) %>%
       openxlsx::writeData(wb_DMR, sheetName, .)
     openxlsx::addFilter(wb_DMR, sheetName, row = 1, cols = 1:ncol(dataTable))
     openxlsx::freezePane(wb_DMR, sheetName,  firstRow = TRUE)
@@ -219,7 +219,7 @@ writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 #'
 #' @param dataTable A `data.frame` of DMR results, typically from [calculateDMRs()].
 #' @param folder `character(1)` Directory in which to write BED files.
-#' @param fdrThres `numeric(1)` False discovery rate threshold for filtering.
+#' @param FDRthres `numeric(1)` False discovery rate threshold for filtering.
 #'
 #' @return Invisibly returns the input `dataTable`, enabling use in a pipe.
 #'
@@ -235,7 +235,7 @@ writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
 #' }
 #'
 #' @export
-writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
+writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
 
   dir.create(folder, showWarnings = TRUE, recursive = TRUE)
 
@@ -246,7 +246,7 @@ writeDMRsToBed <- function(dataTable, folder, fdrThres = 0.05) {
     contrastName <- stringr::str_remove(x,"_adjPval$")
 
     dataTable %>%
-      dplyr::filter(!!rlang::sym(x) <= fdrThres) %>%
+      dplyr::filter(!!rlang::sym(x) <= FDRthres) %>%
       plyranges::as_granges() %>%
       rtracklayer::export.bed(file = file.path(folder, paste0(contrastName,".bed")))
 

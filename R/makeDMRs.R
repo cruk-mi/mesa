@@ -214,7 +214,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 #' @param sampleNames Character vector of sample names to include; if `NULL`,
 #'   determined by `keepData`.
 #' @param variable Variable on which contrasts were based (for group means).
-#' @param fdrThres Numeric(1). FDR threshold for selecting significant regions.
+#' @param FDRthres Numeric(1). FDR threshold for selecting significant regions.
 #' @param keepData Logical. If `TRUE`, include per-sample data columns.
 #' @param keepGroupMeans Logical. If `TRUE`, include group mean columns.
 #' @param keepPvals Logical. If `TRUE`, include raw (unadjusted) p-values.
@@ -232,12 +232,12 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 #' qs <- exampleTumourNormal
 #' contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
 #' glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
-#' dmrTab <- getDMRsData(qs, glmfit, variable = "type", fdrThres = 0.1)
+#' dmrTab <- getDMRsData(qs, glmfit, variable = "type", FDRthres = 0.1)
 #' head(dmrTab)
 #' 
 #' @export
 getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, keepData = FALSE, keepGroupMeans = FALSE,
-                        fdrThres = 0.05, keepPvals = FALSE, keepFragmentInfo = FALSE,
+                        FDRthres = 0.05, keepPvals = FALSE, keepFragmentInfo = FALSE,
                         direction = "both"){
 
   sampleTable <- qsea::getSampleTable(qseaSet)
@@ -250,7 +250,7 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
     }
   }
 
-  sigIndex <- purrr::map(names(qseaGLM@contrast), ~ qsea::isSignificant(qseaGLM, contrast = ., fdr_th = fdrThres, direction = direction)) %>%
+  sigIndex <- purrr::map(names(qseaGLM@contrast), ~ qsea::isSignificant(qseaGLM, contrast = ., fdr_th = FDRthres, direction = direction)) %>%
     unlist() %>%
     unique()
 
@@ -381,7 +381,7 @@ calculateDMRs <- function(qseaSet,
                           minReadCount = 0,
                           minNRPM = 1,
                           checkPVals = TRUE,
-                          fdrThres = 0.05,
+                          FDRthres = 0.05,
                           keepPvals = FALSE,
                           formula = NULL,
                           keepContrastMeans = TRUE,
@@ -450,7 +450,7 @@ calculateDMRs <- function(qseaSet,
                         calcDispersionAll = calcDispersionAll)
 
   dataTable <- getDMRsData(qseaSet, qseaGLM, sampleNames = qsea::getSampleNames(qseaSet),
-                           fdrThres = fdrThres, keepPvals = keepPvals, keepData = keepData,
+                           FDRthres = FDRthres, keepPvals = keepPvals, keepData = keepData,
                            keepGroupMeans = keepGroupMeans,
                            variable = variable,
                            direction = direction) %>%
