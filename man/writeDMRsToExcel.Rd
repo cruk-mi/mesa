@@ -4,14 +4,14 @@
 \alias{writeDMRsToExcel}
 \title{Write DMR results to Excel}
 \usage{
-writeDMRsToExcel(dataTable, path, fdrThres = 0.05)
+writeDMRsToExcel(dataTable, path, FDRthres = 0.05)
 }
 \arguments{
 \item{dataTable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.}
 
 \item{path}{\code{character(1)} File path to write the Excel workbook.}
 
-\item{fdrThres}{\code{numeric(1)} False discovery rate threshold for filtering.}
+\item{FDRthres}{\code{numeric(1)} False discovery rate threshold for filtering.}
 }
 \value{
 Invisibly returns the input \code{dataTable}, enabling use in a pipe.
@@ -22,9 +22,14 @@ Export DMR results to an Excel workbook with one sheet per contrast.
 \examples{
 \dontrun{
 data(exampleTumourNormal, package = "mesa")
-dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-                     contrasts = "LUAD_vs_NormalLung")
-writeDMRsToExcel(dmr, path = "dmr_results.xlsx")
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
+  writeDMRsToExcel(path = "dmr_results.xlsx")
+  
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+  writeDMRsToExcel(paste0(tempdir(),"/test.xlsx"))
 }
 
 }

@@ -26,9 +26,9 @@ with explicit columns for contrasts, effect sizes, and significance values.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-                     contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
-head(pivotDMRsLonger(dmr, FDRthres = 0.1))
+exampleTumourNormal \%>\%
+   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1) \%>\%
+   pivotDMRsLonger(FDRthres = 0.1)
 
 }
 \seealso{

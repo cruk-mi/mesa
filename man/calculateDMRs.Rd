@@ -12,7 +12,7 @@ calculateDMRs(
   minReadCount = 0,
   minNRPM = 1,
   checkPVals = TRUE,
-  fdrThres = 0.05,
+  FDRthres = 0.05,
   keepPvals = FALSE,
   formula = NULL,
   keepContrastMeans = TRUE,
@@ -43,7 +43,7 @@ retain a window.}
 \item{checkPVals}{Logical. If \code{TRUE}, stop or warn if excessive proportions
 of p-values are exactly zero (indicating possible instability).}
 
-\item{fdrThres}{Numeric(1). FDR threshold for selecting significant regions.}
+\item{FDRthres}{Numeric(1). FDR threshold for selecting significant regions.}
 
 \item{keepPvals}{Logical. If \code{TRUE}, include raw (unadjusted) p-values.}
 

@@ -1,26 +1,41 @@
 #' Transform DMR results to long format
 #'
-#' Convert a wide-format DMR results table into a long-format table
-#' with explicit columns for contrasts, effect sizes, and significance values.
+#' Convert wide-format DMR results into a long-format table with explicit
+#' columns for contrasts, effect sizes, and significance values.
 #'
-#' @param DMRtable A `data.frame` of DMR results in wide format, typically the
-#'   output of [calculateDMRs()].
-#' @param FDRthres `numeric(1)` False discovery rate threshold to filter significant
-#'   windows.
-#' @param makePositive `logical(1)` If `TRUE`, reverse the direction of contrasts
-#'   such that all retained windows are positively associated with `group1`.
+#' @param DMRtable `data.frame`  
+#'   DMR results in wide format, typically produced by [calculateDMRs()].
 #'
-#' @return A tibble in long format with columns including `group1`, `group2`,
+#' @param FDRthres `numeric(1)`  
+#'   False discovery rate threshold for filtering significant windows.  
+#'   **Default:** `0.05`.
+#'
+#' @param makePositive `logical(1)`  
+#'   If `TRUE`, reverse the direction of contrasts so that all retained windows
+#'   are positively associated with `group1`.  
+#'   **Default:** `FALSE`.
+#'
+#' @return A `tibble`:
+#'
+#' * **pivotDMRsLonger()**: returns a long-format table with one row per
+#'   DMR–contrast combination, including columns `group1`, `group2`,
 #'   `deltaBeta`, `log2FC`, and `adjPval`.
 #'
-#' @seealso [tidyr::pivot_longer()], [summariseDMRsByContrast()]
+#' @seealso
+#'   [tidyr::pivot_longer()],  
+#'   [summariseDMRsByContrast()]
+#'
 #' @family DMR-helpers
-#' 
+#'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
-#' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1)
-#' head(pivotDMRsLonger(dmr, FDRthres = 0.1))
+#'
+#' # Convert results to long format and filter at custom FDR threshold
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type",
+#'                 contrasts = "LUAD_vs_NormalLung",
+#'                 FDRthres = 0.1) %>%
+#'   pivotDMRsLonger(FDRthres = 0.1)
 #'
 #' @export
 pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
@@ -55,25 +70,46 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE){
 
 #' Summarise DMRs by contrast
 #'
-#' Count the number of up- and down-regulated windows per contrast.
-#' Internally transforms the DMR results to long format.
+#' Count the number of up- and down-regulated DMR windows per contrast.
+#' Internally, results are reshaped to long format before summarisation.
 #'
-#' @param DMRtable A `data.frame` of DMR results, typically from [calculateDMRs()].
-#'   If in wide format, it will be converted with [pivotDMRsLonger()].
-#' @param FDRthres `numeric(1)` False discovery rate threshold.
-#' @param log2FCthres `numeric(1)` Absolute log2 fold-change threshold.
-#' @param deltaBetaThres `numeric(1)` Absolute delta-beta threshold.
+#' @param DMRtable `data.frame` or `GRanges`  
+#'   DMR results, typically returned by [calculateDMRs()]. If in wide format,
+#'   it will be converted with [pivotDMRsLonger()].
 #'
-#' @return A tibble with one row per contrast and columns `nUp` and `nDown`.
+#' @param FDRthres `numeric(1)`  
+#'   False discovery rate threshold for significance.  
+#'   **Default:** `0.05`.
 #'
-#' @seealso [pivotDMRsLonger()], [summariseDMRsByGene()]
+#' @param log2FCthres `numeric(1)`  
+#'   Absolute log2 fold-change threshold for calling up/down regulation.  
+#'   **Default:** `0`.
+#'
+#' @param deltaBetaThres `numeric(1)`  
+#'   Absolute delta-beta threshold for calling up/down regulation.  
+#'   **Default:** `0`.
+#'
+#' @return A `tibble`:
+#'
+#' * **summariseDMRsByContrast()**: returns one row per contrast, with
+#'   counts of up-regulated (`nUp`) and down-regulated (`nDown`) DMRs that
+#'   pass the specified thresholds.
+#'
+#' @seealso
+#'   [pivotDMRsLonger()],  
+#'   [summariseDMRsByGene()]
+#'
 #' @family DMR-helpers
-#' 
+#'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
-#' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1)
-#' summariseDMRsByContrast(dmr, FDRthres = 0.1)
+#'
+#' # Summarise DMRs for a single contrast, using custom FDR threshold
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type",
+#'                 contrasts = "LUAD_vs_NormalLung",
+#'                 FDRthres = 0.1) %>%
+#'   summariseDMRsByContrast(FDRthres = 0.1)
 #'
 #' @export
 summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, deltaBetaThres = 0){
@@ -120,23 +156,40 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 
 #' Summarise DMRs by gene
 #'
-#' Aggregate DMR windows by gene annotation.
+#' Aggregate differentially methylated region (DMR) windows by gene annotation.
 #'
-#' @param DMRtable A `data.frame` or `GRanges` of annotated DMRs.
-#'   Must include columns `ENSEMBL`, `SYMBOL`, and `GENENAME`
+#' @param DMRtable `data.frame` or `GRanges`  
+#'   Annotated DMRs. Must include the columns `ENSEMBL`, `SYMBOL`, and `GENENAME`
 #'   (typically added with [annotateWindows()]).
 #'
-#' @return A tibble with one row per gene and a count of associated DMRs.
+#' @return A `tibble`:
 #'
-#' @seealso [annotateWindows()], [summariseDMRsByContrast()]
+#' * **summariseDMRsByGene()**: returns one row per gene, with counts of
+#'   associated DMRs and any aggregated metadata.
+#'
+#' @seealso
+#'   [annotateWindows()],  
+#'   [summariseDMRsByContrast()]
+#'
 #' @family DMR-helpers
-#' 
+#'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
-#' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1)
-#' dmr_annot <- annotateWindows(dmr)  # requires TxDb/annotation
-#' summariseDMRsByGene(dmr_annot)
+#'
+#' # Summarise DMRs by gene (using default annotation)
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type",
+#'                 contrasts = "LUAD_vs_NormalLung",
+#'                 FDRthres = 0.1) %>%
+#'   annotateWindows() %>%   # requires TxDb/annotation packages
+#'   summariseDMRsByGene()
+#'
+#' # Summarise DMRs with explicit annotation databases
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+#'                   annoDb = "org.Hs.eg.db") %>%
+#'   summariseDMRsByGene()
 #'
 #' @export
 summariseDMRsByGene <- function(DMRtable){
@@ -157,25 +210,52 @@ summariseDMRsByGene <- function(DMRtable){
 }
 
 
-#' Write DMR results to Excel
+#' Write DMR results to an Excel workbook
 #'
-#' Export DMR results to an Excel workbook with one sheet per contrast.
+#' Export differentially methylated region (DMR) results to an Excel workbook,
+#' creating one worksheet per contrast.
 #'
-#' @param dataTable A `data.frame` of DMR results, typically from [calculateDMRs()].
-#' @param path `character(1)` File path to write the Excel workbook.
-#' @param FDRthres `numeric(1)` False discovery rate threshold for filtering.
+#' @param dataTable `data.frame` or `GRanges`  
+#'   DMR results, typically produced by [calculateDMRs()]. If a `GRanges`, it
+#'   will be coerced to a data frame internally.
 #'
-#' @return Invisibly returns the input `dataTable`, enabling use in a pipe.
+#' @param path `character(1)`  
+#'   File path of the Excel workbook to write (e.g., `"dmr_results.xlsx"`).
 #'
-#' @seealso [writeDMRsToBed()]
+#' @param FDRthres `numeric(1)`  
+#'   False discovery rate threshold used to filter DMRs before writing. 
+#'   **Default:** `0.05`.
+#'
+#' @return (Invisibly) returns the input object:
+#'
+#' * **writeDMRsToExcel()**: returns `dataTable` (invisibly), enabling use in
+#'   a pipeline.
+#'
+#' @details
+#' One worksheet is created per contrast found in `dataTable`. If no contrast
+#' column is present, all rows are written to a single worksheet. If file I/O is
+#' restricted on the system (e.g., some HPC build environments), consider
+#' writing to `tempfile(fileext = ".xlsx")` in examples or tests.
+#'
+#' @seealso
+#'   [writeDMRsToBed()]
+#'
 #' @family DMR-helpers
-#' 
+#'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
-#' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung")
-#' writeDMRsToExcel(dmr, path = "dmr_results.xlsx")
+#'
+#' # Minimal example: write results for a single contrast
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") %>%
+#'   writeDMRsToExcel(path = "dmr_results.xlsx")
+#'   
+#' # With explicit annotation (if required upstream)
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") %>%
+#'   writeDMRsToExcel(paste0(tempdir(),"/test.xlsx"))
 #' }
 #'
 #' @export
@@ -215,23 +295,46 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 
 #' Write DMR results to BED files
 #'
-#' Export DMR results to a set of BED files, one file per contrast.
+#' Export differentially methylated region (DMR) results to a set of BED files,
+#' with one file generated per contrast.
 #'
-#' @param dataTable A `data.frame` of DMR results, typically from [calculateDMRs()].
-#' @param folder `character(1)` Directory in which to write BED files.
-#' @param FDRthres `numeric(1)` False discovery rate threshold for filtering.
+#' @param dataTable `data.frame`  
+#'   DMR results, typically returned by [calculateDMRs()]. If a `GRanges`, it
+#'   will be coerced to a data frame internally.
 #'
-#' @return Invisibly returns the input `dataTable`, enabling use in a pipe.
+#' @param folder `character(1)`  
+#'   Directory in which to write BED files. Must exist and be writable.
 #'
-#' @seealso [writeDMRsToExcel()]
+#' @param FDRthres `numeric(1)`  
+#'   False discovery rate threshold used to filter DMRs before writing.  
+#'   **Default:** `0.05`.
+#'
+#' @return (Invisibly) returns the input object:
+#'
+#' * **writeDMRsToBed()**: returns `dataTable` (invisibly), enabling use in a
+#'   pipeline.
+#'
+#' @seealso
+#'   [writeDMRsToExcel()]
+#'
 #' @family DMR-helpers
-#' 
+#'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
-#' dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-#'                      contrasts = "LUAD_vs_NormalLung")
-#' writeDMRsToBed(dmr, folder = "bed_results")
+#'
+#' # Export DMRs for a single contrast to BED files in a temp directory
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "type",
+#'                 contrasts = "LUAD_vs_NormalLung") %>%
+#'   writeDMRsToBed(folder = tempdir())
+#'
+#' # Export DMRs with explicit annotation (requires TxDb/annotation packages)
+#' exampleTumourNormal %>%
+#'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+#'                   annoDb = "org.Hs.eg.db") %>%
+#'   writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
 #' }
 #'
 #' @export

@@ -4,14 +4,14 @@
 \alias{writeDMRsToBed}
 \title{Write DMR results to BED files}
 \usage{
-writeDMRsToBed(dataTable, folder, fdrThres = 0.05)
+writeDMRsToBed(dataTable, folder, FDRthres = 0.05)
 }
 \arguments{
 \item{dataTable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.}
 
 \item{folder}{\code{character(1)} Directory in which to write BED files.}
 
-\item{fdrThres}{\code{numeric(1)} False discovery rate threshold for filtering.}
+\item{FDRthres}{\code{numeric(1)} False discovery rate threshold for filtering.}
 }
 \value{
 Invisibly returns the input \code{dataTable}, enabling use in a pipe.
@@ -22,9 +22,14 @@ Export DMR results to a set of BED files, one file per contrast.
 \examples{
 \dontrun{
 data(exampleTumourNormal, package = "mesa")
-dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-                     contrasts = "LUAD_vs_NormalLung")
-writeDMRsToBed(dmr, folder = "bed_results")
+exampleTumourNormal \%>\%
+   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
+   writeDMRsToBed(folder = "bed_results")
+   
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+  writeDMRsToBed(tempdir())
 }
 
 }

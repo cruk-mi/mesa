@@ -12,7 +12,7 @@ summariseDMRsByContrast(
 )
 }
 \arguments{
-\item{DMRtable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.
+\item{DMRtable}{\code{data.frame} or \code{GRanges} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.
 If in wide format, it will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
 
 \item{FDRthres}{\code{numeric(1)} False discovery rate threshold.}
@@ -30,9 +30,9 @@ Internally transforms the DMR results to long format.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-dmr <- calculateDMRs(exampleTumourNormal, variable = "type",
-                     contrasts = "LUAD_vs_NormalLung", fdrThres = 0.1)
-summariseDMRsByContrast(dmr, FDRthres = 0.1)
+exampleTumourNormal \%>\%
+   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1) \%>\%
+   summariseDMRsByContrast(FDRthres = 0.1)
 
 }
 \seealso{

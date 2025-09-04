@@ -11,7 +11,7 @@ getDMRsData(
   variable = NULL,
   keepData = FALSE,
   keepGroupMeans = FALSE,
-  fdrThres = 0.05,
+  FDRthres = 0.05,
   keepPvals = FALSE,
   keepFragmentInfo = FALSE,
   direction = "both"
@@ -31,7 +31,7 @@ determined by \code{keepData}.}
 
 \item{keepGroupMeans}{Logical. If \code{TRUE}, include group mean columns.}
 
-\item{fdrThres}{Numeric(1). FDR threshold for selecting significant regions.}
+\item{FDRthres}{Numeric(1). FDR threshold for selecting significant regions.}
 
 \item{keepPvals}{Logical. If \code{TRUE}, include raw (unadjusted) p-values.}
 
@@ -53,7 +53,7 @@ data(exampleTumourNormal, package = "mesa")
 qs <- exampleTumourNormal
 contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
 glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
-dmrTab <- getDMRsData(qs, glmfit, variable = "type", fdrThres = 0.1)
+dmrTab <- getDMRsData(qs, glmfit, variable = "type", FDRthres = 0.1)
 head(dmrTab)
 
 }
