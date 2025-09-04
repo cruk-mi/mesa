@@ -15,17 +15,36 @@
 )
 }
 \arguments{
-\item{x}{A \linkS4class{mesaDimRed}.}
+\item{x}{\code{mesaDimRed}
+Object whose \code{sampleTable} will be joined.}
 
-\item{y}{A data.frame to join.}
+\item{y}{\code{data.frame}
+Table to join.}
 
-\item{by, suffix, copy, keep, ...}{Passed to \code{dplyr::left_join()}.}
+\item{by}{\code{character()} or \code{NULL}
+Join columns; see \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. \strong{Default:} \code{NULL}.}
+
+\item{copy}{\code{logical(1)}
+See \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. \strong{Default:} \code{FALSE}.}
+
+\item{suffix}{\code{character(2)}
+Suffixes appended to overlapping non-join column names.
+\strong{Default:} \code{c(".x", ".y")}.}
+
+\item{keep}{\code{logical(1)} or \code{NULL}
+Retain join keys from both tables. \strong{Default:} \code{NULL}.}
+
+\item{...}{Additional arguments to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}.}
 }
 \value{
-A \linkS4class{mesaDimRed} with an updated \code{sampleTable}.
+A \code{mesaDimRed} object:
+\itemize{
+\item \strong{sampleTable} updated with \code{y} via a left join.
+}
 }
 \description{
-Extends \code{dplyr::left_join()} to operate on the \code{sampleTable} slot.
+Extend \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to operate on the \code{sampleTable} slot of a
+\linkS4class{mesaDimRed} object.
 }
 \examples{
 st <- data.frame(sample_name = c("A","B"),

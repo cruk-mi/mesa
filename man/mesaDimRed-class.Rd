@@ -12,38 +12,55 @@ mesaDimRed(res, sampleTable, samples, params, dataTable = data.frame())
 \S4method{show}{mesaDimRed}(object)
 }
 \arguments{
-\item{res}{List of DR result objects.}
+\item{res}{\code{list}
+DR result objects. \strong{Default:} none. \code{res} must be supplied.}
 
-\item{sampleTable}{Data.frame with sample annotations (row names = sample IDs).}
+\item{sampleTable}{\code{data.frame}
+Sample annotations; row names must be sample IDs. \strong{Default:} none.}
 
-\item{samples}{Character vector of sample IDs included.}
+\item{samples}{\code{character()}
+Sample IDs included. \strong{Default:} none.}
 
-\item{params}{List of parameters used to compute \code{res}.}
+\item{params}{\code{list}
+Parameters used to compute \code{res}. \strong{Default:} none.}
 
-\item{dataTable}{Optional data.frame of the numeric matrix used for DR.}
+\item{dataTable}{\code{data.frame}
+Optional numeric matrix/data used for DR.
+\strong{Default:} \code{data.frame()}.}
 
-\item{object}{A \linkS4class{mesaDimRed} object.}
+\item{object}{\code{mesaDimRed}
+Object to display.}
 }
 \value{
-A \linkS4class{mesaDimRed} object.
+A \linkS4class{mesaDimRed} object:
+\itemize{
+\item stores DR results in \code{res},
+\item carries sample metadata in \code{sampleTable},
+\item records the samples in \code{samples},
+\item and persists parameters/data in \code{params} / \code{dataTable}.
+}
 }
 \description{
-Aggregates one or more dimensionality reduction results (e.g., PCA/UMAP)
+Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
 computed on a common set of samples.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{res}}{A list of individual DR results (e.g., \linkS4class{mesaPCA},
-\linkS4class{mesaUMAP}, or related objects).}
+\item{\code{res}}{\code{list}
+Individual DR result objects (e.g., \linkS4class{mesaPCA}, \linkS4class{mesaUMAP}).}
 
-\item{\code{sampleTable}}{A data.frame describing samples (row names = sample IDs).}
+\item{\code{sampleTable}}{\code{data.frame}
+Sample annotations; row names are sample IDs.}
 
-\item{\code{samples}}{Character vector of sample IDs used.}
+\item{\code{samples}}{\code{character()}
+Vector of sample IDs used.}
 
-\item{\code{params}}{List of parameters used to generate results in \code{res}.}
+\item{\code{params}}{\code{list}
+Parameters used to generate results in \code{res}.}
 
-\item{\code{dataTable}}{Optional data.frame containing the matrix used to compute DR.}
+\item{\code{dataTable}}{\code{data.frame}
+Optional matrix/data used to compute DR (for reproducibility).}
 }}
 
 \examples{

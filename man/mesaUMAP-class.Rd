@@ -12,15 +12,17 @@ mesaUMAP(points, windows)
 \S4method{show}{mesaUMAP}(object)
 }
 \arguments{
-\item{points}{A data.frame with one row per sample with the positions in UMAP space.
-Row names should be sample IDs.}
+\item{points}{\code{data.frame}
+One row per sample with positions in UMAP space (row names = sample IDs).
+\strong{Default:} none.}
 
-\item{windows}{Character vector of window IDs used.}
+\item{windows}{\code{character()}
+Window IDs used. \strong{Default:} none.}
 
-\item{object}{A \linkS4class{mesaUMAP} object.}
+\item{object}{\code{mesaUMAP}}
 }
 \value{
-A \linkS4class{mesaUMAP} object.
+A \linkS4class{mesaUMAP} object containing UMAP coordinates and window IDs.
 }
 \description{
 Stores per-sample coordinates from a UMAP embedding computed over methylation
@@ -29,10 +31,12 @@ windows.
 \section{Slots}{
 
 \describe{
-\item{\code{points}}{A data.frame with one row per sample and UMAP coordinates
-(e.g., columns \code{UMAP1}, \code{UMAP2}). Row names are sample IDs.}
+\item{\code{points}}{\code{data.frame}
+One row per sample with UMAP coordinates (e.g., \code{UMAP1}, \code{UMAP2}).
+Row names are sample IDs.}
 
-\item{\code{windows}}{Character vector of window IDs used to compute the embedding.}
+\item{\code{windows}}{\code{character()}
+Window IDs used to compute the embedding.}
 }}
 
 \examples{

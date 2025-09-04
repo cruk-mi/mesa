@@ -11,10 +11,12 @@ subsetQset(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL)
 A qseaSet object containing methylation-enriched sequencing data.}
 
 \item{samplesToKeep}{\code{character()}
-Names of samples to retain. Cannot be used together with \code{samplesToDrop}.}
+Names of samples to retain. Cannot be used together with \code{samplesToDrop}.
+\strong{Default:} \code{NULL}.}
 
 \item{samplesToDrop}{\code{character()}
-Names of samples to remove. Cannot be used together with \code{samplesToKeep}.}
+Names of samples to remove. Cannot be used together with \code{samplesToKeep}.
+\strong{Default:} \code{NULL}.}
 }
 \value{
 A \code{qseaSet} object:

@@ -7,15 +7,21 @@
 \method{mutate}{mesaDimRed}(.data, ...)
 }
 \arguments{
-\item{.data}{A \linkS4class{mesaDimRed} object.}
+\item{.data}{\code{mesaDimRed}
+Object to modify.}
 
-\item{...}{Arguments passed to \code{dplyr::mutate()}.}
+\item{...}{Arguments passed to \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
 }
 \value{
-A \linkS4class{mesaDimRed} with an updated \code{sampleTable}.
+A \code{mesaDimRed} object:
+\itemize{
+\item \strong{sampleTable} updated with the mutated columns.
+\item Sample identity is preserved; attempts to alter \code{sample_name} are rejected.
+}
 }
 \description{
-Extends \code{dplyr::mutate()} to operate on the \code{sampleTable} slot.
+Extend \code{\link[dplyr:mutate]{dplyr::mutate()}} to operate on the \code{sampleTable} slot of a
+\linkS4class{mesaDimRed} object.
 }
 \examples{
 st <- data.frame(sample_name = c("A","B"),

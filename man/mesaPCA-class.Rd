@@ -12,25 +12,28 @@ mesaPCA(prcomp, windows)
 \S4method{show}{mesaPCA}(object)
 }
 \arguments{
-\item{prcomp}{A PCA fit returned by \code{stats::prcomp()}.}
+\item{prcomp}{\code{prcomp}
+PCA fit from \code{\link[stats:prcomp]{stats::prcomp()}}. \strong{Default:} none.}
 
-\item{windows}{Character vector of window IDs used.}
+\item{windows}{\code{character()}
+Window IDs used. \strong{Default:} none.}
 
-\item{object}{A \linkS4class{mesaPCA} object.}
+\item{object}{\code{mesaPCA}}
 }
 \value{
-A \linkS4class{mesaPCA} object.
+A \linkS4class{mesaPCA} object containing the PCA fit and window IDs.
 }
 \description{
-Stores a PCA fit (from \code{stats::prcomp()}) computed over methylation
-windows.
+Stores a PCA fit (from \code{\link[stats:prcomp]{stats::prcomp()}}) computed over methylation windows.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{prcomp}}{A \code{stats::prcomp} object.}
+\item{\code{prcomp}}{\code{prcomp}
+A PCA fit returned by \code{\link[stats:prcomp]{stats::prcomp()}}.}
 
-\item{\code{windows}}{Character vector of window IDs used in the PCA.}
+\item{\code{windows}}{\code{character()}
+Window IDs used in the PCA.}
 }}
 
 \examples{

@@ -11,21 +11,42 @@ calculateCGEnrichmentGRanges(
 )
 }
 \arguments{
-\item{readGRanges}{\linkS4class{GRanges}. Each range represents a fragment.}
+\item{readGRanges}{\code{GRanges}
+Genomic ranges representing fragments (each range = one fragment).
+\strong{Default:} \code{NULL} (must be supplied).}
 
-\item{BSgenome}{Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).}
+\item{BSgenome}{\code{character(1)}
+Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
+The package must be installed and loadable.
+\strong{Default:} \code{NULL}.}
 
-\item{chr.select}{Character vector of chromosomes to restrict the motif positions calculation.}
+\item{chr.select}{\code{character()} or \code{NULL}
+Vector of chromosomes to restrict motif calculation.
+\strong{Default:} \code{NULL} (use all chromosomes).}
 }
 \value{
-A \code{tibble} with columns:
-\code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern},
-\code{n100bpReads}, \code{n100bpReadsWithoutPattern}.
+A \code{tibble} with one row and the following columns:
+\itemize{
+\item \strong{relH} — sample relH normalised by genome relH.
+\item \strong{GoGe} — sample GoGe normalised by genome GoGe.
+\item \strong{nReads} — total reads (fragments).
+\item \strong{nReadsWithoutPattern} — reads lacking \code{"CG"} motif.
+\item \strong{n100bpReads} — reads with length ≥ 100 bp.
+\item \strong{n100bpReadsWithoutPattern} — reads ≥ 100 bp lacking \code{"CG"}.
+}
 }
 \description{
-Compute relH and GoGe CpG enrichment metrics from a \linkS4class{GRanges} of
-read spans, using the specified BSgenome. Useful when reads are already
-represented as genomic ranges rather than a BAM file.
+Compute CpG enrichment metrics (\strong{relH} and \strong{GoGe}) from a
+\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} of read spans, using the specified BSgenome.
+Useful when reads are already represented as genomic ranges rather than
+extracted directly from a BAM file.
+}
+\details{
+relH and GoGe are computed by counting \code{"CG"} dinucleotides in the provided
+fragments and normalising by genome-wide expectations (from
+\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}}).
+Unlike \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, this function assumes reads are already
+summarised as genomic ranges.
 }
 \examples{
 \donttest{
@@ -51,5 +72,8 @@ if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
 
 }
 \seealso{
-\code{\link{calculateCGEnrichment}}, \code{\link{calculateGenomicCGDistribution}}
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
+\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
+\pkg{GenomicRanges},
+\pkg{BSgenome}
 }
