@@ -7,29 +7,44 @@
 writeDMRsToBed(dataTable, folder, FDRthres = 0.05)
 }
 \arguments{
-\item{dataTable}{A \code{data.frame} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.}
+\item{dataTable}{\code{data.frame}
+DMR results, typically returned by \code{\link[=calculateDMRs]{calculateDMRs()}}. If a \code{GRanges}, it
+will be coerced to a data frame internally.}
 
-\item{folder}{\code{character(1)} Directory in which to write BED files.}
+\item{folder}{\code{character(1)}
+Directory in which to write BED files. Must exist and be writable.}
 
-\item{FDRthres}{\code{numeric(1)} False discovery rate threshold for filtering.}
+\item{FDRthres}{\code{numeric(1)}
+False discovery rate threshold used to filter DMRs before writing.
+\strong{Default:} \code{0.05}.}
 }
 \value{
-Invisibly returns the input \code{dataTable}, enabling use in a pipe.
+(Invisibly) returns the input object:
+\itemize{
+\item \strong{writeDMRsToBed()}: returns \code{dataTable} (invisibly), enabling use in a
+pipeline.
+}
 }
 \description{
-Export DMR results to a set of BED files, one file per contrast.
+Export differentially methylated region (DMR) results to a set of BED files,
+with one file generated per contrast.
 }
 \examples{
-\dontrun{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
+
+# Export DMRs for a single contrast to BED files in a temp directory
 exampleTumourNormal \%>\%
-   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
-   writeDMRsToBed(folder = "bed_results")
-   
+  calculateDMRs(variable = "type",
+                contrasts = "LUAD_vs_NormalLung") \%>\%
+  writeDMRsToBed(folder = tempdir())
+
+# Export DMRs with explicit annotation (requires TxDb/annotation packages)
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToBed(tempdir())
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+                  annoDb = "org.Hs.eg.db") \%>\%
+  writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
 }
 
 }

@@ -16,49 +16,66 @@ addBamCoveragePairedAndUnpaired(
 )
 }
 \arguments{
-\item{qs}{A \code{qseaSet} with valid \code{file_name} in its sample table and
-regions accessible via \code{qsea::getRegions(qs)}.}
+\item{qs}{\code{qseaSet}
+Input object with valid \code{file_name} in its sample table and regions
+accessible via \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}.}
 
-\item{fragmentLength}{Integer(1) or \code{NULL}. Length to extend unpaired R1 reads;
-if \code{NULL}, estimated as the median proper-pair width (when available).}
+\item{fragmentLength}{\code{integer(1)} or \code{NULL}
+Length to extend unpaired R1 reads. If \code{NULL}, estimated as the median
+proper-pair width (when available).
+\strong{Default:} \code{NULL}.}
 
-\item{minMapQual}{Integer(1). Minimum MAPQ for either end (proper pairs) or R1 (unpaired).}
+\item{minMapQual}{\code{integer(1)}
+Minimum MAPQ for either end (proper pairs) or R1 (unpaired).
+\strong{Default:} \code{30}.}
 
-\item{maxInsertSize, minInsertSize}{Integer(1). Bounds for absolute insert size of proper pairs.}
+\item{maxInsertSize}{\code{integer(1)}
+Maximum absolute insert size for proper pairs.
+\strong{Default:} \code{1000}.}
 
-\item{minReferenceLength}{Integer(1). Minimum reference span for R1s (unpaired).}
+\item{minInsertSize}{\code{integer(1)}
+Minimum absolute insert size for proper pairs.
+\strong{Default:} \code{100}.}
 
-\item{parallel}{Logical(1). If \code{TRUE} and a multi-core \code{BPPARAM} is registered,
-BAMs are processed in parallel (see \pkg{BiocParallel}).}
+\item{minReferenceLength}{\code{integer(1)}
+Minimum reference span for R1s (unpaired).
+\strong{Default:} \code{30}.}
 
-\item{properPairsOnly}{Logical(1). If \code{TRUE}, only proper pairs (plus rescued near-pairs)
-are used; if \code{FALSE}, combine proper pairs with high-quality unpaired R1 reads.}
+\item{parallel}{\code{logical(1)}
+If \code{TRUE} and a multi-core \code{BPPARAM} is registered, BAMs are processed in
+parallel (see \pkg{BiocParallel}).
+\strong{Default:} \code{getMesaParallel()}.}
+
+\item{properPairsOnly}{\code{logical(1)}
+If \code{TRUE}, only proper pairs (plus rescued near-proper pairs) are used.
+If \code{FALSE}, combine proper pairs with high-quality unpaired R1 reads.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-The input \code{qseaSet} with:
+A \code{qseaSet} with updated slots:
 \itemize{
-\item updated count matrix via \code{qsea:::setCounts()}, columns in sample order;
-\item updated library table via \code{qsea:::setLibrary()} with summary metrics;
-\item appended parameter record (MAPQ/size thresholds etc.) via \code{qsea:::addParameters()}.
+\item \strong{Counts}: updated count matrix via \code{qsea:::setCounts()}.
+\item \strong{Library}: updated library table via \code{qsea:::setLibrary()}, with summary metrics.
+\item \strong{Parameters}: appended record of MAPQ/size thresholds via \code{qsea:::addParameters()}.
 }
 }
 \description{
-Scans BAM files listed in a \code{qseaSet} and adds per-region counts and library
-summaries using proper pairs (with MAPQ and insert-size filters) and, optionally,
-high-quality unpaired R1 reads extended to a fragment length. Parallelisation via
-\pkg{BiocParallel} is supported.
+Scan BAM files listed in a \code{qseaSet} and add per-region counts and library
+summaries using proper pairs (with MAPQ and insert-size filters) and,
+optionally, high-quality unpaired R1 reads extended to a fragment length.
+Parallelisation via \pkg{BiocParallel} is supported.
 }
 \details{
-Per-region counts are computed from fragment midpoints to align with qsea’s counting scheme.
-When \code{properPairsOnly=FALSE}, unpaired R1 reads are extended from the 5' end by
-\code{fragmentLength}. If \code{fragmentLength} is not supplied, it is estimated from
-proper pairs in the same BAM.
+Per-region counts are computed from fragment midpoints to align with qsea’s
+counting scheme. When \code{properPairsOnly = FALSE}, unpaired R1 reads are
+extended from the 5' end by \code{fragmentLength}. If \code{fragmentLength} is not
+supplied, it is estimated from proper pairs in the same BAM.
 }
 \section{Parallelisation}{
 
-Parallel execution uses \code{BiocParallel::bplapply()} with the currently registered
-backend (see \code{BiocParallel::register()}). Pass \code{parallel=TRUE} and set
-a multi-core/cluster backend for speed.
+Parallel execution uses \code{\link[BiocParallel:bplapply]{BiocParallel::bplapply()}} with the currently
+registered backend (see \code{\link[BiocParallel:register]{BiocParallel::register()}}). Pass \code{parallel = TRUE}
+and set a multi-core/cluster backend for speed.
 }
 
 \examples{
@@ -84,6 +101,8 @@ head(qsea::getLibrary(qs2))
 }
 \seealso{
 \code{\link[=getBamCoveragePairedAndUnpairedR1]{getBamCoveragePairedAndUnpairedR1()}} (low-level worker),
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[BiocParallel:register]{BiocParallel::register()}}
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
+\code{\link[BiocParallel:register]{BiocParallel::register()}}
 }
 \concept{coverage}

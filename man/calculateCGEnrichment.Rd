@@ -16,40 +16,68 @@ calculateCGEnrichment(
 )
 }
 \arguments{
-\item{file}{Character(1). Path to a BAM file.}
+\item{file}{\code{character(1)}
+Path to the BAM file.
+\strong{Default:} \code{NULL} (must be supplied).}
 
-\item{BSgenome}{Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
-GRCh38 and hg19 distributions are cached within \pkg{mesa} for speed.}
+\item{BSgenome}{\code{character(1)}
+Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
+For GRCh38 and hg19, precomputed distributions are cached within \pkg{mesa}
+for speed; otherwise, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}} is used.
+\strong{Default:} \code{NULL}.}
 
-\item{exportPath}{Character(1) or \code{NULL}. Directory to write a fragment-length
-density PDF and an RDS of the read GRanges. If \code{NULL}, no files are written.}
+\item{exportPath}{\code{character(1)} or \code{NULL}
+Directory in which to write a fragment-length density PDF and an RDS file
+containing the read GRanges. If \code{NULL}, no files are written.
+\strong{Default:} \code{NULL}.}
 
-\item{extend, shift, uniq, chr.select, paired}{Arguments passed to
-\code{MEDIPS::getGRange()} or \code{MEDIPS::getPairedGRange()}.}
+\item{extend}{\code{integer(1)}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+\strong{Default:} \code{0}.}
+
+\item{shift}{\code{integer(1)}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
+\strong{Default:} \code{0}.}
+
+\item{uniq}{\code{integer(1)}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+\strong{Default:} \code{0}.}
+
+\item{chr.select}{\code{character()} or \code{NULL}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Subset of chromosomes to use.
+\strong{Default:} \code{NULL} (all chromosomes).}
+
+\item{paired}{\code{logical(1)}
+Whether BAM contains paired-end reads (passed to
+\code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A \code{data.frame} with:
-\describe{
-\item{\code{file}}{Input BAM path.}
-\item{\code{relH}}{Sample relH normalised by genome relH.}
-\item{\code{GoGe}}{Sample GoGe normalised by genome GoGe.}
-\item{\code{nReads}}{Total reads considered.}
-\item{\code{nReadsWithoutPattern}}{Reads lacking "CG" motif.}
-\item{\code{n100bpReads}}{Reads with length \eqn{\ge} 100 bp.}
-\item{\code{n100bpReadsWithoutPattern}}{Reads \eqn{\ge} 100 bp lacking "CG".}
+A \code{data.frame} with columns:
+\itemize{
+\item \strong{file} — input BAM path.
+\item \strong{relH} — sample relH normalised by genome relH.
+\item \strong{GoGe} — sample GoGe normalised by genome GoGe.
+\item \strong{nReads} — total reads considered.
+\item \strong{nReadsWithoutPattern} — reads lacking \code{"CG"} motif.
+\item \strong{n100bpReads} — reads with length ≥ 100 bp.
+\item \strong{n100bpReadsWithoutPattern} — reads ≥ 100 bp lacking \code{"CG"}.
 }
 }
 \description{
-Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM,
-using \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
+Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM
+file. Uses \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
 interrogate the reference genome. Optionally exports a fragment-length
 density plot (PDF) and a serialized RDS with the GRanges of reads.
 }
 \details{
-The function counts exact "CG" matches in read sequences and normalises by
-genome-wide CpG metrics (relH, GoGe). For supported genomes, precomputed
-distributions bundled in \pkg{mesa} are used; otherwise,
-\code{\link{calculateGenomicCGDistribution}} is called.
+Reads are scanned for \code{"CG"} dinucleotides. Counts are normalised against
+genome-wide expectations (relH, GoGe).
+\itemize{
+\item For \strong{GRCh38} and \strong{hg19}, cached genomic distributions are bundled
+with \pkg{mesa} for efficiency.
+\item For other genomes, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}} is invoked.
+}
 }
 \examples{
 \donttest{
@@ -63,6 +91,8 @@ distributions bundled in \pkg{mesa} are used; otherwise,
 }
 }
 \seealso{
-\code{\link{calculateCGEnrichmentGRanges}},
-\code{\link{calculateGenomicCGDistribution}}, \pkg{MEDIPS}, \pkg{BSgenome}
+\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},
+\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
+\pkg{MEDIPS},
+\pkg{BSgenome}
 }

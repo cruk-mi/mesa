@@ -1,26 +1,31 @@
 #' Genome-wide CpG statistics (relH and GoGe)
 #'
-#' Compute genome-wide CpG metrics for a given BSgenome: the relative CpG
-#' frequency (\emph{relH}, percent of dinucleotides that are "CG") and the
-#' GoGe statistic \eqn{(nCG * genome_length) / (nC * nG)}. These values are
-#' used as denominators to normalise sample-level CpG enrichment.
+#' Compute genome-wide CpG metrics for a given BSgenome:  
+#' * **relH**: relative CpG frequency (% of dinucleotides that are `"CG"`).  
+#' * **GoGe**: enrichment statistic \eqn{(nCG * genome_length) / (nC * nG)}.  
 #'
-#' @param BSgenome Character(1). The BSgenome package name, e.g.
-#'   \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
+#' These values are used as denominators to normalise sample-level CpG enrichment.
 #'
-#' @return A \code{data.frame} with two columns:
-#' \describe{
-#'   \item{\code{genome.relH}}{Percent of "CG" dinucleotides genome-wide.}
-#'   \item{\code{genome.GoGe}}{GoGe enrichment statistic.}
-#' }
+#' @param BSgenome `character(1)`  
+#'   The name of a BSgenome package, e.g.
+#'   `"BSgenome.Hsapiens.NCBI.GRCh38"`. The package must be installed
+#'   and loadable in the current session.
+#'
+#' @return A `data.frame` with two numeric columns:
+#' * **genome.relH** — percent of `"CG"` dinucleotides genome-wide.  
+#' * **genome.GoGe** — GoGe enrichment statistic.  
 #'
 #' @details
-#' Chromosomes named \code{"rand"} or \code{"chrUn"} are excluded. The function
-#' loads the BSgenome indicated by \code{BSgenome} and uses \pkg{Biostrings}
-#' and \pkg{BSgenome} utilities to count CG, C, and G across the genome.
+#' * Chromosomes with names containing `"rand"` or `"chrUn"` are excluded.  
+#' * The BSgenome indicated by `BSgenome` is loaded dynamically.  
+#' * Uses [Biostrings] and [BSgenome] utilities to count CpG, C, and G
+#'   occurrences across the genome.  
 #'
-#' @seealso \code{\link{calculateCGEnrichment}},
-#'   \code{\link{calculateCGEnrichmentGRanges}}, \pkg{BSgenome}, \pkg{Biostrings}
+#' @seealso
+#'   [calculateCGEnrichment()],  
+#'   [calculateCGEnrichmentGRanges()],  
+#'   \pkg{BSgenome},  
+#'   \pkg{Biostrings}
 #'
 #' @examples
 #' \donttest{
@@ -48,38 +53,68 @@ calculateGenomicCGDistribution <- function(BSgenome){
 
 #' CpG enrichment from a BAM file (MEDIPS-style)
 #'
-#' Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM,
-#' using \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
+#' Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM
+#' file. Uses \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
 #' interrogate the reference genome. Optionally exports a fragment-length
 #' density plot (PDF) and a serialized RDS with the GRanges of reads.
 #'
-#' @param file Character(1). Path to a BAM file.
-#' @param BSgenome Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
-#'   GRCh38 and hg19 distributions are cached within \pkg{mesa} for speed.
-#' @param exportPath Character(1) or \code{NULL}. Directory to write a fragment-length
-#'   density PDF and an RDS of the read GRanges. If \code{NULL}, no files are written.
-#' @param extend,shift,uniq,chr.select,paired Arguments passed to
-#'   \code{MEDIPS::getGRange()} or \code{MEDIPS::getPairedGRange()}.
+#' @param file `character(1)`  
+#'   Path to the BAM file.  
+#'   **Default:** `NULL` (must be supplied).
 #'
-#' @return A \code{data.frame} with:
-#' \describe{
-#'   \item{\code{file}}{Input BAM path.}
-#'   \item{\code{relH}}{Sample relH normalised by genome relH.}
-#'   \item{\code{GoGe}}{Sample GoGe normalised by genome GoGe.}
-#'   \item{\code{nReads}}{Total reads considered.}
-#'   \item{\code{nReadsWithoutPattern}}{Reads lacking "CG" motif.}
-#'   \item{\code{n100bpReads}}{Reads with length \eqn{\ge} 100 bp.}
-#'   \item{\code{n100bpReadsWithoutPattern}}{Reads \eqn{\ge} 100 bp lacking "CG".}
-#' }
+#' @param BSgenome `character(1)`  
+#'   Name of a BSgenome package, e.g. `"BSgenome.Hsapiens.NCBI.GRCh38"`.  
+#'   For GRCh38 and hg19, precomputed distributions are cached within \pkg{mesa}
+#'   for speed; otherwise, [calculateGenomicCGDistribution()] is used.  
+#'   **Default:** `NULL`.
+#'
+#' @param exportPath `character(1)` or `NULL`  
+#'   Directory in which to write a fragment-length density PDF and an RDS file
+#'   containing the read GRanges. If `NULL`, no files are written.  
+#'   **Default:** `NULL`.
+#'
+#' @param extend `integer(1)`  
+#'   Passed to [MEDIPS::getGRange()]. Extension length for unpaired reads.  
+#'   **Default:** `0`.
+#'
+#' @param shift `integer(1)`  
+#'   Passed to [MEDIPS::getGRange()]. Shift applied to read positions.  
+#'   **Default:** `0`.
+#'
+#' @param uniq `integer(1)`  
+#'   Passed to [MEDIPS::getGRange()]. Minimum mapping uniqueness.  
+#'   **Default:** `0`.
+#'
+#' @param chr.select `character()` or `NULL`  
+#'   Passed to [MEDIPS::getGRange()]. Subset of chromosomes to use.  
+#'   **Default:** `NULL` (all chromosomes).
+#'
+#' @param paired `logical(1)`  
+#'   Whether BAM contains paired-end reads (passed to
+#'   [MEDIPS::getPairedGRange()]).  
+#'   **Default:** `TRUE`.
+#'
+#' @return A `data.frame` with columns:
+#' * **file** — input BAM path.  
+#' * **relH** — sample relH normalised by genome relH.  
+#' * **GoGe** — sample GoGe normalised by genome GoGe.  
+#' * **nReads** — total reads considered.  
+#' * **nReadsWithoutPattern** — reads lacking `"CG"` motif.  
+#' * **n100bpReads** — reads with length ≥ 100 bp.  
+#' * **n100bpReadsWithoutPattern** — reads ≥ 100 bp lacking `"CG"`.  
 #'
 #' @details
-#' The function counts exact "CG" matches in read sequences and normalises by
-#' genome-wide CpG metrics (relH, GoGe). For supported genomes, precomputed
-#' distributions bundled in \pkg{mesa} are used; otherwise,
-#' \code{\link{calculateGenomicCGDistribution}} is called.
+#' Reads are scanned for `"CG"` dinucleotides. Counts are normalised against
+#' genome-wide expectations (relH, GoGe).  
+#' * For **GRCh38** and **hg19**, cached genomic distributions are bundled
+#'   with \pkg{mesa} for efficiency.  
+#' * For other genomes, [calculateGenomicCGDistribution()] is invoked.  
 #'
-#' @seealso \code{\link{calculateCGEnrichmentGRanges}},
-#'   \code{\link{calculateGenomicCGDistribution}}, \pkg{MEDIPS}, \pkg{BSgenome}
+#' @seealso
+#'   [calculateCGEnrichmentGRanges()],  
+#'   [calculateGenomicCGDistribution()],  
+#'   \pkg{MEDIPS},  
+#'   \pkg{BSgenome}
 #'
 #' @examples
 #' \donttest{
@@ -224,19 +259,44 @@ getCGPositions <- function(BSgenome, chr.select){
 
 #' CpG enrichment from GRanges of reads (MEDIPS-style)
 #'
-#' Compute relH and GoGe CpG enrichment metrics from a \linkS4class{GRanges} of
-#' read spans, using the specified BSgenome. Useful when reads are already
-#' represented as genomic ranges rather than a BAM file.
+#' Compute CpG enrichment metrics (**relH** and **GoGe**) from a
+#' [GenomicRanges::GRanges-class] of read spans, using the specified BSgenome.
+#' Useful when reads are already represented as genomic ranges rather than
+#' extracted directly from a BAM file.
 #'
-#' @param readGRanges \linkS4class{GRanges}. Each range represents a fragment.
-#' @param BSgenome Character(1). BSgenome package name (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
-#' @param chr.select Character vector of chromosomes to restrict the motif positions calculation.
+#' @param readGRanges `GRanges`  
+#'   Genomic ranges representing fragments (each range = one fragment).  
+#'   **Default:** `NULL` (must be supplied).
 #'
-#' @return A \code{tibble} with columns:
-#' \code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern},
-#' \code{n100bpReads}, \code{n100bpReadsWithoutPattern}.
+#' @param BSgenome `character(1)`  
+#'   Name of a BSgenome package, e.g. `"BSgenome.Hsapiens.NCBI.GRCh38"`.  
+#'   The package must be installed and loadable.  
+#'   **Default:** `NULL`.
 #'
-#' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateGenomicCGDistribution}}
+#' @param chr.select `character()` or `NULL`  
+#'   Vector of chromosomes to restrict motif calculation.  
+#'   **Default:** `NULL` (use all chromosomes).
+#'
+#' @return A `tibble` with one row and the following columns:
+#' * **relH** — sample relH normalised by genome relH.  
+#' * **GoGe** — sample GoGe normalised by genome GoGe.  
+#' * **nReads** — total reads (fragments).  
+#' * **nReadsWithoutPattern** — reads lacking `"CG"` motif.  
+#' * **n100bpReads** — reads with length ≥ 100 bp.  
+#' * **n100bpReadsWithoutPattern** — reads ≥ 100 bp lacking `"CG"`.  
+#'
+#' @details
+#' relH and GoGe are computed by counting `"CG"` dinucleotides in the provided
+#' fragments and normalising by genome-wide expectations (from
+#' [calculateGenomicCGDistribution()]).  
+#' Unlike [calculateCGEnrichment()], this function assumes reads are already
+#' summarised as genomic ranges.
+#'
+#' @seealso
+#'   [calculateCGEnrichment()],  
+#'   [calculateGenomicCGDistribution()],  
+#'   \pkg{GenomicRanges},  
+#'   \pkg{BSgenome}
 #'
 #' @examples
 #' \donttest{
@@ -344,25 +404,69 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 
 #' Add MEDIPS-style enrichment metrics to a qseaSet sample table
 #'
-#' For each sample, compute MEDIPS-style CpG enrichment metrics (relH, GoGe,
-#' and counts) from its BAM, and append the results to the sample table within
-#' the \code{qseaSet}. Supports both pulldown (default) and input libraries.
+#' For each sample, compute MEDIPS-style CpG enrichment metrics (**relH**, **GoGe**,
+#' and read counts) from its BAM and append the results to the `qseaSet` sample
+#' metadata. Supports both pulldown (default) and input libraries.
 #'
-#' @param qseaSet A \code{qseaSet}.
-#' @param exportPath Character(1) or \code{NULL}. Directory to export per-sample
-#'   fragment-length PDFs and read GRanges RDS files (optional).
-#' @param nonEnrich Logical(1). If \code{TRUE}, treat samples as Input; else Pulldown.
-#'   Determines which columns are appended.
-#' @param extend,shift,uniq,chr.select,paired Passed to \pkg{MEDIPS} range extraction.
-#' @param file_name Character(1). Column name in the sample table holding BAM paths
-#'   (used when \code{nonEnrich = FALSE}). For Input, the column \code{input_file} is used.
-#' @param nCores Integer(1). Number of parallel cores for \code{parallel::mclapply()}.
+#' @param qseaSet `qseaSet`
+#'   Input object whose sample table contains BAM paths.
 #'
-#' @return The input \code{qseaSet}, with new columns appended to the corresponding
-#'   \code{@libraries} slot (either \code{$file_name} or \code{$input_file} frame),
-#'   including relH/GoGe and read counts.
+#' @param exportPath `character(1)` or `NULL`
+#'   Directory to export per-sample fragment-length PDFs and read-`GRanges` RDS files.
+#'   If `NULL`, no files are written.  
+#'   **Default:** `NULL`.
 #'
-#' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}
+#' @param nonEnrich `logical(1)`
+#'   If `TRUE`, treat samples as **Input** libraries (columns appended under
+#'   `@libraries$input_file`). If `FALSE`, treat as **Pulldown** (columns appended
+#'   under `@libraries$file_name`).  
+#'   **Default:** `FALSE`.
+#'
+#' @param extend `integer(1)`  
+#'   Passed to [MEDIPS::getGRange()]. Extension length for unpaired reads.  
+#'   **Default:** `0`.
+#'
+#' @param shift `integer(1)`  
+#'   Passed to [MEDIPS::getGRange()]. Shift applied to read positions.  
+#'   **Default:** `0`.
+#'
+#' @param uniq `integer(1)`  
+#'   Passed to [MEDIPS::getGRange()]. Minimum mapping uniqueness.  
+#'   **Default:** `0`.
+#'
+#' @param chr.select `character()` or `NULL`
+#'   Passed to MEDIPS range extraction; subset of chromosomes to analyse.  
+#'   **Default:** `NULL` (all chromosomes).
+#'
+#' @param paired `logical(1)`
+#'   Whether BAMs are paired-end (uses [MEDIPS::getPairedGRange()]).  
+#'   **Default:** `TRUE`.
+#'
+#' @param file_name `character(1)`
+#'   Column name in the sample table holding BAM paths when `nonEnrich = FALSE`.
+#'   When `nonEnrich = TRUE`, the column `input_file` is used instead.  
+#'   **Default:** `"file_name"`.
+#'
+#' @param nCores `integer(1)`
+#'   Number of parallel cores for `parallel::mclapply()`. Set to `1` for serial.  
+#'   **Default:** `1`.
+#'
+#' @return A `qseaSet` with new MEDIPS-style metrics appended:
+#'
+#' * **Sample/library metrics** (added under the appropriate library frame):
+#'   `relH`, `GoGe`, `nReads`, `nReadsWithoutPattern`, `n100bpReads`,
+#'   `n100bpReadsWithoutPattern`.
+#' * **Provenance**: any export artefacts (PDF/RDS) written to `exportPath` if provided.
+#'
+#' @details
+#' Internally calls [calculateCGEnrichment()] per sample to derive relH/GoGe and counts,
+#' then merges the results into the `@libraries` slot (`$file_name` for pulldown,
+#' `$input_file` for input when `nonEnrich = TRUE`). Parallelisation uses
+#' `parallel::mclapply()`; on non-Unix systems, `nCores` > 1 is ignored.
+#'
+#' @seealso
+#'   [calculateCGEnrichment()],  
+#'   [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
 #' \donttest{

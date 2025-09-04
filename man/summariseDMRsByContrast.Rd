@@ -12,31 +12,48 @@ summariseDMRsByContrast(
 )
 }
 \arguments{
-\item{DMRtable}{\code{data.frame} or \code{GRanges} of DMR results, typically from \code{\link[=calculateDMRs]{calculateDMRs()}}.
-If in wide format, it will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
+\item{DMRtable}{\code{data.frame} or \code{GRanges}
+DMR results, typically returned by \code{\link[=calculateDMRs]{calculateDMRs()}}. If in wide format,
+it will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
 
-\item{FDRthres}{\code{numeric(1)} False discovery rate threshold.}
+\item{FDRthres}{\code{numeric(1)}
+False discovery rate threshold for significance.
+\strong{Default:} \code{0.05}.}
 
-\item{log2FCthres}{\code{numeric(1)} Absolute log2 fold-change threshold.}
+\item{log2FCthres}{\code{numeric(1)}
+Absolute log2 fold-change threshold for calling up/down regulation.
+\strong{Default:} \code{0}.}
 
-\item{deltaBetaThres}{\code{numeric(1)} Absolute delta-beta threshold.}
+\item{deltaBetaThres}{\code{numeric(1)}
+Absolute delta-beta threshold for calling up/down regulation.
+\strong{Default:} \code{0}.}
 }
 \value{
-A tibble with one row per contrast and columns \code{nUp} and \code{nDown}.
+A \code{tibble}:
+\itemize{
+\item \strong{summariseDMRsByContrast()}: returns one row per contrast, with
+counts of up-regulated (\code{nUp}) and down-regulated (\code{nDown}) DMRs that
+pass the specified thresholds.
+}
 }
 \description{
-Count the number of up- and down-regulated windows per contrast.
-Internally transforms the DMR results to long format.
+Count the number of up- and down-regulated DMR windows per contrast.
+Internally, results are reshaped to long format before summarisation.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
+
+# Summarise DMRs for a single contrast, using custom FDR threshold
 exampleTumourNormal \%>\%
-   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1) \%>\%
-   summariseDMRsByContrast(FDRthres = 0.1)
+  calculateDMRs(variable = "type",
+                contrasts = "LUAD_vs_NormalLung",
+                FDRthres = 0.1) \%>\%
+  summariseDMRsByContrast(FDRthres = 0.1)
 
 }
 \seealso{
-\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}, \code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
 
 Other DMR-helpers: 
 \code{\link{pivotDMRsLonger}()},

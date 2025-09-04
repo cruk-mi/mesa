@@ -11,45 +11,70 @@ addNormalisation(
 )
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}
+Input object containing methylation-enriched sequencing data.}
 
-\item{enrichmentMethod}{Character(1). Label recorded in \code{qseaSet@parameters$enrichmentMethod}.
-Currently informational; algorithmic behaviour is controlled by other arguments.}
+\item{enrichmentMethod}{\code{character(1)}
+Method used to calculate enrichment.
+Currently implemented:
+\itemize{
+\item \strong{"blind1-15"}: the blind calibration method detailed in the qsea
+paper, fitting a straight line of decreasing expected average
+methylation levels from ~76\% at CpG density = 1 to ~25\% at CpG density = 15.
+\item \strong{"none"}: no enrichment normalisation is performed.
+}
+Recorded in \code{qseaSet@parameters$enrichmentMethod}.
+\strong{Default:} \code{"blind1-15"}.}
 
-\item{maxPatternDensity}{Numeric(1). Maximum pattern density to consider in background
-calculation passed to \code{qsea::addOffset()}.}
+\item{maxPatternDensity}{\code{numeric(1)}
+Maximum pattern density in a window to consider it for the background
+calculation, passed to \code{\link[qsea:addOffset]{qsea::addOffset()}}.
+\strong{Default:} \code{0.05}.}
 }
 \value{
-A \code{qseaSet} with updated library factors, offsets, enrichment parameters,
-and \code{@parameters$enrichmentMethod} set.
+A \code{qseaSet} with updates to:
+\itemize{
+\item \strong{Library factors} — set to \code{1} via \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}.
+\item \strong{Offsets} — added via \code{\link[qsea:addOffset]{qsea::addOffset()}} using \code{\link[=getPattern]{getPattern()}} and
+\code{maxPatternDensity}.
+\item \strong{Enrichment parameters} — configured over windows with CpG density in
+\verb{[1, 15]} using a linear signal schedule and
+\code{bins = seq(0.5, 40.5, 0.5)}.
+\item \strong{Parameters slot} — \code{enrichmentMethod} recorded in
+\code{qseaSet@parameters$enrichmentMethod}.
+}
 }
 \description{
-Applies a set of qsea normalisation steps to a \code{qseaSet}, including
-setting library factors to 1 (disabling TMM), adding offsets based on an
-enrichment pattern, and configuring enrichment parameters across a CpG-density
-window range.
+Apply a set of qsea normalisation steps to a \code{qseaSet}, including:
+\itemize{
+\item setting library factors to 1 (disabling TMM),
+\item adding offsets based on an enrichment pattern, and
+\item configuring enrichment parameters across a CpG-density window range.
+}
 }
 \details{
-\itemize{
-\item Library factors are set to 1 via \code{qsea::addLibraryFactors(qseaSet, factors = 1)}.
-\item Offsets are added with \code{qsea::addOffset()} using \code{getPattern(qseaSet)} and
-\code{maxPatternDensity}.
-\item Enrichment parameters are configured over windows with CpG density in \code{[1, 15]} using
-a linear signal schedule and \code{bins = seq(0.5, 40.5, 0.5)}.
-}
+This function encapsulates a recommended default pipeline for qsea
+normalisation. It ensures consistency across runs and simplifies code by
+bundling commonly applied steps.
 }
 \examples{
 # Run normalisation on a toy qseaSet with ~100k reads
 getExampleQseaSet(expSamplingDepth = 100000) \%>\%
   addNormalisation(maxPatternDensity = 0.5)
-
-# Lightweight example (step by step)
+  
+# Run with no enrichment normalisation
+getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
+  addNormalisation(enrichmentMethod = "none")
+  
+# Access the recorded enrichment method
 qs <- getExampleQseaSet(expSamplingDepth = 1e5)
 qs2 <- addNormalisation(qs, maxPatternDensity = 0.5)
 qs2@parameters$enrichmentMethod
 
 }
 \seealso{
-\code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}, \code{\link[qsea:addOffset]{qsea::addOffset()}}, \code{\link[qsea:addEnrichmentParameters]{qsea::addEnrichmentParameters()}},
+\code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}},
+\code{\link[qsea:addOffset]{qsea::addOffset()}},
+\code{\link[qsea:addEnrichmentParameters]{qsea::addEnrichmentParameters()}},
 \code{\link[=getPattern]{getPattern()}}
 }

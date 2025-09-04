@@ -7,32 +7,44 @@
 pivotDMRsLonger(DMRtable, FDRthres = 0.05, makePositive = FALSE)
 }
 \arguments{
-\item{DMRtable}{A \code{data.frame} of DMR results in wide format, typically the
-output of \code{\link[=calculateDMRs]{calculateDMRs()}}.}
+\item{DMRtable}{\code{data.frame}
+DMR results in wide format, typically produced by \code{\link[=calculateDMRs]{calculateDMRs()}}.}
 
-\item{FDRthres}{\code{numeric(1)} False discovery rate threshold to filter significant
-windows.}
+\item{FDRthres}{\code{numeric(1)}
+False discovery rate threshold for filtering significant windows.
+\strong{Default:} \code{0.05}.}
 
-\item{makePositive}{\code{logical(1)} If \code{TRUE}, reverse the direction of contrasts
-such that all retained windows are positively associated with \code{group1}.}
+\item{makePositive}{\code{logical(1)}
+If \code{TRUE}, reverse the direction of contrasts so that all retained windows
+are positively associated with \code{group1}.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-A tibble in long format with columns including \code{group1}, \code{group2},
+A \code{tibble}:
+\itemize{
+\item \strong{pivotDMRsLonger()}: returns a long-format table with one row per
+DMR–contrast combination, including columns \code{group1}, \code{group2},
 \code{deltaBeta}, \code{log2FC}, and \code{adjPval}.
 }
+}
 \description{
-Convert a wide-format DMR results table into a long-format table
-with explicit columns for contrasts, effect sizes, and significance values.
+Convert wide-format DMR results into a long-format table with explicit
+columns for contrasts, effect sizes, and significance values.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
+
+# Convert results to long format and filter at custom FDR threshold
 exampleTumourNormal \%>\%
-   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung", FDRthres = 0.1) \%>\%
-   pivotDMRsLonger(FDRthres = 0.1)
+  calculateDMRs(variable = "type",
+                contrasts = "LUAD_vs_NormalLung",
+                FDRthres = 0.1) \%>\%
+  pivotDMRsLonger(FDRthres = 0.1)
 
 }
 \seealso{
-\code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
+\code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
 Other DMR-helpers: 
 \code{\link{summariseDMRsByContrast}()},

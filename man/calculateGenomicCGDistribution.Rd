@@ -7,26 +7,33 @@
 calculateGenomicCGDistribution(BSgenome)
 }
 \arguments{
-\item{BSgenome}{Character(1). The BSgenome package name, e.g.
-\code{"BSgenome.Hsapiens.NCBI.GRCh38"}.}
+\item{BSgenome}{\code{character(1)}
+The name of a BSgenome package, e.g.
+\code{"BSgenome.Hsapiens.NCBI.GRCh38"}. The package must be installed
+and loadable in the current session.}
 }
 \value{
-A \code{data.frame} with two columns:
-\describe{
-\item{\code{genome.relH}}{Percent of "CG" dinucleotides genome-wide.}
-\item{\code{genome.GoGe}}{GoGe enrichment statistic.}
+A \code{data.frame} with two numeric columns:
+\itemize{
+\item \strong{genome.relH} — percent of \code{"CG"} dinucleotides genome-wide.
+\item \strong{genome.GoGe} — GoGe enrichment statistic.
 }
 }
 \description{
-Compute genome-wide CpG metrics for a given BSgenome: the relative CpG
-frequency (\emph{relH}, percent of dinucleotides that are "CG") and the
-GoGe statistic \eqn{(nCG * genome_length) / (nC * nG)}. These values are
-used as denominators to normalise sample-level CpG enrichment.
+Compute genome-wide CpG metrics for a given BSgenome:
+\itemize{
+\item \strong{relH}: relative CpG frequency (\% of dinucleotides that are \code{"CG"}).
+\item \strong{GoGe}: enrichment statistic \eqn{(nCG * genome_length) / (nC * nG)}.
+}
 }
 \details{
-Chromosomes named \code{"rand"} or \code{"chrUn"} are excluded. The function
-loads the BSgenome indicated by \code{BSgenome} and uses \pkg{Biostrings}
-and \pkg{BSgenome} utilities to count CG, C, and G across the genome.
+These values are used as denominators to normalise sample-level CpG enrichment.
+\itemize{
+\item Chromosomes with names containing \code{"rand"} or \code{"chrUn"} are excluded.
+\item The BSgenome indicated by \code{BSgenome} is loaded dynamically.
+\item Uses \link{Biostrings} and \link{BSgenome} utilities to count CpG, C, and G
+occurrences across the genome.
+}
 }
 \examples{
 \donttest{
@@ -37,6 +44,8 @@ if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link{calculateCGEnrichment}},
-\code{\link{calculateCGEnrichmentGRanges}}, \pkg{BSgenome}, \pkg{Biostrings}
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
+\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},
+\pkg{BSgenome},
+\pkg{Biostrings}
 }
