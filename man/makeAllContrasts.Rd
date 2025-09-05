@@ -7,20 +7,36 @@
 makeAllContrasts(qseaSet, variable)
 }
 \arguments{
-\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing the sample table from which factor levels are taken.}
 
-\item{variable}{Character scalar. Column in the sample table.}
+\item{variable}{\code{character(1)}.
+Column name in the sample table whose distinct levels define the contrasts.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A tibble with columns \code{group1} and \code{group2}.
+A tibble with two columns:
+\itemize{
+\item \code{group1} – the first level of the pair,
+\item \code{group2} – the second level of the pair.
+Each row represents one \strong{unordered} pair of distinct levels (i.e., all
+combinations without repetition).
+}
 }
 \description{
 Construct a tibble of all pairwise contrasts between levels of a categorical
 variable in the sample table of a \link[qsea:qseaSet-class]{qsea::qseaSet}.
 }
+\details{
+Levels are inferred from \code{unique(qsea::getSampleTable(qseaSet)[[variable]])}.
+Pairs are formed between all distinct levels; no self-contrasts are included.
+}
 \examples{
 data(exampleTumourNormal, package = "mesa")
-makeAllContrasts(exampleTumourNormal, "type")
+
+# All pairwise contrasts among levels of 'type'
+exampleTumourNormal \%>\%
+  makeAllContrasts("type")
 
 }
 \seealso{

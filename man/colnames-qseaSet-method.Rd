@@ -7,23 +7,25 @@
 \S4method{colnames}{qseaSet}(x)
 }
 \arguments{
-\item{x}{A \code{qseaSet}.}
+\item{x}{\code{qseaSet}.
+The qseaSet object whose \code{sampleTable} column names are to be retrieved.}
 }
 \value{
-Character vector of column names.
+\code{character()}.
+A character vector containing the column names of the sample table.
 }
 \description{
-S4 method for BiocGenerics::colnames() that returns the column names of a
-qseaSet's sample metadata table (qsea::getSampleTable(x)).
+S4 method for \code{\link[BiocGenerics:row_colnames]{BiocGenerics::colnames()}} that returns the column names of a
+\code{qseaSet}'s sample metadata table (i.e., \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}).
 }
 \examples{
-\donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-  data(exampleTumourNormal, package="mesa")
-  colnames(exampleTumourNormal)
-}
-}
+data(exampleTumourNormal, package = "mesa")
+
+# Retrieve the column names of the sample metadata
+colnames(exampleTumourNormal)
+
 }
 \seealso{
-qsea::getSampleTable, qsea::getSampleNames
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
+\code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}}
 }

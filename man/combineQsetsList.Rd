@@ -13,40 +13,51 @@ combineQsetsList(
 )
 }
 \arguments{
-\item{qseaSets}{\code{list}. A list of qseaSet objects, or character strings
-giving paths to \code{.rds} files containing qseaSet objects.}
+\item{qseaSets}{\code{list}
+List of \code{qseaSet} objects, or \code{character()} paths to \code{.rds} files
+containing \code{qseaSet} objects. \strong{Default:} none (must be supplied).}
 
-\item{firstQset}{\code{qseaSet} or \code{character(1)} (optional). If provided, this
-serves as the initial qseaSet to merge into. If a character string ending
-in \code{.rds}, it will be loaded via \code{\link[readr:read_rds]{readr::read_rds()}}.}
+\item{firstQset}{\code{qseaSet} or \code{character(1)}
+Optional initial \code{qseaSet} to merge into. If a \code{character(1)} ending in
+\code{.rds}, it is loaded via \code{\link[readr:read_rds]{readr::read_rds()}}.
+\strong{Default:} \code{NULL}.}
 
-\item{dropDuplicates}{\code{logical(1)}. If \code{TRUE} (default), drop samples with
-duplicated names across qseaSets. If \code{FALSE}, duplicates are renamed by
-appending \verb{_Dup}.}
+\item{dropDuplicates}{\code{logical(1)}
+If \code{TRUE}, drop samples with duplicated names across inputs. If \code{FALSE},
+duplicates are renamed by appending \code{"_Dup"}.
+\strong{Default:} \code{TRUE}.}
 
-\item{checkParams}{\code{logical(1)}. Whether to verify that global parameters are
-identical across qseaSets (default \code{TRUE}).}
+\item{checkParams}{\code{logical(1)}
+Verify that global parameters are identical across inputs.
+\strong{Default:} \code{TRUE}.}
 
-\item{regionsToKeep}{\code{GRanges} or coercible. If supplied, restricts each
-qseaSet to these genomic regions before combining (reduces memory usage).}
+\item{regionsToKeep}{\code{GRanges} or coercible
+If supplied, restrict each \code{qseaSet} to these genomic regions \emph{before}
+combining (saves memory). Accepts \code{GRanges} or a data frame with
+\code{seqnames}, \code{start}, \code{end}.
+\strong{Default:} \code{NULL} (keep all regions).}
 }
 \value{
-A single combined \code{qseaSet} object containing all samples.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{Combined samples} from all inputs (or from \code{firstQset} plus inputs).
+\item \strong{Duplicates} handled according to \code{dropDuplicates}.
+\item \strong{Regions} optionally prefiltered by \code{regionsToKeep} prior to merge.
+}
 }
 \description{
-Merge a list of qseaSet objects (or \code{.rds} files containing them) into a
-single qseaSet. This is useful when processing tumour/normal cohorts
-separately or across sequencing runs, then combining results into one
-container.
+Merge a list of \code{qseaSet} objects (or \code{.rds} files containing them) into a
+single \code{qseaSet}. Useful when cohorts were processed separately (e.g.,
+tumour/normal, multiple runs) and need to be combined into one container.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-qs1 <- exampleTumourNormal
-qs2 <- qs1
-qsea::setSampleNames(qs2) <- paste0(qsea::getSampleNames(qs2), "_rep2")
 
-combined <- combineQsetsList(list(qs1, qs2))
-combined
+# Split a cohort into Tumour and Normal, create a list with them, then combine back
+tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
+normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
+qsetList <- list(tumours, normals)
+combineQsetsList(qsetList)
 
 }
 \seealso{

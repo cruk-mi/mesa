@@ -2,34 +2,63 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{select.qseaSet}
 \alias{select.qseaSet}
-\title{Select/rename columns in a qseaSet sample table}
+\title{Select or rename columns in a qseaSet sample table}
 \usage{
 \method{select}{qseaSet}(.data, ...)
 }
 \arguments{
-\item{.data}{A \code{qseaSet}.}
+\item{.data}{\code{qseaSet}.
+A qseaSet object whose \code{sampleTable} columns will be selected or renamed.}
 
-\item{...}{Selection helpers passed to \code{\link[dplyr:select]{dplyr::select()}}.}
+\item{...}{Additional arguments passed to \code{\link[dplyr:select]{dplyr::select()}}, supports tidyselect helpers
+(e.g., \code{\link[dplyr:reexports]{dplyr::matches()}}, \code{\link[dplyr:reexports]{dplyr::starts_with()}}).
+Negative selection (\code{-col}) is supported, but \code{sample_name} and \code{group}
+cannot be removed.
+\strong{Default:} none.}
 }
 \value{
-The input \code{qseaSet} object with an updated \code{sampleTable}.
+A \code{qseaSet} with its \code{sampleTable} updated:
+\itemize{
+\item contains only selected/renamed columns,
+\item always includes \code{sample_name} and \code{group} (if available).
+}
 }
 \description{
 Extends \code{\link[dplyr:select]{dplyr::select()}} to keep or rename columns in a \code{qseaSet}'s
-\code{sampleTable}.
+\code{sampleTable}. This allows column subsetting, renaming, and use of
+tidyselect helpers while preserving key identifiers.
 }
 \details{
-This is a thin wrapper around \code{\link[=selectQset]{selectQset()}}, which preserves \code{sample_name}
-and \code{group} at the front of the table if present.
+This is a wrapper around \code{\link[=selectQset]{selectQset()}}.
+Essential columns \code{sample_name} and \code{group} are always preserved (and appear
+first if present).
 }
 \examples{
-\donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-  data(exampleTumourNormal, package="mesa")
-  exampleTumourNormal \%>\% select(sample_name, group, age)
-}
-}
+data(exampleTumourNormal, package = "mesa")
+
+# Keep only specific columns (sample_name and group always preserved)
+exampleTumourNormal \%>\%
+  dplyr::select(type, tumour) \%>\%
+  qsea::getSampleTable()
+
+# Select and rename a column
+exampleTumourNormal \%>\%
+  dplyr::select(age, tumour_new = tumour) \%>\%
+  qsea::getSampleTable()
+
+# Use tidyselect helpers
+exampleTumourNormal \%>\%
+  dplyr::select(matches("s")) \%>\%
+  qsea::getSampleTable()
+
+# Negative selection (except essential columns)
+exampleTumourNormal \%>\%
+  dplyr::select(-matches("s")) \%>\%
+  qsea::getSampleTable()
+
 }
 \seealso{
-\code{\link[=selectQset]{selectQset()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}
+\code{\link[=selectQset]{selectQset()}} for the underlying implementation,
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to view results,
+\code{\link[=mutate.qseaSet]{mutate.qseaSet()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}} for related dplyr verbs.
 }

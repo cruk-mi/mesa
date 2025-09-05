@@ -7,27 +7,41 @@
 \method{arrange}{qseaSet}(.data, ..., .by_group = FALSE)
 }
 \arguments{
-\item{.data}{A \code{qseaSet}.}
+\item{.data}{\code{qseaSet}.
+The qseaSet whose samples will be reordered.}
 
-\item{...}{Variables to arrange by (passed to \code{\link[dplyr:arrange]{dplyr::arrange()}}).}
+\item{...}{Expressions.
+Variables or helper functions passed to \code{\link[dplyr:arrange]{dplyr::arrange()}} to define the
+ordering.
+\strong{Default:} none (no reordering).}
 
-\item{.by_group}{Ignored; grouping is not used for \code{qseaSet}.}
+\item{.by_group}{\code{logical(1)}.
+Grouped arrangement is not implemented for \code{qseaSet}; this argument is ignored.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-The input \code{qseaSet} object with sample order updated.
+A \code{qseaSet} object with samples reordered.
+Both the \code{count_matrix} and the \code{sampleTable} are updated consistently.
 }
 \description{
 Extends \code{\link[dplyr:arrange]{dplyr::arrange()}} to reorder \strong{samples} of a \code{qseaSet} based on columns
 in its \code{sampleTable}.
 }
 \examples{
-\donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-  data(exampleTumourNormal, package="mesa")
-  exampleTumourNormal \%>\% arrange(age)
-}
-}
+data(exampleTumourNormal, package = "mesa")
+
+# Reorder samples by age
+exampleTumourNormal \%>\% arrange(age)
+
+# Reorder by tissue
+exampleTumourNormal \%>\% arrange(tissue)
+
+# Reorder by tissue (descending), then tumour type
+exampleTumourNormal \%>\% arrange(desc(tissue), tumour)
+
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=subsetQset]{subsetQset()}}
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
+\code{\link[=subsetQset]{subsetQset()}},
+\code{\link[=sort.qseaSet]{sort.qseaSet()}} (for natural sorting of sample names).
 }

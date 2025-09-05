@@ -18,59 +18,78 @@ fitQseaGLM(
 )
 }
 \arguments{
-\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object containing counts and sample metadata.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing counts and sample metadata.}
 
-\item{variable}{Character scalar. Column in the sample table used as the
-primary explanatory variable.}
+\item{variable}{\code{character(1)}
+Column name in the sample table used as the primary explanatory variable.
+\strong{Default:} \code{NULL} (must be provided unless \code{formula} is supplied).}
 
-\item{covariates}{Character vector of additional covariates (e.g. batch,
-patient ID).}
+\item{covariates}{\code{character()}
+Additional column names (e.g., batch, patient ID) to include as covariates.
+\strong{Default:} \code{NULL}.}
 
-\item{contrasts}{Data frame with columns \code{group1} and \code{group2}, specifying
-contrasts to compute.}
+\item{contrasts}{\code{data.frame} or \code{NULL}
+A data frame with columns \code{group1} and \code{group2} specifying contrasts to
+compute. If \code{NULL}, a fitted GLM with no contrasts added is returned.
+\strong{Default:} \code{NULL}.}
 
-\item{keepIndex}{Optional integer vector of row indices to retain; overrides
-filtering by \code{minReadCount}/\code{minNRPM}.}
+\item{keepIndex}{\code{integer()} or \code{NULL}
+Row indices (windows) to retain \strong{before} fitting; when supplied, this
+overrides filtering by \code{minReadCount} / \code{minNRPM}.
+\strong{Default:} \code{NULL}.}
 
-\item{minReadCount}{Minimum raw count required in at least one sample to
-retain a window.}
+\item{minReadCount}{\code{numeric(1)}
+Minimum raw count required in at least one sample to retain a window.
+\strong{Default:} \code{0}.}
 
-\item{minNRPM}{Minimum NRPM required in at least one sample to retain a window.}
+\item{minNRPM}{\code{numeric(1)}
+Minimum NRPM required in at least one sample to retain a window.
+\strong{Default:} \code{1}.}
 
-\item{checkPVals}{Logical. If \code{TRUE}, stop or warn if excessive proportions
-of p-values are exactly zero (indicating possible instability).}
+\item{checkPVals}{\code{logical(1)}
+If \code{TRUE}, stop or warn if an excessive proportion of p-values are exactly
+zero (possible instability).
+\strong{Default:} \code{TRUE}.}
 
-\item{formula}{Optional \code{formula} overriding \code{variable}/\code{covariates}.}
+\item{formula}{\code{formula} or \code{NULL}
+Optional model formula overriding \code{variable}/\code{covariates}.
+\strong{Default:} \code{NULL}.}
 
-\item{calcDispersionAll}{Logical. Whether to use samples that are not present
-in the contrasts to fit the initial generalised linear model, including them
-in the calculation of dispersion estimates. Setting this to be TRUE will mean
-that adding additional samples to the qseaSet will change the calculated DMRs,
-even if they are not being compared across.}
+\item{calcDispersionAll}{\code{logical(1)}
+If \code{TRUE}, samples not present in any specified contrast are still used to
+fit the initial GLM and dispersion estimates. Note this means adding samples
+to \code{qseaSet} can change DMRs even when they are not directly contrasted.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-A \code{qseaGLM} object with fitted model and contrasts.
+A \code{qseaGLM} object containing:
+\itemize{
+\item the fitted negative-binomial GLM;
+\item (optionally) one or more added contrasts (\code{group1} vs \code{group2});
+\item filtering metadata (based on \code{keepIndex}, \code{minReadCount}, \code{minNRPM});
+\item model specification (\code{variable}, \code{covariates}, or \code{formula}).
+}
 }
 \description{
 Fit a negative-binomial GLM using \code{\link[qsea:fitNBglm]{qsea::fitNBglm()}} on counts from a
 \link[qsea:qseaSet-class]{qsea::qseaSet}, and add one or more contrasts.
-This is the low-level function used by \code{\link[=calculateDMRs]{calculateDMRs()}}.
+This is the low-level worker used by \code{\link[=calculateDMRs]{calculateDMRs()}}.
 }
 \details{
 \itemize{
-\item Dispersion is estimated across all contrasts (or all samples, if
-\code{calcDispersionAll = TRUE}).
-\item Contrasts are added sequentially to the fitted GLM using
-\code{\link[qsea:addContrast]{qsea::addContrast()}}.
-\item By default, beta-normalised counts are used as the outcome.
+\item Dispersion is estimated across the windows retained after filtering.
+\item When \code{calcDispersionAll = TRUE}, all samples contribute to dispersion
+estimation even if not part of any contrast.
+\item Contrasts are added sequentially with \code{\link[qsea:addContrast]{qsea::addContrast()}}.
+\item By default, beta-normalised counts are used as the outcome (as in qsea).
 }
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
 qs <- exampleTumourNormal
 contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
-glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
-glmfit
+fitQseaGLM(qs, variable = "type", contrasts = contr)
 
 }
 \seealso{

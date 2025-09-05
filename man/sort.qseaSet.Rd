@@ -7,27 +7,37 @@
 \method{sort}{qseaSet}(x, decreasing = FALSE, ...)
 }
 \arguments{
-\item{x}{A \code{qseaSet} to reorder.}
+\item{x}{\code{qseaSet}.
+A qseaSet object to reorder.}
 
-\item{decreasing}{Logical; reverse the order.}
+\item{decreasing}{\code{logical(1)}.
+Whether to reverse the order.
+\strong{Default:} \code{FALSE}.}
 
-\item{...}{Passed to \code{\link[gtools:mixedsort]{gtools::mixedsort()}}.}
+\item{...}{Additional arguments passed on to \code{\link[gtools:mixedsort]{gtools::mixedsort()}}.
+\strong{Default:} none.}
 }
 \value{
-The input \code{qseaSet} object with samples reordered.
+A \code{qseaSet} object with reordered samples. The content of all slots
+(e.g., \code{count_matrix}, \code{sampleTable}) is updated consistently.
 }
 \description{
-Extends \code{\link[base:sort]{base::sort()}} to reorder the \strong{samples} of a \code{qseaSet} using
-\code{\link[gtools:mixedsort]{gtools::mixedsort()}} so that numeric parts sort naturally (e.g., \code{"2"} before \code{"10"}).
+Extends \code{\link[base:sort]{base::sort()}} to reorder the \strong{samples} of a \code{qseaSet}
+using \code{\link[gtools:mixedsort]{gtools::mixedsort()}} so that numeric parts sort naturally
+(e.g., \code{"2"} comes before \code{"10"}).
 }
 \examples{
-\donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-  data(exampleTumourNormal, package="mesa")
-  sort(exampleTumourNormal, decreasing = TRUE)
-}
-}
+data(exampleTumourNormal, package = "mesa")
+
+# Sort samples in natural (mixed) order
+exampleTumourNormal \%>\% sort()
+
+# Sort in reverse order
+exampleTumourNormal \%>\% sort(decreasing = TRUE)
+
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}}, \code{\link[=subsetQset]{subsetQset()}}
+\code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\code{\link[=subsetQset]{subsetQset()}},
+\code{\link[gtools:mixedsort]{gtools::mixedsort()}}
 }

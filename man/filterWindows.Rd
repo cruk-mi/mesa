@@ -7,26 +7,37 @@
 filterWindows(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet}.}
+\item{qseaSet}{\code{qseaSet}.
+The qseaSet object whose regions (windows) will be filtered.}
 
-\item{...}{Predicates passed to \code{\link[dplyr:filter]{dplyr::filter()}} (applied to the regions).}
+\item{...}{Expressions.
+Predicates passed to \code{\link[dplyr:filter]{dplyr::filter()}} and evaluated on the regions data frame.
+\strong{Default:} none (no filtering).}
 }
 \value{
-The input \code{qseaSet} object with regions filtered.
+A \code{qseaSet} object with only regions matching the filter conditions.
+Both the \code{count_matrix} and \verb{@regions} slot are updated consistently.
 }
 \description{
 Filters the \strong{regions} of a \code{qseaSet} using \code{\link[dplyr:filter]{dplyr::filter()}} predicates
-applied to its regions as a data frame, then subsets the object accordingly.
+applied to its regions (as a data frame), then subsets the object accordingly.
 }
 \examples{
-\donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-  data(exampleTumourNormal, package="mesa")
-  # keep short windows as a toy example
-  filterWindows(exampleTumourNormal, width < 500)
-}
-}
+data(exampleTumourNormal, package = "mesa")
+
+# Keep regions starting before position 25,020,000
+exampleTumourNormal \%>\% filterWindows(start <= 25020000)
+
+# Keep regions with CpG density > 10
+exampleTumourNormal \%>\% filterWindows(CpG_density > 10)
+
+# Combine multiple conditions
+exampleTumourNormal \%>\%
+  filterWindows(seqnames == "chr7", CpG_density > 5)
+
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}}
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
+\code{\link[=filter.qseaSet]{filter.qseaSet()}} (for filtering samples instead of regions),
+\code{\link[dplyr:filter]{dplyr::filter()}}
 }

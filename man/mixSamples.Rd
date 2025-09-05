@@ -17,59 +17,100 @@ mixSamples(
 )
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}.
+The input object containing the two source samples.}
 
-\item{sample1}{\code{character(1)} First sample name, contributing
-\code{proportion * nReadsTotal} reads.}
+\item{sample1}{\code{character(1)}.
+First sample name, contributing \code{proportion * nReadsTotal} reads.}
 
-\item{sample2}{\code{character(1)} Second sample name, contributing the remainder
-of reads.}
+\item{sample2}{\code{character(1)}.
+Second sample name, contributing the remainder of reads.}
 
-\item{nReadsTotal}{\code{integer(1)} Total number of reads to simulate in the
-new mixed sample.}
+\item{nReadsTotal}{\code{integer(1)}.
+Total number of reads to simulate in the new mixed sample.
+Must be \verb{>= 0}.}
 
-\item{proportion}{\code{numeric(1)} Proportion of reads taken from \code{sample1}.
-Must be between 0 and 1. The remaining reads are taken from \code{sample2}.}
+\item{proportion}{\code{numeric(1)}.
+Proportion of reads taken from \code{sample1}. Must be in \verb{[0, 1]}.
+The remaining \code{1 - proportion} reads are taken from \code{sample2}.}
 
-\item{newName}{\code{character(1)} Name for the new synthetic sample. If \code{NULL},
-a name is generated automatically.}
+\item{newName}{\code{character(1)} or \code{NULL}.
+Name for the new synthetic sample.
+\strong{Default:} \code{NULL} (a name is generated automatically, e.g.,
+\code{"Mix_<sample1>_<sample2>_<proportion>"}).}
 
-\item{groupName}{\code{character(1)} Group name for the new sample in the
-\code{sampleTable}. Defaults to \code{newName}.}
+\item{groupName}{\code{character(1)} or \code{NULL}.
+Group name for the new sample recorded in the \code{sampleTable}.
+\strong{Default:} \code{NULL} (uses \code{newName}).}
 
-\item{onlyNew}{\code{logical(1)} If \code{TRUE}, return only the synthetic sample.
-If \code{FALSE} (default), return the original \code{qseaSet} combined with the new
-sample.}
+\item{onlyNew}{\code{logical(1)}.
+If \code{TRUE}, return only the synthetic sample. If \code{FALSE}, return the
+original \code{qseaSet} with the new sample appended.
+\strong{Default:} \code{FALSE}.}
 
-\item{renormalise}{\code{logical(1)} Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the
-result. For efficiency, set to \code{FALSE} if repeatedly mixing, and run
-normalisation once at the end.}
+\item{renormalise}{\code{logical(1)}.
+Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. For efficiency, set
+to \code{FALSE} when creating multiple mixtures and run normalisation once at
+the end.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A \code{qseaSet} containing the new synthetic sample. By default, the
-original samples are preserved as well.
+A \code{qseaSet} containing the new synthetic sample:
+\itemize{
+\item If \code{onlyNew = TRUE}, a \code{qseaSet} with \strong{one} (mixed) sample.
+\item If \code{onlyNew = FALSE}, the input \code{qseaSet} \strong{plus} the mixed sample.
+The \code{sampleTable}, counts, and relevant slots are updated consistently.
+}
 }
 \description{
 Create a new synthetic sample in a \code{qseaSet} by mixing reads from two
-existing samples in user-specified proportions. This can be useful for
-benchmarking, downsampling experiments, or simulating mixtures of tumour
-and normal samples.
+existing samples in user-specified proportions. Useful for benchmarking,
+downsampling experiments, or simulating tumour–normal mixtures.
+}
+\details{
+\itemize{
+\item Input validation ensures \code{sample1}/\code{sample2} exist, \verb{proportion ∈ [0,1]},
+and \code{nReadsTotal} is non-negative.
+\item The mixing strategy (e.g., proportional allocation vs sampling) follows
+the package’s implementation; set \code{renormalise = TRUE} to recompute
+offsets/enrichment after adding the new sample if required by your workflow.
+}
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
 
-## Mix two tumour replicates 70/30, keeping original samples
-qs_mix <- mixSamples(qs, "LUAD_1", "LUAD_2", nReadsTotal = 1e5,
-                     proportion = 0.7, newName = "LUAD_mix")
 
-## Return only the synthetic mixture sample
-qs_mix_only <- mixSamples(qs, "LUAD_1", "LUAD_2", nReadsTotal = 5e4,
-                          proportion = 0.5, onlyNew = TRUE)
+# Mix two samples 50/50 into ~100k total fragments; append to the qseaSet
+mixed <- exampleTumourNormal \%>\% 
+           mixSamples("Colon1_T", 
+                      "Colon1_N", 
+                       nReadsTotal = 100000, 
+                       proportion = 0.5, 
+                       renormalise = FALSE)
+                           
+# Only a few reads are included in this small subset of windows:
+mixed \%>\%
+ getCountTable() \%>\% 
+ pull(Mix_Colon1_T_Colon1_N_0.5) \%>\% 
+ sum()
+
+
+# Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group
+exampleTumourNormal \%>\%
+  mixSamples("Colon1_T", "Colon1_N",
+             nReadsTotal = 50000,
+             proportion  = 0.8,
+             newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
+             groupName   = "Synthetic",
+             onlyNew     = TRUE ,
+             renormalise = FALSE) \%>\%
+  getCountTable() \%>\% 
+  dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\% 
+  sum()
 
 }
 \seealso{
-\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}
+\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}, \code{\link[=addNormalisation]{addNormalisation()}}
 
 Other sample-simulation: 
 \code{\link{mixThreeQsetSamples}()}

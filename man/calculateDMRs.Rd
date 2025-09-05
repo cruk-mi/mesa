@@ -23,65 +23,126 @@ calculateDMRs(
 )
 }
 \arguments{
-\item{qseaSet}{A \link[qsea:qseaSet-class]{qsea::qseaSet} object containing counts and sample metadata.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing counts and sample metadata.}
 
-\item{variable}{Character scalar. Column in the sample table used as the
-primary explanatory variable.}
+\item{variable}{\code{character(1)} or \code{NULL}.
+Sample-table column used as the primary explanatory variable for contrasts.
+\strong{Default:} \code{NULL} (must be supplied unless \code{formula} is provided).}
 
-\item{covariates}{Character vector of additional covariates (e.g. batch,
-patient ID).}
+\item{covariates}{\code{character()} or \code{NULL}.
+Additional covariate column names (e.g., batch, patient).
+\strong{Default:} \code{NULL}.}
 
-\item{contrasts}{Data frame or string specifying contrasts. If \code{"All"},
-generate all pairwise contrasts via \code{\link[=makeAllContrasts]{makeAllContrasts()}}. Strings of the
-form \code{"A_vs_B"}, \code{"All_vs_X"}, or \code{"X_vs_All"} are also supported.}
+\item{contrasts}{\code{data.frame}, \code{character(1)}, or \code{NULL}.
+Contrast specification. If a data frame, must contain columns \code{group1} and
+\code{group2}. If a string, supports:
+\itemize{
+\item \code{"A_vs_B"} — a single explicit contrast,
+\item \code{"All"} / \code{"all"} — all pairwise contrasts among levels of \code{variable},
+\item \code{"All_vs_X"} — each level vs \code{X},
+\item \code{"X_vs_All"} — \code{X} vs each other level,
+\item \code{"first"} — only the first possible contrast (based on factor order).
+\strong{Default:} \code{NULL} (fit the GLM without adding contrasts).
+}}
 
-\item{minReadCount}{Minimum raw count required in at least one sample to
-retain a window.}
+\item{minReadCount}{\code{numeric(1)}.
+Minimum raw count required in at least one sample to keep a window.
+\strong{Default:} \code{0}.}
 
-\item{minNRPM}{Minimum NRPM required in at least one sample to retain a window.}
+\item{minNRPM}{\code{numeric(1)}.
+Minimum NRPM required in at least one sample to keep a window.
+\strong{Default:} \code{1}.}
 
-\item{checkPVals}{Logical. If \code{TRUE}, stop or warn if excessive proportions
-of p-values are exactly zero (indicating possible instability).}
+\item{checkPVals}{\code{logical(1)}.
+If \code{TRUE}, stop/warn when an excessive proportion of p-values are exactly
+zero (instability check).
+\strong{Default:} \code{TRUE}.}
 
-\item{FDRthres}{Numeric(1). FDR threshold for selecting significant regions.}
+\item{FDRthres}{\code{numeric(1)}.
+False discovery rate threshold for calling significance.
+\strong{Default:} \code{0.05}.}
 
-\item{keepPvals}{Logical. If \code{TRUE}, include raw (unadjusted) p-values.}
+\item{keepPvals}{\code{logical(1)}.
+If \code{TRUE}, include raw (unadjusted) p-values in the output.
+\strong{Default:} \code{FALSE}.}
 
-\item{formula}{Optional \code{formula} overriding \code{variable}/\code{covariates}.}
+\item{formula}{\code{formula} or \code{NULL}.
+Optional model formula overriding \code{variable}/\code{covariates}.
+\strong{Default:} \code{NULL}.}
 
-\item{keepContrastMeans}{Logical. If \code{FALSE}, remove contrast mean columns
-from the output.}
+\item{keepContrastMeans}{\code{logical(1)}.
+If \code{FALSE}, drop contrast mean columns from the output.
+\strong{Default:} \code{TRUE}.}
 
-\item{keepData}{Logical. If \code{TRUE}, include per-sample data columns.}
+\item{keepData}{\code{logical(1)}.
+If \code{TRUE}, include per-sample data columns for significant windows.
+\strong{Default:} \code{FALSE}.}
 
-\item{keepGroupMeans}{Logical. If \code{TRUE}, include group mean columns.}
+\item{keepGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, include group mean columns (based on \code{variable}).
+\strong{Default:} \code{FALSE}.}
 
-\item{direction}{Character: \code{"up"}, \code{"down"}, or \code{"both"}. Passed to
-\code{\link[qsea:isSignificant]{qsea::isSignificant()}}.}
+\item{direction}{\code{character(1)}.
+Direction for calling significance, passed to \code{\link[qsea:isSignificant]{qsea::isSignificant()}}:
+one of \code{"up"}, \code{"down"}, or \code{"both"}.
+\strong{Default:} \code{"both"}.}
 
-\item{calcDispersionAll}{Logical. Whether to use samples that are not present
-in the contrasts to fit the initial generalised linear model, including them
-in the calculation of dispersion estimates. Setting this to be TRUE will mean
-that adding additional samples to the qseaSet will change the calculated DMRs,
-even if they are not being compared across.}
+\item{calcDispersionAll}{\code{logical(1)}.
+If \code{TRUE}, samples not present in any contrast still contribute to the
+initial GLM fit/dispersion estimation (so adding samples can change DMRs).
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-A tibble with one row per significant region, containing DMR
-statistics, adjusted p-values, and delta-beta values for each contrast.
+A tibble with one row per \strong{significant} region/window containing:
+\itemize{
+\item per-contrast statistics (e.g., log2FC, deltaBeta, test statistic),
+\item multiple-testing results (FDR; optionally raw p-values if \code{keepPvals}),
+\item optional group means (if \code{keepGroupMeans = TRUE}),
+\item optional per-sample columns (if \code{keepData = TRUE}),
+\item metadata columns for genomic coordinates and window attributes.
+}
 }
 \description{
-High-level wrapper that calls \code{\link[=fitQseaGLM]{fitQseaGLM()}} and \code{\link[=getDMRsData]{getDMRsData()}} to produce a
-DMR results table directly.
+High-level wrapper that calls \code{\link[=fitQseaGLM]{fitQseaGLM()}} and \code{\link[=getDMRsData]{getDMRsData()}} to fit a
+negative-binomial GLM and extract a DMR results table in one go.
+}
+\details{
+Contrast strings are parsed as follows:
+\itemize{
+\item \code{"A_vs_B"} creates a single contrast \emph{A vs B};
+\item \code{"All"}/\code{"all"} expands to all pairwise contrasts among levels of \code{variable}
+(via \code{\link[=makeAllContrasts]{makeAllContrasts()}});
+\item \code{"All_vs_X"} creates \emph{each level vs X};
+\item \code{"X_vs_All"} creates \emph{X vs each other level};
+\item \code{"first"} constructs only the first possible pair (based on factor order).
+Internally, this function:
+}
+\enumerate{
+\item filters windows by \code{minReadCount}/\code{minNRPM} (unless overridden inside the
+GLM wrapper), 2) fits a NB-GLM with \code{\link[=fitQseaGLM]{fitQseaGLM()}}, 3) extracts a wide
+DMR table with \code{\link[=getDMRsData]{getDMRsData()}}, and 4) prunes contrast means if
+\code{keepContrastMeans = FALSE}.
+}
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-# One contrast
-calculateDMRs(qs, variable = "type", contrasts = "LUAD_vs_NormalLung")
 
-# All pairwise contrasts
-dmrTab <- calculateDMRs(qs, variable = "type", contrasts = "All")
-head(dmrTab)
+# A single explicit contrast
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung")
+
+# All pairwise contrasts among levels of 'type'
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all")
+
+# Tighter FDR threshold
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all", FDRthres = 1e-4)
+
+# Return all per-sample columns for the first available contrast on 'tumour'
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first", keepData = TRUE)
 
 }
 \seealso{
