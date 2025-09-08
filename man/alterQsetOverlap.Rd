@@ -44,12 +44,12 @@ counts are subset accordingly.
 data(exampleTumourNormal, package = "mesa")
 
 # Data frame input
-rgns <- data.frame(seqnames = 7L, start = 25_002_001L, end = 25_017_900L)
+rgns <- data.frame(seqnames = 7L, start = 25002001L, end = 25017900L)
 filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
 filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
 
 # GRanges input
-gr <- GenomicRanges::GRanges("chr7", IRanges::IRanges(25_002_001L, 25_017_900L))
+gr <- GenomicRanges::GRanges("chr7", IRanges::IRanges(25002001L, 25017900L))
 filterByOverlaps(exampleTumourNormal, regionsToOverlap = gr)
 filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = gr)
 

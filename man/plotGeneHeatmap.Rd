@@ -26,66 +26,128 @@ plotGeneHeatmap(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and counts/betas.}
 
-\item{gene}{character(1) HGNC/MGI symbol or Ensembl gene ID.}
+\item{gene}{\code{character(1)}.
+Gene identifier to plot (HGNC symbol like \code{"HOXA9"} or Ensembl ID like \code{"ENSG000..."}).}
 
-\item{normMethod}{character(1) \code{"nrpm"} or \code{"beta"}.}
+\item{normMethod}{\code{character(1)}.
+Which measure to plot. One of \code{"beta"} or \code{"nrpm"}.
+\strong{Default:} \code{"beta"}.}
 
-\item{useGroupMeans}{logical collapse replicates by \code{group}.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average samples by the \code{group} column in the sample table (combine replicates).
+\strong{Default:} \code{FALSE}.}
 
-\item{sampleAnnotation}{tidyselect-style sample-table columns to annotate.}
+\item{sampleAnnotation}{tidyselect specification or \code{character()} or \code{NULL}.
+Columns from the sample table to display as column annotations
+(e.g., \code{c("tumour","tissue")} or bare helpers \verb{tumour, tissue}).
+\strong{Default:} \code{NULL}.}
 
-\item{minDensity}{numeric minimum CpG density.}
+\item{minDensity}{\code{numeric(1)}.
+Minimum \code{CpG_density} required to keep a window.
+\strong{Default:} \code{0}.}
 
-\item{minEnrichment}{integer minimum reads for non-NA beta.}
+\item{minEnrichment}{\code{numeric(1)}.
+For \code{"beta"}, values with enrichment \verb{< minEnrichment} are set to \code{NA}.
+\strong{Default:} \code{3}.}
 
-\item{maxScale}{numeric upper colour limit (ignored for \code{"beta"}).}
+\item{maxScale}{\code{numeric(1)}.
+Upper limit of the colour scale (used for \code{"nrpm"}; not applied to \code{"beta"}).
+\strong{Default:} \code{1}.}
 
-\item{clusterNum}{integer optional number of column clusters.}
+\item{clusterNum}{\code{integer(1)} or \code{NULL}.
+If set, cut the \strong{column} dendrogram into this many clusters and display cluster labels.
+\strong{Default:} \code{NULL}.}
 
-\item{annotationColors}{optional list of colours for annotations.}
+\item{annotationColors}{\code{list} or \code{NA}.
+Optional named colour maps for annotations, e.g.
+\code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
 
-\item{upstreamDist, downstreamDist}{integer(1) bp to extend around gene.}
+\item{upstreamDist}{\code{integer(1)}.
+Number of base pairs upstream of the gene to include.
+\strong{Default:} \code{3000}.}
 
-\item{scaleRows}{logical whether to z-scale rows (not used here; reserved).}
+\item{scaleRows}{\code{logical(1)}.
+Whether to z-score scale rows (windows) before plotting.
+\strong{Default:} \code{FALSE}.}
 
-\item{clusterCols}{logical cluster columns.}
+\item{clusterCols}{\code{logical(1)}.
+Whether to cluster columns (samples).
+\strong{Default:} \code{TRUE}.}
 
-\item{mart}{optional biomaRt Mart; if \code{NULL}, a reasonable default is chosen
-for human (hg38/hg19) otherwise \code{idType} must be provided.}
+\item{mart}{\code{biomaRt::Mart} or \code{NULL}.
+Ensembl mart used to resolve gene coordinates. If \code{NULL}, attempts to use a mart
+stored on the \code{qseaSet} (see \code{\link[=setMart]{setMart()}}); otherwise falls back to a default for
+GRCh38/hg38 or hg19.
+\strong{Default:} \code{NULL}.}
 
-\item{showSampleNames}{logical show sample names (default \code{TRUE} if ≤ 50).}
+\item{showSampleNames}{\code{logical(1)} or \code{NULL}.
+If \code{NULL}, names are shown when there are fewer than 50 samples; set \code{TRUE}/\code{FALSE} to force.
+\strong{Default:} \code{NULL}.}
 
-\item{idType}{character(1) biomaRt attribute for \code{gene} identifiers (e.g.
-\code{"ensembl_gene_id"}, \code{"hgnc_symbol"}, \code{"mgi_symbol"}).}
+\item{downstreamDist}{\code{integer(1)}.
+Number of base pairs downstream of the gene to include.
+\strong{Default:} \code{1000}.}
 
-\item{...}{passed to \code{ComplexHeatmap::Heatmap}.}
+\item{idType}{\code{character(1)} or \code{NULL}.
+Column in the mart to match \code{gene} against (needed for non-human/mouse setups).
+\strong{Default:} \code{NULL}.}
+
+\item{...}{Additional arguments forwarded to \strong{ComplexHeatmap} constructors.}
 }
 \value{
-Invisibly returns the numeric matrix used for plotting; the heatmap
-is drawn to the graphics device.
+Draws a heatmap on the active device and (invisibly) returns the underlying
+\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition
+with \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
 }
 \description{
-Retrieve a gene locus via biomaRt and plot window-level values (NRPM/beta)
-across upstream/gene body/downstream regions with sample annotations.
+Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
+\strong{ComplexHeatmap}. The gene can be given as a HGNC symbol or Ensembl ID.
+}
+\details{
+The function resolves the gene to genomic coordinates (using \code{mart}, or a mart
+stored on the object, or a built-in default for human builds), expands the
+interval by \code{upstreamDist}/\code{downstreamDist}, filters windows by overlap and
+\code{minDensity}, then draws a heatmap of \code{"beta"} or \code{"nrpm"}. For \code{"beta"}, values
+below \code{minEnrichment} are set to \code{NA}. If \code{useGroupMeans = TRUE}, samples are
+aggregated by \code{group} prior to plotting. Column annotations can be added via
+\code{sampleAnnotation}; colours can be customized via \code{annotationColors}.
 }
 \examples{
 \donttest{
-# Plot around a gene symbol (human dataset)
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-plotGeneHeatmap(qs, gene = "TP53", normMethod = "beta",
-                upstreamDist = 3000, downstreamDist = 1000,
-                sampleAnnotation = group, clusterCols = TRUE)
+
+# Basic gene heatmap (beta) with defaults
+exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9")
+
+# Add sample annotations (tidyselect bare names) and cluster columns into 2 groups
+exampleTumourNormal \%>\%
+  plotGeneHeatmap("HOXA9",
+                  sampleAnnotation = c(tumour, tissue),
+                  clusterNum = 2)
+
+# Custom colours and wider flanks
+exampleTumourNormal \%>\%
+  plotGeneHeatmap("HOXA9",
+                  sampleAnnotation  = tumour,
+                  annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+                  upstreamDist = 1000,
+                  downstreamDist = 2000)
+
+# Mouse example with explicit Ensembl mart (requires internet)
+# data(exampleMouse, package = "mesa")
+# exampleMouse \%>\% plotGeneHeatmap(
+#   gene = "Fbxl18",
+#   mart = biomaRt::useMart('ensembl', dataset = 'mmusculus_gene_ensembl',
+#                           host = 'https://jul2023.archive.ensembl.org')
+# )
 }
 
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}
-
-Other heatmaps: 
-\code{\link{plotCorrelationMatrix}()},
-\code{\link{plotRegionsHeatmap}()}
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getSampleTable]{getSampleTable()}}, \code{\link[=setMart]{setMart()}},
+\code{\link[biomaRt:useMart]{biomaRt::useMart()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
 }
-\concept{heatmaps}

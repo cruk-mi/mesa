@@ -15,45 +15,72 @@ makeHeatmapAnnotations(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet.}
+\item{qseaSet}{\code{qseaSet}.
+The input object from which sample metadata are taken.}
 
-\item{sampleAnnotation}{tidyselect-style columns from the sample table
-to annotate (unquoted).}
+\item{sampleAnnotation}{tidyselect specification or \code{character()} or \code{NULL}.
+Columns from the sample table to annotate (unquoted helpers like \code{group}, \code{tumour},
+or a character vector of names).
+\strong{Default:} \code{NULL}.}
 
-\item{windowAnnotationDf}{data.frame of row annotations as returned by
-\code{\link[=getWindowAnnotation]{getWindowAnnotation()}}.}
+\item{windowAnnotationDf}{\code{data.frame} or \code{NULL}.
+Row annotations aligned to windows (e.g., output of \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}).
+\strong{Default:} \code{NULL}.}
 
-\item{useGroupMeans}{logical whether to annotate groups instead of samples.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, annotate groups instead of individual samples (using the \code{group}
+column of the sample table).
+\strong{Default:} \code{FALSE}.}
 
-\item{specifiedAnnotationColors}{optional \code{list} mapping levels → colours to
-override the auto-generated palette.}
+\item{specifiedAnnotationColors}{\code{list} or \code{NA}.
+Optional mapping of levels → colours to override auto-generated palettes,
+e.g. \code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
 
-\item{windowOrientation}{character(1) orientation for window annotation
-(\code{"row"} or \code{"column"}).}
+\item{windowOrientation}{\code{character(1)}.
+Orientation for window (row) annotations: \code{"row"} or \code{"column"}.
+\strong{Default:} \code{"row"}.}
 
-\item{sampleOrientation}{character(1) orientation for sample annotation
-(\code{"column"} or \code{"row"}).}
+\item{sampleOrientation}{\code{character(1)}.
+Orientation for sample (column) annotations: \code{"column"} or \code{"row"}.
+\strong{Default:} \code{"column"}.}
 }
 \value{
 \verb{list(sample = <HeatmapAnnotation|NULL>, window = <HeatmapAnnotation|NULL>)}
 ready to pass to \code{ComplexHeatmap::Heatmap(...)}.
 }
 \description{
-Helper to generate \code{HeatmapAnnotation}s for samples and windows with
-automatic colour handling for categorical and numeric variables.
+Helper to generate \code{ComplexHeatmap::HeatmapAnnotation()} objects for samples
+and windows with automatic colour handling for categorical and numeric variables.
+}
+\details{
+When \code{specifiedAnnotationColors} is not supplied, discrete variables receive a
+qualitative palette and numeric variables are mapped to a continuous gradient.
+The function respects \code{useGroupMeans} to annotate either per-sample or per-group.
 }
 \examples{
 \donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-wa <- data.frame()  # no window annotations
-anns <- makeHeatmapAnnotations(qs, sampleAnnotation = group,
-                               windowAnnotationDf = wa, useGroupMeans = FALSE)
-str(anns)
-}
 
+# Build window annotations and immediately feed them into makeHeatmapAnnotations()
+exampleTumourNormal \%>\%
+  filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
+  getDataTable(normMethod = "nrpm") \%>\%
+  dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
+  getWindowAnnotation(
+    regions = qsea::getRegions(exampleTumourNormal)[1:50],
+    windowAnnotation = CpG_density
+  ) \%>\%
+  makeHeatmapAnnotations(
+    qseaSet = exampleTumourNormal,
+    sampleAnnotation = group,
+    windowAnnotationDf = .,
+    useGroupMeans = FALSE
+  ) 
+}
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}},
+\code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
 }
 \keyword{internal}

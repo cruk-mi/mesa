@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotRegionsHeatmap}
 \alias{plotRegionsHeatmap}
-\title{Heatmap of signal across genomic regions}
+\title{Heatmap of signal across selected genomic regions}
 \usage{
 plotRegionsHeatmap(
   qseaSet,
@@ -27,77 +27,122 @@ plotRegionsHeatmap(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and counts/betas.}
 
-\item{regionsToOverlap}{GenomicRanges::GRanges or data frame coercible to GRanges;
-if \code{NULL}, uses all regions in \code{qseaSet}.}
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
+If provided, only windows overlapping these regions are plotted; otherwise all windows are considered.
+\strong{Default:} \code{NULL}.}
 
-\item{normMethod}{character(1) normalisation method to plot, typically
-\code{"nrpm"} or \code{"beta"}. Defaults to \code{"beta"}.}
+\item{normMethod}{\code{character(1)}.
+Which measure to plot, \code{"beta"} or \code{"nrpm"}.
+\strong{Default:} \code{"beta"}.}
 
-\item{sampleAnnotation}{tidyselect-style columns from the sample table to show
-as annotations (use unquoted names, e.g. \code{group}).}
+\item{sampleAnnotation}{\code{character()} or \code{NULL}.
+Names of columns from the sample table to display as column annotations (e.g., \code{c("tumour","tissue")}).
+\strong{Default:} \code{NULL}.}
 
-\item{windowAnnotation}{tidyselect-style columns from \code{qseaSet} regions or
-\code{regionsToOverlap} to show as row annotations (unquoted).}
+\item{windowAnnotation}{\code{character()} or \code{NULL}.
+Names of columns from region metadata (from the \code{qseaSet} regions or \code{regionsToOverlap}) to display as row annotations (e.g., \code{c("CpG_density")}).
+\strong{Default:} \code{NULL}.}
 
-\item{annotationColors}{optional \code{list} of colour mappings for annotation
-variables; if omitted, colours are generated.}
+\item{annotationColors}{\code{list} or \code{NA}.
+Optional named colour maps for annotations, e.g. \code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
 
-\item{useGroupMeans}{logical(1) whether to average replicates by the \code{group}
-column of the sample table (i.e. combine replicates)}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average samples by the \code{group} column in the sample table (combine replicates).
+\strong{Default:} \code{FALSE}.}
 
-\item{clusterRows, clusterCols}{logical whether to cluster rows/columns.}
+\item{clusterRows}{\code{logical(1)}.
+Whether to cluster rows (windows).
+\strong{Default:} \code{FALSE}.}
 
-\item{minEnrichment}{integer(1) minimum reads for non-NA beta (qsea rule).}
+\item{clusterCols}{\code{logical(1)}.
+Whether to cluster columns (samples).
+\strong{Default:} \code{TRUE}.}
 
-\item{maxScale}{numeric(1) upper bound of colour scale (ignored for \code{"beta"}).}
+\item{minEnrichment}{\code{numeric(1)}.
+For \code{"beta"}, values with enrichment \verb{< minEnrichment} are set to \code{NA}.
+\strong{Default:} \code{3}.}
 
-\item{clusterNum}{integer(1) optional number of column clusters (if
-\code{clusterCols = TRUE}) to break the column dendrogram into.}
+\item{maxScale}{\code{numeric(1)}.
+Upper limit of the colour scale (used for \code{"nrpm"}; not applied to \code{"beta"}).
+\strong{Default:} \code{5}.}
 
-\item{clip}{numeric(1) clip values above this threshold before plotting.}
+\item{clusterNum}{\code{integer(1)} or \code{NULL}.
+If set, cut the \strong{column} dendrogram into this many clusters and display cluster labels.
+\strong{Default:} \code{NULL}.}
 
-\item{minDensity}{numeric(1) minimum CpG density for windows to be kept.}
+\item{clip}{\code{numeric(1)}.
+Cap values above this threshold before plotting (applies to \code{"nrpm"}, ignored for \code{"beta"}).
+\strong{Default:} \code{1e9}.}
 
-\item{annotationPosition}{character(1) legend side (\code{"right"}, \code{"bottom"}).}
+\item{minDensity}{\code{numeric(1)}.
+Minimum \code{CpG_density} required to keep a window.
+\strong{Default:} \code{0}.}
 
-\item{title}{optional character(1) column title.}
+\item{annotationPosition}{\code{character(1)}.
+Where to place column annotations (e.g., \code{"right"} or \code{"bottom"}).
+\strong{Default:} \code{"right"}.}
 
-\item{showSampleNames}{logical(1) whether to draw sample names (default
-\code{TRUE} if ≤ 50 samples).}
+\item{title}{\code{character(1)} or \code{NULL}.
+Optional plot title.
+\strong{Default:} \code{NULL}.}
 
-\item{clusterMethod}{character(1) clustering method passed to ComplexHeatmap.}
+\item{showSampleNames}{\code{logical(1)} or \code{NULL}.
+If \code{NULL}, names are shown when there are fewer than 50 samples; set \code{TRUE}/\code{FALSE} to force.
+\strong{Default:} \code{NULL}.}
 
-\item{...}{additional arguments passed to \code{ComplexHeatmap::Heatmap()}.}
+\item{clusterMethod}{\code{character(1)}.
+Clustering method for dendrograms (e.g., \code{"ward.D2"}).
+\strong{Default:} \code{"ward.D2"}.}
+
+\item{...}{Additional arguments forwarded to \strong{ComplexHeatmap} constructors.}
 }
 \value{
-Invisibly returns the numeric matrix used for plotting; the heatmap
-is drawn to the active graphics device.
+Draws a heatmap on the active device and (invisibly) returns the underlying
+\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition with
+\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
 }
 \description{
-Plot a heatmap of per-window values (NRPM/beta) for regions of interest,
-optionally adding sample and window annotations and clustering.
+Plot sample signal over a set of regions as a heatmap using \strong{ComplexHeatmap}.
+Regions are selected by overlap with \code{regionsToOverlap}, values are taken from
+the \code{qseaSet}, and optional annotations from the sample/region metadata can be added.
+}
+\details{
+Windows are filtered by overlap (if \code{regionsToOverlap} is given) and by \code{minDensity}.
+For \code{"beta"}, low-enrichment values are set to \code{NA} using \code{minEnrichment}. For \code{"nrpm"},
+\code{clip} and \code{maxScale} help stabilise colour scaling for outliers. If \code{useGroupMeans = TRUE},
+samples are aggregated by \code{group} before plotting.
 }
 \examples{
-\donttest{
-# Plot beta values for a small subset of windows with sample annotations
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-regs <- qsea::getRegions(qs)[1:400]   # small region subset for speed
-plotRegionsHeatmap(qs, regs, normMethod = "beta",
-                   sampleAnnotation = group,              # add sample group
-                   windowAnnotation = CpG_density,        # row-side CpG info
-                   clusterCols = TRUE, clusterRows = FALSE)
-}
+
+# Compute regions (DMRs) to plot
+DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+
+# Basic heatmap of beta values over DMRs
+exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
+
+# Cluster rows, add sample and window annotations
+exampleTumourNormal \%>\% 
+  plotRegionsHeatmap(DMRs, 
+                     clusterRows = TRUE, 
+                     sampleAnnotation = c(tumour, tissue))
+
+# Group means, 2 column clusters, and custom annotation colours
+exampleTumourNormal \%>\% 
+  plotRegionsHeatmap(regionsToOverlap = DMRs, 
+                   clusterRows = TRUE, 
+                   clusterNum = 2,
+                   sampleAnnotation = tumour,
+                   windowAnnotation = CpG_density,
+                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+                    )
 
 }
 \seealso{
-\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}},
-\code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}
-
-Other heatmaps: 
-\code{\link{plotCorrelationMatrix}()},
-\code{\link{plotGeneHeatmap}()}
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}},
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[=getSampleTable]{getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }
-\concept{heatmaps}

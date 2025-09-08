@@ -7,31 +7,58 @@
 plotDMRUpset(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...)
 }
 \arguments{
-\item{DMRtable}{data.frame as returned by \code{\link[=calculateDMRs]{calculateDMRs()}} (possibly filtered).}
+\item{DMRtable}{\code{data.frame}.
+Table as returned by \code{\link[=calculateDMRs]{calculateDMRs()}} (optionally pre-filtered).}
 
-\item{string}{optional regex to subset DMR columns (after stripping suffixes).}
+\item{string}{\code{character(1)} or \code{NULL}.
+Optional regular expression to subset the set/contrast names (applied after
+stripping suffixes).
+\strong{Default:} \code{NULL} (use all sets).}
 
-\item{removeVS}{logical remove \code{"_vs_"} and following text from column names.}
+\item{removeVS}{\code{logical(1)}.
+If \code{TRUE}, remove the \code{"_vs_"} substring and everything after it from set
+names (e.g., \code{"Tumour_vs_Normal"} → \code{"Tumour"}).
+\strong{Default:} \code{FALSE}.}
 
-\item{minAdjPval}{numeric adjusted P-value threshold for inclusion.}
+\item{minAdjPval}{\code{numeric(1)}.
+Adjusted P-value threshold; windows with \code{adjPval <= minAdjPval} are included
+in each set.
+\strong{Default:} \code{0.05}.}
 
-\item{...}{passed to \code{UpSetR::upset()}.}
+\item{...}{Additional arguments forwarded to \code{\link[UpSetR:upset]{UpSetR::upset()}}.}
 }
 \value{
-An UpSet plot (drawn), and the function returns the \code{UpSetR} object.
+Draws an UpSet plot on the active device and \strong{invisibly} returns the result
+from \code{\link[UpSetR:upset]{UpSetR::upset()}} (for further customization if needed).
 }
 \description{
-Visualise overlap of significant DMR sets across contrasts from a DMR table
-(columns \verb{*_adjPval}) using an UpSet plot.
+Visualise the overlap of significant DMR sets across contrasts (columns ending
+with \verb{*_adjPval}) using an UpSet plot.
+}
+\details{
+The function discovers DMR sets by locating columns that end with \code{"_adjPval"}.
+For each such column, a logical membership is formed at the chosen FDR cutoff
+(\code{minAdjPval}). Optionally, set names are simplified with \code{removeVS}, and then
+subset with \code{string} if provided. The resulting membership matrix is visualised
+with \strong{UpSetR}.
 }
 \examples{
 \donttest{
-# Suppose `dmr` is a DMR table from calculateDMRs()
-# plotDMRUpset(dmr, string = "LUAD|LUSC", minAdjPval = 0.05)
+data(exampleTumourNormal, package = "mesa")
+
+# Overlap of significant DMR sets across contrasts (default FDR 0.05)
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
+  plotDMRUpset()
+
+# Clean set names by dropping the '_vs_*' suffix
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
+  plotDMRUpset(removeVS = TRUE)
 }
 
 }
 \seealso{
-\code{\link[=calculateDMRs]{calculateDMRs()}}
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[UpSetR:upset]{UpSetR::upset()}}
 }
 \concept{dmr-plots}

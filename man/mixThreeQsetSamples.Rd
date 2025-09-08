@@ -81,55 +81,36 @@ on offsets/enrichment being recomputed.
 }
 }
 \examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-# Mix 50\% / 30\% / 20\% across three samples; append to qseaSet
-exampleTumourNormal \%>\%
-  mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
-                      nReadsTotal = 100000,
-                      proportion1 = 0.5, proportion2 = 0.3,
-                      newName = "Mix3_50_30_20",
-                      renormalise = FALSE) 
-
-# Return only the synthetic mixture (60\% / 20\% / 20\%), with custom group
-exampleTumourNormal \%>\%
-  mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
-                      nReadsTotal = 50000,
-                      proportion1 = 0.6, proportion2 = 0.2,
-                      onlyNew = TRUE, groupName = "Synthetic") \%>\%
-  qsea::getSampleTable()
-}
-
 data(exampleTumourNormal, package = "mesa")
 
 
-# Mix two samples 50/50 into ~100k total fragments; append to the qseaSet
-mixed <- exampleTumourNormal \%>\% 
-              mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
-                                   nReadsTotal = 100000,
-                                    proportion1 = 0.5, proportion2 = 0.3,
-                                    newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
-                                    renormalise = FALSE) 
-                           
-# Only a few reads are included in this small subset of windows:
-mixed \%>\%
+# Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
+exampleTumourNormal \%>\% 
+  mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
+                       nReadsTotal = 100000,
+                       proportion1 = 0.5, proportion2 = 0.3,
+                       newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
+                       renormalise = FALSE) \%>\%
+                       
+ # Only a few reads are included in this small subset of windows (78):
  getCountTable() \%>\% 
  pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) \%>\% 
  sum()
 
 
-# Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group
+# Mix three samples and return only the synthetic sample, with an explicit name and group.
 exampleTumourNormal \%>\%
-  mixSamples("Colon1_T", "Colon1_N",
+  mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
              nReadsTotal = 50000,
-             proportion  = 0.8,
-             newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
+             proportion1 = 0.1, proportion2 = 0.2,
+             newName     = "Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7",
              groupName   = "Synthetic",
              onlyNew     = TRUE ,
              renormalise = FALSE) \%>\%
+             
+  # Only a few reads are included in this small subset of windows (29):
   getCountTable() \%>\% 
-  dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\% 
+  dplyr::pull(Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7) \%>\% 
   sum()
 
 }

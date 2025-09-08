@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{getWindowAnnotation}
 \alias{getWindowAnnotation}
-\title{Build row annotations for region heatmaps}
+\title{Prepare window-level annotations for plotRegionsHeatmap()}
 \usage{
 getWindowAnnotation(
   dataTab,
@@ -12,41 +12,59 @@ getWindowAnnotation(
 )
 }
 \arguments{
-\item{dataTab}{tibble/data.frame produced by \code{\link[=getDataTable]{getDataTable()}} plus \code{seqnames},
-\code{start}, \code{end}, and a \code{window} column (\code{chr:start-end}).}
+\item{dataTab}{\code{data.frame}/\code{tibble}.
+Table produced by \code{\link[=getDataTable]{getDataTable()}} that includes \code{seqnames}, \code{start}, \code{end},
+and a \code{window} column of the form \code{"chr:start-end"}.}
 
-\item{regions}{GenomicRanges::GRanges for overlap-derived annotations
-(e.g., columns already present on \code{regions}).}
+\item{regions}{\code{GRanges}.
+Genomic regions used for overlap-derived annotations (e.g., columns already
+present in \code{mcols(regions)} will be joinable by window coordinates).}
 
-\item{windowAnnotation}{tidyselect-style columns (unquoted) to keep as
-annotation (from either \code{dataTab} or \code{regions}).}
+\item{windowAnnotation}{tidyselect specification or \code{character()} or \code{NULL}.
+Columns to keep as annotations. Supports tidyselect helpers when supplied
+unquoted (e.g., \code{CpG_density}, \code{starts_with("qc_")}) or a character vector
+of column names.
+\strong{Default:} \code{NULL} (keep none).}
 
-\item{clusterRows}{logical; if \code{FALSE}, preserves genomic order of windows.}
+\item{clusterRows}{\code{logical(1)}.
+If \code{FALSE}, preserve genomic order of windows. If \code{TRUE}, follow the row
+order produced by clustering in the heatmap.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
 \code{data.frame} with row names set to the \code{window} identifiers and the
 requested annotation columns.
 }
 \description{
-Prepare a data.frame of window-level annotations aligned to rows in the
-heatmap created by \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}.
+Note that windowAnnotation must be enclosed within double curly brackets when used.
+}
+\details{
+Build a data frame of row annotations aligned to the windows shown in the
+heatmap created by \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}. Annotations can be sourced from
+the table used to plot (e.g. \code{getDataTable()} output) and/or from metadata
+columns on a \code{GRanges} of regions.
+
+Rows are aligned by the \code{window} label (\code{"chr:start-end"}). When both \code{dataTab}
+and \code{regions} provide overlapping information, columns from either source may be
+selected via \code{windowAnnotation}. Use tidyselect to pick or pattern-match columns.
 }
 \examples{
-# Build a minimal window annotation table from a toy selection
 \donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-regs <- qsea::getRegions(qs)[1:50]
-dt   <- qs |>
-  filterByOverlaps(regs) |>
-  getDataTable(normMethod = "nrpm") |>
-  dplyr::mutate(window = paste0(seqnames, ":", start, "-", end))
-wa <- getWindowAnnotation(dt, regs, windowAnnotation = CpG_density)
-head(wa)
-}
 
+# One pipeline, no intermediate objects:
+exampleTumourNormal \%>\%
+  filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
+  getDataTable(normMethod = "nrpm") \%>\%
+  dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
+  getWindowAnnotation(
+    regions = qsea::getRegions(exampleTumourNormal)[1:50],
+    windowAnnotation = CpG_density
+  ) \%>\%
+  head()
+}
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=getDataTable]{getDataTable()}}
 }
 \keyword{internal}

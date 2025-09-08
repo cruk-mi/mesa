@@ -81,15 +81,14 @@ data(exampleTumourNormal, package = "mesa")
 
 
 # Mix two samples 50/50 into ~100k total fragments; append to the qseaSet
-mixed <- exampleTumourNormal \%>\% 
-           mixSamples("Colon1_T", 
-                      "Colon1_N", 
-                       nReadsTotal = 100000, 
-                       proportion = 0.5, 
-                       renormalise = FALSE)
+exampleTumourNormal \%>\% 
+  mixSamples("Colon1_T", 
+             "Colon1_N", 
+             nReadsTotal = 100000, 
+             proportion = 0.5, 
+             renormalise = FALSE) \%>\%
                            
-# Only a few reads are included in this small subset of windows:
-mixed \%>\%
+# Only a few reads are included in this small subset of windows (82):
  getCountTable() \%>\% 
  pull(Mix_Colon1_T_Colon1_N_0.5) \%>\% 
  sum()
@@ -104,6 +103,8 @@ exampleTumourNormal \%>\%
              groupName   = "Synthetic",
              onlyNew     = TRUE ,
              renormalise = FALSE) \%>\%
+             
+  # Only a few reads are included in this small subset of windows (45):
   getCountTable() \%>\% 
   dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\% 
   sum()
