@@ -5,59 +5,93 @@
 #' per-window copy-number in the \code{qseaSet}. Supports parallel execution.
 #' Only GRCh38/hg38 is currently supported.
 #'
+#' @param qs `qseaSet`.  
+#'   Input object whose samples will receive CNV tracks.
+#'
+#' @param inputColumn `character(1)`.  
+#'   Column in the sample table containing BAM paths (e.g. `"input_file"`).  
+#'   **Default:** `"input_file"`.
+#'
+#' @param windowSize `integer(1)`.  
+#'   CNV bin size in bp. Allowed values: `50000`, `500000`, `1000000`.  
+#'   **Default:** `1000000`.
+#'
+#' @param fragmentLength `integer(1)` or `NULL`.  
+#'   Length to extend unpaired R1 reads; if `NULL`, estimate from proper pairs.  
+#'   **Default:** `NULL`.
+#'
+#' @param plotDir `character(1)` or `NULL`.  
+#'   Directory to write per-sample PDF diagnostics; if `NULL`, no plots are saved.  
+#'   **Default:** `NULL`.
+#'
+#' @param parallel `logical(1)`.  
+#'   Use the registered **BiocParallel** backend when `TRUE`; otherwise run serially.  
+#'   **Default:** `getMesaParallel()`.
+#'
+#' @param maxInsertSize `integer(1)`.  
+#'   Maximum insert size to accept for proper pairs (bp).  
+#'   **Default:** `1000`.
+#'
+#' @param minInsertSize `integer(1)`.  
+#'   Minimum insert size to accept for proper pairs (bp).  
+#'   **Default:** `50`.
+#'
+#' @param minReferenceLength `integer(1)`.  
+#'   Minimum aligned reference span for unpaired R1 (bp).  
+#'   **Default:** `30`.
+#'
+#' @param minMapQual `integer(1)`.  
+#'   Minimum MAPQ; for pairs, either end meeting the cutoff is accepted.  
+#'   **Default:** `30`.
+#'
+#' @param properPairsOnly `logical(1)`.  
+#'   If `TRUE`, ignore unpaired R1; if `FALSE`, combine proper pairs with high-quality R1.  
+#'   **Default:** `FALSE`.
+#'
+#' @param hmmCopyGC `GRanges` or `NULL`.  
+#'   Precomputed GC content track binned at `windowSize`.  
+#'   **Default:** `NULL`.
+#'
+#' @param hmmCopyMap `GRanges` or `NULL`.  
+#'   Precomputed mappability track binned at `windowSize`.  
+#'   **Default:** `NULL`.
+#'
 #' @details
-#' For each sample, coverage is computed with
-#' \code{\link{getBamCoveragePairedAndUnpairedR1}} over genome windows generated
-#' by \code{qsea:::makeGenomeWindows()}, normalised with HMMcopy
-#' (\code{HMMcopy::correctReadcount()} + \code{HMMcopy::HMMsegment()}), and the
-#' resulting CNV tracks are merged across samples into the qseaSet.
+#' Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
+#' HMMcopy (`HMMcopy::correctReadcount()` followed by `HMMcopy::HMMsegment()`), and
+#' merged back into the `qseaSet`. You must supply GC/mappability tracks binned at
+#' the same `windowSize` (or use package-provided defaults where applicable).
+#' When `parallel = TRUE`, computation uses the currently registered backend
+#' (see `BiocParallel::register()`).
 #'
-#' @param qs A \code{qseaSet} object.
-#' @param inputColumn Character(1). Column name in the sample table with BAM paths (e.g. `"input_file"`).
-#' @param windowSize Integer(1). Window size in bp; allowed values: 50000, 500000, 1000000.
-#' @param parallel Logical(1). Use \pkg{BiocParallel} if a parallel backend is registered.
-#' @param fragmentLength Integer(1) or \code{NULL}. Extend unpaired R1 to this length; if \code{NULL},
-#'   estimate from proper pairs.
-#' @param minMapQual Integer(1). Minimum MAPQ for either end (pairs) or R1.
-#' @param minInsertSize,maxInsertSize Integer(1). Absolute insert-size bounds for proper pairs.
-#' @param properPairsOnly Logical(1). If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine pairs + high‑quality R1.
-#' @param minReferenceLength Integer(1). Minimum reference span for R1 (unpaired).
-#' @param plotDir Character(1) or \code{NULL}. If given, PDF plots per sample are written here.
-#' @param hmmCopyGC,hmmCopyMap \linkS4class{GRanges}. Precomputed GC and mappability tracks binned at \code{windowSize}.
+#' @return
+#' The input `qseaSet` with CNV information attached, including:
+#' - per-window CNV tracks accessible via downstream CNV accessors,
+#' - library/sample tables updated with relevant CNV/coverage summaries,
+#' - (optionally) per-sample diagnostic PDFs if `plotDir` is provided.
 #'
-#' @return The input \code{qseaSet} with:
-#' \itemize{
-#'   \item CNV per window stored via \code{qsea:::setCNV()};
-#'   \item \code{@libraries$input_counts} containing raw per-window counts + GC/map;
-#'   \item library table updated via \code{qsea:::setLibrary()}.
+#' @seealso
+#' [runHMMcopy()], [plotCNVheatmap()], [getBamCoveragePairedAndUnpairedR1()],  
+#' [HMMcopy::correctReadcount()], [HMMcopy::HMMsegment()], [BiocParallel::register()]
+#'
+#' @family CNV
+#'
+#' @examples
+#' \donttest{
+#' # Skeleton (requires real BAMs and GC/map tracks)
+#' # data(exampleTumourNormal, package = "mesa")
+#' # exampleTumourNormal %>%
+#' #   addHMMcopyCNV(
+#' #     inputColumn   = "input_file",
+#' #     windowSize    = 1e6,
+#' #     hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
+#' #     hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
+#' #     properPairsOnly = TRUE,
+#' #     parallel      = FALSE,
+#' #     plotDir       = tempdir()
+#' #   )
 #' }
 #'
-#' @seealso \code{\link{runHMMCopy}}, \code{\link{plotCNVheatmap}},
-#'   \code{\link{getBamCoveragePairedAndUnpairedR1}}, \pkg{HMMcopy}
-#' @family CNV
-#' 
-#' @examples
-#' # Example workflow (non-running here; requires BAMs and GC/map tracks)
-#' # data(exampleTumourNormal, package = "mesa")
-#' # qs <- exampleTumourNormal
-#' #
-#' # # Provide GC and mappability tracks at the desired window size
-#' # # (e.g. precomputed 1 Mb hg38 tracks as GRanges with columns 'gc' and 'map')
-#' # gc_track  <- hmmcopy_gc_1Mb_hg38   # user-supplied GRanges
-#' # map_track <- hmmcopy_map_1Mb_hg38  # user-supplied GRanges
-#' #
-#' # # Make sure the sample table has a BAM column (e.g., 'input_file')
-#' # # st <- qsea::getSampleTable(qs); stopifnot("input_file" %in% names(st))
-#' #
-#' # BiocParallel::register(BiocParallel::SerialParam())
-#' # qs2 <- addHMMcopyCNV(
-#' #   qs, inputColumn = "input_file", windowSize = 1e6,
-#' #   hmmCopyGC = gc_track, hmmCopyMap = map_track,
-#' #   properPairsOnly = TRUE, parallel = FALSE, plotDir = tempdir()
-#' # )
-#' # # Per-window CNV now available:
-#' # # qsea::getCNV(qs2)
-#' 
 #' @export
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
                           plotDir = NULL,
@@ -156,32 +190,50 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 #' correction and segmentation, and return a GRanges of CNV calls for the
 #' selected sample/column.
 #'
-#' @param CNV_RegionsWithReads A \code{data.frame} / \code{data.table} / \linkS4class{GRanges}
-#'   coercible object with columns:
-#'   \code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map},
-#'   and one sample-specific \code{reads} column (passed by name via \code{colname}).
-#' @param colname Character(1). The sample column to use as read counts.
-#' @param plotDir Character(1) or \code{NULL}. If provided, writes a PDF plot named \code{<colname>.pdf}.
+#' @param CNV_RegionsWithReads `data.frame` / `data.table` / `GRanges`.  
+#'   Coercible table with columns:
+#'   `chr`, `start`, `end`, `width`, `strand`, `gc`, `map`, and one
+#'   sample-specific count column referenced by `colname`.
 #'
-#' @return A \linkS4class{GRanges} with columns named \code{<colname>} containing
-#'   per-window CNV estimates (HMM state means on the log2 scale).
+#' @param colname `character(1)`.  
+#'   Name of the sample count column to use (e.g., `"sampleA"`).
 #'
-#' @seealso \code{\link{addHMMcopyCNV}}, \pkg{HMMcopy}
+#' @param plotDir `character(1)` or `NULL`.  
+#'   Directory to write a per-sample PDF diagnostic plot named `<colname>.pdf`;  
+#'   if `NULL`, no plot is produced.  
+#'   **Default:** `NULL`.
+#'
+#' @details
+#' Counts are GC/map corrected via `HMMcopy::correctReadcount()` and segmented
+#' with `HMMcopy::HMMsegment()`. The result is mapped back to the input windows
+#' and returned as a `GRanges`. Ensure that the binning (`width`) and covariate
+#' columns (`gc`, `map`) are consistent across the table.
+#'
+#' @return A `GRanges` with a metadata column named `<colname>` containing
+#'   per-window CNV estimates (typically HMM state means on the log2 scale).
+#'
+#' @seealso
+#' [addHMMcopyCNV()], [HMMcopy::correctReadcount()], [HMMcopy::HMMsegment()]
+#'
 #' @family CNV
 #'
 #' @examples
-#' # Minimal skeleton (non-running): build the required table, then call:
-#' # tbl <- data.frame(
-#' #   chr = rep(paste0("chr", 1:2), each = 5),
-#' #   start = seq(1, by = 1e6, length.out = 10),
-#' #   end   = seq(1e6, by = 1e6, length.out = 10),
-#' #   width = 1e6, strand = "*",
-#' #   gc = runif(10, 0.3, 0.7), map = runif(10, 0.8, 1.0),
-#' #   sampleA = rpois(10, 500)
-#' # )
-#' # gr_cnv <- runHMMCopy(tbl, colname = "sampleA", plotDir = tempdir())
-#' # gr_cnv
-#' 
+#' \donttest{
+#' # Minimal synthetic example: build a table and pipe into runHMMCopy()
+#' set.seed(1)
+#' tibble::tibble(
+#'   chr    = rep(paste0("chr", 1:2), each = 5),
+#'   start  = seq(1, by = 1e6, length.out = 10),
+#'   end    = start + 1e6 - 1L,
+#'   width  = 1e6,
+#'   strand = "*",
+#'   gc     = runif(10, 0.3, 0.7),
+#'   map    = runif(10, 0.8, 1.0),
+#'   sampleA= rpois(10, 500)
+#' ) %>%
+#'   runHMMCopy(colname = "sampleA", plotDir = tempdir())
+#' }
+#'
 #' @export
 runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
@@ -244,38 +296,63 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 }
 
 
-#' Run HMMcopy on per-window reads for a single sample
+#' CNV heatmap across samples
 #'
-#' Given a table of per-window counts with GC and mappability, run HMMcopy
-#' correction and segmentation, and return a GRanges of CNV calls for the
-#' selected sample/column.
+#' Plot per-window copy-number estimates stored in a `qseaSet` as a heatmap
+#' using **ComplexHeatmap**. Each column is a sample; rows are genome windows.
 #'
-#' @param CNV_RegionsWithReads A \code{data.frame} / \code{data.table} / \linkS4class{GRanges}
-#'   coercible object with columns:
-#'   \code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map},
-#'   and one sample-specific \code{reads} column (passed by name via \code{colname}).
-#' @param colname Character(1). The sample column to use as read counts.
-#' @param plotDir Character(1) or \code{NULL}. If provided, writes a PDF plot named \code{<colname>.pdf}.
+#' @param qseaSet `qseaSet`.  
+#'   Input object containing per-window CNV tracks (e.g., created by
+#'   [addHMMcopyCNV()] or `qsea::addCNV()`).
 #'
-#' @return A \linkS4class{GRanges} with columns named \code{<colname>} containing
-#'   per-window CNV estimates (HMM state means on the log2 scale).
+#' @param sampleAnnotation tidyselect specification, `character()`, or `NULL`.  
+#'   Sample-table columns to display as column annotations (e.g., `c("tumour","type")`
+#'   or bare helpers `tumour, type`).  
+#'   **Default:** `NULL`.
 #'
-#' @seealso \code{\link{addHMMcopyCNV}}, \pkg{HMMcopy}
+#' @param annotationColors `list` or `NA`.  
+#'   Optional mapping of levels → colours to override auto palettes, e.g.
+#'   `list(tumour = c(Tumour = "firebrick4", Normal = "blue"))`.  
+#'   **Default:** `NA`.
+#'
+#' @param clusterRows `logical(1)`.  
+#'   Cluster rows (windows) before plotting.  
+#'   **Default:** `TRUE`.
+#'
+#' @details
+#' Assumes CNV values are available per window and sample. Rows are windows
+#' (typically in genomic order if `clusterRows = FALSE`), columns are samples.
+#' Sample annotations (and optional colours) are added when `sampleAnnotation`
+#' and `annotationColors` are provided.
+#'
+#' @return
+#' Draws a heatmap on the active device and (invisibly) returns the underlying
+#' **ComplexHeatmap** object for further composition with
+#' [ComplexHeatmap::draw()].
+#'
+#' @seealso
+#' [addHMMcopyCNV()], [runHMMCopy()], [ComplexHeatmap::Heatmap()],
+#' [qsea::addCNV()]
+#'
 #' @family CNV
 #'
 #' @examples
-#' # Minimal skeleton (non-running): build the required table, then call:
-#' # tbl <- data.frame(
-#' #   chr = rep(paste0("chr", 1:2), each = 5),
-#' #   start = seq(1, by = 1e6, length.out = 10),
-#' #   end   = seq(1e6, by = 1e6, length.out = 10),
-#' #   width = 1e6, strand = "*",
-#' #   gc = runif(10, 0.3, 0.7), map = runif(10, 0.8, 1.0),
-#' #   sampleA = rpois(10, 500)
-#' # )
-#' # gr_cnv <- runHMMCopy(tbl, colname = "sampleA", plotDir = tempdir())
-#' # gr_cnv
-#' 
+#' \donttest{
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # Basic CNV heatmap with sample annotations
+#' exampleTumourNormal %>%
+#'   plotCNVheatmap(sampleAnnotation = c(tumour, type))
+#'
+#' # Custom annotation colours; disable row clustering
+#' exampleTumourNormal %>%
+#'   plotCNVheatmap(
+#'     sampleAnnotation = tumour,
+#'     annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+#'     clusterRows = FALSE
+#'   )
+#' }
+#'
 #' @export
 plotCNVheatmap <- function(qseaSet,
                            sampleAnnotation = NULL,
@@ -334,20 +411,35 @@ plotCNVheatmap <- function(qseaSet,
 
 #' Remove (zero out) CNV data from a qseaSet
 #'
-#' Sets all per-window CNV values to zero, keeping genomic coordinates intact.
-#' Useful for resetting CNV prior to recalculation.
+#' Set all per-window CNV values to zero while keeping genomic coordinates
+#' and sample metadata intact. Useful for resetting CNV prior to recomputation.
 #'
-#' @param qseaSet A \code{qseaSet}.
-#' @return A \code{qseaSet} with the CNV assay zeroed.
-#' @seealso \code{\link{addHMMcopyCNV}}, \code{\link{plotCNVheatmap}}
+#' @param qseaSet `qseaSet`.  
+#'   Input object whose CNV assay will be replaced by zeros.
+#'
+#' @return A `qseaSet` with the CNV matrix zeroed (same dimensions as before).
+#'
+#' @details
+#' This operation preserves regions (windows) and sample metadata; only the
+#' per-window CNV values are replaced with zeros. Use this to “clear” existing
+#' CNV calls before running [addHMMcopyCNV()] or other CNV routines again.
+#'
+#' @seealso
+#' [addHMMcopyCNV()], [plotCNVheatmap()], [qsea::addCNV()]
+#'
 #' @family CNV
 #'
 #' @examples
-#' # data(exampleTumourNormal, package = "mesa")
-#' # qs <- exampleTumourNormal
-#' # qs <- removeCNV(qs)
-#' # qsea::getCNV(qs)
-#' 
+#' \donttest{
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # Zero out CNV and inspect the first rows
+#' exampleTumourNormal %>%
+#'   removeCNV() %>%
+#'   getCNV() %>%
+#'   head()
+#' }
+#'
 #' @export
 removeCNV <- function(qseaSet){
 
