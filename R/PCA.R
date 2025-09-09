@@ -592,7 +592,7 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
       stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; `shapePalette` only has {length(shapePalette)} values."))
     }
     if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
-      stop("'shapePalette' must contain either 0–20 (unfilled) OR 21–25 (filled), not both.")
+      stop("'shapePalette' must contain either 0-20 (unfilled) OR 21-25 (filled), not both.")
     }
     
   } else if (is.character(shapePalette)) {
