@@ -1,52 +1,71 @@
 #' Summarise the fraction of hyper-stable methylated regions (GRCh38 only)
 #'
-#' Calculates, for each sample in a `qseaSet`, the proportion of *Edgar et al.* “ultra-stable”
-#' regions that are present and clearly methylated (beta ≥ `minBeta`) after filtering by CpG
-#' density (≥ `minDensity`). The result is added as the column `hyperStableEdgar` in the
-#' sample table. If that column already exists it will be overwritten.
+#' For each sample, compute the proportion of *Edgar et al.* “ultra-stable”
+#' windows that are clearly methylated (beta ≥ `minBeta`) after filtering by
+#' CpG density (≥ `minDensity`). The result is added to the sample table as
+#' `hyperStableEdgar` (overwriting any existing column of that name).
 #'
 #' @details
-#' - **Genome restriction:** Only defined for `BSgenome.Hsapiens.NCBI.GRCh38`; the function stops otherwise.
-#' - **Regions used:** Requires `mesa::hg38UltraStableProbes` (GRCh38 “ultra-stable” methylated windows
-#'   derived from array data).
-#' - **Computation:** Overlap windows with `hg38UltraStableProbes`, build a beta table
-#'   (`qsea::makeTable(norm_methods = "beta")`), keep windows with `CpG_density >= minDensity`,
-#'   treat `NA` beta values as 0 for thresholding, and take the fraction ≥ `minBeta` per sample.
+#' - **Genome restriction.** Only supported for
+#'   `"BSgenome.Hsapiens.NCBI.GRCh38"`; the function stops otherwise (checked via
+#'   `qsea:::getGenome()`).
+#' - **Regions used.** Uses `mesa::hg38UltraStableProbes`, a GRCh38 set derived
+#'   from array data (*Edgar et al.*, 2014).
+#' - **Computation.** Windows overlapping the ultra-stable set are extracted,
+#'   beta values are computed via `qsea::makeTable(norm_methods = "beta")`,
+#'   windows with `CpG_density < minDensity` are dropped, `NA` beta are treated
+#'   as `0` for thresholding, and the per-sample fraction with beta ≥ `minBeta`
+#'   is returned.
 #'
-#' @param qseaSet A `qseaSet` object (must be GRCh38).
-#' @param minDensity Numeric. Minimum `CpG_density` to keep a window (default `5`).
-#' @param minBeta Numeric. Beta threshold to call a window methylated (default `0.8`).
+#' @param qseaSet `qseaSet`.  
+#'   Input object (must be GRCh38).  
+#'   **Default:** none (must be supplied).
+#'
+#' @param minDensity `numeric(1)`.  
+#'   Minimum `CpG_density` to keep a window.  
+#'   **Default:** `5`.
+#'
+#' @param minBeta `numeric(1)`.  
+#'   Beta threshold to call a window methylated.  
+#'   **Default:** `0.8`.
 #'
 #' @return
-#' The input `qseaSet`, with its sample table augmented by a numeric column `hyperStableEdgar`
-#' (range 0–1) giving, per sample, the fraction of hyper-stable regions called methylated.
-#' The `qseaSet` is returned.
+#' The input `qseaSet` with its `sampleTable` augmented by a numeric column
+#' `hyperStableEdgar` (range 0–1) giving, per sample, the fraction of ultra-stable
+#' windows called methylated.
 #'
 #' @seealso
-#' [qsea::makeTable()], [qsea::getSampleTable()], [qsea::getSampleNames()], [hg38UltraStableProbes],
-#' [getSampleQCSummary()]
+#' [qsea::makeTable()], [qsea::getSampleTable()], [qsea::getSampleNames()],
+#' [hg38UltraStableProbes], [getSampleQCSummary()]
 #'
 #' @references
-#' Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
-#' *Meta-analysis of human methylomes reveals stably methylated sequences surrounding CpG islands associated with high gene expression*.
+#' Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).  
+#' *Meta-analysis of human methylomes reveals stably methylated sequences
+#' surrounding CpG islands associated with high gene expression*.  
 #' <https://pubmed.ncbi.nlm.nih.gov/25493099/>
 #'
 #' @examples
 #' \donttest{
-#' if (requireNamespace("qsea", quietly = TRUE)) {
-#'   # Example qseaSet shipped with mesa (should be GRCh38)
-#'   if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
-#'     data("exampleTumourNormal", package = "mesa")
+#' data(exampleTumourNormal, package = "mesa")
 #'
-#'     # Add the hyper-stable fraction with defaults
-#'     qset1 <- addHyperStableFraction(exampleTumourNormal)
-#'     head(qsea::getSampleTable(qset1)$hyperStableEdgar)
+#' # Run only if the example windows overlap the ultra-stable probes
+#' exampleTumourNormal %>%
+#' {
+#'   has_ov <- sum(
+#'     GenomicRanges::countOverlaps(
+#'       qsea::getRegions(.),
+#'       mesa::hg38UltraStableProbes
+#'     )
+#'   ) > 0
 #'
-#'     # Stricter thresholds
-#'     qset2 <- addHyperStableFraction(exampleTumourNormal, minDensity = 10, minBeta = 0.9)
-#'     summary(qsea::getSampleTable(qset2)$hyperStableEdgar)
+#'   if (has_ov) addHyperStableFraction(.) else {
+#'     message("No overlap with hg38UltraStableProbes in this toy dataset; skipping.")
+#'     .
 #'   }
-#' }
+#' } %>%
+#' qsea::getSampleTable() %>%
+#' dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) %>%
+#' head()
 #' }
 #' @export
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
@@ -83,34 +102,44 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
 
 }
 
+
 #' Summarise key QC fields per sample
 #'
-#' Returns a tidy summary of the most relevant QC fields from a `qseaSet` sample table.
-#' If library metrics are missing, they are added via `addLibraryInformation()` before summarising.
+#' Return a tidy summary of the most relevant QC fields from a `qseaSet`
+#' `sampleTable`. If core library metrics are missing, they are first added via
+#' [addLibraryInformation()].
 #'
-#' @param qseaSet A `qseaSet` object.
+#' @param qseaSet `qseaSet`.  
+#'   Input object from which to extract QC fields.  
+#'   **Default:** none (must be supplied).
+#'
+#' @details
+#' If the `sampleTable` lacks library metrics (e.g., `valid_fragments`), the
+#' function calls [addLibraryInformation()] to populate them. The output keeps
+#' `sample_name` and any columns whose names match the regex
+#' `"valid_fragment|relH|hyperStable|ichorTumo"` (if present), then orders rows
+#' by `sample_name`.
 #'
 #' @return
-#' A tibble with one row per sample and (at least) the columns:
+#' A tibble with one row per sample containing:
 #' - `sample_name`
-#' - any columns matching `valid_fragment`, `relH`, `hyperStable`, or `ichorTumo` (if present).
-#' Rows are ordered by `sample_name`.
+#' - any available QC columns matching `valid_fragment`, `relH`, `hyperStable`,
+#'   or `ichorTumo`.  
+#' Columns not present in the `sampleTable` are silently omitted.
 #'
 #' @seealso
 #' [qsea::getSampleTable()], [addLibraryInformation()], [addHyperStableFraction()]
 #'
 #' @examples
 #' \donttest{
-#' if (requireNamespace("qsea", quietly = TRUE)) {
-#'   if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
-#'     data("exampleTumourNormal", package = "mesa")
-#'     # Ensure the hyper-stable column exists to demonstrate inclusion
-#'     qset <- addHyperStableFraction(exampleTumourNormal)
-#'     qc   <- getSampleQCSummary(qset)
-#'     qc
-#'   }
+#' data("exampleTumourNormal", package = "mesa")
+#'
+#' # QC summary (adds library info if missing), ordered by sample_name
+#' exampleTumourNormal %>%
+#'   getSampleQCSummary() %>%
+#'   head()
 #' }
-#' }
+#'
 #' @export
 getSampleQCSummary <- function(qseaSet){
 
