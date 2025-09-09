@@ -13,7 +13,10 @@ editor_options:
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 
 ### BUG FIXES
-* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
+* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
+* Correct the message produced by `addMedipsEnrichmentFactors`.
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 
 # mesa 0.5.1
 

@@ -51,6 +51,12 @@ test_that("Annotation getting works", {
                                      regionsToOverlap = regions %>% mutate(newCol = rnorm(10)),
                                      windowAnnotation = c(CpG_density, newCol)))
 
+  expect_error(plotRegionsHeatmap(exampleTumourNormal,
+                                  regionsToOverlap = regions %>% 
+                                    bind_ranges(regions) %>%
+                                    mutate(newCol = rnorm(20)),
+                                  windowAnnotation = c(CpG_density, newCol)))
+  
 }
 )
 
