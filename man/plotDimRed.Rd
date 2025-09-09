@@ -14,7 +14,7 @@ plotDimRed(
   symDivColourScale = FALSE,
   shape = NULL,
   shapePalette = NULL,
-  NAshape = 25,
+  NAshape = NULL,
   showSampleNames = FALSE,
   pointSize = 2,
   alpha = 1,
