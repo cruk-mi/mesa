@@ -204,7 +204,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 #' @param windowAnnotation Columns of the regions annotation or the dataTab to use
 #' @param clusterRows Whether the rows are going to be clustered. If not, ensure the annotation is the correct order.
 #'
-#' @return A data frame containing the annotation columns, ready for use in
+#' @return A data frame containing the annotation columns, ready for use in plotting functions
 getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clusterRows = FALSE) {
   rowAnnotDf <- dataTab %>%
     plyranges::as_granges() %>%
@@ -221,8 +221,21 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
       dplyr::arrange(.rowID)
   }
 
-  rowAnnotDf %>%
+  rowAnnotDfdistinct <- rowAnnotDf %>%
     dplyr::select(-.rowID) %>%
+    distinct()
+  
+  
+  nonUniqueWindowsDf <-rowAnnotDfdistinct %>% 
+    group_by(window) %>% 
+    filter(dplyr::n() > 1)
+  
+  if(nrow(nonUniqueWindowsDf) > 0) {
+    stop(glue::glue("Non-unique annotations found in window annotations: 
+         {paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}
+                    "))
+  }
+  rowAnnotDfdistinct %>%
     tibble::column_to_rownames("window")
 
 }

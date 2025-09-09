@@ -63,7 +63,7 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
                       windowSize = 300,
                       CNVwindowSize = 1000000,
                       fragmentType = "Sheared",
-                      CNVmethod = "None",
+                      CNVmethod = "MeCap",
                       coverageMethod = "qseaPaired",
                       minMapQual = 10,
                       minInsertSize = 70,
@@ -77,6 +77,7 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
   expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
   expect_equal(testSet %>% qsea::getCounts() %>% colSums() %>% unname(), testSet %>% qsea::getLibSize())
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
+  expect_equal(testSet %>% qsea::getCNV() %>% length(), 51)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 

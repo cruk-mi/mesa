@@ -14,6 +14,12 @@ editor_options:
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
 
+### BUG FIXES
+* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
+* Correct the message produced by `addMedipsEnrichmentFactors`.
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
+
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
