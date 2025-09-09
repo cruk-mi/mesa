@@ -7,9 +7,14 @@
 downSample(qseaSet, nReads)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object whose per-window counts will be downsampled.
+\strong{Default:} none (must be supplied).}
 
-\item{nReads}{\code{integer(1)} Target number of reads to retain per sample.}
+\item{nReads}{\code{integer(1)}.
+Target number of reads to retain \strong{per sample}. If a sample has fewer than
+\code{nReads}, it is left unchanged.
+\strong{Default:} none (must be supplied).}
 }
 \value{
 A \code{qseaSet} with downsampled counts. Library metadata
@@ -17,18 +22,39 @@ A \code{qseaSet} with downsampled counts. Library metadata
 }
 \description{
 Randomly subsample reads to a fixed depth across all samples in a \code{qseaSet}.
-This is useful for equalizing library sizes prior to comparison.
+Useful for equalising library sizes prior to comparison.
+}
+\details{
+Downsampling is performed independently per sample. To obtain reproducible
+results across runs, call \code{set.seed()} \strong{before} invoking \code{downSample()}.
+Samples with total reads \verb{< nReads} are not upsampled.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
 
-## Downsample to 1e5 reads per sample
-ds <- downSample(qs, nReads = 1e5)
+set.seed(1)
+# Downsample to 100 fragments per sample, then check per-sample totals
+exampleTumourNormal \%>\%
+  downSample(100) \%>\%
+  getCountTable() \%>\%
+  dplyr::select(tidyselect::matches("_[NT]")) \%>\%
+  colSums() \%>\%
+  range()  # should be ~ c(100, 100) if all samples had >= 100 reads
+
+# Also inspect the updated library sizes recorded in the sample table
+exampleTumourNormal \%>\%
+  downSample(100) \%>\%
+  qsea::getSampleTable() \%>\%
+  dplyr::select(patient, type, gender)
+}
 
 }
 \seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}, \code{\link[=mixSamples]{mixSamples()}}
+
 Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
 \code{\link{convertToArrayBetaTable}()},
 \code{\link{subsetWindowsBySignal}()},
 \code{\link{subsetWindowsOverBackground}()}

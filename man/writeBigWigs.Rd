@@ -13,29 +13,64 @@ writeBigWigs(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing window coordinates and signal.
+\strong{Default:} none (must be supplied).}
 
-\item{folderName}{character(1) output folder.}
+\item{folderName}{\code{character(1)}.
+Output directory where \code{.bw} files will be written (created if missing).
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{character(1) normalisation method (e.g., \code{"nrpm"} or \code{"beta"}).}
+\item{normMethod}{\code{character(1)}.
+Normalisation/measure to export. Common choices: \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{useGroupMeans}{logical export group means instead of samples.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, export group-mean tracks instead of per-sample tracks.
+\strong{Default:} \code{FALSE}.}
 
-\item{naVal}{numeric(1) value used to replace \code{NA} scores (for beta).}
+\item{naVal}{\code{numeric(1)}.
+Value used to replace \code{NA} scores prior to export (useful for beta).
+\strong{Default:} \code{0}.}
 }
 \value{
-(invisible) \code{NULL}. Files are written to \code{folderName}.
+(Invisibly) \code{NULL}. Files are written to \code{folderName}.
 }
 \description{
 Export bigWig files with per-window scores for each sample (or group means).
 }
+\details{
+For each sample (or group), the function pairs the per-window scores from
+\code{qseaSet} with the corresponding window genomic coordinates and writes a
+bigWig via \strong{rtracklayer}. When exporting beta, windows failing the minimum
+read threshold used to compute beta may be \code{NA}; these are replaced by
+\code{naVal} before writing.
+
+\strong{File naming.} Output files are typically named using the sample (or group)
+name and the method, e.g. \code{"<sample>_<method>.bw"} or
+\code{"<group>_<method>_means.bw"} when \code{useGroupMeans = TRUE}.
+
+\strong{Seqinfo.} bigWig export requires chromosome lengths; ensure the window
+GRanges in \code{qseaSet} carries valid \code{seqinfo} (this is the case for the
+example data on GRCh38).
+}
 \examples{
 \donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-td <- tempfile(); dir.create(td)
-writeBigWigs(qs, td, normMethod = "nrpm", useGroupMeans = FALSE)
-list.files(td, pattern = "\\\\.bw$")
+
+# Per-sample NRPM bigWigs
+exampleTumourNormal \%>\%
+  { td <- tempfile(); dir.create(td);
+    writeBigWigs(., folderName = td, normMethod = "nrpm", useGroupMeans = FALSE);
+    list.files(td, pattern = "\\\\\\\\.bw$")
+  }
+
+# Group-mean beta bigWigs (replace NA beta with 0)
+exampleTumourNormal \%>\%
+  { td <- tempfile(); dir.create(td);
+    writeBigWigs(., folderName = td, normMethod = "beta", useGroupMeans = TRUE, naVal = 0);
+    head(list.files(td, pattern = "\\\\\\\\.bw$"))
+  }
 }
 
 }

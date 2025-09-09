@@ -5,7 +5,7 @@
 \alias{setMart,qseaSet-method}
 \alias{getMart}
 \alias{getMart,qseaSet-method}
-\title{Set or get an Ensembl/Biomart (or other) handle on a qseaSet}
+\title{Set or get an Ensembl/BioMart handle on a qseaSet}
 \usage{
 setMart(object, ...)
 
@@ -16,32 +16,50 @@ getMart(object, ...)
 \S4method{getMart}{qseaSet}(object)
 }
 \arguments{
-\item{object}{A \code{qseaSet}.}
+\item{object}{\code{qseaSet}.
+The object to modify or query.}
 
-\item{mart}{An object or string identifying the mart to use (e.g., an Ensembl/BioMart
-connection or a label you interpret elsewhere).}
+\item{mart}{\code{biomaRt::Mart}, \code{character(1)}, or \code{ANY}.
+Connection object returned by \strong{biomaRt} (recommended), or a string label
+you interpret elsewhere (e.g., \code{"ENSEMBL_110"}). Stored verbatim in
+\code{object@parameters$mart}.
+\strong{Default:} none (must be supplied to \code{setMart()}).}
 }
 \value{
 \itemize{
 \item \code{setMart()} returns the updated \code{qseaSet} (with \verb{@parameters$mart} set).
-\item \code{getMart()} returns the stored mart value.
+\item \code{getMart()} returns the stored value (whatever was set), or \code{NULL} if absent.
 }
 }
 \description{
-These functions store and retrieve a “mart” object (or string handle) inside a \code{qseaSet}
-for downstream annotation tasks.
+Store and retrieve a “mart” handle inside a \code{qseaSet} for downstream
+annotation tasks (e.g., resolving gene coordinates).
 }
+\details{
+These are S4 generics with methods for class \code{"qseaSet"}. The value is not
+validated or dereferenced here; functions that consume it (e.g., gene
+annotation helpers) should perform any needed checks.
+}
+\section{Methods}{
+
+\describe{
+\item{\code{setMart(object, mart)}}{Set the handle on a \code{qseaSet}.}
+\item{\code{getMart(object)}}{Retrieve the stored handle from a \code{qseaSet}.}
+}
+}
+
 \examples{
 \donttest{
-if (requireNamespace("qsea", quietly = TRUE)) {
-  if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
-    data("exampleTumourNormal", package = "mesa")
-    qs <- setMart(exampleTumourNormal, mart = "ENSEMBL_110")
-    getMart(qs)
-  }
+data(exampleTumourNormal, package = "mesa")
+
+# Store a label (or use a real biomaRt::Mart) and read it back
+exampleTumourNormal \%>\%
+   setMart("ENSEMBL_110") \%>\%
+   getMart()
 }
-}
+
 }
 \seealso{
-\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}}
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
+\code{\link[biomaRt:useMart]{biomaRt::useMart()}}
 }

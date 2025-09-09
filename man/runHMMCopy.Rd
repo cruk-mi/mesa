@@ -7,40 +7,54 @@
 runHMMCopy(CNV_RegionsWithReads, colname, plotDir = NULL)
 }
 \arguments{
-\item{CNV_RegionsWithReads}{A \code{data.frame} / \code{data.table} / \linkS4class{GRanges}
-coercible object with columns:
-\code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map},
-and one sample-specific \code{reads} column (passed by name via \code{colname}).}
+\item{CNV_RegionsWithReads}{\code{data.frame} / \code{data.table} / \code{GRanges}.
+Coercible table with columns:
+\code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map}, and one
+sample-specific count column referenced by \code{colname}.}
 
-\item{colname}{Character(1). The sample column to use as read counts.}
+\item{colname}{\code{character(1)}.
+Name of the sample count column to use (e.g., \code{"sampleA"}).}
 
-\item{plotDir}{Character(1) or \code{NULL}. If provided, writes a PDF plot named \code{<colname>.pdf}.}
+\item{plotDir}{\code{character(1)} or \code{NULL}.
+Directory to write a per-sample PDF diagnostic plot named \verb{<colname>.pdf};
+if \code{NULL}, no plot is produced.
+\strong{Default:} \code{NULL}.}
 }
 \value{
-A \linkS4class{GRanges} with columns named \code{<colname>} containing
-per-window CNV estimates (HMM state means on the log2 scale).
+A \code{GRanges} with a metadata column named \verb{<colname>} containing
+per-window CNV estimates (typically HMM state means on the log2 scale).
 }
 \description{
 Given a table of per-window counts with GC and mappability, run HMMcopy
 correction and segmentation, and return a GRanges of CNV calls for the
 selected sample/column.
 }
+\details{
+Counts are GC/map corrected via \code{HMMcopy::correctReadcount()} and segmented
+with \code{HMMcopy::HMMsegment()}. The result is mapped back to the input windows
+and returned as a \code{GRanges}. Ensure that the binning (\code{width}) and covariate
+columns (\code{gc}, \code{map}) are consistent across the table.
+}
 \examples{
-# Minimal skeleton (non-running): build the required table, then call:
-# tbl <- data.frame(
-#   chr = rep(paste0("chr", 1:2), each = 5),
-#   start = seq(1, by = 1e6, length.out = 10),
-#   end   = seq(1e6, by = 1e6, length.out = 10),
-#   width = 1e6, strand = "*",
-#   gc = runif(10, 0.3, 0.7), map = runif(10, 0.8, 1.0),
-#   sampleA = rpois(10, 500)
-# )
-# gr_cnv <- runHMMCopy(tbl, colname = "sampleA", plotDir = tempdir())
-# gr_cnv
+\donttest{
+# Minimal synthetic example: build a table and pipe into runHMMCopy()
+set.seed(1)
+tibble::tibble(
+  chr    = rep(paste0("chr", 1:2), each = 5),
+  start  = seq(1, by = 1e6, length.out = 10),
+  end    = start + 1e6 - 1L,
+  width  = 1e6,
+  strand = "*",
+  gc     = runif(10, 0.3, 0.7),
+  map    = runif(10, 0.8, 1.0),
+  sampleA= rpois(10, 500)
+) \%>\%
+  runHMMCopy(colname = "sampleA", plotDir = tempdir())
+}
 
 }
 \seealso{
-\code{\link{addHMMcopyCNV}}, \pkg{HMMcopy}
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}}, \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}}
 
 Other CNV: 
 \code{\link{addHMMcopyCNV}()},

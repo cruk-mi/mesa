@@ -15,46 +15,99 @@ subsetWindowsBySignal(
 )
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and signal.}
 
-\item{fn}{A function applied row-wise across selected samples (e.g. \code{median},
-\code{min}, \code{max}).}
+\item{fn}{\code{function}.
+Summary function applied \strong{row-wise} across the selected samples (e.g.,
+\code{median}, \code{min}, \code{max}). If you need NA handling, provide it explicitly,
+e.g. \code{function(x) median(x, na.rm = TRUE)}.
+\strong{Default:} none (must be supplied).}
 
-\item{threshold}{\code{numeric(1)} Threshold value applied to \code{fn} results.}
+\item{threshold}{\code{numeric(1)}.
+Threshold applied to the summary value returned by \code{fn}.
+\strong{Default:} none (must be supplied).}
 
-\item{aboveThreshold}{\code{logical(1)} If \code{TRUE}, retain windows with values
-\verb{>= threshold}; otherwise, retain windows \verb{< threshold}.}
+\item{aboveThreshold}{\code{logical(1)}.
+Keep windows with values \verb{>= threshold} when \code{TRUE}; keep windows with values
+\verb{< threshold} when \code{FALSE}.
+\strong{Default:} none (must be supplied).}
 
-\item{samples}{\code{character()} Sample names to consider, or a string pattern
-matched against sample names. Defaults to all samples.}
+\item{samples}{\code{character()} or \code{NULL}.
+Sample names to include, or a single string used as a pattern to match
+sample names. If \code{NULL}, use all samples.
+\strong{Default:} \code{NULL}.}
 
-\item{normMethod}{\code{character(1)} Normalization method, one of \code{"nrpm"},
-\code{"beta"}, or \code{"counts"}.}
+\item{normMethod}{\code{character(1)}.
+Normalisation/measure to evaluate. One of \code{"nrpm"}, \code{"beta"}, or \code{"counts"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{useGroupMeans}{\code{logical(1)} If \code{TRUE}, aggregate replicate samples
-by their \code{group} in the sample table.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, aggregate replicates by the \code{group} column in the sample table
+and apply \code{fn} to group means; if \code{FALSE}, use individual samples.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
 A filtered \code{qseaSet} containing only the selected windows.
 }
 \description{
-Filter genomic windows based on a summary function applied to selected
-samples. For example, retain windows with median normalized counts above
-a threshold, or where the minimum beta value is below 0.5.
+Filter genomic windows based on a summary function applied across selected
+samples. Typical uses include keeping windows with median NRPM above a
+threshold, or retaining windows where the minimum beta is below 0.5.
+}
+\details{
+The function builds a window × sample matrix for the chosen \code{normMethod},
+optionally restricts to samples via \code{samples} (exact names or pattern match),
+computes \code{fn} per row, and filters by \code{threshold} according to
+\code{aboveThreshold}. Supply a summary function that accepts a numeric vector and
+returns a scalar; include \code{na.rm = TRUE} inside \code{fn} if needed.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
 
-## Keep windows with median nrpm > 1 across tumour samples
-subsetWindowsBySignal(qs, fn = median, threshold = 1,
-                      aboveThreshold = TRUE, samples = "LUAD")
+# Keep windows with median NRPM > 1 across all samples
+exampleTumourNormal \%>\%
+  subsetWindowsBySignal(
+    fn = median,                # accepts na.rm
+    threshold = 1,
+    aboveThreshold = TRUE
+  )
+
+# Keep windows where the MIN beta < 0.5 in any sample
+exampleTumourNormal \%>\%
+  subsetWindowsBySignal(
+    fn = min,                   # accepts na.rm
+    threshold = 0.5,
+    aboveThreshold = FALSE,
+    normMethod = "beta"
+  )
+
+# Restrict to samples whose names contain "Lung"
+exampleTumourNormal \%>\%
+  subsetWindowsBySignal(
+    fn = median,
+    threshold = 1,
+    aboveThreshold = TRUE,
+    samples = "Lung"
+  )
+
+# Use group means instead of individual samples
+exampleTumourNormal \%>\%
+  subsetWindowsBySignal(
+    fn = median,
+    threshold = 1,
+    aboveThreshold = TRUE,
+    useGroupMeans = TRUE
+  )
+}
 
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}}
 
 Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
 \code{\link{convertToArrayBetaTable}()},
 \code{\link{downSample}()},
 \code{\link{subsetWindowsOverBackground}()}

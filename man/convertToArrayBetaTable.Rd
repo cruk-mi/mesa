@@ -2,41 +2,58 @@
 % Please edit documentation in R/qseaExtra.R
 \name{convertToArrayBetaTable}
 \alias{convertToArrayBetaTable}
-\title{Convert qsea beta values to array-like format}
+\title{Convert qsea beta values to array-like probe matrix}
 \usage{
 convertToArrayBetaTable(qseaSet, arrayDetails = "Infinium450k")
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing per-window beta values.
+\strong{Default:} none (must be supplied).}
 
-\item{arrayDetails}{Either a recognized string (currently \code{"Infinium450k"})
-or a \code{GRanges} object with an \code{ID} column of probe identifiers.}
+\item{arrayDetails}{\code{character(1)} or \code{GRanges}.
+Either a recognised keyword (currently \code{"Infinium450k"}) or a \code{GRanges}
+of probe loci with an \code{ID} metadata column of probe identifiers. Coordinates
+must match the \code{qseaSet} genome (e.g., GRCh38).
+\strong{Default:} \code{"Infinium450k"}.}
 }
 \value{
-A \code{data.frame} with rows as probes (including \code{ID} column) and
-columns as samples with corresponding beta values.
+A \code{data.frame} with one row per probe (including an \code{ID} column) and one
+column per sample containing the corresponding beta values. Probes with no
+matching/overlapping window receive \code{NA}.
 }
 \description{
-Extract beta values for probes from a methylation array, suitable for use
-with tools expecting array-style beta matrices. Currently supports
-Illumina Infinium450k probes on GRCh38.
+Build a probe × sample beta table by mapping \code{qseaSet} windows to array
+probe coordinates. Currently supports Illumina \strong{Infinium 450k} probes on
+GRCh38; a custom \code{GRanges} of probes can also be supplied.
+}
+\details{
+Probe coordinates are matched to \code{qseaSet} windows (e.g., via overlap). When
+multiple windows are relevant for a probe, the package's implementation is
+used to derive a single beta value per probe. Ensure the probe genome build
+matches the \code{qseaSet} (e.g., GRCh38) to avoid mismatches.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
 
-## Using built-in probe set
-beta_tab <- convertToArrayBetaTable(exampleTumourNormal,
-                                    arrayDetails = "Infinium450k")
+# Use the built-in keyword for 450k probes (GRCh38)
+exampleTumourNormal \%>\%
+  convertToArrayBetaTable(arrayDetails = "Infinium450k") \%>\%
+  head()
 
-## Using a GRanges probe object
-beta_tab2 <- convertToArrayBetaTable(exampleTumourNormal,
-                                     arrayDetails = mesa::hg38_450kArrayGR)
+# Supply an explicit GRanges of 450k probes (must have metadata column 'ID')
+exampleTumourNormal \%>\%
+  convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
+  head()
+}
 
 }
 \seealso{
-\code{\link[=getDataTable]{getDataTable()}}
+\code{\link[=getDataTable]{getDataTable()}}, dataset \code{mesa::hg38_450kArrayGR}
 
 Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
 \code{\link{downSample}()},
 \code{\link{subsetWindowsBySignal}()},
 \code{\link{subsetWindowsOverBackground}()}

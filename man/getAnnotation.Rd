@@ -61,10 +61,6 @@ exampleTumourNormal \%>\%
 }
 \seealso{
 \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}
-
-Other heatmap-annotation: 
-\code{\link{getAnnotationDataFrame}()},
-\code{\link{getAnnotationDataFrameIndividual}()}
 }
 \concept{heatmap-annotation}
 \keyword{internal}

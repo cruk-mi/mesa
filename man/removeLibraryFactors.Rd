@@ -7,22 +7,45 @@
 removeLibraryFactors(qseaSet)
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object whose library factors will be reset.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-qsea::qseaSet with library factors set to 1.
+A \code{qseaSet} with all library factors set to \code{1} and \code{sampleTable} updated.
 }
 \description{
-Set all library-factor columns in the qseaSet (and sample table) to one.
+Overwrite all library-factor values in a \code{qseaSet} (and its \code{sampleTable})
+with \code{1}. Useful when you want to avoid library scaling (e.g., TMM) and
+keep beta unchanged; NRPM may change depending on downstream use.
+}
+\details{
+Setting library factors to \code{1} has \strong{no effect on beta} (fractional measure)
+but can affect \strong{NRPM} since scaling factors are neutralised. This is
+akin to calling \code{qsea::addLibraryFactors(qseaSet, factors = 1)} and
+synchronising the \code{sampleTable}.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-qs2 <- removeLibraryFactors(qs)
-# qsea::getSampleTable(qs2)$library_factor
+
+# Show current factors then reset to 1 and show again
+exampleTumourNormal \%>\%
+  addLibraryInformation() \%>\%
+  pull(library_factor) \%>\%
+  head()
+
+exampleTumourNormal \%>\%
+  removeLibraryFactors() \%>\%
+  addLibraryInformation() \%>\%   # refresh cached summaries if needed
+  pull(library_factor) \%>\%
+  head()
+}
 
 }
 \seealso{
+\code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}
+
 Other table-helpers: 
 \code{\link{getBetaTable}()},
 \code{\link{getCountTable}()},

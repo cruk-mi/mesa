@@ -7,23 +7,45 @@
 removeNormMethodSuffix(dataTable, normMethod)
 }
 \arguments{
-\item{dataTable}{data.frame with window x sample/group values.}
+\item{dataTable}{\code{data.frame} or tibble.
+Window × sample (or group) table whose column names may include a
+normalisation suffix (e.g., \code{"sampleA_beta"}, \code{"Tumour_beta_means"}).
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{character(1) normalisation method (e.g., \code{"beta"}, \code{"nrpm"}).}
+\item{normMethod}{\code{character(1)}.
+Normalisation/measure tag to remove from column names (e.g., \code{"beta"},
+\code{"nrpm"}).
+\strong{Default:} none (must be supplied).}
 }
 \value{
-data.frame with cleaned column names.
+A \code{data.frame} like \code{dataTable} but with cleaned column names (suffixes
+\verb{_\{normMethod\}} and \verb{_\{normMethod\}_means} removed where present).
 }
 \description{
-Drop the \verb{_\{normMethod\}} (and optional \verb{_means}) suffix from sample or
-group mean columns in a wide data table (e.g., from \code{\link[=getDataTable]{getDataTable()}}).
+Clean wide tables (e.g., from \code{\link[=getDataTable]{getDataTable()}}) by stripping the trailing
+\verb{_\{normMethod\}} and optional \verb{_\{normMethod\}_means} suffixes from sample /
+group-mean columns.
+}
+\details{
+Intended for post-processing tables where column names encode the measure,
+e.g., \code{"sample_beta"}, \code{"group_beta_means"}. The function drops those suffixes
+to yield bare sample/group names, facilitating downstream joins and plotting.
 }
 \examples{
-df <- data.frame(A_beta = 1:3, B_beta_means = 4:6)
-removeNormMethodSuffix(df, "beta")
+# Basic cleaning for 'beta'
+data.frame(A_beta = 1:3, B_beta_means = 4:6) \%>\%
+  removeNormMethodSuffix("beta") \%>\%
+  names()
+
+# Works similarly for other measures (e.g., 'nrpm')
+data.frame(S1_nrpm = 1:2, Tumour_nrpm_means = 3:4) \%>\%
+  removeNormMethodSuffix("nrpm") \%>\%
+  names()
 
 }
 \seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=selectQset]{selectQset()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}
+
 Other table-helpers: 
 \code{\link{getBetaTable}()},
 \code{\link{getCountTable}()},

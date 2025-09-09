@@ -13,30 +13,56 @@ countWindowsAboveCutoff(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing window-level signal.
+\strong{Default:} none (must be supplied).}
 
-\item{GRanges}{GenomicRanges::GRanges windows to filter on.}
+\item{GRanges}{\code{GenomicRanges::GRanges}.
+Windows to evaluate (typically a subset of \code{qsea::getRegions(qseaSet)}).
+\strong{Default:} none (must be supplied).}
 
-\item{samples}{character() sample names to include (default: all).}
+\item{samples}{\code{character()} or \code{NULL}.
+Sample names to include, or a single string used as a pattern to match
+sample names. If \code{NULL}, all samples are used.
+\strong{Default:} \code{NULL}.}
 
-\item{cutoff}{numeric(1) threshold to count windows above.}
+\item{cutoff}{\code{numeric(1)}.
+Threshold; windows with value \verb{>= cutoff} are counted.
+\strong{Default:} \code{0}.}
 
-\item{normMethod}{character(1) normalisation method (\code{"nrpm"} or \code{"beta"}).}
+\item{normMethod}{\code{character(1)}.
+Measure to use. One of \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 }
 \value{
-tibble with columns: \code{sample_name}, \code{numOverCutoff}, \code{totalWindowsUsed},
-plus sample table columns joined from the \code{qseaSet}.
+A tibble with one row per sample containing:
+\itemize{
+\item \code{sample_name}
+\item \code{numOverCutoff} — number of windows \verb{>= cutoff}
+\item \code{totalWindowsUsed} — number of windows evaluated
+followed by columns from the sample table (left-joined).
+}
 }
 \description{
-For a set of windows, count how many exceed a cutoff per sample.
+For a given set of genomic windows, count (per sample) how many windows
+exceed a chosen threshold using the selected normalisation/measure.
+}
+\details{
+The function builds a window × sample matrix over \code{GRanges} for the chosen
+\code{normMethod}, optionally restricts to \code{samples}, and counts, per sample, the
+number of windows with value \verb{>= cutoff}. It also reports how many windows
+were evaluated (\code{totalWindowsUsed}). Results are joined with the sample table.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-gr <- qsea::getRegions(qs)[1:100]
-out <- countWindowsAboveCutoff(qs, gr, cutoff = 1, normMethod = "nrpm")
-head(out)
 
+#' # Count windows with NRPM >= 1 over the first 100 regions
+countWindowsAboveCutoff(exampleTumourNormal, 
+                               qsea::getRegions(exampleTumourNormal)[1:100], 
+                               cutoff = 1, 
+                               normMethod = "nrpm")
+}
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}

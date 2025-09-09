@@ -7,22 +7,35 @@
 getSampleGroups2(qseaSet)
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Object providing the sample table (must contain \code{sample_name} and \code{group}).
+\strong{Default:} none (must be supplied).}
 }
 \value{
-named list of character vectors.
+A named \code{list} of \code{character} vectors, where each list name is a group and
+each element is the ordered vector of sample names in that group.
 }
 \description{
-Construct a named list mapping each \code{group} to the vector of \code{sample_name}s
-in that group, preserving original ordering.
+Build a named list mapping each \code{group} to the vector of \code{sample_name}s
+in that group, preserving the current sample order.
+}
+\details{
+Groups are taken from the \code{group} column of the \code{sampleTable}. The order of
+samples within each group reflects their current order in the \code{qseaSet}.
+Useful for per-group plotting or aggregation utilities.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-# getSampleGroups2(qs)
 
+# Internal helper (not exported): inspect structure of the mapping
+exampleTumourNormal \%>\%
+  mesa:::getSampleGroups2() 
+}
 }
 \seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
+
 Other table-helpers: 
 \code{\link{getBetaTable}()},
 \code{\link{getCountTable}()},

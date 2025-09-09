@@ -7,24 +7,35 @@
 removeCNV(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet}.}
+\item{qseaSet}{\code{qseaSet}.
+Input object whose CNV assay will be replaced by zeros.}
 }
 \value{
-A \code{qseaSet} with the CNV assay zeroed.
+A \code{qseaSet} with the CNV matrix zeroed (same dimensions as before).
 }
 \description{
-Sets all per-window CNV values to zero, keeping genomic coordinates intact.
-Useful for resetting CNV prior to recalculation.
+Set all per-window CNV values to zero while keeping genomic coordinates
+and sample metadata intact. Useful for resetting CNV prior to recomputation.
+}
+\details{
+This operation preserves regions (windows) and sample metadata; only the
+per-window CNV values are replaced with zeros. Use this to “clear” existing
+CNV calls before running \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or other CNV routines again.
 }
 \examples{
-# data(exampleTumourNormal, package = "mesa")
-# qs <- exampleTumourNormal
-# qs <- removeCNV(qs)
-# qsea::getCNV(qs)
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Zero out CNV and inspect the first rows
+exampleTumourNormal \%>\%
+  removeCNV() \%>\%
+  getCNV() \%>\%
+  head()
+}
 
 }
 \seealso{
-\code{\link{addHMMcopyCNV}}, \code{\link{plotCNVheatmap}}
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[=plotCNVheatmap]{plotCNVheatmap()}}, \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
 Other CNV: 
 \code{\link{addHMMcopyCNV}()},

@@ -12,31 +12,58 @@ getCountTable(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing window-level counts.
+\strong{Default:} none (must be supplied).}
 
-\item{useGroupMeans}{logical(1). If \code{TRUE}, average replicates by the \code{group}
-column instead of returning per-sample values.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average replicates by the \code{group} column in the sample table and
+return group means; if \code{FALSE}, return per-sample counts.
+\strong{Default:} \code{FALSE}.}
 
-\item{addMethodSuffix}{logical(1). If \code{TRUE}, keep the method suffix in
-column names (e.g., \code{Sample1_counts}). The suffix is always kept if
-multiple normalisation methods are requested.}
+\item{addMethodSuffix}{\code{logical(1)}.
+If \code{TRUE}, keep the method suffix in column names (e.g., \code{Sample1_counts}
+or \code{Group_counts_means}); if \code{FALSE}, return bare sample/group names.
+\strong{Default:} \code{FALSE}.}
 
-\item{verbose}{logical(1). Print progress/messages.}
+\item{verbose}{\code{logical(1)}.
+Print progress/messages.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A tibble/data.frame of \emph{counts} (one row per window).
+A tibble/data.frame with one row per genomic window and columns for each
+sample (or group), plus any window metadata included by \code{\link[=getDataTable]{getDataTable()}}.
 }
 \description{
-Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extract \emph{counts}.
+Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extract \strong{raw counts}.
+Returns a window × sample (or group) table for downstream summaries/plots.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-head(getCountTable(qs))
+
+# Per-sample counts (first rows/columns)
+exampleTumourNormal \%>\%
+  getCountTable() \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Group means instead of individual samples
+exampleTumourNormal \%>\%
+  getCountTable(useGroupMeans = TRUE) \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Keep the method suffix in column names
+exampleTumourNormal \%>\%
+  getCountTable(addMethodSuffix = TRUE) \%>\%
+  names() \%>\%
+  head()
+}
 
 }
 \seealso{
-\code{\link[=getDataTable]{getDataTable()}}
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}}
 
 Other table-helpers: 
 \code{\link{getBetaTable}()},

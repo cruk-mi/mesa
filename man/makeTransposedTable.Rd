@@ -7,28 +7,53 @@
 makeTransposedTable(qseaSet, normMethod = "nrpm", ...)
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing window-level signal.
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{character(1) normalisation method (e.g., \code{"nrpm"}).}
+\item{normMethod}{\code{character(1)}.
+Measure to extract. Common choices include \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{...}{Optional columns from the sample table to append.}
+\item{...}{tidyselect specification or \code{character()}.
+Optional columns from the sample table to append as additional features
+(e.g., \verb{group, tumour} or \code{c("group","tumour")}).
+\strong{Default:} none.}
 }
 \value{
-tibble with one row per sample and one column per genomic window.
+A tibble with one row per sample and one column per genomic window, plus any
+appended sample-level metadata.
 }
 \description{
-Create a wide table suitable for ML/visualisation where rows are samples and
-columns are windows, using a single normalisation method.
+Create a wide table for ML/visualisation where \strong{rows are samples} and
+\strong{columns are genomic windows}, using one normalisation/measure.
+}
+\details{
+Internally obtains a window × sample matrix for \code{normMethod}, transposes it
+to sample × window, and (if requested) appends selected sample-table columns.
+Window columns are typically named \code{"chr:start-end"}. If measure suffixes
+are present in column names, they may be cleaned to bare sample/window names
+(see \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}).
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-tbl <- makeTransposedTable(qs, normMethod = "nrpm", group)
-dim(tbl)
+
+# NRPM features (sample × first few windows) with a group column appended
+exampleTumourNormal \%>\%
+  makeTransposedTable(normMethod = "nrpm", group) \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Beta features; inspect dimensions
+exampleTumourNormal \%>\%
+  makeTransposedTable(normMethod = "beta") \%>\%
+  dim()
+}
 
 }
 \seealso{
-\code{\link[=getDataTable]{getDataTable()}}
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}, \code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
 
 Other table-helpers: 
 \code{\link{getBetaTable}()},

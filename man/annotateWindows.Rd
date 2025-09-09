@@ -14,24 +14,39 @@ annotateWindows(
 )
 }
 \arguments{
-\item{dataTable}{A data frame coercible to \code{GRanges}, or a \code{GRanges} directly.}
+\item{dataTable}{\code{data.frame}/\code{tibble} (coercible to \code{GRanges}) or \code{GRanges}.
+Windows to annotate. Data frames must include \code{seqnames}, \code{start}, and \code{end}
+(or columns convertible by \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}).}
 
-\item{genome}{Genome string guiding defaults (currently \code{"hg38"}/\code{"GRCh38"} supported).
-If \code{NULL}, a fully specified \code{TxDb}/\code{annoDb} must be supplied.}
+\item{genome}{\code{character(1)} or \code{NULL}.
+Guides annotation defaults. Currently supports \code{"hg38"}/\code{"GRCh38"}.
+\strong{Default:} value set by \code{\link[=setMesaGenome]{setMesaGenome()}} (via internal \code{.getMesaGenome()}), or \code{NULL}.}
 
-\item{TxDb}{A TxDb object (unquoted) or a string of the form
-\code{"PkgName::ObjectName"}. If \code{NULL} and \code{genome} is GRCh38, a default TxDb is used.}
+\item{TxDb}{TxDb object or \code{character(1)}.
+Either an unquoted TxDb object or a string like
+\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}. If character, it is resolved at
+runtime.
+\strong{Default:} value set by \code{\link[=setMesaTxDb]{setMesaTxDb()}} (via \code{.getMesaTxDb()}), or for
+GRCh38/hg38 when \code{NULL}, use
+\code{TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
+if installed.}
 
-\item{annoDb}{A string naming a Bioconductor OrgDb package (e.g., \code{"org.Hs.eg.db"}).
-If \code{NULL} and \code{genome} is GRCh38, \code{"org.Hs.eg.db"} is used if installed.}
+\item{annoDb}{\code{character(1)} or \code{NULL}.
+OrgDb package name (e.g., \code{"org.Hs.eg.db"}).
+\strong{Default:} value set by \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} (via \code{.getMesaAnnoDb()}), or for
+GRCh38/hg38 when \code{NULL}, use \code{"org.Hs.eg.db"} if installed.}
 
-\item{CpGislandsGR}{Optional \code{GRanges} of CpG islands (if \code{NULL} and GRCh38, uses \code{mesa::hg38CpGIslands} if available).}
+\item{CpGislandsGR}{\code{GRanges} or \code{NULL}.
+CpG island regions for island/shore/shelf context.
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::hg38CpGIslands} if available).}
 
-\item{FantomRegionsGR}{Optional \code{GRanges} of FANTOM enhancers (if \code{NULL} and GRCh38, uses \code{mesa::FantomRegions} if available).}
+\item{FantomRegionsGR}{\code{GRanges} or \code{NULL}.
+FANTOM enhancer regions for overlap counts.
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::FantomRegions} if available).}
 }
 \value{
 A tibble with the input windows augmented by ChIPseeker annotations and,
-if provided/available, CpG island landscape and FANTOM overlap counts.
+when available, CpG island landscape and FANTOM overlap counts.
 }
 \description{
 Uses \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}} to assign transcript-relative annotations
@@ -43,40 +58,51 @@ left \code{NULL} to use mesa defaults for GRCh38).
 }
 \details{
 \itemize{
-\item \strong{Inputs:} \code{dataTable} may be a \code{GRanges}, or a data frame coercible by
-\code{qseaTableToChrGRanges()} (must include \code{seqnames}, \code{start}, \code{end}).
-\item \strong{Genome defaults (GRCh38):} When \code{genome} is \code{"hg38"}/\code{"GRCh38"} and \code{TxDb}
-or \code{annoDb} are \code{NULL}, the function uses
-\code{TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
-and \code{"org.Hs.eg.db"} if installed. For \code{CpGislandsGR} and \code{FantomRegionsGR},
-mesa defaults (\code{hg38CpGIslands}, \code{FantomRegions}) are used if available.
-\item \strong{Seqname style:} The output removes the \code{"chr"} prefix (\code{seqnames} become \verb{"1"…"22","X","Y"}).
-\item \strong{Output columns:} Adds \code{shortAnno} (annotation without the trailing parenthetical),
-optional CpG landscape (\code{landscape} with Island/Shore/Shelf/Open Sea) and
-\code{inFantom} (overlap count with FANTOM enhancers). Width and strand are dropped.
+\item \strong{Conversion:} Non-\code{GRanges} inputs are converted via \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}.
+\item \strong{Genome-aware defaults (GRCh38/hg38):} Missing \code{TxDb}/\code{annoDb}/contexts are
+filled using the packages noted above when installed.
+\item \strong{Seqlevels style:} Output \code{seqnames} have the \code{"chr"} prefix removed
+(e.g., \code{"chr1"} → \code{"1"}).
+\item \strong{ChIPseeker call:} Uses \code{tssRegion = c(-2000, 500)}, \code{level = "transcript"},
+\code{overlap = "all"}, \code{verbose = FALSE}.
+\item \strong{Output columns:} Includes \code{annotation} (full label), \code{shortAnno} (without the
+trailing parenthetical), and—when contexts are provided—\code{landscape}
+(Island/Shore/Shelf/Open Sea) and \code{inFantom} (overlap count with FANTOM).
+Width/strand are dropped.
 }
 }
 \examples{
 \donttest{
-ok <- requireNamespace("ChIPseeker", quietly = TRUE) &&
-      requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
-      requireNamespace("org.Hs.eg.db", quietly = TRUE)
-if (ok) {
-  # Minimal toy GRanges
-  gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(1e6 + 0:4 * 1000, width = 200))
+data(exampleTumourNormal, package = "mesa")
 
-  # Use GRCh38 defaults (TxDb/org.Hs.eg.db; mesa CpG/FANTOM if available)
-  setMesaGenome("hg38")
-  ann <- annotateWindows(gr)
-  head(ann)
+# Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+  annotateWindows(genome = "hg38")
 
-  # Data-frame input also works (coerced internally)
-  df <- data.frame(seqnames = "chr1", start = 2e6, end = 2e6 + 199)
-  annotateWindows(df)
+# Or specify TxDb/annoDb explicitly (strings are resolved at runtime)
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+  annotateWindows(
+    TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+    annoDb = "org.Hs.eg.db"
+  )
+
+# Mouse example (mm10): supply mouse TxDb and OrgDb
+# data(exampleMouse, package = "mesa")
+# exampleMouse \%>\%
+#   getRegions() \%>\%
+#   annotateWindows(
+#     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+#     annoDb = "org.Mm.eg.db"
+#   )
+
+# You can also set defaults globally:
+# setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
 }
-}
+
 }
 \seealso{
 \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
-\code{\link[=liftOverHg19]{liftOverHg19()}}
+\code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}, \code{\link[=liftOverHg19]{liftOverHg19()}}
 }

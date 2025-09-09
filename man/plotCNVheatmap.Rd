@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaCNV.R
 \name{plotCNVheatmap}
 \alias{plotCNVheatmap}
-\title{Run HMMcopy on per-window reads for a single sample}
+\title{CNV heatmap across samples}
 \usage{
 plotCNVheatmap(
   qseaSet,
@@ -12,40 +12,60 @@ plotCNVheatmap(
 )
 }
 \arguments{
-\item{CNV_RegionsWithReads}{A \code{data.frame} / \code{data.table} / \linkS4class{GRanges}
-coercible object with columns:
-\code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map},
-and one sample-specific \code{reads} column (passed by name via \code{colname}).}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing per-window CNV tracks (e.g., created by
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or \code{qsea::addCNV()}).}
 
-\item{colname}{Character(1). The sample column to use as read counts.}
+\item{sampleAnnotation}{tidyselect specification, \code{character()}, or \code{NULL}.
+Sample-table columns to display as column annotations (e.g., \code{c("tumour","type")}
+or bare helpers \verb{tumour, type}).
+\strong{Default:} \code{NULL}.}
 
-\item{plotDir}{Character(1) or \code{NULL}. If provided, writes a PDF plot named \code{<colname>.pdf}.}
+\item{annotationColors}{\code{list} or \code{NA}.
+Optional mapping of levels → colours to override auto palettes, e.g.
+\code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
+
+\item{clusterRows}{\code{logical(1)}.
+Cluster rows (windows) before plotting.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A \linkS4class{GRanges} with columns named \code{<colname>} containing
-per-window CNV estimates (HMM state means on the log2 scale).
+Draws a heatmap on the active device and (invisibly) returns the underlying
+\strong{ComplexHeatmap} object for further composition with
+\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
 }
 \description{
-Given a table of per-window counts with GC and mappability, run HMMcopy
-correction and segmentation, and return a GRanges of CNV calls for the
-selected sample/column.
+Plot per-window copy-number estimates stored in a \code{qseaSet} as a heatmap
+using \strong{ComplexHeatmap}. Each column is a sample; rows are genome windows.
+}
+\details{
+Assumes CNV values are available per window and sample. Rows are windows
+(typically in genomic order if \code{clusterRows = FALSE}), columns are samples.
+Sample annotations (and optional colours) are added when \code{sampleAnnotation}
+and \code{annotationColors} are provided.
 }
 \examples{
-# Minimal skeleton (non-running): build the required table, then call:
-# tbl <- data.frame(
-#   chr = rep(paste0("chr", 1:2), each = 5),
-#   start = seq(1, by = 1e6, length.out = 10),
-#   end   = seq(1e6, by = 1e6, length.out = 10),
-#   width = 1e6, strand = "*",
-#   gc = runif(10, 0.3, 0.7), map = runif(10, 0.8, 1.0),
-#   sampleA = rpois(10, 500)
-# )
-# gr_cnv <- runHMMCopy(tbl, colname = "sampleA", plotDir = tempdir())
-# gr_cnv
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Basic CNV heatmap with sample annotations
+exampleTumourNormal \%>\%
+  plotCNVheatmap(sampleAnnotation = c(tumour, type))
+
+# Custom annotation colours; disable row clustering
+exampleTumourNormal \%>\%
+  plotCNVheatmap(
+    sampleAnnotation = tumour,
+    annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+    clusterRows = FALSE
+  )
+}
 
 }
 \seealso{
-\code{\link{addHMMcopyCNV}}, \pkg{HMMcopy}
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[=runHMMCopy]{runHMMCopy()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
+\code{\link[qsea:addCNV]{qsea::addCNV()}}
 
 Other CNV: 
 \code{\link{addHMMcopyCNV}()},

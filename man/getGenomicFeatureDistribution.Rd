@@ -12,31 +12,73 @@ getGenomicFeatureDistribution(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and signal.
+\strong{Default:} none (must be supplied).}
 
-\item{cutoff}{numeric(1) threshold to call window “over cutoff”.}
+\item{cutoff}{\code{numeric(1)}.
+Threshold used to call a window “over cutoff” for counting.
+\strong{Default:} \code{1}.}
 
-\item{normMethod}{character(1) \code{"nrpm"} or \code{"beta"}.}
+\item{normMethod}{\code{character(1)}.
+Measure to summarise. One of \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{minEnrichment}{integer(1) minimum reads for non-NA beta.}
+\item{minEnrichment}{\code{integer(1)}.
+Minimum reads per window required for a non-\code{NA} beta (relevant when
+\code{normMethod = "beta"}).
+\strong{Default:} \code{3}.}
 }
 \value{
-tibble with \code{sample_name}, \code{landscape}, \code{shortAnno},
-\code{nWindows}, \code{sum}, \code{nOverCutoff}, and sample metadata columns.
+A tibble with columns:
+\code{sample_name}, \code{landscape}, \code{shortAnno}, \code{nWindows}, \code{sum}, \code{nOverCutoff},
+followed by sample-table metadata joined from \code{qseaSet}.
 }
 \description{
 Annotate windows, then summarise signal and counts by CpG landscape
-(island/shore/shelf) and short genomic annotation (e.g. promoter/exon/intron).
+(Island/Shore/Shelf/Open Sea) and short genomic annotation
+(e.g., Promoter/Exon/Intron/Intergenic).
+}
+\details{
+Windows are annotated via \code{\link[=annotateWindows]{annotateWindows()}} (which can add CpG landscape
+and a concise \code{shortAnno} label). The function then groups by \code{sample_name},
+\code{landscape}, and \code{shortAnno} to compute:
+\itemize{
+\item \code{nWindows}: number of windows in the group,
+\item \code{sum}: sum of the selected measure across those windows,
+\item \code{nOverCutoff}: number of windows with value \verb{>= cutoff}.
+When using beta, windows failing \code{minEnrichment} are treated as \code{NA} before
+summarisation.
+}
+
+This function requires a transcript database and OrgDb to annotate windows (via
+\code{\link[=annotateWindows]{annotateWindows()}}). Either:
+\itemize{
+\item set them globally with \code{\link[=setMesaGenome]{setMesaGenome()}} (recommended for GRCh38/hg38), or
+\item provide compatible \code{TxDb}/\code{annoDb} packages yourself.
+}
 }
 \examples{
+\donttest{
+# Ensure annotation defaults are available (GRCh38/hg38)
+setMesaGenome("hg38")
+
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-gfd <- getGenomicFeatureDistribution(qs, cutoff = 1, normMethod = "nrpm")
-head(gfd)
+
+# NRPM-based context summary
+exampleTumourNormal \%>\%
+  getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
+  head()
+
+# Beta-based summary (apply a minimum enrichment for non-NA betas)
+exampleTumourNormal \%>\%
+  getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) \%>\%
+  head()
+}
 
 }
 \seealso{
-\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
 Other annotation-summaries: 
 \code{\link{plotGenomicFeatureDistribution}()}

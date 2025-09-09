@@ -21,35 +21,63 @@ addHMMcopyCNV(
 )
 }
 \arguments{
-\item{qs}{A \code{qseaSet} object.}
+\item{qs}{\code{qseaSet}.
+Input object whose samples will receive CNV tracks.}
 
-\item{inputColumn}{Character(1). Column name in the sample table with BAM paths (e.g. \code{"input_file"}).}
+\item{inputColumn}{\code{character(1)}.
+Column in the sample table containing BAM paths (e.g. \code{"input_file"}).
+\strong{Default:} \code{"input_file"}.}
 
-\item{windowSize}{Integer(1). Window size in bp; allowed values: 50000, 500000, 1000000.}
+\item{windowSize}{\code{integer(1)}.
+CNV bin size in bp. Allowed values: \code{50000}, \code{500000}, \code{1000000}.
+\strong{Default:} \code{1000000}.}
 
-\item{fragmentLength}{Integer(1) or \code{NULL}. Extend unpaired R1 to this length; if \code{NULL},
-estimate from proper pairs.}
+\item{fragmentLength}{\code{integer(1)} or \code{NULL}.
+Length to extend unpaired R1 reads; if \code{NULL}, estimate from proper pairs.
+\strong{Default:} \code{NULL}.}
 
-\item{plotDir}{Character(1) or \code{NULL}. If given, PDF plots per sample are written here.}
+\item{plotDir}{\code{character(1)} or \code{NULL}.
+Directory to write per-sample PDF diagnostics; if \code{NULL}, no plots are saved.
+\strong{Default:} \code{NULL}.}
 
-\item{parallel}{Logical(1). Use \pkg{BiocParallel} if a parallel backend is registered.}
+\item{parallel}{\code{logical(1)}.
+Use the registered \strong{BiocParallel} backend when \code{TRUE}; otherwise run serially.
+\strong{Default:} \code{getMesaParallel()}.}
 
-\item{minInsertSize, maxInsertSize}{Integer(1). Absolute insert-size bounds for proper pairs.}
+\item{maxInsertSize}{\code{integer(1)}.
+Maximum insert size to accept for proper pairs (bp).
+\strong{Default:} \code{1000}.}
 
-\item{minReferenceLength}{Integer(1). Minimum reference span for R1 (unpaired).}
+\item{minInsertSize}{\code{integer(1)}.
+Minimum insert size to accept for proper pairs (bp).
+\strong{Default:} \code{50}.}
 
-\item{minMapQual}{Integer(1). Minimum MAPQ for either end (pairs) or R1.}
+\item{minReferenceLength}{\code{integer(1)}.
+Minimum aligned reference span for unpaired R1 (bp).
+\strong{Default:} \code{30}.}
 
-\item{properPairsOnly}{Logical(1). If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine pairs + high‑quality R1.}
+\item{minMapQual}{\code{integer(1)}.
+Minimum MAPQ; for pairs, either end meeting the cutoff is accepted.
+\strong{Default:} \code{30}.}
 
-\item{hmmCopyGC, hmmCopyMap}{\linkS4class{GRanges}. Precomputed GC and mappability tracks binned at \code{windowSize}.}
+\item{properPairsOnly}{\code{logical(1)}.
+If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine proper pairs with high-quality R1.
+\strong{Default:} \code{FALSE}.}
+
+\item{hmmCopyGC}{\code{GRanges} or \code{NULL}.
+Precomputed GC content track binned at \code{windowSize}.
+\strong{Default:} \code{NULL}.}
+
+\item{hmmCopyMap}{\code{GRanges} or \code{NULL}.
+Precomputed mappability track binned at \code{windowSize}.
+\strong{Default:} \code{NULL}.}
 }
 \value{
-The input \code{qseaSet} with:
+The input \code{qseaSet} with CNV information attached, including:
 \itemize{
-\item CNV per window stored via \code{qsea:::setCNV()};
-\item \code{@libraries$input_counts} containing raw per-window counts + GC/map;
-\item library table updated via \code{qsea:::setLibrary()}.
+\item per-window CNV tracks accessible via downstream CNV accessors,
+\item library/sample tables updated with relevant CNV/coverage summaries,
+\item (optionally) per-sample diagnostic PDFs if \code{plotDir} is provided.
 }
 }
 \description{
@@ -59,38 +87,33 @@ per-window copy-number in the \code{qseaSet}. Supports parallel execution.
 Only GRCh38/hg38 is currently supported.
 }
 \details{
-For each sample, coverage is computed with
-\code{\link{getBamCoveragePairedAndUnpairedR1}} over genome windows generated
-by \code{qsea:::makeGenomeWindows()}, normalised with HMMcopy
-(\code{HMMcopy::correctReadcount()} + \code{HMMcopy::HMMsegment()}), and the
-resulting CNV tracks are merged across samples into the qseaSet.
+Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
+HMMcopy (\code{HMMcopy::correctReadcount()} followed by \code{HMMcopy::HMMsegment()}), and
+merged back into the \code{qseaSet}. You must supply GC/mappability tracks binned at
+the same \code{windowSize} (or use package-provided defaults where applicable).
+When \code{parallel = TRUE}, computation uses the currently registered backend
+(see \code{BiocParallel::register()}).
 }
 \examples{
-# Example workflow (non-running here; requires BAMs and GC/map tracks)
+\donttest{
+# Skeleton (requires real BAMs and GC/map tracks)
 # data(exampleTumourNormal, package = "mesa")
-# qs <- exampleTumourNormal
-#
-# # Provide GC and mappability tracks at the desired window size
-# # (e.g. precomputed 1 Mb hg38 tracks as GRanges with columns 'gc' and 'map')
-# gc_track  <- hmmcopy_gc_1Mb_hg38   # user-supplied GRanges
-# map_track <- hmmcopy_map_1Mb_hg38  # user-supplied GRanges
-#
-# # Make sure the sample table has a BAM column (e.g., 'input_file')
-# # st <- qsea::getSampleTable(qs); stopifnot("input_file" \%in\% names(st))
-#
-# BiocParallel::register(BiocParallel::SerialParam())
-# qs2 <- addHMMcopyCNV(
-#   qs, inputColumn = "input_file", windowSize = 1e6,
-#   hmmCopyGC = gc_track, hmmCopyMap = map_track,
-#   properPairsOnly = TRUE, parallel = FALSE, plotDir = tempdir()
-# )
-# # Per-window CNV now available:
-# # qsea::getCNV(qs2)
+# exampleTumourNormal \%>\%
+#   addHMMcopyCNV(
+#     inputColumn   = "input_file",
+#     windowSize    = 1e6,
+#     hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
+#     hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
+#     properPairsOnly = TRUE,
+#     parallel      = FALSE,
+#     plotDir       = tempdir()
+#   )
+}
 
 }
 \seealso{
-\code{\link{runHMMCopy}}, \code{\link{plotCNVheatmap}},
-\code{\link{getBamCoveragePairedAndUnpairedR1}}, \pkg{HMMcopy}
+\code{\link[=runHMMcopy]{runHMMcopy()}}, \code{\link[=plotCNVheatmap]{plotCNVheatmap()}}, \code{\link[=getBamCoveragePairedAndUnpairedR1]{getBamCoveragePairedAndUnpairedR1()}},
+\code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}}, \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}}, \code{\link[BiocParallel:register]{BiocParallel::register()}}
 
 Other CNV: 
 \code{\link{plotCNVheatmap}()},

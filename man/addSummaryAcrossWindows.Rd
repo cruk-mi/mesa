@@ -15,39 +15,97 @@ addSummaryAcrossWindows(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing window-level signal.
+\strong{Default:} none (must be supplied).}
 
-\item{regionsToOverlap}{GRanges or data.frame coercible to GRanges; if \code{NULL},
-use all regions in the qseaSet.}
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame}, or \code{NULL}.
+Regions used to restrict the windows before summarising. Data frames must be
+coercible to \code{GRanges} (e.g., have \code{seqnames}/\code{start}/\code{end} or
+\code{chr}/\code{window_start}/\code{window_end}). If \code{NULL}, use all windows in \code{qseaSet}.
+\strong{Default:} \code{NULL}.}
 
-\item{fn}{function summary function (e.g., \code{mean}).}
+\item{fn}{\code{function}.
+Summary function applied \strong{per sample} over the selected windows (e.g.,
+\code{mean}, \code{median}, \code{sd}). Provide NA handling inside \code{fn} if needed, e.g.,
+\code{function(x) mean(x, na.rm = TRUE)}.
+\strong{Default:} \code{mean}.}
 
-\item{suffix}{character(1) suffix for output columns (e.g., a region label).}
+\item{suffix}{\code{character(1)}.
+Optional string appended to output column names (e.g., a region label) so
+you can call this repeatedly for different regions.
+\strong{Default:} \code{""}.}
 
-\item{normMethod}{character() one or more of \code{"nrpm"}, \code{"beta"}.}
+\item{normMethod}{\code{character()}.
+One or more measures to summarise. Typically a subset of \code{c("nrpm","beta")}.
+\strong{Default:} \code{c("nrpm","beta")}.}
 
-\item{naMethod}{character(1) \code{"na.rm"} (default) or \code{"drop"} rows with NA.}
+\item{naMethod}{\code{character(1)}.
+How to treat missing values prior to/within summarisation. Supported values:
+\code{"na.rm"} — call \code{fn} with \code{na.rm = TRUE} (when supported);
+\code{"drop"}  — drop windows with any \code{NA} across selected methods;
+\code{"impute"} — replace missing values via the package’s internal strategy
+before summarising.
+\strong{Default:} \code{"impute"}.}
 
-\item{minEnrichment}{integer(1) minimum reads for non-NA beta.}
+\item{minEnrichment}{\code{integer(1)}.
+Minimum reads per window required for a non-\code{NA} beta (relevant when
+\code{normMethod} includes \code{"beta"}).
+\strong{Default:} \code{3}.}
 }
 \value{
-qsea::qseaSet with new summary columns in the sample table.
+A \code{qseaSet} with new summary columns appended to its \code{sampleTable}.
 }
 \description{
 Compute per-sample summaries across windows and left-join them to the
 \code{qseaSet} sample table.
 }
+\details{
+Internally, this calls \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}} to compute per-sample
+summaries for the requested \code{normMethod}(s), then left-joins those summaries
+to the \code{sampleTable}. Output column names typically encode the method and the
+summary function (and include \code{suffix} when provided).
+}
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-gr <- qsea::getRegions(qs)[1:300]
-qs2 <- addSummaryAcrossWindows(qs, regionsToOverlap = gr, fn = mean,
-                               normMethod = "nrpm", suffix = "first300")
-head(qsea::getSampleTable(qs2))
+
+# Add mean NRPM and beta across all windows 
+exampleTumourNormal \%>\%
+  addSummaryAcrossWindows(
+    fn         = mean,
+    normMethod = c("nrpm","beta")
+  ) \%>\%
+  getSampleTable()
+
+# Maximum NRPM across a small genomic slice
+exampleTumourNormal \%>\%
+  addSummaryAcrossWindows(
+    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    fn         = max,
+    normMethod = "nrpm"
+  ) \%>\%
+  getSampleTable()
+
+# Add summaries repeatedly with different regions using a suffix
+exampleTumourNormal \%>\%
+  addSummaryAcrossWindows(
+    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    fn         = median,
+    normMethod = "nrpm",
+    suffix     = "subset"
+  ) \%>\%
+  addSummaryAcrossWindows(
+    fn         = median,
+    normMethod = "nrpm",
+    suffix     = "all"
+  ) \%>\%
+  getSampleTable()
+}
 
 }
 \seealso{
-\code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
+\code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
 Other window-summaries: 
 \code{\link{countWindowsAboveCutoff}()},

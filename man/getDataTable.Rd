@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getDataTable}
 \alias{getDataTable}
-\title{Extract per-window data (counts/NRPM/beta)}
+\title{Extract per-window data (counts / NRPM / beta)}
 \usage{
 getDataTable(
   qseaSet,
@@ -14,33 +14,86 @@ getDataTable(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing window-level signal.
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{character() one or more of \code{"counts"}, \code{"nrpm"}, \code{"beta"}.}
+\item{normMethod}{\code{character()}.
+One or more of \code{"counts"}, \code{"nrpm"}, \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{useGroupMeans}{logical use group means instead of individual samples.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average replicates by the \code{group} column and return group means;
+if \code{FALSE}, return per-sample values.
+\strong{Default:} \code{FALSE}.}
 
-\item{minEnrichment}{integer(1) minimum reads for non-NA beta.}
+\item{minEnrichment}{\code{integer(1)}.
+Minimum reads per window required for a non-\code{NA} beta (applies only when
+\code{normMethod} includes \code{"beta"}).
+\strong{Default:} \code{3}.}
 
-\item{addMethodSuffix}{logical keep method suffix in column names.}
+\item{addMethodSuffix}{\code{logical(1)}.
+Keep a method suffix in column names (e.g., \code{Sample1_nrpm},
+\code{Group_beta_means}). If multiple methods are requested, suffixes are kept
+regardless to avoid collisions.
+\strong{Default:} \code{FALSE}.}
 
-\item{verbose}{logical print messages.}
+\item{verbose}{\code{logical(1)}.
+Print progress/messages.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-tibble with one row per window and columns per sample or group.
+A tibble/data.frame with one row per genomic window and one column per
+sample (or group), plus window metadata columns.
 }
 \description{
-Generate a per-window table for one or more normalisation methods,
-for individual samples or group means.
+Build a per-window table for one or more normalisation methods, returning
+values per \strong{sample} or \strong{group means}.
+}
+\details{
+The result is a \strong{window × sample (or group)} table. Window coordinates and
+any available region metadata (e.g., \code{seqnames}, \code{start}, \code{end}, densities)
+are kept alongside the requested measures. Column naming: when a single
+method is requested and \code{addMethodSuffix = FALSE}, columns are bare sample /
+group names; otherwise a \verb{_\{method\}} (and for group means \verb{_\{method\}_means})
+suffix is appended.
+
+For \code{"beta"}, windows with reads \verb{< minEnrichment} are set to \code{NA} before
+aggregation. Use \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}} afterwards if you want to strip
+method tags in wide tables.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-head(getDataTable(qs, normMethod = "nrpm"))
+
+# Default: NRPM per window (first few columns)
+exampleTumourNormal \%>\%
+  getDataTable() \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Multiple methods together (suffixes retained automatically)
+exampleTumourNormal \%>\%
+  getDataTable(normMethod = c("nrpm","beta"), minEnrichment = 3) \%>\%
+  dplyr::select(1:8) \%>\%
+  head()
+
+# Group means instead of individual samples
+exampleTumourNormal \%>\%
+  getDataTable(useGroupMeans = TRUE, normMethod = "nrpm") \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Keep (or later remove) the method suffix
+exampleTumourNormal \%>\%
+  getDataTable(normMethod = "nrpm", addMethodSuffix = TRUE) \%>\%
+  names() \%>\%
+  head()
+}
 
 }
 \seealso{
-\code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}}
+\code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}}, \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 
 Other table-helpers: 
 \code{\link{getBetaTable}()},

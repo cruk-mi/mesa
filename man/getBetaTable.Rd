@@ -13,34 +13,72 @@ getBetaTable(
 )
 }
 \arguments{
-\item{qseaSet}{qsea::qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing window-level signal.
+\strong{Default:} none (must be supplied).}
 
-\item{useGroupMeans}{logical(1). If \code{TRUE}, average replicates by the \code{group}
-column instead of returning per-sample values.}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average replicates by the \code{group} column in the sample table and
+return group means; if \code{FALSE}, return per-sample betas.
+\strong{Default:} \code{FALSE}.}
 
-\item{minEnrichment}{integer(1). Minimum number of reads required for a
-window to be considered fully methylated (below this, qsea sets beta to NA).}
+\item{minEnrichment}{\code{integer(1)}.
+Minimum reads per window required for a non-\code{NA} beta (below this threshold,
+qsea sets beta to \code{NA}).
+\strong{Default:} \code{3}.}
 
-\item{addMethodSuffix}{logical(1). If \code{TRUE}, keep the method suffix in
-column names (e.g., \code{Sample1_beta}). The suffix is always kept if
-multiple normalisation methods are requested.}
+\item{addMethodSuffix}{\code{logical(1)}.
+If \code{TRUE}, keep the method suffix in column names (e.g., \code{Sample1_beta}
+or \code{Group_beta_means}); if \code{FALSE}, return bare sample/group names.
+\strong{Default:} \code{FALSE}.}
 
-\item{verbose}{logical(1). Print progress/messages.}
+\item{verbose}{\code{logical(1)}.
+Print progress/messages.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A tibble/data.frame of \emph{beta} values (one row per window).
+A tibble/data.frame with one row per genomic window and columns for each
+sample (or group), plus any window metadata included by \code{\link[=getDataTable]{getDataTable()}}.
 }
 \description{
-Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extract \emph{beta} values.
+Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extract \strong{beta} values
+(fraction methylated). Returns a window × sample (or group) table for
+downstream summaries/plots.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-head(getBetaTable(qs, minEnrichment = 3))
+
+# Per-sample beta (first rows/columns), with a minimum read threshold
+exampleTumourNormal \%>\%
+  getBetaTable(minEnrichment = 3) \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Group means instead of individual samples
+exampleTumourNormal \%>\%
+  getBetaTable(useGroupMeans = TRUE, minEnrichment = 3) \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Keep the method suffix in column names
+exampleTumourNormal \%>\%
+  getBetaTable(addMethodSuffix = TRUE) \%>\%
+  names() \%>\%
+  head()
+
+# Inspect how many NAs arise from the minEnrichment filter
+exampleTumourNormal \%>\%
+  getBetaTable(minEnrichment = 5) \%>\%
+  dplyr::select(dplyr::where(is.numeric)) \%>\%
+  is.na() \%>\%
+  colSums() \%>\%
+  head()
+}
 
 }
 \seealso{
-\code{\link[=getDataTable]{getDataTable()}}
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}
 
 Other table-helpers: 
 \code{\link{getCountTable}()},
