@@ -7,57 +7,74 @@
 addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object (must be GRCh38).}
+\item{qseaSet}{\code{qseaSet}.
+Input object (must be GRCh38).
+\strong{Default:} none (must be supplied).}
 
-\item{minDensity}{Numeric. Minimum \code{CpG_density} to keep a window (default \code{5}).}
+\item{minDensity}{\code{numeric(1)}.
+Minimum \code{CpG_density} to keep a window.
+\strong{Default:} \code{5}.}
 
-\item{minBeta}{Numeric. Beta threshold to call a window methylated (default \code{0.8}).}
+\item{minBeta}{\code{numeric(1)}.
+Beta threshold to call a window methylated.
+\strong{Default:} \code{0.8}.}
 }
 \value{
-The input \code{qseaSet}, with its sample table augmented by a numeric column \code{hyperStableEdgar}
-(range 0–1) giving, per sample, the fraction of hyper-stable regions called methylated.
-The \code{qseaSet} is returned.
+The input \code{qseaSet} with its \code{sampleTable} augmented by a numeric column
+\code{hyperStableEdgar} (range 0–1) giving, per sample, the fraction of ultra-stable
+windows called methylated.
 }
 \description{
-Calculates, for each sample in a \code{qseaSet}, the proportion of \emph{Edgar et al.} “ultra-stable”
-regions that are present and clearly methylated (beta ≥ \code{minBeta}) after filtering by CpG
-density (≥ \code{minDensity}). The result is added as the column \code{hyperStableEdgar} in the
-sample table. If that column already exists it will be overwritten.
+For each sample, compute the proportion of \emph{Edgar et al.} “ultra-stable”
+windows that are clearly methylated (beta ≥ \code{minBeta}) after filtering by
+CpG density (≥ \code{minDensity}). The result is added to the sample table as
+\code{hyperStableEdgar} (overwriting any existing column of that name).
 }
 \details{
 \itemize{
-\item \strong{Genome restriction:} Only defined for \code{BSgenome.Hsapiens.NCBI.GRCh38}; the function stops otherwise.
-\item \strong{Regions used:} Requires \code{mesa::hg38UltraStableProbes} (GRCh38 “ultra-stable” methylated windows
-derived from array data).
-\item \strong{Computation:} Overlap windows with \code{hg38UltraStableProbes}, build a beta table
-(\code{qsea::makeTable(norm_methods = "beta")}), keep windows with \code{CpG_density >= minDensity},
-treat \code{NA} beta values as 0 for thresholding, and take the fraction ≥ \code{minBeta} per sample.
+\item \strong{Genome restriction.} Only supported for
+\code{"BSgenome.Hsapiens.NCBI.GRCh38"}; the function stops otherwise (checked via
+\code{qsea:::getGenome()}).
+\item \strong{Regions used.} Uses \code{mesa::hg38UltraStableProbes}, a GRCh38 set derived
+from array data (\emph{Edgar et al.}, 2014).
+\item \strong{Computation.} Windows overlapping the ultra-stable set are extracted,
+beta values are computed via \code{qsea::makeTable(norm_methods = "beta")},
+windows with \code{CpG_density < minDensity} are dropped, \code{NA} beta are treated
+as \code{0} for thresholding, and the per-sample fraction with beta ≥ \code{minBeta}
+is returned.
 }
 }
 \examples{
 \donttest{
-if (requireNamespace("qsea", quietly = TRUE)) {
-  # Example qseaSet shipped with mesa (should be GRCh38)
-  if (system.file("data", "exampleTumourNormal.rda", package = "mesa") != "") {
-    data("exampleTumourNormal", package = "mesa")
+data(exampleTumourNormal, package = "mesa")
 
-    # Add the hyper-stable fraction with defaults
-    qset1 <- addHyperStableFraction(exampleTumourNormal)
-    head(qsea::getSampleTable(qset1)$hyperStableEdgar)
+# Run only if the example windows overlap the ultra-stable probes
+exampleTumourNormal \%>\%
+{
+  has_ov <- sum(
+    GenomicRanges::countOverlaps(
+      qsea::getRegions(.),
+      mesa::hg38UltraStableProbes
+    )
+  ) > 0
 
-    # Stricter thresholds
-    qset2 <- addHyperStableFraction(exampleTumourNormal, minDensity = 10, minBeta = 0.9)
-    summary(qsea::getSampleTable(qset2)$hyperStableEdgar)
+  if (has_ov) addHyperStableFraction(.) else {
+    message("No overlap with hg38UltraStableProbes in this toy dataset; skipping.")
+    .
   }
-}
+} \%>\%
+qsea::getSampleTable() \%>\%
+dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) \%>\%
+head()
 }
 }
 \references{
 Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
-\emph{Meta-analysis of human methylomes reveals stably methylated sequences surrounding CpG islands associated with high gene expression}.
+\emph{Meta-analysis of human methylomes reveals stably methylated sequences
+surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}}, \link{hg38UltraStableProbes},
-\code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\link{hg38UltraStableProbes}, \code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }

@@ -7,32 +7,49 @@
 qseaTableToChrGRanges(dataTable)
 }
 \arguments{
-\item{dataTable}{A data frame (typically from \code{qsea::makeTable()}), or a \code{GRanges}.}
+\item{dataTable}{\code{data.frame}.
+Table of windows to convert. Must contain either the trio
+\code{chr}/\code{window_start}/\code{window_end} \strong{or} \code{seqnames}/\code{start}/\code{end}.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A \code{GRanges} with \code{seqnames} in UCSC style (\code{"chr1"}, …). The genome tag
-is not set; set it yourself if needed (e.g., \code{GenomeInfoDb::genome(gr) <- "hg38"}).
+A \code{GRanges} with \code{seqnames} in UCSC style. The genome is unset.
 }
 \description{
-Coerces a table of windows to \code{GRanges}. Two input formats are supported:
+Coerce a table of windows to a \linkS4class{GRanges}. Two input layouts are
+supported:
 \itemize{
-\item \code{chr}, \code{window_start}, \code{window_end} (like \code{qsea::makeTable()} output), or
+\item \code{chr}, \code{window_start}, \code{window_end} (as in \code{qsea::makeTable()} output), or
 \item \code{seqnames}, \code{start}, \code{end}.
-If chromosome labels lack \code{"chr"}, the prefix is added.
+}
+}
+\details{
+If chromosome labels lack the \code{"chr"} prefix, it is added automatically so
+that \code{seqnames} are in UCSC style (e.g., \code{"chr1"}).
+\itemize{
+\item When given \code{chr}/\code{window_start}/\code{window_end}, the columns are renamed to
+\code{seqnames}/\code{start}/\code{end} before coercion.
+\item When given \code{seqnames}/\code{start}/\code{end}, \code{seqnames} are first coerced to
+character and normalised to include the \code{"chr"} prefix.
+\item The returned \code{GRanges} does \strong{not} set a genome tag; set it yourself if
+needed (e.g., \code{GenomeInfoDb::genome(gr) <- "hg38"}).
 }
 }
 \examples{
 # From makeTable-like columns
-df1 <- data.frame(chr = c("1","2"), window_start = c(100, 500), window_end = c(200, 600))
-gr1 <- qseaTableToChrGRanges(df1)
-gr1
+data.frame(chr = c("1","2"),
+           window_start = c(100, 500),
+           window_end   = c(200, 600)) \%>\%
+  qseaTableToChrGRanges()
 
-# From seqnames/start/end; adds chr prefix if missing
-df2 <- data.frame(seqnames = c("chr3","4"), start = c(1000, 2000), end = c(1100, 2100))
-gr2 <- qseaTableToChrGRanges(df2)
-gr2
+# From seqnames/start/end; adds 'chr' if missing
+data.frame(seqnames = c("chr3","4"),
+           start = c(1000, 2000),
+           end   = c(1100, 2100)) \%>\%
+  qseaTableToChrGRanges()
 
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[GenomeInfoDb:seqlevelsStyle]{GenomeInfoDb::seqlevelsStyle()}}
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}},
+\code{\link[GenomeInfoDb:seqlevelsStyle]{GenomeInfoDb::seqlevelsStyle()}}
 }

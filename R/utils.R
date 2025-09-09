@@ -1,32 +1,43 @@
 #' Drop fragment detail columns from regions
 #'
-#' Removes region metadata columns whose names match `"avgFragment"` (e.g.,
+#' Remove region metadata columns whose names contain `"avgFragment"` (e.g.,
 #' `avgFragmentLength`, `avgFragmentMAPQ`) from the `regions` slot of a `qseaSet`,
 #' if present.
 #'
-#' @param qseaSet A `qseaSet` object to modify.
+#' @param qseaSet `qseaSet`.  
+#'   Input object to modify.  
+#'   **Default:** none (must be supplied).
 #'
-#' @return The input `qseaSet` with its `regions` metadata updated (columns matching
+#' @details
+#' This operation only affects the **metadata columns** (`mcols`) of the regions.
+#' Genomic coordinates and the number/order of regions are preserved. If no
+#' matching columns are found, the function is a no-op.
+#'
+#' @return
+#' A `qseaSet` with its `regions` metadata updated (columns matching
 #' `"avgFragment"` removed if present).
 #'
-#' @seealso [qsea::getRegions()], [plyranges::as_granges()], [dplyr::select()]
+#' @seealso
+#' [qsea::getRegions()], [S4Vectors::mcols()], [dplyr::select()]
 #'
 #' @examples
 #' \donttest{
-#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+#' if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
 #'   data(exampleTumourNormal, package = "mesa")
-#'   # Add toy fragment columns, then drop them
-#'   qs <- exampleTumourNormal
-#'   r  <- qsea::getRegions(qs)
-#'   GenomicRanges::mcols(r)$avgFragmentLength <- 150L
-#'   GenomicRanges::mcols(r)$avgFragmentMAPQ   <- 60L
-#'   qs@regions <- r
-#'   qs2 <- dropAvgFragDetails(qs)
-#'   setdiff(colnames(GenomicRanges::mcols(qs@regions)),
-#'           colnames(GenomicRanges::mcols(qs2@regions)))
+#'
+#'   # Add toy fragment columns via plyranges, then drop them (pipe-only)
+#'   exampleTumourNormal %>%
+#'     { .@regions <- .@regions %>%
+#'         plyranges::mutate(avgFragmentLength = 150L,
+#'                           avgFragmentMAPQ   = 60L); . } %>%
+#'     dropAvgFragDetails() %>%
+#'     qsea::getRegions() %>%
+#'     GenomicRanges::mcols() %>%
+#'     colnames() %>%
+#'     grep("^avgFragment", ., value = TRUE)   # character(0) if removed
 #' }
 #' }
-#' 
+#'
 #' @export
 dropAvgFragDetails <- function(qseaSet) {
   qseaSet@regions <- qseaSet@regions %>%
@@ -35,31 +46,49 @@ dropAvgFragDetails <- function(qseaSet) {
   return(qseaSet)
 }
 
+
 #' Convert a makeTable-like data frame to GRanges (UCSC style)
 #'
-#' Coerces a table of windows to `GRanges`. Two input formats are supported:
-#' - `chr`, `window_start`, `window_end` (like `qsea::makeTable()` output), or
+#' Coerce a table of windows to a \linkS4class{GRanges}. Two input layouts are
+#' supported:
+#' - `chr`, `window_start`, `window_end` (as in `qsea::makeTable()` output), or
 #' - `seqnames`, `start`, `end`.
-#' If chromosome labels lack `"chr"`, the prefix is added.
 #'
-#' @param dataTable A data frame (typically from `qsea::makeTable()`), or a `GRanges`.
+#' If chromosome labels lack the `"chr"` prefix, it is added automatically so
+#' that `seqnames` are in UCSC style (e.g., `"chr1"`).
 #'
-#' @return A `GRanges` with `seqnames` in UCSC style (`"chr1"`, …). The genome tag
-#' is not set; set it yourself if needed (e.g., `GenomeInfoDb::genome(gr) <- "hg38"`).
+#' @param dataTable `data.frame`.  
+#'   Table of windows to convert. Must contain either the trio
+#'   `chr`/`window_start`/`window_end` **or** `seqnames`/`start`/`end`.  
+#'   **Default:** none (must be supplied).
 #'
-#' @seealso [qsea::makeTable()], [plyranges::as_granges()], [GenomeInfoDb::seqlevelsStyle()]
+#' @details
+#' - When given `chr`/`window_start`/`window_end`, the columns are renamed to
+#'   `seqnames`/`start`/`end` before coercion.  
+#' - When given `seqnames`/`start`/`end`, `seqnames` are first coerced to
+#'   character and normalised to include the `"chr"` prefix.  
+#' - The returned `GRanges` does **not** set a genome tag; set it yourself if
+#'   needed (e.g., `GenomeInfoDb::genome(gr) <- "hg38"`).
+#'
+#' @return A `GRanges` with `seqnames` in UCSC style. The genome is unset.
+#'
+#' @seealso
+#' [qsea::makeTable()], [plyranges::as_granges()],
+#' [GenomeInfoDb::seqlevelsStyle()]
 #'
 #' @examples
 #' # From makeTable-like columns
-#' df1 <- data.frame(chr = c("1","2"), window_start = c(100, 500), window_end = c(200, 600))
-#' gr1 <- qseaTableToChrGRanges(df1)
-#' gr1
+#' data.frame(chr = c("1","2"),
+#'            window_start = c(100, 500),
+#'            window_end   = c(200, 600)) %>%
+#'   qseaTableToChrGRanges()
 #'
-#' # From seqnames/start/end; adds chr prefix if missing
-#' df2 <- data.frame(seqnames = c("chr3","4"), start = c(1000, 2000), end = c(1100, 2100))
-#' gr2 <- qseaTableToChrGRanges(df2)
-#' gr2
-#' 
+#' # From seqnames/start/end; adds 'chr' if missing
+#' data.frame(seqnames = c("chr3","4"),
+#'            start = c(1000, 2000),
+#'            end   = c(1100, 2100)) %>%
+#'   qseaTableToChrGRanges()
+#'
 #' @export
 qseaTableToChrGRanges <- function(dataTable) {
 
@@ -81,33 +110,46 @@ qseaTableToChrGRanges <- function(dataTable) {
   return(outGRanges)
 }
 
+
 #' Get window names from a qseaSet or ranges/table
 #'
-#' Returns character labels of the form `"seqnames:start-end"` for each window.
+#' Return character labels of the form `"seqnames:start-end"` for each genomic
+#' window/region.
 #'
-#' @param x A `qseaSet`, a `GRanges`, or a data frame coercible to `GRanges`
-#' (must contain `seqnames/chr`, `start`, `end`).
+#' @param x `qseaSet` **or** `GRanges` **or** `data.frame`.  
+#'   If a data frame, it must be coercible to `GRanges` (accepted columns include
+#'   `seqnames/start/end`, or `chr/start/end`, or `chr/window_start/window_end`).  
+#'   **Default:** none (must be supplied).
 #'
-#' @return A character vector of window labels, one per region.
+#' @details
+#' If `x` is a `qseaSet`, regions are taken from `qsea::getRegions(x)`. Otherwise
+#' the input is coerced to `GRanges` (see [asValidGranges()]) and labels are
+#' constructed as `"seqnames:start-end"`.
 #'
-#' @seealso [qsea::getRegions()], [asValidGranges()]
+#' @return
+#' `character()` vector of window labels, one per region.
+#'
+#' @seealso
+#' [qsea::getRegions()], [asValidGranges()]
 #'
 #' @examples
-#' # From a GRanges
-#' gr <- GenomicRanges::GRanges(c("chr1","chr2"), IRanges::IRanges(c(10,20), c(15,30)))
-#' getWindowNames(gr)
+#' # From a GRanges (no intermediate objects)
+#' GenomicRanges::GRanges(c("chr1","chr2"),
+#'                        IRanges::IRanges(c(10,20), c(15,30))) %>%
+#'   getWindowNames()
 #'
-#' # From a data frame
-#' df <- data.frame(seqnames = c("chr1","chr2"), start = c(100,200), end = c(120,220))
-#' getWindowNames(df)
+#' # From a data.frame (no intermediate objects)
+#' data.frame(seqnames = c("chr1","chr2"),
+#'            start    = c(100,200),
+#'            end      = c(120,220)) %>%
+#'   getWindowNames()
 #'
 #' \donttest{
-#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-#'   data(exampleTumourNormal, package="mesa")
-#'   head(getWindowNames(exampleTumourNormal))
+#' # From a qseaSet shipped with mesa (if available)
+#' data(exampleTumourNormal, package = "mesa")
+#' exampleTumourNormal %>% getWindowNames() %>% head()
 #' }
-#' }
-#' 
+#'
 #' @export
 getWindowNames <- function(x) {
 
@@ -127,26 +169,36 @@ getWindowNames <- function(x) {
   stop("Unknown data type!")
 }
 
-#' Infer the pattern name used by addPatternDensity
+
+#' Infer pattern names from region density columns
 #'
-#' Scans the region metadata of a `qseaSet` for columns ending with `"_density"`
-#' and returns the base pattern name (e.g., `"CpG"` for `"CpG_density"`).
+#' Scan the region metadata of a `qseaSet` for columns ending in `"_density"`
+#' (e.g., `"CpG_density"`) and return the base pattern names (e.g., `"CpG"`).
 #'
-#' @param qseaSet A `qseaSet` with pattern density columns (e.g., added by `addPatternDensity()`).
+#' @param qseaSet `qseaSet`.  
+#'   Object whose regions (via `qsea::getRegions()`) may contain `*_density`
+#'   columns produced by `qsea::addPatternDensity()`.  
+#'   **Default:** none (must be supplied).
 #'
-#' @return A character vector of pattern names found (possibly length 0 if none).
+#' @details
+#' This function inspects `mcols(qsea::getRegions(qseaSet))`, selects column
+#' names matching the regex `"_density$"`, and strips that suffix. It does not
+#' compute densities or modify the object. If no matching columns exist, a
+#' zero-length character vector is returned.
 #'
-#' @seealso [qsea::getRegions()]
+#' @return
+#' `character()` vector of pattern names discovered (length 0 if none).
+#'
+#' @seealso
+#' [qsea::addPatternDensity()], [qsea::getRegions()], [S4Vectors::mcols()]
 #'
 #' @examples
 #' \donttest{
-#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-#'   data(exampleTumourNormal, package="mesa")
-#'   # Returns character(0) if no *_density columns present
-#'   getPattern(exampleTumourNormal)
+#' data(exampleTumourNormal, package = "mesa")
+#' # Returns character(0) if no *_density columns are present
+#' exampleTumourNormal %>% getPattern()
 #' }
-#' }
-#' 
+#'
 #' @export
 getPattern <- function(qseaSet) {
   qseaSet %>%
@@ -158,24 +210,27 @@ getPattern <- function(qseaSet) {
     return()
 }
 
+
 #' Extract the regions (windows) used in a qseaSet
 #'
-#' Convenience wrapper for `qsea::getRegions()`, returning the genomic windows.
+#' Convenience wrapper for [qsea::getRegions()], returning the genomic windows.
 #'
-#' @param qseaSet A `qseaSet`.
+#' @param qseaSet `qseaSet`.  
+#'   Input object.  
+#'   **Default:** none (must be supplied).
 #'
-#' @return A `GRanges` of windows.
+#' @return
+#' A [GenomicRanges::GRanges] of windows.
 #'
-#' @seealso [qsea::getRegions()], [getWindowNames()]
+#' @seealso
+#' [qsea::getRegions()], [getWindowNames()]
 #'
 #' @examples
 #' \donttest{
-#' if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-#'   data(exampleTumourNormal, package="mesa")
-#'   getWindows(exampleTumourNormal)
+#' data(exampleTumourNormal, package = "mesa")
+#' exampleTumourNormal %>% getWindows() %>% head()
 #' }
-#' }
-#' 
+#'
 #' @export
 getWindows <- function(qseaSet) {
   qseaSet %>%
@@ -183,37 +238,52 @@ getWindows <- function(qseaSet) {
     return()
 }
 
+
 #' Remove almost-empty columns from a data frame
 #'
-#' Drops columns whose proportion of `NA` values exceeds a threshold.
-#' Based on `janitor::remove_empty_cols()`, but with a custom `prop` cutoff.
+#' Drop columns whose proportion of `NA` values exceeds a threshold.
+#' Inspired by `janitor::remove_empty_cols()` but with a custom `prop` cutoff.
 #'
-#' @param dat A data frame.
-#' @param prop Numeric in `[0, 1]`. Keep columns with `NA` proportion `<= prop`.
+#' @param dat `data.frame`.  
+#'   Table to filter.  
+#'   **Default:** none (must be supplied).
 #'
-#' @return A data frame with columns failing the threshold removed. The original
-#' order and row count are preserved.
+#' @param prop `numeric(1)`.  
+#'   Keep columns with `NA` proportion `<= prop` (range `[0, 1]`).  
+#'   **Default:** none (must be supplied).
 #'
-#' @seealso [janitor::remove_empty()]
+#' @details
+#' Column order and the number of rows are preserved. A message is emitted via
+#' an internal janitor helper indicating which columns were removed.
+#'
+#' @return
+#' A `data.frame` with columns failing the threshold removed.
+#'
+#' @seealso
+#' [janitor::remove_empty()]
 #'
 #' @examples
-#' df <- data.frame(a = c(1, NA, 3),
-#'                  b = c(NA, NA, NA),
-#'                  c = c(1, 2, NA))
-#' remove_almost_empty_cols(df, prop = 0.5)  # drops column b
-#' 
+#' data.frame(a = c(1, NA, 3),
+#'            b = c(NA, NA, NA),
+#'
+#'            c = c(1, 2, NA)) %>%
+#'   remove_almost_empty_cols(prop = 0.5)  # drops column b
+#'
 remove_almost_empty_cols <- function(dat, prop)  {
   mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
   janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
   return(dat[,mask_keep, drop = FALSE])
 }
 
+
 #' Skip slow checks when configured
 #'
 #' Test helper that skips long-running checks when the option
 #' `options(skip_long_checks = TRUE)` is set.
 #'
-#' @return Invisibly returns `TRUE` if not skipping; otherwise calls `testthat::skip()`.
+#' @return
+#' Invisibly returns `TRUE` if **not** skipping; otherwise calls
+#' `testthat::skip()` to skip the test.
 #'
 #' @examples
 #' \donttest{
@@ -231,34 +301,38 @@ skip_long_checks <- function() {
   testthat::skip("Slow checks skipped when options(skip_long_checks = TRUE) has been set")
 }
 
+
 #' Coerce common tabular inputs to GRanges
 #'
-#' Checks if `object` is a `GRanges` or a data frame containing window coordinates,
-#' and returns a valid `GRanges`. Supported data frame schemas:
+#' Accept a `GRanges` or a data frame containing window coordinates and
+#' return a valid [GenomicRanges::GRanges]. Supported data-frame schemas:
 #' - `seqnames`, `start`, `end`
 #' - `chr`, `start`, `end` (renamed to `seqnames`)
 #' - `chr`, `window_start`, `window_end` (renamed to `seqnames/start/end`)
 #'
-#' @param object A `GRanges` or a data frame with window coordinates.
+#' @param object `GRanges` **or** `data.frame` with window coordinates.  
+#'   **Default:** none (must be supplied).
 #'
-#' @return A `GRanges` with coordinates taken from `object`. Errors if no supported
-#' schema is found.
+#' @return
+#' A [GenomicRanges::GRanges] built from `object`.  
+#' Errors if no supported schema is found.
 #'
-#' @seealso [plyranges::as_granges()], [qseaTableToChrGRanges()]
+#' @seealso
+#' [plyranges::as_granges()], [qseaTableToChrGRanges()]
 #'
 #' @examples
 #' # From GRanges (passes through)
-#' gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100, 200))
-#' asValidGranges(gr)
+#' GenomicRanges::GRanges("chr1", IRanges::IRanges(100, 200)) %>%
+#'   asValidGranges()
 #'
-#' # From data frame (seqnames/start/end)
-#' df1 <- data.frame(seqnames = "chr2", start = 10, end = 20)
-#' asValidGranges(df1)
+#' # From data.frame (seqnames/start/end)
+#' data.frame(seqnames = "chr2", start = 10, end = 20) %>%
+#'   asValidGranges()
 #'
-#' # From data frame (chr/window_start/window_end)
-#' df2 <- data.frame(chr = "1", window_start = 1000, window_end = 1100)
-#' asValidGranges(df2)
-#' 
+#' # From data.frame (chr/window_start/window_end)
+#' data.frame(chr = "1", window_start = 1000, window_end = 1100) %>%
+#'   asValidGranges()
+#'
 asValidGranges <- function(object){
 
   if("GRanges" %in% class(object)){

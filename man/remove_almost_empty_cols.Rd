@@ -7,23 +7,31 @@
 remove_almost_empty_cols(dat, prop)
 }
 \arguments{
-\item{dat}{A data frame.}
+\item{dat}{\code{data.frame}.
+Table to filter.
+\strong{Default:} none (must be supplied).}
 
-\item{prop}{Numeric in \verb{[0, 1]}. Keep columns with \code{NA} proportion \verb{<= prop}.}
+\item{prop}{\code{numeric(1)}.
+Keep columns with \code{NA} proportion \verb{<= prop} (range \verb{[0, 1]}).
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A data frame with columns failing the threshold removed. The original
-order and row count are preserved.
+A \code{data.frame} with columns failing the threshold removed.
 }
 \description{
-Drops columns whose proportion of \code{NA} values exceeds a threshold.
-Based on \code{janitor::remove_empty_cols()}, but with a custom \code{prop} cutoff.
+Drop columns whose proportion of \code{NA} values exceeds a threshold.
+Inspired by \code{janitor::remove_empty_cols()} but with a custom \code{prop} cutoff.
+}
+\details{
+Column order and the number of rows are preserved. A message is emitted via
+an internal janitor helper indicating which columns were removed.
 }
 \examples{
-df <- data.frame(a = c(1, NA, 3),
-                 b = c(NA, NA, NA),
-                 c = c(1, 2, NA))
-remove_almost_empty_cols(df, prop = 0.5)  # drops column b
+data.frame(a = c(1, NA, 3),
+           b = c(NA, NA, NA),
+
+           c = c(1, 2, NA)) \%>\%
+  remove_almost_empty_cols(prop = 0.5)  # drops column b
 
 }
 \seealso{

@@ -7,20 +7,20 @@
 getWindows(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet}.}
+\item{qseaSet}{\code{qseaSet}.
+Input object.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A \code{GRanges} of windows.
+A \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} of windows.
 }
 \description{
-Convenience wrapper for \code{qsea::getRegions()}, returning the genomic windows.
+Convenience wrapper for \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, returning the genomic windows.
 }
 \examples{
 \donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
-  data(exampleTumourNormal, package="mesa")
-  getWindows(exampleTumourNormal)
-}
+data(exampleTumourNormal, package = "mesa")
+exampleTumourNormal \%>\% getWindows() \%>\% head()
 }
 
 }

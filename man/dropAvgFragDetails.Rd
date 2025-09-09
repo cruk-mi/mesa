@@ -7,34 +7,43 @@
 dropAvgFragDetails(qseaSet)
 }
 \arguments{
-\item{qseaSet}{A \code{qseaSet} object to modify.}
+\item{qseaSet}{\code{qseaSet}.
+Input object to modify.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-The input \code{qseaSet} with its \code{regions} metadata updated (columns matching
+A \code{qseaSet} with its \code{regions} metadata updated (columns matching
 \code{"avgFragment"} removed if present).
 }
 \description{
-Removes region metadata columns whose names match \code{"avgFragment"} (e.g.,
+Remove region metadata columns whose names contain \code{"avgFragment"} (e.g.,
 \code{avgFragmentLength}, \code{avgFragmentMAPQ}) from the \code{regions} slot of a \code{qseaSet},
 if present.
 }
+\details{
+This operation only affects the \strong{metadata columns} (\code{mcols}) of the regions.
+Genomic coordinates and the number/order of regions are preserved. If no
+matching columns are found, the function is a no-op.
+}
 \examples{
 \donttest{
-if (system.file("data","exampleTumourNormal.rda",package="mesa") != "") {
+if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
   data(exampleTumourNormal, package = "mesa")
-  # Add toy fragment columns, then drop them
-  qs <- exampleTumourNormal
-  r  <- qsea::getRegions(qs)
-  GenomicRanges::mcols(r)$avgFragmentLength <- 150L
-  GenomicRanges::mcols(r)$avgFragmentMAPQ   <- 60L
-  qs@regions <- r
-  qs2 <- dropAvgFragDetails(qs)
-  setdiff(colnames(GenomicRanges::mcols(qs@regions)),
-          colnames(GenomicRanges::mcols(qs2@regions)))
+
+  # Add toy fragment columns via plyranges, then drop them (pipe-only)
+  exampleTumourNormal \%>\%
+    { .@regions <- .@regions \%>\%
+        plyranges::mutate(avgFragmentLength = 150L,
+                          avgFragmentMAPQ   = 60L); . } \%>\%
+    dropAvgFragDetails() \%>\%
+    qsea::getRegions() \%>\%
+    GenomicRanges::mcols() \%>\%
+    colnames() \%>\%
+    grep("^avgFragment", ., value = TRUE)   # character(0) if removed
 }
 }
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[dplyr:select]{dplyr::select()}}
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[S4Vectors:Vector-class]{S4Vectors::mcols()}}, \code{\link[dplyr:select]{dplyr::select()}}
 }

@@ -7,15 +7,16 @@
 asValidGranges(object)
 }
 \arguments{
-\item{object}{A \code{GRanges} or a data frame with window coordinates.}
+\item{object}{\code{GRanges} \strong{or} \code{data.frame} with window coordinates.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A \code{GRanges} with coordinates taken from \code{object}. Errors if no supported
-schema is found.
+A \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} built from \code{object}.
+Errors if no supported schema is found.
 }
 \description{
-Checks if \code{object} is a \code{GRanges} or a data frame containing window coordinates,
-and returns a valid \code{GRanges}. Supported data frame schemas:
+Accept a \code{GRanges} or a data frame containing window coordinates and
+return a valid \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}. Supported data-frame schemas:
 \itemize{
 \item \code{seqnames}, \code{start}, \code{end}
 \item \code{chr}, \code{start}, \code{end} (renamed to \code{seqnames})
@@ -24,16 +25,16 @@ and returns a valid \code{GRanges}. Supported data frame schemas:
 }
 \examples{
 # From GRanges (passes through)
-gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100, 200))
-asValidGranges(gr)
+GenomicRanges::GRanges("chr1", IRanges::IRanges(100, 200)) \%>\%
+  asValidGranges()
 
-# From data frame (seqnames/start/end)
-df1 <- data.frame(seqnames = "chr2", start = 10, end = 20)
-asValidGranges(df1)
+# From data.frame (seqnames/start/end)
+data.frame(seqnames = "chr2", start = 10, end = 20) \%>\%
+  asValidGranges()
 
-# From data frame (chr/window_start/window_end)
-df2 <- data.frame(chr = "1", window_start = 1000, window_end = 1100)
-asValidGranges(df2)
+# From data.frame (chr/window_start/window_end)
+data.frame(chr = "1", window_start = 1000, window_end = 1100) \%>\%
+  asValidGranges()
 
 }
 \seealso{
