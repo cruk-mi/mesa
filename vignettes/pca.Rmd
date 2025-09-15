@@ -211,7 +211,7 @@ pca <- getPCA(qseaSet = exampleTumourNormal)
 
 ## `getPCA()` function arguments
 
-By default, the `getPCA` function will only consider a subset of the most variable windows across the qseaSet. This has two benefits, the first being computational efficiency, but the second is to prevent the effects of minor batch effects from appearing on the when they are summed over many windows (although that is also worth investigating separately). This is seen particularly when using `beta` values, as how close a beta value can get to 0 or 1 is determined by the enrichment and number of fragments sequenced; a sample with 5 million fragments might be assigned a beta value of 0.95 in a window, but 0.99 in the same window if it had 10 million fragments.
+By default, the `getPCA` function will only consider a subset of the most variable windows across the qseaSet. This has two benefits, the first being computational efficiency, but the second is to prevent the effects of minor batch effects from appearing when they are summed over many windows (although that is also worth investigating separately). This is seen particularly when using `beta` values, as how close a beta value can get to 0 or 1 is determined by the enrichment and number of fragments sequenced; a sample with 5 million fragments might be assigned a beta value of 0.95 in a window, but 0.99 in the same window if it had 10 million fragments.
 
 ### Setting number of top variable windows to use
 This selection of the number of windows can be set using the `topVarNum` argument of `getPCA()`. If not explicitly set, the default value is the top 1000 most variable windows.
