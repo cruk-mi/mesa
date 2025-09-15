@@ -17,7 +17,7 @@ plotCorrelationMatrix(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{The qseaSet object}
 
 \item{regionsToOverlap}{Regions to overlap}
 
@@ -36,8 +36,14 @@ plotCorrelationMatrix(
 \item{...}{Other arguments for pheatmap}
 }
 \value{
-A table
+Invisibly returns the matrix of correlations
 }
 \description{
 This function takes a qseaSet and plots a correlation matrix
+}
+\examples{
+# by default uses nrpm
+exampleTumourNormal \%>\% plotCorrelationMatrix()
+#using beta values often looks quite different
+exampleTumourNormal \%>\% plotCorrelationMatrix(normMethod = "beta", sampleAnnotation = c(tumour,patient))
 }

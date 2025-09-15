@@ -6,3 +6,5 @@ inst/doc
 /doc/
 /Meta/
 .RData
+vignettes/.build.timestamp
+vignettes/*_files

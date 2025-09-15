@@ -37,3 +37,10 @@ This function is designed to take a qseaSet and filter the windows by applying a
 For instance, we can keep only regions that have a median normalised reads per million value above 1, or those where the minimum beta value is below 0.5.
 Which samples to apply the filter based on can be specified with the \code{samples} argument, either as a list of samples or a string.
 }
+\examples{
+# keep only windows with a mean nrpm value above 1 across all samples
+exampleTumourNormal \%>\% subsetWindowsBySignal(fn = mean, threshold = 1, aboveThreshold = TRUE, normMethod = "nrpm")
+# keep only windows with a median beta value below 0.25 in the normal samples
+exampleTumourNormal \%>\% subsetWindowsBySignal(fn = median, threshold = 0.25, aboveThreshold = FALSE, normMethod = "beta", samples = "_N")
+
+}

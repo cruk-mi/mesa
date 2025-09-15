@@ -78,3 +78,12 @@ This function takes a qseaSet and generates a table of data containing data for 
 \item \code{getBetaTable()}: 
 
 }}
+\examples{
+exampleTumourNormal \%>\% getCountTable()
+
+
+exampleTumourNormal \%>\% getNRPMTable()
+exampleTumourNormal \%>\% getNRPMTable()
+exampleTumourNormal \%>\% getDataTable()
+exampleTumourNormal \%>\% getDataTable(normMethod = c("nrpm","beta"))
+}
