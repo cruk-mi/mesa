@@ -36,7 +36,20 @@ test_that("Making a hg19 qseaSet", {
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
-  expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
+  safePlotGeneHeatmap <- function(...) {
+    tryCatch({
+      plotGeneHeatmap(...)
+      succeed()
+    }, error = function(e) {
+      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof", e$message, ignore.case = TRUE)) {
+        skip("Connection to biomart failed, skipping test.")
+      } else {
+        stop(e)
+      }
+    })
+  }
+  
+  expect_no_error(testSet %>% safePlotGeneHeatmap("JAM2"))
 
 })
 
@@ -80,7 +93,20 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
-  expect_no_error(testSet %>% plotGeneHeatmap("EWSR1"))
+  safePlotGeneHeatmap <- function(...) {
+    tryCatch({
+      plotGeneHeatmap(...)
+      succeed()
+    }, error = function(e) {
+      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof", e$message, ignore.case = TRUE)) {
+        skip("Connection to biomart failed, skipping test.")
+      } else {
+        stop(e)
+      }
+    })
+  }
+  
+  expect_no_error(testSet %>% safePlotGeneHeatmap("EWSR1"))
 
 })
 
