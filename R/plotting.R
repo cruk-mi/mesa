@@ -510,11 +510,30 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     }
   }
 
-  gene_details <- biomaRt::getBM(mart = mart,
-                                 attributes = c('hgnc_symbol', 'description', 'chromosome_name',
-                                                'start_position', 'end_position', 'strand','ensembl_gene_id'),
-                                 filters = idType,
-                                 values = gene) %>%
+
+  rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
+
+  # Use purrr::insistently wrapped in purrr::possibly for biomart retry logic
+  safeBiomartLookup <- purrr::possibly(
+    purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
+    otherwise = NULL
+  )
+
+  bm_result <- safeBiomartLookup(
+    mart = mart,
+    attributes = c('hgnc_symbol', 'description', 'chromosome_name',
+                   'start_position', 'end_position', 'strand','ensembl_gene_id'),
+    filters = idType,
+    values = gene
+  )
+
+  if (is.null(bm_result)) {
+    stop(
+      "Could not retrieve gene information from biomart after multiple attempts. Please check your internet connection or try again later."
+    )
+  }
+
+  gene_details <- bm_result %>%
     dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
 
   qseaSetChr <- qseaSet %>%
