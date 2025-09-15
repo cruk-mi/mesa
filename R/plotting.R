@@ -464,6 +464,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' # cluster the rows and add annotation
 #' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 #' # more complex example
+#' \donttest{
 #' exampleTumourNormal %>% 
 #'   plotGeneHeatmap(gene = "HOXA9", 
 #'                    clusterNum = 2,
@@ -472,10 +473,13 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'                    upstreamDist = 1000,
 #'                    downstreamDist = 2000
 #'                     )
+#'}
 #' # example with specifying the mart for mouse data
+#' \donttest{
 #' plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
 #'   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
-#'   
+#'}   
+#'
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
@@ -514,10 +518,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
 
   # Use purrr::insistently wrapped in purrr::possibly for biomart retry logic
-  safeBiomartLookup <- purrr::possibly(
-    purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
-    otherwise = NULL
-  )
+  safeBiomartLookup <-
+    purrr::possibly(purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
+                    otherwise = NULL)
 
   bm_result <- safeBiomartLookup(
     mart = mart,
