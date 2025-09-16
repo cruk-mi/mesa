@@ -242,12 +242,12 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 
   rowAnnotDfdistinct <- rowAnnotDf %>%
     dplyr::select(-.rowID) %>%
-    distinct()
+    dplyr::distinct()
   
   
-  nonUniqueWindowsDf <-rowAnnotDfdistinct %>% 
-    group_by(window) %>% 
-    filter(dplyr::n() > 1)
+  nonUniqueWindowsDf <- rowAnnotDfdistinct %>% 
+    dplyr::group_by(window) %>% 
+    dplyr::filter(dplyr::n() > 1)
   
   if(nrow(nonUniqueWindowsDf) > 0) {
     stop(glue::glue("Non-unique annotations found in window annotations: 
