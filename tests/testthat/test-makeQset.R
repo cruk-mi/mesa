@@ -36,6 +36,9 @@ test_that("Making a hg19 qseaSet", {
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
+  # biomaRt-dependent → skip if offline/CI
+  skip_if_offline()
+  skip_on_ci()
   expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
 
 })
@@ -80,6 +83,9 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
+  # biomaRt-dependent → skip if offline/CI
+  skip_if_offline()
+  skip_on_ci()
   expect_no_error(testSet %>% plotGeneHeatmap("EWSR1"))
 
 })
