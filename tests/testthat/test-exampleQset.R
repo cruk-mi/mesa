@@ -56,39 +56,26 @@ test_that("Annotation getting works", {
 
 test_that("Testing hg38 related annotation/plotting functions", {
 
-  safePlotGeneHeatmap <- function(...) {
-    tryCatch({
-      plotGeneHeatmap(...)
-      succeed()
-    }, error = function(e) {
-      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof|Internal Server Error (HTTP 500)", e$message, ignore.case = TRUE)) {
-        skip("Connection to biomart failed, skipping test.")
-      } else {
-        stop(e)
-      }
-    })
-  }
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c("tumour","type"),  useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = FALSE)
 
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE)
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = FALSE)
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c("tumour","type"),  useGroupMeans = FALSE)
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE)
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = TRUE)
 
-  safePlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE)
-  safePlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = TRUE)
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE, showSampleNames = FALSE)
 
-  safePlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE, showSampleNames = FALSE)
+  expect_error(testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
+  expect_error(testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
 
-  expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
-  expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
-
-  safePlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
                                annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")))
 
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10")
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm")
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3)
-  safePlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10")
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm")
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
                                     sampleAnnotation = "tumour" )
 
   expect_no_error(exampleTumourNormal %>%

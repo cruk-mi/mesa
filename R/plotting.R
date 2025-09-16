@@ -1021,3 +1021,21 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
 
   return(annotationColDf)
 }
+
+
+#' An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
+#' 
+#' @param ... Arguments to pass to plotGeneHeatmap
+#' 
+testPlotGeneHeatmap <- function(...) {
+  tryCatch({
+    plotGeneHeatmap(...)
+    succeed()
+  }, error = function(e) {
+    if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof", e$message, ignore.case = TRUE)) {
+      skip("Connection to biomart failed, skipping test.")
+    } else {
+      fail()
+    }
+  })
+}

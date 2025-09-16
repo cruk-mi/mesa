@@ -6,23 +6,10 @@ test_that("Mouse plotting", {
   
   expect_true("Mart" %in% class(exampleMouse %>% getMart()))
 
-  safePlotGeneHeatmap <- function(...) {
-    tryCatch({
-      plotGeneHeatmap(...)
-      succeed()
-    }, error = function(e) {
-      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof|Internal Server Error (HTTP 500)", e$message, ignore.case = TRUE)) {
-        skip("Connection to biomart failed, skipping test.")
-      } else {
-        stop(e)
-      }
-    })
-  }
-
-  safePlotGeneHeatmap(exampleMouse, gene = "Fbxl18")
+  testPlotGeneHeatmap(exampleMouse, gene = "Fbxl18")
   
   #specify a different Mart:
-  safePlotGeneHeatmap(exampleMouse, 
+  testPlotGeneHeatmap(exampleMouse, 
                                   gene = "Fbxl18",
                                   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org")
                                   )
@@ -30,7 +17,7 @@ test_that("Mouse plotting", {
   exampleMouse2 <- exampleMouse %>%
     setMart(biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org"))
     
-  safePlotGeneHeatmap(exampleMouse2, gene = "Fbxl18")
+  testPlotGeneHeatmap(exampleMouse2, gene = "Fbxl18")
 })
 
 test_that("Mouse annotation", {

@@ -35,21 +35,8 @@ test_that("Making a hg19 qseaSet", {
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 541532)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
-
-  safePlotGeneHeatmap <- function(...) {
-    tryCatch({
-      plotGeneHeatmap(...)
-      succeed()
-    }, error = function(e) {
-      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof|Internal Server Error (HTTP 500)", e$message, ignore.case = TRUE)) {
-        skip("Connection to biomart failed, skipping test.")
-      } else {
-        stop(e)
-      }
-    })
-  }
   
-  expect_no_error(testSet %>% safePlotGeneHeatmap("JAM2"))
+  testPlotGeneHeatmap(testSet, "JAM2")
 
 })
 
@@ -92,21 +79,8 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
-
-  safePlotGeneHeatmap <- function(...) {
-    tryCatch({
-      plotGeneHeatmap(...)
-      succeed()
-    }, error = function(e) {
-      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof", e$message, ignore.case = TRUE)) {
-        skip("Connection to biomart failed, skipping test.")
-      } else {
-        stop(e)
-      }
-    })
-  }
   
-  expect_no_error(testSet %>% safePlotGeneHeatmap("EWSR1"))
+  testPlotGeneHeatmap(testSet, "EWSR1")
 
 })
 
