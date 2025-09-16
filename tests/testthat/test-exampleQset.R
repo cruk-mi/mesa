@@ -54,7 +54,8 @@ test_that("Annotation getting works", {
 }
 )
 
-test_that("Testing hg38 related annotation/plotting functions", {
+test_that("Testing plotGeneHeatmap annotation logic on hg38", {
+  # These don't need internet or CI skip
 
   expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE))
   expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = FALSE))
@@ -70,21 +71,23 @@ test_that("Testing hg38 related annotation/plotting functions", {
   expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
 
   expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
-                               annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
+                                  annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
 
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10"))
+})
+  
+  test_that("Testing plotGeneHeatmap network-dependent calls on hg38", {
+    skip_if_offline()
+    skip_on_ci()
+    
+    expect_no_error(exampleTumourNormal %>% plotGeneHeatmap(gene = "HOXA10"))
+    expect_no_error(exampleTumourNormal %>% plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm"))
+    expect_no_error(exampleTumourNormal %>% plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3))
+    expect_no_error(exampleTumourNormal %>% plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
+                                                            sampleAnnotation = "tumour"))
+})
 
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm"))
 
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3))
-
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
-                                    sampleAnnotation = "tumour" ))
-
+test_that("Testing hg38 CNV, subset, and summarise functions", {
   expect_no_error(exampleTumourNormal %>%
                     plotCNVheatmap(tumour))
 
@@ -122,8 +125,15 @@ test_that("Testing hg38 related annotation/plotting functions", {
   expect_equal(exampleTumourNormal %>% pull(group) %>% length(), exampleTumourNormal %>% getSampleNames() %>% length())
   expect_equal(exampleTumourNormal %>% pull(tumour) %>% unique(), c("Normal", "Tumour"))
   expect_equal(exampleTumourNormal %>% pull(type) %>% unique() %>% length(), 5)
-
 })
+
+
+  
+  
+  
+
+  
+
 
 test_that("Testing general functionality", {
   randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
