@@ -1,4 +1,7 @@
-test_that("Mouse annotation and plotting", {
+test_that("Testing if mouse plotGeneHeatmap works", {
+  
+  skip_if_offline()
+  skip_on_ci()
   
   expect_true("Mart" %in% class(exampleMouse %>% getMart()))
 
@@ -18,8 +21,9 @@ test_that("Mouse annotation and plotting", {
   expect_no_error(plotGeneHeatmap(exampleMouse2, 
                                   gene = "Fbxl18")
                   )
-  
-  
+})
+
+test_that("Testing mouse annotation and TxDb/annoDb handling", {
   #expect an error if global settings not set
   setMesaTxDb(NULL)
   setMesaAnnoDb(NULL)
