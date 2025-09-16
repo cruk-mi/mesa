@@ -41,7 +41,7 @@ test_that("Making a hg19 qseaSet", {
       plotGeneHeatmap(...)
       succeed()
     }, error = function(e) {
-      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof", e$message, ignore.case = TRUE)) {
+      if (grepl("biomart|SSL|connection|timeout|could not resolve|unexpected eof|Internal Server Error (HTTP 500)", e$message, ignore.case = TRUE)) {
         skip("Connection to biomart failed, skipping test.")
       } else {
         stop(e)
