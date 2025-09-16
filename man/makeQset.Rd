@@ -81,7 +81,7 @@ A qseaSet object, containing all the information required.
 This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata.
 }
 \examples{
-\dontshow{if (requireNamespace("MEDIPSData", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("MEDIPSData", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 # make a sampleTable (requires `MEDIPSData` package to be installed)
 sampleTable <- data.frame(sample_name = c("Normal1","Tumour1"),
   group = c("Normal1","Tumour1"),
