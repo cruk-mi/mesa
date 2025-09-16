@@ -464,7 +464,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' # cluster the rows and add annotation
 #' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 #' # more complex example
-#' \donttest{
+#' \dontrun{
 #' exampleTumourNormal %>% 
 #'   plotGeneHeatmap(gene = "HOXA9", 
 #'                    clusterNum = 2,
@@ -475,7 +475,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'                     )
 #'}
 #' # example with specifying the mart for mouse data
-#' \donttest{
+#' \dontrun{
 #' plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
 #'   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
 #'}   
