@@ -1031,7 +1031,7 @@ testPlotGeneHeatmap <- function(...) {
     plotGeneHeatmap(...)
     succeed()
   }, error = function(e) {
-    if (str_detect(e$message, "biomart|SSL|connection|timeout|could not resolve|unexpected eof", ignore.case = TRUE)) {
+    if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof")) {
       skip("Connection to biomart failed, skipping test.")
     } else {
       stop(e)
