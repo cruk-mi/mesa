@@ -525,7 +525,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   bm_result <- safeBiomartLookup(
     mart = mart,
     attributes = c('hgnc_symbol', 'description', 'chromosome_name',
-                   'start_position', 'end_position', 'strand','ensembl_gene_id'),
+                   'start_position', 'end_position', 'strand', 'ensembl_gene_id'),
     filters = idType,
     values = gene
   )
