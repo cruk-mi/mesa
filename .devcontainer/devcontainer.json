@@ -1,0 +1,22 @@
+{
+  "name": "mesa-dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "ikuyadeu.r",
+        "ms-python.python"
+      ]
+    }
+  },
+
+  "remoteEnv": {
+    "R_LIBS_USER": "/home/vscode/R/x86_64-pc-linux-gnu-library/4.3"
+  },
+
+  "postCreateCommand": "Rscript .devcontainer/install.R"
+}
