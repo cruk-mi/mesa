@@ -18,5 +18,5 @@ A GRanges object with the result of calling HMMcopy.
 }
 \description{
 This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-Only works for hg38/GRCh38!
+Assumes gc and map columns have already been added.
 }

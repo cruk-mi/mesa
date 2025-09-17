@@ -4,7 +4,7 @@
 \alias{removeNormMethodSuffix}
 \title{This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values}
 \usage{
-removeNormMethodSuffix(dataTable, normMethod)
+removeNormMethodSuffix(dataTable, normMethod = NULL)
 }
 \arguments{
 \item{dataTable}{A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from \code{\link[=getDataTable]{getDataTable()}}.}
@@ -16,4 +16,8 @@ The dataTable with the normMethod suffix "_{normMethod}" removed from sample (or
 }
 \description{
 This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values
+}
+\examples{
+exampleTumourNormal \%>\% getDataTable(addMethodSuffix = TRUE)  \%>\% removeNormMethodSuffix(normMethod = "nrpm")
+
 }

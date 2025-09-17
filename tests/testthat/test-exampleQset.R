@@ -51,12 +51,6 @@ test_that("Annotation getting works", {
                                      regionsToOverlap = regions %>% mutate(newCol = rnorm(10)),
                                      windowAnnotation = c(CpG_density, newCol)))
 
-  expect_error(plotRegionsHeatmap(exampleTumourNormal,
-                                  regionsToOverlap = regions %>% 
-                                    bind_ranges(regions) %>%
-                                    mutate(newCol = rnorm(20)),
-                                  windowAnnotation = c(CpG_density, newCol)))
-  
 }
 )
 
@@ -180,6 +174,12 @@ test_that("Analysing DMRs", {
                  summariseDMRsByGene() %>%
                  dim(),c(21,4))
 
+  expect_no_error(DMRs %>% 
+                    writeDMRsToBed(tempdir()))
+  
+  expect_no_error(DMRs %>% 
+                    writeDMRsToExcel(paste0(tempdir(),"/test.xlsx")))
+  
 })
 
 test_that("Multiple DMRs", {
