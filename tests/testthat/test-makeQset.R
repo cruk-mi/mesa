@@ -163,14 +163,18 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 
 test_that("calculateCGEnrichment works", {
 
-enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+  if(!rlang::is_installed("MEDIPSData")){
+    skip("MEDIPSData Not installed")
+  }  
+  
+  enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
                        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
                        exportPath = NULL,
                        extend = 0, shift = 0, uniq = 0,
                        chr.select = "chr22", paired = TRUE)
 
-expect_equal(enr$nReads, 636130)
-expect_equal(enr$relH, 3.353462, tolerance = 5)
-expect_equal(enr$GoGe, 1.631612, tolerance = 5)
+  expect_equal(enr$nReads, 636130)
+  expect_equal(enr$relH, 3.353462, tolerance = 5)
+  expect_equal(enr$GoGe, 1.631612, tolerance = 5)
 
 })
