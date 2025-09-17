@@ -74,6 +74,7 @@ exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9")
 # cluster the rows and add annotation
 exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 # more complex example
+\dontrun{
 exampleTumourNormal \%>\% 
   plotGeneHeatmap(gene = "HOXA9", 
                    clusterNum = 2,
@@ -82,8 +83,11 @@ exampleTumourNormal \%>\%
                    upstreamDist = 1000,
                    downstreamDist = 2000
                     )
+}
 # example with specifying the mart for mouse data
+\dontrun{
 plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
-  
+}   
+
 }
