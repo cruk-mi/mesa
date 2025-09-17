@@ -33,3 +33,18 @@ A tibble with the data, augmented with ChIPseeker region location and CpG island
 This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
 Defaults to being hg38, unless
 }
+\examples{
+DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+# have to specify what species. Genome only recognises hg38
+annotateWindows(DMRs, genome = "hg38")
+# otherwise we can specify TxDb and annoDb
+annotateWindows(DMRs, TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db")
+
+# for mouse mm10 genome:
+exampleMouse \%>\% 
+  getRegions() \%>\%  
+  annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene", annoDb = "org.Mm.eg.db")
+  
+# use setMesaTxDb and setMesaAnnoDb to set these databases globally
+
+}

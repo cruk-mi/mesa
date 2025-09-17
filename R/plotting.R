@@ -20,6 +20,23 @@
 #' @param ... Other arguments to pass to ComplexHeatmap.
 #' @return A qseaSet object with the sampleTable enhanced with the information on number of reads etc
 #' @export
+#' @examples
+#' # calculate DMRs to plot
+#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
+#' # plot these windows
+#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
+#' # cluster the rows and add annotation
+#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+#' # more complex example
+#' exampleTumourNormal %>% 
+#'   plotRegionsHeatmap(regionsToOverlap = DMRs, 
+#'                    clusterRows = TRUE, 
+#'                    clusterNum = 2,
+#'                    sampleAnnotation = tumour,
+#'                    windowAnnotation = CpG_density,
+#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+#'                     )
+#' 
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
@@ -186,7 +203,8 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                             show_column_names = showSampleNames,
                             column_title = NULL,
                             top_annotation = colAnnot,
-                            left_annotation = rowAnnot) %>%
+                            left_annotation = rowAnnot,
+                            ...) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "bottom",
                          annotation_legend_side = annotationPosition,
                          column_title = title,
@@ -205,6 +223,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 #' @param clusterRows Whether the rows are going to be clustered. If not, ensure the annotation is the correct order.
 #'
 #' @return A data frame containing the annotation columns, ready for use in plotting functions
+
 getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clusterRows = FALSE) {
   rowAnnotDf <- dataTab %>%
     plyranges::as_granges() %>%
@@ -240,7 +259,6 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 
 }
 
-
 #' This function makes a pair of HeatmapAnnotation objects, and is a helper function for plotRegionsHeatmap and plotCNV.
 #' @param qseaSet Whether to cluster the rows or not.
 #' @param sampleAnnotation Which columns to use of the sampleTable.
@@ -249,7 +267,6 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #' @param specifiedAnnotationColors Allow for overwriting of some of the colours with pre-specified values.
 #' @param windowOrientation Which orientation the window annotation should be.
 #' @param sampleOrientation Which orientation the sample annotation should be.
-
 #' @return A list containing two annotation objects
 makeHeatmapAnnotations <- function(qseaSet,
                                    sampleAnnotation = NULL,
@@ -420,9 +437,6 @@ makeHeatmapAnnotations <- function(qseaSet,
   return(list(sample = sampleAnnot, window = windowAnnot))
 }
 
-
-
-
 #' This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
 #' @param qseaSet The qseaSet object.
 #' @param gene A gene to plot. Either a gene symbol or an ensembl ID.
@@ -441,10 +455,31 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' @param showSampleNames Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.
 #' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
 #' @param idType A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse. 
-#' @param ... Additional arguments to pass to pheatmap.
+#' @param ... Additional arguments to pass to ComplexHeatmap
 #' @return A heatmap showing the methylation patterns across the gene of interest.
 #' @export
-
+#' @examples
+#' # plot a gene
+#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9")
+#' # cluster the rows and add annotation
+#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
+#' # more complex example
+#' \dontrun{
+#' exampleTumourNormal %>% 
+#'   plotGeneHeatmap(gene = "HOXA9", 
+#'                    clusterNum = 2,
+#'                    sampleAnnotation = tumour,
+#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue")),
+#'                    upstreamDist = 1000,
+#'                    downstreamDist = 2000
+#'                     )
+#'}
+#' # example with specifying the mart for mouse data
+#' \dontrun{
+#' plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
+#'   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
+#'}   
+#'
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
@@ -479,11 +514,29 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     }
   }
 
-  gene_details <- biomaRt::getBM(mart = mart,
-                                 attributes = c('hgnc_symbol', 'description', 'chromosome_name',
-                                                'start_position', 'end_position', 'strand','ensembl_gene_id'),
-                                 filters = idType,
-                                 values = gene) %>%
+
+  rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
+
+  # Use purrr::insistently wrapped in purrr::possibly for biomart retry logic
+  safeBiomartLookup <-
+    purrr::possibly(purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
+                    otherwise = NULL)
+
+  bm_result <- safeBiomartLookup(
+    mart = mart,
+    attributes = c('hgnc_symbol', 'description', 'chromosome_name',
+                   'start_position', 'end_position', 'strand', 'ensembl_gene_id'),
+    filters = idType,
+    values = gene
+  )
+
+  if (is.null(bm_result)) {
+    stop(
+      "Could not retrieve gene information from biomart after multiple attempts. Please check your internet connection or try again later."
+    )
+  }
+
+  gene_details <- bm_result %>%
     dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
 
   qseaSetChr <- qseaSet %>%
@@ -596,7 +649,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     mutate(gap = cumsum(ifelse(start - tidyr::replace_na(dplyr::lag(start),0) > !!windowSize,1,0))) %>%
     pull(gap)
 
-  #Make rowannoation object
+  #Make row annotation object
   rowAnnot <- makeGeneHeatmapRowAnnotation(annoRow)
 
   #Set the cell border line width depending on the number of rows or columns, as pheatmap does.
@@ -649,7 +702,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             column_title = NULL,
                             na_col = "lightgrey",
                             heatmap_legend_param = list(legend_direction = "vertical",
-                                                        at = seq(0, maxScale, length.out = 6) %>% round(1))
+                                                        at = seq(0, maxScale, length.out = 6) %>% round(1)),
+                            ...
                             ) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "right",
                          annotation_legend_side = "right",
@@ -689,8 +743,6 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 
   annotationCol_numeric_min_negative <- annotationCol_numeric %>%
     dplyr::select_if(function(x) min(x) < 0)
-
-  #if(is.null())
 
   colvecs_binary <- c("Reds","YlGnBu","YlOrBr","PuRd","Blues","Purples") %>%
       purrr::set_names(., nm = .) %>%
@@ -744,18 +796,20 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
   return(annot)
 }
 
-#' This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it
+#' This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff
 #' @param qseaSet The qseaSet object.
 #' @param cutoff The cutoff to use on the windows for each sample
 #' @param barType What type of bars to use for the plot (stack, dodge, fill)
 #' @param normMethod Normalisation method to use
 #' @return A plot of the distribution
-#' @export
-#'
+
+#' @examples
+#' exampleTumourNormal %>% mesa:::plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+#' 
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stack", normMethod = "nrpm"){
 
-  #rpmFactor <- (qsea::getLibSize(qseaSetcfDNA)[sampleName]/1000000)
-
+  #TODO: Rewrite this function to work with any genome! Needs more options exposed (TxDb etc).
+  
   temp <- qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
     # makeTable(keep = which(qsea::getCounts(.)[,sampleName] >= (0.75 * rpmFactor)), samples = sampleName, norm_methods = "nrpm") %>%
@@ -794,10 +848,8 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 
 }
 
-
-
 #' This function takes a qseaSet and plots a correlation matrix
-#' @param qseaSet The qseaSet object.
+#' @param qseaSet The qseaSet object
 #' @param regionsToOverlap Regions to overlap
 #' @param sampleAnnotation Columns of the sampleTable to use to annotate the heatmap
 #' @param useGroupMeans Whether to use the replicate information or not (group column)
@@ -806,9 +858,14 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' @param minDensity Minimum CpG density to keep
 #' @param minEnrichment Minimum number of reads for beta values
 #' @param ... Other arguments for pheatmap
-#' @return A table
+#' @return Invisibly returns the matrix of correlations
 #' @export
-#'
+#' @examples
+#' # by default uses nrpm
+#' exampleTumourNormal %>% plotCorrelationMatrix()
+#' #using beta values often looks quite different
+#' exampleTumourNormal %>% plotCorrelationMatrix(normMethod = "beta", sampleAnnotation = c(tumour,patient))
+
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
                                   minEnrichment = 3, annotationColors = NA, minDensity = 0, ...){
 
@@ -848,14 +905,18 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
     janitor::remove_empty(which = "cols", quiet = FALSE) %>%
     janitor::remove_empty(which = "rows", quiet = FALSE)
 
-  numData %>%
+  corMat <- numData %>%
     stats::cor(use = "pairwise.complete.obs") %>%
-    as.data.frame() %>%
+    as.data.frame()
+  
+  corMat %>%
     pheatmap::pheatmap(display_numbers = TRUE,
                        color = RColorBrewer::brewer.pal(name = "YlOrRd", n = 9),
                        annotation_row = annotationDf,
                        annotation_col = annotationDf,
                        annotation_colors = annotationColors, ...)
+  
+  return(invisible(corMat))
 }
 
 #' This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot
@@ -866,7 +927,11 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 #' @param ... Other arguments to be passed to upset
 #' @return An UpSet plot
 #' @export
-#'
+#' @examples
+#' DMRs <- calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all_vs_NormalLung")
+#' plotDMRUpset(DMRs)
+#' # remove the "_vs_" part of the set names:
+#' plotDMRUpset(DMRs, removeVS = TRUE)
 plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...){
 
   if (!requireNamespace("UpSetR", quietly = TRUE)) {
@@ -898,7 +963,20 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' @param useGroupMeans Whether to use the "group" variable to collapse replicates
 #' @param sampleAnnotation Columns of the sampleTable to use
 #'
-#' @return A data frame containing the annotation columns, ready for use in
+#' @return A data frame containing the annotation columns, ready for use in heatmap functions
+#' @examples
+#' 
+#' # works for none, one or more columns:
+#' exampleTumourNormal %>% mesa:::getAnnotation()
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = type)
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c(tumour,type))
+#' # also works for quoted string names
+#' exampleTumourNormal %>% mesa:::getAnnotation()
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = "type")
+#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+#' # and for asking to use the groups
+#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% mesa:::getAnnotation(useGroupMeans = TRUE)
+#' exampleTumourNormal %>% mutate(group = stringr::str_remove(sample_name,"[0-9]")) %>% mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL){
 
   if (rlang::quo_is_null(rlang::enquo(sampleAnnotation))) {
@@ -942,4 +1020,21 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   }
 
   return(annotationColDf)
+}
+
+
+#' An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
+#' 
+#' @param ... Arguments to pass to plotGeneHeatmap
+testPlotGeneHeatmap <- function(...) {
+  tryCatch({
+    plotGeneHeatmap(...)
+    succeed()
+  }, error = function(e) {
+    if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http 500")) {
+      skip("Connection to biomart failed, skipping test.")
+    } else {
+      stop(e)
+    }
+  })
 }

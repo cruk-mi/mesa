@@ -71,3 +71,21 @@ A qseaSet object with the sampleTable enhanced with the information on number of
 \description{
 This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap
 }
+\examples{
+# calculate DMRs to plot
+DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+# plot these windows
+exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
+# cluster the rows and add annotation
+exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+# more complex example
+exampleTumourNormal \%>\% 
+  plotRegionsHeatmap(regionsToOverlap = DMRs, 
+                   clusterRows = TRUE, 
+                   clusterNum = 2,
+                   sampleAnnotation = tumour,
+                   windowAnnotation = CpG_density,
+                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+                    )
+
+}
