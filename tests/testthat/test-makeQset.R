@@ -128,6 +128,10 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
+  if(!file.exists("/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")){
+    skip("Only run on internal server")
+  }
+
   sampleTable <- data.frame(sample_name = "Test1",
                             group = "Group1",
                             file_name = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam",
