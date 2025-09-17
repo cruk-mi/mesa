@@ -35,8 +35,8 @@ test_that("Making a hg19 qseaSet", {
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 541532)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
-
-  expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
+  
+  testPlotGeneHeatmap(testSet, "JAM2")
 
 })
 
@@ -79,8 +79,8 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
-
-  expect_no_error(testSet %>% plotGeneHeatmap("EWSR1"))
+  
+  testPlotGeneHeatmap(testSet, "EWSR1")
 
 })
 

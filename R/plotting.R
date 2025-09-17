@@ -464,6 +464,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' # cluster the rows and add annotation
 #' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 #' # more complex example
+#' \dontrun{
 #' exampleTumourNormal %>% 
 #'   plotGeneHeatmap(gene = "HOXA9", 
 #'                    clusterNum = 2,
@@ -472,10 +473,13 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'                    upstreamDist = 1000,
 #'                    downstreamDist = 2000
 #'                     )
+#'}
 #' # example with specifying the mart for mouse data
+#' \dontrun{
 #' plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
 #'   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
-#'   
+#'}   
+#'
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
@@ -510,11 +514,29 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     }
   }
 
-  gene_details <- biomaRt::getBM(mart = mart,
-                                 attributes = c('hgnc_symbol', 'description', 'chromosome_name',
-                                                'start_position', 'end_position', 'strand','ensembl_gene_id'),
-                                 filters = idType,
-                                 values = gene) %>%
+
+  rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
+
+  # Use purrr::insistently wrapped in purrr::possibly for biomart retry logic
+  safeBiomartLookup <-
+    purrr::possibly(purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
+                    otherwise = NULL)
+
+  bm_result <- safeBiomartLookup(
+    mart = mart,
+    attributes = c('hgnc_symbol', 'description', 'chromosome_name',
+                   'start_position', 'end_position', 'strand', 'ensembl_gene_id'),
+    filters = idType,
+    values = gene
+  )
+
+  if (is.null(bm_result)) {
+    stop(
+      "Could not retrieve gene information from biomart after multiple attempts. Please check your internet connection or try again later."
+    )
+  }
+
+  gene_details <- bm_result %>%
     dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
 
   qseaSetChr <- qseaSet %>%
@@ -998,4 +1020,21 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
   }
 
   return(annotationColDf)
+}
+
+
+#' An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
+#' 
+#' @param ... Arguments to pass to plotGeneHeatmap
+testPlotGeneHeatmap <- function(...) {
+  tryCatch({
+    plotGeneHeatmap(...)
+    succeed()
+  }, error = function(e) {
+    if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http 500")) {
+      skip("Connection to biomart failed, skipping test.")
+    } else {
+      stop(e)
+    }
+  })
 }
