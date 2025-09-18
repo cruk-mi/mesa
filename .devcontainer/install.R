@@ -7,13 +7,6 @@ if (!dir.exists(user_lib)) {
 
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
-# --- Bootstrap essentials (needed by devcontainer + Bioconductor) ---
-for (pkg in c("jsonlite", "BiocManager")) {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg, lib = user_lib, repos = "https://cloud.r-project.org")
-  }
-}
-
 # --- Pin critical versions to avoid build failures ---
 install.packages("BH", version = "1.81.0-1", lib = user_lib, repos = "https://cloud.r-project.org")
 install.packages("ggplot2", version = "3.4.4", lib = user_lib, repos = "https://cloud.r-project.org")
@@ -25,7 +18,7 @@ install.packages("devtools", lib = user_lib, repos = "https://cloud.r-project.or
 install.packages(c(
   "httr", "png", "RCurl", "igraph", "ggraph",
   "rlang", "dplyr", "tibble", "tidyr", "readr",
-  "purrr", "stringr", "forcats",  # tidyverse core
+  "purrr", "stringr", "forcats",
   "Rcpp", "RcppAnnoy", "RcppProgress",
   "uwot"
 ), lib = user_lib)

@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     sudo \
+    build-essential \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
@@ -18,5 +19,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Preinstall bootstrap R packages (for smoother Codespace startup)
-RUN R -e "install.packages(c('jsonlite','BiocManager'), repos='https://cloud.r-project.org')"
+# Create vscode user (UID 1000) with sudo privileges
+RUN useradd -ms /bin/bash vscode \
+    && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-vscode
+
+# Preinstall bootstrap packages globally (needed before user lib init)
+RUN R -e "install.packages(c('jsonlite','BiocManager','languageserver'), repos='https://cloud.r-project.org')"
+
+# Switch to vscode user
+USER vscode
+WORKDIR /workspaces/mesa
