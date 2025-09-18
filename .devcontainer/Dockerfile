@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     libxml2-dev \
     libpng-dev \
+    libjpeg-dev \
+    libtiff-dev \
+    libicu-dev \
     libfreetype6-dev \
     libharfbuzz-dev \
     libfribidi-dev \
@@ -24,7 +27,7 @@ RUN useradd -ms /bin/bash vscode \
     && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-vscode
 
 # Preinstall bootstrap packages globally (needed before user lib init)
-RUN R -e "install.packages(c('jsonlite','BiocManager','languageserver'), repos='https://cloud.r-project.org')"
+RUN R -e "install.packages(c('jsonlite','BiocManager','languageserver','remotes'), repos='https://cloud.r-project.org')"
 
 # Switch to vscode user
 USER vscode

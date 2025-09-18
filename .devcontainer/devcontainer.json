@@ -26,6 +26,5 @@
   "remoteUser": "vscode",
 
   "postCreateCommand": "Rscript .devcontainer/install.R || true",
-  "postStartCommand": "Rscript -e 'if (!requireNamespace(\"devtools\", quietly=TRUE)) source(\".devcontainer/install.R\")'"
-
+  "postStartCommand": "Rscript -e 'if (!requireNamespace(\"ggtree\", quietly=TRUE) || !requireNamespace(\"devtools\", quietly=TRUE)) source(\".devcontainer/install.R\")'"
 }
