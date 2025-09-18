@@ -7,9 +7,15 @@ if (!dir.exists(user_lib)) {
 
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
+# Bootstrap remotes
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes", lib = user_lib, repos = "https://cloud.r-project.org")
+}
+
 # --- Pin critical versions to avoid build failures ---
-install.packages("BH", version = "1.81.0-1", lib = user_lib, repos = "https://cloud.r-project.org")
-install.packages("ggplot2", version = "3.4.4", lib = user_lib, repos = "https://cloud.r-project.org")
+remotes::install_version("BH", version = "1.81.0-1", lib = user_lib, repos = "https://cloud.r-project.org")
+remotes::install_version("ggplot2", version = "3.4.4", lib = user_lib, repos = "https://cloud.r-project.org")
+
 
 # Install devtools (needed for devtools::test)
 install.packages("devtools", lib = user_lib, repos = "https://cloud.r-project.org")
