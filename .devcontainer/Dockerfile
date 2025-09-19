@@ -3,24 +3,31 @@ FROM rocker/r-ver:4.3.3
 
 # Install system dependencies for R packages and Git
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    curl \
-    ca-certificates \
-    sudo \
     build-essential \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libxml2-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libtiff-dev \
-    libicu-dev \
-    libfreetype6-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
+    ca-certificates \
+    curl \
+    git \
+    libbz2-dev \
     libfontconfig1-dev \
+    libfreetype6-dev \
+    libfribidi-dev \
+    libharfbuzz-dev \
+    libicu-dev \
+    libjpeg-dev \
+    liblzma-dev \
+    libncurses5-dev \
+    libncursesw5-dev \
+    libpng-dev \
+    libssl-dev \
+    libtiff-dev \
+    libwebp-dev \
+    libxml2-dev \
+    sudo \
+    zlib1g-dev \
+    libcurl4-openssl-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Create vscode user (UID 1000) with sudo privileges
 RUN useradd -ms /bin/bash vscode \

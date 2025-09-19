@@ -5,11 +5,18 @@ if (!dir.exists(user_lib)) {
 }
 .libPaths(c(user_lib, .libPaths()))
 
-options(repos = c(CRAN = "https://cloud.r-project.org"))
+options(
+  repos = c(CRAN = "https://cloud.r-project.org"),
+  install.packages.check.source = "no"  # don’t “update” to source if binary differs
+)
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS = "true")
 
-# --- Bootstrap remotes ---
+# --- Bootstrap remotes + BiocManager ---
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes", lib = user_lib, repos = "https://cloud.r-project.org")
+}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager", lib = user_lib, repos = "https://cloud.r-project.org")
 }
 
 # --- Pin critical versions ---
@@ -30,25 +37,21 @@ remotes::install_version(
   type = "source"
 )
 
-# --- BiocManager for Bioconductor installs ---
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager", lib = user_lib, repos = "https://cloud.r-project.org")
-}
-
-# --- Upgrade ggiraph (>=0.9.1 required for ggtree dev) ---
+# --- Pin CRAN critical versions ---
+remotes::install_version("BH", version = "1.81.0-1", lib = user_lib, repos = "https://cloud.r-project.org", type = "source")
+remotes::install_version("ggplot2", version = "4.0.0", lib = user_lib, repos = "https://cloud.r-project.org", type = "source")
 remotes::install_version("ggiraph", version = "0.9.1", lib = user_lib, repos = "https://cloud.r-project.org")
 
-# --- Install ggtree from GitHub (latest dev release) ---
+# --- Install ggtree (dev version, requires pinned deps) ---
 remotes::install_github("YuLab-SMU/ggtree", lib = user_lib, upgrade = "never")
 
-message("✅ Test environment ready with BH 1.81.0-1, ggplot2 4.0.0, and ggtree 3.99.0")
-
-
-
-# Install devtools (needed for devtools::test)
+# --- Install devtools ---
 install.packages("devtools", lib = user_lib, repos = "https://cloud.r-project.org")
 
+
 message("✅ Core graphics stack ready: BH 1.81.0-1, ggplot2 4.0.0, ggiraph 0.9.1 ggtree 3.99.0")
+
+
 
 # --- CRAN core deps (without full tidyverse) ---
 install.packages(c(
@@ -58,8 +61,38 @@ install.packages(c(
   "Rcpp", "RcppAnnoy", "RcppProgress", "uwot"
 ), lib = user_lib)
 
+
+# --- Sanity check core graphics stack before Bioconductor ---
+ip <- installed.packages(lib.loc = user_lib)
+
+required <- list(
+  BH       = "1.81.0-1",  # pinned because fgsea needs <=1.81
+  ggplot2  = "4.0.0",     # required for ggtree >= 3.99.0
+  ggiraph  = "0.9.1",     # required for ggtree dev
+  fgsea    = NA,          # Bioc package, any version is ok
+  ggtree   = NA           # dev version, skip version check
+)
+
+for (pkg in names(required)) {
+  if (!pkg %in% rownames(ip)) {
+    stop("❌ Package ", pkg, " is not installed in ", user_lib,
+         ". Please re-run install.R earlier steps.")
+  }
+  target_ver <- required[[pkg]]
+  if (!is.na(target_ver)) {
+    inst_ver <- ip[pkg, "Version"]
+    if (inst_ver != target_ver) {
+      stop("❌ Package ", pkg, " version mismatch: installed ", inst_ver,
+           " but expected ", target_ver)
+    }
+  }
+}
+
+message("✅ Core graphics stack verified. Proceeding with Bioconductor install…")
+
 # --- Bioconductor 3.18 ---
 BiocManager::install(version = "3.18", ask = FALSE)
+
 
 # Core Bioconductor packages
 BiocManager::install(c(
