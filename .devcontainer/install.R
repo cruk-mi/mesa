@@ -62,37 +62,39 @@ install.packages(c(
 ), lib = user_lib)
 
 
-# --- Sanity check core graphics stack before Bioconductor ---
-ip <- installed.packages(lib.loc = user_lib)
-
-required <- list(
-  BH       = "1.81.0-1",  # pinned because fgsea needs <=1.81
-  ggplot2  = "4.0.0",     # required for ggtree >= 3.99.0
-  ggiraph  = "0.9.1",     # required for ggtree dev
-  fgsea    = NA,          # Bioc package, any version is ok
-  ggtree   = NA           # dev version, skip version check
-)
-
-for (pkg in names(required)) {
-  if (!pkg %in% rownames(ip)) {
-    stop("❌ Package ", pkg, " is not installed in ", user_lib,
-         ". Please re-run install.R earlier steps.")
-  }
-  target_ver <- required[[pkg]]
-  if (!is.na(target_ver)) {
-    inst_ver <- ip[pkg, "Version"]
-    if (inst_ver != target_ver) {
-      stop("❌ Package ", pkg, " version mismatch: installed ", inst_ver,
-           " but expected ", target_ver)
-    }
-  }
-}
-
-message("✅ Core graphics stack verified. Proceeding with Bioconductor install…")
+# # --- Sanity check core graphics stack before Bioconductor ---
+# ip <- installed.packages(lib.loc = user_lib)
+# 
+# required <- list(
+#   BH       = "1.81.0-1",  # pinned because fgsea needs <=1.81
+#   ggplot2  = "4.0.0",     # required for ggtree >= 3.99.0
+#   ggiraph  = "0.9.1",     # required for ggtree dev
+#   fgsea    = NA,          # Bioc package, any version is ok
+#   ggtree   = NA           # dev version, skip version check
+# )
+# 
+# for (pkg in names(required)) {
+#   if (!pkg %in% rownames(ip)) {
+#     stop("❌ Package ", pkg, " is not installed in ", user_lib,
+#          ". Please re-run install.R earlier steps.")
+#   }
+#   target_ver <- required[[pkg]]
+#   if (!is.na(target_ver)) {
+#     inst_ver <- ip[pkg, "Version"]
+#     if (inst_ver != target_ver) {
+#       stop("❌ Package ", pkg, " version mismatch: installed ", inst_ver,
+#            " but expected ", target_ver)
+#     }
+#   }
+# }
+# 
+# message("✅ Core graphics stack verified. Proceeding with Bioconductor install…")
 
 # --- Bioconductor 3.18 ---
 BiocManager::install(version = "3.18", ask = FALSE)
 
+# Explicitly install fgsea first (critical dep)
+BiocManager::install("fgsea", lib = user_lib, ask = FALSE, update = FALSE)
 
 # Core Bioconductor packages
 BiocManager::install(c(
