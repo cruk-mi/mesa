@@ -23,3 +23,9 @@ An UpSet plot
 \description{
 This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot
 }
+\examples{
+DMRs <- calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all_vs_NormalLung")
+plotDMRUpset(DMRs)
+# remove the "_vs_" part of the set names:
+plotDMRUpset(DMRs, removeVS = TRUE)
+}

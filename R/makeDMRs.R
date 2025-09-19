@@ -275,12 +275,15 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 #' @param variable Which variable to use to calculate the DMRs between
 #' @return A tibble with two columns, each row with a pair of contrasts
 #' @export
+#' @examples
+#' exampleTumourNormal %>% makeAllContrasts(type)
+#' 
 #'
 makeAllContrasts <- function(qseaSet, variable){
   vals <- qseaSet %>%
     qsea::getSampleTable() %>%
-    tidyr::drop_na(tidyselect::all_of(variable)) %>%
-    dplyr::pull(variable) %>%
+    filter(!is.na({{variable}})) %>%
+    dplyr::pull({{variable}}) %>%
     unique() %>%
     gtools::mixedsort()
 
@@ -296,7 +299,14 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @param qseaSet The qseaSet object
 #' @param variable Which variable to use to calculate the DMRs between
 #' @param covariates Any variables to use as covariates, for instance patient in a paired analysis
-#' @param contrasts A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted
+#' @param contrasts Either a data frame or a string to specify the contrasts to use.
+#' If using a data frame, it should have two columns, `group1` and `group2`, with the strings to compare between in each. 
+#' Multiple rows means that multiple comparisons will be fitted.
+#' If using a string, then either:
+#' * `"all"` to calculate all possible contrasts on the variable column
+#' * `"first"` to calculate only the first possible contrast on the variable column
+#' * `"<value1>_vs_<value2>"` to calculate the contrast between two specific values in the variable column
+#' * `"all_vs_<value>"` or `"<value>_vs_all"` to calculate all possible contrasts against a specific value in the variable column
 #' @param formula Alternative formula mode for calculating DMRs (not recommended)
 #' @param minNRPM A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).
 #' @param minReadCount A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.
@@ -312,9 +322,14 @@ makeAllContrasts <- function(qseaSet, variable){
 #' @return A tibble with the data
 #' @export
 #' @examples
-#' qseaSet <- mesa::exampleTumourNormal
-#' calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
-#'
+#' calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_NormalLung")
+#' # calculate all possible DMRs on one column 
+#' calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
+#' # change the False Discovery Rate threshold
+#' calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
+#' # can also return all the columns of data for the significant windows. 
+#' # using `contrasts = "first"` will only make the first possible contrast on the tumour column.
+#' calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
 calculateDMRs <- function(qseaSet,
                           variable = NULL,
                           covariates = NULL,

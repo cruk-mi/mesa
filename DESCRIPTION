@@ -32,7 +32,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Imports:
     plyranges,
     magrittr,
@@ -96,7 +96,8 @@ Suggests:
     org.Hs.eg.db,
     org.Mm.eg.db,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
-    TxDb.Mmusculus.UCSC.mm10.knownGene
+    TxDb.Mmusculus.UCSC.mm10.knownGene,
+    plotly
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

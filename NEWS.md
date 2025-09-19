@@ -6,15 +6,29 @@ editor_options:
 
 # dev
 
+### ADDED
+* Many more examples for individual functions on their help pages, as well as a set of vignettes.
+
 ### CHANGES
-* Converted `plotPCA` into a method for the `qsea` defined method.
+* Converted `plotPCA` into a submethod for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
+* `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 
+### REMOVED
+* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
+* Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads.
+* Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
+* Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
+* Removed `colnames` function definion on a qseaSet, which was not working anyway.
+
 ### BUG FIXES
+* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
+* `writeDMRsToBed` should now correctly export the files.
 * Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
-* Correct the message produced by `addMedipsEnrichmentFactors`.
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 * `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 

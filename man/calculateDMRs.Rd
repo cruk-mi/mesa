@@ -29,7 +29,16 @@ calculateDMRs(
 
 \item{covariates}{Any variables to use as covariates, for instance patient in a paired analysis}
 
-\item{contrasts}{A data frame with two columns, group1 and group2, with the strings to compare between in each. Multiple rows means that multiple comparisons will be fitted}
+\item{contrasts}{Either a data frame or a string to specify the contrasts to use.
+If using a data frame, it should have two columns, \code{group1} and \code{group2}, with the strings to compare between in each.
+Multiple rows means that multiple comparisons will be fitted.
+If using a string, then either:
+\itemize{
+\item \code{"all"} to calculate all possible contrasts on the variable column
+\item \code{"first"} to calculate only the first possible contrast on the variable column
+\item \code{"<value1>_vs_<value2>"} to calculate the contrast between two specific values in the variable column
+\item \code{"all_vs_<value>"} or \code{"<value>_vs_all"} to calculate all possible contrasts against a specific value in the variable column
+}}
 
 \item{minReadCount}{A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.}
 
@@ -61,7 +70,12 @@ A tibble with the data
 This function fits a GLM and returns the resulting data table
 }
 \examples{
-qseaSet <- mesa::exampleTumourNormal
-calculateDMRs(qseaSet, variable = "type", contrasts = "LUAD_vs_NormalLung")
-
+calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_NormalLung")
+# calculate all possible DMRs on one column 
+calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
+# change the False Discovery Rate threshold
+calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
+# can also return all the columns of data for the significant windows. 
+# using `contrasts = "first"` will only make the first possible contrast on the tumour column.
+calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
 }
