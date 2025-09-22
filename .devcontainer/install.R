@@ -87,8 +87,9 @@ if (!"BH" %in% rownames(ip) || ip["BH", "Version"] != "1.81.0-1") {
   )
 }
 
-# --- Critical Bioc package: fgsea ---
+# --- Critical Bioc packages ---
 BiocManager::install("fgsea", lib = user_lib, ask = FALSE, update = FALSE)
+BiocManager::install("qsea",  lib = user_lib, ask = FALSE, update = FALSE)
 
 # Core Bioconductor packages
 BiocManager::install(c(
@@ -111,5 +112,15 @@ BiocManager::install(c(
   "DOSE", "GOSemSim", "enrichplot", "ReactomePA",
   "treeio", "tidytree"
 ), lib = user_lib, ask = FALSE, update = FALSE)
+
+# --- Additional test/runtime dependencies ---
+install.packages(c(
+  "pheatmap", "janitor", "hues"
+), lib = user_lib, repos = "https://cloud.r-project.org")
+
+BiocManager::install(c(
+  "plyranges", "ComplexHeatmap", "biomaRt", "circlize"
+), lib = user_lib, ask = FALSE, update = FALSE)
+
 
 message("✅ Full R dev environment ready in: ", user_lib)
