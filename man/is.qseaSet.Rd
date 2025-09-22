@@ -12,3 +12,7 @@ is.qseaSet(x)
 \description{
 This function checks that an object is a qseaSet.
 }
+\examples{
+exampleTumourNormal \%>\% is("qseaSet")
+
+}

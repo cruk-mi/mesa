@@ -36,3 +36,8 @@ A qseaSet object with the sampleTable changed by a call to dplyr::left_join
 \description{
 This function extends the dplyr function left_join to act on qseaSet sampleTable.
 }
+\examples{
+newData <- tibble(patient = c("Colon1","Colon2","Lung1","Lung3"), new = 1:4)
+exampleTumourNormal \%>\% left_join(newData) \%>\% getSampleTable()
+
+}

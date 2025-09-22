@@ -1,9 +1,19 @@
-#' This function calculates and summarises the proportion of hyperstable regions that are present in each sample, and adds to columns of the sampleTable
-#' @param qseaSet A qseaSet object
-#' @export
-#'
-addHyperStableFraction <- function(qseaSet){
+#' Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
 
+#' This function calculates and summarises the proportion of hyperstable regions that are present in each sample, 
+#'   and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of 
+#'   human methylation arrays over a wide range of tissues and diseases by [Edgar et al (2014)](https://pubmed.ncbi.nlm.nih.gov/25493099/)
+#' @param qseaSet A qseaSet object
+#' @param minDensity A value of `CpG_density` to only consider regions above. Defaults to 5.
+#' @param minBeta The minimum beta value to consider a region as being called as methylated. Defaults to 0.8
+#' @export
+
+addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
+
+  if(qsea:::getGenome(qseaSet) != "BSgenome.Hsapiens.NCBI.GRCh38") {
+    stop("This function is only currently defined for BSgenome.Hsapiens.NCBI.GRCh38.")
+  }
+  
   if ("hyperStableEdgar" %in% colnames(qsea::getSampleTable(qseaSet))) {
     qseaSet <- qseaSet %>%
       selectQset(-tidyselect::matches("^hyperStableEdgar$"))
@@ -13,12 +23,12 @@ addHyperStableFraction <- function(qseaSet){
     filterByOverlaps(mesa::hg38UltraStableProbes) %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.)) %>%
     dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-    dplyr::filter(CpG_density >= 5) %>%
+    dplyr::filter(CpG_density >= !!minDensity) %>%
     dplyr::select(tidyselect::matches("beta"))
 
   overp8Fraction <- hyperStableBetaTable %>%
     replace(., is.na(.), 0) %>%
-    {. >= 0.8} %>%
+    {. >= minBeta} %>%
     apply(2,mean,na.rm = TRUE)
 
   newData <- tibble::tibble(sample_name = names(overp8Fraction),
@@ -32,11 +42,12 @@ addHyperStableFraction <- function(qseaSet){
 
 }
 
-
 #' This function returns the most important columns of a qseaSet with respect to quality controls
 #' @param qseaSet A qseaSet object
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% getSampleQCSummary()
+#' 
 getSampleQCSummary <- function(qseaSet){
 
   if (!("valid_fragments" %in% colnames(qsea::getSampleTable(qseaSet)))) {
@@ -52,4 +63,3 @@ getSampleQCSummary <- function(qseaSet){
     return()
 
 }
-

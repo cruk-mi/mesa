@@ -95,9 +95,6 @@ setMethod("show", "mesaDimRed", function(object) {
   cat("Object containing ", length(object@res)," dimensionality reduction objects for ", length(object@samples), " samples", sep = "")
 })
 
-setMethod("plotPCA", "mesaDimRed", function(object) {
-  cat("Object containing ", length(object@res)," dimensionality reduction objects for ", length(object@samples), " samples", sep = "")
-})
 
 setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
 

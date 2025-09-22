@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotGenomicFeatureDistribution}
 \alias{plotGenomicFeatureDistribution}
-\title{This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it}
+\title{This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff}
 \usage{
 plotGenomicFeatureDistribution(
   qseaSet,
@@ -24,5 +24,9 @@ plotGenomicFeatureDistribution(
 A plot of the distribution
 }
 \description{
-This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it
+This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff
+}
+\examples{
+exampleTumourNormal \%>\% mesa:::plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+
 }

@@ -14,8 +14,22 @@ getAnnotation(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL)
 \item{sampleAnnotation}{Columns of the sampleTable to use}
 }
 \value{
-A data frame containing the annotation columns, ready for use in
+A data frame containing the annotation columns, ready for use in heatmap functions
 }
 \description{
 Note that sampleAnnotation must be enclosed within double curly brackets when used.
+}
+\examples{
+
+# works for none, one or more columns:
+exampleTumourNormal \%>\% mesa:::getAnnotation()
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = type)
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour,type))
+# also works for quoted string names
+exampleTumourNormal \%>\% mesa:::getAnnotation()
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+# and for asking to use the groups
+exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(useGroupMeans = TRUE)
+exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 }

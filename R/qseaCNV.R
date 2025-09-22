@@ -113,13 +113,13 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 #' Function to call HMMcopy on the individual reads for a sample
 #'
 #' This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-#' Only works for hg38/GRCh38!
+#' Assumes gc and map columns have already been added.
 #'
 #' @param CNV_RegionsWithReads Granges object with reads columns
 #' @param colname Which column of the sample to use
 #' @param plotDir A directory to export individual HMMcopy plots to.
 #' @return A GRanges object with the result of calling HMMcopy.
-#' @export
+
 runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 
   if(!is.null(plotDir)){
@@ -163,8 +163,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
          xlab = "Window (over chr1 to chr22)",
          ylab = "Log 2 Ratio compared to 2 chromosomes")
     graphics::points(tttt$CNV,col = "red", lwd = 0.5)
-    #points(as.data.frame(qseaM023@cnv)[,colname], col = "blue", lwd = 0.5)
-    #points(as.data.frame(qseaM023recalInput@cnv)[,colname], col = "green", lwd = 0.5)
     graphics::title(main = glue::glue("Copy number estimated via HMMcopy."),
           sub = "Black circles are HMMcopy mappability and gc normalised values.")
     grDevices::dev.off()
@@ -187,7 +185,8 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' @param clusterRows Whether to cluster the rows of the heatmap
 #' @return A heatmap with the calculated number of chromosomes for each samples
 #' @export
-#'
+#' @examples
+#' exampleTumourNormal %>% plotCNVheatmap(sampleAnnotation = c(tumour,type))
 
 plotCNVheatmap <- function(qseaSet,
                            sampleAnnotation = NULL,
@@ -248,7 +247,9 @@ plotCNVheatmap <- function(qseaSet,
 #' @param qseaSet The qseaSet object.
 #' @return A qseaSet with the CNV data removed
 #' @export
-#'
+#' @examples
+#' new <- exampleTumourNormal %>% removeCNV()
+#' new %>% getCNV() %>% head()
 removeCNV <- function(qseaSet){
 
   qseaSet@cnv <- qseaSet@cnv %>%
