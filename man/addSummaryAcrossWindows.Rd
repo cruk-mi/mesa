@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{addSummaryAcrossWindows}
 \alias{addSummaryAcrossWindows}
-\title{Append window summaries to the sample table}
+\title{This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.}
 \usage{
 addSummaryAcrossWindows(
   qseaSet,
@@ -15,46 +15,22 @@ addSummaryAcrossWindows(
 )
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Input object providing window-level signal.
-\strong{Default:} none (must be supplied).}
+\item{qseaSet}{The qseaSet object.}
 
-\item{regionsToOverlap}{\code{GRanges}, \code{data.frame}, or \code{NULL}.
-Regions used to restrict the windows before summarising. Data frames must be
-coercible to \code{GRanges} (e.g., have \code{seqnames}/\code{start}/\code{end} or
-\code{chr}/\code{window_start}/\code{window_end}). If \code{NULL}, use all windows in \code{qseaSet}.
-\strong{Default:} \code{NULL}.}
+\item{regionsToOverlap}{A GRanges object (or data frame coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
 
-\item{fn}{\code{function}.
-Summary function applied \strong{per sample} over the selected windows (e.g.,
-\code{mean}, \code{median}, \code{sd}). Provide NA handling inside \code{fn} if needed, e.g.,
-\code{function(x) mean(x, na.rm = TRUE)}.
-\strong{Default:} \code{mean}.}
+\item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
 
-\item{suffix}{\code{character(1)}.
-Optional string appended to output column names (e.g., a region label) so
-you can call this repeatedly for different regions.
-\strong{Default:} \code{""}.}
+\item{suffix}{A suffix for adding to the new columns of data, to clarify where the regions came from for instance.}
 
-\item{normMethod}{\code{character()}.
-One or more measures to summarise. Typically a subset of \code{c("nrpm","beta")}.
-\strong{Default:} \code{c("nrpm","beta")}.}
+\item{normMethod}{One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").}
 
-\item{naMethod}{\code{character(1)}.
-How to treat missing values prior to/within summarisation. Supported values:
-\code{"na.rm"} — call \code{fn} with \code{na.rm = TRUE} (when supported);
-\code{"drop"}  — drop windows with any \code{NA} across selected methods;
-\code{"impute"} — replace missing values via the package’s internal strategy
-before summarising.
-\strong{Default:} \code{"impute"}.}
+\item{naMethod}{What method to use to deal with NA values (for beta values). Options are "drop" or "impute".}
 
-\item{minEnrichment}{\code{integer(1)}.
-Minimum reads per window required for a non-\code{NA} beta (relevant when
-\code{normMethod} includes \code{"beta"}).
-\strong{Default:} \code{3}.}
+\item{minEnrichment}{For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.}
 }
 \value{
-A \code{qseaSet} with new summary columns appended to its \code{sampleTable}.
+A table of data, one row per sample, with columns indicating the application of the summary statistic to the
 }
 \description{
 This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.

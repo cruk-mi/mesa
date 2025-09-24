@@ -2,52 +2,18 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{selectQset}
 \alias{selectQset}
-\title{Select or rename columns of a qseaSet sample table}
+\title{This function takes a qseaSet and selects columns from its sampleTable based on a call to dplyr::select}
 \usage{
 selectQset(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-A qseaSet object whose \code{sampleTable} columns will be selected or renamed.}
+\item{qseaSet}{The qseaSet object.}
 
-\item{...}{Additional arguments passed to \code{\link[dplyr:select]{dplyr::select()}}. Supports tidyselect helpers
-(e.g., \code{\link[dplyr:reexports]{dplyr::matches()}}, \code{\link[dplyr:reexports]{dplyr::starts_with()}}) and renaming
-(\code{newName = oldName}). Negative selection is supported, but \code{sample_name}
-and \code{group} cannot be removed.
-\strong{Default:} none.}
+\item{...}{Other arguments to pass to dplyr::select}
 }
 \value{
-A \code{qseaSet} with its \code{sampleTable} updated:
-\itemize{
-\item contains only the selected/renamed columns,
-\item always includes \code{sample_name} and \code{group} (if available).
-}
+A qseaSet object with the sampleTable selected as specified.
 }
 \description{
-Keeps or renames columns from the \code{sampleTable} of a \code{qseaSet}.
-Essential columns \code{sample_name} and \code{group} are always preserved (and placed
-at the front of the table if present).
-}
-\examples{
-data(exampleTumourNormal, package = "mesa")
-
-# Keep only sample_name and group
-exampleTumourNormal \%>\%
-  selectQset(sample_name, group) \%>\%
-  qsea::getSampleTable()
-
-# Select and rename a column
-exampleTumourNormal \%>\%
-  selectQset(age, tumour_type = tumour) \%>\%
-  qsea::getSampleTable()
-
-# Use tidyselect helpers
-exampleTumourNormal \%>\%
-  selectQset(matches("s")) \%>\%
-  qsea::getSampleTable()
-
-}
-\seealso{
-\code{\link[=select.qseaSet]{select.qseaSet()}} for the dplyr S3 method,
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect the updated table.
+This function takes a qseaSet and selects columns from its sampleTable based on a call to dplyr::select
 }

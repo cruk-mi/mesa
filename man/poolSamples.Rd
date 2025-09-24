@@ -2,48 +2,18 @@
 % Please edit documentation in R/alterQset.R
 \name{poolSamples}
 \alias{poolSamples}
-\title{Pool (merge) samples that share a common name prefix}
+\title{This function takes a qseaSet and merges samples together into a single sample.}
 \usage{
 poolSamples(qseaSet, mergeString)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}
-A qseaSet object containing methylation-enriched sequencing data.}
+\item{qseaSet}{The qseaSet object.}
 
-\item{mergeString}{\code{character(1)}
-Regular expression used to remove the \strong{suffix} that distinguishes samples
-to be merged. The remaining prefix becomes the pooled sample name. After
-removal, pooled names are matched using \code{startsWith()}.
-For example, with names like \code{"Patient1_T"} and \code{"Patient1_N"}, use
-\code{mergeString = "_[TN]$"} to pool them into \code{"Patient1"}.}
+\item{mergeString}{A string to merge on}
 }
 \value{
-A \code{qseaSet} object:
-\itemize{
-\item \strong{poolSamples()}: returns a new \code{qseaSet} where samples with names sharing
-a common prefix (after applying \code{mergeString}) are merged. Counts are summed,
-CNV and zygosity values are combined using weighted averages, and library
-statistics are aggregated.
-}
+A qseaSet object with the samples merged together.
 }
 \description{
-Merge samples whose names share a common prefix by removing a suffix pattern
-(\code{mergeString}) and summing counts across the resulting groups. CNV and
-zygosity values are combined using fragment‐count weights. The result is a
-new \code{qseaSet} with pooled samples and updated metadata.
-}
-\details{
-Internally, pooled counts are simple sums. CNV values and zygosity are
-combined by a weighted average using \code{total_fragments} from
-\verb{@libraries$input_file}. Library statistics are aggregated (sums for counts,
-weighted means for rates).
-}
-\examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-# Pool Tumour/Normal pairs by patient into a single sample per patient:
-# e.g., "Colon1_T","Colon1_N" -> "Colon1"
-poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
-}
-
+This function takes a qseaSet and merges samples together into a single sample.
 }

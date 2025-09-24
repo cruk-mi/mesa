@@ -2,74 +2,23 @@
 % Please edit documentation in R/qseaExtra.R
 \name{downSample}
 \alias{downSample}
-<<<<<<< HEAD
 \title{This function takes a qseaSet and downsamples the reads in the counts matrix.}
-=======
-\title{Downsample reads in a qseaSet}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 downSample(qseaSet, nReads)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Input object whose per-window counts will be downsampled.
-\strong{Default:} none (must be supplied).}
+\item{qseaSet}{The qseaSet object.}
 
-\item{nReads}{\code{integer(1)}.
-Target number of reads to retain \strong{per sample}. If a sample has fewer than
-\code{nReads}, it is left unchanged.
-\strong{Default:} none (must be supplied).}
+\item{nReads}{How many reads to downsample to.}
 }
 \value{
-A \code{qseaSet} with downsampled counts. Library metadata
-(\code{valid_fragments}, \code{offset}, \code{library_factor}) are updated accordingly.
+A qseaSet object with the reads downsampled.
 }
 \description{
-<<<<<<< HEAD
 This function takes a qseaSet and downsamples the reads in the counts matrix.
 }
 \examples{
 new <- exampleTumourNormal \%>\% downSample(100)
 new \%>\% getCountTable() \%>\% dplyr::select(matches("_[NT]")) \%>\% colSums()
 
-=======
-Randomly subsample reads to a fixed depth across all samples in a \code{qseaSet}.
-Useful for equalising library sizes prior to comparison.
->>>>>>> origin/general_doc_updates_from_main
 }
-\details{
-Downsampling is performed independently per sample. To obtain reproducible
-results across runs, call \code{set.seed()} \strong{before} invoking \code{downSample()}.
-Samples with total reads \verb{< nReads} are not upsampled.
-}
-\examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-set.seed(1)
-# Downsample to 100 fragments per sample, then check per-sample totals
-exampleTumourNormal \%>\%
-  downSample(100) \%>\%
-  getCountTable() \%>\%
-  dplyr::select(tidyselect::matches("_[NT]")) \%>\%
-  colSums() \%>\%
-  range()  # should be ~ c(100, 100) if all samples had >= 100 reads
-
-# Also inspect the updated library sizes recorded in the sample table
-exampleTumourNormal \%>\%
-  downSample(100) \%>\%
-  qsea::getSampleTable() \%>\%
-  dplyr::select(patient, type, gender)
-}
-
-}
-\seealso{
-\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}, \code{\link[=mixSamples]{mixSamples()}}
-
-Other window-helpers: 
-\code{\link{calculateFractionReadsInGRanges}()},
-\code{\link{convertToArrayBetaTable}()},
-\code{\link{subsetWindowsBySignal}()},
-\code{\link{subsetWindowsOverBackground}()}
-}
-\concept{window-helpers}

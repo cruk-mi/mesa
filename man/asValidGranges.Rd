@@ -2,41 +2,13 @@
 % Please edit documentation in R/utils.R
 \name{asValidGranges}
 \alias{asValidGranges}
-\title{Coerce common tabular inputs to GRanges}
+\title{This function checks that an object can be coerced into a GRanges object and does so if possible}
 \usage{
 asValidGranges(object)
 }
 \arguments{
-\item{object}{\code{GRanges} \strong{or} \code{data.frame} with window coordinates.
-\strong{Default:} none (must be supplied).}
-}
-\value{
-A \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} built from \code{object}.
-Errors if no supported schema is found.
+\item{object}{An object that may be a GRanges object.}
 }
 \description{
-Accept a \code{GRanges} or a data frame containing window coordinates and
-return a valid \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}. Supported data-frame schemas:
-\itemize{
-\item \code{seqnames}, \code{start}, \code{end}
-\item \code{chr}, \code{start}, \code{end} (renamed to \code{seqnames})
-\item \code{chr}, \code{window_start}, \code{window_end} (renamed to \code{seqnames/start/end})
-}
-}
-\examples{
-# From GRanges (passes through)
-GenomicRanges::GRanges("chr1", IRanges::IRanges(100, 200)) \%>\%
-  asValidGranges()
-
-# From data.frame (seqnames/start/end)
-data.frame(seqnames = "chr2", start = 10, end = 20) \%>\%
-  asValidGranges()
-
-# From data.frame (chr/window_start/window_end)
-data.frame(chr = "1", window_start = 1000, window_end = 1100) \%>\%
-  asValidGranges()
-
-}
-\seealso{
-\code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}
+This function checks that an object can be coerced into a GRanges object and does so if possible
 }

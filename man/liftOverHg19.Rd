@@ -2,50 +2,16 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{liftOverHg19}
 \alias{liftOverHg19}
-\title{Lift over genomic ranges from hg19 to hg38}
+\title{This function takes a genomic ranges object or data frame, and lifts over from hg19 to hg38.}
 \usage{
 liftOverHg19(grOrDf)
 }
 \arguments{
-\item{grOrDf}{\code{GRanges} or \code{data.frame}.
-Input intervals. Data frames must contain at least \code{seqnames}, \code{start},
-and \code{end}. \code{seqnames} may include or omit the \code{"chr"} prefix; it is added
-automatically if missing.
-\strong{Default:} none (must be supplied).}
+\item{grOrDf}{Either a genomic ranges object or a data frame (with seqnames column), with or without chr in the seqnames}
 }
 \value{
-A \linkS4class{GRanges} in hg38 coordinates (with
-\code{GenomeInfoDb::genome(x) <- "hg38"}). Intervals that cannot be mapped by the
-chain are dropped (i.e., may return fewer ranges than provided).
+A genomic ranges object object with coordinates in hg38.
 }
 \description{
-Convert genomic intervals from UCSC \strong{hg19} to \strong{hg38/GRCh38} using
-a preloaded chain object.
-}
-\details{
-Internally, the input is coerced to a \code{GRanges} (adding \code{"chr"} if needed),
-then lifted over via \pkg{rtracklayer} with the chain stored in
-\code{mesa::hg19ToHg38.over.chain}. Unmappable or split mappings are handled by
-\code{rtracklayer::liftOver()}, and unmapped intervals are discarded when the
-result is unlisted. The returned object is tagged as \code{"hg38"}.
-}
-\examples{
-\donttest{
-# Data.frame input; mix of 'chr' and no 'chr' is fine
-data.frame(
-  seqnames = c("1", "chr2"),
-  start    = c(100000, 200000),
-  end      = c(100100, 200100)
-) \%>\% 
-  liftOverHg19() \%>\% 
-  { GenomeInfoDb::genome(.) }
-
-# GRanges input (some intervals may not map and can be dropped)
-gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))
-liftOverHg19(gr)
-}
-
-}
-\seealso{
-\code{\link[rtracklayer:liftOver]{rtracklayer::liftOver()}}, \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}, \link[GenomeInfoDb:seqinfo]{GenomeInfoDb::genome}
+This function takes a genomic ranges object or data frame, and lifts over from hg19 to hg38.
 }

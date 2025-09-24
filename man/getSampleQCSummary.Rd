@@ -2,49 +2,15 @@
 % Please edit documentation in R/sampleQC.R
 \name{getSampleQCSummary}
 \alias{getSampleQCSummary}
-\title{Summarise key QC fields per sample}
+\title{This function returns the most important columns of a qseaSet with respect to quality controls}
 \usage{
 getSampleQCSummary(qseaSet)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Input object from which to extract QC fields.
-\strong{Default:} none (must be supplied).}
-}
-\value{
-A tibble with one row per sample containing:
-\itemize{
-\item \code{sample_name}
-\item any available QC columns matching \code{valid_fragment}, \code{relH}, \code{hyperStable},
-or \code{ichorTumo}.
-Columns not present in the \code{sampleTable} are silently omitted.
-}
+\item{qseaSet}{A qseaSet object}
 }
 \description{
-Return a tidy summary of the most relevant QC fields from a \code{qseaSet}
-\code{sampleTable}. If core library metrics are missing, they are first added via
-\code{\link[=addLibraryInformation]{addLibraryInformation()}}.
-}
-\details{
-If the \code{sampleTable} lacks library metrics (e.g., \code{valid_fragments}), the
-function calls \code{\link[=addLibraryInformation]{addLibraryInformation()}} to populate them. The output keeps
-\code{sample_name} and any columns whose names match the regex
-\code{"valid_fragment|relH|hyperStable|ichorTumo"} (if present), then orders rows
-by \code{sample_name}.
-}
-\examples{
-\donttest{
-data("exampleTumourNormal", package = "mesa")
-
-# QC summary (adds library info if missing), ordered by sample_name
-exampleTumourNormal \%>\%
-  getSampleQCSummary() \%>\%
-  head()
-}
-
-}
-\seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=addHyperStableFraction]{addHyperStableFraction()}}
+This function returns the most important columns of a qseaSet with respect to quality controls
 }
 \examples{
 exampleTumourNormal \%>\% getSampleQCSummary()

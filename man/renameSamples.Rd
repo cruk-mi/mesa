@@ -2,41 +2,23 @@
 % Please edit documentation in R/alterQset.R
 \name{renameSamples}
 \alias{renameSamples}
-\title{Rename samples using a column from the sample table}
+\title{This function takes a qseaSet and renames the samples based on a column of the sampleTable.}
 \usage{
 renameSamples(qseaSet, newNameColumn)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}
-A qseaSet object containing methylation-enriched sequencing data.}
+\item{qseaSet}{The qseaSet object.}
 
-\item{newNameColumn}{\code{character(1)}
-The name of a column in the \code{sampleTable} containing new sample names.
-Values must be unique and contain no \code{NA}s.
-(Unquoted column names are supported via tidy evaluation.)}
+\item{newNameColumn}{A column of the qseaSet to use to rename each sample with.}
 }
 \value{
-A \code{qseaSet} object:
-\itemize{
-\item \strong{renameSamples()}: returns the input \code{qseaSet} with sample names replaced
-by values from \code{newNameColumn}. All associated slots are updated to reflect
-the new naming.
-}
+A qseaSet object with the samples renamed.
 }
 \description{
-Replace sample names with values from a user-supplied column in the
-\code{sampleTable} of a \code{qseaSet}, updating all dependent slots consistently.
+This function takes a qseaSet and renames the samples based on a column of the sampleTable.
 }
 \examples{
-data(exampleTumourNormal, package = "mesa")
-
 exampleTumourNormal \%>\%
-<<<<<<< HEAD
 mutate(newName = paste0("Sample",1:10)) \%>\%
 renameSamples(newNameColumn = 'newName')
-=======
-  dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(exampleTumourNormal))))) \%>\% # Add a column with synthetic names
-  renameSamples(newNameColumn = newName) # Rename samples based on that column
-
->>>>>>> origin/general_doc_updates_from_main
 }

@@ -2,47 +2,24 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{pull.qseaSet}
 \alias{pull.qseaSet}
-\title{Pull a column from a qseaSet sample table}
+\title{This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.}
 \usage{
 \method{pull}{qseaSet}(.data, var = -1, name = NULL, ...)
 }
 \arguments{
-\item{.data}{\code{qseaSet}.
-A qseaSet object whose \code{sampleTable} column should be extracted.}
+\item{.data}{A qseaSet.}
 
-\item{var}{Column to extract (name or position).
-\strong{Default:} \code{-1} (last column).}
+\item{var}{A variable specified as a column name or an integer (negative counting from right)}
 
-\item{name}{Optional column to use for names in the returned vector.
-\strong{Default:} \code{NULL} (no names).}
+\item{name}{An optional parameter that specifies the column to be used as names for a named vector. Specified in a similar manner as var.}
 
-\item{...}{Additional arguments passed to \code{\link[dplyr:pull]{dplyr::pull()}}.
-\strong{Default:} none.}
+\item{...}{Other arguments to pass to dplyr::pull (column name to extract)}
 }
 \value{
-A vector with length equal to the number of samples in the \code{qseaSet}.
-If \code{name} is provided, the vector is named accordingly.
+A vector the same size as the number of samples in the qseaSet.
 }
 \description{
-Extends \code{\link[dplyr:pull]{dplyr::pull()}} to extract a column from the \code{sampleTable}
-of a \code{qseaSet}.
-}
-\examples{
-data(exampleTumourNormal, package = "mesa")
-
-# Pull the 'group' column as a vector
-exampleTumourNormal \%>\% pull(group)
-
-# Pull by column position (last column by default)
-exampleTumourNormal \%>\% pull()
-
-# Pull a column and name it by sample_name
-exampleTumourNormal \%>\% pull(group, name = sample_name)
-
-}
-\seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
-\code{\link[dplyr:pull]{dplyr::pull()}}
+This function extends the dplyr function pull to act on qseaSet sampleTable. It returns a column of the sampleTable.
 }
 \examples{
 exampleTumourNormal \%>\% pull(tumour)

@@ -2,31 +2,18 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{getCGPositions}
 \alias{getCGPositions}
-\title{Genomic positions of a motif (CG) from MEDIPS}
+\title{This function takes a GRanges object and calculates the enrichment scores.}
 \usage{
 getCGPositions(BSgenome, chr.select)
 }
 \arguments{
-\item{BSgenome}{Character(1). BSgenome package name.}
+\item{BSgenome}{Which BSgenome to use}
 
-\item{chr.select}{Character vector of chromosome names to include (e.g., \code{paste0("chr", 1:22)}).}
+\item{chr.select}{Which chromosomes to use}
 }
 \value{
-A \linkS4class{GRanges} of motif positions.
+A data frame containing the relH, GoGe and number of reads values for the samples
 }
 \description{
-Convenience wrapper that returns genomic positions of the \code{"CG"} motif
-for the specified BSgenome and chromosomes, via \code{MEDIPS::MEDIPS.getPositions()}.
-}
-\examples{
-\donttest{
-# Requires MEDIPS and a BSgenome package
-# if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = paste0("chr", 1:2))
-#   gr
-# }
-}
-}
-\seealso{
-\code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
+This function takes a GRanges object and calculates the enrichment scores.
 }

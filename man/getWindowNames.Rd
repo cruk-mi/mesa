@@ -2,47 +2,13 @@
 % Please edit documentation in R/utils.R
 \name{getWindowNames}
 \alias{getWindowNames}
-\title{Get window names from a qseaSet or ranges/table}
+\title{This function returns a vector of window names from a qseaSet or a data frame.}
 \usage{
 getWindowNames(x)
 }
 \arguments{
-\item{x}{\code{qseaSet} \strong{or} \code{GRanges} \strong{or} \code{data.frame}.
-If a data frame, it must be coercible to \code{GRanges} (accepted columns include
-\code{seqnames/start/end}, or \code{chr/start/end}, or \code{chr/window_start/window_end}).
-\strong{Default:} none (must be supplied).}
-}
-\value{
-\code{character()} vector of window labels, one per region.
+\item{x}{A data frame or qseaSet to return the window names of}
 }
 \description{
-Return character labels of the form \code{"seqnames:start-end"} for each genomic
-window/region.
-}
-\details{
-If \code{x} is a \code{qseaSet}, regions are taken from \code{qsea::getRegions(x)}. Otherwise
-the input is coerced to \code{GRanges} (see \code{\link[=asValidGranges]{asValidGranges()}}) and labels are
-constructed as \code{"seqnames:start-end"}.
-}
-\examples{
-# From a GRanges (no intermediate objects)
-GenomicRanges::GRanges(c("chr1","chr2"),
-                       IRanges::IRanges(c(10,20), c(15,30))) \%>\%
-  getWindowNames()
-
-# From a data.frame (no intermediate objects)
-data.frame(seqnames = c("chr1","chr2"),
-           start    = c(100,200),
-           end      = c(120,220)) \%>\%
-  getWindowNames()
-
-\donttest{
-# From a qseaSet shipped with mesa (if available)
-data(exampleTumourNormal, package = "mesa")
-exampleTumourNormal \%>\% getWindowNames() \%>\% head()
-}
-
-}
-\seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=asValidGranges]{asValidGranges()}}
+This function returns a vector of window names from a qseaSet or a data frame.
 }

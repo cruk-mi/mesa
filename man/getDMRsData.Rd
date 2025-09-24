@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDMRs.R
 \name{getDMRsData}
 \alias{getDMRsData}
-\title{Extract DMR-level results from a fitted GLM}
+\title{Extract the data table from all the contrasts}
 \usage{
 getDMRsData(
   qseaSet,
@@ -11,89 +11,36 @@ getDMRsData(
   variable = NULL,
   keepData = FALSE,
   keepGroupMeans = FALSE,
-  FDRthres = 0.05,
+  fdrThres = 0.05,
   keepPvals = FALSE,
   keepFragmentInfo = FALSE,
   direction = "both"
 )
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Input object used to obtain metadata and counts.}
+\item{qseaSet}{The qseaSet object}
 
-\item{qseaGLM}{\code{qseaGLM}.
-Fitted model returned by \code{\link[=fitQseaGLM]{fitQseaGLM()}}.}
+\item{qseaGLM}{A qseaGLM object}
 
-\item{sampleNames}{\code{character()} or \code{NULL}.
-Sample names to include as per-sample columns.
-\strong{Default:} \code{NULL} (chosen automatically when \code{keepData = TRUE}, otherwise
-per-sample columns are omitted).}
+\item{sampleNames}{Which samples to return the information for.}
 
-\item{variable}{\code{character(1)} or \code{NULL}.
-Sample-table column on which contrasts were based (used to compute group
-means).
-\strong{Default:} \code{NULL} (required if \code{keepGroupMeans = TRUE}).}
+\item{variable}{Which variable the DMR comparison has been performed on}
 
-\item{keepData}{\code{logical(1)}.
-If \code{TRUE}, include per-sample values (beta/NRPM etc.) as columns.
-\strong{Default:} \code{FALSE}.}
+\item{keepData}{Whether to keep the individual data columns}
 
-\item{keepGroupMeans}{\code{logical(1)}.
-If \code{TRUE}, include group mean columns for each contrast side (based on
-\code{variable}).
-\strong{Default:} \code{FALSE}.}
+\item{keepGroupMeans}{Whether to keep the group means}
 
-\item{FDRthres}{\code{numeric(1)}.
-False discovery rate threshold used to flag significance.
-\strong{Default:} \code{0.05}.}
+\item{fdrThres}{False discovery rate threshold.}
 
-\item{keepPvals}{\code{logical(1)}.
-If \code{TRUE}, include raw (unadjusted) p-values in addition to FDR.
-\strong{Default:} \code{FALSE}.}
+\item{keepPvals}{Whether to keep the unadjusted p-values in the output}
 
-\item{keepFragmentInfo}{\code{logical(1)}.
-If \code{TRUE}, include fragment/MAPQ metrics where available.
-\strong{Default:} \code{FALSE}.}
+\item{keepFragmentInfo}{Whether to keep information on the average fragment length and MAPQ (if present)}
 
-\item{direction}{\code{character(1)}.
-Direction for significance calling, passed to \code{\link[qsea:isSignificant]{qsea::isSignificant()}}:
-one of \code{"up"}, \code{"down"}, or \code{"both"}.
-\strong{Default:} \code{"both"}.}
+\item{direction}{Whether to use regions that are up/down/both.}
 }
 \value{
-A tibble with one row per DMR (window) containing:
-\itemize{
-\item \strong{Per-contrast statistics} (e.g., log2FC, deltaBeta, test statistic).
-\item \strong{Multiple-testing output} (FDR; optionally raw p-values if \code{keepPvals}).
-\item \strong{Optional group summaries} if \code{keepGroupMeans = TRUE}.
-\item \strong{Optional per-sample columns} if \code{keepData = TRUE} (for \code{sampleNames}).
-\item \strong{Optional fragment/MAPQ metrics} if \code{keepFragmentInfo = TRUE}.
-}
+A tibble with the data
 }
 \description{
-Given a \code{\link{qseaGLM}} object with one or more contrasts, extract a \emph{wide}
-results table of statistics, adjusted p-values, and (optionally) group means
-and per-sample values.
+This function extracts the information from the DMR contrasts into a wide table
 }
-\details{
-Significant rows are determined using \code{FDRthres} and \code{direction} via
-\code{\link[qsea:isSignificant]{qsea::isSignificant()}}. When \code{keepData = TRUE} and \code{sampleNames = NULL},
-per-sample columns are included for all samples in the fitted model (or the
-subset relevant to each contrast, depending on the internal representation).
-Group means require \code{variable} to identify the groupings used in contrasts.
-}
-\examples{
-data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-contr <- tibble::tibble(group1 = "LUAD", group2 = "NormalLung")
-glmfit <- fitQseaGLM(qs, variable = "type", contrasts = contr)
-getDMRsData(qs, glmfit, variable = "type", FDRthres = 0.1)
-
-}
-\seealso{
-Other DMR-detection: 
-\code{\link{calculateDMRs}()},
-\code{\link{fitQseaGLM}()},
-\code{\link{makeAllContrasts}()}
-}
-\concept{DMR-detection}

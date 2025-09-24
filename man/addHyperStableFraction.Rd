@@ -8,7 +8,6 @@ and adds this as a column to the sampleTable. Uses a set of windows shown to be 
 human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}}
 \usage{
 addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
-addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 }
 \arguments{
 \item{qseaSet}{A qseaSet object}

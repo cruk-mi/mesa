@@ -2,61 +2,22 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{filter.qseaSet}
 \alias{filter.qseaSet}
-\title{Filter samples in a qseaSet}
+\title{This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.}
 \usage{
 \method{filter}{qseaSet}(.data, ..., .preserve = FALSE)
 }
 \arguments{
-\item{.data}{\code{qseaSet}
-A \code{qseaSet} object whose samples are to be filtered.}
+\item{.data}{A qseaSet to filter, based on the sampleTable}
 
-\item{...}{Predicate expressions passed to \code{\link[dplyr:filter]{dplyr::filter()}}, evaluated on the
-\code{sampleTable}. For example, \code{age > 65}, \code{tissue == "Colon"}.
-\strong{Default:} none (no filtering).}
+\item{...}{Other arguments to pass to dplyr::filter}
 
-\item{.preserve}{\code{logical(1)}
-Placeholder argument for compatibility with \code{dplyr::filter()}. Ignored
-here since grouping is not implemented.
-\strong{Default:} \code{FALSE}.}
+\item{.preserve}{Not implemented as grouping is not available  for qseaSet}
 }
 \value{
-A \code{qseaSet} object containing only the samples whose
-\code{sampleTable} rows satisfied the filter expressions. If no samples
-remain, an empty \code{qseaSet} is returned (with a message but not an error).
+A qseaSet object, with only samples that are selected by the filtering operation.
 }
 \description{
-Extends \code{\link[dplyr:filter]{dplyr::filter()}} to subset \strong{samples} in a \code{qseaSet} based on
-predicates applied to its \code{sampleTable}.
-}
-\details{
-Filtering is performed on the result of \code{qsea::getSampleTable(.data)}.
-Matching rows determine the \code{sample_name}s retained in the \code{qseaSet}.
-Grouped filtering (\code{group_by}) is not supported for \code{qseaSet}.
-}
-\examples{
-data(exampleTumourNormal, package = "mesa")
-
-# Keep only older patients
-exampleTumourNormal \%>\% filter(age >= 70)
-
-# Restrict to colon tissue
-exampleTumourNormal \%>\% filter(tissue == "Colon")
-
-# Select only tumour samples
-exampleTumourNormal \%>\% filter(tumour != "Normal")
-
-# Combine predicates: lung tumours only
-exampleTumourNormal \%>\%
-  filter(stringr::str_detect(sample_name, "Lung"), tumour != "Normal")
-
-# If no rows match, returns empty qseaSet (with a message)
-exampleTumourNormal \%>\% filter(tissue == "Liver")
-
-}
-\seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
-\code{\link[=subsetQset]{subsetQset()}} for explicit sample subsetting,
-\code{\link[=selectQset]{selectQset()}} for column selection in the \code{sampleTable}.
+This function extends the dplyr function filter to act on qseaSet, subseting samples by using the sampleTable.
 }
 \examples{
 exampleTumourNormal \%>\% filter(tissue == "Colon")

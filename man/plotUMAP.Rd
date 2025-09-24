@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotUMAP}
 \alias{plotUMAP}
-\title{Plot UMAP results}
+\title{This function takes the output of \code{\link[=getUMAP]{getUMAP()}} and produces plots.}
 \usage{
 plotUMAP(
   object,
@@ -22,137 +22,55 @@ plotUMAP(
 )
 }
 \arguments{
-\item{object}{\code{mesaDimRed}.
-A dimensionality-reduction container returned by \code{\link[=getUMAP]{getUMAP()}}.}
+\item{object}{The output from \code{\link[=getUMAP]{getUMAP()}}.}
 
-\item{qseaSet}{\code{qseaSet} or \code{NULL}.
-The dataset used to generate \code{object}. Required if aesthetics (e.g. \code{colour},
-\code{shape}) refer to variables in the sample table.
-\strong{Default:} \code{NULL}.}
+\item{qseaSet}{The qseaSet object used to generate \code{object}.}
 
-\item{components}{\code{integer(2)} \strong{or} \code{list} of \code{integer(2)}.
-UMAP indices to plot (e.g. \code{c(1, 2)} for UMAP1 vs UMAP2), or a list of such
-pairs to produce multiple plots.
-\strong{Default:} \code{list(c(1, 2))}.}
+\item{components}{Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.}
 
-\item{colour}{\code{NULL} or \code{character()}.
-Name(s) of sample-table variable(s) mapped to point colour; one plot per
-variable.
-\strong{Default:} \code{NULL} (no colour mapping).}
+\item{colour}{Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.}
 
-\item{colourPalette}{\code{NULL} or \code{character()}.
-Palette used for colouring points. If \code{NULL}, a suitable default is chosen.
-\strong{Default:} \code{NULL}.}
+\item{colourPalette}{Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.}
 
-\item{NAcolour}{\code{character(1)}.
-Colour for missing values in \code{colour}.
-\strong{Default:} \code{"grey50"}.}
+\item{NAcolour}{Colour to use for NA values in the \code{colour} variable. Default is "grey50".}
 
-\item{symDivColourScale}{\code{logical(1)}.
-If \code{TRUE}, diverging colour scales are centred symmetrically around zero.
-Ignored for non-diverging scales.
-\strong{Default:} \code{FALSE}.}
+\item{symDivColourScale}{Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).}
 
-\item{shape}{\code{NULL} or \code{character(1)}.
-Sample-table variable mapped to point shape (single variable only).
-\strong{Default:} \code{NULL}.}
+\item{shape}{Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.}
 
-\item{shapePalette}{\code{NULL}, \code{character(1)}, or \code{numeric()}.
-Shapes used for categories of the \code{shape} variable. Options:
+\item{shapePalette}{Shapes to use for the points (samples) for each category of the \code{shape} variable. Can be one of the following options:
 \itemize{
-\item A numeric vector of base-R shape codes.
+\item A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
+\item A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
 \itemize{
-\item 0–20: line/filled shapes.
-\item 21–25: filled shapes with a border (border colour = black).
+\item "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
+\item "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
+\item "mixture" (mixture of line and filled shapes; max. 19 categories).
+\item "filled+border" (max. 5 categories, or 4 if there are NAs in the \code{shape} variable).
 }
-\item A keyword, with internally defined sets:
-\itemize{
-\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19 categories}).
-\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19 categories}).
-\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
-\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories, or 4 if NAs in \code{shape}}).
-}
-\item \code{NULL}: choose automatically (\code{"mixture"} for non-diverging/none; \code{"filled+border"}
-for diverging colour scales).
-\strong{Default:} \code{NULL}.
+\item NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
 }}
 
-\item{NAshape}{\code{NULL} or \code{numeric(1)}.
-Shape for missing values in \code{shape}. If \code{NULL}, uses \code{7}, or \code{25} when
-\code{"filled+border"} is active.
-\strong{Default:} \code{NULL}.}
+\item{NAshape}{Shape to use for NA values in the \code{shape} variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.}
 
-\item{showSampleNames}{\code{logical(1)}.
-Overlay sample names on points.
-\strong{Default:} \code{FALSE}.}
+\item{showSampleNames}{Logical indicating whether to show the sample names.}
 
-\item{pointSize}{\code{numeric(1)}.
-Point size.
-\strong{Default:} \code{2}.}
+\item{pointSize}{Numeric value to set the size of the points. Default is 2.}
 
-\item{alpha}{\code{numeric(1)}.
-Point transparency in \verb{[0, 1]}.
-\strong{Default:} \code{1}.}
+\item{alpha}{Numeric value between 0 and 1 to set alpha of points. Default is 1.}
 
-\item{plotlyAnnotations}{\code{character()}.
-Column names from the sample table to add as tooltips when converting to
-interactive \code{plotly}.
-\strong{Default:} \code{""} (empty string).}
+\item{plotlyAnnotations}{Vector of columns to annotate for plotly, e.g. c("group","tissue")}
 }
 \value{
-A \code{list} of \code{ggplot} objects—one per combination of \code{components}
-pairs and \code{colour} variables—each depicting the chosen UMAP dimensions with
-requested aesthetics. Specifically:
-\itemize{
-\item one plot per \code{components} pair × per \code{colour} variable;
-\item shapes/labels applied per \code{shape}/\code{showSampleNames};
-\item consistent axis labelling (UMAP1/UMAP2 etc.).
-}
+A list of ggplot objects: one for each combination of \code{object@res}, \code{colour} and \code{components}.
 }
 \description{
-Convenience wrapper around \code{\link[=plotDimRed]{plotDimRed()}} for UMAP embeddings returned by
-\code{\link[=getUMAP]{getUMAP()}}. Supports flexible visual encodings (colour, shape, size) of
-sample-level metadata, and can return multiple plots across UMAP component
-pairs and annotation variables.
+This function takes the output of \code{\link[=getUMAP]{getUMAP()}} and produces plots.
 }
 \examples{
-<<<<<<< HEAD
 umap <- qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP()
 
 plotUMAP(umap)
 plotUMAP(umap, colour = "group")
 plotUMAP(umap, colour = "group", shape = "group")
 }
-=======
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-# Default UMAP (beta-normalised, top 1000 most variable windows)
-exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal)
-
-# Colour by group; show names
-exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal,
-           colour = "group",
-           showSampleNames = TRUE)
-
-# Custom components and shape mapping
-exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal,
-           components = list(c(1, 2)),
-           colour = "group",
-           shape  = "tissue")
-}
-
-}
-\seealso{
-Other dimred-helpers: 
-\code{\link{getPCA}()},
-\code{\link{plotDimRed}()}
-}
-\concept{dimred-helpers}
->>>>>>> origin/general_doc_updates_from_main

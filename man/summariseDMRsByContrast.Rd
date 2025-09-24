@@ -2,7 +2,8 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByContrast}
 \alias{summariseDMRsByContrast}
-\title{Summarise DMRs by contrast}
+\title{This function summarises the number of windows called as up/down in each comparison in a .
+Internally transforms the data to a long format. Contrasts with no significant windows will be dropped!}
 \usage{
 summariseDMRsByContrast(
   DMRtable,
@@ -12,60 +13,20 @@ summariseDMRsByContrast(
 )
 }
 \arguments{
-\item{DMRtable}{\code{data.frame} or \code{GRanges}
-DMR results, typically returned by \code{\link[=calculateDMRs]{calculateDMRs()}}. If in wide format,
-it will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
+\item{DMRtable}{A data frame with multiple comparisons inside}
 
-\item{FDRthres}{\code{numeric(1)}
-False discovery rate threshold for significance.
-\strong{Default:} \code{0.05}.}
+\item{FDRthres}{FDR threshold to apply to each comparison}
 
-\item{log2FCthres}{\code{numeric(1)}
-Absolute log2 fold-change threshold for calling up/down regulation.
-\strong{Default:} \code{0}.}
+\item{log2FCthres}{A log2FC threshold to apply to each comparison (absolute)}
 
-\item{deltaBetaThres}{\code{numeric(1)}
-Absolute delta-beta threshold for calling up/down regulation.
-\strong{Default:} \code{0}.}
-}
-\value{
-A \code{tibble}:
-\itemize{
-\item \strong{summariseDMRsByContrast()}: returns one row per contrast, with
-counts of up-regulated (\code{nUp}) and down-regulated (\code{nDown}) DMRs that
-pass the specified thresholds.
-}
+\item{deltaBetaThres}{A deltaBeta (change in average beta values) threshold to apply to each comparison (absolute)}
 }
 \description{
-Count the number of up- and down-regulated DMR windows per contrast.
-Internally, results are reshaped to long format before summarisation.
+This function summarises the number of windows called as up/down in each comparison in a .
+Internally transforms the data to a long format. Contrasts with no significant windows will be dropped!
 }
 \examples{
-<<<<<<< HEAD
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "type", contrasts = "all") \%>\%
   summariseDMRsByContrast()
 }
-=======
-data(exampleTumourNormal, package = "mesa")
-
-# Summarise DMRs for a single contrast, using custom FDR threshold
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  summariseDMRsByContrast(FDRthres = 0.1)
-
-}
-\seealso{
-\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
-\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
-
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
-}
-\concept{DMR-helpers}
->>>>>>> origin/general_doc_updates_from_main

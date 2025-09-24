@@ -2,54 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{qseaTableToChrGRanges}
 \alias{qseaTableToChrGRanges}
-\title{Convert a makeTable-like data frame to GRanges (UCSC style)}
+\title{Convert a table from makeTable into a GRanges object}
 \usage{
 qseaTableToChrGRanges(dataTable)
 }
 \arguments{
-\item{dataTable}{\code{data.frame}.
-Table of windows to convert. Must contain either the trio
-\code{chr}/\code{window_start}/\code{window_end} \strong{or} \code{seqnames}/\code{start}/\code{end}.
-\strong{Default:} none (must be supplied).}
+\item{dataTable}{The data frame, generally from qsea::makeTable. Can also be a GRanges object.}
 }
 \value{
-A \code{GRanges} with \code{seqnames} in UCSC style. The genome is unset.
+A GenomicRanges object
 }
 \description{
-Coerce a table of windows to a \linkS4class{GRanges}. Two input layouts are
-supported:
-\itemize{
-\item \code{chr}, \code{window_start}, \code{window_end} (as in \code{qsea::makeTable()} output), or
-\item \code{seqnames}, \code{start}, \code{end}.
-}
-}
-\details{
-If chromosome labels lack the \code{"chr"} prefix, it is added automatically so
-that \code{seqnames} are in UCSC style (e.g., \code{"chr1"}).
-\itemize{
-\item When given \code{chr}/\code{window_start}/\code{window_end}, the columns are renamed to
-\code{seqnames}/\code{start}/\code{end} before coercion.
-\item When given \code{seqnames}/\code{start}/\code{end}, \code{seqnames} are first coerced to
-character and normalised to include the \code{"chr"} prefix.
-\item The returned \code{GRanges} does \strong{not} set a genome tag; set it yourself if
-needed (e.g., \code{GenomeInfoDb::genome(gr) <- "hg38"}).
-}
-}
-\examples{
-# From makeTable-like columns
-data.frame(chr = c("1","2"),
-           window_start = c(100, 500),
-           window_end   = c(200, 600)) \%>\%
-  qseaTableToChrGRanges()
-
-# From seqnames/start/end; adds 'chr' if missing
-data.frame(seqnames = c("chr3","4"),
-           start = c(1000, 2000),
-           end   = c(1100, 2100)) \%>\%
-  qseaTableToChrGRanges()
-
-}
-\seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}},
-\code{\link[GenomeInfoDb:seqlevelsStyle]{GenomeInfoDb::seqlevelsStyle()}}
+This function adds the column names to be able to make the makeTable output into a hg38 GRanges object.
+Basically it converts chr to seqnames, window_start to start, window_end to end, then turns it into a GRanges.
 }

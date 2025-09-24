@@ -2,72 +2,30 @@
 % Please edit documentation in R/plotting.R
 \name{plotDMRUpset}
 \alias{plotDMRUpset}
-\title{UpSet plot of DMR overlaps}
+\title{This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot}
 \usage{
 plotDMRUpset(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...)
 }
 \arguments{
-\item{DMRtable}{\code{data.frame}.
-Table as returned by \code{\link[=calculateDMRs]{calculateDMRs()}} (optionally pre-filtered).}
+\item{DMRtable}{The data frame containing the differentially methylated regions.}
 
-\item{string}{\code{character(1)} or \code{NULL}.
-Optional regular expression to subset the set/contrast names (applied after
-stripping suffixes).
-\strong{Default:} \code{NULL} (use all sets).}
+\item{string}{A string to subset the columns based on (always requires adjPval)}
 
-\item{removeVS}{\code{logical(1)}.
-If \code{TRUE}, remove the \code{"_vs_"} substring and everything after it from set
-names (e.g., \code{"Tumour_vs_Normal"} → \code{"Tumour"}).
-\strong{Default:} \code{FALSE}.}
+\item{removeVS}{Whether to remove the string "\emph{vs}" and everything after from the column names. For instance if all comparisons are against the same sample(s)}
 
-\item{minAdjPval}{\code{numeric(1)}.
-Adjusted P-value threshold; windows with \code{adjPval <= minAdjPval} are included
-in each set.
-\strong{Default:} \code{0.05}.}
+\item{minAdjPval}{A minimum adjusted P value to consider the window as present}
 
-\item{...}{Additional arguments forwarded to \code{\link[UpSetR:upset]{UpSetR::upset()}}.}
+\item{...}{Other arguments to be passed to upset}
 }
 \value{
-Draws an UpSet plot on the active device and \strong{invisibly} returns the result
-from \code{\link[UpSetR:upset]{UpSetR::upset()}} (for further customization if needed).
+An UpSet plot
 }
 \description{
-Visualise the overlap of significant DMR sets across contrasts (columns ending
-with \verb{*_adjPval}) using an UpSet plot.
+This function takes a DMRtable as output by calculateDMRs (possibly after filtering), and generates an upset plot
 }
-<<<<<<< HEAD
 \examples{
 DMRs <- calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all_vs_NormalLung")
 plotDMRUpset(DMRs)
 # remove the "_vs_" part of the set names:
 plotDMRUpset(DMRs, removeVS = TRUE)
 }
-=======
-\details{
-The function discovers DMR sets by locating columns that end with \code{"_adjPval"}.
-For each such column, a logical membership is formed at the chosen FDR cutoff
-(\code{minAdjPval}). Optionally, set names are simplified with \code{removeVS}, and then
-subset with \code{string} if provided. The resulting membership matrix is visualised
-with \strong{UpSetR}.
-}
-\examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-# Overlap of significant DMR sets across contrasts (default FDR 0.05)
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
-  plotDMRUpset()
-
-# Clean set names by dropping the '_vs_*' suffix
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
-  plotDMRUpset(removeVS = TRUE)
-}
-
-}
-\seealso{
-\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[UpSetR:upset]{UpSetR::upset()}}
-}
-\concept{dmr-plots}
->>>>>>> origin/general_doc_updates_from_main

@@ -3,48 +3,15 @@
 \docType{class}
 \name{mesaPCA-class}
 \alias{mesaPCA-class}
-\alias{mesaPCA}
-\alias{show,mesaPCA-method}
-\title{PCA results container}
-\usage{
-mesaPCA(prcomp, windows)
-
-\S4method{show}{mesaPCA}(object)
-}
-\arguments{
-\item{prcomp}{\code{prcomp}
-PCA fit from \code{\link[stats:prcomp]{stats::prcomp()}}. \strong{Default:} none.}
-
-\item{windows}{\code{character()}
-Window IDs used. \strong{Default:} none.}
-
-\item{object}{\code{mesaPCA}}
-}
-\value{
-A \linkS4class{mesaPCA} object containing the PCA fit and window IDs.
-}
+\title{The mesaPCA class}
 \description{
-Stores a PCA fit (from \code{\link[stats:prcomp]{stats::prcomp()}}) computed over methylation windows.
+This is a class for containing a PCA object calculated on a qseaSet
 }
 \section{Slots}{
 
 \describe{
-\item{\code{prcomp}}{\code{prcomp}
-A PCA fit returned by \code{\link[stats:prcomp]{stats::prcomp()}}.}
+\item{\code{prcomp}}{A principal component object output from \code{\link[stats:prcomp]{stats::prcomp()}}}
 
-\item{\code{windows}}{\code{character()}
-Window IDs used in the PCA.}
+\item{\code{windows}}{A character vector of the windows used.}
 }}
 
-\examples{
-set.seed(1)
-x <- matrix(rnorm(20), nrow = 5, ncol = 4,
-            dimnames = list(paste0("S",1:5), paste0("W",1:4)))
-pc <- stats::prcomp(x, center = TRUE, scale. = FALSE)
-mp <- mesaPCA(prcomp = pc, windows = colnames(x))
-mp
-
-}
-\seealso{
-\linkS4class{mesaDimRed}
-}

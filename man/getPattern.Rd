@@ -2,37 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{getPattern}
 \alias{getPattern}
-\title{Infer pattern names from region density columns}
+\title{This function returns the name of the pattern added by addPatternDensity, e.g. "CpG"}
 \usage{
 getPattern(qseaSet)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Object whose regions (via \code{qsea::getRegions()}) may contain \verb{*_density}
-columns produced by \code{qsea::addPatternDensity()}.
-\strong{Default:} none (must be supplied).}
-}
-\value{
-\code{character()} vector of pattern names discovered (length 0 if none).
+\item{qseaSet}{A qseaSet with pattern details added by addPatternDensity}
 }
 \description{
-Scan the region metadata of a \code{qseaSet} for columns ending in \code{"_density"}
-(e.g., \code{"CpG_density"}) and return the base pattern names (e.g., \code{"CpG"}).
-}
-\details{
-This function inspects \code{mcols(qsea::getRegions(qseaSet))}, selects column
-names matching the regex \code{"_density$"}, and strips that suffix. It does not
-compute densities or modify the object. If no matching columns exist, a
-zero-length character vector is returned.
+This function returns the name of the pattern added by addPatternDensity, e.g. "CpG"
 }
 \examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-# Returns character(0) if no *_density columns are present
-exampleTumourNormal \%>\% getPattern()
-}
+getPattern(exampleTumourNormal)
 
-}
-\seealso{
-\code{\link[qsea:addPatternDensity]{qsea::addPatternDensity()}}, \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[S4Vectors:Vector-class]{S4Vectors::mcols()}}
 }

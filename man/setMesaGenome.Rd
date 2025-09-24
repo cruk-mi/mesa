@@ -2,45 +2,16 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{setMesaGenome}
 \alias{setMesaGenome}
-\title{Set default genome for downstream annotation helpers}
+\title{This function sets a default genome for the annotateWindows function to use}
 \usage{
 setMesaGenome(genome)
 }
 \arguments{
-\item{genome}{\code{character(1)} or \code{NULL}.
-Genome identifier to store (typically \code{"hg38"} or \code{"GRCh38"}).
-Use \code{NULL} to clear the setting.
-\strong{Default:} none (must be supplied).}
+\item{genome}{String corresponding to a genome.}
 }
 \value{
-Invisibly returns \code{TRUE} on success.
+None
 }
 \description{
-Record a preferred genome string (e.g., \code{"hg38"} / \code{"GRCh38"}) in the session
-options so that functions like \code{\link[=annotateWindows]{annotateWindows()}} can use it when \code{genome}
-is not explicitly supplied.
-}
-\details{
-This function sets the session option \verb{options(mesa_genome = <genome>)}.
-It \strong{does not} modify TxDb or OrgDb options directly; set those via
-\code{\link[=setMesaTxDb]{setMesaTxDb()}} and \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} if you want global defaults for
-transcript and gene annotation packages. Helpers such as \code{\link[=annotateWindows]{annotateWindows()}}
-consult \code{getOption("mesa_genome")} when \code{genome} is missing.
-}
-\examples{
-# Set the default genome to hg38
-setMesaGenome("hg38")
-getOption("mesa_genome")
-
-# Use the GRCh38 alias
-setMesaGenome("GRCh38")
-getOption("mesa_genome")
-
-# Reset/remove the default genome
-setMesaGenome(NULL)
-is.null(getOption("mesa_genome"))
-
-}
-\seealso{
-\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}}
+Currently supporting "hg38" and "GRCh38", this sets the TxDb and annoDb options to appropriate files.
 }

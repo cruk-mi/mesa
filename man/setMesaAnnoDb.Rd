@@ -2,50 +2,19 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{setMesaAnnoDb}
 \alias{setMesaAnnoDb}
-\title{Set default OrgDb (annoDb) for downstream annotation helpers}
+\title{This function sets a default annoDb for the annotateWindows function to use.}
 \usage{
 setMesaAnnoDb(annoDb)
 }
 \arguments{
-\item{annoDb}{\code{character(1)} or \code{NULL}.
-Name of an installed OrgDb package (e.g., \code{"org.Hs.eg.db"} or
-\code{"org.Mm.eg.db"}), or \code{NULL} to clear the setting. The package must be
-installed if a string is supplied.
-\strong{Default:} none (must be supplied).}
+\item{annoDb}{An annoDb package (as a string, or the object itself)}
 }
 \value{
-Invisibly returns \code{TRUE} on success.
+None
 }
 \description{
-Record a preferred \strong{OrgDb} package to use when functions such as
-\code{\link[=annotateWindows]{annotateWindows()}} are called without an explicit \code{annoDb}.
-}
-\details{
-This sets the session option \verb{options(mesa_annoDb = <annoDb>)}. When present,
-helpers like \code{\link[=annotateWindows]{annotateWindows()}} will use this OrgDb by default (particularly
-for GRCh38 workflows) unless an explicit \code{annoDb} is provided. Use
-\code{\link[=setMesaGenome]{setMesaGenome()}} and \code{\link[=setMesaTxDb]{setMesaTxDb()}} to configure complementary defaults for
-the genome and TxDb, respectively.
-}
-\examples{
-# Set default annoDb for human (only if the package is installed)
-if (requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-  setMesaAnnoDb("org.Hs.eg.db")
-  getOption("mesa_annoDb")
-}
-
-# Set default annoDb for mouse (only if the package is installed)
-if (requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
-  setMesaAnnoDb("org.Mm.eg.db")
-  getOption("mesa_annoDb")
-}
-
-# Unset the default annoDb
-setMesaAnnoDb(NULL)
-is.null(getOption("mesa_annoDb"))
-
+For instance "org.Hs.eg.db" for human, or "org.Mm.eg.db" for mouse.
 }
 \seealso{
-\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}},
-\code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}
+The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}
 }

@@ -8,15 +8,12 @@ editor_options:
 
 ### ADDED
 * Many more examples for individual functions on their help pages, as well as a set of vignettes.
-* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
-* Objects with invalid slots will now throw informative errors.
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
-* Updated function documentation with examples, default parameter values, and more detailed descriptions.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.

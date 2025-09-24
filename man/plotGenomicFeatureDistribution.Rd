@@ -2,11 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotGenomicFeatureDistribution}
 \alias{plotGenomicFeatureDistribution}
-<<<<<<< HEAD
 \title{This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff}
-=======
-\title{Distribution of windows across genomic features}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 plotGenomicFeatureDistribution(
   qseaSet,
@@ -16,60 +12,21 @@ plotGenomicFeatureDistribution(
 )
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Input object containing windows and signal (beta or nrpm).}
+\item{qseaSet}{The qseaSet object.}
 
-\item{cutoff}{\code{numeric(1)}.
-Threshold applied to the chosen normalisation measure per window.
-\strong{Default:} \code{1}.}
+\item{cutoff}{The cutoff to use on the windows for each sample}
 
-\item{barType}{\code{character(1)}.
-Bar layout: one of \code{"stack"}, \code{"dodge"}, or \code{"fill"} (relative proportions).
-\strong{Default:} \code{"stack"}.}
+\item{barType}{What type of bars to use for the plot (stack, dodge, fill)}
 
-\item{normMethod}{\code{character(1)}.
-Normalisation/measure to threshold. One of \code{"nrpm"} or \code{"beta"}.
-\strong{Default:} \code{"nrpm"}.}
+\item{normMethod}{Normalisation method to use}
 }
 \value{
-A \code{ggplot2} object showing counts (or proportions, for \code{"fill"})
-of feature classes per sample above \code{cutoff}.
+A plot of the distribution
 }
 \description{
-<<<<<<< HEAD
 This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff
 }
 \examples{
 exampleTumourNormal \%>\% mesa:::plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 
-=======
-Annotate windows (e.g., promoters/exons/introns) and plot the distribution
-per sample as stacked/dodged/filled bars.
->>>>>>> origin/general_doc_updates_from_main
 }
-\details{
-Feature classes are taken from region annotations available on the windows
-(e.g., columns produced by \code{\link[=annotateWindows]{annotateWindows()}} such as \code{shortAnno}/\code{annotation},
-if present). Bars are positioned according to \code{barType} (\code{stack}/\code{dodge}/\code{fill}).
-}
-\examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-# Beta >= 0.75, stacked bars per sample
-exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
-
-# NRPM >= 2, show within-sample proportions
-exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
-}
-
-}
-\seealso{
-\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}
-
-Other annotation-summaries: 
-\code{\link{getGenomicFeatureDistribution}()}
-}
-\concept{annotation-summaries}

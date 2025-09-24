@@ -2,44 +2,20 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{filterWindows}
 \alias{filterWindows}
-\title{Filter regions (windows) inside a qseaSet}
+\title{This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.}
 \usage{
 filterWindows(qseaSet, ...)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-The qseaSet object whose regions (windows) will be filtered.}
+\item{qseaSet}{The qseaSet object.}
 
-\item{...}{Expressions.
-Predicates passed to \code{\link[dplyr:filter]{dplyr::filter()}} and evaluated on the regions data frame.
-\strong{Default:} none (no filtering).}
+\item{...}{Additional arguments to be used to filter the regions ONLY, as if they were a data frame.}
 }
 \value{
-A \code{qseaSet} object with only regions matching the filter conditions.
-Both the \code{count_matrix} and \verb{@regions} slot are updated consistently.
+A qseaSet object, with the regions filtered appropriately.
 }
 \description{
-Filters the \strong{regions} of a \code{qseaSet} using \code{\link[dplyr:filter]{dplyr::filter()}} predicates
-applied to its regions (as a data frame), then subsets the object accordingly.
-}
-\examples{
-data(exampleTumourNormal, package = "mesa")
-
-# Keep regions starting before position 25,020,000
-exampleTumourNormal \%>\% filterWindows(start <= 25020000)
-
-# Keep regions with CpG density > 10
-exampleTumourNormal \%>\% filterWindows(CpG_density > 10)
-
-# Combine multiple conditions
-exampleTumourNormal \%>\%
-  filterWindows(seqnames == "chr7", CpG_density > 5)
-
-}
-\seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
-\code{\link[=filter.qseaSet]{filter.qseaSet()}} (for filtering samples instead of regions),
-\code{\link[dplyr:filter]{dplyr::filter()}}
+This function takes a qseaSet object and filters the regions inside it by a call to dplyr::filter.
 }
 \examples{
 exampleTumourNormal \%>\% filterWindows(start <= 25020000)

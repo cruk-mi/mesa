@@ -2,45 +2,19 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{pivotDMRsLonger}
 \alias{pivotDMRsLonger}
-\title{Transform DMR results to long format}
+\title{This function transforms a DMR data frame from the wide format to a long format}
 \usage{
 pivotDMRsLonger(DMRtable, FDRthres = 0.05, makePositive = FALSE)
 }
 \arguments{
-\item{DMRtable}{\code{data.frame}
-DMR results in wide format, typically produced by \code{\link[=calculateDMRs]{calculateDMRs()}}.}
+\item{DMRtable}{A data frame with multiple comparisons inside}
 
-\item{FDRthres}{\code{numeric(1)}
-False discovery rate threshold for filtering significant windows.
-\strong{Default:} \code{0.05}.}
+\item{FDRthres}{FDR threshold to apply to each comparison}
 
-\item{makePositive}{\code{logical(1)}
-If \code{TRUE}, reverse the direction of contrasts so that all retained windows
-are positively associated with \code{group1}.
-\strong{Default:} \code{FALSE}.}
-}
-\value{
-A \code{tibble}:
-\itemize{
-\item \strong{pivotDMRsLonger()}: returns a long-format table with one row per
-DMR–contrast combination, including columns \code{group1}, \code{group2},
-\code{deltaBeta}, \code{log2FC}, and \code{adjPval}.
-}
+\item{makePositive}{Whether to reverse the contrast when the window is hypomethylated in the contrast}
 }
 \description{
-Convert wide-format DMR results into a long-format table with explicit
-columns for contrasts, effect sizes, and significance values.
-}
-\examples{
-data(exampleTumourNormal, package = "mesa")
-
-# Convert results to long format and filter at custom FDR threshold
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  pivotDMRsLonger(FDRthres = 0.1)
-
+This function transforms a DMR data frame from the wide format to a long format
 }
 \examples{
 exampleTumourNormal \%>\%
@@ -49,13 +23,5 @@ exampleTumourNormal \%>\%
   
 }
 \seealso{
-\code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}},
-\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
-
-Other DMR-helpers: 
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+[tidyr]{pivot_longer}
 }
-\concept{DMR-helpers}

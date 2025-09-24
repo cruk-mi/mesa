@@ -2,39 +2,13 @@
 % Please edit documentation in R/plotting.R
 \name{makeGeneHeatmapRowAnnotation}
 \alias{makeGeneHeatmapRowAnnotation}
-\title{Row annotations for gene heatmaps}
+\title{This function makes a row annotation object for the gene heatmap, which hows information about gene regions and CpG density. It is a helper function for plotGeneHeatmap}
 \usage{
 makeGeneHeatmapRowAnnotation(rowAnnotationDF)
 }
 \arguments{
-\item{rowAnnotationDF}{\code{data.frame}/\code{tibble}.
-One row per window with columns to annotate (e.g., \code{annotation}, \code{CpG_density}).
-Categorical variables (factor/character) receive discrete colour maps; numeric
-variables are mapped to a continuous gradient.}
-}
-\value{
-\code{ComplexHeatmap::HeatmapAnnotation} configured for the row side.
+\item{rowAnnotationDF}{A dataframe of variables that provide information about the gene regions, which will be used to annotate windows within the heatmap}
 }
 \description{
-Helper to create a \code{ComplexHeatmap::HeatmapAnnotation} for \strong{rows} showing
-categorical tracks (e.g., region labels) and numeric tracks (e.g., CpG density).
+This function makes a row annotation object for the gene heatmap, which hows information about gene regions and CpG density. It is a helper function for plotGeneHeatmap
 }
-\details{
-Column types determine colour mapping automatically: factors/characters get a
-qualitative palette; numeric columns use a continuous scale. Missing values are
-allowed and rendered per \strong{ComplexHeatmap} defaults.
-}
-\examples{
-\donttest{
-set.seed(1)
-data.frame(
-  CpG_density = runif(10),
-  annotation  = rep(c("Upstream","GeneBody"), 5)
-) \%>\%
-  makeGeneHeatmapRowAnnotation() 
-}
-}
-\seealso{
-\code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}
-}
-\keyword{internal}

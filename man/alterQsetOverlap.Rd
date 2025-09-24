@@ -3,59 +3,29 @@
 \name{filterByOverlaps}
 \alias{filterByOverlaps}
 \alias{filterByNonOverlaps}
-\title{Subset a qseaSet by overlaps / non-overlaps with genomic regions}
+\title{Filter a qseaSet by overlapping/non-overlapping GRanges object or table that can be coerced to one}
 \usage{
 filterByOverlaps(qseaSet, regionsToOverlap)
 
 filterByNonOverlaps(qseaSet, regionsToOverlap)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}
-A qseaSet object containing methylation-enriched sequencing data.}
+\item{qseaSet}{The qseaSet object.}
 
-\item{regionsToOverlap}{\code{GRanges} or \code{data.frame}
-Genomic regions used for filtering. If a \code{data.frame}, it must contain
-columns \code{seqnames} (\code{character()}), \code{start} (\code{integer()}), and \code{end}
-(\code{integer()}); the object is coerced internally to a \code{GRanges}.}
+\item{regionsToOverlap}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
 }
 \value{
-A \code{qseaSet} object:
-\itemize{
-\item \strong{filterByOverlaps()}: returns the input \code{qseaSet} restricted to
-windows that \strong{overlap} \code{regionsToOverlap}.
-\item \strong{filterByNonOverlaps()}: returns the input \code{qseaSet} restricted to
-windows that \strong{do not overlap} \code{regionsToOverlap}.
-}
+A qseaSet object, with only a subset of the windows.
 }
 \description{
-\code{filterByOverlaps()} retains windows that \strong{overlap}, while
-\code{filterByNonOverlaps()} retains windows that \strong{do not overlap} a set of
-genomic regions. Inputs may use different chromosome styles (with or without
-the \code{"chr"} prefix); styles are harmonized automatically before overlap
-computation.
-}
-\details{
-Chromosome naming is aligned using \code{\link[GenomeInfoDb:seqlevelsStyle]{GenomeInfoDb::seqlevelsStyle()}} so that
-overlap computation is consistent even when one input uses \code{"chr1"} and the
-other uses \code{"1"}. Only the \strong{window set} is filtered; sample metadata and
-counts are subset accordingly.
+Filter a qseaSet by overlapping/non-overlapping GRanges object or table that can be coerced to one
 }
 \examples{
-data(exampleTumourNormal, package = "mesa")
 
-# Data frame input
-rgns <- data.frame(seqnames = 7L, start = 25002001L, end = 25017900L)
+rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
 filterByOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
 filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = rgns)
-
-# GRanges input
-gr <- GenomicRanges::GRanges("chr7", IRanges::IRanges(25002001L, 25017900L))
-filterByOverlaps(exampleTumourNormal, regionsToOverlap = gr)
-filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = gr)
-
 }
 \seealso{
-\code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_overlaps()}},
-\code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_non_overlaps()}},
-\code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}}
+Check the plyranges documentation on \link[plyranges]{filter_by_overlaps} and \link[plyranges]{filter_by_non_overlaps}
 }

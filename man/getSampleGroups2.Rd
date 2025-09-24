@@ -2,59 +2,19 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getSampleGroups2}
 \alias{getSampleGroups2}
-<<<<<<< HEAD
 \title{This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.}
-=======
-\title{Sample names per group (order-preserving)}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 getSampleGroups2(qseaSet)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Object providing the sample table (must contain \code{sample_name} and \code{group}).
-\strong{Default:} none (must be supplied).}
+\item{qseaSet}{The qseaSet object.}
 }
 \value{
-A named \code{list} of \code{character} vectors, where each list name is a group and
-each element is the ordered vector of sample names in that group.
+A named list, where each element contains the vector of sample_names that are in that group.
 }
 \description{
-<<<<<<< HEAD
 This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.
 }
 \examples{
 exampleTumourNormal \%>\% mesa:::getSampleGroups2()
-=======
-Build a named list mapping each \code{group} to the vector of \code{sample_name}s
-in that group, preserving the current sample order.
->>>>>>> origin/general_doc_updates_from_main
 }
-\details{
-Groups are taken from the \code{group} column of the \code{sampleTable}. The order of
-samples within each group reflects their current order in the \code{qseaSet}.
-Useful for per-group plotting or aggregation utilities.
-}
-\examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-# Internal helper (not exported): inspect structure of the mapping
-exampleTumourNormal \%>\%
-  mesa:::getSampleGroups2() 
-}
-}
-\seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
-
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getCountTable}()},
-\code{\link{getDataTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{makeTransposedTable}()},
-\code{\link{removeLibraryFactors}()},
-\code{\link{removeNormMethodSuffix}()}
-}
-\concept{table-helpers}
-\keyword{internal}

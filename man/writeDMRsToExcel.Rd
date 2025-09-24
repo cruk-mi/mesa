@@ -2,70 +2,26 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{writeDMRsToExcel}
 \alias{writeDMRsToExcel}
-\title{Write DMR results to an Excel workbook}
+\title{Write the qsea result to an Excel file}
 \usage{
-writeDMRsToExcel(dataTable, path, FDRthres = 0.05)
+writeDMRsToExcel(dataTable, path, fdrThres = 0.05)
 }
 \arguments{
-\item{dataTable}{\code{data.frame} or \code{GRanges}
-DMR results, typically produced by \code{\link[=calculateDMRs]{calculateDMRs()}}. If a \code{GRanges}, it
-will be coerced to a data frame internally.}
+\item{dataTable}{An (optionally annotated) data table with contrasts}
 
-\item{path}{\code{character(1)}
-File path of the Excel workbook to write (e.g., \code{"dmr_results.xlsx"}).}
+\item{path}{The path to write the excel file to.}
 
-\item{FDRthres}{\code{numeric(1)}
-False discovery rate threshold used to filter DMRs before writing.
-\strong{Default:} \code{0.05}.}
+\item{fdrThres}{FDR rate threshold to apply to each contrast}
 }
 \value{
-(Invisibly) returns the input object:
-\itemize{
-\item \strong{writeDMRsToExcel()}: returns \code{dataTable} (invisibly), enabling use in
-a pipeline.
-}
+Returns the original table invisibly, so can be used in a pipe.
 }
 \description{
-Export differentially methylated region (DMR) results to an Excel workbook,
-creating one worksheet per contrast.
-}
-<<<<<<< HEAD
-\examples{
-=======
-\details{
-One worksheet is created per contrast found in \code{dataTable}. If no contrast
-column is present, all rows are written to a single worksheet. If file I/O is
-restricted on the system (e.g., some HPC build environments), consider
-writing to \code{tempfile(fileext = ".xlsx")} in examples or tests.
+This writes an Excel file with the results, with one sheet per contrast.
 }
 \examples{
-\donttest{
-data(exampleTumourNormal, package = "mesa")
-
-# Minimal example: write results for a single contrast
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
-  writeDMRsToExcel(path = "dmr_results.xlsx")
-  
-# With explicit annotation (if required upstream)
->>>>>>> origin/general_doc_updates_from_main
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
   writeDMRsToExcel(paste0(tempdir(),"/test.xlsx"))
 }
-<<<<<<< HEAD
-=======
-
-}
-\seealso{
-\code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
-
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()}
-}
-\concept{DMR-helpers}
->>>>>>> origin/general_doc_updates_from_main

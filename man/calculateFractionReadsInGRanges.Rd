@@ -7,8 +7,7 @@
 calculateFractionReadsInGRanges(qseaSet, regionsToOverlap, numCountsNeeded)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-Input object providing per-window counts. \strong{Default:} none (must be supplied).}
+\item{qseaSet}{A qseaSet}
 
 \item{regionsToOverlap}{A set of windows to keep, either a GRanges object, a dataframe with seqnames, start and end.}
 
