@@ -163,8 +163,8 @@ getDimRed <- function(qseaSet,
       stop("At least one window in dataTable does not have a matching window in qseaSet.")
     }
 
-    testSamples <- samples[1:min(5, length(samples))]
-    inputValues <- dataTable[1:min(50, length(dataTable)), ]
+    testSamples <- samples[seq_along(min(5, length(samples)))]
+    inputValues <- dataTable[seq_along(min(50, length(dataTable))), ]
     testValues <- getDataTable(qseaSet %>%
                                  filter(sample_name %in% testSamples) %>%
                                  filterByOverlaps(inputValues),
@@ -482,7 +482,7 @@ getDimRed <- function(qseaSet,
                        ...) %>%
             as.data.frame()
 
-          colnames(uwotObj) <- paste0("UMAP",seq_along(1:ncol(uwotObj)))
+          colnames(uwotObj) <- paste0("UMAP",seq_along(ncol(uwotObj)))
 
           return(list(resObj =  list(x = uwotObj, windows = colnames(dataTable)), th = th))
 
@@ -642,7 +642,7 @@ getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL,
     }
 
     if(!is.null(NAshape)) {
-      if (NAshape %in% shapePalette[1:nShape] & any(is.na(plotData %>% pull(!!shape)))) {
+      if (NAshape %in% shapePalette[seq_along(nShape)] & any(is.na(plotData %>% pull(!!shape)))) {
         stop(glue::glue("NA shape value (={NAshape}) is already being used for a '{shape}' category. Values in use: {paste0(shapePalette[1:nShape], collapse = ', ')}."))
       }
     }

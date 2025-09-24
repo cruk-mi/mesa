@@ -153,7 +153,7 @@ writeDMRsToExcel <- function(dataTable, path, fdrThres = 0.05) {
     dataTable %>%
       dplyr::filter(!!dplyr::sym(x) <= fdrThres) %>%
       openxlsx::writeData(wb_DMR, sheetName, .)
-    openxlsx::addFilter(wb_DMR, sheetName, row = 1, cols = 1:ncol(dataTable))
+    openxlsx::addFilter(wb_DMR, sheetName, row = 1, cols = seq_along(dataTable))
     openxlsx::freezePane(wb_DMR, sheetName,  firstRow = TRUE)
 
   }

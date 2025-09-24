@@ -124,7 +124,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   pb$tick()
 
   # Yes, a for loop. The issue is that it adds repeatedly to the qseaGLM object, so can't be vectorised easily.
-  for (i in seq_along(1:nrow(contrasts))) {
+  for (i in seq_along(nrow(contrasts))) {
 
     conName <- paste0(variable, contrasts[i,"group1"], "-", variable, contrasts[i,"group2"])
 
@@ -412,7 +412,7 @@ calculateDMRs <- function(qseaSet,
                            direction = direction) %>%
     dplyr::rename(seqnames = chr, start = window_start, end = window_end)
 
-  deltas  <- purrr::map_dfc(1:nrow(contrasts),
+  deltas  <- purrr::map_dfc(seq_along(nrow(contrasts)),
                             function(x){
                               name1 <- contrasts[x,]$group1
                               name2 <- contrasts[x,]$group2

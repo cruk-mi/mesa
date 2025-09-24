@@ -464,7 +464,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' # cluster the rows and add annotation
 #' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
 #' # more complex example
-#' \dontrun{
+#' \donttest{
 #' exampleTumourNormal %>% 
 #'   plotGeneHeatmap(gene = "HOXA9", 
 #'                    clusterNum = 2,
@@ -475,7 +475,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'                     )
 #'}
 #' # example with specifying the mart for mouse data
-#' \dontrun{
+#' \donttest{
 #' plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
 #'   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
 #'}   
@@ -761,7 +761,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
     )
 
   col_list_num_min_positive <- annotationCol_numeric_min_positive %>%
-    purrr::map2(colvecs_binary[1:ncol(.)], function(val, cols){
+    purrr::map2(colvecs_binary[seq_along(ncol(.))], function(val, cols){
       circlize::colorRamp2(c(min(val, na.rm = TRUE),
                              max(val, na.rm = TRUE)),
                            cols)
@@ -769,7 +769,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
     )
 
   col_list_num_min_negative <- annotationCol_numeric_min_negative %>%
-    purrr::map2(colvecs_zerocenter[1:ncol(.)], function(val, cols){
+    purrr::map2(colvecs_zerocenter[seq_along(ncol(.))], function(val, cols){
       circlize::colorRamp2(c(min(val, na.rm = TRUE),
                              0,
                              max(val, na.rm = TRUE)),
