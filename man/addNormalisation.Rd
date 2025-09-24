@@ -31,5 +31,23 @@ A qseaSet object with normalisation steps added.
 This function takes a qseaSet and adds several normalisation steps from qsea, with default values.
 }
 \examples{
-getExampleQseaSet(expSamplingDepth = 100000) \%>\% addNormalisation(maxPatternDensity = 0.5)
+# Run normalisation on a toy qseaSet with ~100k reads
+getExampleQseaSet(expSamplingDepth = 100000) \%>\%
+  addNormalisation(maxPatternDensity = 0.5)
+  
+# Run with no enrichment normalisation
+getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
+  addNormalisation(enrichmentMethod = "none")
+  
+# Access the recorded enrichment method
+qs <- getExampleQseaSet(expSamplingDepth = 1e5)
+qs2 <- addNormalisation(qs, maxPatternDensity = 0.5)
+qs2@parameters$enrichmentMethod
+
+}
+\seealso{
+\code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}},
+\code{\link[qsea:addOffset]{qsea::addOffset()}},
+\code{\link[qsea:addEnrichmentParameters]{qsea::addEnrichmentParameters()}},
+\code{\link[=getPattern]{getPattern()}}
 }

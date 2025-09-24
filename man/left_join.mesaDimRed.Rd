@@ -2,7 +2,7 @@
 % Please edit documentation in R/classes.R
 \name{left_join.mesaDimRed}
 \alias{left_join.mesaDimRed}
-\title{This function extends the dplyr function left_join to act on mesaDimRed sampleTable.}
+\title{Left-join onto the sample table of a mesaDimRed}
 \usage{
 \method{left_join}{mesaDimRed}(
   x,
@@ -15,24 +15,44 @@
 )
 }
 \arguments{
-\item{x}{A mesaDimRed to join data onto the sampleTable of}
+\item{x}{\code{mesaDimRed}
+Object whose \code{sampleTable} will be joined.}
 
-\item{y}{A data frame to join with the sampleTable}
+\item{y}{\code{data.frame}
+Table to join.}
 
-\item{by}{A character vector of variables to join by. If NULL, will perform a join on all common variables.}
+\item{by}{\code{character()} or \code{NULL}
+Join columns; see \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. \strong{Default:} \code{NULL}.}
 
-\item{copy}{If x and y are not from the same data source, and copy is TRUE, then y will be copied into the same src as x.
-This allows you to join tables across srcs, but it is a potentially expensive operation so you must opt into it.}
+\item{copy}{\code{logical(1)}
+See \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. \strong{Default:} \code{FALSE}.}
 
-\item{suffix}{If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.}
+\item{suffix}{\code{character(2)}
+Suffixes appended to overlapping non-join column names.
+\strong{Default:} \code{c(".x", ".y")}.}
 
-\item{keep}{Should the join keys from both x and y be preserved in the output?}
+\item{keep}{\code{logical(1)} or \code{NULL}
+Retain join keys from both tables. \strong{Default:} \code{NULL}.}
 
-\item{...}{Other arguments to pass to dplyr::left_join}
+\item{...}{Additional arguments to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}.}
 }
 \value{
-A mesaDimRed object with the sampleTable changed by a call to dplyr::left_join
+A \code{mesaDimRed} object:
+\itemize{
+\item \strong{sampleTable} updated with \code{y} via a left join.
+}
 }
 \description{
-This function extends the dplyr function left_join to act on mesaDimRed sampleTable.
+Extend \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to operate on the \code{sampleTable} slot of a
+\linkS4class{mesaDimRed} object.
+}
+\examples{
+st <- data.frame(sample_name = c("A","B"),
+                 group = c("X","Y"),
+                 row.names = "sample_name")
+md <- mesaDimRed(res = list(), sampleTable = st,
+                 samples = rownames(st), params = list())
+ann <- data.frame(rownameCol = c("A","B"), batch = c(1,2))
+md3 <- left_join(md, ann, by = "rownameCol")
+
 }

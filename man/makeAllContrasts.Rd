@@ -2,23 +2,55 @@
 % Please edit documentation in R/makeDMRs.R
 \name{makeAllContrasts}
 \alias{makeAllContrasts}
-\title{Make a full set of possible contrasts for calculating DMRs on.}
+\title{Generate all possible pairwise contrasts}
 \usage{
 makeAllContrasts(qseaSet, variable)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing the sample table from which factor levels are taken.}
 
-\item{variable}{Which variable to use to calculate the DMRs between}
+\item{variable}{\code{character(1)}.
+Column name in the sample table whose distinct levels define the contrasts.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A tibble with two columns, each row with a pair of contrasts
+A tibble with two columns:
+\itemize{
+\item \code{group1} – the first level of the pair,
+\item \code{group2} – the second level of the pair.
+Each row represents one \strong{unordered} pair of distinct levels (i.e., all
+combinations without repetition).
+}
 }
 \description{
-This function returns a set of all possible contrasts
+Construct a tibble of all pairwise contrasts between levels of a categorical
+variable in the sample table of a \link[qsea:qseaSet-class]{qsea::qseaSet}.
 }
+<<<<<<< HEAD
 \examples{
 exampleTumourNormal \%>\% makeAllContrasts(type)
 
 
 }
+=======
+\details{
+Levels are inferred from \code{unique(qsea::getSampleTable(qseaSet)[[variable]])}.
+Pairs are formed between all distinct levels; no self-contrasts are included.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# All pairwise contrasts among levels of 'type'
+exampleTumourNormal \%>\%
+  makeAllContrasts("type")
+
+}
+\seealso{
+Other DMR-detection: 
+\code{\link{calculateDMRs}()},
+\code{\link{fitQseaGLM}()},
+\code{\link{getDMRsData}()}
+}
+\concept{DMR-detection}
+>>>>>>> origin/general_doc_updates_from_main

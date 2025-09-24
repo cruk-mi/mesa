@@ -22,13 +22,21 @@ combineQsetsList(
 )
 }
 \arguments{
-\item{qseaSet1}{The first qseaSet object.}
+\item{qseaSet1}{\code{qseaSet} or \code{character(1)}
+Either a \code{qseaSet} object, or path to an \code{.rds} file containing one.}
 
-\item{qseaSet2}{The second qseaSet object.}
+\item{qseaSet2}{\code{qseaSet} or \code{character(1)}
+Either a \code{qseaSet} object, or path to an \code{.rds} file containing one.}
 
-\item{checkParams}{Whether to verify that all the parameters are identical in both objects}
+\item{checkParams}{\code{logical(1)}
+If \code{TRUE}, enforce identical global parameters across inputs.
+\strong{Default:} \code{FALSE}.}
 
-\item{regionsToKeep}{A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.}
+\item{regionsToKeep}{\code{GRanges} or coercible
+If supplied, restrict both \code{qseaSet1} and \code{qseaSet2} to these genomic
+regions before combining. Accepts a \code{GRanges} or a data frame with
+\code{seqnames}, \code{start}, \code{end}.
+\strong{Default:} \code{NULL}.}
 
 \item{dropDuplicates}{Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.}
 
