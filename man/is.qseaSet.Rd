@@ -2,15 +2,34 @@
 % Please edit documentation in R/qseaExtra.R
 \name{is.qseaSet}
 \alias{is.qseaSet}
-\title{Check if an object is a qseaSet}
+\title{Check whether an object is a qseaSet}
 \usage{
 is.qseaSet(x)
 }
 \arguments{
-\item{x}{The object}
+\item{x}{\code{ANY}.
+Object to test.}
+}
+\value{
+\code{logical(1)}: \code{TRUE} if \code{x} inherits from class \code{"qseaSet"}, otherwise \code{FALSE}.
 }
 \description{
-This function checks that an object is a qseaSet.
+Predicate helper used in input validation and branching logic.
+}
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# TRUE for qseaSet objects
+exampleTumourNormal \%>\% is.qseaSet()
+
+# FALSE for non-qseaSet objects
+iris \%>\% is.qseaSet()
+}
+
+}
+\seealso{
+\code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[base:class]{base::inherits()}}
 }
 \examples{
 exampleTumourNormal \%>\% is("qseaSet")

@@ -2,14 +2,21 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeLibraryFactors}
 \alias{removeLibraryFactors}
+<<<<<<< HEAD
 \title{This function takes a qseaSet and sets all the library factor parts to one, including in the sampleTable if present.}
+=======
+\title{Set library factors to 1}
+>>>>>>> origin/general_doc_updates_from_main
 \usage{
 removeLibraryFactors(qseaSet)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object whose library factors will be reset.
+\strong{Default:} none (must be supplied).}
 }
 \value{
+<<<<<<< HEAD
 A qseaSet, without the library_factor column for each individual sample
 }
 \description{
@@ -19,4 +26,49 @@ This function takes a qseaSet and sets all the library factor parts to one, incl
 exampleTumourNormal \%>\% removeLibraryFactors() \%>\% addLibraryInformation() \%>\% pull(library_factor)
 # different to previously set library factors:
 exampleTumourNormal  \%>\% addLibraryInformation() \%>\% pull(library_factor)
+=======
+A \code{qseaSet} with all library factors set to \code{1} and \code{sampleTable} updated.
 }
+\description{
+Overwrite all library-factor values in a \code{qseaSet} (and its \code{sampleTable})
+with \code{1}. Useful when you want to avoid library scaling (e.g., TMM) and
+keep beta unchanged; NRPM may change depending on downstream use.
+>>>>>>> origin/general_doc_updates_from_main
+}
+\details{
+Setting library factors to \code{1} has \strong{no effect on beta} (fractional measure)
+but can affect \strong{NRPM} since scaling factors are neutralised. This is
+akin to calling \code{qsea::addLibraryFactors(qseaSet, factors = 1)} and
+synchronising the \code{sampleTable}.
+}
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Show current factors then reset to 1 and show again
+exampleTumourNormal \%>\%
+  addLibraryInformation() \%>\%
+  pull(library_factor) \%>\%
+  head()
+
+exampleTumourNormal \%>\%
+  removeLibraryFactors() \%>\%
+  addLibraryInformation() \%>\%   # refresh cached summaries if needed
+  pull(library_factor) \%>\%
+  head()
+}
+
+}
+\seealso{
+\code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}
+
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeNormMethodSuffix}()}
+}
+\concept{table-helpers}

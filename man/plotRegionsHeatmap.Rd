@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotRegionsHeatmap}
 \alias{plotRegionsHeatmap}
-\title{This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap}
+\title{Heatmap of signal across selected genomic regions}
 \usage{
 plotRegionsHeatmap(
   qseaSet,
@@ -27,49 +27,124 @@ plotRegionsHeatmap(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and counts/betas.}
 
-\item{regionsToOverlap}{A genomic ranges to plot.}
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
+If provided, only windows overlapping these regions are plotted; otherwise all windows are considered.
+\strong{Default:} \code{NULL}.}
 
-\item{normMethod}{Whether to plot nrpm values or beta values.}
+\item{normMethod}{\code{character(1)}.
+Which measure to plot, \code{"beta"} or \code{"nrpm"}.
+\strong{Default:} \code{"beta"}.}
 
-\item{sampleAnnotation}{A character vector with names of columns from the sampleTable to use as annotation.}
+\item{sampleAnnotation}{\code{character()} or \code{NULL}.
+Names of columns from the sample table to display as column annotations (e.g., \code{c("tumour","tissue")}).
+\strong{Default:} \code{NULL}.}
 
-\item{windowAnnotation}{A character vector with names of columns from the qseaSet regions or the regionsToOverlap data, to use as row annotations.}
+\item{windowAnnotation}{\code{character()} or \code{NULL}.
+Names of columns from region metadata (from the \code{qseaSet} regions or \code{regionsToOverlap}) to display as row annotations (e.g., \code{c("CpG_density")}).
+\strong{Default:} \code{NULL}.}
 
-\item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
+\item{annotationColors}{\code{list} or \code{NA}.
+Optional named colour maps for annotations, e.g. \code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
 
-\item{useGroupMeans}{Whether to average samples over the group column (i.e. combine replicates)}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average samples by the \code{group} column in the sample table (combine replicates).
+\strong{Default:} \code{FALSE}.}
 
-\item{clusterRows}{Whether to cluster the rows or not.}
+\item{clusterRows}{\code{logical(1)}.
+Whether to cluster rows (windows).
+\strong{Default:} \code{FALSE}.}
 
-\item{clusterCols}{Whether to cluster the columns or not.}
+\item{clusterCols}{\code{logical(1)}.
+Whether to cluster columns (samples).
+\strong{Default:} \code{TRUE}.}
 
-\item{minEnrichment}{Minimum enrichment factor for beta values, will give NAs below this.}
+\item{minEnrichment}{\code{numeric(1)}.
+For \code{"beta"}, values with enrichment \verb{< minEnrichment} are set to \code{NA}.
+\strong{Default:} \code{3}.}
 
-\item{maxScale}{The maximum of the scale, not used when plotting beta values.}
+\item{maxScale}{\code{numeric(1)}.
+Upper limit of the colour scale (used for \code{"nrpm"}; not applied to \code{"beta"}).
+\strong{Default:} \code{5}.}
 
-\item{clusterNum}{A number of clusters to break the column dendrogram into.}
+\item{clusterNum}{\code{integer(1)} or \code{NULL}.
+If set, cut the \strong{column} dendrogram into this many clusters and display cluster labels.
+\strong{Default:} \code{NULL}.}
 
-\item{clip}{An upper level to clip the data at, anything higher than this is replaced with the clip value.}
+\item{clip}{\code{numeric(1)}.
+Cap values above this threshold before plotting (applies to \code{"nrpm"}, ignored for \code{"beta"}).
+\strong{Default:} \code{1e9}.}
 
-\item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
+\item{minDensity}{\code{numeric(1)}.
+Minimum \code{CpG_density} required to keep a window.
+\strong{Default:} \code{0}.}
 
-\item{annotationPosition}{Where to put the annotation for the samples, e.g. "bottom" or "right".}
+\item{annotationPosition}{\code{character(1)}.
+Where to place column annotations (e.g., \code{"right"} or \code{"bottom"}).
+\strong{Default:} \code{"right"}.}
 
-\item{title}{A title to add to the top of the plot.}
+\item{title}{\code{character(1)} or \code{NULL}.
+Optional plot title.
+\strong{Default:} \code{NULL}.}
 
-\item{showSampleNames}{Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.}
+\item{showSampleNames}{\code{logical(1)} or \code{NULL}.
+If \code{NULL}, names are shown when there are fewer than 50 samples; set \code{TRUE}/\code{FALSE} to force.
+\strong{Default:} \code{NULL}.}
 
-\item{clusterMethod}{What method to use to cluster the dendrograms.}
+\item{clusterMethod}{\code{character(1)}.
+Clustering method for dendrograms (e.g., \code{"ward.D2"}).
+\strong{Default:} \code{"ward.D2"}.}
 
-\item{...}{Other arguments to pass to ComplexHeatmap.}
+\item{...}{Additional arguments forwarded to \strong{ComplexHeatmap} constructors.}
 }
 \value{
-A qseaSet object with the sampleTable enhanced with the information on number of reads etc
+Draws a heatmap on the active device and (invisibly) returns the underlying
+\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition with
+\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
 }
 \description{
-This function takes a qseaSet and a GRanges object, and plots the expression across the gene as a heatmap
+Plot sample signal over a set of regions as a heatmap using \strong{ComplexHeatmap}.
+Regions are selected by overlap with \code{regionsToOverlap}, values are taken from
+the \code{qseaSet}, and optional annotations from the sample/region metadata can be added.
+}
+\details{
+Windows are filtered by overlap (if \code{regionsToOverlap} is given) and by \code{minDensity}.
+For \code{"beta"}, low-enrichment values are set to \code{NA} using \code{minEnrichment}. For \code{"nrpm"},
+\code{clip} and \code{maxScale} help stabilise colour scaling for outliers. If \code{useGroupMeans = TRUE},
+samples are aggregated by \code{group} before plotting.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Compute regions (DMRs) to plot
+DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+
+# Basic heatmap of beta values over DMRs
+exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
+
+# Cluster rows, add sample and window annotations
+exampleTumourNormal \%>\% 
+  plotRegionsHeatmap(DMRs, 
+                     clusterRows = TRUE, 
+                     sampleAnnotation = c(tumour, tissue))
+
+# Group means, 2 column clusters, and custom annotation colours
+exampleTumourNormal \%>\% 
+  plotRegionsHeatmap(regionsToOverlap = DMRs, 
+                   clusterRows = TRUE, 
+                   clusterNum = 2,
+                   sampleAnnotation = tumour,
+                   windowAnnotation = CpG_density,
+                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+                    )
+
+}
+\seealso{
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}},
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[=getSampleTable]{getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }
 \examples{
 # calculate DMRs to plot

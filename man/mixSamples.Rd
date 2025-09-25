@@ -2,7 +2,11 @@
 % Please edit documentation in R/mixQsets.R
 \name{mixSamples}
 \alias{mixSamples}
+<<<<<<< HEAD
 \title{This function takes a qseaSet and makes a new sample by mixing two samples.}
+=======
+\title{Mix two samples to generate a synthetic qseaSet sample}
+>>>>>>> origin/general_doc_updates_from_main
 \usage{
 mixSamples(
   qseaSet,
@@ -17,8 +21,10 @@ mixSamples(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+The input object containing the two source samples.}
 
+<<<<<<< HEAD
 \item{sample1}{First sample name, from which to take \code{proportion} of reads.}
 
 \item{sample2}{Second sample name.}
@@ -50,4 +56,102 @@ E.g. if there are 50\% of the total fragments in the windows present in the curr
 mixed <- exampleTumourNormal \%>\% mixSamples("Colon1_T", "Colon1_N", nReadsTotal = 100000, proportion = 0.5, renormalise = FALSE)
 # only a few reads are included in this small subset of windows:
 mixed \%>\% getCountTable() \%>\% pull(Mix_Colon1_T_Colon1_N_0.5) \%>\% sum()
+=======
+\item{sample1}{\code{character(1)}.
+First sample name, contributing \code{proportion * nReadsTotal} reads.}
+
+\item{sample2}{\code{character(1)}.
+Second sample name, contributing the remainder of reads.}
+
+\item{nReadsTotal}{\code{integer(1)}.
+Total number of reads to simulate in the new mixed sample.
+Must be \verb{>= 0}.}
+
+\item{proportion}{\code{numeric(1)}.
+Proportion of reads taken from \code{sample1}. Must be in \verb{[0, 1]}.
+The remaining \code{1 - proportion} reads are taken from \code{sample2}.}
+
+\item{newName}{\code{character(1)} or \code{NULL}.
+Name for the new synthetic sample.
+\strong{Default:} \code{NULL} (a name is generated automatically, e.g.,
+\code{"Mix_<sample1>_<sample2>_<proportion>"}).}
+
+\item{groupName}{\code{character(1)} or \code{NULL}.
+Group name for the new sample recorded in the \code{sampleTable}.
+\strong{Default:} \code{NULL} (uses \code{newName}).}
+
+\item{onlyNew}{\code{logical(1)}.
+If \code{TRUE}, return only the synthetic sample. If \code{FALSE}, return the
+original \code{qseaSet} with the new sample appended.
+\strong{Default:} \code{FALSE}.}
+
+\item{renormalise}{\code{logical(1)}.
+Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. For efficiency, set
+to \code{FALSE} when creating multiple mixtures and run normalisation once at
+the end.
+\strong{Default:} \code{TRUE}.}
 }
+\value{
+A \code{qseaSet} containing the new synthetic sample:
+\itemize{
+\item If \code{onlyNew = TRUE}, a \code{qseaSet} with \strong{one} (mixed) sample.
+\item If \code{onlyNew = FALSE}, the input \code{qseaSet} \strong{plus} the mixed sample.
+The \code{sampleTable}, counts, and relevant slots are updated consistently.
+}
+}
+\description{
+Create a new synthetic sample in a \code{qseaSet} by mixing reads from two
+existing samples in user-specified proportions. Useful for benchmarking,
+downsampling experiments, or simulating tumour–normal mixtures.
+>>>>>>> origin/general_doc_updates_from_main
+}
+\details{
+\itemize{
+\item Input validation ensures \code{sample1}/\code{sample2} exist, \verb{proportion ∈ [0,1]},
+and \code{nReadsTotal} is non-negative.
+\item The mixing strategy (e.g., proportional allocation vs sampling) follows
+the package’s implementation; set \code{renormalise = TRUE} to recompute
+offsets/enrichment after adding the new sample if required by your workflow.
+}
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+
+# Mix two samples 50/50 into ~100k total fragments; append to the qseaSet
+exampleTumourNormal \%>\% 
+  mixSamples("Colon1_T", 
+             "Colon1_N", 
+             nReadsTotal = 100000, 
+             proportion = 0.5, 
+             renormalise = FALSE) \%>\%
+                           
+# Only a few reads are included in this small subset of windows (82):
+ getCountTable() \%>\% 
+ pull(Mix_Colon1_T_Colon1_N_0.5) \%>\% 
+ sum()
+
+
+# Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group
+exampleTumourNormal \%>\%
+  mixSamples("Colon1_T", "Colon1_N",
+             nReadsTotal = 50000,
+             proportion  = 0.8,
+             newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
+             groupName   = "Synthetic",
+             onlyNew     = TRUE ,
+             renormalise = FALSE) \%>\%
+             
+  # Only a few reads are included in this small subset of windows (45):
+  getCountTable() \%>\% 
+  dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\% 
+  sum()
+
+}
+\seealso{
+\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}, \code{\link[=addNormalisation]{addNormalisation()}}
+
+Other sample-simulation: 
+\code{\link{mixThreeQsetSamples}()}
+}
+\concept{sample-simulation}

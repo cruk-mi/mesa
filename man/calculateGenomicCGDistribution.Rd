@@ -2,16 +2,50 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{calculateGenomicCGDistribution}
 \alias{calculateGenomicCGDistribution}
-\title{This function takes a BSGenome and returns a data frame with the relH and GoGe parameters used for calculating enrichment}
+\title{Genome-wide CpG statistics (relH and GoGe)}
 \usage{
 calculateGenomicCGDistribution(BSgenome)
 }
 \arguments{
-\item{BSgenome}{The BSgenome object.}
+\item{BSgenome}{\code{character(1)}
+The name of a BSgenome package, e.g.
+\code{"BSgenome.Hsapiens.NCBI.GRCh38"}. The package must be installed
+and loadable in the current session.}
 }
 \value{
-A data frame with two entries, genome.relH and genome.GoGe
+A \code{data.frame} with two numeric columns:
+\itemize{
+\item \strong{genome.relH} — percent of \code{"CG"} dinucleotides genome-wide.
+\item \strong{genome.GoGe} — GoGe enrichment statistic.
+}
 }
 \description{
-This function takes a BSGenome and returns a data frame with the relH and GoGe parameters used for calculating enrichment
+Compute genome-wide CpG metrics for a given BSgenome:
+\itemize{
+\item \strong{relH}: relative CpG frequency (\% of dinucleotides that are \code{"CG"}).
+\item \strong{GoGe}: enrichment statistic \eqn{(nCG * genome_length) / (nC * nG)}.
+}
+}
+\details{
+These values are used as denominators to normalise sample-level CpG enrichment.
+\itemize{
+\item Chromosomes with names containing \code{"rand"} or \code{"chrUn"} are excluded.
+\item The BSgenome indicated by \code{BSgenome} is loaded dynamically.
+\item Uses \link{Biostrings} and \link{BSgenome} utilities to count CpG, C, and G
+occurrences across the genome.
+}
+}
+\examples{
+\donttest{
+# Example: compute genome-wide CpG metrics for GRCh38 (package must be installed)
+if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+  calculateGenomicCGDistribution("BSgenome.Hsapiens.NCBI.GRCh38")
+}
+}
+}
+\seealso{
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
+\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},
+\pkg{BSgenome},
+\pkg{Biostrings}
 }
