@@ -55,6 +55,9 @@ is.qseaSet <- function(x){
 #'   you interpret elsewhere (e.g., `"ENSEMBL_110"`). Stored verbatim in
 #'   `object@parameters$mart`.  
 #'   **Default:** none (must be supplied to `setMart()`).
+#'   
+#' @param ... Additional arguments passed to methods or to
+#'   [biomaRt::useMart()]. Not used in the default `"qseaSet"` method.
 #'
 #' @return
 #' - `setMart()` returns the updated `qseaSet` (with `@parameters$mart` set).  
