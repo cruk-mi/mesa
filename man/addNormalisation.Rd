@@ -63,15 +63,19 @@ bundling commonly applied steps.
 getExampleQseaSet(expSamplingDepth = 100000) \%>\%
   addNormalisation(maxPatternDensity = 0.5)
   
+# Run normalisation on a toy qseaSet with 10k reads
+getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
+  addNormalisation(maxPatternDensity = 0.5)
+  
 # Run with no enrichment normalisation
 getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
   addNormalisation(enrichmentMethod = "none", maxPatternDensity = 0.5)
   
 # Access the recorded enrichment method
-qs <- getExampleQseaSet(expSamplingDepth = 1e5)
-qs2 <- addNormalisation(qs, maxPatternDensity = 0.5)
-qs2@parameters$enrichmentMethod
-
+getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
+  addNormalisation(maxPatternDensity = 0.5) \%>\%
+  getParameters() \%>\% 
+  purrr::pluck("enrichmentMethod")
 }
 \seealso{
 \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}},

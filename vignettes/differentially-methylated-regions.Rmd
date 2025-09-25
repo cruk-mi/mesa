@@ -139,14 +139,14 @@ exampleTumourNormal |> getSampleTable() |> dplyr::count(tumour,type)
 
 
 ## Additional Options
-For finer control of the calculation, you can specify the false discovery rate (FDR) that is being applied, using `fdrThres`. The default is rather lenient at 0.05, and will often return many windows that are only marginally differentially methylated. We can also return all windows without applying a threshold by setting `fdrThres = 1`. This can be useful, for instance when plotting a volcano plot:
+For finer control of the calculation, you can specify the false discovery rate (FDR) that is being applied, using `FDRthres`. The default is rather lenient at 0.05, and will often return many windows that are only marginally differentially methylated. We can also return all windows without applying a threshold by setting `FDRthres = 1`. This can be useful, for instance when plotting a volcano plot:
 
 ```{r}
 allWindows <- exampleTumourNormal |>
   calculateDMRs(variable = "tumour",
                 contrasts = "Tumour_vs_Normal",
                 covariates = "patient",
-                fdrThres = 1)
+                FDRthres = 1)
 
 allWindows |>
   mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>

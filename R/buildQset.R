@@ -375,28 +375,6 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 #'   [BiocParallel::register()]
 #'
 #' @family coverage
-#'
-#' 
-#' @examples
-#' \donttest{
-#' # Load toy qseaSet
-#' data(exampleTumourNormal, package = "mesa")
-#' qs <- exampleTumourNormal
-#'
-#' # Pretend BAM files exist (replace with real file paths in practice)
-#' st <- qsea::getSampleTable(qs)
-#' st$file_name <- tempfile(fileext = ".bam")
-#' file.create(st$file_name)  # create empty placeholder files
-#' qs <- qsea::setSampleTable(qs, st)
-#'
-#' # Run coverage (serial execution for simplicity)
-#' BiocParallel::register(BiocParallel::SerialParam())
-#' qs2 <- addBamCoveragePairedAndUnpaired(qs, properPairsOnly = TRUE)
-#'
-#' # Show updated library table
-#' head(qsea::getLibrary(qs2))
-#' }
-#' 
 #' @export
 addBamCoveragePairedAndUnpaired <- function(qs,
                                             fragmentLength = NULL,

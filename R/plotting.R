@@ -1517,10 +1517,10 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
 testPlotGeneHeatmap <- function(...) {
   tryCatch({
     plotGeneHeatmap(...)
-    succeed()
+    testthat::succeed()
   }, error = function(e) {
     if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http 500")) {
-      skip("Connection to biomart failed, skipping test.")
+      testthat::skip("Connection to biomart failed, skipping test.")
     } else {
       stop(e)
     }
