@@ -42,12 +42,6 @@ exampleTumourNormal \%>\%
   pivotDMRsLonger(FDRthres = 0.1)
 
 }
-\examples{
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all") \%>\%
-  pivotDMRsLonger()
-  
-}
 \seealso{
 \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}},
 \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}

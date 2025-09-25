@@ -29,9 +29,6 @@ a pipeline.
 Export differentially methylated region (DMR) results to an Excel workbook,
 creating one worksheet per contrast.
 }
-<<<<<<< HEAD
-\examples{
-=======
 \details{
 One worksheet is created per contrast found in \code{dataTable}. If no contrast
 column is present, all rows are written to a single worksheet. If file I/O is
@@ -48,14 +45,11 @@ exampleTumourNormal \%>\%
   writeDMRsToExcel(path = "dmr_results.xlsx")
   
 # With explicit annotation (if required upstream)
->>>>>>> origin/general_doc_updates_from_main
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
   writeDMRsToExcel(paste0(tempdir(),"/test.xlsx"))
 }
-<<<<<<< HEAD
-=======
 
 }
 \seealso{
@@ -68,4 +62,3 @@ Other DMR-helpers:
 \code{\link{writeDMRsToBed}()}
 }
 \concept{DMR-helpers}
->>>>>>> origin/general_doc_updates_from_main

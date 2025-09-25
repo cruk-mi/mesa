@@ -141,12 +141,6 @@ exampleTumourNormal \%>\%
                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
                     )
 
-}
-\seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}},
-\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[=getSampleTable]{getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
-}
-\examples{
 # calculate DMRs to plot
 DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
 # plot these windows
@@ -163,4 +157,8 @@ exampleTumourNormal \%>\%
                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
                     )
 
+}
+\seealso{
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}},
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }

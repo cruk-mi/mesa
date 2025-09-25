@@ -97,7 +97,7 @@ exampleTumourNormal \%>\%
 #     annoDb = "org.Mm.eg.db"
 #   )
 
-# You can also set defaults globally:
+# You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
 # setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
 }
 
@@ -105,19 +105,4 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
 \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}, \code{\link[=liftOverHg19]{liftOverHg19()}}
-}
-\examples{
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
-# have to specify what species. Genome only recognises hg38
-annotateWindows(DMRs, genome = "hg38")
-# otherwise we can specify TxDb and annoDb
-annotateWindows(DMRs, TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db")
-
-# for mouse mm10 genome:
-exampleMouse \%>\% 
-  getRegions() \%>\%  
-  annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene", annoDb = "org.Mm.eg.db")
-  
-# use setMesaTxDb and setMesaAnnoDb to set these databases globally
-
 }

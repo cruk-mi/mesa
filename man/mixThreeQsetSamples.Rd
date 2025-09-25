@@ -59,16 +59,6 @@ mixtures, consider \code{FALSE} and normalise once at the end.
 \strong{Default:} \code{TRUE}.}
 }
 \value{
-<<<<<<< HEAD
-A qseaSet object containing a new sample, potentially with all the previous samples.
-}
-\description{
-Perform in silico mixing between three samples, enabling the generation of new synthetic data.
-Note that if the qseaSet windows have been filtered prior to using this, the fraction of fragments
-present in the current qseaSet is calculated, such that the total number of reads would have been approximately \code{nReadsTotal}.
-E.g. if there are 50\% of the total fragments in the windows present in the current samples,
-0.5*\code{nReadsTotal} fragments will be sampled.
-=======
 A \code{qseaSet} containing the new synthetic sample:
 \itemize{
 \item If \code{onlyNew = TRUE}, a \code{qseaSet} with \strong{one} (mixed) sample.
@@ -80,9 +70,13 @@ The \code{sampleTable}, counts, and dependent slots are updated consistently.
 Create a new synthetic sample in a \code{qseaSet} by mixing reads from \strong{three}
 existing samples according to user-specified proportions. Useful for simple
 mixture simulations; currently intended for internal use.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
+Note that if the qseaSet windows have been filtered prior to using this,
+the fraction of fragments present in the current qseaSet is calculated,
+such that the total number of reads would have been approximately \code{nReadsTotal}.
+E.g. if there are 50\% of the total fragments in the windows present in the current samples,
+0.5*\code{nReadsTotal} fragments will be sampled.
 \itemize{
 \item Validates that \code{sample1}, \code{sample2}, \code{sample3} exist; \code{nReadsTotal >= 0};
 \verb{proportion1, proportion2 ∈ [0, 1]}; and \verb{proportion1 + proportion2 ≤ 1}.

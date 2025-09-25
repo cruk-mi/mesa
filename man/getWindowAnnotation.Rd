@@ -32,12 +32,8 @@ order produced by clustering in the heatmap.
 \strong{Default:} \code{FALSE}.}
 }
 \value{
-<<<<<<< HEAD
-A data frame containing the annotation columns, ready for use in plotting functions
-=======
 \code{data.frame} with row names set to the \code{window} identifiers and the
 requested annotation columns.
->>>>>>> origin/general_doc_updates_from_main
 }
 \description{
 Note that windowAnnotation must be enclosed within double curly brackets when used.

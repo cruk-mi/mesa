@@ -116,14 +116,6 @@ sample-level metadata, and can return multiple plots across UMAP component
 pairs and annotation variables.
 }
 \examples{
-<<<<<<< HEAD
-umap <- qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP()
-
-plotUMAP(umap)
-plotUMAP(umap, colour = "group")
-plotUMAP(umap, colour = "group", shape = "group")
-}
-=======
 \donttest{
 data(exampleTumourNormal, package = "mesa")
 
@@ -155,4 +147,3 @@ Other dimred-helpers:
 \code{\link{plotDimRed}()}
 }
 \concept{dimred-helpers}
->>>>>>> origin/general_doc_updates_from_main

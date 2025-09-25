@@ -17,12 +17,6 @@ A \code{qseaSet} with the CNV matrix zeroed (same dimensions as before).
 Set all per-window CNV values to zero while keeping genomic coordinates
 and sample metadata intact. Useful for resetting CNV prior to recomputation.
 }
-<<<<<<< HEAD
-\examples{
-new <- exampleTumourNormal \%>\% removeCNV()
-new \%>\% getCNV() \%>\% head()
-}
-=======
 \details{
 This operation preserves regions (windows) and sample metadata; only the
 per-window CNV values are replaced with zeros. Use this to “clear” existing
@@ -49,4 +43,3 @@ Other CNV:
 \code{\link{runHMMCopy}()}
 }
 \concept{CNV}
->>>>>>> origin/general_doc_updates_from_main

@@ -31,10 +31,6 @@ matrices and slots are subset consistently.
 Use exactly one of \code{samplesToKeep} or \code{samplesToDrop}.
 }
 \examples{
-<<<<<<< HEAD
-subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
-subsetQset(exampleTumourNormal, samplesToDrop = c('Colon1_T','Colon1_N'))
-=======
 data(exampleTumourNormal, package = "mesa")
 
 # Keep only two samples
@@ -43,5 +39,4 @@ subsetQset(exampleTumourNormal, samplesToKeep = c("Colon1_T", "Colon1_N"))
 # Drop one sample
 subsetQset(exampleTumourNormal, samplesToDrop = "Lung1_N")
 
->>>>>>> origin/general_doc_updates_from_main
 }

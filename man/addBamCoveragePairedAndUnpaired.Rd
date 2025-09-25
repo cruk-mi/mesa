@@ -100,7 +100,7 @@ head(qsea::getLibrary(qs2))
 
 }
 \seealso{
-\code{\link[=getBamCoveragePairedAndUnpairedR1]{getBamCoveragePairedAndUnpairedR1()}} (low-level worker),
+\code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),
 \code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
 \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
 \code{\link[BiocParallel:register]{BiocParallel::register()}}

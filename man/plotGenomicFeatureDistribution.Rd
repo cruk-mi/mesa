@@ -2,11 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotGenomicFeatureDistribution}
 \alias{plotGenomicFeatureDistribution}
-<<<<<<< HEAD
-\title{This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff}
-=======
 \title{Distribution of windows across genomic features}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 plotGenomicFeatureDistribution(
   qseaSet,
@@ -36,16 +32,8 @@ A \code{ggplot2} object showing counts (or proportions, for \code{"fill"})
 of feature classes per sample above \code{cutoff}.
 }
 \description{
-<<<<<<< HEAD
-This function takes a qseaSet and plots the distribution of the genomic features of all the windows over a cutoff
-}
-\examples{
-exampleTumourNormal \%>\% mesa:::plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
-
-=======
 Annotate windows (e.g., promoters/exons/introns) and plot the distribution
 per sample as stacked/dodged/filled bars.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
 Feature classes are taken from region annotations available on the windows

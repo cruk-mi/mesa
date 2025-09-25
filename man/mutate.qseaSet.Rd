@@ -7,18 +7,12 @@
 \method{mutate}{qseaSet}(.data, ...)
 }
 \arguments{
-<<<<<<< HEAD
-\item{.data}{A qseaSet to mutate the sampleTable of.}
-
-\item{...}{Other arguments to pass to dplyr::mutate. Note that you can't alter the sample_name column this way.}
-=======
 \item{.data}{\code{qseaSet}
 A \code{qseaSet} object whose \code{sampleTable} will be mutated.}
 
 \item{...}{Column transformations passed to \code{\link[dplyr:mutate]{dplyr::mutate()}}. For example,
 \code{over70 = age > 70}, \code{group = paste(tissue, tumour, sep = "_")}.
 \strong{Default:} none.}
->>>>>>> origin/general_doc_updates_from_main
 }
 \value{
 A \code{qseaSet} object with its \code{sampleTable} updated:
@@ -60,13 +54,4 @@ exampleTumourNormal \%>\%
 \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
 \code{\link[=renameSamples]{renameSamples()}} and \code{\link[=renameQsetNames]{renameQsetNames()}} for renaming,
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} and \code{\link[=selectQset]{selectQset()}} for other dplyr verbs.
-}
-\examples{
-# add new logical column based on age
-exampleTumourNormal \%>\% mutate(over70 = (age > 70)) \%>\% getSampleTable()
-# change the gender column by replacing (note, better practice would be case_when or str_replace, 
-# this will replace with Male for everything that isn't exactly F)
-exampleTumourNormal \%>\% mutate(gender = ifelse(gender == "F", "Female","Male")) \%>\% getSampleTable()
-# change group by removing the number
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% getSampleTable()
 }

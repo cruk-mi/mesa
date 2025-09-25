@@ -112,8 +112,12 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 
 }
 \seealso{
-\code{\link[=runHMMcopy]{runHMMcopy()}}, \code{\link[=plotCNVheatmap]{plotCNVheatmap()}}, \code{\link[=getBamCoveragePairedAndUnpairedR1]{getBamCoveragePairedAndUnpairedR1()}},
-\code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}}, \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}}, \code{\link[BiocParallel:register]{BiocParallel::register()}}
+\code{runHMMcopy()},
+\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
+\code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),
+\code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}},
+\code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}},
+\code{\link[BiocParallel:register]{BiocParallel::register()}}
 
 Other CNV: 
 \code{\link{plotCNVheatmap}()},

@@ -39,12 +39,6 @@ Value used to replace \code{NA} scores prior to export (useful for beta).
 \description{
 Export bigWig files with per-window scores for each sample (or group means).
 }
-<<<<<<< HEAD
-\examples{
-# write bigwigs to a temporary directory
-exampleTumourNormal \%>\% writeBigWigs(tempdir())
-}
-=======
 \details{
 For each sample (or group), the function pairs the per-window scores from
 \code{qseaSet} with the corresponding window genomic coordinates and writes a
@@ -84,4 +78,3 @@ exampleTumourNormal \%>\%
 \code{\link[=getDataTable]{getDataTable()}}
 }
 \concept{io}
->>>>>>> origin/general_doc_updates_from_main

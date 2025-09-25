@@ -27,13 +27,6 @@ combinations without repetition).
 Construct a tibble of all pairwise contrasts between levels of a categorical
 variable in the sample table of a \link[qsea:qseaSet-class]{qsea::qseaSet}.
 }
-<<<<<<< HEAD
-\examples{
-exampleTumourNormal \%>\% makeAllContrasts(type)
-
-
-}
-=======
 \details{
 Levels are inferred from \code{unique(qsea::getSampleTable(qseaSet)[[variable]])}.
 Pairs are formed between all distinct levels; no self-contrasts are included.
@@ -53,4 +46,3 @@ Other DMR-detection:
 \code{\link{getDMRsData}()}
 }
 \concept{DMR-detection}
->>>>>>> origin/general_doc_updates_from_main
