@@ -822,9 +822,8 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
   filledShapes <- any(my_scale_shape$palette(1) %in% 21:25)
   
   if (filledShapes &&
-      (length(cV) > 1 || cV != "NULLcol") &&
-      colourScaleType == "qualitative" &&
-      shape == "NULLshape") {
+      !(cV %in% c("NULLcol", shape)) &&
+      colourScaleType == "qualitative") {
     my_legend_params <- ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
   } else {
     my_legend_params <- NULL
