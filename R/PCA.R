@@ -819,21 +819,18 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 }
 
 getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
-
-  if(any(my_scale_shape$palette(1) %in% 21:25)){
-    filledShapes <- TRUE
-  } else {
-    filledShapes <- FALSE 
-  }
+  filledShapes <- any(my_scale_shape$palette(1) %in% 21:25)
   
-  if (filledShapes && (length(cV) > 1 || cV != "NULLcol") && colourScaleType == "qualitative") {
-    my_legend_params = ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
+  if (filledShapes &&
+      (length(cV) > 1 || cV != "NULLcol") &&
+      colourScaleType == "qualitative" &&
+      shape == "NULLshape") {
+    ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
   } else {
-    my_legend_params <- NULL
+    NULL
   }
-  
-  return(my_legend_params)
 }
+
 
 #' This function takes the `mesaDimRed` object output of [getPCA()] and produces plots.
 #' @param object The output from [getPCA()].
