@@ -484,14 +484,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'   Input object containing methylation-enriched sequencing data.
 #'
 #' @param enrichmentMethod `character(1)`  
-#'   Method used to calculate enrichment.  
-#'   Currently implemented:
-#'   \itemize{
-#'     \item **"blind1-15"**: the blind calibration method detailed in the qsea
-#'       paper, fitting a straight line of decreasing expected average
-#'       methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.
-#'     \item **"none"**: no enrichment normalisation is performed.
-#'   }  
+#'   Method used to calculate enrichment. Options are described in **Details**.  
 #'   Recorded in `qseaSet@parameters$enrichmentMethod`.  
 #'   **Default:** `"blind1-15"`.
 #'
@@ -515,7 +508,15 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #' This function encapsulates a recommended default pipeline for qsea
 #' normalisation. It ensures consistency across runs and simplifies code by
 #' bundling commonly applied steps.
-#'
+#' 
+#' #' Methods available for `enrichmentMethod`:
+#' \itemize{
+#'   \item **"blind1-15"**: the blind calibration method detailed in the qsea
+#'     paper, fitting a straight line of decreasing expected average
+#'     methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.
+#'   \item **"none"**: no enrichment normalisation is performed.
+#' }
+#' 
 #' @seealso
 #'   [qsea::addLibraryFactors()],  
 #'   [qsea::addOffset()],  
@@ -523,7 +524,6 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'   [getPattern()]
 #'
 #' @examples
-#' 
 #' # Run normalisation on a toy qseaSet with ~100k reads
 #' getExampleQseaSet(expSamplingDepth = 100000) %>%
 #'   addNormalisation(maxPatternDensity = 0.5)

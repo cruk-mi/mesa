@@ -87,7 +87,6 @@ is.qseaSet <- function(x){
 #'    setMart("ENSEMBL_110") %>%
 #'    getMart()
 #' }
-#'
 NULL
 
 #' @rdname setMart
