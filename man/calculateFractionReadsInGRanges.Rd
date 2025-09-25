@@ -4,19 +4,19 @@
 \alias{calculateFractionReadsInGRanges}
 \title{Fraction of thresholded windows overlapping a set of regions}
 \usage{
-calculateFractionReadsInGRanges(qseaSet, windowsToConsider, numCountsNeeded)
+calculateFractionReadsInGRanges(qseaSet, regionsToOverlap, numCountsNeeded)
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
 Input object providing per-window counts. \strong{Default:} none (must be supplied).}
 
+\item{numCountsNeeded}{\code{integer(1)}.
+Minimum reads per window for it to count toward the fraction.
+\strong{Default:} none (must be supplied).}
+
 \item{windowsToConsider}{\code{GRanges} or \code{data.frame}.
 Regions to consider for overlap. Data frames must be coercible to \code{GRanges}
 (e.g., have \code{seqnames}/\code{start}/\code{end} or \code{chr}/\code{window_start}/\code{window_end}).
-\strong{Default:} none (must be supplied).}
-
-\item{numCountsNeeded}{\code{integer(1)}.
-Minimum reads per window for it to count toward the fraction.
 \strong{Default:} none (must be supplied).}
 }
 \value{
@@ -55,7 +55,7 @@ data(exampleTumourNormal, package = "mesa")
 # Using the shipped ultra-stable probes (GRCh38) as the region set
 exampleTumourNormal \%>\%
   calculateFractionReadsInGRanges(
-    windowsToConsider = mesa::hg38UltraStableProbes,
+    regionsToOverlap = mesa::hg38UltraStableProbes,
     numCountsNeeded   = 5
   ) \%>\%
   dplyr::select(sample_name, fraction) 
@@ -67,7 +67,7 @@ exampleTumourNormal \%>\%
   (\(subgr)
     calculateFractionReadsInGRanges(
       qseaSet           = exampleTumourNormal,
-      windowsToConsider = subgr,
+      regionsToOverlap = subgr,
       numCountsNeeded   = 3
     )
   ) \%>\%

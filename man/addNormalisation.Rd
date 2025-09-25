@@ -15,14 +15,7 @@ addNormalisation(
 Input object containing methylation-enriched sequencing data.}
 
 \item{enrichmentMethod}{\code{character(1)}
-Method used to calculate enrichment.
-Currently implemented:
-\itemize{
-\item \strong{"blind1-15"}: the blind calibration method detailed in the qsea
-paper, fitting a straight line of decreasing expected average
-methylation levels from ~76\% at CpG density = 1 to ~25\% at CpG density = 15.
-\item \strong{"none"}: no enrichment normalisation is performed.
-}
+Method used to calculate enrichment. Options are described in \strong{Details}.
 Recorded in \code{qseaSet@parameters$enrichmentMethod}.
 \strong{Default:} \code{"blind1-15"}.}
 
@@ -56,15 +49,18 @@ Apply a set of qsea normalisation steps to a \code{qseaSet}, including:
 This function encapsulates a recommended default pipeline for qsea
 normalisation. It ensures consistency across runs and simplifies code by
 bundling commonly applied steps.
+
+#' Methods available for \code{enrichmentMethod}:
+\itemize{
+\item \strong{"blind1-15"}: the blind calibration method detailed in the qsea
+paper, fitting a straight line of decreasing expected average
+methylation levels from ~76\% at CpG density = 1 to ~25\% at CpG density = 15.
+\item \strong{"none"}: no enrichment normalisation is performed.
+}
 }
 \examples{
-
 # Run normalisation on a toy qseaSet with ~100k reads
 getExampleQseaSet(expSamplingDepth = 100000) \%>\%
-  addNormalisation(maxPatternDensity = 0.5)
-  
-# Run normalisation on a toy qseaSet with 10k reads
-getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
   addNormalisation(maxPatternDensity = 0.5)
   
 # Run with no enrichment normalisation
@@ -76,6 +72,7 @@ getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
   addNormalisation(maxPatternDensity = 0.5) \%>\%
   getParameters() \%>\% 
   purrr::pluck("enrichmentMethod")
+
 }
 \seealso{
 \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}},

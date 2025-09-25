@@ -13,7 +13,6 @@ A GRanges object with 31144 ranges and 7 metadata columns:
 \item{perCpg}{Percent CGs in the island}
 \item{perGc}{Percent of Cs or Gs in the island}
 \item{obsExp}{Unclear what this column means}
-...
 }
 }
 \usage{

@@ -17,6 +17,7 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
 * Updated function documentation with examples, default parameter values, and more detailed descriptions.
+* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.

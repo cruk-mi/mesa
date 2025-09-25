@@ -60,7 +60,6 @@ exampleTumourNormal \%>\%
    setMart("ENSEMBL_110") \%>\%
    getMart()
 }
-
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
