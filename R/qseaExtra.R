@@ -796,7 +796,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' # Using the shipped ultra-stable probes (GRCh38) as the region set
 #' exampleTumourNormal %>%
 #'   calculateFractionReadsInGRanges(
-#'     windowsToConsider = mesa::hg38UltraStableProbes,
+#'     regionsToOverlap = mesa::hg38UltraStableProbes,
 #'     numCountsNeeded   = 5
 #'   ) %>%
 #'   dplyr::select(sample_name, fraction) 
@@ -808,7 +808,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'   (\(subgr)
 #'     calculateFractionReadsInGRanges(
 #'       qseaSet           = exampleTumourNormal,
-#'       windowsToConsider = subgr,
+#'       regionsToOverlap = subgr,
 #'       numCountsNeeded   = 3
 #'     )
 #'   ) %>%
@@ -816,7 +816,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' }
 #'
 #' @export
-calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCountsNeeded) {
+calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
   initialReadTotals <- qseaSet %>%
     qsea::getCounts() %>%
     {. >= numCountsNeeded } %>%
