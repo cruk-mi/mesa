@@ -816,7 +816,7 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 }
 
-getLegendParams <- function(cV, shape, my_scale_shape) {
+getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 
   if(any(my_scale_shape$palette(1) %in% 21:25)){
     filledShapes <- TRUE
@@ -824,7 +824,7 @@ getLegendParams <- function(cV, shape, my_scale_shape) {
     filledShapes <- FALSE 
   }
   
-  if (filledShapes && (length(cV) > 1 || cV != "NULLcol")) {
+  if (filledShapes && (length(cV) > 1 || cV != "NULLcol") && colourScaleType == "qualitative") {
     my_legend_params = ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
   } else {
     my_legend_params <- NULL
@@ -1183,7 +1183,7 @@ plotDimRed <- function(object,
 
         my_scale_colour <- getColourScale(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour = NAcolour, symDivColourScale = symDivColourScale)
         
-        my_legend_params <- getLegendParams(cV, shape, my_scale_shape)
+        my_legend_params <- getLegendParams(cV, shape, my_scale_shape, colourScaleType)
 
         ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
 
