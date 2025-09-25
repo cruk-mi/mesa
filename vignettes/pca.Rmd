@@ -26,6 +26,7 @@ One essential functionality in the analysis of large scale datasets is the abili
 We will use the `exampleTumourNormal` data object for these examples.
 
 ## PCA functions
+
 First we will show the functionality for PCA, which is a linear dimensionality reduction technique. PCA is performed with mesa using a two-step approach:
 
 1.  Running PCA with the `getPCA()` function to generate the PCA results
@@ -41,9 +42,9 @@ The function `getPCA` calculates a PCA on a qseaSet:
 pca1 <- getPCA(exampleTumourNormal)
 ```
 
-By default, this will perform the PCA using beta values, and consider the 1000 most variable windows across all samples (or all windows if there are less than 1000). 
+By default, this will perform the PCA using beta values, and consider the 1000 most variable windows across all samples (or all windows if there are less than 1000).
 
-We then can use the `plotPCA()` function to plot the result. 
+We then can use the `plotPCA()` function to plot the result.
 
 ```{r}
 plotPCA(pca1)
@@ -51,9 +52,10 @@ plotPCA(pca1)
 
 The output of `getPCA()` is the PCA result object (technically a `mesaDimRed` object). This includes a copy of the `sampleTable`, detached from the original qseaSet.
 
-As shown above, `plotPCA()` returns two separate plots by default; one for PC1 vs PC2 and another for PC2 vs PC3. 
+As shown above, `plotPCA()` returns two separate plots by default; one for PC1 vs PC2 and another for PC2 vs PC3.
 
 ## Editing the sampleTable
+
 In the same way as for a `qseaSet`, the sampleTable may be updated directly, using `mutate` or `left_join`.
 
 ```{r}
@@ -67,7 +69,7 @@ pca1 <- pca1 |>
 
 The `colour` and `shape` arguments to `plotPCA()` specify variables to use to set the colour and/or shape of the points (samples) on the PCA plot. These variables need to be in the qseaSet sample table.\
 Multiple variables can be specified for `colour` and a PCA plot will be produced for each variable.\
-Only one variable can be specified for `shape`. 
+Only one variable can be specified for `shape`.
 
 ```{r}
 plotPCA(pca1,
@@ -90,7 +92,8 @@ PCAplots1$pca1$transformed_age$PC1vsPC2
 ```
 
 ### Colour and shape palettes
-The function aims to select sensible colour and shape palettes based on the types of variable being used. 
+
+The function aims to select sensible colour and shape palettes based on the properties of the variable being used.
 
 For the `transformed_age` variable (that was generated in the `mutate` example above), a diverging colour palette is used, but it is not symmetric around zero. That is, the darkest blue maps to approx -0.5 whereas the darkest red maps to approx 2.\
 Depending on the variable, it may be appropriate that the darkest blue maps to -2 (i.e. equivalent to the darkest red mapping to 2), and for this the `symDivColourScale` argument can be set to TRUE, as seen below (and we also replot the above version for comparison).
@@ -101,6 +104,24 @@ PCAplots2 <- plotPCA(pca1, colour = "transformed_age", shape = "tumour", symDivC
 PCAplots1$pca1$transformed_age$PC1vsPC2
 
 PCAplots2$pca1$transformed_age$PC1vsPC2
+```
+
+By default, filled shapes (21-25) with a black outline are used for points unless a categorical variable with more than 5 categories (including NA) is set to the shape, in which case the unfilled shapes are used (0-20)\*. Filled shapes are generally preferred, as they remain more distinguishable when many points overlap.
+
+*\*Note: Shapes 19 and 20 are excluded from default palettes as they are difficult to distinguish from shape 16.*
+
+As a rule, we do not allow mixing of filled and unfilled shapes on the same plot. This is because the variable provided to the `colour` argument is mapped to the fill aesthetic for filled shapes and the colour aesthetic for unfilled shapes in the underlying **ggplot2** geom.
+
+```{r}
+plotPCA(pca1,
+        colour = "tumour",
+        shape = "tissue") 
+```
+
+```{r}
+plotPCA(pca1,
+        colour = "tumour",
+        shape = "stage") 
 ```
 
 It is possible to specify your own colour and shape palettes using the `colourPalette` and `shapePalette` arguments.
@@ -127,7 +148,7 @@ plotPCA(pca1,
 
 If a variable used for colour annotation contains NA values then these are displayed with a dark grey colour by default (this can be changed using the `NAcolour` argument).
 
-If a variable used for shape annotation contains NA values then these are displayed explicitly (the shape can be controlled via the `NAshape` argument).
+If a variable used for shape annotation contains NA values then these are displayed explicitly with shape 25 by default for a filled shape palette and shape 7 by default for an unfilled shape palette (this can be changed using the `NAshape` argument).
 
 ```{r}
 plotPCA(pca1, components = c(1,2), colour = "stage")
@@ -203,10 +224,15 @@ pca <- getPCA(qseaSet = exampleTumourNormal)
 <!-- The output of `getPCA()` is a `mesaDimRed` object with the following components: -->
 
 <!-- -   **pcas** A named list of objects of class prcomp. List names correspond to entries in the `params$topVar` component of the output. -->
+
 <!-- -   **samples** Names of the samples analysed. -->
+
 <!-- -   **windows** A list of names of the windows analysed. List names correspond to entries in the `params$topVar` component of the output. -->
+
 <!-- -   **dataTable** If `returnDataTable = TRUE`, the table of normalised values. The table will contain windows after filtering based on `regionsToOverlap` and `minDensity`, but _prior_ to filtering based on `topVarNum`. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the `params$topVar` component of the output. -->
+
 <!-- -   **params** A list of the parameters used. -->
+
 <!-- -   **windowFiltering** A list of the initial number of windows and the number filtered out at each filtering step (not including filtering based on `topVarNum`). -->
 
 ## `getPCA()` function arguments
@@ -214,6 +240,7 @@ pca <- getPCA(qseaSet = exampleTumourNormal)
 By default, the `getPCA` function will only consider a subset of the most variable windows across the qseaSet. This has two benefits, the first being computational efficiency, but the second is to prevent the effects of minor batch effects from appearing when they are summed over many windows (although that is also worth investigating separately). This is seen particularly when using `beta` values, as how close a beta value can get to 0 or 1 is determined by the enrichment and number of fragments sequenced; a sample with 5 million fragments might be assigned a beta value of 0.95 in a window, but 0.99 in the same window if it had 10 million fragments.
 
 ### Setting number of top variable windows to use
+
 This selection of the number of windows can be set using the `topVarNum` argument of `getPCA()`. If not explicitly set, the default value is the top 1000 most variable windows.
 
 More than one value can be specified for `topVarNum` and PCA results will be produced for each. This is computationally more efficient than running `getPCA()` multiple times with a single `topVarNum` value each time.
@@ -229,7 +256,7 @@ Here, four different values have been used and the messages output tell you the 
 When plugging this output into `plotPCA`, plots are produced for all four PCA versions, with all options for the `colour` parameter:
 
 ```{r}
-PCAplots4 <- plotPCA(pca, exampleTumourNormal, colour = c("patient", "age"), shape = "tumour") 
+PCAplots4 <- plotPCA(pca2, exampleTumourNormal, colour = c("patient", "age"), shape = "tumour") 
 
 PCAplots4$pca1$patient$PC1vsPC2
 
@@ -248,7 +275,7 @@ pca <- getPCA(exampleTumourNormal, topVarNum = c(250, 500, 750, 1000, NA))
 
 ### Samples used to calculate variability
 
-It is possible to select which samples are used to calculate the standard deviation for each window using the `topVarSamples` argument. This may be either an explicit vector of sample names, 
+It is possible to select which samples are used to calculate the standard deviation for each window using the `topVarSamples` argument. This may be either an explicit vector of sample names,
 
 ```{r}
 tumourNames <- exampleTumourNormal |> filter(tumour == "Tumour") |> getSampleNames()
@@ -320,7 +347,8 @@ pca_nrpm |> plotPCA(colour = "tissue", shape = "tumour", components = c(1,2))
 ```
 
 ## Filtering regions
-Whilst PCA is an unsupervised method for dimensionality reduction, sometimes there is a set of windows which are of particular interest, and you wish to see how the samples cluster when considering these. Ideally these have been selected in an orthogonal manner rather than generated using the samples that are being plotted in the PCA. For instance, differentially methylated regions may have been found using a comparison between methylation arrays (a different technology), and you wish to see how these same windows split the samples. 
+
+Whilst PCA is an unsupervised method for dimensionality reduction, sometimes there is a set of windows which are of particular interest, and you wish to see how the samples cluster when considering these. Ideally these have been selected in an orthogonal manner rather than generated using the samples that are being plotted in the PCA. For instance, differentially methylated regions may have been found using a comparison between methylation arrays (a different technology), and you wish to see how these same windows split the samples.
 
 This may be done by pre-filtering the qseaSet object via `filterByOverlaps`:
 
@@ -333,7 +361,9 @@ exampleTumourNormal |>
 For a full list of arguments, see the documentation (`?getPCA`).
 
 ## UMAPs
-Uniform Manifold and Projection (UMAP) is another method for performing dimensionality reduction. This is a nonlinear technique, attempting to reduce the N-dimensional space onto a 2 or 3 dimensional projection, attempting to preserve both local distances between points as well as the global topology. This is more appropriate for large datasets so we use the [qsea::getExampleQseaSet()] function to create an example dataset with two types of samples, before calculating and plotting a UMAP using the `getUMAP` and `plotUMAP` functions: 
+
+Uniform Manifold and Projection (UMAP) is another method for performing dimensionality reduction. This is a nonlinear technique, attempting to reduce the N-dimensional space onto a 2 or 3 dimensional projection, attempting to preserve both local distances between points as well as the global topology. This is more appropriate for large datasets so we use the [qsea::getExampleQseaSet()] function to create an example dataset with two types of samples, before calculating and plotting a UMAP using the `getUMAP` and `plotUMAP` functions:
+
 ```{r}
 set.seed(1)
 qseaSetRandom <- qsea::getExampleQseaSet(repl = 20)
