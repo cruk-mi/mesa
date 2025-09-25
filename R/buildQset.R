@@ -369,7 +369,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 #' and set a multi-core/cluster backend for speed.
 #'
 #' @seealso
-#'   [getBamCoveragePairedAndUnpairedR1()] (low-level worker),  
+#'   \code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),  
 #'   [qsea::getRegions()],  
 #'   [qsea::getSampleTable()],  
 #'   [BiocParallel::register()]

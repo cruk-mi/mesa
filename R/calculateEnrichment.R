@@ -18,7 +18,7 @@
 #' @details
 #' * Chromosomes with names containing `"rand"` or `"chrUn"` are excluded.  
 #' * The BSgenome indicated by `BSgenome` is loaded dynamically.  
-#' * Uses [Biostrings] and [BSgenome] utilities to count CpG, C, and G
+#' * Uses \pkg{Biostrings} and \pkg{BSgenome} utilities to count CpG, C, and G
 #'   occurrences across the genome.  
 #'
 #' @seealso

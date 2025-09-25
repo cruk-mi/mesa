@@ -71,8 +71,12 @@
 #' - (optionally) per-sample diagnostic PDFs if `plotDir` is provided.
 #'
 #' @seealso
-#' [runHMMcopy()], [plotCNVheatmap()], [getBamCoveragePairedAndUnpairedR1()],  
-#' [HMMcopy::correctReadcount()], [HMMcopy::HMMsegment()], [BiocParallel::register()]
+#' \code{runHMMcopy()}, 
+#' [plotCNVheatmap()], 
+#' \code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),  
+#' [HMMcopy::correctReadcount()], 
+#' [HMMcopy::HMMsegment()], 
+#' [BiocParallel::register()]
 #'
 #' @family CNV
 #'
@@ -329,7 +333,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' [ComplexHeatmap::draw()].
 #'
 #' @seealso
-#' [addHMMcopyCNV()], [runHMMCopy()], [ComplexHeatmap::Heatmap()],
+#' [addHMMcopyCNV()], \code{runHMMcopy()}, [ComplexHeatmap::Heatmap()],
 #' [qsea::addCNV()]
 #'
 #' @family CNV
