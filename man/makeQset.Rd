@@ -109,9 +109,9 @@ Mappability per CNV bin (size = \code{CNVwindowSize}) for HMMcopy.
 \item{maxPatternDensity}{\code{numeric(1)}.
 Maximum allowed pattern density (e.g., CpG) when calculating enrichment
 factors. Regions above this are excluded from the calculation.
-\strong{Default:} \code{0.05}.
+\strong{Default:} \code{0.05}.}
 
-@param enrichmentMethod \code{character(1)}.
+\item{enrichmentMethod}{\code{character(1)}.
 Method for calculating enrichment for target pattern (e.g. CpG).
 See \code{\link[=addNormalisation]{addNormalisation()}} for details.
 \strong{Default:} \code{"blind1-15"}.}
