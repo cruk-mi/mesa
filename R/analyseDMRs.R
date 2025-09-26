@@ -376,6 +376,7 @@ writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
 #' DMRs %>% sliceDMRs(n = 1, metric = CpG_density)
 #' # If position is used, then the windows are sorted by genomic position:
 #' DMRs %>% sliceDMRs(n = 1, metric = position)
+#' @export
 sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRthres = 0.05) {
   
   positiveDMRs <- DMRs %>% 
