@@ -332,7 +332,7 @@ skip_long_checks <- function() {
 #' # From data.frame (chr/window_start/window_end)
 #' data.frame(chr = "1", window_start = 1000, window_end = 1100) %>%
 #'   asValidGranges()
-#'
+#' @export
 asValidGranges <- function(object){
 
   if("GRanges" %in% class(object)){
