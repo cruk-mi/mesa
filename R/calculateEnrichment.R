@@ -248,7 +248,7 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
 #' \donttest{
 #' # Requires MEDIPS and a BSgenome package
 #' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#' #   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = paste0("chr", 1:2))
+#' #   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
 #' #   gr
 #' # }
 #' }
