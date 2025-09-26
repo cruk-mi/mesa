@@ -2,34 +2,65 @@
 % Please edit documentation in R/plotting.R
 \name{getAnnotation}
 \alias{getAnnotation}
-\title{Get an annotation data frame, for use in heatmap plotting functions}
+\title{Sample/group annotation data.frame}
 \usage{
 getAnnotation(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL)
 }
 \arguments{
-\item{qseaSet}{A qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Object from which sample metadata are taken.}
 
-\item{useGroupMeans}{Whether to use the "group" variable to collapse replicates}
+\item{useGroupMeans}{\code{logical(1)}.
+Build annotations at the \strong{group} level (aggregate replicates by \code{group});
+if \code{FALSE}, return per-sample annotations.
+\strong{Default:} \code{FALSE}.}
 
-\item{sampleAnnotation}{Columns of the sampleTable to use}
+\item{sampleAnnotation}{tidyselect specification, \code{character()}, or \code{NULL}.
+Columns from the sample table to include as annotations. Accepts unquoted
+tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g., \code{c("tumour","type")}).
+\strong{Default:} \code{NULL} (no extra columns beyond the identifier).}
 }
 \value{
-A data frame containing the annotation columns, ready for use in heatmap functions
+\code{data.frame} of annotations with row names set to \code{sample_name}
+(or to \code{group} when \code{useGroupMeans = TRUE}).
 }
 \description{
 Note that sampleAnnotation must be enclosed within double curly brackets when used.
 }
-\examples{
+\details{
+Select sample-table columns to use as annotations, either per-sample or
+per-group (with consistency checks across replicates).
 
-# works for none, one or more columns:
+When \emph{programming} with tidyselect inside your own functions, wrap the
+\code{sampleAnnotation} argument in \strong{double curly braces} (\code{{{ }}}) to enable
+tidy-evaluation. End-users can pass unquoted column names or character
+vectors directly.
+}
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Works with none, one, or multiple columns (unquoted tidyselect):
 exampleTumourNormal \%>\% mesa:::getAnnotation()
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = type)
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour,type))
-# also works for quoted string names
-exampleTumourNormal \%>\% mesa:::getAnnotation()
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
+
+# Also works with quoted column names:
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
-# and for asking to use the groups
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(useGroupMeans = TRUE)
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
+
+# group-level annotations for tumour & tissue
+exampleTumourNormal \%>\%
+  dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
+  mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
+
+exampleTumourNormal \%>\%
+  dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
+  mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 }
+}
+\seealso{
+\code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}
+}
+\concept{heatmap-annotation}
+\keyword{internal}

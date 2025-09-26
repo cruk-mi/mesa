@@ -2,20 +2,89 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{setMesaParallel}
 \alias{setMesaParallel}
-\title{Toggle whether to use parallelisation or not inside various functions in mesa}
+\alias{getMesaParallel}
+\title{Manage mesa parallelisation (set & query)}
 \usage{
 setMesaParallel(nCores = NULL, useParallel = FALSE, verbose = TRUE)
+
+getMesaParallel(verbose = FALSE)
 }
 \arguments{
-\item{nCores}{How many cores to set. Assumes you want to use MulticoreParam, for another architecture use the useParallel argument and specify manually.}
+\item{nCores}{\code{integer(1)} or \code{NULL}.
+If \verb{> 1} on Unix/macOS, registers \code{BiocParallel::MulticoreParam(workers = nCores)}
+and enables parallel mode. Ignored on Windows (see \strong{Details}).
+\strong{Default:} \code{NULL}.}
 
-\item{useParallel}{Boolean denoting whether or not to use parallelisation for various functions in mesa}
+\item{useParallel}{\code{logical(1)}.
+Explicitly turn mesa parallelisation on/off (sets the \code{"mesa_parallel"}
+option). If \code{nCores > 1}, this is treated as \code{TRUE}.
+\strong{Default:} \code{FALSE}.}
 
-\item{verbose}{Boolean to determine whether to print messages or not}
+\item{verbose}{Boolean to determine whether to print messages or not.}
 }
 \value{
-None
+\itemize{
+\item \code{setMesaParallel()} — logical scalar (\code{TRUE}/\code{FALSE}), returned \strong{invisibly};
+primarily used for its side effects (setting the option and possibly
+registering a backend).
+\item \code{getMesaParallel()} — logical scalar indicating whether mesa parallelisation
+is currently enabled; with \code{verbose = TRUE}, also prints a status message.
+}
 }
 \description{
-Toggle whether to use parallelisation or not inside various functions in mesa
+\code{setMesaParallel()} enables/disables parallelisation (and may register a
+backend); \code{getMesaParallel()} returns the current setting.
+}
+\details{
+\itemize{
+\item This function stores the flag in \verb{options(mesa_parallel = <TRUE/FALSE>)}.
+\item On Unix/macOS, supplying \code{nCores > 1} will \strong{register} a
+\code{MulticoreParam} backend via \code{BiocParallel::register()} and enable
+parallelisation.
+\item On \strong{Windows}, forked backends are unavailable; you should manually
+register a compatible backend (e.g., \code{SnowParam}) and then call
+\code{setMesaParallel(useParallel = TRUE)}.
+\item You can always inspect the active backend with \code{BiocParallel::bpparam()}
+and the worker count with \code{BiocParallel::bpworkers()}.
+}
+}
+\section{Functions}{
+\itemize{
+\item \code{getMesaParallel()}: Get whether mesa is using parallelisation.
+
+}}
+\examples{
+# Turn parallelisation OFF (serial evaluation)
+setMesaParallel(useParallel = FALSE, verbose = FALSE)
+getMesaParallel()  # FALSE
+
+# --- Unix/mac (MulticoreParam): enable and use 2 cores ---
+\donttest{
+if (.Platform$OS.type != "windows") {
+  old <- BiocParallel::bpparam()                         # save current backend
+  setMesaParallel(nCores = 2, verbose = FALSE)           # registers MulticoreParam(2)
+  BiocParallel::bpworkers()                               # e.g. 2
+  getMesaParallel()                                       # TRUE
+  BiocParallel::register(old)                             # restore previous backend
+  setMesaParallel(useParallel = FALSE, verbose = FALSE)   # back to serial
+}
+}
+
+# --- Windows: register SnowParam yourself, then enable ---
+\donttest{
+if (.Platform$OS.type == "windows") {
+  old <- BiocParallel::bpparam()
+  BiocParallel::register(BiocParallel::SnowParam(workers = 2))
+  setMesaParallel(useParallel = TRUE, verbose = FALSE)
+  BiocParallel::bpworkers()                               # e.g. 2
+  getMesaParallel()                                       # TRUE
+  BiocParallel::register(old)
+  setMesaParallel(useParallel = FALSE, verbose = FALSE)
+}
+}
+
+}
+\seealso{
+\code{\link[BiocParallel:register]{BiocParallel::register()}}, \code{\link[BiocParallel:MulticoreParam-class]{BiocParallel::MulticoreParam()}},
+\code{\link[BiocParallel:SnowParam-class]{BiocParallel::SnowParam()}}, \code{\link[BiocParallel:BiocParallelParam-class]{BiocParallel::bpworkers()}}
 }
