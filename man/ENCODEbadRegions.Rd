@@ -9,7 +9,6 @@ A Granges object with 636 ranges:
 \describe{
 \item{seqnames}{chromosome}
 \item{ranges}{position on the chromosome}
-...
 }
 }
 \source{

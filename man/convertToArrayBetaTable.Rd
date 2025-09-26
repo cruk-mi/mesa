@@ -2,24 +2,60 @@
 % Please edit documentation in R/qseaExtra.R
 \name{convertToArrayBetaTable}
 \alias{convertToArrayBetaTable}
-\title{Calculate beta values for the windows covering probes from a methylation array.}
+\title{Convert qsea beta values to array-like probe matrix}
 \usage{
 convertToArrayBetaTable(qseaSet, arrayDetails = "Infinium450k")
 }
 \arguments{
-\item{qseaSet}{qseaSet object to calculate approximate beta values.}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing per-window beta values.
+\strong{Default:} none (must be supplied).}
 
-\item{arrayDetails}{Either a recognised string or a GRanges object with an ID column.}
+\item{arrayDetails}{\code{character(1)} or \code{GRanges}.
+Either a recognised keyword (currently \code{"Infinium450k"}) or a \code{GRanges}
+of probe loci with an \code{ID} metadata column of probe identifiers. Coordinates
+must match the \code{qseaSet} genome (e.g., GRCh38).
+\strong{Default:} \code{"Infinium450k"}.}
 }
 \value{
-A wide data frame with each row being a probe, and each sample being a column (plus the ID column)
+A \code{data.frame} with one row per probe (including an \code{ID} column) and one
+column per sample containing the corresponding beta values. Probes with no
+matching/overlapping window receive \code{NA}.
 }
 \description{
-This function returns a wide data frame with beta values corresponding to overlapping probes from a methylation array.
-This is suitable for input into tools in other packages that are designed for tables of array beta values.
-Currently only "Infinium450k" is recognised, and only for GRCh38.
+Build a probe × sample beta table by mapping \code{qseaSet} windows to array
+probe coordinates. Currently supports Illumina \strong{Infinium 450k} probes on
+GRCh38; a custom \code{GRanges} of probes can also be supplied.
+}
+\details{
+Probe coordinates are matched to \code{qseaSet} windows (e.g., via overlap). When
+multiple windows are relevant for a probe, the package's implementation is
+used to derive a single beta value per probe. Ensure the probe genome build
+matches the \code{qseaSet} (e.g., GRCh38) to avoid mismatches.
 }
 \examples{
-convertToArrayBetaTable(exampleTumourNormal, arrayDetails = "Infinium450k")
-convertToArrayBetaTable(exampleTumourNormal, arrayDetails = mesa::hg38_450kArrayGR)
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Use the built-in keyword for 450k probes (GRCh38)
+exampleTumourNormal \%>\%
+  convertToArrayBetaTable(arrayDetails = "Infinium450k") \%>\%
+  head()
+
+# Supply an explicit GRanges of 450k probes (must have metadata column 'ID')
+exampleTumourNormal \%>\%
+  convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
+  head()
 }
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}, dataset \code{mesa::hg38_450kArrayGR}
+
+Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
+\code{\link{downSample}()},
+\code{\link{subsetWindowsBySignal}()},
+\code{\link{subsetWindowsOverBackground}()}
+}
+\concept{window-helpers}

@@ -2,19 +2,43 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByGene}
 \alias{summariseDMRsByGene}
-\title{This function summarises a data frame by gene}
+\title{Summarise DMRs by gene}
 \usage{
 summariseDMRsByGene(DMRtable)
 }
 \arguments{
-\item{DMRtable}{A data frame that has already been annotated by annotateWindows}
+\item{DMRtable}{\code{data.frame} or \code{GRanges}
+Annotated DMRs. Must include the columns \code{ENSEMBL}, \code{SYMBOL}, and \code{GENENAME}
+(typically added with \code{\link[=annotateWindows]{annotateWindows()}}).}
+}
+\value{
+A \code{tibble}:
+\itemize{
+\item \strong{summariseDMRsByGene()}: returns one row per gene, with counts of
+associated DMRs and any aggregated metadata.
+}
 }
 \description{
-This function summarises a data frame by gene
+Aggregate differentially methylated region (DMR) windows by gene annotation.
 }
 \examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Summarise DMRs with explicit annotation databases
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+                  annoDb = "org.Hs.eg.db") \%>\%
   summariseDMRsByGene()
 }
+\seealso{
+\code{\link[=annotateWindows]{annotateWindows()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
+
+Other DMR-helpers: 
+\code{\link{pivotDMRsLonger}()},
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{writeDMRsToBed}()},
+\code{\link{writeDMRsToExcel}()}
+}
+\concept{DMR-helpers}

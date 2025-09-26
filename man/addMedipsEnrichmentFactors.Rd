@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{addMedipsEnrichmentFactors}
 \alias{addMedipsEnrichmentFactors}
-\title{This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.}
+\title{Add MEDIPS-style enrichment metrics to a qseaSet sample table}
 \usage{
 addMedipsEnrichmentFactors(
   qseaSet,
@@ -18,21 +18,84 @@ addMedipsEnrichmentFactors(
 )
 }
 \arguments{
-\item{qseaSet}{The cutoff to use on the windows for each sample}
+\item{qseaSet}{\code{qseaSet}
+Input object whose sample table contains BAM paths.}
 
-\item{exportPath}{Folder to export files}
+\item{exportPath}{\code{character(1)} or \code{NULL}
+Directory to export per-sample fragment-length PDFs and read-\code{GRanges} RDS files.
+If \code{NULL}, no files are written.
+\strong{Default:} \code{NULL}.}
 
-\item{nonEnrich}{Boolean to signify function is being ran on the Input samples}
+\item{nonEnrich}{\code{logical(1)}
+If \code{TRUE}, treat samples as \strong{Input} libraries (columns appended under
+\verb{@libraries$input_file}). If \code{FALSE}, treat as \strong{Pulldown} (columns appended
+under \verb{@libraries$file_name}).
+\strong{Default:} \code{FALSE}.}
 
-\item{extend, shift, uniq, chr.select, paired}{Options to feed into medips::getGRange or medips::getPairedGRange}
+\item{extend}{\code{integer(1)}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+\strong{Default:} \code{0}.}
 
-\item{file_name}{Column of the sampleTable which contains the file_name.}
+\item{shift}{\code{integer(1)}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
+\strong{Default:} \code{0}.}
 
-\item{nCores}{Number of cores to use for parallelisation}
+\item{uniq}{\code{integer(1)}
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+\strong{Default:} \code{0}.}
+
+\item{chr.select}{\code{character()} or \code{NULL}
+Passed to MEDIPS range extraction; subset of chromosomes to analyse.
+\strong{Default:} \code{NULL} (all chromosomes).}
+
+\item{paired}{\code{logical(1)}
+Whether BAMs are paired-end (uses \code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
+\strong{Default:} \code{TRUE}.}
+
+\item{file_name}{\code{character(1)}
+Column name in the sample table holding BAM paths when \code{nonEnrich = FALSE}.
+When \code{nonEnrich = TRUE}, the column \code{input_file} is used instead.
+\strong{Default:} \code{"file_name"}.}
+
+\item{nCores}{\code{integer(1)}
+Number of parallel cores for \code{parallel::mclapply()}. Set to \code{1} for serial.
+\strong{Default:} \code{1}.}
 }
 \value{
-A qseaSet supplemented with more columns on the sampleTable, related to enrichment.
+A \code{qseaSet} with new MEDIPS-style metrics appended:
+\itemize{
+\item \strong{Sample/library metrics} (added under the appropriate library frame):
+\code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern}, \code{n100bpReads},
+\code{n100bpReadsWithoutPattern}.
+\item \strong{Provenance}: any export artefacts (PDF/RDS) written to \code{exportPath} if provided.
+}
 }
 \description{
-This function takes a qseaSet and adds the Medips-style enrichment scores to the object sampleTable.
+For each sample, compute MEDIPS-style CpG enrichment metrics (\strong{relH}, \strong{GoGe},
+and read counts) from its BAM and append the results to the \code{qseaSet} sample
+metadata. Supports both pulldown (default) and input libraries.
+}
+\details{
+Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and counts,
+then merges the results into the \verb{@libraries} slot (\verb{$file_name} for pulldown,
+\verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelisation uses
+\code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
+}
+\examples{
+\donttest{
+# Sketch (requires BAMs and a BSgenome):
+# data(exampleTumourNormal, package = "mesa")
+# qs <- exampleTumourNormal
+# qs <- addMedipsEnrichmentFactors(
+#   qs, exportPath = tempdir(), nonEnrich = FALSE,
+#   file_name = "file_name", nCores = 1,
+#   paired = TRUE, chr.select = paste0("chr", 1:22)
+# )
+# head(qsea::getSampleTable(qs))
+}
+
+}
+\seealso{
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
+\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}
 }

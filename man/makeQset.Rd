@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeQset.R
 \name{makeQset}
 \alias{makeQset}
-\title{Make the initial qseaSet object from a set of samples}
+\title{Construct an initial qseaSet from BAMs and metadata}
 \usage{
 makeQset(
   sampleTable,
@@ -29,70 +29,213 @@ makeQset(
 )
 }
 \arguments{
-\item{sampleTable}{A data frame with the sample information to be passed to qsea.}
+\item{sampleTable}{\code{data.frame}.
+Must contain \code{sample_name}, \code{file_name}, and \code{group}. If \code{CNVmethod}
+requires inputs, also \code{input_file}. Additional columns are preserved as
+sample metadata.
+\strong{Default:} none (must be supplied).}
 
-\item{BSgenome}{A BSgenome string. See BSgenome::available.genomes() for options.}
+\item{BSgenome}{\code{character(1)} or \code{NULL}.
+BSgenome package string (e.g., \code{"BSgenome.Hsapiens.NCBI.GRCh38"}).
+See \code{\link[BSgenome:available.genomes]{BSgenome::available.genomes()}}.
+\strong{Default:} \code{NULL} (must be supplied).}
 
-\item{chrSelect}{Which chromosomes to use (default 1:22).}
+\item{chrSelect}{\code{integer()} or \code{character()}.
+Chromosomes to include.
+\strong{Default:} \code{1:22}.}
 
-\item{windowSize}{What window size (in bp) to use in the genome (default 300).}
+\item{windowSize}{\code{integer(1)}.
+Window size in bp for tiling the genome.
+\strong{Default:} \code{300}.}
 
-\item{CNVwindowSize}{What window size (in bp) to use in the calculation of CNV (default 1000000).}
+\item{CNVwindowSize}{\code{integer(1)}.
+CNV bin size (bp).
+\strong{Default:} \code{1e6}.}
 
-\item{fragmentType}{What type of procedure generated the library, Sheared or cfDNA (used to set the average fragment length/SD to some predefined defaults)}
+\item{fragmentType}{\code{character(1)} or \code{NULL}.
+If \code{"Sheared"} or \code{"cfDNA"}, sets defaults for \code{fragmentLength}/\code{fragmentSD};
+otherwise supply both explicitly.
+\strong{Default:} \code{NULL}.}
 
-\item{fragmentLength}{Average DNA fragment length. Can be set to some defaults by using fragmentType.}
+\item{fragmentLength}{\code{numeric(1)} or \code{NULL}.
+Average fragment length (bp).
+\strong{Default:} \code{NULL} (inferred from \code{fragmentType} or must be provided).}
 
-\item{fragmentSD}{Standard deviation of the DNA fragment lengths. Can be set by fragmentType.}
+\item{fragmentSD}{\code{numeric(1)} or \code{NULL}.
+Standard deviation of fragment length (bp).
+\strong{Default:} \code{NULL} (inferred from \code{fragmentType} or must be provided).}
 
-\item{CNVmethod}{Which method to use for calculation of CNV. Options include "HMMdefault" (hmmcopy with default parameters) and "None".}
+\item{CNVmethod}{\code{character(1)}.
+One of \code{"HMMdefault"}, \code{"qseaInput"}, \code{"MeCap"}, \code{"None"}.
+\strong{Default:} \code{"HMMdefault"}.}
 
-\item{coverageMethod}{Whether to use custom method for reading coverage in ("PairedAndR1s"), rather than qsea's ("qseaPaired").}
+\item{coverageMethod}{\code{character(1)}.
+One of \code{"PairedAndR1s"} (mesa) or \code{"qseaPaired"} (qsea).
+\strong{Default:} \code{"PairedAndR1s"}.}
 
-\item{minMapQual}{Minimum MAPQ score for a read to be kept. For coverageMethod = "PairedAndR1s", will keep if either R1 or R2 meet this cutoff in a properly paired read (if MQ tags are set in the bam file with samtools fixmate).}
+\item{minMapQual}{\code{integer(1)}.
+Minimum MAPQ to retain a read. For \code{"PairedAndR1s"}, a pair is kept if
+either end passes when properly paired and MAPQ tags are set.
+\strong{Default:} \code{10}.}
 
-\item{minInsertSize}{For paired reads, only keep them if they are above a minimum length. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
+\item{minInsertSize}{\code{integer(1)}.
+Minimum absolute insert size for proper pairs (bp).
+\strong{Default:} \code{70}.}
 
-\item{maxInsertSize}{For paired reads, only keep them if they are below a maximum length. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
+\item{maxInsertSize}{\code{integer(1)}.
+Maximum absolute insert size for proper pairs (bp).
+\strong{Default:} \code{1000}.}
 
-\item{minReferenceLength}{A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
+\item{minReferenceLength}{\code{integer(1)}.
+Minimum aligned reference span for R1 singletons (bp).
+\strong{Default:} \code{30}.}
 
-\item{badRegions}{A GRanges object containing regions to filter out from the result.}
+\item{badRegions}{\code{GRanges} or \code{NULL}.
+Genomic regions to exclude (blacklist).
+\strong{Default:} \code{NULL}.}
 
-\item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection. Only applies to coverageMethod = "PairedAndR1s", and applies to Input samples as well as MeCap.}
+\item{properPairsOnly}{\code{logical(1)}.
+If \code{TRUE}, use only proper pairs (stricter size selection).
+\strong{Default:} \code{FALSE}.}
 
-\item{hmmCopyGC}{A data frame containing GC content per bin (each with size \code{CNVwindowSize}), only for use with hmmcopy.}
+\item{hmmCopyGC}{\code{data.frame} or \code{NULL}.
+GC content per CNV bin (size = \code{CNVwindowSize}) for HMMcopy.
+\strong{Default:} \code{NULL}.}
 
-\item{hmmCopyMap}{A data frame containing Mapability content per bin (each with size \code{CNVwindowSize}), only for use with hmmcopy.}
+\item{hmmCopyMap}{\code{data.frame} or \code{NULL}.
+Mappability per CNV bin (size = \code{CNVwindowSize}) for HMMcopy.
+\strong{Default:} \code{NULL}.}
 
-\item{maxPatternDensity}{Maximum pattern density in a window to consider it for the background calculation.}
+\item{maxPatternDensity}{\code{numeric(1)}.
+Maximum allowed pattern density (e.g., CpG) when calculating enrichment
+factors. Regions above this are excluded from the calculation.
+\strong{Default:} \code{0.05}.}
 
-\item{enrichmentMethod}{What method to use to calculate the enrichment step. Current options are "none" or "blind1-15",
-the blind calibration method detailed in the qsea paper of fitting of a straight line of decreasing expected average
-methylation levels from 76\% at CpG_density = 1 to 25\% at CpG_density = 15.}
+\item{enrichmentMethod}{\code{character(1)}.
+Method for calculating enrichment for target pattern (e.g. CpG).
+See \code{\link[=addNormalisation]{addNormalisation()}} for details.
+\strong{Default:} \code{"blind1-15"}.}
 
-\item{parallel}{Whether to read in files by using each core in parallel.
-Control number of calls by calling e.g. setMesaParallel(nCores = 4) beforehand.}
+\item{parallel}{\code{logical(1)}.
+Use the registered BiocParallel backend (\code{TRUE}) or run serially (\code{FALSE}).
+See \code{\link[BiocParallel:register]{BiocParallel::register()}}.
+\strong{Default:} \code{getMesaParallel()}.}
 }
 \value{
-A qseaSet object, containing all the information required.
+A \code{qseaSet} containing:
+\itemize{
+\item tiled (and optionally blacklisted) genomic windows;
+\item the input \code{sampleTable} as sample metadata;
+\item loaded coverage according to \code{coverageMethod};
+\item CNV results depending on \code{CNVmethod};
+\item CpG density and enrichment parameters;
+\item recorded processing parameters in \verb{@parameters}.
+}
 }
 \description{
-This function makes the initial qseaSet from a sampleTable that includes the file paths for the bam files and their metadata.
+Build a \code{qseaSet} from a \code{sampleTable} that lists BAM files and sample
+metadata, tile the genome into fixed windows, optionally remove blacklisted
+regions, and load coverage and (optionally) CNV information according to the
+selected methods. This is typically the first step in a mesa/qsea workflow.
+}
+\details{
+\strong{Inputs & requirements}
+\itemize{
+\item \code{sampleTable} must include at least:
+\itemize{
+\item \code{sample_name} (unique per sample),
+\item \code{file_name} (path to MeDIP/capture BAM),
+\item \code{group} (string label).
+If \code{CNVmethod} uses inputs (\code{"HMMdefault"}, \code{"qseaInput"}), also include
+\code{input_file} (path to matched Input BAM).
+}
+\item BAMs should be coordinate-sorted. For paired data, running \verb{samtools fixmate}
+is recommended so MAPQ tags are available (see \code{minMapQual} note below).
+\item \code{BSgenome} must be an installed genome package string (e.g.
+\code{"BSgenome.Hsapiens.NCBI.GRCh38"}), which provides chromosome lengths and
+sequences for tiling windows.
+}
+
+\strong{Windows & blacklist}
+\itemize{
+\item Chromosomes in \code{chrSelect} are tiled into non-overlapping windows of size
+\code{windowSize} (bp). Windows overlapping \code{badRegions} (if provided) are removed.
+}
+
+\strong{Coverage loading}
+\itemize{
+\item \code{coverageMethod = "PairedAndR1s"} loads proper pairs and, optionally,
+high-MAPQ R1 singletons; governed by \code{minMapQual}, \code{minInsertSize},
+\code{maxInsertSize}, \code{properPairsOnly}, \code{minReferenceLength}.
+\item \code{coverageMethod = "qseaPaired"} delegates to \code{\link[qsea:addCoverage]{qsea::addCoverage()}} with paired
+settings.
+\item \code{fragmentType} can set defaults for \code{fragmentLength}/\code{fragmentSD} (\code{"Sheared"}
+or \code{"cfDNA"}); otherwise supply both explicitly.
+}
+
+\strong{CNV options}
+\itemize{
+\item \code{"qseaInput"}: run \code{\link[qsea:addCNV]{qsea::addCNV()}} using \code{input_file} BAMs.
+\item \code{"HMMdefault"}: use mesa's \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} with supplied defaults for GRCh38
+GC/mappability tracks (objects like \code{gc_hg38_1000kb}, \code{map_hg38_1000kb},
+chosen by \code{CNVwindowSize}).
+\item \code{"MeCap"}: estimate CNV from MeCap BAMs (\code{file_name}).
+\item \code{"None"}: do not compute CNV.
+}
+
+\strong{Parallelisation}
+\itemize{
+\item If \code{parallel = TRUE}, computation uses the currently registered
+BiocParallel backend (see \code{\link[BiocParallel:register]{BiocParallel::register()}}); otherwise runs serially.
+Use \code{setMesaParallel()} to toggle package-wide.
+}
+
+\strong{Additional processing}
+\itemize{
+\item Adds CpG density via \code{qsea::addPatternDensity(pattern = "CG")},
+enrichment parameters, sets library factors to 1 (so betas are not scaled),
+and stores key parameters in \code{qseaSet@parameters}.
+}
+
+\strong{Errors & validations}
+\itemize{
+\item The function verifies required columns, existence of listed BAMs, and
+presence of required GC/mappability tracks for \code{"HMMdefault"}. It stops with
+a descriptive message if any prerequisite is missing.
+}
 }
 \examples{
-\dontshow{if (requireNamespace("MEDIPSData", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-# make a sampleTable (requires `MEDIPSData` package to be installed)
-sampleTable <- data.frame(sample_name = c("Normal1","Tumour1"),
-  group = c("Normal1","Tumour1"),
-  file_name = c(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-               system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)))
-               
-makeQset(sampleTable, 
-  BSgenome = "BSgenome.Hsapiens.UCSC.hg19", 
-  chrSelect = paste0("chr",20:22), 
-  fragmentLength = 200, 
-  fragmentSD = 50, 
-  CNVmethod = "none")
-\dontshow{\}) # examplesIf}
+\donttest{
+# Minimal runnable sketch if MEDIPSData is installed (toy BAMs)
+if (requireNamespace("MEDIPSData", quietly = TRUE)) {
+  sampleTable <- data.frame(
+    sample_name = c("Normal1", "Tumour1"),
+    group       = c("Normal",  "Tumour"),
+    file_name   = c(
+      system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+                  package = "MEDIPSData", mustWork = TRUE),
+      system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
+                  package = "MEDIPSData", mustWork = TRUE)
+    )
+  )
+
+  sampleTable \%>\%
+    makeQset(
+      BSgenome          = "BSgenome.Hsapiens.UCSC.hg19",
+      chrSelect         = paste0("chr", 20:22),
+      windowSize        = 300,
+      fragmentLength    = 200,
+      fragmentSD        = 50,
+      CNVmethod         = "None",
+      coverageMethod    = "PairedAndR1s",
+      properPairsOnly   = FALSE,
+      minMapQual        = 10
+    )
+}
+}
+
+}
+\seealso{
+\code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:addCoverage]{qsea::addCoverage()}}, \code{\link[qsea:addCNV]{qsea::addCNV()}},
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[=setMesaParallel]{setMesaParallel()}}, \code{\link[BSgenome:available.genomes]{BSgenome::available.genomes()}}
 }

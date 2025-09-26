@@ -8,6 +8,8 @@ editor_options:
 
 ### ADDED
 * Many more examples for individual functions on their help pages, as well as a set of vignettes.
+* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
+* Objects with invalid slots will now throw informative errors.
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method.
@@ -16,6 +18,8 @@ editor_options:
 * `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given.
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
+* Updated function documentation with examples, default parameter values, and more detailed descriptions.
+* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.

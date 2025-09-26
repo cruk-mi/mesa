@@ -3,15 +3,50 @@
 \docType{class}
 \name{mesaUMAP-class}
 \alias{mesaUMAP-class}
-\title{The mesaUMAP class}
+\alias{mesaUMAP}
+\alias{show,mesaUMAP-method}
+\title{UMAP results container}
+\usage{
+mesaUMAP(points, windows)
+
+\S4method{show}{mesaUMAP}(object)
+}
+\arguments{
+\item{points}{\code{data.frame}
+One row per sample with positions in UMAP space (row names = sample IDs).
+\strong{Default:} none.}
+
+\item{windows}{\code{character()}
+Window IDs used. \strong{Default:} none.}
+
+\item{object}{\code{mesaUMAP}}
+}
+\value{
+A \linkS4class{mesaUMAP} object containing UMAP coordinates and window IDs.
+}
 \description{
-This is a class for containing UMAP objects calculated on a qseaSet
+Stores per-sample coordinates from a UMAP embedding computed over methylation
+windows.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{points}}{Data frame containing one row for each sample, with the positions in UMAP space.}
+\item{\code{points}}{\code{data.frame}
+One row per sample with UMAP coordinates (e.g., \code{UMAP1}, \code{UMAP2}).
+Row names are sample IDs.}
 
-\item{\code{windows}}{A character vector of the windows used.}
+\item{\code{windows}}{\code{character()}
+Window IDs used to compute the embedding.}
 }}
 
+\examples{
+pts <- data.frame(UMAP1 = c(0.1, -0.2, 0.0),
+                  UMAP2 = c(0.3,  0.1, -0.1))
+rownames(pts) <- paste0("S", 1:3)
+mu <- mesaUMAP(points = pts, windows = c("w1","w2","w3"))
+mu
+
+}
+\seealso{
+\linkS4class{mesaDimRed}
+}
