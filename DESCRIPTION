@@ -4,12 +4,11 @@ Version: 0.99.0
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
-           role = c("aut", "cre"),
-           email = "simonppearce+mesa@gmail.com",
+           role = c("aut"),
            comment = c(ORCID = "0000-0002-1680-5538")),
     person(given = "Steven",
            family = "Hill",
-           role = c("aut"),
+           role = c("aut", "cre"),
            email = "steven.hill@cruk.manchester.ac.uk",
            comment = c(ORCID = "0000-0002-5909-692X")),
     person(given = "Paddy",
@@ -28,7 +27,9 @@ Authors@R: c(
            family = "Perez Martinez",
            role = "ctb",
            email = "felipe.perezmartinez@cruk.manchester.ac.uk",
-           comment = c(ORCID = "0009-0007-9138-3674"))
+           comment = c(ORCID = "0009-0007-9138-3674")),
+    person(given = "Cancer Research UK National Biomarker Centre", 
+           role = c("cph", "fnd"))
            )
 Description: A package for the analysis of methylation enrichment sequencing 
     data (e.g. MBD-seq or MEDIP-seq). This allows for the window-based 
