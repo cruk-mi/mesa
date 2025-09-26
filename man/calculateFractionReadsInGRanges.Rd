@@ -10,13 +10,13 @@ calculateFractionReadsInGRanges(qseaSet, regionsToOverlap, numCountsNeeded)
 \item{qseaSet}{\code{qseaSet}.
 Input object providing per-window counts. \strong{Default:} none (must be supplied).}
 
-\item{numCountsNeeded}{\code{integer(1)}.
-Minimum reads per window for it to count toward the fraction.
-\strong{Default:} none (must be supplied).}
-
-\item{windowsToConsider}{\code{GRanges} or \code{data.frame}.
+\item{regionsToOverlap}{\code{GRanges} or \code{data.frame}.
 Regions to consider for overlap. Data frames must be coercible to \code{GRanges}
 (e.g., have \code{seqnames}/\code{start}/\code{end} or \code{chr}/\code{window_start}/\code{window_end}).
+\strong{Default:} none (must be supplied).}
+
+\item{numCountsNeeded}{\code{integer(1)}.
+Minimum reads per window for it to count toward the fraction.
 \strong{Default:} none (must be supplied).}
 }
 \value{
@@ -24,14 +24,14 @@ A tibble with one row per sample containing:
 \itemize{
 \item \code{sample_name}
 \item \code{initialOverBackNum} — windows \code{>=} threshold genome-wide
-\item \code{afterOverBackNum} — windows \code{>=} threshold within \code{windowsToConsider}
+\item \code{afterOverBackNum} — windows \code{>=} threshold within \code{regionsToOverlap}
 \item \code{fraction} — \code{afterOverBackNum / initialOverBackNum}
 followed by columns from the sample table (left-joined by \code{sample_name}).
 }
 }
 \description{
 For each sample, compute the proportion of \strong{windows} with counts
-\verb{>= numCountsNeeded} that overlap \code{windowsToConsider}, relative to all
+\verb{>= numCountsNeeded} that overlap \code{regionsToOverlap}, relative to all
 windows with counts \verb{>= numCountsNeeded} in that sample.
 }
 \details{
@@ -41,7 +41,7 @@ and summed per sample:
 \itemize{
 \item \code{initialOverBackNum}: windows meeting the threshold genome-wide.
 \item \code{afterOverBackNum}: windows meeting the threshold \strong{within}
-\code{windowsToConsider} (via \code{\link[=filterByOverlaps]{filterByOverlaps()}}).
+\code{regionsToOverlap} (via \code{\link[=filterByOverlaps]{filterByOverlaps()}}).
 The reported \code{fraction} is \code{afterOverBackNum / initialOverBackNum}.
 }
 

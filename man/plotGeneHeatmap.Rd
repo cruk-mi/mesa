@@ -2,7 +2,8 @@
 % Please edit documentation in R/plotting.R
 \name{plotGeneHeatmap}
 \alias{plotGeneHeatmap}
-\title{Heatmap across a single gene locus}
+\title{Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
+\strong{ComplexHeatmap}. The gene can be given as a HGNC symbol or Ensembl ID.}
 \usage{
 plotGeneHeatmap(
   qseaSet,

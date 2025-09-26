@@ -640,8 +640,6 @@ makeHeatmapAnnotations <- function(qseaSet,
   return(list(sample = sampleAnnot, window = windowAnnot))
 }
 
-
-#' Heatmap across a single gene locus
 #'
 #' Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
 #' **ComplexHeatmap**. The gene can be given as a HGNC symbol or Ensembl ID.
@@ -1077,7 +1075,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
     )
 
   col_list_num_min_positive <- annotationCol_numeric_min_positive %>%
-    purrr::map2(colvecs_binary[1:ncol(.)], function(val, cols){
+    purrr::map2(colvecs_binary[seq_along(ncol(.))], function(val, cols){
       circlize::colorRamp2(c(min(val, na.rm = TRUE),
                              max(val, na.rm = TRUE)),
                            cols)
@@ -1085,7 +1083,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
     )
 
   col_list_num_min_negative <- annotationCol_numeric_min_negative %>%
-    purrr::map2(colvecs_zerocenter[1:ncol(.)], function(val, cols){
+    purrr::map2(colvecs_zerocenter[seq_along(ncol(.))], function(val, cols){
       circlize::colorRamp2(c(min(val, na.rm = TRUE),
                              0,
                              max(val, na.rm = TRUE)),
