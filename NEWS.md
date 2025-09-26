@@ -41,6 +41,7 @@ editor_options:
 * `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
+* `getDimRed` will no longer print `Peforming PCA...` messages for redundant values of `topVarNum`.
 
 # mesa 0.5.1
 
