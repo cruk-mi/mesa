@@ -1,11 +1,10 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.5.1
+Version: 0.99.0
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
            role = c("aut", "cre"),
-           email = "simon.pearce@cruk.manchester.ac.uk",
            comment = c(ORCID = "0000-0002-1680-5538")),
     person(given = "Steven",
            family = "Hill",
@@ -15,7 +14,6 @@ Authors@R: c(
     person(given = "Paddy",
            family = "Harker",
            role = "ctb",
-           email = "patrick.harker@cruk.manchester.ac.uk",
            comment = c(ORCID = "0000-0002-2531-8774")),
     person(given = "Kevin",
            family = "Brennan",
@@ -31,7 +29,12 @@ Authors@R: c(
            email = "felipe.perezmartinez@cruk.manchester.ac.uk",
            comment = c(ORCID = "0009-0007-9138-3674"))
            )
-Description: Analysis tools for methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq), building off the qsea package.
+Description: A package for the analysis of methylation enrichment sequencing 
+    data (e.g. MBD-seq or MEDIP-seq). This allows for the window-based 
+    evaluation of methylation levels (using the 'qsea' package), including 
+    functions for determining differentially methylated regions. Many functions 
+    are provided for tidyverse style modification of the qseaSet objects 
+    originally defined in 'qsea'. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
