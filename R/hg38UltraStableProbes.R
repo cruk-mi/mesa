@@ -10,19 +10,17 @@
 #' \describe{
 #'   \item{Probe_ID}{Character cg identifier for the probe/locus (e.g., `"cg11733071"`).}
 #' }
-#' Additional characteristics:
-#' - **Seqnames:** numeric chromosomes `"1"`–`"22"` (no `"chr"` prefix; UCSC style can be set if needed).
-#' - **Strand:** `"*"` for all ranges.
-#' - **Widths:** 3 bp windows (probe CpG ±1 bp).
-#' - **Genome metadata:** currently unset; set to `"hg38"` if you need an explicit tag.
-#'
-#' @usage
-#' data(hg38UltraStableProbes)
-#'
+#' 
 #' @details
-#' The object ships with numeric seqnames (no `chr` prefix) and no seqlengths or genome tag.
-#' When combining with other GRanges, harmonise styles/metadata as needed, e.g.:
-#' `GenomeInfoDb::seqlevelsStyle()` to convert to `"UCSC"` (`"chr1"`, …) and
+#' - **Seqnames:** numeric chromosomes `"1"`–`"22"` (no `"chr"` prefix; UCSC style
+#'   can be set if needed).  
+#' - **Strand:** `"*"` for all ranges.  
+#' - **Widths:** 3 bp windows (probe CpG ±1 bp).  
+#' - **Genome metadata:** currently unset; set to `"hg38"` if you need an explicit
+#'   tag.  
+#'
+#' When combining with other `GRanges`, harmonise styles/metadata as needed, e.g.
+#' use `GenomeInfoDb::seqlevelsStyle()` to convert to `"UCSC"` (`"chr1"`, …) and
 #' `GenomeInfoDb::genome()` to set `"hg38"`.
 #'
 #' @source

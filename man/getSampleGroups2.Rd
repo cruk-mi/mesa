@@ -2,11 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getSampleGroups2}
 \alias{getSampleGroups2}
-<<<<<<< HEAD
-\title{This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.}
-=======
 \title{Sample names per group (order-preserving)}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 getSampleGroups2(qseaSet)
 }
@@ -20,15 +16,8 @@ A named \code{list} of \code{character} vectors, where each list name is a group
 each element is the ordered vector of sample names in that group.
 }
 \description{
-<<<<<<< HEAD
-This function takes a qseaSet and constructs a list with the groups, but retaining the original sorting.
-}
-\examples{
-exampleTumourNormal \%>\% mesa:::getSampleGroups2()
-=======
 Build a named list mapping each \code{group} to the vector of \code{sample_name}s
 in that group, preserving the current sample order.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
 Groups are taken from the \code{group} column of the \code{sampleTable}. The order of

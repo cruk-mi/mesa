@@ -45,8 +45,3 @@ exampleTumourNormal \%>\% arrange(desc(tissue), tumour)
 \code{\link[=subsetQset]{subsetQset()}},
 \code{\link[=sort.qseaSet]{sort.qseaSet()}} (for natural sorting of sample names).
 }
-\examples{
-exampleTumourNormal \%>\% arrange(tissue)
-exampleTumourNormal \%>\% arrange(desc(tissue), tumour)
-
-}

@@ -57,17 +57,58 @@ Minimum reads per window required for a non-\code{NA} beta (relevant when
 A \code{qseaSet} with new summary columns appended to its \code{sampleTable}.
 }
 \description{
-This function takes a qseaSet and adds to the sampleTable summary statistics calculated over a set of windows.
+Compute per-sample summaries across windows and left-join them to the
+\code{qseaSet} sample table.
+}
+\details{
+Internally, this calls \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}} to compute per-sample
+summaries for the requested \code{normMethod}(s), then left-joins those summaries
+to the \code{sampleTable}. Output column names typically encode the method and the
+summary function (and include \code{suffix} when provided).
 }
 \examples{
-# add to the sampleTable the median NRPM and beta values across all windows
-exampleTumourNormal \%>\% addSummaryAcrossWindows(fn = mean) \%>\% getSampleTable()
-# maximum NRPM across a smaller region of the genome
-rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
-exampleTumourNormal \%>\% addSummaryAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm") \%>\% getSampleTable()
-# can add a suffix and apply repeatedly with different windows
-exampleTumourNormal \%>\% 
-  addSummaryAcrossWindows(regionsToOverlap = rgns, fn = median, normMethod = "nrpm", suffix = "subset") \%>\% 
-  addSummaryAcrossWindows(fn = median, normMethod = "nrpm", suffix = "all") \%>\% 
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Add mean NRPM and beta across all windows 
+exampleTumourNormal \%>\%
+  addSummaryAcrossWindows(
+    fn         = mean,
+    normMethod = c("nrpm","beta")
+  ) \%>\%
+  getSampleTable()
+
+# Maximum NRPM across a small genomic slice
+exampleTumourNormal \%>\%
+  addSummaryAcrossWindows(
+    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    fn         = max,
+    normMethod = "nrpm"
+  ) \%>\%
+  getSampleTable()
+
+# Add summaries repeatedly with different regions using a suffix
+exampleTumourNormal \%>\%
+  addSummaryAcrossWindows(
+    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    fn         = median,
+    normMethod = "nrpm",
+    suffix     = "subset"
+  ) \%>\%
+  addSummaryAcrossWindows(
+    fn         = median,
+    normMethod = "nrpm",
+    suffix     = "all"
+  ) \%>\%
   getSampleTable()
 }
+
+}
+\seealso{
+\code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
+
+Other window-summaries: 
+\code{\link{countWindowsAboveCutoff}()},
+\code{\link{summariseAcrossWindows}()}
+}
+\concept{window-summaries}

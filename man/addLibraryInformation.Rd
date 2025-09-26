@@ -24,9 +24,8 @@ from \code{qseaSet@libraries$input_file} (prefixed with \code{"input_"}). Existi
 columns are not duplicated.
 }
 \examples{
-#original columns on the sampleTable
-colnames(getSampleTable(exampleTumourNormal))
-updated <- addLibraryInformation(exampleTumourNormal) 
-# now the qseaSet has additional columns from the libraries slot in the qseaSet
-colnames(getSampleTable(updated))
+data(exampleTumourNormal, package = "mesa")
+qs <- addLibraryInformation(exampleTumourNormal)
+head(qsea::getSampleTable(qs))
+
 }

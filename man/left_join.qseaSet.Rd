@@ -71,8 +71,3 @@ Extends \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to merge a data fra
 \code{\link[=mutate.qseaSet]{mutate.qseaSet()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}} for other dplyr verbs,
 \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} for join semantics.
 }
-\examples{
-newData <- tibble(patient = c("Colon1","Colon2","Lung1","Lung3"), new = 1:4)
-exampleTumourNormal \%>\% left_join(newData) \%>\% getSampleTable()
-
-}

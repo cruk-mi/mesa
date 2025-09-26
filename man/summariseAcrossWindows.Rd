@@ -21,15 +21,11 @@ summariseAcrossWindows(
 Input object providing window-level signal.
 \strong{Default:} none (must be supplied).}
 
-<<<<<<< HEAD
-\item{regionsToOverlap}{A GRanges object (or coercible dataframe) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
-=======
 \item{regionsToOverlap}{\code{GRanges}, \code{data.frame}, or \code{NULL}.
 Regions used to restrict the windows before summarising. Data frames must be
 coercible to \code{GRanges} (e.g., have \code{seqnames}/\code{start}/\code{end} or
 \code{chr}/\code{window_start}/\code{window_end}). If \code{NULL}, use all windows in \code{qseaSet}.
 \strong{Default:} \code{NULL}.}
->>>>>>> origin/general_doc_updates_from_main
 
 \item{fn}{\code{function}.
 Summary function applied \strong{column-wise per sample} over the selected windows
@@ -67,29 +63,15 @@ from \code{fn}.
 \strong{Default:} \code{NULL}.}
 }
 \value{
-<<<<<<< HEAD
-A table of data, one row per sample, with columns indicating the number of windows considered
-(which may be less for beta values due to application of NA values), the summary statistic and optionally the sampleTable columns.
-=======
 A tibble with one row per sample. For each requested \code{normMethod}, a summary
 column is added (column naming typically reflects \verb{<method>} and \code{fn} and may
 include \code{suffix}). If \code{addSampleTable = TRUE}, sample-table columns are joined.
->>>>>>> origin/general_doc_updates_from_main
 }
 \description{
 Apply a summary function (e.g., mean, median, sd) over genomic windows
 per sample, optionally restricted to a set of regions and for one or more
 normalisation methods.
 }
-<<<<<<< HEAD
-\examples{
-# median NRPM and beta values across all windows
-exampleTumourNormal \%>\% summariseAcrossWindows(fn = mean)
-# maximum NRPM across a smaller region of the genome
-rgns <- data.frame(seqnames = 7, start = 25002001, end = 25017900)
-exampleTumourNormal \%>\% summariseAcrossWindows(regionsToOverlap = rgns, fn = max, normMethod = "nrpm")
-}
-=======
 \details{
 The function builds a window × sample matrix for each \code{normMethod}, optionally
 restricts to \code{regionsToOverlap}, then applies \code{fn} over windows for each
@@ -135,4 +117,3 @@ Other window-summaries:
 \code{\link{countWindowsAboveCutoff}()}
 }
 \concept{window-summaries}
->>>>>>> origin/general_doc_updates_from_main

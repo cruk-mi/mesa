@@ -41,7 +41,3 @@ exampleTumourNormal \%>\%
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} (for filtering samples instead of regions),
 \code{\link[dplyr:filter]{dplyr::filter()}}
 }
-\examples{
-exampleTumourNormal \%>\% filterWindows(start <= 25020000)
-exampleTumourNormal \%>\% filterWindows(CpG_density > 10)
-}

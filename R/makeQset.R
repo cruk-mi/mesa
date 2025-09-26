@@ -132,6 +132,16 @@
 #'   Mappability per CNV bin (size = `CNVwindowSize`) for HMMcopy.  
 #'   **Default:** `NULL`.
 #'
+#' @param maxPatternDensity `numeric(1)`.
+#'  Maximum allowed pattern density (e.g., CpG) when calculating enrichment
+#'  factors. Regions above this are excluded from the calculation.
+#'  **Default:** `0.05`.
+#'  
+#' @param enrichmentMethod `character(1)`.
+#'  Method for calculating enrichment for target pattern (e.g. CpG). 
+#'  See [addNormalisation()] for details.
+#'  **Default:** `"blind1-15"`.
+#'
 #' @param parallel `logical(1)`.  
 #'   Use the registered BiocParallel backend (`TRUE`) or run serially (`FALSE`).  
 #'   See [BiocParallel::register()].  

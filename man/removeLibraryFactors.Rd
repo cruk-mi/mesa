@@ -2,11 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeLibraryFactors}
 \alias{removeLibraryFactors}
-<<<<<<< HEAD
-\title{This function takes a qseaSet and sets all the library factor parts to one, including in the sampleTable if present.}
-=======
 \title{Set library factors to 1}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 removeLibraryFactors(qseaSet)
 }
@@ -16,24 +12,12 @@ Input object whose library factors will be reset.
 \strong{Default:} none (must be supplied).}
 }
 \value{
-<<<<<<< HEAD
-A qseaSet, without the library_factor column for each individual sample
-}
-\description{
-This function takes a qseaSet and sets all the library factor parts to one, including in the sampleTable if present.
-}
-\examples{
-exampleTumourNormal \%>\% removeLibraryFactors() \%>\% addLibraryInformation() \%>\% pull(library_factor)
-# different to previously set library factors:
-exampleTumourNormal  \%>\% addLibraryInformation() \%>\% pull(library_factor)
-=======
 A \code{qseaSet} with all library factors set to \code{1} and \code{sampleTable} updated.
 }
 \description{
 Overwrite all library-factor values in a \code{qseaSet} (and its \code{sampleTable})
 with \code{1}. Useful when you want to avoid library scaling (e.g., TMM) and
 keep beta unchanged; NRPM may change depending on downstream use.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
 Setting library factors to \code{1} has \strong{no effect on beta} (fractional measure)

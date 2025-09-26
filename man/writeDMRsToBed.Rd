@@ -2,11 +2,7 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{writeDMRsToBed}
 \alias{writeDMRsToBed}
-<<<<<<< HEAD
-\title{Write one or more DMRs to a set of bed files}
-=======
 \title{Write DMR results to BED files}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 writeDMRsToBed(dataTable, folder, FDRthres = 0.05)
 }
@@ -34,13 +30,6 @@ Export differentially methylated region (DMR) results to a set of BED files,
 with one file generated per contrast.
 }
 \examples{
-<<<<<<< HEAD
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToBed(tempdir())
-}
-=======
 \donttest{
 data(exampleTumourNormal, package = "mesa")
 
@@ -69,4 +58,3 @@ Other DMR-helpers:
 \code{\link{writeDMRsToExcel}()}
 }
 \concept{DMR-helpers}
->>>>>>> origin/general_doc_updates_from_main

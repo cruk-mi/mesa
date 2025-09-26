@@ -72,18 +72,6 @@ exampleTumourNormal \%>\%
   dplyr::select(1:6) \%>\%
   head()
 
-<<<<<<< HEAD
-}}
-\examples{
-exampleTumourNormal \%>\% getCountTable()
-
-
-exampleTumourNormal \%>\% getNRPMTable()
-exampleTumourNormal \%>\% getNRPMTable()
-exampleTumourNormal \%>\% getDataTable()
-exampleTumourNormal \%>\% getDataTable(normMethod = c("nrpm","beta"))
-}
-=======
 # Multiple methods together (suffixes retained automatically)
 exampleTumourNormal \%>\%
   getDataTable(normMethod = c("nrpm","beta"), minEnrichment = 3) \%>\%
@@ -117,4 +105,3 @@ Other table-helpers:
 \code{\link{removeNormMethodSuffix}()}
 }
 \concept{table-helpers}
->>>>>>> origin/general_doc_updates_from_main

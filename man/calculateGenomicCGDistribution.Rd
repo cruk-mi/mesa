@@ -31,7 +31,7 @@ These values are used as denominators to normalise sample-level CpG enrichment.
 \itemize{
 \item Chromosomes with names containing \code{"rand"} or \code{"chrUn"} are excluded.
 \item The BSgenome indicated by \code{BSgenome} is loaded dynamically.
-\item Uses \link{Biostrings} and \link{BSgenome} utilities to count CpG, C, and G
+\item Uses \pkg{Biostrings} and \pkg{BSgenome} utilities to count CpG, C, and G
 occurrences across the genome.
 }
 }

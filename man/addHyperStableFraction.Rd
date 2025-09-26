@@ -2,24 +2,79 @@
 % Please edit documentation in R/sampleQC.R
 \name{addHyperStableFraction}
 \alias{addHyperStableFraction}
-\title{Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
-This function calculates and summarises the proportion of hyperstable regions that are present in each sample,
-and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of
-human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}}
+\title{Summarise the fraction of hyper-stable methylated regions (GRCh38 only)}
 \usage{
-addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 }
 \arguments{
-\item{qseaSet}{A qseaSet object}
+\item{qseaSet}{\code{qseaSet}.
+Input object (must be GRCh38).
+\strong{Default:} none (must be supplied).}
 
-\item{minDensity}{A value of \code{CpG_density} to only consider regions above. Defaults to 5.}
+\item{minDensity}{\code{numeric(1)}.
+Minimum \code{CpG_density} to keep a window.
+\strong{Default:} \code{5}.}
 
-\item{minBeta}{The minimum beta value to consider a region as being called as methylated. Defaults to 0.8}
+\item{minBeta}{\code{numeric(1)}.
+Beta threshold to call a window methylated.
+\strong{Default:} \code{0.8}.}
+}
+\value{
+The input \code{qseaSet} with its \code{sampleTable} augmented by a numeric column
+\code{hyperStableEdgar} (range 0–1) giving, per sample, the fraction of ultra-stable
+windows called methylated.
 }
 \description{
-Summarise the fraction of hyperstably methylated regions with clear methylation (hg38 only)
-This function calculates and summarises the proportion of hyperstable regions that are present in each sample,
-and adds this as a column to the sampleTable. Uses a set of windows shown to be methylated across a large number of
-human methylation arrays over a wide range of tissues and diseases by \href{https://pubmed.ncbi.nlm.nih.gov/25493099/}{Edgar et al (2014)}
+For each sample, compute the proportion of \emph{Edgar et al.} “ultra-stable”
+windows that are clearly methylated (beta ≥ \code{minBeta}) after filtering by
+CpG density (≥ \code{minDensity}). The result is added to the sample table as
+\code{hyperStableEdgar} (overwriting any existing column of that name).
+}
+\details{
+\itemize{
+\item \strong{Genome restriction.} Only supported for
+\code{"BSgenome.Hsapiens.NCBI.GRCh38"}; the function stops otherwise (checked via
+\code{qsea:::getGenome()}).
+\item \strong{Regions used.} Uses \code{mesa::hg38UltraStableProbes}, a GRCh38 set derived
+from array data (\emph{Edgar et al.}, 2014).
+\item \strong{Computation.} Windows overlapping the ultra-stable set are extracted,
+beta values are computed via \code{qsea::makeTable(norm_methods = "beta")},
+windows with \code{CpG_density < minDensity} are dropped, \code{NA} beta are treated
+as \code{0} for thresholding, and the per-sample fraction with beta ≥ \code{minBeta}
+is returned.
+}
+}
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Run only if the example windows overlap the ultra-stable probes
+exampleTumourNormal \%>\%
+{
+  has_ov <- sum(
+    GenomicRanges::countOverlaps(
+      qsea::getRegions(.),
+      mesa::hg38UltraStableProbes
+    )
+  ) > 0
+
+  if (has_ov) addHyperStableFraction(.) else {
+    message("No overlap with hg38UltraStableProbes in this toy dataset; skipping.")
+    .
+  }
+} \%>\%
+qsea::getSampleTable() \%>\%
+dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) \%>\%
+head()
+}
+}
+\references{
+Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
+\emph{Meta-analysis of human methylomes reveals stably methylated sequences
+surrounding CpG islands associated with high gene expression}.
+\url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
+}
+\seealso{
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\link{hg38UltraStableProbes}, \code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }

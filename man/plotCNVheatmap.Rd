@@ -39,11 +39,6 @@ Draws a heatmap on the active device and (invisibly) returns the underlying
 Plot per-window copy-number estimates stored in a \code{qseaSet} as a heatmap
 using \strong{ComplexHeatmap}. Each column is a sample; rows are genome windows.
 }
-<<<<<<< HEAD
-\examples{
-exampleTumourNormal \%>\% plotCNVheatmap(sampleAnnotation = c(tumour,type))
-}
-=======
 \details{
 Assumes CNV values are available per window and sample. Rows are windows
 (typically in genomic order if \code{clusterRows = FALSE}), columns are samples.
@@ -69,7 +64,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[=runHMMCopy]{runHMMCopy()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
 \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
 Other CNV: 
@@ -78,4 +73,3 @@ Other CNV:
 \code{\link{runHMMCopy}()}
 }
 \concept{CNV}
->>>>>>> origin/general_doc_updates_from_main
