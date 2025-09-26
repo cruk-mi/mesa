@@ -10,6 +10,12 @@ editor_options:
 * Many more examples for individual functions on their help pages, as well as a set of vignettes.
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
 * Objects with invalid slots will now throw informative errors.
+* Exported `enrichmentMethod`.
+* Exported internal helper `asValidGRanges()`.
+* Added `@param ...` to `setMart()` to explain forwarding of extra arguments.
+* Added `getMesaParallel()` to exported functions.
+* Added namespace qualification to `testthat` usage in tests.
+* Added fallback documentation for `calculateFractionReadsInGRanges()`.
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method.
@@ -17,7 +23,14 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
 * Updated function documentation with examples, default parameter values, and more detailed descriptions.
-* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
+* `fdrThres` changed to `FDRthres` in `subsetWindowsOverBackground`, `writeDMRsToExcel`, `writeDMRsToBed`, `getDMRsData` and `calculateDMRs`.
+* Improved documentation for several functions, including clearer `@return`, `@param`, and consistent use of pipe-based examples.
+* Fixed formatting and invalid `\item` usage in dataset documentation.
+* Marked internal functions as `\donttest{}` to prevent CMD check errors.
+* Updated `DESCRIPTION` to fix typo that interrupted Bioc check.
+* Updated `RoxygenNote` and regenerated man/ files.
+* Updated GitHub Action to use `actions/cache@v4` in Bioc check workflow.
+* Renamed the windowsToConsider parameter to regionsToOverlap in calculateFractionReadsInGRanges().
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
@@ -34,6 +47,8 @@ editor_options:
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 * `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
+* Fixed missing bracket in \donttest `mixThreeQsetSamples` examples.
+
 
 # mesa 0.5.1
 
