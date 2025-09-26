@@ -39,6 +39,8 @@ editor_options:
 * `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`.
 * When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes.
 * `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
+* Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 
 # mesa 0.5.1
 
