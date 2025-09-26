@@ -119,14 +119,12 @@ Number of principal components to compute (PCA only).
 If \code{TRUE}, include the matrix used for DR in the return object.
 \strong{Default:} \code{FALSE}.}
 
-<<<<<<< HEAD
-\item{verbose}{Boolean to determine whether to print messages}
+\item{verbose}{\code{logical(1)}.
+If \code{TRUE}, print messages regarding the function execution.
+\strong{Default:} \code{TRUE}.}
 
-\item{...}{Other parameters to pass to \code{\link[uwot:umap]{uwot::umap()}} function.}
-=======
 \item{...}{Additional arguments passed to \code{\link[uwot:umap]{uwot::umap()}} (when \code{method="UMAP"}),
 e.g. \code{n_neighbors}, \code{min_dist}, \code{metric}.}
->>>>>>> origin/general_doc_updates_from_main
 
 \item{method}{\code{character(1)}. One of \code{"PCA"} or \code{"UMAP"}.
 \strong{Default:} \code{"PCA"}.}
@@ -161,17 +159,6 @@ wrappers such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUM
 \item \code{getUMAP()}: Uniform manifold approximation and projection of a qseaSet.
 
 }}
-<<<<<<< HEAD
-\examples{
-exampleTumourNormal \%>\% getPCA()
-# select different numbers of most variable windows
-exampleTumourNormal \%>\% getPCA(topVarNum = c(10,100,500,NA))
-
-qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP()
-# alter the n_neighbors and min_dist parameters
-qsea::getExampleQseaSet(repl = 20) \%>\% getUMAP(n_neighbors = 5, min_dist = 1)
-}
-=======
 \section{Details}{
 
 \itemize{
@@ -259,4 +246,3 @@ Other dimred-helpers:
 \code{\link{plotUMAP}()}
 }
 \concept{dimred-helpers}
->>>>>>> origin/general_doc_updates_from_main

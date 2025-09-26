@@ -263,12 +263,12 @@ getWindows <- function(qseaSet) {
 #' [janitor::remove_empty()]
 #'
 #' @examples
+#' \donttest{
 #' data.frame(a = c(1, NA, 3),
 #'            b = c(NA, NA, NA),
-#'
 #'            c = c(1, 2, NA)) %>%
 #'   remove_almost_empty_cols(prop = 0.5)  # drops column b
-#'
+#' }
 remove_almost_empty_cols <- function(dat, prop)  {
   mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
   janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
@@ -332,7 +332,7 @@ skip_long_checks <- function() {
 #' # From data.frame (chr/window_start/window_end)
 #' data.frame(chr = "1", window_start = 1000, window_end = 1100) %>%
 #'   asValidGranges()
-#'
+#' @export
 asValidGranges <- function(object){
 
   if("GRanges" %in% class(object)){
@@ -356,3 +356,8 @@ asValidGranges <- function(object){
   stop("Object can not be coerced to a GRanges object")
 
 }
+
+#' This function captures a printed form of the object x, for use in error messages
+#' Taken from https://stackoverflow.com/a/26083626 by Richie Cotton
+#' @param x An object to capture
+print_and_capture <- function(x) {paste(capture.output(print(x)), collapse = "\n") }

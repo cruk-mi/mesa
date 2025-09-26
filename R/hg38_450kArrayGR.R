@@ -1,6 +1,7 @@
 #' Infinium 450k probe locations for hg38.
 #'
 #' A GRanges object containing the Illumina Infinium 450k array probe locations for hg38
+#' 
 #' @format A GRanges object with 485541 ranges and 2 metadata columns:
 #' \describe{
 #'   \item{ID}{Array probe ID}

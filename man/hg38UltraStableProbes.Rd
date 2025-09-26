@@ -9,19 +9,12 @@ A \code{GRanges} object with 974 ranges and 1 metadata column:
 \describe{
 \item{Probe_ID}{Character cg identifier for the probe/locus (e.g., \code{"cg11733071"}).}
 }
-Additional characteristics:
-\itemize{
-\item \strong{Seqnames:} numeric chromosomes \code{"1"}–\code{"22"} (no \code{"chr"} prefix; UCSC style can be set if needed).
-\item \strong{Strand:} \code{"*"} for all ranges.
-\item \strong{Widths:} 3 bp windows (probe CpG ±1 bp).
-\item \strong{Genome metadata:} currently unset; set to \code{"hg38"} if you need an explicit tag.
-}
 }
 \source{
 Processed from public array resources following Edgar et al. (2014).
 }
 \usage{
-data(hg38UltraStableProbes)
+hg38UltraStableProbes
 }
 \description{
 Genomic loci that are consistently methylated (“ultra-stable”) across many human tissues
@@ -30,9 +23,17 @@ and diseases, mapped to GRCh38. Regions correspond to Illumina array probe loci
 metrics (e.g., \code{\link[=addHyperStableFraction]{addHyperStableFraction()}}).
 }
 \details{
-The object ships with numeric seqnames (no \code{chr} prefix) and no seqlengths or genome tag.
-When combining with other GRanges, harmonise styles/metadata as needed, e.g.:
-\code{GenomeInfoDb::seqlevelsStyle()} to convert to \code{"UCSC"} (\code{"chr1"}, …) and
+\itemize{
+\item \strong{Seqnames:} numeric chromosomes \code{"1"}–\code{"22"} (no \code{"chr"} prefix; UCSC style
+can be set if needed).
+\item \strong{Strand:} \code{"*"} for all ranges.
+\item \strong{Widths:} 3 bp windows (probe CpG ±1 bp).
+\item \strong{Genome metadata:} currently unset; set to \code{"hg38"} if you need an explicit
+tag.
+}
+
+When combining with other \code{GRanges}, harmonise styles/metadata as needed, e.g.
+use \code{GenomeInfoDb::seqlevelsStyle()} to convert to \code{"UCSC"} (\code{"chr1"}, …) and
 \code{GenomeInfoDb::genome()} to set \code{"hg38"}.
 }
 \examples{

@@ -29,7 +29,7 @@ Authors@R: c(
            family = "Perez Martinez",
            role = "ctb",
            email = "felipe.perezmartinez@cruk.manchester.ac.uk",
-           comment = c(ORCID = "0009-0007-9138-3674")
+           comment = c(ORCID = "0009-0007-9138-3674"))
            )
 Description: Analysis tools for methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq), building off the qsea package.
 License: GPL-3

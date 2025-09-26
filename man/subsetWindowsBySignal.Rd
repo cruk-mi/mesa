@@ -55,15 +55,6 @@ Filter genomic windows based on a summary function applied across selected
 samples. Typical uses include keeping windows with median NRPM above a
 threshold, or retaining windows where the minimum beta is below 0.5.
 }
-<<<<<<< HEAD
-\examples{
-# keep only windows with a mean nrpm value above 1 across all samples
-exampleTumourNormal \%>\% subsetWindowsBySignal(fn = mean, threshold = 1, aboveThreshold = TRUE, normMethod = "nrpm")
-# keep only windows with a median beta value below 0.25 in the normal samples
-exampleTumourNormal \%>\% subsetWindowsBySignal(fn = median, threshold = 0.25, aboveThreshold = FALSE, normMethod = "beta", samples = "_N")
-
-}
-=======
 \details{
 The function builds a window × sample matrix for the chosen \code{normMethod},
 optionally restricts to samples via \code{samples} (exact names or pattern match),
@@ -122,4 +113,3 @@ Other window-helpers:
 \code{\link{subsetWindowsOverBackground}()}
 }
 \concept{window-helpers}
->>>>>>> origin/general_doc_updates_from_main

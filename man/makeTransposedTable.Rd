@@ -2,11 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{makeTransposedTable}
 \alias{makeTransposedTable}
-<<<<<<< HEAD
-\title{Generate a wide data table from a qseaSet}
-=======
 \title{Make a wide sample-by-window table}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 makeTransposedTable(qseaSet, normMethod = "nrpm", ...)
 }
@@ -19,17 +15,6 @@ Input object providing window-level signal.
 Measure to extract. Common choices include \code{"nrpm"} or \code{"beta"}.
 \strong{Default:} \code{"nrpm"}.}
 
-<<<<<<< HEAD
-\item{...}{Other columns to add from the sampleTable in the output (along with sample_name).
-Must specify normMethod if using. Can use everything() for all columns, or leave blank to just have the sample_name (as the first column).}
-}
-\value{
-A table where each row represents one sample and each column represents a genomic window.
-}
-\description{
-This function takes a qseaSet and generates a table of data where each row represents one sample and each column represents a genomic window.
-Note that
-=======
 \item{...}{tidyselect specification or \code{character()}.
 Optional columns from the sample table to append as additional features
 (e.g., \verb{group, tumour} or \code{c("group","tumour")}).
@@ -42,7 +27,6 @@ appended sample-level metadata.
 \description{
 Create a wide table for ML/visualisation where \strong{rows are samples} and
 \strong{columns are genomic windows}, using one normalisation/measure.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
 Internally obtains a window × sample matrix for \code{normMethod}, transposes it

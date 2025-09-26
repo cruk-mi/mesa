@@ -18,12 +18,8 @@ Whether to reverse the order.
 \strong{Default:} none.}
 }
 \value{
-<<<<<<< HEAD
-A qseaSet with the sample names reordered alphabetically
-=======
 A \code{qseaSet} object with reordered samples. The content of all slots
 (e.g., \code{count_matrix}, \code{sampleTable}) is updated consistently.
->>>>>>> origin/general_doc_updates_from_main
 }
 \description{
 Extends \code{\link[base:sort]{base::sort()}} to reorder the \strong{samples} of a \code{qseaSet}
@@ -44,7 +40,4 @@ exampleTumourNormal \%>\% sort(decreasing = TRUE)
 \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
 \code{\link[=subsetQset]{subsetQset()}},
 \code{\link[gtools:mixedsort]{gtools::mixedsort()}}
-}
-\examples{
-sort(exampleTumourNormal, decreasing = TRUE)
 }

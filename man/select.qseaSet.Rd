@@ -17,16 +17,11 @@ cannot be removed.
 \strong{Default:} none.}
 }
 \value{
-<<<<<<< HEAD
-A qseaSet object with the sampleTable changed by a call to dplyr::select.
-The sample_name and group columns will always be returned.
-=======
 A \code{qseaSet} with its \code{sampleTable} updated:
 \itemize{
 \item contains only selected/renamed columns,
 \item always includes \code{sample_name} and \code{group} (if available).
 }
->>>>>>> origin/general_doc_updates_from_main
 }
 \description{
 Extends \code{\link[dplyr:select]{dplyr::select()}} to keep or rename columns in a \code{qseaSet}'s
@@ -66,15 +61,4 @@ exampleTumourNormal \%>\%
 \code{\link[=selectQset]{selectQset()}} for the underlying implementation,
 \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to view results,
 \code{\link[=mutate.qseaSet]{mutate.qseaSet()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}} for related dplyr verbs.
-}
-\examples{
-# select only a few columns, note that sample_name and group are always kept
-# note here we use the `dplyr::` prefix, to ensure that `AnnotationDbi::select` isn't called. 
-exampleTumourNormal \%>\% dplyr::select(type, tumour) \%>\% getSampleTable()
-# select and rename a column
-exampleTumourNormal \%>\% dplyr::select(age, tumour_new = tumour) \%>\% getSampleTable()
-# you can use tidyselect helper functions
-exampleTumourNormal \%>\% dplyr::select(matches("s")) \%>\% getSampleTable()
-# negative selection also works, but not for `sample_name` and `group` which are essential columns:
-exampleTumourNormal \%>\% dplyr::select(-matches("s")) \%>\% getSampleTable()
 }

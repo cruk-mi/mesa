@@ -2,27 +2,11 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{summariseDMRsByGene}
 \alias{summariseDMRsByGene}
-<<<<<<< HEAD
-\title{This function summarises a data frame by gene}
-=======
 \title{Summarise DMRs by gene}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 summariseDMRsByGene(DMRtable)
 }
 \arguments{
-<<<<<<< HEAD
-\item{DMRtable}{A data frame that has already been annotated by annotateWindows}
-}
-\description{
-This function summarises a data frame by gene
-}
-\examples{
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  summariseDMRsByGene()
-=======
 \item{DMRtable}{\code{data.frame} or \code{GRanges}
 Annotated DMRs. Must include the columns \code{ENSEMBL}, \code{SYMBOL}, and \code{GENENAME}
 (typically added with \code{\link[=annotateWindows]{annotateWindows()}}).}
@@ -36,18 +20,9 @@ associated DMRs and any aggregated metadata.
 }
 \description{
 Aggregate differentially methylated region (DMR) windows by gene annotation.
->>>>>>> origin/general_doc_updates_from_main
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-
-# Summarise DMRs by gene (using default annotation)
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  annotateWindows() \%>\%   # requires TxDb/annotation packages
-  summariseDMRsByGene()
 
 # Summarise DMRs with explicit annotation databases
 exampleTumourNormal \%>\%
@@ -55,7 +30,6 @@ exampleTumourNormal \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
                   annoDb = "org.Hs.eg.db") \%>\%
   summariseDMRsByGene()
-
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}},

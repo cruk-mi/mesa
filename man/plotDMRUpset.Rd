@@ -35,14 +35,6 @@ from \code{\link[UpSetR:upset]{UpSetR::upset()}} (for further customization if n
 Visualise the overlap of significant DMR sets across contrasts (columns ending
 with \verb{*_adjPval}) using an UpSet plot.
 }
-<<<<<<< HEAD
-\examples{
-DMRs <- calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all_vs_NormalLung")
-plotDMRUpset(DMRs)
-# remove the "_vs_" part of the set names:
-plotDMRUpset(DMRs, removeVS = TRUE)
-}
-=======
 \details{
 The function discovers DMR sets by locating columns that end with \code{"_adjPval"}.
 For each such column, a logical membership is formed at the chosen FDR cutoff
@@ -70,4 +62,3 @@ exampleTumourNormal \%>\%
 \code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[UpSetR:upset]{UpSetR::upset()}}
 }
 \concept{dmr-plots}
->>>>>>> origin/general_doc_updates_from_main

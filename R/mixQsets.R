@@ -264,8 +264,8 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #' @family sample-simulation
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
-#' 
 #' 
 #' # Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
 #' exampleTumourNormal %>% 
@@ -273,12 +273,11 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #'                        nReadsTotal = 100000,
 #'                        proportion1 = 0.5, proportion2 = 0.3,
 #'                        newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
-#'                        renormalise = FALSE) %>%
-#'                        
-#'  # Only a few reads are included in this small subset of windows (78):
-#'  getCountTable() %>% 
-#'  pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) %>% 
-#'  sum()
+#'                        renormalise = FALSE) %>%   
+#'   # Only a few reads are included in this small subset of windows (78):
+#'   getCountTable() %>% 
+#'   pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) %>% 
+#'   sum()
 #'
 #'
 #' # Mix three samples and return only the synthetic sample, with an explicit name and group.
@@ -290,11 +289,11 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #'              groupName   = "Synthetic",
 #'              onlyNew     = TRUE ,
 #'              renormalise = FALSE) %>%
-#'              
 #'   # Only a few reads are included in this small subset of windows (29):
 #'   getCountTable() %>% 
 #'   dplyr::pull(Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7) %>% 
 #'   sum()
+#' }
 #'
 #' @keywords internal
 mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal, proportion1, proportion2, newName = NULL, groupName = NULL,

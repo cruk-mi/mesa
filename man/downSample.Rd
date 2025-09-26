@@ -2,11 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{downSample}
 \alias{downSample}
-<<<<<<< HEAD
-\title{This function takes a qseaSet and downsamples the reads in the counts matrix.}
-=======
 \title{Downsample reads in a qseaSet}
->>>>>>> origin/general_doc_updates_from_main
 \usage{
 downSample(qseaSet, nReads)
 }
@@ -25,17 +21,8 @@ A \code{qseaSet} with downsampled counts. Library metadata
 (\code{valid_fragments}, \code{offset}, \code{library_factor}) are updated accordingly.
 }
 \description{
-<<<<<<< HEAD
-This function takes a qseaSet and downsamples the reads in the counts matrix.
-}
-\examples{
-new <- exampleTumourNormal \%>\% downSample(100)
-new \%>\% getCountTable() \%>\% dplyr::select(matches("_[NT]")) \%>\% colSums()
-
-=======
 Randomly subsample reads to a fixed depth across all samples in a \code{qseaSet}.
 Useful for equalising library sizes prior to comparison.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
 Downsampling is performed independently per sample. To obtain reproducible

@@ -19,6 +19,9 @@ getMart(object, ...)
 \item{object}{\code{qseaSet}.
 The object to modify or query.}
 
+\item{...}{Additional arguments passed to methods or to
+\code{\link[biomaRt:useMart]{biomaRt::useMart()}}. Not used in the default \code{"qseaSet"} method.}
+
 \item{mart}{\code{biomaRt::Mart}, \code{character(1)}, or \code{ANY}.
 Connection object returned by \strong{biomaRt} (recommended), or a string label
 you interpret elsewhere (e.g., \code{"ENSEMBL_110"}). Stored verbatim in
@@ -57,7 +60,6 @@ exampleTumourNormal \%>\%
    setMart("ENSEMBL_110") \%>\%
    getMart()
 }
-
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},

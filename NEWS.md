@@ -18,6 +18,7 @@ editor_options:
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
 * Updated function documentation with examples, default parameter values, and more detailed descriptions.
+* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
@@ -34,6 +35,7 @@ editor_options:
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 * `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
+* Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 
 # mesa 0.5.1
 

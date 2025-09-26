@@ -34,18 +34,17 @@ Sample-table column used as the primary explanatory variable for contrasts.
 Additional covariate column names (e.g., batch, patient).
 \strong{Default:} \code{NULL}.}
 
-\item{contrasts}{Either a data frame or a string to specify the contrasts to use.
-If using a data frame, it should have two columns, \code{group1} and \code{group2}, with the strings to compare between in each.
-Multiple rows means that multiple comparisons will be fitted.
-If using a string, then either:
+\item{contrasts}{\code{data.frame}, \code{character(1)}, or \code{NULL}.
+Contrast specification. If a data frame, must contain columns \code{group1} and
+\code{group2}. If a string, supports:
 \itemize{
-\item \code{"all"} to calculate all possible contrasts on the variable column
-\item \code{"first"} to calculate only the first possible contrast on the variable column
-\item \code{"<value1>_vs_<value2>"} to calculate the contrast between two specific values in the variable column
-\item \code{"all_vs_<value>"} or \code{"<value>_vs_all"} to calculate all possible contrasts against a specific value in the variable column
+\item \code{"A_vs_B"} — a single explicit contrast,
+\item \code{"All"} / \code{"all"} — all pairwise contrasts among levels of \code{variable},
+\item \code{"All_vs_X"} — each level vs \code{X},
+\item \code{"X_vs_All"} — \code{X} vs each other level,
+\item \code{"first"} — only the first possible contrast (based on factor order).
+\strong{Default:} \code{NULL} (fit the GLM without adding contrasts).
 }}
-
-\item{minReadCount}{A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.}
 
 \item{minReadCount}{\code{numeric(1)}.
 Minimum raw count required in at least one sample to keep a window.
@@ -127,12 +126,29 @@ DMR table with \code{\link[=getDMRsData]{getDMRsData()}}, and 4) prunes contrast
 }
 }
 \examples{
-calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_NormalLung")
-# calculate all possible DMRs on one column 
-calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
-# change the False Discovery Rate threshold
-calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
-# can also return all the columns of data for the significant windows. 
-# using `contrasts = "first"` will only make the first possible contrast on the tumour column.
-calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
+data(exampleTumourNormal, package = "mesa")
+
+# A single explicit contrast
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung")
+
+# All pairwise contrasts among levels of 'type'
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all")
+
+# Tighter FDR threshold
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all", FDRthres = 1e-4)
+
+# Return all per-sample columns for the first available contrast on 'tumour'
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first", keepData = TRUE)
+
 }
+\seealso{
+Other DMR-detection: 
+\code{\link{fitQseaGLM}()},
+\code{\link{getDMRsData}()},
+\code{\link{makeAllContrasts}()}
+}
+\concept{DMR-detection}

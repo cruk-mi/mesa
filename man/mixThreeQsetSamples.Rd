@@ -59,16 +59,6 @@ mixtures, consider \code{FALSE} and normalise once at the end.
 \strong{Default:} \code{TRUE}.}
 }
 \value{
-<<<<<<< HEAD
-A qseaSet object containing a new sample, potentially with all the previous samples.
-}
-\description{
-Perform in silico mixing between three samples, enabling the generation of new synthetic data.
-Note that if the qseaSet windows have been filtered prior to using this, the fraction of fragments
-present in the current qseaSet is calculated, such that the total number of reads would have been approximately \code{nReadsTotal}.
-E.g. if there are 50\% of the total fragments in the windows present in the current samples,
-0.5*\code{nReadsTotal} fragments will be sampled.
-=======
 A \code{qseaSet} containing the new synthetic sample:
 \itemize{
 \item If \code{onlyNew = TRUE}, a \code{qseaSet} with \strong{one} (mixed) sample.
@@ -80,9 +70,13 @@ The \code{sampleTable}, counts, and dependent slots are updated consistently.
 Create a new synthetic sample in a \code{qseaSet} by mixing reads from \strong{three}
 existing samples according to user-specified proportions. Useful for simple
 mixture simulations; currently intended for internal use.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
+Note that if the qseaSet windows have been filtered prior to using this,
+the fraction of fragments present in the current qseaSet is calculated,
+such that the total number of reads would have been approximately \code{nReadsTotal}.
+E.g. if there are 50\% of the total fragments in the windows present in the current samples,
+0.5*\code{nReadsTotal} fragments will be sampled.
 \itemize{
 \item Validates that \code{sample1}, \code{sample2}, \code{sample3} exist; \code{nReadsTotal >= 0};
 \verb{proportion1, proportion2 ∈ [0, 1]}; and \verb{proportion1 + proportion2 ≤ 1}.
@@ -92,8 +86,8 @@ on offsets/enrichment being recomputed.
 }
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
-
 
 # Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
 exampleTumourNormal \%>\% 
@@ -101,12 +95,11 @@ exampleTumourNormal \%>\%
                        nReadsTotal = 100000,
                        proportion1 = 0.5, proportion2 = 0.3,
                        newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
-                       renormalise = FALSE) \%>\%
-                       
- # Only a few reads are included in this small subset of windows (78):
- getCountTable() \%>\% 
- pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) \%>\% 
- sum()
+                       renormalise = FALSE) \%>\%   
+  # Only a few reads are included in this small subset of windows (78):
+  getCountTable() \%>\% 
+  pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) \%>\% 
+  sum()
 
 
 # Mix three samples and return only the synthetic sample, with an explicit name and group.
@@ -118,11 +111,11 @@ exampleTumourNormal \%>\%
              groupName   = "Synthetic",
              onlyNew     = TRUE ,
              renormalise = FALSE) \%>\%
-             
   # Only a few reads are included in this small subset of windows (29):
   getCountTable() \%>\% 
   dplyr::pull(Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7) \%>\% 
   sum()
+}
 
 }
 \seealso{
