@@ -6,8 +6,8 @@
 \usage{
 makeQset(
   sampleTable,
-  BSgenome = NULL,
-  chrSelect = 1:22,
+  BSgenome,
+  chrSelect,
   windowSize = 300,
   CNVwindowSize = 1e+06,
   fragmentType = NULL,
@@ -49,20 +49,24 @@ Window size in bp for tiling the genome.
 \strong{Default:} \code{300}.}
 
 \item{CNVwindowSize}{\code{integer(1)}.
-CNV bin size (bp).
+Copy number variation (CNV) window size (bp).
 \strong{Default:} \code{1e6}.}
 
 \item{fragmentType}{\code{character(1)} or \code{NULL}.
 If \code{"Sheared"} or \code{"cfDNA"}, sets defaults for \code{fragmentLength}/\code{fragmentSD};
-otherwise supply both explicitly.
+otherwise both must be supplied explicitly.
 \strong{Default:} \code{NULL}.}
 
 \item{fragmentLength}{\code{numeric(1)} or \code{NULL}.
-Average fragment length (bp).
+Average fragment length (bp). This is used to extend single-end reads if
+used, but also strongly affects the CpG density calculation, which will
+strongly impact the beta value estimation.
 \strong{Default:} \code{NULL} (inferred from \code{fragmentType} or must be provided).}
 
 \item{fragmentSD}{\code{numeric(1)} or \code{NULL}.
-Standard deviation of fragment length (bp).
+Standard deviation of fragment length (bp). Used to calculate the window
+based CpG density calculation, which will strongly impact the beta value
+estimation.
 \strong{Default:} \code{NULL} (inferred from \code{fragmentType} or must be provided).}
 
 \item{CNVmethod}{\code{character(1)}.
@@ -80,18 +84,29 @@ either end passes when properly paired and MAPQ tags are set.
 
 \item{minInsertSize}{\code{integer(1)}.
 Minimum absolute insert size for proper pairs (bp).
+Only applies to coverageMethod = "PairedAndR1s", and applies to Input
+samples as well as MeCap.
 \strong{Default:} \code{70}.}
 
 \item{maxInsertSize}{\code{integer(1)}.
 Maximum absolute insert size for proper pairs (bp).
+Only applies to coverageMethod = "PairedAndR1s", and applies to Input
+samples as well as MeCap.
 \strong{Default:} \code{1000}.}
 
 \item{minReferenceLength}{\code{integer(1)}.
-Minimum aligned reference span for R1 singletons (bp).
+A minimum mapped distance on the genome to keep an read. This is to avoid
+very short reads that may be due to mapping artefacts. Note that with
+defaultparameters bwa will allow reads where only 19bps have mapped to the
+genome.
+Only applies to coverageMethod = "PairedAndR1s", and applies to Input
+samples as well as MeCap.
 \strong{Default:} \code{30}.}
 
 \item{badRegions}{\code{GRanges} or \code{NULL}.
-Genomic regions to exclude (blacklist).
+Genomic regions to exclude (blacklist). These regions will be removed from
+the output. Note a set of GRCh38 windows identified by ENCODE are provided
+in the \link{ENCODEbadRegions} data object.
 \strong{Default:} \code{NULL}.}
 
 \item{properPairsOnly}{\code{logical(1)}.
@@ -100,15 +115,23 @@ If \code{TRUE}, use only proper pairs (stricter size selection).
 
 \item{hmmCopyGC}{\code{data.frame} or \code{NULL}.
 GC content per CNV bin (size = \code{CNVwindowSize}) for HMMcopy.
+Required if using the \code{CNVmethod = "HMMdefault"} option \emph{unless} you are
+using hg38/GRCh38 with provided default bin sizes (50kb, 500kb, 1Mb).
+Must be a dataframe with columns \code{chr}, \code{start}, \code{end}, and \code{gc}.
 \strong{Default:} \code{NULL}.}
 
 \item{hmmCopyMap}{\code{data.frame} or \code{NULL}.
 Mappability per CNV bin (size = \code{CNVwindowSize}) for HMMcopy.
+Required if using the \code{CNVmethod = "HMMdefault"} option \emph{unless} you are
+using hg38/GRCh38 with provided default bin sizes (50kb, 500kb, 1Mb).
+Must be a dataframe with columns \code{chr}, \code{start}, \code{end}, and \code{map}.
 \strong{Default:} \code{NULL}.}
 
 \item{maxPatternDensity}{\code{numeric(1)}.
-Maximum allowed pattern density (e.g., CpG) when calculating enrichment
-factors. Regions above this are excluded from the calculation.
+Maximum pattern density (e.g., CpG) to consider a window for background
+offset calculation. Regions above this are excluded from the calculation.
+This may need to be set higher if you are not considering many windows or
+have a high average genomic CG content.
 \strong{Default:} \code{0.05}.}
 
 \item{enrichmentMethod}{\code{character(1)}.
@@ -146,8 +169,8 @@ selected methods. This is typically the first step in a mesa/qsea workflow.
 \item \code{sample_name} (unique per sample),
 \item \code{file_name} (path to MeDIP/capture BAM),
 \item \code{group} (string label).
-If \code{CNVmethod} uses inputs (\code{"HMMdefault"}, \code{"qseaInput"}), also include
-\code{input_file} (path to matched Input BAM).
+If the selected \code{CNVmethod} uses inputs (\code{"HMMdefault"}, \code{"qseaInput"}),
+also include \code{input_file} (path to matched Input BAM).
 }
 \item BAMs should be coordinate-sorted. For paired data, running \verb{samtools fixmate}
 is recommended so MAPQ tags are available (see \code{minMapQual} note below).
@@ -167,8 +190,8 @@ sequences for tiling windows.
 \item \code{coverageMethod = "PairedAndR1s"} loads proper pairs and, optionally,
 high-MAPQ R1 singletons; governed by \code{minMapQual}, \code{minInsertSize},
 \code{maxInsertSize}, \code{properPairsOnly}, \code{minReferenceLength}.
-\item \code{coverageMethod = "qseaPaired"} delegates to \code{\link[qsea:addCoverage]{qsea::addCoverage()}} with paired
-settings.
+\item \code{coverageMethod = "qseaPaired"} delegates to \code{\link[qsea:addCoverage]{qsea::addCoverage()}} with
+paired settings.
 \item \code{fragmentType} can set defaults for \code{fragmentLength}/\code{fragmentSD} (\code{"Sheared"}
 or \code{"cfDNA"}); otherwise supply both explicitly.
 }
@@ -192,21 +215,13 @@ Use \code{setMesaParallel()} to toggle package-wide.
 
 \strong{Additional processing}
 \itemize{
-\item Adds CpG density via \code{qsea::addPatternDensity(pattern = "CG")},
-enrichment parameters, sets library factors to 1 (so betas are not scaled),
-and stores key parameters in \code{qseaSet@parameters}.
-}
-
-\strong{Errors & validations}
-\itemize{
-\item The function verifies required columns, existence of listed BAMs, and
-presence of required GC/mappability tracks for \code{"HMMdefault"}. It stops with
-a descriptive message if any prerequisite is missing.
+\item Adds CpG density via \code{qsea::addPatternDensity(pattern = "CG")}, and
+enrichment parameters, allowing for estimation of beta values.
 }
 }
 \examples{
 \donttest{
-# Minimal runnable sketch if MEDIPSData is installed (toy BAMs)
+# Minimal runnable sketch if MEDIPSData is installed
 if (requireNamespace("MEDIPSData", quietly = TRUE)) {
   sampleTable <- data.frame(
     sample_name = c("Normal1", "Tumour1"),
@@ -233,7 +248,6 @@ if (requireNamespace("MEDIPSData", quietly = TRUE)) {
     )
 }
 }
-
 }
 \seealso{
 \code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:addCoverage]{qsea::addCoverage()}}, \code{\link[qsea:addCNV]{qsea::addCNV()}},
