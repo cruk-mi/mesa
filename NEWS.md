@@ -14,6 +14,8 @@ editor_options:
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
+* `plotPCA` and `plotUMAP` now default to filled shapes rather than empty shapes if less than 6 shapes are required.
+* `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given.
 * `getSampleTable` is now defined for PCA/UMAP objects.
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
 * Updated function documentation with examples, default parameter values, and more detailed descriptions.
@@ -33,6 +35,10 @@ editor_options:
 * Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
 * Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 * `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.
+* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`.
+* When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes.
+* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 

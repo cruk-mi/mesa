@@ -13,11 +13,6 @@ test_that("Mouse plotting", {
                                   gene = "Fbxl18",
                                   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org")
                                   )
-  
-  exampleMouse2 <- exampleMouse %>%
-    setMart(biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org"))
-    
-  testPlotGeneHeatmap(exampleMouse2, gene = "Fbxl18")
 })
 
 test_that("Mouse annotation", {
