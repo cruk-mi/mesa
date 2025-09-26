@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{annotateWindows}
 \alias{annotateWindows}
-\title{Add annotation onto a data table}
+\title{Annotate genomic windows using ChIPseeker (with optional CpG/FANTOM context)}
 \usage{
 annotateWindows(
   dataTable,
@@ -14,37 +14,95 @@ annotateWindows(
 )
 }
 \arguments{
-\item{dataTable}{A data frame which can be coerced into a GRanges object or a GRanges object directly.}
+\item{dataTable}{\code{data.frame}/\code{tibble} (coercible to \code{GRanges}) or \code{GRanges}.
+Windows to annotate. Data frames must include \code{seqnames}, \code{start}, and \code{end}
+(or columns convertible by \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}).}
 
-\item{genome}{A genome string to set the rest of the parameters (currently only hg38/GRCh38 supported)}
+\item{genome}{\code{character(1)} or \code{NULL}.
+Guides annotation defaults. Currently supports \code{"hg38"}/\code{"GRCh38"}.
+\strong{Default:} value set by \code{\link[=setMesaGenome]{setMesaGenome()}} (via internal \code{.getMesaGenome()}), or \code{NULL}.}
 
-\item{TxDb}{A TxDb database object (unquoted) to pass to ChIPseeker::annotatePeak}
+\item{TxDb}{TxDb object or \code{character(1)}.
+Either an unquoted TxDb object or a string like
+\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}. If character, it is resolved at
+runtime.
+\strong{Default:} value set by \code{\link[=setMesaTxDb]{setMesaTxDb()}} (via \code{.getMesaTxDb()}), or for
+GRCh38/hg38 when \code{NULL}, use
+\code{TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
+if installed.}
 
-\item{annoDb}{A string giving a Bioconductor annotation package, such as "org.Hs.eg.db"}
+\item{annoDb}{\code{character(1)} or \code{NULL}.
+OrgDb package name (e.g., \code{"org.Hs.eg.db"}).
+\strong{Default:} value set by \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} (via \code{.getMesaAnnoDb()}), or for
+GRCh38/hg38 when \code{NULL}, use \code{"org.Hs.eg.db"} if installed.}
 
-\item{CpGislandsGR}{A GRanges object giving locations of CpG islands}
+\item{CpGislandsGR}{\code{GRanges} or \code{NULL}.
+CpG island regions for island/shore/shelf context.
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::hg38CpGIslands} if available).}
 
-\item{FantomRegionsGR}{A GRanges object giving Fantom enhancer regions}
+\item{FantomRegionsGR}{\code{GRanges} or \code{NULL}.
+FANTOM enhancer regions for overlap counts.
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::FantomRegions} if available).}
 }
 \value{
-A tibble with the data, augmented with ChIPseeker region location and CpG island information.
+A tibble with the input windows augmented by ChIPseeker annotations and,
+when available, CpG island landscape and FANTOM overlap counts.
 }
 \description{
-This function uses the ChIPseeker::annotatePeak function to determine the closest region to each genomic window provided.
-Defaults to being hg38, unless
+Uses \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}} to assign transcript-relative annotations
+(promoter, exon, intron, intergenic, etc.) to genomic windows in \code{dataTable}.
+If a genome is specified or globally set via \code{\link[=setMesaGenome]{setMesaGenome()}}, defaults and
+convenience datasets are applied for GRCh38. CpG island context and FANTOM
+enhancer overlaps can be added if the corresponding ranges are provided (or
+left \code{NULL} to use mesa defaults for GRCh38).
+}
+\details{
+\itemize{
+\item \strong{Conversion:} Non-\code{GRanges} inputs are converted via \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}.
+\item \strong{Genome-aware defaults (GRCh38/hg38):} Missing \code{TxDb}/\code{annoDb}/contexts are
+filled using the packages noted above when installed.
+\item \strong{Seqlevels style:} Output \code{seqnames} have the \code{"chr"} prefix removed
+(e.g., \code{"chr1"} → \code{"1"}).
+\item \strong{ChIPseeker call:} Uses \code{tssRegion = c(-2000, 500)}, \code{level = "transcript"},
+\code{overlap = "all"}, \code{verbose = FALSE}.
+\item \strong{Output columns:} Includes \code{annotation} (full label), \code{shortAnno} (without the
+trailing parenthetical), and—when contexts are provided—\code{landscape}
+(Island/Shore/Shelf/Open Sea) and \code{inFantom} (overlap count with FANTOM).
+Width/strand are dropped.
+}
 }
 \examples{
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
-# have to specify what species. Genome only recognises hg38
-annotateWindows(DMRs, genome = "hg38")
-# otherwise we can specify TxDb and annoDb
-annotateWindows(DMRs, TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db")
+\donttest{
+data(exampleTumourNormal, package = "mesa")
 
-# for mouse mm10 genome:
-exampleMouse \%>\% 
-  getRegions() \%>\%  
-  annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene", annoDb = "org.Mm.eg.db")
-  
-# use setMesaTxDb and setMesaAnnoDb to set these databases globally
+# Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+  annotateWindows(genome = "hg38")
 
+# Or specify TxDb/annoDb explicitly (strings are resolved at runtime)
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+  annotateWindows(
+    TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+    annoDb = "org.Hs.eg.db"
+  )
+
+# Mouse example (mm10): supply mouse TxDb and OrgDb
+# data(exampleMouse, package = "mesa")
+# exampleMouse \%>\%
+#   getRegions() \%>\%
+#   annotateWindows(
+#     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+#     annoDb = "org.Mm.eg.db"
+#   )
+
+# You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
+# setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
+}
+
+}
+\seealso{
+\code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
+\code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}, \code{\link[=liftOverHg19]{liftOverHg19()}}
 }

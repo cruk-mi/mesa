@@ -2,21 +2,63 @@
 % Please edit documentation in R/qseaCNV.R
 \name{runHMMCopy}
 \alias{runHMMCopy}
-\title{Function to call HMMcopy on the individual reads for a sample}
+\title{Run HMMcopy on per-window reads for a single sample}
 \usage{
 runHMMCopy(CNV_RegionsWithReads, colname, plotDir = NULL)
 }
 \arguments{
-\item{CNV_RegionsWithReads}{Granges object with reads columns}
+\item{CNV_RegionsWithReads}{\code{data.frame} / \code{data.table} / \code{GRanges}.
+Coercible table with columns:
+\code{chr}, \code{start}, \code{end}, \code{width}, \code{strand}, \code{gc}, \code{map}, and one
+sample-specific count column referenced by \code{colname}.}
 
-\item{colname}{Which column of the sample to use}
+\item{colname}{\code{character(1)}.
+Name of the sample count column to use (e.g., \code{"sampleA"}).}
 
-\item{plotDir}{A directory to export individual HMMcopy plots to.}
+\item{plotDir}{\code{character(1)} or \code{NULL}.
+Directory to write a per-sample PDF diagnostic plot named \verb{<colname>.pdf};
+if \code{NULL}, no plot is produced.
+\strong{Default:} \code{NULL}.}
 }
 \value{
-A GRanges object with the result of calling HMMcopy.
+A \code{GRanges} with a metadata column named \verb{<colname>} containing
+per-window CNV estimates (typically HMM state means on the log2 scale).
 }
 \description{
-This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-Assumes gc and map columns have already been added.
+Given a table of per-window counts with GC and mappability, run HMMcopy
+correction and segmentation, and return a GRanges of CNV calls for the
+selected sample/column.
 }
+\details{
+Counts are GC/map corrected via \code{HMMcopy::correctReadcount()} and segmented
+with \code{HMMcopy::HMMsegment()}. The result is mapped back to the input windows
+and returned as a \code{GRanges}. Ensure that the binning (\code{width}) and covariate
+columns (\code{gc}, \code{map}) are consistent across the table.
+}
+\examples{
+\donttest{
+# Minimal synthetic example: build a table and pipe into runHMMCopy()
+set.seed(1)
+tibble::tibble(
+  chr    = rep(paste0("chr", 1:2), each = 5),
+  start  = seq(1, by = 1e6, length.out = 10),
+  end    = start + 1e6 - 1L,
+  width  = 1e6,
+  strand = "*",
+  gc     = runif(10, 0.3, 0.7),
+  map    = runif(10, 0.8, 1.0),
+  sampleA= rpois(10, 500)
+) \%>\%
+  runHMMCopy(colname = "sampleA", plotDir = tempdir())
+}
+
+}
+\seealso{
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}}, \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}}
+
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{plotCNVheatmap}()},
+\code{\link{removeCNV}()}
+}
+\concept{CNV}

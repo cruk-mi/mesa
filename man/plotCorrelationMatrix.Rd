@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plotCorrelationMatrix}
 \alias{plotCorrelationMatrix}
-\title{This function takes a qseaSet and plots a correlation matrix}
+\title{Sample correlation heatmap}
 \usage{
 plotCorrelationMatrix(
   qseaSet,
@@ -17,33 +17,72 @@ plotCorrelationMatrix(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and signal (beta or nrpm).}
 
-\item{regionsToOverlap}{Regions to overlap}
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
+If provided, restrict computation to windows overlapping these regions; otherwise
+use all windows.
+\strong{Default:} \code{NULL}.}
 
-\item{useGroupMeans}{Whether to use the replicate information or not (group column)}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average replicates by the \code{group} column and compute correlations
+on group means; if \code{FALSE}, use individual samples.
+\strong{Default:} \code{FALSE}.}
 
-\item{sampleAnnotation}{Columns of the sampleTable to use to annotate the heatmap}
+\item{sampleAnnotation}{tidyselect specification or \code{character()} or \code{NULL}.
+Columns from the sample table to display as annotations on the heatmap
+(e.g., \code{c("tumour","patient")} or bare helpers \verb{tumour, patient}).
+\strong{Default:} \code{NULL}.}
 
-\item{normMethod}{What normalisation method to use}
+\item{normMethod}{\code{character(1)}.
+Measure to correlate. One of \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{minEnrichment}{Minimum number of reads for beta values}
+\item{minEnrichment}{\code{numeric(1)}.
+For \code{"beta"}, values with enrichment \verb{< minEnrichment} are set to \code{NA} before
+correlation.
+\strong{Default:} \code{3}.}
 
-\item{annotationColors}{A list of custom colours to use for the annotation}
+\item{annotationColors}{\code{list} or \code{NA}.
+Optional named colour maps for annotations (passed to \strong{pheatmap}), e.g.
+\code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
 
-\item{minDensity}{Minimum CpG density to keep}
+\item{minDensity}{\code{numeric(1)}.
+Minimum \code{CpG_density} required to keep a window.
+\strong{Default:} \code{0}.}
 
-\item{...}{Other arguments for pheatmap}
+\item{...}{Additional arguments forwarded to \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap()}}.}
 }
 \value{
-Invisibly returns the matrix of correlations
+A \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}} object.
 }
 \description{
-This function takes a qseaSet and plots a correlation matrix
+Compute and plot the correlation matrix across samples (or group means)
+using the selected normalisation measure and optional region filters.
+}
+\details{
+Windows are optionally restricted by \code{regionsToOverlap} and filtered by \code{minDensity}.
+Correlations are computed on the chosen \code{normMethod} after any group averaging.
+For \code{"beta"}, entries below \code{minEnrichment} are set to \code{NA} to down-weight
+low-enrichment windows.
 }
 \examples{
-# by default uses nrpm
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# By default uses NRPM
 exampleTumourNormal \%>\% plotCorrelationMatrix()
-#using beta values often looks quite different
-exampleTumourNormal \%>\% plotCorrelationMatrix(normMethod = "beta", sampleAnnotation = c(tumour,patient))
+
+# Using beta values and adding sample annotations
+exampleTumourNormal \%>\% 
+  plotCorrelationMatrix(normMethod = "beta",
+                        sampleAnnotation = c(tumour, patient))
 }
+
+}
+\seealso{
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getDataTable]{getDataTable()}}, \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap()}}
+}
+\concept{heatmaps}

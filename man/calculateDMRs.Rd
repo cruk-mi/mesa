@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDMRs.R
 \name{calculateDMRs}
 \alias{calculateDMRs}
-\title{Fit the GLM and return the data}
+\title{Fit GLM and return DMR data in one step}
 \usage{
 calculateDMRs(
   qseaSet,
@@ -12,7 +12,7 @@ calculateDMRs(
   minReadCount = 0,
   minNRPM = 1,
   checkPVals = TRUE,
-  fdrThres = 0.05,
+  FDRthres = 0.05,
   keepPvals = FALSE,
   formula = NULL,
   keepContrastMeans = TRUE,
@@ -23,59 +23,132 @@ calculateDMRs(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing counts and sample metadata.}
 
-\item{variable}{Which variable to use to calculate the DMRs between}
+\item{variable}{\code{character(1)} or \code{NULL}.
+Sample-table column used as the primary explanatory variable for contrasts.
+\strong{Default:} \code{NULL} (must be supplied unless \code{formula} is provided).}
 
-\item{covariates}{Any variables to use as covariates, for instance patient in a paired analysis}
+\item{covariates}{\code{character()} or \code{NULL}.
+Additional covariate column names (e.g., batch, patient).
+\strong{Default:} \code{NULL}.}
 
-\item{contrasts}{Either a data frame or a string to specify the contrasts to use.
-If using a data frame, it should have two columns, \code{group1} and \code{group2}, with the strings to compare between in each.
-Multiple rows means that multiple comparisons will be fitted.
-If using a string, then either:
+\item{contrasts}{\code{data.frame}, \code{character(1)}, or \code{NULL}.
+Contrast specification. If a data frame, must contain columns \code{group1} and
+\code{group2}. If a string, supports:
 \itemize{
-\item \code{"all"} to calculate all possible contrasts on the variable column
-\item \code{"first"} to calculate only the first possible contrast on the variable column
-\item \code{"<value1>_vs_<value2>"} to calculate the contrast between two specific values in the variable column
-\item \code{"all_vs_<value>"} or \code{"<value>_vs_all"} to calculate all possible contrasts against a specific value in the variable column
+\item \code{"A_vs_B"} — a single explicit contrast,
+\item \code{"All"} / \code{"all"} — all pairwise contrasts among levels of \code{variable},
+\item \code{"All_vs_X"} — each level vs \code{X},
+\item \code{"X_vs_All"} — \code{X} vs each other level,
+\item \code{"first"} — only the first possible contrast (based on factor order).
+\strong{Default:} \code{NULL} (fit the GLM without adding contrasts).
 }}
 
-\item{minReadCount}{A minimum read count that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Preferably use minNRPM.}
+\item{minReadCount}{\code{numeric(1)}.
+Minimum raw count required in at least one sample to keep a window.
+\strong{Default:} \code{0}.}
 
-\item{minNRPM}{A minimum normalised reads per million value that at least one sample (in the contrasts) must reach in order to consider the region for further calculation. Set this or minReadCount (but preferably this).}
+\item{minNRPM}{\code{numeric(1)}.
+Minimum NRPM required in at least one sample to keep a window.
+\strong{Default:} \code{1}.}
 
-\item{checkPVals}{Whether to check that the p-values aren't mostly zero to avoid a bug with covariates, only turn this off if you are sure what you are doing!}
+\item{checkPVals}{\code{logical(1)}.
+If \code{TRUE}, stop/warn when an excessive proportion of p-values are exactly
+zero (instability check).
+\strong{Default:} \code{TRUE}.}
 
-\item{fdrThres}{False discovery rate threshold.}
+\item{FDRthres}{\code{numeric(1)}.
+False discovery rate threshold for calling significance.
+\strong{Default:} \code{0.05}.}
 
-\item{keepPvals}{Whether to keep the unadjusted p-values in the output}
+\item{keepPvals}{\code{logical(1)}.
+If \code{TRUE}, include raw (unadjusted) p-values in the output.
+\strong{Default:} \code{FALSE}.}
 
-\item{formula}{Alternative formula mode for calculating DMRs (not recommended)}
+\item{formula}{\code{formula} or \code{NULL}.
+Optional model formula overriding \code{variable}/\code{covariates}.
+\strong{Default:} \code{NULL}.}
 
-\item{keepContrastMeans}{Whether to keep the columns containing the means of the contrasts in the output}
+\item{keepContrastMeans}{\code{logical(1)}.
+If \code{FALSE}, drop contrast mean columns from the output.
+\strong{Default:} \code{TRUE}.}
 
-\item{keepData}{Whether to keep the individual data columns in the output}
+\item{keepData}{\code{logical(1)}.
+If \code{TRUE}, include per-sample data columns for significant windows.
+\strong{Default:} \code{FALSE}.}
 
-\item{keepGroupMeans}{Whether to keep the group means in the output}
+\item{keepGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, include group mean columns (based on \code{variable}).
+\strong{Default:} \code{FALSE}.}
 
-\item{direction}{Whether to keep regions that are up/down/both.}
+\item{direction}{\code{character(1)}.
+Direction for calling significance, passed to \code{\link[qsea:isSignificant]{qsea::isSignificant()}}:
+one of \code{"up"}, \code{"down"}, or \code{"both"}.
+\strong{Default:} \code{"both"}.}
 
-\item{calcDispersionAll}{Whether to use samples that are not present in the contrasts to fit the initial generalised linear model, including them in the calculation of dispersion estimates.
-Setting this to be TRUE will mean that adding additional samples to the qseaSet will change the calculated DMRs, even if they are not being compared across.}
+\item{calcDispersionAll}{\code{logical(1)}.
+If \code{TRUE}, samples not present in any contrast still contribute to the
+initial GLM fit/dispersion estimation (so adding samples can change DMRs).
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-A tibble with the data
+A tibble with one row per \strong{significant} region/window containing:
+\itemize{
+\item per-contrast statistics (e.g., log2FC, deltaBeta, test statistic),
+\item multiple-testing results (FDR; optionally raw p-values if \code{keepPvals}),
+\item optional group means (if \code{keepGroupMeans = TRUE}),
+\item optional per-sample columns (if \code{keepData = TRUE}),
+\item metadata columns for genomic coordinates and window attributes.
+}
 }
 \description{
-This function fits a GLM and returns the resulting data table
+High-level wrapper that calls \code{\link[=fitQseaGLM]{fitQseaGLM()}} and \code{\link[=getDMRsData]{getDMRsData()}} to fit a
+negative-binomial GLM and extract a DMR results table in one go.
+}
+\details{
+Contrast strings are parsed as follows:
+\itemize{
+\item \code{"A_vs_B"} creates a single contrast \emph{A vs B};
+\item \code{"All"}/\code{"all"} expands to all pairwise contrasts among levels of \code{variable}
+(via \code{\link[=makeAllContrasts]{makeAllContrasts()}});
+\item \code{"All_vs_X"} creates \emph{each level vs X};
+\item \code{"X_vs_All"} creates \emph{X vs each other level};
+\item \code{"first"} constructs only the first possible pair (based on factor order).
+Internally, this function:
+}
+\enumerate{
+\item filters windows by \code{minReadCount}/\code{minNRPM} (unless overridden inside the
+GLM wrapper), 2) fits a NB-GLM with \code{\link[=fitQseaGLM]{fitQseaGLM()}}, 3) extracts a wide
+DMR table with \code{\link[=getDMRsData]{getDMRsData()}}, and 4) prunes contrast means if
+\code{keepContrastMeans = FALSE}.
+}
 }
 \examples{
-calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "LUAD_vs_NormalLung")
-# calculate all possible DMRs on one column 
-calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all")
-# change the False Discovery Rate threshold
-calculateDMRs(exampleTumourNormal, variable = "type", contrasts = "all", fdrThres = 0.0001)
-# can also return all the columns of data for the significant windows. 
-# using `contrasts = "first"` will only make the first possible contrast on the tumour column.
-calculateDMRs(exampleTumourNormal, variable = "tumour", contrasts = "first", keepData = TRUE)
+data(exampleTumourNormal, package = "mesa")
+
+# A single explicit contrast
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung")
+
+# All pairwise contrasts among levels of 'type'
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all")
+
+# Tighter FDR threshold
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type", contrasts = "all", FDRthres = 1e-4)
+
+# Return all per-sample columns for the first available contrast on 'tumour'
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "first", keepData = TRUE)
+
 }
+\seealso{
+Other DMR-detection: 
+\code{\link{fitQseaGLM}()},
+\code{\link{getDMRsData}()},
+\code{\link{makeAllContrasts}()}
+}
+\concept{DMR-detection}

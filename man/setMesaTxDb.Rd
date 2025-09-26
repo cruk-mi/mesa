@@ -2,19 +2,44 @@
 % Please edit documentation in R/utilityFunctions.R
 \name{setMesaTxDb}
 \alias{setMesaTxDb}
-\title{This function sets a default TxDb for the annotateWindows function to use.}
+\title{Set default TxDb for downstream annotation helpers}
 \usage{
 setMesaTxDb(TxDb)
 }
 \arguments{
-\item{TxDb}{A TxDb package (as a string, or the object itself)}
+\item{TxDb}{\code{character(1)}, TxDb \strong{object}, or \code{NULL}.
+Either the name of an installed TxDb package (e.g.,
+\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}), the TxDb object itself, or \code{NULL}
+to clear the setting. If a string is supplied, the package must be installed.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-None
+Invisibly returns \code{TRUE} on success.
 }
 \description{
-For instance "TxDb.Hsapiens.UCSC.hg38.knownGene" for human, or "TxDb.Mmusculus.UCSC.mm10.knownGene" for mouse.
+Record a preferred TxDb to use when functions such as \code{\link[=annotateWindows]{annotateWindows()}}
+are called without an explicit \code{TxDb}.
+}
+\details{
+This sets the session option \code{options(mesa_TxDb = TxDb)}. When a string is
+stored, helpers like \code{\link[=annotateWindows]{annotateWindows()}} will load the TxDb object on demand
+(e.g., \code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}). Use \code{\link[=setMesaGenome]{setMesaGenome()}} and
+\code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} to configure complementary defaults for genome and OrgDb.
+}
+\examples{
+# Set default TxDb for human (GRCh38/hg38)
+setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene")
+getOption("mesa_TxDb")
+
+# Clear the default TxDb
+setMesaTxDb(NULL)
+getOption("mesa_TxDb")
+
+# (Alternatively) you can store the object itself if already loaded:
+# setMesaTxDb(TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene)
+
 }
 \seealso{
-The ChIPseeker function  used by annotateWindows is annotatePeak, \link[ChIPseeker]{annotatePeak}
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
+\code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}
 }
