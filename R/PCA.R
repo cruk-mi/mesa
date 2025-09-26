@@ -500,9 +500,7 @@ getDimRed <- function(qseaSet,
     dplyr::mutate(windowSdName = ifelse(!is.na(topVarNum), glue::glue("windowSd{dplyr::cur_group_id()}"), NA), .before = 1) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(windowSdName, topVarNum) %>%
-    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) %>%
-    dplyr::bind_rows(topVar) %>%
-    dplyr::distinct(topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, .keep_all = TRUE)
+    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) 
 
   rowSds <- function(x) {
     sqrt(rowSums((x - rowMeans(x)) ^ 2) / (ncol(x) - 1))
