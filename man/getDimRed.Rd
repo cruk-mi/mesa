@@ -119,6 +119,10 @@ Number of principal components to compute (PCA only).
 If \code{TRUE}, include the matrix used for DR in the return object.
 \strong{Default:} \code{FALSE}.}
 
+\item{verbose}{\code{logical(1)}.
+If \code{TRUE}, print messages regarding the function execution.
+\strong{Default:} \code{TRUE}.}
+
 \item{...}{Additional arguments passed to \code{\link[uwot:umap]{uwot::umap()}} (when \code{method="UMAP"}),
 e.g. \code{n_neighbors}, \code{min_dist}, \code{metric}.}
 

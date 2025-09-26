@@ -177,7 +177,11 @@ getUMAP <- function(qseaSet,
 #' @param returnDataTable `logical(1)`.  
 #'   If `TRUE`, include the matrix used for DR in the return object.  
 #'   **Default:** `FALSE`.
-#'
+#'   
+#' @param verbose `logical(1)`.  
+#'   If `TRUE`, print messages regarding the function execution.  
+#'   **Default:** `TRUE`.
+#'   
 #' @param ... Additional arguments passed to [uwot::umap()] (when `method="UMAP"`),
 #'   e.g. `n_neighbors`, `min_dist`, `metric`.
 #'

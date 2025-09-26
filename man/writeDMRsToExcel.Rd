@@ -42,15 +42,14 @@ data(exampleTumourNormal, package = "mesa")
 # Minimal example: write results for a single contrast
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
-  writeDMRsToExcel(path = "dmr_results.xlsx")
-  
-# With explicit annotation (if required upstream)
+  writeDMRsToExcel(path = file.path(tempdir(),"test.xlsx"))
+
+# With multiple contrasts and annotation 
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToExcel(paste0(tempdir(),"/test.xlsx"))
+  writeDMRsToExcel(path = file.path(tempdir(),"test.xlsx"))
 }
-
 }
 \seealso{
 \code{\link[=writeDMRsToBed]{writeDMRsToBed()}}

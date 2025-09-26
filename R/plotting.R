@@ -640,53 +640,7 @@ makeHeatmapAnnotations <- function(qseaSet,
   return(list(sample = sampleAnnot, window = windowAnnot))
 }
 
-<<<<<<< HEAD
-#' This function takes a qseaSet and a gene, and plots the expression across the gene as a heatmap
-#' @param qseaSet The qseaSet object.
-#' @param gene A gene to plot. Either a gene symbol or an ensembl ID.
-#' @param normMethod Whether to plot nrpm values or beta values.
-#' @param sampleAnnotation A data frame with annotations for the samples.
-#' @param clusterNum A number of clusters to break the column dendrogram into.
-#' @param clusterCols Whether to cluster the columns or not.
-#' @param minDensity A minimum CpG density level to filter out windows with values lower than.
-#' @param maxScale The maximum of the scale, not used when plotting beta values.
-#' @param useGroupMeans Whether to use the group variable to collapse replicates.
-#' @param upstreamDist Number of basepairs upstream of the gene to include.
-#' @param downstreamDist Number of basepairs downstream of the gene to include.
-#' @param minEnrichment Minimum enrichment factor for beta values, will give NAs below this.
-#' @param scaleRows Whether to scale the rows of the heatmap
-#' @param annotationColors A list with the colours to use for the column legend, to pass to pheatmap
-#' @param showSampleNames Whether to plot the names of the samples. Defaults to doing so if less than 50 samples being plotted.
-#' @param mart A biomaRt mart object. If not supplied, will check the qseaSet, else will get a default for GRCh38/hg38 or hg19.
-#' @param idType A string to determine which column of the mart to find gene names in, required for using genomes that are not human or mouse. 
-#' @param ... Additional arguments to pass to ComplexHeatmap
-#' @return A heatmap showing the methylation patterns across the gene of interest.
-#' @export
-#' @examples
-#' # plot a gene
-#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9")
-#' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9", sampleAnnotation = c(tumour, tissue))
-#' # more complex example
-#' \donttest{
-#' exampleTumourNormal %>% 
-#'   plotGeneHeatmap(gene = "HOXA9", 
-#'                    clusterNum = 2,
-#'                    sampleAnnotation = tumour,
-#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue")),
-#'                    upstreamDist = 1000,
-#'                    downstreamDist = 2000
-#'                     )
-#'}
-#' # example with specifying the mart for mouse data
-#' \donttest{
-#' plotGeneHeatmap(exampleMouse, gene = "Fbxl18",
-#'   mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org") )
-#'}   
-=======
-
 #' Heatmap across a single gene locus
->>>>>>> fix_CMD_errors_and_warnings
 #'
 #' Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
 #' **ComplexHeatmap**. The gene can be given as a HGNC symbol or Ensembl ID.
