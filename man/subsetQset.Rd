@@ -2,24 +2,41 @@
 % Please edit documentation in R/alterQset.R
 \name{subsetQset}
 \alias{subsetQset}
-\title{Subset a qseaSet}
+\title{Subset a qseaSet by samples}
 \usage{
 subsetQset(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL)
 }
 \arguments{
-\item{qseaSet}{The original qseaSet object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing methylation-enriched sequencing data.}
 
-\item{samplesToKeep}{Which samples to keep. Only one of samplesToKeep or samplesToDrop should be specified.}
+\item{samplesToKeep}{\code{character()}
+Names of samples to retain. Cannot be used together with \code{samplesToDrop}.
+\strong{Default:} \code{NULL}.}
 
-\item{samplesToDrop}{Which samples to drop.}
+\item{samplesToDrop}{\code{character()}
+Names of samples to remove. Cannot be used together with \code{samplesToKeep}.
+\strong{Default:} \code{NULL}.}
 }
 \value{
-A qseaSet object, with only the selected samples inside it.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{subsetQset()}: returns the input \code{qseaSet} restricted to the
+selected samples.
+}
 }
 \description{
-This function takes a qseaSet and keeps only a subset of the samples from it.
+Restrict a \code{qseaSet} to a specified set of samples. All internal
+matrices and slots are subset consistently.
+Use exactly one of \code{samplesToKeep} or \code{samplesToDrop}.
 }
 \examples{
-subsetQset(exampleTumourNormal, samplesToKeep = c('Colon1_T','Colon1_N'))
-subsetQset(exampleTumourNormal, samplesToDrop = c('Colon1_T','Colon1_N'))
+data(exampleTumourNormal, package = "mesa")
+
+# Keep only two samples
+subsetQset(exampleTumourNormal, samplesToKeep = c("Colon1_T", "Colon1_N"))
+
+# Drop one sample
+subsetQset(exampleTumourNormal, samplesToDrop = "Lung1_N")
+
 }

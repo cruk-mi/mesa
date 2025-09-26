@@ -2,22 +2,57 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeNormMethodSuffix}
 \alias{removeNormMethodSuffix}
-\title{This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values}
+\title{Remove normalisation suffix from column names}
 \usage{
-removeNormMethodSuffix(dataTable, normMethod = NULL)
+removeNormMethodSuffix(dataTable, normMethod)
 }
 \arguments{
-\item{dataTable}{A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from \code{\link[=getDataTable]{getDataTable()}}.}
+\item{dataTable}{\code{data.frame} or tibble.
+Window × sample (or group) table whose column names may include a
+normalisation suffix (e.g., \code{"sampleA_beta"}, \code{"Tumour_beta_means"}).
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{A character giving the normalisation method used (e.g. "beta" or "nrpm").}
+\item{normMethod}{\code{character(1)}.
+Normalisation/measure tag to remove from column names (e.g., \code{"beta"},
+\code{"nrpm"}).
+\strong{Default:} none (must be supplied).}
 }
 \value{
-The dataTable with the normMethod suffix "_{normMethod}" removed from sample (or sample group) column names.
+A \code{data.frame} like \code{dataTable} but with cleaned column names (suffixes
+\verb{_\{normMethod\}} and \verb{_\{normMethod\}_means} removed where present).
 }
 \description{
-This function removes the normMethod suffix, if present, from the sample (or sample group) column names in a data frame of normalised values
+Clean wide tables (e.g., from \code{\link[=getDataTable]{getDataTable()}}) by stripping the trailing
+\verb{_\{normMethod\}} and optional \verb{_\{normMethod\}_means} suffixes from sample /
+group-mean columns.
+}
+\details{
+Intended for post-processing tables where column names encode the measure,
+e.g., \code{"sample_beta"}, \code{"group_beta_means"}. The function drops those suffixes
+to yield bare sample/group names, facilitating downstream joins and plotting.
 }
 \examples{
-exampleTumourNormal \%>\% getDataTable(addMethodSuffix = TRUE)  \%>\% removeNormMethodSuffix(normMethod = "nrpm")
+# Basic cleaning for 'beta'
+data.frame(A_beta = 1:3, B_beta_means = 4:6) \%>\%
+  removeNormMethodSuffix("beta") \%>\%
+  names()
+
+# Works similarly for other measures (e.g., 'nrpm')
+data.frame(S1_nrpm = 1:2, Tumour_nrpm_means = 3:4) \%>\%
+  removeNormMethodSuffix("nrpm") \%>\%
+  names()
 
 }
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=selectQset]{selectQset()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}
+
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeLibraryFactors}()}
+}
+\concept{table-helpers}

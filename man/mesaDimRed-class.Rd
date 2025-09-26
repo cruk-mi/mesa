@@ -3,21 +3,76 @@
 \docType{class}
 \name{mesaDimRed-class}
 \alias{mesaDimRed-class}
-\title{The MesaDimRed class}
+\alias{mesaDimRed}
+\alias{show,mesaDimRed-method}
+\title{Dimensionality reduction results container}
+\usage{
+mesaDimRed(res, sampleTable, samples, params, dataTable = data.frame())
+
+\S4method{show}{mesaDimRed}(object)
+}
+\arguments{
+\item{res}{\code{list}
+DR result objects. \strong{Default:} none. \code{res} must be supplied.}
+
+\item{sampleTable}{\code{data.frame}
+Sample annotations; row names must be sample IDs. \strong{Default:} none.}
+
+\item{samples}{\code{character()}
+Sample IDs included. \strong{Default:} none.}
+
+\item{params}{\code{list}
+Parameters used to compute \code{res}. \strong{Default:} none.}
+
+\item{dataTable}{\code{data.frame}
+Optional numeric matrix/data used for DR.
+\strong{Default:} \code{data.frame()}.}
+
+\item{object}{\code{mesaDimRed}
+Object to display.}
+}
+\value{
+A \linkS4class{mesaDimRed} object:
+\itemize{
+\item stores DR results in \code{res},
+\item carries sample metadata in \code{sampleTable},
+\item records the samples in \code{samples},
+\item and persists parameters/data in \code{params} / \code{dataTable}.
+}
+}
 \description{
-This is a class for containing the results of a dimensionality reduction on a qseaSet
+Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
+computed on a common set of samples.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{res}}{The results, a list containing individual PCA/UMAP objects.}
+\item{\code{res}}{\code{list}
+Individual DR result objects (e.g., \linkS4class{mesaPCA}, \linkS4class{mesaUMAP}).}
 
-\item{\code{sampleTable}}{A sampleTable from the qseaSet.}
+\item{\code{sampleTable}}{\code{data.frame}
+Sample annotations; row names are sample IDs.}
 
-\item{\code{samples}}{A character vector of the samples used.}
+\item{\code{samples}}{\code{character()}
+Vector of sample IDs used.}
 
-\item{\code{params}}{The parameters used during construction.}
+\item{\code{params}}{\code{list}
+Parameters used to generate results in \code{res}.}
 
-\item{\code{dataTable}}{The data used to construct the PCA/UMAP object (optional).}
+\item{\code{dataTable}}{\code{data.frame}
+Optional matrix/data used to compute DR (for reproducibility).}
 }}
 
+\examples{
+st <- data.frame(sample_name = c("S1","S2"),
+                 group = c("A","B"),
+                 row.names = "sample_name")
+md <- mesaDimRed(res = list(), sampleTable = st,
+                 samples = rownames(st), params = list(),
+                 dataTable = data.frame())
+md
+
+}
+\seealso{
+\linkS4class{mesaPCA}, \linkS4class{mesaUMAP}
+}
