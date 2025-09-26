@@ -30,7 +30,7 @@ data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\%
   removeCNV() \%>\%
   getCNV() \%>\%
-  head()
+  utils::head()
 }
 
 }

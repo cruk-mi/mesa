@@ -13,7 +13,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                        "afterOverBackNum","initialOverBackNum", "qname","inOut","nSign","nStrands",
                        "chromosome_name","start_position","end_position", "input_file",
                        "topVarNumInput", "windowSdName", "pcaName",
-                       "fnValue", "group2new","gap"))
+                       "fnValue", "group2new","gap","size"))
 
 #' Lift over genomic ranges from hg19 to hg38
 #'
