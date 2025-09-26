@@ -10,6 +10,7 @@ editor_options:
 * Many more examples for individual functions on their help pages, as well as a set of vignettes.
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
 * Objects with invalid slots will now throw informative errors.
+* Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column.
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method.

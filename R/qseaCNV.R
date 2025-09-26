@@ -456,7 +456,7 @@ plotCNVheatmap <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   removeCNV() %>%
 #'   getCNV() %>%
-#'   head()
+#'   utils::head()
 #' }
 #'
 #' @export
