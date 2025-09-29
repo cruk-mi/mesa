@@ -78,29 +78,8 @@ registered backend (see \code{\link[BiocParallel:register]{BiocParallel::registe
 and set a multi-core/cluster backend for speed.
 }
 
-\examples{
-\donttest{
-# Load toy qseaSet
-data(exampleTumourNormal, package = "mesa")
-qs <- exampleTumourNormal
-
-# Pretend BAM files exist (replace with real file paths in practice)
-st <- qsea::getSampleTable(qs)
-st$file_name <- tempfile(fileext = ".bam")
-file.create(st$file_name)  # create empty placeholder files
-qs <- qsea::setSampleTable(qs, st)
-
-# Run coverage (serial execution for simplicity)
-BiocParallel::register(BiocParallel::SerialParam())
-qs2 <- addBamCoveragePairedAndUnpaired(qs, properPairsOnly = TRUE)
-
-# Show updated library table
-head(qsea::getLibrary(qs2))
-}
-
-}
 \seealso{
-\code{\link[=getBamCoveragePairedAndUnpairedR1]{getBamCoveragePairedAndUnpairedR1()}} (low-level worker),
+\code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),
 \code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
 \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
 \code{\link[BiocParallel:register]{BiocParallel::register()}}

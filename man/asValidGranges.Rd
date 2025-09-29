@@ -35,7 +35,6 @@ data.frame(seqnames = "chr2", start = 10, end = 20) \%>\%
 # From data.frame (chr/window_start/window_end)
 data.frame(chr = "1", window_start = 1000, window_end = 1100) \%>\%
   asValidGranges()
-
 }
 \seealso{
 \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}

@@ -58,12 +58,3 @@ exampleTumourNormal \%>\% filter(tissue == "Liver")
 \code{\link[=subsetQset]{subsetQset()}} for explicit sample subsetting,
 \code{\link[=selectQset]{selectQset()}} for column selection in the \code{sampleTable}.
 }
-\examples{
-exampleTumourNormal \%>\% filter(tissue == "Colon")
-exampleTumourNormal \%>\% filter(stringr::str_detect(sample_name, "Colon"))
-exampleTumourNormal \%>\% filter(tumour != "Normal")
-exampleTumourNormal \%>\% filter(stringr::str_detect(sample_name, "Lung"), tumour != "Normal")
-#note a message is given if no samples remain, but not an error or warning
-exampleTumourNormal \%>\% filter(tissue == "Liver")
-
-}

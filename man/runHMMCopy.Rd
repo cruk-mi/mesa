@@ -25,14 +25,9 @@ A \code{GRanges} with a metadata column named \verb{<colname>} containing
 per-window CNV estimates (typically HMM state means on the log2 scale).
 }
 \description{
-<<<<<<< HEAD
-This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-Assumes gc and map columns have already been added.
-=======
 Given a table of per-window counts with GC and mappability, run HMMcopy
 correction and segmentation, and return a GRanges of CNV calls for the
 selected sample/column.
->>>>>>> origin/general_doc_updates_from_main
 }
 \details{
 Counts are GC/map corrected via \code{HMMcopy::correctReadcount()} and segmented

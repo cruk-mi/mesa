@@ -11,8 +11,8 @@
 #'   - `sample_name` (unique per sample),
 #'   - `file_name` (path to MeDIP/capture BAM),
 #'   - `group` (string label).  
-#'   If `CNVmethod` uses inputs (`"HMMdefault"`, `"qseaInput"`), also include
-#'   `input_file` (path to matched Input BAM).
+#'   If the selected `CNVmethod` uses inputs (`"HMMdefault"`, `"qseaInput"`), 
+#'   also include `input_file` (path to matched Input BAM).
 #' - BAMs should be coordinate-sorted. For paired data, running `samtools fixmate`
 #'   is recommended so MAPQ tags are available (see `minMapQual` note below).
 #' - `BSgenome` must be an installed genome package string (e.g.
@@ -27,8 +27,8 @@
 #' - `coverageMethod = "PairedAndR1s"` loads proper pairs and, optionally,
 #'   high-MAPQ R1 singletons; governed by `minMapQual`, `minInsertSize`,
 #'   `maxInsertSize`, `properPairsOnly`, `minReferenceLength`.
-#' - `coverageMethod = "qseaPaired"` delegates to [qsea::addCoverage()] with paired
-#'   settings.
+#' - `coverageMethod = "qseaPaired"` delegates to [qsea::addCoverage()] with 
+#'   paired settings.
 #' - `fragmentType` can set defaults for `fragmentLength`/`fragmentSD` (`"Sheared"`
 #'   or `"cfDNA"`); otherwise supply both explicitly.
 #'
@@ -46,14 +46,8 @@
 #'   Use `setMesaParallel()` to toggle package-wide.
 #'
 #' **Additional processing**
-#' - Adds CpG density via `qsea::addPatternDensity(pattern = "CG")`,
-#'   enrichment parameters, sets library factors to 1 (so betas are not scaled),
-#'   and stores key parameters in `qseaSet@parameters`.
-#'
-#' **Errors & validations**
-#' - The function verifies required columns, existence of listed BAMs, and
-#'   presence of required GC/mappability tracks for `"HMMdefault"`. It stops with
-#'   a descriptive message if any prerequisite is missing.
+#' - Adds CpG density via `qsea::addPatternDensity(pattern = "CG")`, and 
+#'   enrichment parameters, allowing for estimation of beta values.
 #'
 #' @param sampleTable `data.frame`.  
 #'   Must contain `sample_name`, `file_name`, and `group`. If `CNVmethod`
@@ -67,7 +61,7 @@
 #'   **Default:** `NULL` (must be supplied).
 #'
 #' @param chrSelect `integer()` or `character()`.  
-#'   Chromosomes to include.  
+#'   Chromosomes to include.
 #'   **Default:** `1:22`.
 #'
 #' @param windowSize `integer(1)`.  
@@ -75,20 +69,24 @@
 #'   **Default:** `300`.
 #'
 #' @param CNVwindowSize `integer(1)`.  
-#'   CNV bin size (bp).  
+#'   Copy number variation (CNV) window size (bp).
 #'   **Default:** `1e6`.
 #'
 #' @param fragmentType `character(1)` or `NULL`.  
 #'   If `"Sheared"` or `"cfDNA"`, sets defaults for `fragmentLength`/`fragmentSD`;
-#'   otherwise supply both explicitly.  
+#'   otherwise both must be supplied explicitly.  
 #'   **Default:** `NULL`.
 #'
 #' @param fragmentLength `numeric(1)` or `NULL`.  
-#'   Average fragment length (bp).  
+#'   Average fragment length (bp). This is used to extend single-end reads if 
+#'   used, but also strongly affects the CpG density calculation, which will 
+#'   strongly impact the beta value estimation.
 #'   **Default:** `NULL` (inferred from `fragmentType` or must be provided).
 #'
 #' @param fragmentSD `numeric(1)` or `NULL`.  
-#'   Standard deviation of fragment length (bp).  
+#'   Standard deviation of fragment length (bp). Used to calculate the window 
+#'   based CpG density calculation, which will strongly impact the beta value 
+#'   estimation.
 #'   **Default:** `NULL` (inferred from `fragmentType` or must be provided).
 #'
 #' @param CNVmethod `character(1)`.  
@@ -105,19 +103,30 @@
 #'   **Default:** `10`.
 #'
 #' @param minInsertSize `integer(1)`.  
-#'   Minimum absolute insert size for proper pairs (bp).  
+#'   Minimum absolute insert size for proper pairs (bp).
+#'   Only applies to coverageMethod = "PairedAndR1s", and applies to Input 
+#'   samples as well as MeCap.
 #'   **Default:** `70`.
 #'
 #' @param maxInsertSize `integer(1)`.  
-#'   Maximum absolute insert size for proper pairs (bp).  
+#'   Maximum absolute insert size for proper pairs (bp). 
+#'   Only applies to coverageMethod = "PairedAndR1s", and applies to Input 
+#'   samples as well as MeCap. 
 #'   **Default:** `1000`.
 #'
 #' @param minReferenceLength `integer(1)`.  
-#'   Minimum aligned reference span for R1 singletons (bp).  
+#'   A minimum mapped distance on the genome to keep an read. This is to avoid
+#'   very short reads that may be due to mapping artefacts. Note that with 
+#'   defaultparameters bwa will allow reads where only 19bps have mapped to the
+#'   genome.
+#'   Only applies to coverageMethod = "PairedAndR1s", and applies to Input 
+#'   samples as well as MeCap. 
 #'   **Default:** `30`.
 #'
 #' @param badRegions `GRanges` or `NULL`.  
-#'   Genomic regions to exclude (blacklist).  
+#'   Genomic regions to exclude (blacklist). These regions will be removed from 
+#'   the output. Note a set of GRCh38 windows identified by ENCODE are provided 
+#'   in the [ENCODEbadRegions] data object.
 #'   **Default:** `NULL`.
 #'
 #' @param properPairsOnly `logical(1)`.  
@@ -125,12 +134,30 @@
 #'   **Default:** `FALSE`.
 #'
 #' @param hmmCopyGC `data.frame` or `NULL`.  
-#'   GC content per CNV bin (size = `CNVwindowSize`) for HMMcopy.  
+#'   GC content per CNV bin (size = `CNVwindowSize`) for HMMcopy.
+#'   Required if using the `CNVmethod = "HMMdefault"` option *unless* you are 
+#'   using hg38/GRCh38 with provided default bin sizes (50kb, 500kb, 1Mb).
+#'   Must be a dataframe with columns `chr`, `start`, `end`, and `gc`.
 #'   **Default:** `NULL`.
 #'
 #' @param hmmCopyMap `data.frame` or `NULL`.  
 #'   Mappability per CNV bin (size = `CNVwindowSize`) for HMMcopy.  
+#'   Required if using the `CNVmethod = "HMMdefault"` option *unless* you are 
+#'   using hg38/GRCh38 with provided default bin sizes (50kb, 500kb, 1Mb).
+#'   Must be a dataframe with columns `chr`, `start`, `end`, and `map`.
 #'   **Default:** `NULL`.
+#'
+#' @param maxPatternDensity `numeric(1)`.
+#'  Maximum pattern density (e.g., CpG) to consider a window for background 
+#'  offset calculation. Regions above this are excluded from the calculation.
+#'  This may need to be set higher if you are not considering many windows or 
+#'  have a high average genomic CG content.
+#'  **Default:** `0.05`.
+#'  
+#' @param enrichmentMethod `character(1)`.
+#'  Method for calculating enrichment for target pattern (e.g. CpG). 
+#'  See [addNormalisation()] for details.
+#'  **Default:** `"blind1-15"`.
 #'
 #' @param parallel `logical(1)`.  
 #'   Use the registered BiocParallel backend (`TRUE`) or run serially (`FALSE`).  
@@ -151,7 +178,7 @@
 #'
 #' @examples
 #' \donttest{
-#' # Minimal runnable sketch if MEDIPSData is installed (toy BAMs)
+#' # Minimal runnable sketch if MEDIPSData is installed
 #' if (requireNamespace("MEDIPSData", quietly = TRUE)) {
 #'   sampleTable <- data.frame(
 #'     sample_name = c("Normal1", "Tumour1"),
@@ -178,11 +205,10 @@
 #'     )
 #' }
 #' }
-#'
 #' @export
 makeQset <- function(sampleTable,
-                     BSgenome = NULL,
-                     chrSelect = 1:22,
+                     BSgenome,
+                     chrSelect,
                      windowSize = 300,
                      CNVwindowSize = 1000000,
                      fragmentType = NULL,
@@ -201,7 +227,7 @@ makeQset <- function(sampleTable,
                      maxPatternDensity = 0.05,
                      enrichmentMethod = "blind1-15",
                      parallel = getMesaParallel()) {
-
+  
   if(parallel) {
     if(BiocParallel::bpworkers() == 1){
       message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
@@ -279,19 +305,43 @@ makeQset <- function(sampleTable,
 
   # Get data from the BSgenome
   refGenome <- BSgenome::getBSgenome(BSgenome)
+  
+  # check that the chromosome names match the BS genome
+  bsNames <- GenomeInfoDb::seqnames(refGenome)
+  unknownChr <- setdiff(chrSelect, bsNames)
+  if (length(unknownChr) > 0) {
+    
+    if(stringr::str_detect(BSgenome,"UCSC") && all(stringr::str_detect(chrSelect,"chr", negate = TRUE))) {
+      stop(glue::glue("UCSC genome requires 'chr' prefixes which were not found. \\
+            Add these or consider swapping to a BSgenome without 'chr', \\
+            e.g. BSgenome.Hsapiens.NCBI.GRCh38"))
+    } 
+    
+    if(stringr::str_detect(BSgenome,"NCBI") && all(stringr::str_detect(chrSelect,"chr"))) {
+      stop(glue::glue("NCBI genome does not use 'chr' prefixes. \\
+            Remove these or consider swapping to e.g. BSgenome.Hsapiens.UCSC.hg38"))
+    }
+      
+    stop(glue::glue(
+    "Chromosomes provided not found in the given BSgenome! \\
+    Showing first errors out of {length(unknownChr)}:
+    {paste(head(unknownChr), collapse = '\n    ')}"
+    ))
+  }
+  
   # chromosome lengths, and then a Seqinfo object with that
-  chr_length <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
-  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chr_length, NA, BSgenome)
+  chrLength <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
+  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chrLength, NA, BSgenome)
 
   # number of windows of size windowSize on each chromosome
-  nr_wd <- floor(chr_length/windowSize)
+  numWindows <- floor(chrLength/windowSize)
 
   # starting point of each window on each chromosome, then make a GRanges object with all those windows
-  wd_start <- unlist(lapply(FUN = seq, X = chr_length - windowSize + 1,
+  windowStart <- unlist(lapply(FUN = seq, X = chrLength - windowSize + 1,
                             from = 1, by = windowSize), FALSE, FALSE)
 
-  windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), nr_wd),
-                                           ranges = IRanges::IRanges(start = wd_start,
+  windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), numWindows),
+                                           ranges = IRanges::IRanges(start = windowStart,
                                                                      width = windowSize),
                                            seqinfo = seqinfo)
 
@@ -440,10 +490,36 @@ makeQset <- function(sampleTable,
     
       if (is.null(hmmCopyGC)) {
       stop("No hmmCopy GC content object provided!")
+      } else {
+        requiredColumns <- c("chr","start","end","gc")
+        columnDiff <- setdiff(colnames(hmmCopyGC), requiredColumns)
+      if(length(columnDiff) > 0) {
+        stop(glue::glue("hmmCopyGC object missing required columns: {paste(columnDiff, collapse = ' ')}"))
+      } 
+      objectWindowSize <- hmmCopyGC %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
+      
+      if(length(objectWindowSize) != 1) {
+        stop(glue::glue("hmmCopyGC object should have constant window size for all windows."))
+      } else if (objectWindowSize != CNVwindowSize) {
+        stop(glue::glue("hmmCopyGC object window size should be the same as the CNVwindowSize."))
+      }
     }
 
     if (is.null(hmmCopyMap)) {
       stop("No hmmCopy Mapability file provided!")
+    } else {
+      requiredColumns <- c("chr","start","end","map")
+      columnDiff <- setdiff(colnames(hmmCopyMap), requiredColumns)
+      if(length(columnDiff) > 0) {
+        stop(glue::glue("hmmCopyMap object missing required columns: {paste(columnDiff, collapse = ' ')}"))
+      } 
+      objectWindowSize <- hmmCopyMap %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
+      
+      if(length(objectWindowSize) != 1) {
+        stop(glue::glue("hmmCopyMap object should have constant window size for all windows."))
+      } else if (objectWindowSize != CNVwindowSize) {
+        stop(glue::glue("hmmCopyMap object window size should be the same as the CNVwindowSize."))
+      }
     }
 
     # use HMMCopy directly, with default settings

@@ -17,12 +17,8 @@ plotCorrelationMatrix(
 )
 }
 \arguments{
-<<<<<<< HEAD
-\item{qseaSet}{The qseaSet object}
-=======
 \item{qseaSet}{\code{qseaSet}.
 Input object containing windows and signal (beta or nrpm).}
->>>>>>> origin/general_doc_updates_from_main
 
 \item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
 If provided, restrict computation to windows overlapping these regions; otherwise
@@ -60,24 +56,12 @@ Minimum \code{CpG_density} required to keep a window.
 \item{...}{Additional arguments forwarded to \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap()}}.}
 }
 \value{
-<<<<<<< HEAD
-Invisibly returns the matrix of correlations
-=======
 A \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}} object.
->>>>>>> origin/general_doc_updates_from_main
 }
 \description{
 Compute and plot the correlation matrix across samples (or group means)
 using the selected normalisation measure and optional region filters.
 }
-<<<<<<< HEAD
-\examples{
-# by default uses nrpm
-exampleTumourNormal \%>\% plotCorrelationMatrix()
-#using beta values often looks quite different
-exampleTumourNormal \%>\% plotCorrelationMatrix(normMethod = "beta", sampleAnnotation = c(tumour,patient))
-}
-=======
 \details{
 Windows are optionally restricted by \code{regionsToOverlap} and filtered by \code{minDensity}.
 Correlations are computed on the chosen \code{normMethod} after any group averaging.
@@ -102,4 +86,3 @@ exampleTumourNormal \%>\%
 \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getDataTable]{getDataTable()}}, \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap()}}
 }
 \concept{heatmaps}
->>>>>>> origin/general_doc_updates_from_main

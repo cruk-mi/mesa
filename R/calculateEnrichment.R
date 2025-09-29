@@ -248,7 +248,7 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
 #' \donttest{
 #' # Requires MEDIPS and a BSgenome package
 #' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#' #   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = paste0("chr", 1:2))
+#' #   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
 #' #   gr
 #' # }
 #' }
@@ -305,7 +305,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #'   set.seed(1)
 #'   n <- 200
 #'   gr <- GenomicRanges::GRanges(
-#'     seqnames = rep("chr1", n),
+#'     seqnames = rep(1, n),
 #'     ranges   = IRanges::IRanges(
 #'       start = sample(1e6:2e6, n),
 #'       width = sample(80:180, n, replace = TRUE)
@@ -315,7 +315,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #'   calculateCGEnrichmentGRanges(
 #'     readGRanges = gr,
 #'     BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
-#'     chr.select  = "chr1"
+#'     chr.select  = 1
 #'   )
 #' }
 #' }

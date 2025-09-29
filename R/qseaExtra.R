@@ -87,7 +87,6 @@ is.qseaSet <- function(x){
 #'    setMart("ENSEMBL_110") %>%
 #'    getMart()
 #' }
-#'
 NULL
 
 #' @rdname setMart
@@ -749,7 +748,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' Fraction of thresholded windows overlapping a set of regions
 #'
 #' For each sample, compute the proportion of **windows** with counts
-#' `>= numCountsNeeded` that overlap `windowsToConsider`, relative to all
+#' `>= numCountsNeeded` that overlap `regionsToOverlap`, relative to all
 #' windows with counts `>= numCountsNeeded` in that sample.
 #'
 #' @details
@@ -758,7 +757,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' and summed per sample:
 #' - `initialOverBackNum`: windows meeting the threshold genome-wide.
 #' - `afterOverBackNum`: windows meeting the threshold **within**
-#'   `windowsToConsider` (via [filterByOverlaps()]).
+#'   `regionsToOverlap` (via [filterByOverlaps()]).
 #' The reported `fraction` is `afterOverBackNum / initialOverBackNum`.
 #'
 #' **Note:** despite the function name, this computes a **window-based** fraction
@@ -767,7 +766,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' @param qseaSet `qseaSet`.  
 #'   Input object providing per-window counts. **Default:** none (must be supplied).
 #'
-#' @param windowsToConsider `GRanges` or `data.frame`.  
+#' @param regionsToOverlap `GRanges` or `data.frame`.  
 #'   Regions to consider for overlap. Data frames must be coercible to `GRanges`
 #'   (e.g., have `seqnames`/`start`/`end` or `chr`/`window_start`/`window_end`).  
 #'   **Default:** none (must be supplied).
@@ -780,7 +779,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' A tibble with one row per sample containing:
 #' - `sample_name`  
 #' - `initialOverBackNum` — windows `>=` threshold genome-wide  
-#' - `afterOverBackNum` — windows `>=` threshold within `windowsToConsider`  
+#' - `afterOverBackNum` — windows `>=` threshold within `regionsToOverlap`  
 #' - `fraction` — `afterOverBackNum / initialOverBackNum`  
 #' followed by columns from the sample table (left-joined by `sample_name`).
 #'
@@ -797,7 +796,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' # Using the shipped ultra-stable probes (GRCh38) as the region set
 #' exampleTumourNormal %>%
 #'   calculateFractionReadsInGRanges(
-#'     windowsToConsider = mesa::hg38UltraStableProbes,
+#'     regionsToOverlap = mesa::hg38UltraStableProbes,
 #'     numCountsNeeded   = 5
 #'   ) %>%
 #'   dplyr::select(sample_name, fraction) 
@@ -809,7 +808,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'   (\(subgr)
 #'     calculateFractionReadsInGRanges(
 #'       qseaSet           = exampleTumourNormal,
-#'       windowsToConsider = subgr,
+#'       regionsToOverlap = subgr,
 #'       numCountsNeeded   = 3
 #'     )
 #'   ) %>%
@@ -817,7 +816,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' }
 #'
 #' @export
-calculateFractionReadsInGRanges <- function(qseaSet, windowsToConsider, numCountsNeeded) {
+calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
   initialReadTotals <- qseaSet %>%
     qsea::getCounts() %>%
     {. >= numCountsNeeded } %>%

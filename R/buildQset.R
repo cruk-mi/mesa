@@ -98,6 +98,14 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
                                               minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
                                               minReferenceLength = 30, properPairsOnly = FALSE){
 
+  if (is.null(BSgenome) ){
+    stop("Please provide the BSgenome to use.")
+  }
+
+  if (is.null(regions) ){
+    stop("Please provide a set of regions.")
+  }
+
   if (!requireNamespace("Rsamtools", quietly = TRUE)) {
     stop(
       "Package \"Rsamtools\" must be installed to use this function.",
@@ -119,12 +127,18 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
   if(properPairsOnly){
 
-    myParam <- Rsamtools::ScanBamParam(what = c("qname","flag","strand","rname","pos",
-                                              "mapq","cigar","isize"), tag = "MQ")
+    myParam <- Rsamtools::ScanBamParam(
+      what = c("qname","flag","strand","rname","pos","mapq","cigar","isize"), 
+      which = regions %>% plyranges::reduce_ranges(),
+      tag = "MQ"
+      )
   } else {
 
-    myParam <- Rsamtools::ScanBamParam(what = c("flag","strand","rname","pos",
-                                                "mapq","cigar","isize"), tag = "MQ")
+    myParam <- Rsamtools::ScanBamParam(
+      what = c("flag","strand","rname","pos","mapq","cigar","isize"), 
+      which = regions %>% plyranges::reduce_ranges(),
+      tag = "MQ"
+      )
 
   }
 
@@ -133,14 +147,24 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
   if (is.null(readBamData[[1]]$tag$MQ)) {
     #MQ is the mate quality tag, coming from samtools fixmate. If not present, then add as NA.
     message(glue::glue("No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only."))
-    readBamData[[1]]$tag$MQ <- rep(NA, length(readBamData[[1]]$flag))
+    
+    readBamData <- readBamData %>% purrr::map(~purrr::discard_at(.,"tag"))
+
   }
 
   readDF <- readBamData %>%
-    as.data.frame() %>%
-    tibble::as_tibble() %>%
-    dplyr::bind_cols(., tibble::as_tibble(Rsamtools::bamFlagAsBitMatrix(.$flag)))
-
+    purrr::map_df(function(x) {
+        x %>%
+          as.data.frame() %>%
+          tibble::as_tibble() %>%
+          dplyr::bind_cols(., tibble::as_tibble(Rsamtools::bamFlagAsBitMatrix(.$flag)))
+        }
+      )
+  
+  if(!("MQ" %in% colnames(readDF))) {
+    readDF <- readDF %>% mutate(MQ = NA)
+  }
+  
   #remove the chr if present in the bam file but not in the regions
   if(!any(stringr::str_detect(regions %>% GenomeInfoDb::seqlevels(),"chr"))) {
     readDF <- readDF  %>%
@@ -206,7 +230,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
   numPairsWithinSize <- length(properPairsGRanges)
 
-  if (numPairsWithinSize < numPairsInit) {
+  if (numPairsWithinSize < numPairsAfterMAPQ) {
     message(glue::glue("Dropping {numPairsAfterMAPQ - numPairsWithinSize} proper pairs that do not lie within [{minInsertSize}, {maxInsertSize}]"))
   }
 
@@ -375,28 +399,6 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 #'   [BiocParallel::register()]
 #'
 #' @family coverage
-#'
-#' 
-#' @examples
-#' \donttest{
-#' # Load toy qseaSet
-#' data(exampleTumourNormal, package = "mesa")
-#' qs <- exampleTumourNormal
-#'
-#' # Pretend BAM files exist (replace with real file paths in practice)
-#' st <- qsea::getSampleTable(qs)
-#' st$file_name <- tempfile(fileext = ".bam")
-#' file.create(st$file_name)  # create empty placeholder files
-#' qs <- qsea::setSampleTable(qs, st)
-#'
-#' # Run coverage (serial execution for simplicity)
-#' BiocParallel::register(BiocParallel::SerialParam())
-#' qs2 <- addBamCoveragePairedAndUnpaired(qs, properPairsOnly = TRUE)
-#'
-#' # Show updated library table
-#' head(qsea::getLibrary(qs2))
-#' }
-#' 
 #' @export
 addBamCoveragePairedAndUnpaired <- function(qs,
                                             fragmentLength = NULL,
@@ -484,14 +486,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'   Input object containing methylation-enriched sequencing data.
 #'
 #' @param enrichmentMethod `character(1)`  
-#'   Method used to calculate enrichment.  
-#'   Currently implemented:
-#'   \itemize{
-#'     \item **"blind1-15"**: the blind calibration method detailed in the qsea
-#'       paper, fitting a straight line of decreasing expected average
-#'       methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.
-#'     \item **"none"**: no enrichment normalisation is performed.
-#'   }  
+#'   Method used to calculate enrichment. Options are described in **Details**.  
 #'   Recorded in `qseaSet@parameters$enrichmentMethod`.  
 #'   **Default:** `"blind1-15"`.
 #'
@@ -515,7 +510,15 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #' This function encapsulates a recommended default pipeline for qsea
 #' normalisation. It ensures consistency across runs and simplifies code by
 #' bundling commonly applied steps.
-#'
+#' 
+#' #' Methods available for `enrichmentMethod`:
+#' \itemize{
+#'   \item **"blind1-15"**: the blind calibration method detailed in the qsea
+#'     paper, fitting a straight line of decreasing expected average
+#'     methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.
+#'   \item **"none"**: no enrichment normalisation is performed.
+#' }
+#' 
 #' @seealso
 #'   [qsea::addLibraryFactors()],  
 #'   [qsea::addOffset()],  
@@ -523,21 +526,20 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'   [getPattern()]
 #'
 #' @examples
-#' \dontrun{
 #' # Run normalisation on a toy qseaSet with ~100k reads
 #' getExampleQseaSet(expSamplingDepth = 100000) %>%
 #'   addNormalisation(maxPatternDensity = 0.5)
 #'   
 #' # Run with no enrichment normalisation
 #' getExampleQseaSet(expSamplingDepth = 1e5) %>%
-#'   addNormalisation(enrichmentMethod = "none")
+#'   addNormalisation(enrichmentMethod = "none", maxPatternDensity = 0.5)
 #'   
 #' # Access the recorded enrichment method
-#' qs <- getExampleQseaSet(expSamplingDepth = 1e5)
-#' qs2 <- addNormalisation(qs, maxPatternDensity = 0.5)
-#' qs2@parameters$enrichmentMethod
-#' }
-#' 
+#' getExampleQseaSet(expSamplingDepth = 1e5) %>%
+#'   addNormalisation(maxPatternDensity = 0.5) %>%
+#'   getParameters() %>% 
+#'   purrr::pluck("enrichmentMethod")
+#'
 #' @export
 addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15", maxPatternDensity = 0.05){
 

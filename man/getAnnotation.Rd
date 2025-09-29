@@ -21,32 +21,12 @@ tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g., \code{c("tum
 \strong{Default:} \code{NULL} (no extra columns beyond the identifier).}
 }
 \value{
-<<<<<<< HEAD
-A data frame containing the annotation columns, ready for use in heatmap functions
-=======
 \code{data.frame} of annotations with row names set to \code{sample_name}
 (or to \code{group} when \code{useGroupMeans = TRUE}).
->>>>>>> origin/general_doc_updates_from_main
 }
 \description{
 Note that sampleAnnotation must be enclosed within double curly brackets when used.
 }
-<<<<<<< HEAD
-\examples{
-
-# works for none, one or more columns:
-exampleTumourNormal \%>\% mesa:::getAnnotation()
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = type)
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour,type))
-# also works for quoted string names
-exampleTumourNormal \%>\% mesa:::getAnnotation()
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
-# and for asking to use the groups
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(useGroupMeans = TRUE)
-exampleTumourNormal \%>\% mutate(group = stringr::str_remove(sample_name,"[0-9]")) \%>\% mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
-}
-=======
 \details{
 Select sample-table columns to use as annotations, either per-sample or
 per-group (with consistency checks across replicates).
@@ -84,4 +64,3 @@ exampleTumourNormal \%>\%
 }
 \concept{heatmap-annotation}
 \keyword{internal}
->>>>>>> origin/general_doc_updates_from_main

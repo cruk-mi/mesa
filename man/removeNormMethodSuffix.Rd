@@ -4,7 +4,7 @@
 \alias{removeNormMethodSuffix}
 \title{Remove normalisation suffix from column names}
 \usage{
-removeNormMethodSuffix(dataTable, normMethod = NULL)
+removeNormMethodSuffix(dataTable, normMethod)
 }
 \arguments{
 \item{dataTable}{\code{data.frame} or tibble.
@@ -26,12 +26,6 @@ Clean wide tables (e.g., from \code{\link[=getDataTable]{getDataTable()}}) by st
 \verb{_\{normMethod\}} and optional \verb{_\{normMethod\}_means} suffixes from sample /
 group-mean columns.
 }
-<<<<<<< HEAD
-\examples{
-exampleTumourNormal \%>\% getDataTable(addMethodSuffix = TRUE)  \%>\% removeNormMethodSuffix(normMethod = "nrpm")
-
-}
-=======
 \details{
 Intended for post-processing tables where column names encode the measure,
 e.g., \code{"sample_beta"}, \code{"group_beta_means"}. The function drops those suffixes
@@ -62,4 +56,3 @@ Other table-helpers:
 \code{\link{removeLibraryFactors}()}
 }
 \concept{table-helpers}
->>>>>>> origin/general_doc_updates_from_main
