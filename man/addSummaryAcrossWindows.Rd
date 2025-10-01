@@ -67,7 +67,6 @@ to the \code{sampleTable}. Output column names typically encode the method and t
 summary function (and include \code{suffix} when provided).
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Add mean NRPM and beta across all windows 
@@ -101,7 +100,6 @@ exampleTumourNormal \%>\%
     suffix     = "all"
   ) \%>\%
   getSampleTable()
-}
 
 }
 \seealso{

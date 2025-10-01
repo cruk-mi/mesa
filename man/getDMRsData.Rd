@@ -71,7 +71,7 @@ A tibble with one row per DMR (window) containing:
 }
 }
 \description{
-Given a \code{\link{qseaGLM}} object with one or more contrasts, extract a \emph{wide}
+Given a \code{\link[qsea:qseaGLM-class]{qsea::qseaGLM}} object with one or more contrasts, extract a \emph{wide}
 results table of statistics, adjusted p-values, and (optionally) group means
 and per-sample values.
 }

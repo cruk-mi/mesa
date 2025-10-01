@@ -34,7 +34,6 @@ used to derive a single beta value per probe. Ensure the probe genome build
 matches the \code{qseaSet} (e.g., GRCh38) to avoid mismatches.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Use the built-in keyword for 450k probes (GRCh38)
@@ -46,7 +45,6 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
   head()
-}
 
 }
 \seealso{

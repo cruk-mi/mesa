@@ -52,14 +52,12 @@ annotation helpers) should perform any needed checks.
 }
 
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Store a label (or use a real biomaRt::Mart) and read it back
 exampleTumourNormal \%>\%
    setMart("ENSEMBL_110") \%>\%
    getMart()
-}
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
