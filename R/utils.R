@@ -21,7 +21,6 @@
 #' [qsea::getRegions()], [S4Vectors::mcols()], [dplyr::select()]
 #'
 #' @examples
-#' \donttest{
 #' if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
 #'   data(exampleTumourNormal, package = "mesa")
 #'
@@ -35,7 +34,6 @@
 #'     GenomicRanges::mcols() %>%
 #'     colnames() %>%
 #'     grep("^avgFragment", ., value = TRUE)   # character(0) if removed
-#' }
 #' }
 #'
 #' @export
@@ -144,11 +142,9 @@ qseaTableToChrGRanges <- function(dataTable) {
 #'            end      = c(120,220)) %>%
 #'   getWindowNames()
 #'
-#' \donttest{
 #' # From a qseaSet shipped with mesa (if available)
 #' data(exampleTumourNormal, package = "mesa")
 #' exampleTumourNormal %>% getWindowNames() %>% head()
-#' }
 #'
 #' @export
 getWindowNames <- function(x) {
@@ -193,11 +189,9 @@ getWindowNames <- function(x) {
 #' [qsea::addPatternDensity()], [qsea::getRegions()], [S4Vectors::mcols()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #' # Returns character(0) if no *_density columns are present
 #' exampleTumourNormal %>% getPattern()
-#' }
 #'
 #' @export
 getPattern <- function(qseaSet) {
@@ -226,10 +220,8 @@ getPattern <- function(qseaSet) {
 #' [qsea::getRegions()], [getWindowNames()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #' exampleTumourNormal %>% getWindows() %>% head()
-#' }
 #'
 #' @export
 getWindows <- function(qseaSet) {
@@ -263,12 +255,11 @@ getWindows <- function(qseaSet) {
 #' [janitor::remove_empty()]
 #'
 #' @examples
-#' \donttest{
 #' data.frame(a = c(1, NA, 3),
 #'            b = c(NA, NA, NA),
 #'            c = c(1, 2, NA)) %>%
 #'   remove_almost_empty_cols(prop = 0.5)  # drops column b
-#' }
+#'   
 remove_almost_empty_cols <- function(dat, prop)  {
   mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
   janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
@@ -286,11 +277,10 @@ remove_almost_empty_cols <- function(dat, prop)  {
 #' `testthat::skip()` to skip the test.
 #'
 #' @examples
-#' \donttest{
 #' old <- options(skip_long_checks = TRUE)
 #' skip_long_checks()  # will skip if option is TRUE
 #' options(old)
-#' }
+#' 
 #' @keywords internal
 #' @noRd
 skip_long_checks <- function() {
