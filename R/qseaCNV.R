@@ -356,7 +356,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic CNV heatmap with sample annotations
@@ -370,7 +369,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #'     annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
 #'     clusterRows = FALSE
 #'   )
-#' }
 #'
 #' @export
 plotCNVheatmap <- function(qseaSet,
@@ -449,7 +447,6 @@ plotCNVheatmap <- function(qseaSet,
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Zero out CNV and inspect the first rows
@@ -457,7 +454,6 @@ plotCNVheatmap <- function(qseaSet,
 #'   removeCNV() %>%
 #'   getCNV() %>%
 #'   utils::head()
-#' }
 #'
 #' @export
 removeCNV <- function(qseaSet){
