@@ -29,8 +29,6 @@ r-dplyr
 r-ggplot2
 r-ggrepel
 r-glue
-r-graphics
-r-grdevices
 r-gtools
 r-hues
 r-janitor
@@ -39,7 +37,6 @@ r-limma
 r-magrittr
 r-matrixstats
 r-memoise
-r-methods
 r-openxlsx
 r-pheatmap
 r-plyranges
@@ -50,12 +47,10 @@ r-readr
 r-rlang
 r-rmarkdown
 r-scales
-r-stats
 r-stringr
 r-testthat
 r-tibble
 r-tidyr
 r-tidyselect
-r-tools
 r-upsetr
 r-uwot
