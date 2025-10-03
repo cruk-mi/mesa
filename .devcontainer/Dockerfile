@@ -41,8 +41,15 @@ RUN conda install -n base -c conda-forge mamba -y
 # Copy package list
 COPY package_list.txt /opt/package_list.txt
 
-# Create conda environment with all packages (Imports + Depends + Suggests)
-RUN mamba create -y -n shiny_env -c conda-forge -c bioconda --file /opt/package_list.txt
+# Debug: prove the file is there & looks right
+RUN ls -l /opt && head -n 40 /opt/package_list.txt
+
+# Before create: print versions & run a dry query
+RUN mamba --version && conda config --show channels && \
+    mamba repoquery search bioconductor-qsea -c conda-forge -c bioconda || true
+
+# Create conda environment with all packages (Imports + Depends + Suggests) (Now try a verbose solve)
+RUN mamba create -vv -y -n shiny_env -c conda-forge -c bioconda --file /opt/package_list.txt
 
 # Activate env and install extra CRAN/GitHub-only packages
 RUN /bin/bash -c "source activate shiny_env && R -e \"install.packages('imsig', repos='https://cloud.r-project.org')\""
