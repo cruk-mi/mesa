@@ -1,6 +1,6 @@
 {
-  "name": "mesa-dev",
-  "image": "crukmi/mesa_env:latest",
+  "name": "R Bioconductor Dev",
+  "image": "ghcr.io/cruk-mi/mesa/devcontainer:latest",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -10,5 +10,7 @@
       ]
     }
   },
-  "remoteUser": "vscode"
+  "postCreateCommand": "conda run -n shiny_env R -e \"devtools::install_local('.', upgrade='never')\""
 }
+
+

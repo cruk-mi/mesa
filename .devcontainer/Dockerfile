@@ -1,8 +1,11 @@
-# Start from official Rocker R image
-FROM rocker/r-ver:4.3.3
+FROM continuumio/miniconda3
 
-# Install system dependencies for R packages and Git
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies
+RUN apt-get update && apt-get install -y -q \
+    libnss-ldapd \
+    acl \
+    libnetcdf-dev \
+    gcc-multilib \
     build-essential \
     ca-certificates \
     curl \
@@ -28,15 +31,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+    
+# Update conda
+RUN conda update -n base -c defaults conda -y
 
+# Install mamba
+RUN conda install -n base -c conda-forge mamba -y
 
-# Create vscode user (UID 1000) with sudo privileges
-RUN useradd -ms /bin/bash vscode \
-    && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-vscode
+# Copy package list
+COPY package_list.txt /opt/package_list.txt
 
-# Preinstall bootstrap packages globally (needed before user lib init)
-RUN R -e "install.packages(c('jsonlite','BiocManager','languageserver','remotes'), repos='https://cloud.r-project.org')"
+# Create conda environment with all packages (Imports + Depends + Suggests)
+RUN mamba create -y -n shiny_env -c conda-forge -c bioconda --file /opt/package_list.txt
 
-# Switch to vscode user
-USER vscode
-WORKDIR /workspaces/mesa
+# Activate env and install extra CRAN/GitHub-only packages
+RUN /bin/bash -c "source activate shiny_env && R -e \"install.packages('imsig', repos='https://cloud.r-project.org')\""
+RUN /bin/bash -c "source activate shiny_env && R -e \"remotes::install_github('omnideconv/immunedeconv')\""
+
+# Set default environment for subsequent RUN/CMD
+SHELL ["conda", "run", "-n", "shiny_env", "/bin/bash", "-c"]
+
+CMD ["R"]
