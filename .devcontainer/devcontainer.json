@@ -2,6 +2,10 @@
   "name": "R Bioconductor Dev (codespace_env_implementation)",
   "image": "ghcr.io/cruk-mi/mesa/devcontainer:codespace_env_implementation",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  // Run the container as a normal user
+  "remoteUser": "vscode",
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -11,5 +15,15 @@
       ]
     }
   },
-  "postCreateCommand": "conda run -n shiny_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\""
+
+  // Leave this – it installs your local package after the container starts
+  "postCreateCommand": "conda run -n shiny_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\"",
+
+  // Handy if you use Shiny
+  "forwardPorts": [3838],
+
+  // Slightly nicer CRAN/GitHub installs in postCreate
+  "containerEnv": {
+    "R_REMOTES_NO_ERRORS_FROM_WARNINGS": "true"
+  }
 }
