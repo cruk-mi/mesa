@@ -52,16 +52,16 @@ COPY package_list.txt /opt/package_list.txt
 
 # --- Create the env using ONLY CF+Bioconda; clean caches
 RUN ls -l /opt && head -n 40 /opt/package_list.txt \
- && mamba create -vv -y -n shiny_env \
+ && mamba create -vv -y -n mesa_env \
       --override-channels -c conda-forge -c bioconda \
       --file /opt/package_list.txt \
  && conda clean -afy && mamba clean -afy
 
 # --- Put the env on PATH so R is available without activation
-ENV PATH="/opt/conda/envs/shiny_env/bin:${PATH}"
+ENV PATH="/opt/conda/envs/mesa_env/bin:${PATH}"
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
-# --- Install extra R packages (inside shiny_env)
+# --- Install extra R packages (inside mesa_env)
 #     - CRAN 'imsig'
 #     - 'remotes' (for postCreate install_local)
 #     - 'languageserver' for IDE features
