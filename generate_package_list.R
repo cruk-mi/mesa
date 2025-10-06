@@ -1,19 +1,25 @@
 #!/usr/bin/env Rscript
+# generate_package_list.R
+# - Keep R 4.3
+# - Force ggplot2 < 4 (compatible with R 4.3)
+# - Remove any preexisting ggplot2 entries
+
 if (!requireNamespace("desc", quietly = TRUE)) {
   install.packages("desc", repos = "https://cloud.r-project.org")
 }
 library(desc)
 
+# Read DESCRIPTION deps
 d <- desc::desc(file = "DESCRIPTION")
 deps <- d$get_deps()
 deps <- subset(deps, package != "R")
 
-# Base R libs to drop
+# Drop base R stdlib
 base_r <- c("base","compiler","datasets","graphics","grDevices","grid","methods",
             "parallel","splines","stats","stats4","tcltk","tools","translations","utils")
 deps <- subset(deps, !(package %in% base_r))
 
-# Bioconductor packages (add here as needed)
+# Bioconductor packages to map to bioconductor-*
 bioc_pkgs <- c(
   "limma","plyranges","GenomicRanges","IRanges","BSgenome","ChIPseeker","qsea",
   "BiocGenerics","Biostrings","ComplexHeatmap","GenomeInfoDb","GenomicAlignments",
@@ -23,20 +29,22 @@ bioc_pkgs <- c(
   "BSgenome.Hsapiens.NCBI.GRCh38","BSgenome.Hsapiens.UCSC.hg19"
 )
 
-# Map (note: workflows is CRAN!)
+# Map to conda names
 deps$conda_name <- ifelse(deps$package %in% bioc_pkgs,
                           paste0("bioconductor-", tolower(deps$package)),
                           paste0("r-", tolower(deps$package)))
 
-# Optional: pick your R version. If you need ggplot2 >= 4, prefer R 4.4
-r_line <- "r-base=4."  # use "r-base=4.3" and add "r-ggplot2<4" if you must stay on 4.3
-
-# Sort + unique
+# Dedup/sort
 pkg_lines <- sort(unique(deps$conda_name))
-out <- c(r_line, pkg_lines)
 
-# If you must stay on R 4.3, uncomment:
-out <- c("r-base=4.3", pkg_lines, "r-ggplot2<4")
+# ---- Enforce ggplot2 < 4 for R 4.3 ----
+# Remove any ggplot2 entries (plain or pinned)
+pkg_lines <- pkg_lines[!grepl("^r-ggplot2(\\b|[<>=]).*$", pkg_lines)]
+# Add the required pin
+pkg_lines <- sort(unique(c(pkg_lines, "r-ggplot2<4")))
+
+# Pin R to 4.3
+out <- c("r-base=4.3", pkg_lines)
 
 writeLines(out, "package_list.txt")
-cat("✅ package_list.txt written with", length(out), "lines.\n")
+cat("✅ package_list.txt written with", length(out), "lines (R 4.3, ggplot2<4).\n")

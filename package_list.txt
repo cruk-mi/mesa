@@ -27,7 +27,7 @@ bioconductor-txdb.mmusculus.ucsc.mm10.knowngene
 r-circlize
 r-data.table
 r-dplyr
-r-ggplot2
+r-ggplot2<4
 r-ggrepel
 r-glue
 r-gtools
@@ -54,4 +54,3 @@ r-tidyselect
 r-upsetr
 r-uwot
 r-workflows
-r-ggplot2<4
