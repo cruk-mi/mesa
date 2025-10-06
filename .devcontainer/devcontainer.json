@@ -17,10 +17,7 @@
   },
 
   // Leave this – it installs your local package after the container starts
-  "postCreateCommand": "conda run -n shiny_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\"",
-
-  // Handy if you use Shiny
-  "forwardPorts": [3838],
+  "postCreateCommand": "conda run -n mesa_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\"",
 
   // Slightly nicer CRAN/GitHub installs in postCreate
   "containerEnv": {
