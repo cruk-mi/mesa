@@ -6,34 +6,37 @@ library(desc)
 
 d <- desc::desc(file = "DESCRIPTION")
 deps <- d$get_deps()
-deps <- deps[deps$package != "R", ]
+deps <- subset(deps, package != "R")
 
-# Base R stdlib that must NOT go into conda list
-base_r <- c("base","compiler","datasets","graphics","grDevices",
-            "grid","methods","parallel","splines","stats",
-            "stats4","tcltk","tools","translations","utils")
+# Base R libs to drop
+base_r <- c("base","compiler","datasets","graphics","grDevices","grid","methods",
+            "parallel","splines","stats","stats4","tcltk","tools","translations","utils")
+deps <- subset(deps, !(package %in% base_r))
 
-deps <- deps[!(deps$package %in% base_r), ]
-
-# Bioconductor packages to map to bioconductor-*
+# Bioconductor packages (add here as needed)
 bioc_pkgs <- c(
-  "GenomicRanges","IRanges","BSgenome","ChIPseeker","qsea",
-  "BiocGenerics","Biostrings","ComplexHeatmap","GenomeInfoDb",
-  "GenomicAlignments","Rsamtools","BiocParallel","biomaRt","HMMcopy",
-  "MEDIPS","rtracklayer","workflows","MEDIPSData",
+  "limma","plyranges","GenomicRanges","IRanges","BSgenome","ChIPseeker","qsea",
+  "BiocGenerics","Biostrings","ComplexHeatmap","GenomeInfoDb","GenomicAlignments",
+  "Rsamtools","BiocParallel","biomaRt","HMMcopy","MEDIPS","rtracklayer","MEDIPSData",
   "org.Hs.eg.db","org.Mm.eg.db",
   "TxDb.Hsapiens.UCSC.hg38.knownGene","TxDb.Mmusculus.UCSC.mm10.knownGene",
   "BSgenome.Hsapiens.NCBI.GRCh38","BSgenome.Hsapiens.UCSC.hg19"
 )
 
-# Map to conda names
+# Map (note: workflows is CRAN!)
 deps$conda_name <- ifelse(deps$package %in% bioc_pkgs,
                           paste0("bioconductor-", tolower(deps$package)),
                           paste0("r-", tolower(deps$package)))
 
-# Finalize: pin R, sort, unique
-deps_sorted <- sort(unique(deps$conda_name))
-out <- c("r-base=4.3", deps_sorted)
-writeLines(out, "package_list.txt")
+# Optional: pick your R version. If you need ggplot2 >= 4, prefer R 4.4
+r_line <- "r-base=4."  # use "r-base=4.3" and add "r-ggplot2<4" if you must stay on 4.3
 
+# Sort + unique
+pkg_lines <- sort(unique(deps$conda_name))
+out <- c(r_line, pkg_lines)
+
+# If you must stay on R 4.3, uncomment:
+out <- c("r-base=4.3", pkg_lines, "r-ggplot2<4")
+
+writeLines(out, "package_list.txt")
 cat("✅ package_list.txt written with", length(out), "lines.\n")
