@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y -q \
     && rm -rf /var/lib/apt/lists/*
 
 
-# Conda + mamba + strict channel priority (system-wide) and no defaults
+# --- Conda + mamba; only conda-forge + bioconda (no defaults)
 RUN conda update -n base -c defaults conda -y \
  && conda install -n base -c conda-forge mamba -y \
  && conda config --system --remove-key channels || true \
@@ -47,30 +47,34 @@ RUN conda update -n base -c defaults conda -y \
  && conda config --system --set add_pip_as_python_dependency false \
  && conda config --show-sources && conda config --show channels
 
-# Copy package list (generated from DESCRIPTION)
+# --- Bring in the conda package list generated from DESCRIPTION
 COPY package_list.txt /opt/package_list.txt
 
-# Mamba quick availability check
-RUN mamba repoquery search bioconductor-limma -c conda-forge -c bioconda || true
-RUN mamba repoquery search bioconductor-plyranges -c conda-forge -c bioconda || true
-RUN mamba repoquery search r-workflows -c conda-forge -c bioconda || true
-
-# Create env using ONLY conda-forge + bioconda
+# --- Create the env using ONLY CF+Bioconda; clean caches
 RUN ls -l /opt && head -n 40 /opt/package_list.txt \
  && mamba create -vv -y -n shiny_env \
       --override-channels -c conda-forge -c bioconda \
       --file /opt/package_list.txt \
  && conda clean -afy && mamba clean -afy
 
-
-# From here on, run inside the env
-SHELL ["conda", "run", "-n", "shiny_env", "/bin/bash", "-c"]
+# --- Put the env on PATH so R is available without activation
+ENV PATH="/opt/conda/envs/shiny_env/bin:${PATH}"
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
-# Extras not on conda (keep only what you need)
-RUN R -e "install.packages('imsig', repos='https://cloud.r-project.org')" \
- && R -e "if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org')" \
+# --- Install extra R packages (inside shiny_env)
+#     - CRAN 'imsig'
+#     - 'remotes' (for postCreate install_local)
+#     - 'languageserver' for IDE features
+#     - GitHub 'omnideconv/immunedeconv'
+RUN R -e "install.packages(c('imsig','remotes','languageserver'), repos='https://cloud.r-project.org')" \
  && R -e "remotes::install_github('omnideconv/immunedeconv')"
 
-CMD ["R"]
+# --- Create an unprivileged user 'vscode' (Codespaces will use this)
+RUN useradd -m -s /bin/bash vscode \
+ && echo 'vscode ALL=(ALL) NOPASSWD:ALL' >/etc/sudoers.d/99-vscode \
+ && chmod 0440 /etc/sudoers.d/99-vscode
 
+# (Optional) a friendly workdir; Codespaces will mount the repo here
+WORKDIR /workspaces/mesa
+
+CMD ["R"]
