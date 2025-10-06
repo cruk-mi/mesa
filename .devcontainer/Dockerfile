@@ -35,21 +35,33 @@ RUN apt-get update && apt-get install -y -q \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Conda + mamba + strict channel priority
+
+# Conda + mamba + strict channel priority (system-wide) and no defaults
 RUN conda update -n base -c defaults conda -y \
  && conda install -n base -c conda-forge mamba -y \
- && conda config --remove-key channels || true \
- && conda config --add channels conda-forge \
- && conda config --add channels bioconda \
- && conda config --set channel_priority strict
+ && conda config --system --remove-key channels || true \
+ && conda config --system --remove-key default_channels || true \
+ && conda config --system --add channels conda-forge \
+ && conda config --system --add channels bioconda \
+ && conda config --system --set channel_priority strict \
+ && conda config --system --set add_pip_as_python_dependency false \
+ && conda config --show-sources && conda config --show channels
 
 # Copy package list (generated from DESCRIPTION)
 COPY package_list.txt /opt/package_list.txt
 
-# Sanity print, then create env (verbose to surface any missing names)
+# Mamba quick availability check
+RUN mamba repoquery search bioconductor-limma -c conda-forge -c bioconda || true
+RUN mamba repoquery search bioconductor-plyranges -c conda-forge -c bioconda || true
+RUN mamba repoquery search r-workflows -c conda-forge -c bioconda || true
+
+# Create env using ONLY conda-forge + bioconda
 RUN ls -l /opt && head -n 40 /opt/package_list.txt \
- && mamba create -vv -y -n shiny_env --file /opt/package_list.txt \
+ && mamba create -vv -y -n shiny_env \
+      --override-channels -c conda-forge -c bioconda \
+      --file /opt/package_list.txt \
  && conda clean -afy && mamba clean -afy
+
 
 # From here on, run inside the env
 SHELL ["conda", "run", "-n", "shiny_env", "/bin/bash", "-c"]
