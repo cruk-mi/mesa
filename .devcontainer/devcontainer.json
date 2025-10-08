@@ -1,26 +1,27 @@
 {
-  "name": "R Bioconductor Dev (codespace_env_implementation)",
-  "image": "ghcr.io/cruk-mi/mesa/devcontainer:codespace_env_implementation",
+  "name": "R Bioconductor Dev (Codespaces)",
+  "image": "ghcr.io/cruk-mi/mesa/devcontainer:codespaces-slim",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-
-  // Run the container as a normal user
   "remoteUser": "vscode",
-
   "customizations": {
     "vscode": {
       "extensions": [
         "REditorSupport.r",
         "ikuyadeu.r",
         "ms-python.python"
-      ]
+      ],
+      "settings": {
+        "r.rterm.linux": "/opt/conda/envs/mesa_env/bin/R",
+        "r.lsp.path": "/opt/conda/envs/mesa_env/bin/R",
+        "r.alwaysUseActiveTerminal": true,
+        "r.bracketedPaste": true,
+        "r.plot.devArgs": { "width": 1200, "height": 500 }
+      }
     }
   },
-
-  // Leave this – it installs your local package after the container starts
-  "postCreateCommand": "conda run -n mesa_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\"",
-
-  // Slightly nicer CRAN/GitHub installs in postCreate
   "containerEnv": {
     "R_REMOTES_NO_ERRORS_FROM_WARNINGS": "true"
-  }
+  },
+  "postCreateCommand": "conda run -n mesa_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\""
 }
+
