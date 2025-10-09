@@ -2,16 +2,57 @@
 % Please edit documentation in R/qseaExtra.R
 \name{removeLibraryFactors}
 \alias{removeLibraryFactors}
-\title{This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.}
+\title{Set library factors to 1}
 \usage{
 removeLibraryFactors(qseaSet)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object whose library factors will be reset.
+\strong{Default:} none (must be supplied).}
 }
 \value{
-A table of data, with a column for each individual sample
+A \code{qseaSet} with all library factors set to \code{1} and \code{sampleTable} updated.
 }
 \description{
-This function takes a qseaSet and sets all the library factor columns to one, including in the sampleTable.
+Overwrite all library-factor values in a \code{qseaSet} (and its \code{sampleTable})
+with \code{1}. Useful when you want to avoid library scaling (e.g., TMM) and
+keep beta unchanged; NRPM may change depending on downstream use.
 }
+\details{
+Setting library factors to \code{1} has \strong{no effect on beta} (fractional measure)
+but can affect \strong{NRPM} since scaling factors are neutralised. This is
+akin to calling \code{qsea::addLibraryFactors(qseaSet, factors = 1)} and
+synchronising the \code{sampleTable}.
+}
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Show current factors then reset to 1 and show again
+exampleTumourNormal \%>\%
+  addLibraryInformation() \%>\%
+  pull(library_factor) \%>\%
+  head()
+
+exampleTumourNormal \%>\%
+  removeLibraryFactors() \%>\%
+  addLibraryInformation() \%>\%   # refresh cached summaries if needed
+  pull(library_factor) \%>\%
+  head()
+}
+
+}
+\seealso{
+\code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}
+
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeNormMethodSuffix}()}
+}
+\concept{table-helpers}

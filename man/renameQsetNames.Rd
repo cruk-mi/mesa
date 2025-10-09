@@ -2,23 +2,39 @@
 % Please edit documentation in R/alterQset.R
 \name{renameQsetNames}
 \alias{renameQsetNames}
-\title{Rename samples in a qseaSet.}
+\title{Rename samples in a qseaSet by regex}
 \usage{
 renameQsetNames(qseaSet, pattern, replacement = "")
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}
+A qseaSet object containing methylation-enriched sequencing data.}
 
-\item{pattern}{Pattern to replace in the names of the samples.}
+\item{pattern}{\code{character(1)}
+Regular expression used to match substrings in sample names.}
 
-\item{replacement}{Pattern to replace with in the names of the samples.}
+\item{replacement}{\code{character(1)}
+String to replace matches of \code{pattern}. Defaults to \code{""} (empty string).}
 }
 \value{
-A qseaSet object, containing all the samples from both qseaSet objects.
+A \code{qseaSet} object:
+\itemize{
+\item \strong{renameQsetNames()}: returns the input \code{qseaSet} with sample names
+updated according to \code{pattern} and \code{replacement}. All dependent slots
+are updated consistently.
+}
 }
 \description{
-This function takes a qseaSet and renames the samples in it.
+Apply a regular expression replacement to sample names and update all
+relevant slots consistently (counts, CNV, enrichment, zygosity, libraries,
+and the \code{sampleTable}).
 }
 \examples{
-renameQsetNames(exampleTumourNormal, pattern = 'T', replacement = 'Tumour' )
+data(exampleTumourNormal, package = "mesa")
+
+# Replace "T" with "Tumour" in sample names
+renameQsetNames(exampleTumourNormal, 
+                pattern = "T",
+                replacement = "Tumour")
+
 }

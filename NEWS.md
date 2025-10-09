@@ -6,16 +6,45 @@ editor_options:
 
 # dev
 
+### ADDED
+* Many more examples for individual functions on their help pages, as well as a set of vignettes.
+* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
+* Objects with invalid slots will now throw informative errors.
+* Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column.
+
 ### CHANGES
-* Converted `plotPCA` into a method for the `qsea` defined method.
+* Converted `plotPCA` into a submethod for the `qsea` defined method.
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced.
+* `plotPCA` and `plotUMAP` now default to filled shapes rather than empty shapes if less than 6 shapes are required.
+* `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given.
 * `getSampleTable` is now defined for PCA/UMAP objects.
+* `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
+* Updated function documentation with examples, default parameter values, and more detailed descriptions.
+* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
+* `makeQset` now checks that the chromosomes provided match with those present in the BSgenome.
+* The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions.
+
+### REMOVED
+* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
+* Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads.
+* Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
+* Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
+* Removed `colnames` function definion on a qseaSet, which was not working anyway.
 
 ### BUG FIXES
+* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
+* `writeDMRsToBed` should now correctly export the files.
 * Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
-* Correct the message produced by `addMedipsEnrichmentFactors`.
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
 * `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.
+* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`.
+* When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes.
+* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
+* Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
+* Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range.
 
 # mesa 0.5.1
 

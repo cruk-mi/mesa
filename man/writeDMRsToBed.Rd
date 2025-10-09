@@ -2,20 +2,59 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{writeDMRsToBed}
 \alias{writeDMRsToBed}
-\title{Write the qsea result to a set of bed file}
+\title{Write DMR results to BED files}
 \usage{
-writeDMRsToBed(dataTable, folder, fdrThres = 0.05)
+writeDMRsToBed(dataTable, folder, FDRthres = 0.05)
 }
 \arguments{
-\item{dataTable}{An (annotated) data table with contrasts}
+\item{dataTable}{\code{data.frame}
+DMR results, typically returned by \code{\link[=calculateDMRs]{calculateDMRs()}}. If a \code{GRanges}, it
+will be coerced to a data frame internally.}
 
-\item{folder}{The folder to place the bed files.}
+\item{folder}{\code{character(1)}
+Directory in which to write BED files. Must exist and be writable.}
 
-\item{fdrThres}{FDR rate threshold to apply to each contrast}
+\item{FDRthres}{\code{numeric(1)}
+False discovery rate threshold used to filter DMRs before writing.
+\strong{Default:} \code{0.05}.}
 }
 \value{
-Returns the original table invisibly, so can be used in a pipe.
+(Invisibly) returns the input object:
+\itemize{
+\item \strong{writeDMRsToBed()}: returns \code{dataTable} (invisibly), enabling use in a
+pipeline.
+}
 }
 \description{
-This writes a set of bed files with the results, with one bed file per contrast.
+Export differentially methylated region (DMR) results to a set of BED files,
+with one file generated per contrast.
 }
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Export DMRs for a single contrast to BED files in a temp directory
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "type",
+                contrasts = "LUAD_vs_NormalLung") \%>\%
+  writeDMRsToBed(folder = tempdir())
+
+# Export DMRs with explicit annotation (requires TxDb/annotation packages)
+exampleTumourNormal \%>\%
+  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+                  annoDb = "org.Hs.eg.db") \%>\%
+  writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
+}
+
+}
+\seealso{
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
+
+Other DMR-helpers: 
+\code{\link{pivotDMRsLonger}()},
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{summariseDMRsByGene}()},
+\code{\link{writeDMRsToExcel}()}
+}
+\concept{DMR-helpers}

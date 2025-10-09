@@ -24,7 +24,12 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-9018-9852")),           
     person(given = "Katarzyna",
            family = "Kamieniecka",
-           role = "ctb")    
+           role = "ctb"),
+    person(given = "Felipe",
+           family = "Perez Martinez",
+           role = "ctb",
+           email = "felipe.perezmartinez@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0009-0007-9138-3674"))
            )
 Description: Analysis tools for methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq), building off the qsea package.
 License: GPL-3
@@ -32,7 +37,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Imports:
     plyranges,
     magrittr,
@@ -96,7 +101,8 @@ Suggests:
     org.Hs.eg.db,
     org.Mm.eg.db,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
-    TxDb.Mmusculus.UCSC.mm10.knownGene
+    TxDb.Mmusculus.UCSC.mm10.knownGene,
+    plotly
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

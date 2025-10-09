@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{summariseAcrossWindows}
 \alias{summariseAcrossWindows}
-\title{This function takes a qseaSet and calculates a summary statistic across the windows.}
+\title{Summarise across windows per sample}
 \usage{
 summariseAcrossWindows(
   qseaSet,
@@ -17,27 +17,103 @@ summariseAcrossWindows(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing window-level signal.
+\strong{Default:} none (must be supplied).}
 
-\item{regionsToOverlap}{A GRanges object (or dataframe coercible to one) containing the windows to summarise over. If missing, will use all the regions in the qseaSet.}
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame}, or \code{NULL}.
+Regions used to restrict the windows before summarising. Data frames must be
+coercible to \code{GRanges} (e.g., have \code{seqnames}/\code{start}/\code{end} or
+\code{chr}/\code{window_start}/\code{window_end}). If \code{NULL}, use all windows in \code{qseaSet}.
+\strong{Default:} \code{NULL}.}
 
-\item{fn}{A function to apply across the windows. e.g. mean, median, sd.}
+\item{fn}{\code{function}.
+Summary function applied \strong{column-wise per sample} over the selected windows
+(e.g., \code{mean}, \code{median}, \code{sd}). Provide NA handling inside \code{fn} if needed,
+e.g., \code{function(x) mean(x, na.rm = TRUE)}.
+\strong{Default:} \code{mean}.}
 
-\item{addSampleTable}{A boolean with whether to add the sampleTable on to the output table}
+\item{addSampleTable}{\code{logical(1)}.
+If \code{TRUE}, join sample-table columns to the result.
+\strong{Default:} \code{TRUE}.}
 
-\item{normMethod}{One or more normalisation methods to use, e.g. "nrpm" or "beta" or c("nrpm", "beta").}
+\item{normMethod}{\code{character()}.
+One or more measures to summarise. Typically a subset of \code{c("nrpm","beta")}.
+\strong{Default:} \code{c("nrpm","beta")}.}
 
-\item{naMethod}{What method to use to deal with NA values (for beta values). Options are "drop" or "na.rm" (default).}
+\item{naMethod}{\code{character(1)}.
+How to treat missing values prior to/within summarisation. Common choices:
+\code{"na.rm"} — call \code{fn} with \code{na.rm = TRUE} when supported;
+\code{"drop"}  — drop windows with any \code{NA} across the selected methods before
+summarising.
+\strong{Default:} \code{"na.rm"}.}
 
-\item{minEnrichment}{For beta values only, the minimum number of reads required for a window to be fully methylated, qsea replaces with NA below this value.}
+\item{minEnrichment}{\code{integer(1)}.
+Minimum reads per window required for a non-\code{NA} beta (relevant when
+\code{normMethod} includes \code{"beta"}).
+\strong{Default:} \code{3}.}
 
-\item{suffix}{A suffix for adding to the new columns of data, to clarify what regions for instance.}
+\item{suffix}{\code{character(1)}.
+Optional string appended to output column names (e.g., a region label).
+\strong{Default:} \code{""}.}
 
-\item{fnName}{Name of the function. Should only be necessary to use if you are doing something unusual, otherwise detected automatically.}
+\item{fnName}{\code{character(1)} or \code{NULL}.
+Name of \code{fn} used to construct output column names; if \code{NULL}, inferred
+from \code{fn}.
+\strong{Default:} \code{NULL}.}
 }
 \value{
-A table of data, one row per sample, with columns indicating the application of the summary statistic to the
+A tibble with one row per sample. For each requested \code{normMethod}, a summary
+column is added (column naming typically reflects \verb{<method>} and \code{fn} and may
+include \code{suffix}). If \code{addSampleTable = TRUE}, sample-table columns are joined.
 }
 \description{
-This function takes a qseaSet and calculates a summary statistic across the windows.
+Apply a summary function (e.g., mean, median, sd) over genomic windows
+per sample, optionally restricted to a set of regions and for one or more
+normalisation methods.
 }
+\details{
+The function builds a window × sample matrix for each \code{normMethod}, optionally
+restricts to \code{regionsToOverlap}, then applies \code{fn} over windows for each
+sample to produce a single summary value per sample (per method). Missing-value
+handling follows \code{naMethod}. When summarising betas, windows below
+\code{minEnrichment} reads are \code{NA} prior to summarisation.
+}
+\examples{
+\donttest{
+data(exampleTumourNormal, package = "mesa")
+
+# Mean NRPM and beta across all windows
+exampleTumourNormal \%>\%
+  summariseAcrossWindows(
+    fn         = mean,
+    normMethod = c("nrpm","beta")
+  )
+
+# Maximum NRPM within a small genomic region
+exampleTumourNormal \%>\%
+  summariseAcrossWindows(
+    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    fn         = max,
+    normMethod = "nrpm",
+    suffix     = "_chr7_slice"
+  )
+
+# Median beta over all windows
+exampleTumourNormal \%>\%
+  summariseAcrossWindows(
+    fn         = median,
+    normMethod = "beta",
+    minEnrichment = 3
+  )
+}
+
+}
+\seealso{
+\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
+
+Other window-summaries: 
+\code{\link{addSummaryAcrossWindows}()},
+\code{\link{countWindowsAboveCutoff}()}
+}
+\concept{window-summaries}

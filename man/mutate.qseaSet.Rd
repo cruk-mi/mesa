@@ -2,18 +2,56 @@
 % Please edit documentation in R/dplyrVerbs.R
 \name{mutate.qseaSet}
 \alias{mutate.qseaSet}
-\title{This function extends the dplyr function mutate to act on qseaSet sampleTable.}
+\title{Mutate columns in a qseaSet sample table}
 \usage{
 \method{mutate}{qseaSet}(.data, ...)
 }
 \arguments{
-\item{.data}{A qseaSet to mutate}
+\item{.data}{\code{qseaSet}
+A \code{qseaSet} object whose \code{sampleTable} will be mutated.}
 
-\item{...}{Other arguments to pass to dplyr::mutate}
+\item{...}{Column transformations passed to \code{\link[dplyr:mutate]{dplyr::mutate()}}. For example,
+\code{over70 = age > 70}, \code{group = paste(tissue, tumour, sep = "_")}.
+\strong{Default:} none.}
 }
 \value{
-A qseaSet object with the sampleTable changed by a call to dplyr::mutate
+A \code{qseaSet} object with its \code{sampleTable} updated:
+\itemize{
+\item new columns are added,
+\item existing columns are modified,
+\item \code{sample_name} remains unchanged.
+}
 }
 \description{
-This function extends the dplyr function mutate to act on qseaSet sampleTable.
+Extends \code{\link[dplyr:mutate]{dplyr::mutate()}} to add or modify columns in a \code{qseaSet}'s
+\code{sampleTable}.
+}
+\details{
+The order of samples is preserved.
+The \code{sample_name} column \strong{cannot} be changed with this function; use
+\code{\link[=renameQsetNames]{renameQsetNames()}} or \code{\link[=renameSamples]{renameSamples()}} if sample names must be updated.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Add a new logical column based on age
+exampleTumourNormal \%>\%
+  mutate(over70 = age > 70) \%>\%
+  qsea::getSampleTable()
+
+# Recode gender (better practice: use dplyr::case_when or stringr::str_replace)
+exampleTumourNormal \%>\%
+  mutate(gender = ifelse(gender == "F", "Female", "Male")) \%>\%
+  qsea::getSampleTable()
+
+# Change group by removing digits from sample_name
+exampleTumourNormal \%>\%
+  mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
+  qsea::getSampleTable()
+
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
+\code{\link[=renameSamples]{renameSamples()}} and \code{\link[=renameQsetNames]{renameQsetNames()}} for renaming,
+\code{\link[=filter.qseaSet]{filter.qseaSet()}} and \code{\link[=selectQset]{selectQset()}} for other dplyr verbs.
 }
