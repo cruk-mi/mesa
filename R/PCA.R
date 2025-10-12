@@ -1359,7 +1359,9 @@ plotDimRed <- function(object,
   if (!inherits(object,"mesaDimRed")) {
     stop("First argument should be the output from the getPCA()/getUMAP() functions in mesa.")
   }
-
+  
+  sampleTable <- object@sampleTable
+  
   if (!is.null(colour)){
     colDiff <- setdiff(colour, colnames(sampleTable))
     if(length(colDiff) > 0){

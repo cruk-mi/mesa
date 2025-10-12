@@ -59,8 +59,8 @@ test_that("PCAs", {
     ##### plotting tests
 
     # Check no error is returned
-    expect_no_error(plots1 <- plotPCA(obj1, exampleTumourNormal))
-    expect_no_error(plots6 <- plotPCA(obj6, exampleTumourNormal))
+    expect_no_error(plots1 <- plotPCA(obj1))
+    expect_no_error(plots6 <- plotPCA(obj6))
 
     # Check output is correct length
     expect_equal(length(plots1), 1)

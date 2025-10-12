@@ -6,7 +6,6 @@
 \usage{
 plotDimRed(
   object,
-  qseaSet = NULL,
   components = list(c(1, 2), c(2, 3)),
   colour = NULL,
   colourPalette = NULL,
@@ -24,11 +23,6 @@ plotDimRed(
 \arguments{
 \item{object}{\code{mesaDimRed}.
 A dimensionality reduction container returned by \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}}.}
-
-\item{qseaSet}{\code{qseaSet} or \code{NULL}.
-The dataset used to generate \code{object}. Required if aesthetics (e.g. \code{colour},
-\code{shape}) reference variables in the sample table.
-\strong{Default:} \code{NULL}.}
 
 \item{components}{\code{integer(2)} \strong{or} \code{list} of \code{integer(2)}.
 Component indices to plot (e.g. \code{c(1, 2)} for PC1 vs PC2). A list of pairs
@@ -110,32 +104,28 @@ Each plot depicts the requested dimensions with aesthetics mapped as specified.
 }
 \description{
 Visualise PCA or UMAP coordinates stored in a \link{mesaDimRed} object.
-Wrappers such as \code{\link[=plotPCA]{plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
+Wrappers such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
 for common use cases.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # PCA: colour by group
 exampleTumourNormal \%>\%
   getPCA(nPC = 3) \%>\%
-  plotDimRed(qseaSet = exampleTumourNormal, colour = "group")
+  plotDimRed(colour = "group")
 
 # UMAP: colour by group, shape by tissue
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotDimRed(qseaSet = exampleTumourNormal,
-             colour = "group",
+  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+  plotDimRed(colour = "group",
              shape = "tissue") 
 
 # Show sample names
 exampleTumourNormal \%>\%
   getPCA(nPC = 3) \%>\%
-  plotDimRed(qseaSet = exampleTumourNormal,
-             colour = "group",
+  plotDimRed(colour = "group",
              showSampleNames = TRUE) 
-}
 
 }
 \seealso{

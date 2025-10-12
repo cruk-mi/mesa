@@ -6,7 +6,6 @@
 \usage{
 plotUMAP(
   object,
-  qseaSet = NULL,
   components = list(c(1, 2)),
   colour = NULL,
   colourPalette = NULL,
@@ -24,11 +23,6 @@ plotUMAP(
 \arguments{
 \item{object}{\code{mesaDimRed}.
 A dimensionality-reduction container returned by \code{\link[=getUMAP]{getUMAP()}}.}
-
-\item{qseaSet}{\code{qseaSet} or \code{NULL}.
-The dataset used to generate \code{object}. Required if aesthetics (e.g. \code{colour},
-\code{shape}) refer to variables in the sample table.
-\strong{Default:} \code{NULL}.}
 
 \item{components}{\code{integer(2)} \strong{or} \code{list} of \code{integer(2)}.
 UMAP indices to plot (e.g. \code{c(1, 2)} for UMAP1 vs UMAP2), or a list of such
@@ -116,29 +110,25 @@ sample-level metadata, and can return multiple plots across UMAP component
 pairs and annotation variables.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Default UMAP (beta-normalised, top 1000 most variable windows)
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal)
+  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+  plotUMAP()
 
 # Colour by group; show names
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal,
-           colour = "group",
+  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+  plotUMAP(colour = "group",
            showSampleNames = TRUE)
 
 # Custom components and shape mapping
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal,
-           components = list(c(1, 2)),
+  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+  plotUMAP(components = list(c(1, 2)),
            colour = "group",
            shape  = "tissue")
-}
 
 }
 \seealso{
