@@ -30,7 +30,6 @@ Export differentially methylated region (DMR) results to a set of BED files,
 with one file generated per contrast.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Export DMRs for a single contrast to BED files in a temp directory
@@ -45,8 +44,6 @@ exampleTumourNormal \%>\%
   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
                   annoDb = "org.Hs.eg.db") \%>\%
   writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
-}
-
 }
 \seealso{
 \code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}

@@ -23,7 +23,6 @@ per-window CNV values are replaced with zeros. Use this to “clear” existing
 CNV calls before running \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or other CNV routines again.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Zero out CNV and inspect the first rows
@@ -31,7 +30,6 @@ exampleTumourNormal \%>\%
   removeCNV() \%>\%
   getCNV() \%>\%
   utils::head()
-}
 
 }
 \seealso{

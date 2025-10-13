@@ -63,7 +63,6 @@ aggregation. Use \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 method tags in wide tables.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Default: NRPM per window (first few columns)
@@ -89,7 +88,6 @@ exampleTumourNormal \%>\%
   getDataTable(normMethod = "nrpm", addMethodSuffix = TRUE) \%>\%
   names() \%>\%
   head()
-}
 
 }
 \seealso{

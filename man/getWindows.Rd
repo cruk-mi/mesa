@@ -18,10 +18,8 @@ A \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} of windows.
 Convenience wrapper for \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, returning the genomic windows.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\% getWindows() \%>\% head()
-}
 
 }
 \seealso{

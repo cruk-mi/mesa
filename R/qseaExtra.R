@@ -24,7 +24,6 @@
 #' [qsea::createQseaSet()], [qsea::getSampleTable()], [base::inherits()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # TRUE for qseaSet objects
@@ -32,7 +31,6 @@
 #'
 #' # FALSE for non-qseaSet objects
 #' iris %>% is.qseaSet()
-#' }
 #'
 #' @export
 is.qseaSet <- function(x){
@@ -79,14 +77,12 @@ is.qseaSet <- function(x){
 #' [biomaRt::useMart()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Store a label (or use a real biomaRt::Mart) and read it back
 #' exampleTumourNormal %>%
 #'    setMart("ENSEMBL_110") %>%
 #'    getMart()
-#' }
 NULL
 
 #' @rdname setMart
@@ -346,7 +342,6 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 #' @family window-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Keep windows with median NRPM > 1 across all samples
@@ -383,7 +378,6 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 #'     aboveThreshold = TRUE,
 #'     useGroupMeans = TRUE
 #'   )
-#' }
 #'
 #' @export
 subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
@@ -616,7 +610,6 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
 #' @family window-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' set.seed(1)
@@ -633,7 +626,6 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
 #'   downSample(100) %>%
 #'   qsea::getSampleTable() %>%
 #'   dplyr::select(patient, type, gender)
-#' }
 #'
 #' @export
 downSample <- function(qseaSet, nReads){
@@ -702,7 +694,6 @@ downSample <- function(qseaSet, nReads){
 #' @family window-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Use the built-in keyword for 450k probes (GRCh38)
@@ -714,7 +705,6 @@ downSample <- function(qseaSet, nReads){
 #' exampleTumourNormal %>%
 #'   convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) %>%
 #'   head()
-#' }
 #'
 #' @export
 convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
@@ -790,7 +780,6 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' @family window-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Using the shipped ultra-stable probes (GRCh38) as the region set
@@ -813,7 +802,6 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'     )
 #'   ) %>%
 #'   dplyr::select(sample_name, fraction) 
-#' }
 #'
 #' @export
 calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
@@ -931,7 +919,6 @@ removeNormMethodSuffix <- function(dataTable, normMethod) {
 #' @family window-summaries
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' #' # Count windows with NRPM >= 1 over the first 100 regions
@@ -939,7 +926,7 @@ removeNormMethodSuffix <- function(dataTable, normMethod) {
 #'                                qsea::getRegions(exampleTumourNormal)[1:100], 
 #'                                cutoff = 1, 
 #'                                normMethod = "nrpm")
-#' }
+#'                                
 #' @export
 countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
                                    cutoff = 0, normMethod = "nrpm"){
@@ -1003,7 +990,6 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
 #' @family table-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # NRPM features (sample × first few windows) with a group column appended
@@ -1016,7 +1002,6 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
 #' exampleTumourNormal %>%
 #'   makeTransposedTable(normMethod = "beta") %>%
 #'   dim()
-#' }
 #'
 #' @export
 makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
@@ -1070,7 +1055,6 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 #' @family table-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Per-sample counts (first rows/columns)
@@ -1090,7 +1074,6 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 #'   getCountTable(addMethodSuffix = TRUE) %>%
 #'   names() %>%
 #'   head()
-#' }
 #'
 #' @rdname getCountTable
 #' @export
@@ -1139,7 +1122,6 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 #' @family table-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Per-sample NRPM (first rows/columns)
@@ -1159,7 +1141,6 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 #'   getNRPMTable(addMethodSuffix = TRUE) %>%
 #'   names() %>%
 #'   head()
-#' }
 #'
 #' @rdname getNRPMTable
 #' @export
@@ -1213,7 +1194,6 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #' @family table-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Per-sample beta (first rows/columns), with a minimum read threshold
@@ -1241,7 +1221,6 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #'   is.na() %>%
 #'   colSums() %>%
 #'   head()
-#' }
 #'
 #' @rdname getBetaTable
 #' @export
@@ -1325,7 +1304,6 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #' @family window-summaries
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Mean NRPM and beta across all windows
@@ -1351,7 +1329,6 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #'     normMethod = "beta",
 #'     minEnrichment = 3
 #'   )
-#' }
 #'
 #' @export
 summariseAcrossWindows <- function(qseaSet,
@@ -1479,7 +1456,6 @@ summariseAcrossWindows <- function(qseaSet,
 #' @family window-summaries
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Add mean NRPM and beta across all windows 
@@ -1513,7 +1489,6 @@ summariseAcrossWindows <- function(qseaSet,
 #'     suffix     = "all"
 #'   ) %>%
 #'   getSampleTable()
-#' }
 #'
 #' @export
 addSummaryAcrossWindows <- function(qseaSet,
@@ -1700,13 +1675,12 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Internal helper (not exported): inspect structure of the mapping
 #' exampleTumourNormal %>%
 #'   mesa:::getSampleGroups2() 
-#' }
+#'   
 getSampleGroups2 <- function(qseaSet){
   qseaSet %>%
     qsea::getSampleTable() %>%
@@ -1777,7 +1751,6 @@ getSampleGroups2 <- function(qseaSet){
 #' @family table-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default: NRPM per window (first few columns)
@@ -1803,7 +1776,6 @@ getSampleGroups2 <- function(qseaSet){
 #'   getDataTable(normMethod = "nrpm", addMethodSuffix = TRUE) %>%
 #'   names() %>%
 #'   head()
-#' }
 #'
 #' @export
 getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
@@ -1905,7 +1877,6 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' @family io
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Per-sample NRPM bigWigs
@@ -1921,7 +1892,6 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #'     writeBigWigs(., folderName = td, normMethod = "beta", useGroupMeans = TRUE, naVal = 0);
 #'     head(list.files(td, pattern = "\\\\.bw$"))
 #'   }
-#' }
 #'
 #' @export
 writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){
@@ -1986,7 +1956,6 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
 #' @family table-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Show current factors then reset to 1 and show again
@@ -2000,7 +1969,6 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
 #'   addLibraryInformation() %>%   # refresh cached summaries if needed
 #'   pull(library_factor) %>%
 #'   head()
-#' }
 #'
 #' @export
 removeLibraryFactors <- function(qseaSet){

@@ -49,7 +49,6 @@ The reported \code{fraction} is \code{afterOverBackNum / initialOverBackNum}.
 using a count threshold, not a direct fraction of raw reads.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Using the shipped ultra-stable probes (GRCh38) as the region set
@@ -72,7 +71,6 @@ exampleTumourNormal \%>\%
     )
   ) \%>\%
   dplyr::select(sample_name, fraction) 
-}
 
 }
 \seealso{

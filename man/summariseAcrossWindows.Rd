@@ -80,7 +80,6 @@ handling follows \code{naMethod}. When summarising betas, windows below
 \code{minEnrichment} reads are \code{NA} prior to summarisation.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Mean NRPM and beta across all windows
@@ -106,7 +105,6 @@ exampleTumourNormal \%>\%
     normMethod = "beta",
     minEnrichment = 3
   )
-}
 
 }
 \seealso{

@@ -45,7 +45,6 @@ is returned.
 }
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Run only if the example windows overlap the ultra-stable probes
@@ -66,7 +65,7 @@ exampleTumourNormal \%>\%
 qsea::getSampleTable() \%>\%
 dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) \%>\%
 head()
-}
+
 }
 \references{
 Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).

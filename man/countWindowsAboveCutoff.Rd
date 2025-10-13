@@ -54,7 +54,6 @@ number of windows with value \verb{>= cutoff}. It also reports how many windows
 were evaluated (\code{totalWindowsUsed}). Results are joined with the sample table.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 #' # Count windows with NRPM >= 1 over the first 100 regions
@@ -62,7 +61,7 @@ countWindowsAboveCutoff(exampleTumourNormal,
                                qsea::getRegions(exampleTumourNormal)[1:100], 
                                cutoff = 1, 
                                normMethod = "nrpm")
-}
+                               
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}

@@ -46,7 +46,6 @@ Sample annotations (and optional colours) are added when \code{sampleAnnotation}
 and \code{annotationColors} are provided.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Basic CNV heatmap with sample annotations
@@ -60,7 +59,6 @@ exampleTumourNormal \%>\%
     annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
     clusterRows = FALSE
   )
-}
 
 }
 \seealso{

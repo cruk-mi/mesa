@@ -40,7 +40,6 @@ Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extrac
 for downstream summaries/plots.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Per-sample NRPM (first rows/columns)
@@ -60,7 +59,6 @@ exampleTumourNormal \%>\%
   getNRPMTable(addMethodSuffix = TRUE) \%>\%
   names() \%>\%
   head()
-}
 
 }
 \seealso{
