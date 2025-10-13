@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(ggplot2)
-library(mesa)
+#library(mesa)
 ```
 
 One essential functionality in the analysis of large scale datasets is the ability to perform dimensionality reduction techniques and plot the outputs, such as Principal Component Analysis (PCA), t-distributed Stochastic Neighbor Embedding (t-SNE) or Uniform Manifold Approximation and Projection (UMAPs). The mesa package currently supports functionality for PCAs and UMAPs.
@@ -256,7 +256,7 @@ Here, four different values have been used and the messages output tell you the 
 When plugging this output into `plotPCA`, plots are produced for all four PCA versions, with all options for the `colour` parameter:
 
 ```{r}
-PCAplots4 <- plotPCA(pca2, exampleTumourNormal, colour = c("patient", "age"), shape = "tumour") 
+PCAplots4 <- plotPCA(pca2, colour = c("patient", "age"), shape = "tumour") 
 
 PCAplots4$pca1$patient$PC1vsPC2
 
