@@ -215,7 +215,7 @@ regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 exampleTumourNormal \%>\%
   getDimRed(method = "PCA", regionsToOverlap = regs)
 
-# Vectorised topVarNum runs (returns a list of results, )
+# Vectorised topVarNum runs (returns a list of results)
 exampleTumourNormal \%>\%
   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
   slot("res") \%>\%

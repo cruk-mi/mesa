@@ -223,7 +223,7 @@ getUMAP <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   getDimRed(method = "PCA", regionsToOverlap = regs)
 #'
-#' # Vectorised topVarNum runs (returns a list of results, )
+#' # Vectorised topVarNum runs (returns a list of results)
 #' exampleTumourNormal %>%
 #'   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) %>%
 #'   slot("res") %>%
@@ -820,7 +820,7 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
     }
     
   } else {
-    NAshape <- NULL
+    NAshape <- NA
   }
   
   
@@ -972,7 +972,6 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #'
 #' @param object `mesaDimRed`.  
 #'   A dimensionality-reduction container returned by [getPCA()].
-#'
 #' @param components `integer(2)` **or** `list` of `integer(2)`.  
 #'   PC indices to plot (e.g. `c(1, 2)` for PC1 vs PC2), or a list of such pairs
 #'   to produce multiple plots.  

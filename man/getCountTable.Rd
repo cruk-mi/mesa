@@ -39,7 +39,6 @@ Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extrac
 Returns a window × sample (or group) table for downstream summaries/plots.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Per-sample counts (first rows/columns)
@@ -59,7 +58,6 @@ exampleTumourNormal \%>\%
   getCountTable(addMethodSuffix = TRUE) \%>\%
   names() \%>\%
   head()
-}
 
 }
 \seealso{

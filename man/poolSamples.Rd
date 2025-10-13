@@ -45,5 +45,4 @@ data(exampleTumourNormal, package = "mesa")
 # e.g., "Colon1_T","Colon1_N" -> "Colon1"
 poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
 }
-
 }

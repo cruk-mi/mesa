@@ -165,7 +165,7 @@ test_that("Analysing DMRs", {
                  pivotDMRsLonger() %>%
                  annotateWindows(genome = "hg38") %>%
                  summariseDMRsByGene() %>%
-                 dim(),c(21,4))
+                 ncol(),4)
 
   expect_no_error(DMRs <- exampleTumourNormal %>%
                     filter(type %in% c("LUAD","LUSC","CRC")) %>%

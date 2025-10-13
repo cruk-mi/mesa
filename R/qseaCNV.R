@@ -134,7 +134,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   # two conditions should be the same, but really don't want this to happen as it 
   # leads to exponentially increasing numbers of rows 
   if(any(overlappedRegions %>% duplicated()) || (length(overlappedRegions) != length(CNV_Regions))) {
-    duplicatedRegions <- head(overlappedRegions[overlappedRegions %>% duplicated()])
+    duplicatedRegions <- utils::head(overlappedRegions[overlappedRegions %>% duplicated()])
     stop(paste(c("CNV regions overlaps with multiple windows from the hmmCopyGC and/or hmmCopyMap objects! 
     This probably means that your window sizes do not match. 
     Showing first affected regions: \n", print_and_capture(duplicatedRegions))))
@@ -356,7 +356,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic CNV heatmap with sample annotations
@@ -370,7 +369,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #'     annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
 #'     clusterRows = FALSE
 #'   )
-#' }
 #'
 #' @export
 plotCNVheatmap <- function(qseaSet,
@@ -449,7 +447,6 @@ plotCNVheatmap <- function(qseaSet,
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Zero out CNV and inspect the first rows
@@ -457,7 +454,6 @@ plotCNVheatmap <- function(qseaSet,
 #'   removeCNV() %>%
 #'   getCNV() %>%
 #'   utils::head()
-#' }
 #'
 #' @export
 removeCNV <- function(qseaSet){

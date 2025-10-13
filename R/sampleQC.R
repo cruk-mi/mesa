@@ -45,7 +45,6 @@
 #' <https://pubmed.ncbi.nlm.nih.gov/25493099/>
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Run only if the example windows overlap the ultra-stable probes
@@ -66,7 +65,7 @@
 #' qsea::getSampleTable() %>%
 #' dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) %>%
 #' head()
-#' }
+#' 
 #' @export
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
 
@@ -131,14 +130,12 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
 #' [qsea::getSampleTable()], [addLibraryInformation()], [addHyperStableFraction()]
 #'
 #' @examples
-#' \donttest{
 #' data("exampleTumourNormal", package = "mesa")
 #'
 #' # QC summary (adds library info if missing), ordered by sample_name
 #' exampleTumourNormal %>%
 #'   getSampleQCSummary() %>%
 #'   head()
-#' }
 #'
 #' @export
 getSampleQCSummary <- function(qseaSet){

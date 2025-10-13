@@ -26,7 +26,6 @@ Genomic coordinates and the number/order of regions are preserved. If no
 matching columns are found, the function is a no-op.
 }
 \examples{
-\donttest{
 if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
   data(exampleTumourNormal, package = "mesa")
 
@@ -40,7 +39,6 @@ if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
     GenomicRanges::mcols() \%>\%
     colnames() \%>\%
     grep("^avgFragment", ., value = TRUE)   # character(0) if removed
-}
 }
 
 }

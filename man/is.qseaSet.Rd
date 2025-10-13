@@ -17,7 +17,6 @@ Object to test.}
 Predicate helper used in input validation and branching logic.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # TRUE for qseaSet objects
@@ -25,7 +24,6 @@ exampleTumourNormal \%>\% is.qseaSet()
 
 # FALSE for non-qseaSet objects
 iris \%>\% is.qseaSet()
-}
 
 }
 \seealso{

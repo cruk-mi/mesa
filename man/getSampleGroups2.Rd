@@ -25,13 +25,12 @@ samples within each group reflects their current order in the \code{qseaSet}.
 Useful for per-group plotting or aggregation utilities.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Internal helper (not exported): inspect structure of the mapping
 exampleTumourNormal \%>\%
   mesa:::getSampleGroups2() 
-}
+  
 }
 \seealso{
 \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
