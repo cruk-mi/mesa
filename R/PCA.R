@@ -821,7 +821,7 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
     }
     
   } else {
-    NAshape <- NULL
+    NAshape <- NA
   }
   
   
