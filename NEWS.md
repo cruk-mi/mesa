@@ -45,6 +45,7 @@ editor_options:
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 * Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range.
+* Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0.
 
 # mesa 0.5.1
 

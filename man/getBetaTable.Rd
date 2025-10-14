@@ -46,7 +46,6 @@ Convenience wrapper around \code{\link[=getDataTable]{getDataTable()}} to extrac
 downstream summaries/plots.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Per-sample beta (first rows/columns), with a minimum read threshold
@@ -74,7 +73,6 @@ exampleTumourNormal \%>\%
   is.na() \%>\%
   colSums() \%>\%
   head()
-}
 
 }
 \seealso{

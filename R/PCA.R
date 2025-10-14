@@ -20,7 +20,6 @@
 #'   getPCA(topVarNum = c(10, 100, 500, NA)) %>%
 #'   slot("res") %>%
 #'   names()
-#'   
 #' @export
 getPCA <- function(qseaSet,
                    dataTable = NULL,
@@ -74,7 +73,6 @@ getPCA <- function(qseaSet,
 #' # Use top 500 most variable windows only
 #' qsea::getExampleQseaSet(repl = 20) %>%
 #'   getUMAP(topVarNum = 500)
-#'
 #' @export
 getUMAP <- function(qseaSet,
                    dataTable = NULL,
@@ -225,7 +223,7 @@ getUMAP <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   getDimRed(method = "PCA", regionsToOverlap = regs)
 #'
-#' # Vectorised topVarNum runs (returns a list of results, )
+#' # Vectorised topVarNum runs (returns a list of results)
 #' exampleTumourNormal %>%
 #'   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) %>%
 #'   slot("res") %>%
@@ -823,7 +821,7 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
     }
     
   } else {
-    NAshape <- NULL
+    NAshape <- NA
   }
   
   
@@ -976,9 +974,9 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #' @param object `mesaDimRed`.  
 #'   A dimensionality-reduction container returned by [getPCA()].
 #'
-#' @param qseaSet `qseaSet` or `NULL`.  
-#'   The dataset used to generate `object`. Required if aesthetics (e.g. `colour`,
-#'   `shape`) refer to variables in the sample table.  
+#' @param qseaSet `qseaSet` or `NULL`.
+#'   A qseaSet to use the `sampleTable` from, if different from the `sampleTable` 
+#'   already attached to the object. May be deprecated in the future. 
 #'   **Default:** `NULL`.
 #'
 #' @param components `integer(2)` **or** `list` of `integer(2)`.  
@@ -1061,27 +1059,27 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #' @family dimred-plotting
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic PCA plot (PC1 vs PC2) with defaults
 #' exampleTumourNormal %>%
 #'   getPCA() %>%
-#'   plotPCA(qseaSet = exampleTumourNormal)
+#'   plotPCA()
 #'
 #' # Colour by sample group; show names
 #' exampleTumourNormal %>%
 #'   getPCA() %>%
-#'   plotPCA(qseaSet = exampleTumourNormal,
-#'           colour = "group",
+#'   plotPCA(colour = "group",
 #'           showSampleNames = TRUE)
 #'
 #' # Plot PC1 vs PC3; shape by tissue
 #' exampleTumourNormal %>%
 #'   getPCA() %>%
-#'   plotPCA(qseaSet = exampleTumourNormal,
-#'           components = list(c(1, 3)),
-#'           colour = "group")
-#'
+#'   plotPCA(components = list(c(1, 3)),
+#'           colour = "group",
+#'           shape  = "tissue") 
+#' }
 #' @export
 plotPCA.mesaDimRed <- function(object,
                     qseaSet = NULL,
@@ -1127,9 +1125,9 @@ plotPCA.mesaDimRed <- function(object,
 #' @param object `mesaDimRed`.  
 #'   A dimensionality-reduction container returned by [getUMAP()].
 #'
-#' @param qseaSet `qseaSet` or `NULL`.  
-#'   The dataset used to generate `object`. Required if aesthetics (e.g. `colour`,
-#'   `shape`) refer to variables in the sample table.  
+#' @param qseaSet `qseaSet` or `NULL`.
+#'   A qseaSet to use the `sampleTable` from, if different from the `sampleTable` 
+#'   already attached to the object. May be deprecated in the future. 
 #'   **Default:** `NULL`.
 #'
 #' @param components `integer(2)` **or** `list` of `integer(2)`.  
@@ -1205,19 +1203,27 @@ plotPCA.mesaDimRed <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default UMAP (beta-normalised, top 1000 most variable windows)
 #' exampleTumourNormal %>%
 #'   getUMAP(n_neighbors=5, min_dist = 1) %>%
-#'   plotUMAP(qseaSet = exampleTumourNormal)
+#'   plotUMAP()
 #'
 #' # Colour by group; show names
 #' exampleTumourNormal %>%
 #'   getUMAP(n_neighbors=5, min_dist = 1) %>%
-#'   plotUMAP(qseaSet = exampleTumourNormal,
-#'            colour = "group",
+#'   plotUMAP(colour = "group",
 #'            showSampleNames = TRUE)
+#'
+#' # Custom components and shape mapping
+#' exampleTumourNormal %>%
+#'   getUMAP(n_neighbors=5, min_dist = 1) %>%
+#'   plotUMAP(components = list(c(1, 2)),
+#'            colour = "group",
+#'            shape  = "tissue")
+#' }
 #'
 #' @export
 plotUMAP <- function(object,
@@ -1263,9 +1269,9 @@ plotUMAP <- function(object,
 #' @param object `mesaDimRed`.  
 #'   A dimensionality reduction container returned by [getPCA()] or [getUMAP()].
 #'
-#' @param qseaSet `qseaSet` or `NULL`.  
-#'   The dataset used to generate `object`. Required if aesthetics (e.g. `colour`,
-#'   `shape`) reference variables in the sample table.  
+#' @param qseaSet `qseaSet` or `NULL`.
+#'   A qseaSet to use the `sampleTable` from, if different from the `sampleTable` 
+#'   already attached to the object. May be deprecated in the future. 
 #'   **Default:** `NULL`.
 #'
 #' @param components `integer(2)` **or** `list` of `integer(2)`.  
@@ -1340,25 +1346,26 @@ plotUMAP <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # PCA: colour by group
 #' exampleTumourNormal %>%
 #'   getPCA(nPC = 3) %>%
-#'   plotDimRed(qseaSet = exampleTumourNormal, colour = "group")
+#'   plotDimRed(colour = "group")
 #'
 #' # UMAP: colour by group, shape by tissue
 #' exampleTumourNormal %>%
-#'   getUMAP(n_neighbors=5, min_dist = 1) %>%
-#'   plotDimRed(qseaSet = exampleTumourNormal,
-#'              colour = "group")
+#'   getUMAP(n_neighbors = 5, min_dist = 1) %>%
+#'   plotDimRed(colour = "group",
+#'              shape = "tissue") 
 #'
 #' # Show sample names
 #' exampleTumourNormal %>%
 #'   getPCA(nPC = 3) %>%
-#'   plotDimRed(qseaSet = exampleTumourNormal,
-#'              colour = "group",
+#'   plotDimRed(colour = "group",
 #'              showSampleNames = TRUE) 
+#' }
 #'
 #' @export
 plotDimRed <- function(object,

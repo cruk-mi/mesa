@@ -36,11 +36,9 @@ data.frame(seqnames = c("chr1","chr2"),
            end      = c(120,220)) \%>\%
   getWindowNames()
 
-\donttest{
 # From a qseaSet shipped with mesa (if available)
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\% getWindowNames() \%>\% head()
-}
 
 }
 \seealso{

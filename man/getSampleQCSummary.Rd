@@ -33,14 +33,12 @@ function calls \code{\link[=addLibraryInformation]{addLibraryInformation()}} to 
 by \code{sample_name}.
 }
 \examples{
-\donttest{
 data("exampleTumourNormal", package = "mesa")
 
 # QC summary (adds library info if missing), ordered by sample_name
 exampleTumourNormal \%>\%
   getSampleQCSummary() \%>\%
   head()
-}
 
 }
 \seealso{

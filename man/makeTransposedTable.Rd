@@ -36,7 +36,6 @@ are present in column names, they may be cleaned to bare sample/window names
 (see \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}).
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # NRPM features (sample × first few windows) with a group column appended
@@ -49,7 +48,6 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   makeTransposedTable(normMethod = "beta") \%>\%
   dim()
-}
 
 }
 \seealso{

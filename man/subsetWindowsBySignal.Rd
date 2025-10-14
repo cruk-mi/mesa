@@ -63,7 +63,6 @@ computes \code{fn} per row, and filters by \code{threshold} according to
 returns a scalar; include \code{na.rm = TRUE} inside \code{fn} if needed.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Keep windows with median NRPM > 1 across all samples
@@ -100,7 +99,6 @@ exampleTumourNormal \%>\%
     aboveThreshold = TRUE,
     useGroupMeans = TRUE
   )
-}
 
 }
 \seealso{
