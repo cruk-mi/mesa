@@ -49,10 +49,8 @@ Unlike \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, this funct
 summarised as genomic ranges.
 }
 \examples{
-\donttest{
 # Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
 if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-  set.seed(1)
   n <- 200
   gr <- GenomicRanges::GRanges(
     seqnames = rep(1, n),
@@ -68,8 +66,6 @@ if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
     chr.select  = 1
   )
 }
-}
-
 }
 \seealso{
 \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},

@@ -26,8 +26,8 @@ plotUMAP(
 A dimensionality-reduction container returned by \code{\link[=getUMAP]{getUMAP()}}.}
 
 \item{qseaSet}{\code{qseaSet} or \code{NULL}.
-The dataset used to generate \code{object}. Required if aesthetics (e.g. \code{colour},
-\code{shape}) refer to variables in the sample table.
+A qseaSet to use the \code{sampleTable} from, if different from the \code{sampleTable}
+already attached to the object. May be deprecated in the future.
 \strong{Default:} \code{NULL}.}
 
 \item{components}{\code{integer(2)} \strong{or} \code{list} of \code{integer(2)}.
@@ -122,20 +122,18 @@ data(exampleTumourNormal, package = "mesa")
 # Default UMAP (beta-normalised, top 1000 most variable windows)
 exampleTumourNormal \%>\%
   getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal)
+  plotUMAP()
 
 # Colour by group; show names
 exampleTumourNormal \%>\%
   getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal,
-           colour = "group",
+  plotUMAP(colour = "group",
            showSampleNames = TRUE)
 
 # Custom components and shape mapping
 exampleTumourNormal \%>\%
   getUMAP(n_neighbors=5, min_dist = 1) \%>\%
-  plotUMAP(qseaSet = exampleTumourNormal,
-           components = list(c(1, 2)),
+  plotUMAP(components = list(c(1, 2)),
            colour = "group",
            shape  = "tissue")
 }

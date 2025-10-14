@@ -19,13 +19,10 @@ Convenience wrapper that returns genomic positions of the \code{"CG"} motif
 for the specified BSgenome and chromosomes, via \code{MEDIPS::MEDIPS.getPositions()}.
 }
 \examples{
-\donttest{
 # Requires MEDIPS and a BSgenome package
 # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = paste0("chr", 1:2))
-#   gr
+#   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
 # }
-}
 }
 \seealso{
 \code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}

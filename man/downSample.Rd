@@ -30,7 +30,6 @@ results across runs, call \code{set.seed()} \strong{before} invoking \code{downS
 Samples with total reads \verb{< nReads} are not upsampled.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 set.seed(1)
@@ -47,7 +46,6 @@ exampleTumourNormal \%>\%
   downSample(100) \%>\%
   qsea::getSampleTable() \%>\%
   dplyr::select(patient, type, gender)
-}
 
 }
 \seealso{

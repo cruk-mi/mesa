@@ -10,6 +10,7 @@ editor_options:
 * Many more examples for individual functions on their help pages, as well as a set of vignettes.
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
 * Objects with invalid slots will now throw informative errors.
+* Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column.
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method.
@@ -20,6 +21,8 @@ editor_options:
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
 * Updated function documentation with examples, default parameter values, and more detailed descriptions.
 * `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
+* `makeQset` now checks that the chromosomes provided match with those present in the BSgenome.
+* The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
@@ -41,6 +44,8 @@ editor_options:
 * `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
 * Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
+* Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range.
+* Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0.
 * `getDimRed` will no longer print `Peforming PCA...` messages for redundant values of `topVarNum`.
 
 # mesa 0.5.1

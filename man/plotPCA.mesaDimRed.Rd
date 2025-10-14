@@ -26,8 +26,8 @@ plotPCA.mesaDimRed(
 A dimensionality-reduction container returned by \code{\link[=getPCA]{getPCA()}}.}
 
 \item{qseaSet}{\code{qseaSet} or \code{NULL}.
-The dataset used to generate \code{object}. Required if aesthetics (e.g. \code{colour},
-\code{shape}) refer to variables in the sample table.
+A qseaSet to use the \code{sampleTable} from, if different from the \code{sampleTable}
+already attached to the object. May be deprecated in the future.
 \strong{Default:} \code{NULL}.}
 
 \item{components}{\code{integer(2)} \strong{or} \code{list} of \code{integer(2)}.
@@ -130,24 +130,21 @@ data(exampleTumourNormal, package = "mesa")
 # Basic PCA plot (PC1 vs PC2) with defaults
 exampleTumourNormal \%>\%
   getPCA() \%>\%
-  plotPCA(qseaSet = exampleTumourNormal)
+  plotPCA()
 
 # Colour by sample group; show names
 exampleTumourNormal \%>\%
   getPCA() \%>\%
-  plotPCA(qseaSet = exampleTumourNormal,
-          colour = "group",
+  plotPCA(colour = "group",
           showSampleNames = TRUE)
 
 # Plot PC1 vs PC3; shape by tissue
 exampleTumourNormal \%>\%
   getPCA() \%>\%
-  plotPCA(qseaSet = exampleTumourNormal,
-          components = list(c(1, 3)),
+  plotPCA(components = list(c(1, 3)),
           colour = "group",
           shape  = "tissue") 
 }
-
 }
 \seealso{
 \code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}

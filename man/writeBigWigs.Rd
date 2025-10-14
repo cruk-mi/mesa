@@ -55,7 +55,6 @@ GRanges in \code{qseaSet} carries valid \code{seqinfo} (this is the case for the
 example data on GRCh38).
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Per-sample NRPM bigWigs
@@ -71,7 +70,6 @@ exampleTumourNormal \%>\%
     writeBigWigs(., folderName = td, normMethod = "beta", useGroupMeans = TRUE, naVal = 0);
     head(list.files(td, pattern = "\\\\\\\\.bw$"))
   }
-}
 
 }
 \seealso{

@@ -30,7 +30,6 @@ then lifted over via \pkg{rtracklayer} with the chain stored in
 result is unlisted. The returned object is tagged as \code{"hg38"}.
 }
 \examples{
-\donttest{
 # Data.frame input; mix of 'chr' and no 'chr' is fine
 data.frame(
   seqnames = c("1", "chr2"),
@@ -43,7 +42,6 @@ data.frame(
 # GRanges input (some intervals may not map and can be dropped)
 gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))
 liftOverHg19(gr)
-}
 
 }
 \seealso{

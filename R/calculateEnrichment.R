@@ -245,13 +245,10 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
 #' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
 #'
 #' @examples
-#' \donttest{
 #' # Requires MEDIPS and a BSgenome package
 #' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#' #   gr <- getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = paste0("chr", 1:2))
-#' #   gr
+#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
 #' # }
-#' }
 getCGPositions <- function(BSgenome, chr.select){
   MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
 }
@@ -299,10 +296,8 @@ getCGPositions <- function(BSgenome, chr.select){
 #'   \pkg{BSgenome}
 #'
 #' @examples
-#' \donttest{
 #' # Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
 #' if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#'   set.seed(1)
 #'   n <- 200
 #'   gr <- GenomicRanges::GRanges(
 #'     seqnames = rep(1, n),
@@ -318,8 +313,6 @@ getCGPositions <- function(BSgenome, chr.select){
 #'     chr.select  = 1
 #'   )
 #' }
-#' }
-#' 
 #' @export
 calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
 

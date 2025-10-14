@@ -26,7 +26,6 @@ akin to calling \code{qsea::addLibraryFactors(qseaSet, factors = 1)} and
 synchronising the \code{sampleTable}.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Show current factors then reset to 1 and show again
@@ -40,7 +39,6 @@ exampleTumourNormal \%>\%
   addLibraryInformation() \%>\%   # refresh cached summaries if needed
   pull(library_factor) \%>\%
   head()
-}
 
 }
 \seealso{

@@ -13,7 +13,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
                        "afterOverBackNum","initialOverBackNum", "qname","inOut","nSign","nStrands",
                        "chromosome_name","start_position","end_position", "input_file",
                        "topVarNumInput", "windowSdName", "pcaName",
-                       "fnValue", "group2new","gap"))
+                       "fnValue", "group2new","gap","size"))
 
 #' Lift over genomic ranges from hg19 to hg38
 #'
@@ -42,7 +42,6 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #' [rtracklayer::liftOver()], [GenomicRanges::GRanges], [GenomeInfoDb::genome]
 #'
 #' @examples
-#' \donttest{
 #' # Data.frame input; mix of 'chr' and no 'chr' is fine
 #' data.frame(
 #'   seqnames = c("1", "chr2"),
@@ -55,7 +54,6 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #' # GRanges input (some intervals may not map and can be dropped)
 #' gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))
 #' liftOverHg19(gr)
-#' }
 #'
 #' @export
 liftOverHg19 <- function(grOrDf){

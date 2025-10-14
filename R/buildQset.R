@@ -98,6 +98,14 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
                                               minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
                                               minReferenceLength = 30, properPairsOnly = FALSE){
 
+  if (is.null(BSgenome) ){
+    stop("Please provide the BSgenome to use.")
+  }
+
+  if (is.null(regions) ){
+    stop("Please provide a set of regions.")
+  }
+
   if (!requireNamespace("Rsamtools", quietly = TRUE)) {
     stop(
       "Package \"Rsamtools\" must be installed to use this function.",
@@ -119,12 +127,18 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
   if(properPairsOnly){
 
-    myParam <- Rsamtools::ScanBamParam(what = c("qname","flag","strand","rname","pos",
-                                              "mapq","cigar","isize"), tag = "MQ")
+    myParam <- Rsamtools::ScanBamParam(
+      what = c("qname","flag","strand","rname","pos","mapq","cigar","isize"), 
+      which = regions %>% plyranges::reduce_ranges(),
+      tag = "MQ"
+      )
   } else {
 
-    myParam <- Rsamtools::ScanBamParam(what = c("flag","strand","rname","pos",
-                                                "mapq","cigar","isize"), tag = "MQ")
+    myParam <- Rsamtools::ScanBamParam(
+      what = c("flag","strand","rname","pos","mapq","cigar","isize"), 
+      which = regions %>% plyranges::reduce_ranges(),
+      tag = "MQ"
+      )
 
   }
 
@@ -133,14 +147,24 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
   if (is.null(readBamData[[1]]$tag$MQ)) {
     #MQ is the mate quality tag, coming from samtools fixmate. If not present, then add as NA.
     message(glue::glue("No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only."))
-    readBamData[[1]]$tag$MQ <- rep(NA, length(readBamData[[1]]$flag))
+    
+    readBamData <- readBamData %>% purrr::map(~purrr::discard_at(.,"tag"))
+
   }
 
   readDF <- readBamData %>%
-    as.data.frame() %>%
-    tibble::as_tibble() %>%
-    dplyr::bind_cols(., tibble::as_tibble(Rsamtools::bamFlagAsBitMatrix(.$flag)))
-
+    purrr::map_df(function(x) {
+        x %>%
+          as.data.frame() %>%
+          tibble::as_tibble() %>%
+          dplyr::bind_cols(., tibble::as_tibble(Rsamtools::bamFlagAsBitMatrix(.$flag)))
+        }
+      )
+  
+  if(!("MQ" %in% colnames(readDF))) {
+    readDF <- readDF %>% mutate(MQ = NA)
+  }
+  
   #remove the chr if present in the bam file but not in the regions
   if(!any(stringr::str_detect(regions %>% GenomeInfoDb::seqlevels(),"chr"))) {
     readDF <- readDF  %>%
@@ -206,7 +230,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
   numPairsWithinSize <- length(properPairsGRanges)
 
-  if (numPairsWithinSize < numPairsInit) {
+  if (numPairsWithinSize < numPairsAfterMAPQ) {
     message(glue::glue("Dropping {numPairsAfterMAPQ - numPairsWithinSize} proper pairs that do not lie within [{minInsertSize}, {maxInsertSize}]"))
   }
 

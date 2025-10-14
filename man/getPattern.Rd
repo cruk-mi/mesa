@@ -26,11 +26,9 @@ compute densities or modify the object. If no matching columns exist, a
 zero-length character vector is returned.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 # Returns character(0) if no *_density columns are present
 exampleTumourNormal \%>\% getPattern()
-}
 
 }
 \seealso{
