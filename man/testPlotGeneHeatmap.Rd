@@ -2,7 +2,8 @@
 % Please edit documentation in R/plotting.R
 \name{testPlotGeneHeatmap}
 \alias{testPlotGeneHeatmap}
-\title{An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur}
+\title{An internal wrapper around plotGeneHeatmap that catches biomart connection
+errors and skips the test if they occur}
 \usage{
 testPlotGeneHeatmap(...)
 }
@@ -10,5 +11,6 @@ testPlotGeneHeatmap(...)
 \item{...}{Arguments to pass to plotGeneHeatmap}
 }
 \description{
-An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
+An internal wrapper around plotGeneHeatmap that catches biomart connection
+errors and skips the test if they occur
 }

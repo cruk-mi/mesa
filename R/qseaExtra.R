@@ -191,7 +191,9 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' #   )
 #'
 #' # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-#' # setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
+#' # setMesaGenome("hg38"); 
+#' # setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+#' # setMesaAnnoDb("org.Hs.eg.db")
 #' }
 #'
 #' @export

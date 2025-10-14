@@ -120,7 +120,8 @@ samples are aggregated by \code{group} before plotting.
 data(exampleTumourNormal, package = "mesa")
 
 # Compute regions (DMRs) to plot
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", 
+                                              contrasts = "first")
 
 # Basic heatmap of beta values over DMRs
 exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
@@ -138,23 +139,8 @@ exampleTumourNormal \%>\%
                    clusterNum = 2,
                    sampleAnnotation = tumour,
                    windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-                    )
-
-# calculate DMRs to plot
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
-# plot these windows
-exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
-# cluster the rows and add annotation
-exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
-# more complex example
-exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                   clusterRows = TRUE, 
-                   clusterNum = 2,
-                   sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+                   annotationColors = list(
+                      tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
                     )
 
 }

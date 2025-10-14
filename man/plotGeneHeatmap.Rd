@@ -134,7 +134,8 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   plotGeneHeatmap("HOXA9",
                   sampleAnnotation  = tumour,
-                  annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+                  annotationColors  = list(
+                    tumour = c(Tumour = "firebrick4", Normal = "blue")),
                   upstreamDist = 1000,
                   downstreamDist = 2000)
 

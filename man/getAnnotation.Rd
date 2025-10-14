@@ -43,16 +43,19 @@ data(exampleTumourNormal, package = "mesa")
 # Works with none, one, or multiple columns (unquoted tidyselect):
 exampleTumourNormal \%>\% mesa:::getAnnotation()
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = type)
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
+exampleTumourNormal \%>\% mesa:::getAnnotation(
+    sampleAnnotation = c(tumour, type))
 
 # Also works with quoted column names:
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+exampleTumourNormal \%>\% mesa:::getAnnotation(
+    sampleAnnotation = c("tumour","type"))
 
 # group-level annotations for tumour & tissue
 exampleTumourNormal \%>\%
   dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
-  mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
+  mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), 
+    useGroupMeans = TRUE)
 
 exampleTumourNormal \%>\%
   dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%

@@ -96,7 +96,8 @@
 #' data(exampleTumourNormal, package = "mesa")
 #' 
 #' # Compute regions (DMRs) to plot
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
+#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", 
+#'                                               contrasts = "first")
 #' 
 #' # Basic heatmap of beta values over DMRs
 #' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
@@ -114,27 +115,11 @@
 #'                    clusterNum = 2,
 #'                    sampleAnnotation = tumour,
 #'                    windowAnnotation = CpG_density,
-#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+#'                    annotationColors = list(
+#'                       tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
 #'                     )
 #' 
 #' @export
-#' @examples
-#' # calculate DMRs to plot
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
-#' # plot these windows
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
-#' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
-#' # more complex example
-#' exampleTumourNormal %>% 
-#'   plotRegionsHeatmap(regionsToOverlap = DMRs, 
-#'                    clusterRows = TRUE, 
-#'                    clusterNum = 2,
-#'                    sampleAnnotation = tumour,
-#'                    windowAnnotation = CpG_density,
-#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-#'                     )
-#' 
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
@@ -751,7 +736,8 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   plotGeneHeatmap("HOXA9",
 #'                   sampleAnnotation  = tumour,
-#'                   annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+#'                   annotationColors  = list(
+#'                     tumour = c(Tumour = "firebrick4", Normal = "blue")),
 #'                   upstreamDist = 1000,
 #'                   downstreamDist = 2000)
 #'
@@ -1448,16 +1434,19 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' # Works with none, one, or multiple columns (unquoted tidyselect):
 #' exampleTumourNormal %>% mesa:::getAnnotation()
 #' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = type)
-#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
+#' exampleTumourNormal %>% mesa:::getAnnotation(
+#'     sampleAnnotation = c(tumour, type))
 #'
 #' # Also works with quoted column names:
 #' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = "type")
-#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+#' exampleTumourNormal %>% mesa:::getAnnotation(
+#'     sampleAnnotation = c("tumour","type"))
 #'
 #' # group-level annotations for tumour & tissue
 #' exampleTumourNormal %>%
 #'   dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) %>%
-#'   mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
+#'   mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), 
+#'     useGroupMeans = TRUE)
 #'
 #' exampleTumourNormal %>%
 #'   dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) %>%
@@ -1509,7 +1498,8 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
 }
 
 
-#' An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
+#' An internal wrapper around plotGeneHeatmap that catches biomart connection 
+#' errors and skips the test if they occur
 #' 
 #' @param ... Arguments to pass to plotGeneHeatmap
 testPlotGeneHeatmap <- function(...) {
