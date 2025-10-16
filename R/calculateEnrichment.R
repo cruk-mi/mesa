@@ -118,15 +118,13 @@ calculateGenomicCGDistribution <- function(BSgenome){
 #'   \pkg{BSgenome}
 #'
 #' @examples
-#' \donttest{
 #' # Sketch of usage (requires a real BAM and installed BSgenome):
-#' # calculateCGEnrichment(
-#' #   file = "sample.bam",
-#' #   BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-#' #   exportPath = tempdir(),
-#' #   paired = TRUE
-#' # )
-#' }
+#'  calculateCGEnrichment(
+#'    file = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"),
+#'    BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+#'    exportPath = tempdir(),
+#'    paired = TRUE
+#'  )
 #' @export
 calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
                                    extend = 0, shift = 0, uniq = 0,
