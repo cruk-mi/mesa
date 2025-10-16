@@ -28,12 +28,13 @@
 #'   \pkg{Biostrings}
 #'
 #' @examples
-#' \donttest{
-#' # Example: compute genome-wide CpG metrics for GRCh38 (package must be installed)
-#' if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#'   calculateGenomicCGDistribution("BSgenome.Hsapiens.NCBI.GRCh38")
-#' }
-#' }
+#' # Example: compute genome-wide CpG metrics for a S. cerevisae genome. 
+#' It could be done for GRCh38 genome instead, but it will take more time to
+#' run (package must be installed)
+#' if (requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer3", quietly = TRUE)) {
+#'   calculateGenomicCGDistribution("BSgenome.Scerevisiae.UCSC.sacCer3")
+#'   }
+#'   
 calculateGenomicCGDistribution <- function(BSgenome){
   dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
