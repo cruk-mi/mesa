@@ -76,20 +76,21 @@
 #' @family coverage
 #'
 #' @examples
-#' \donttest{
-#' # Pseudo-code (requires a BAM and a BSgenome):
-#' # library(BSgenome.Hsapiens.UCSC.hg38)
-#' #
-#' # GenomicRanges::GRanges("1", IRanges::IRanges(c(1e6, 2e6), width = 1000)) %>%
-#' #   getBamCoveragePairedAndUnpairedR1(
-#' #     fileName = "sample.bam",
-#' #     BSgenome = BSgenome.Hsapiens.UCSC.hg38,
-#' #     minMapQual = 30,
-#' #     minInsertSize = 50,
-#' #     maxInsertSize = 1000,
-#' #     minReferenceLength = 30,
-#' #     properPairsOnly = FALSE
-#' #   )
+#' if (requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#' 
+#' regions <- GenomicRanges::GRanges("chr22", 
+#'                                   IRanges::IRanges(20000000, 20001000))
+#'  (
+#'     fileName = system.file("extdata", "mini_chr22.bam", package = "mesa"),
+#'     BSgenome = "BSgenome.Hsapiens.UCSC.hg19", # pass a string, not the object
+#'     regions  = regions,
+#'     minMapQual = 30, 
+#'     minInsertSize = 50, 
+#'     maxInsertSize = 1000, 
+#'     minReferenceLength = 30,
+#'     properPairsOnly = FALSE
+#'  )
+#'   
 #' }
 #'
 #' @keywords internal
