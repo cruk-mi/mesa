@@ -165,7 +165,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' [qseaTableToChrGRanges()], [liftOverHg19()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
@@ -180,19 +179,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'     TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
 #'     annoDb = "org.Hs.eg.db"
 #'   )
-#'
-#' # Mouse example (mm10): supply mouse TxDb and OrgDb
-#' # data(exampleMouse, package = "mesa")
-#' # exampleMouse %>%
-#' #   getRegions() %>%
-#' #   annotateWindows(
-#' #     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-#' #     annoDb = "org.Mm.eg.db"
-#' #   )
-#'
-#' # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-#' # setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
-#' }
 #'
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
