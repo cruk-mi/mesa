@@ -1555,7 +1555,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @family annotation-summaries
 #'
 #' @examples
-#' \donttest{
 #' # Ensure annotation defaults are available (GRCh38/hg38)
 #' setMesaGenome("hg38")
 #'
@@ -1570,7 +1569,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) %>%
 #'   head()
-#' }
 #'
 #' @export
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
