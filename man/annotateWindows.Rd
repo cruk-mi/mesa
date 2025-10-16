@@ -72,17 +72,17 @@ Width/strand are dropped.
 }
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
-# Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
+# Annotate all regions using GRCh38 defaults
 exampleTumourNormal \%>\%
+  getRegions() \%>\%
   calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
   annotateWindows(genome = "hg38")
 
 # Or specify TxDb/annoDb explicitly (strings are resolved at runtime)
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+  getRegions() \%>\%
   annotateWindows(
     TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
     annoDb = "org.Hs.eg.db"
@@ -97,10 +97,11 @@ exampleTumourNormal \%>\%
 #     annoDb = "org.Mm.eg.db"
 #   )
 
-# You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-# setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
-}
-
+# You can also set defaults globally using setMesaGenome, setMesaTxDb and 
+# setMesaAnnoDb:
+# setMesaGenome("hg38"); 
+# setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+# setMesaAnnoDb("org.Hs.eg.db")
 }
 \seealso{
 \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},

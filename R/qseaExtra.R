@@ -165,17 +165,17 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' [qseaTableToChrGRanges()], [liftOverHg19()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
+#' # Annotate all regions using GRCh38 defaults
 #' exampleTumourNormal %>%
+#'   getRegions() %>%
 #'   calculateDMRs(variable = "tumour", contrasts = "first") %>%
 #'   annotateWindows(genome = "hg38")
 #'
 #' # Or specify TxDb/annoDb explicitly (strings are resolved at runtime)
 #' exampleTumourNormal %>%
-#'   calculateDMRs(variable = "tumour", contrasts = "first") %>%
+#'   getRegions() %>%
 #'   annotateWindows(
 #'     TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
 #'     annoDb = "org.Hs.eg.db"
@@ -190,10 +190,11 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' #     annoDb = "org.Mm.eg.db"
 #' #   )
 #'
-#' # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-#' # setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
-#' }
-#'
+#' # You can also set defaults globally using setMesaGenome, setMesaTxDb and 
+#' # setMesaAnnoDb:
+#' # setMesaGenome("hg38"); 
+#' # setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+#' # setMesaAnnoDb("org.Hs.eg.db")
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
                             annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
@@ -287,7 +288,6 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 
   return(dfAnno)
 }
-
 
 #' Subset windows in a qseaSet by signal across samples
 #'
@@ -438,7 +438,6 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
   return(qseaSet)
 
 }
-
 
 #' Subset windows above Poisson background
 #'
@@ -1542,6 +1541,32 @@ addSummaryAcrossWindows <- function(qseaSet,
 #'   `normMethod = "beta"`).  
 #'   **Default:** `3`.
 #'
+#' @param genome `character(1)` or `NULL`.  
+#'   Guides annotation defaults. Currently supports `"hg38"`/`"GRCh38"`.  
+#'   **Default:** value set by [setMesaGenome()] (via internal `.getMesaGenome()`), or `NULL`.
+#'
+#' @param TxDb TxDb object or `character(1)`.  
+#'   Either an unquoted TxDb object or a string like
+#'   `"TxDb.Hsapiens.UCSC.hg38.knownGene"`. If character, it is resolved at
+#'   runtime.  
+#'   **Default:** value set by [setMesaTxDb()] (via `.getMesaTxDb()`), or for
+#'   GRCh38/hg38 when `NULL`, use
+#'   `TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene`
+#'   if installed.
+#'
+#' @param annoDb `character(1)` or `NULL`.  
+#'   OrgDb package name (e.g., `"org.Hs.eg.db"`).  
+#'   **Default:** value set by [setMesaAnnoDb()] (via `.getMesaAnnoDb()`), or for
+#'   GRCh38/hg38 when `NULL`, use `"org.Hs.eg.db"` if installed.
+#'
+#' @param CpGislandsGR `GRanges` or `NULL`.  
+#'   CpG island regions for island/shore/shelf context. 
+#'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::hg38CpGIslands`).
+#'
+#' @param FantomRegionsGR `GRanges` or `NULL`.  
+#'   FANTOM enhancer regions for overlap counts.  
+#'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::FantomRegions`).
+#'
 #' @details
 #' Windows are annotated via [annotateWindows()] (which can add CpG landscape
 #' and a concise `shortAnno` label). The function then groups by `sample_name`,
@@ -1557,7 +1582,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' - set them globally with [setMesaGenome()] (recommended for GRCh38/hg38), or
 #' - provide compatible `TxDb`/`annoDb` packages yourself.
 #'
-#'
 #' @return
 #' A tibble with columns:
 #' `sample_name`, `landscape`, `shortAnno`, `nWindows`, `sum`, `nOverCutoff`,
@@ -1569,7 +1593,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @family annotation-summaries
 #'
 #' @examples
-#' \donttest{
 #' # Ensure annotation defaults are available (GRCh38/hg38)
 #' setMesaGenome("hg38")
 #'
@@ -1584,57 +1607,81 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) %>%
 #'   head()
-#' }
 #'
 #' @export
-getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
-  
-  #TODO: This requires the annotateWindows parameters to be exposed to not require setMesaTxDb and setMesaAnnoDb.
-  #TODO: Ensure this works when landscape is not present, as that is optional output from annotateWindows
+getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, normMethod = "nrpm", 
+                                          minEnrichment = 3,
+                                          genome = .getMesaGenome(),
+                                          TxDb = .getMesaTxDb(),
+                                          annoDb = .getMesaAnnoDb(),
+                                          CpGislandsGR = NULL, 
+                                          FantomRegionsGR = NULL
+                                          ){
   
   temp <- qseaSet %>%
     getDataTable(normMethod = normMethod,
                  minEnrichment = minEnrichment,
                  addMethodSuffix = TRUE) %>%
-    annotateWindows()
+    annotateWindows(TxDb = TxDb,
+                    annoDb = annoDb,
+                    CpGislandsGR = CpGislandsGR,
+                    FantomRegionsGR = FantomRegionsGR
+                    )
+  
+  if(!("landscape" %in% colnames(temp))){
+    temp <- temp %>% 
+      mutate(landscape = "undefined")
+  }
 
   nWindows <- temp %>%
     dplyr::group_by(landscape) %>%
-    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(!is.na(.), na.rm = TRUE))) %>%
-    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nWindows") %>%
+    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),
+                                   ~sum(!is.na(.), na.rm = TRUE))) %>%
+    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"),
+                        names_to = "sample_name", values_to = "nWindows") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
   sumData <- temp %>%
     dplyr::group_by(landscape) %>%
-    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(., na.rm = TRUE))) %>%
-    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "sum") %>%
+    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),
+                                   ~sum(., na.rm = TRUE))) %>%
+    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"),
+                        names_to = "sample_name", values_to = "sum") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
   overCutoffData <- temp %>%
     dplyr::group_by(landscape) %>%
-    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(.>= cutoff, na.rm = TRUE))) %>%
-    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nOverCutoff") %>%
+    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),
+                                   ~sum(.>= cutoff, na.rm = TRUE))) %>%
+    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"),
+                        names_to = "sample_name", values_to = "nOverCutoff") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
   nWindowsShortAnno <- temp %>%
     dplyr::group_by(shortAnno) %>%
-    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(!is.na(.), na.rm = TRUE))) %>%
-    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nWindows") %>%
+    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),
+                                   ~sum(!is.na(.), na.rm = TRUE))) %>%
+    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"),
+                        names_to = "sample_name", values_to = "nWindows") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
   sumDataShortAnno <- temp %>%
     dplyr::group_by(shortAnno) %>%
-    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(.,na.rm = TRUE)), nWindows = dplyr::n()) %>%
-    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "sum") %>%
+    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),
+                                   ~sum(.,na.rm = TRUE)), nWindows = dplyr::n()) %>%
+    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), 
+                        names_to = "sample_name", values_to = "sum") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
   overCutoffShortAnno <- temp %>%
     dplyr::group_by(shortAnno) %>%
-    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(.>= cutoff, na.rm = TRUE))) %>%
-    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nOverCutoff") %>%
+    dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),
+                                   ~sum(.>= cutoff, na.rm = TRUE))) %>%
+    tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), 
+                        names_to = "sample_name", values_to = "nOverCutoff") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  sumData %>%
+  out <- sumData %>%
     dplyr::left_join(overCutoffData) %>%
     dplyr::left_join(nWindows) %>%
     dplyr::full_join(sumDataShortAnno %>%
@@ -1642,13 +1689,15 @@ getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nr
                        dplyr::left_join(nWindowsShortAnno)
     ) %>%
     dplyr::select(sample_name, landscape, shortAnno, nWindows, sum, nOverCutoff) %>%
-    dplyr:: left_join(qseaSet %>% qsea::getSampleTable()) %>%
-    return()
+    dplyr:: left_join(qseaSet %>% qsea::getSampleTable())
+  
+  return(out)
 
 }
 
-setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames is not defined on a data frame, only on a qseaSet.")})
-
+setMethod('getSampleNames', 'data.frame',
+          function(object){stop("getSampleNames is not defined on a data frame, 
+                                only on a qseaSet.")})
 
 #' Sample names per group (order-preserving)
 #'

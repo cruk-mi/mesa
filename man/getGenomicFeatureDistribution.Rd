@@ -8,7 +8,12 @@ getGenomicFeatureDistribution(
   qseaSet,
   cutoff = 1,
   normMethod = "nrpm",
-  minEnrichment = 3
+  minEnrichment = 3,
+  genome = .getMesaGenome(),
+  TxDb = .getMesaTxDb(),
+  annoDb = .getMesaAnnoDb(),
+  CpGislandsGR = NULL,
+  FantomRegionsGR = NULL
 )
 }
 \arguments{
@@ -28,6 +33,32 @@ Measure to summarise. One of \code{"nrpm"} or \code{"beta"}.
 Minimum reads per window required for a non-\code{NA} beta (relevant when
 \code{normMethod = "beta"}).
 \strong{Default:} \code{3}.}
+
+\item{genome}{\code{character(1)} or \code{NULL}.
+Guides annotation defaults. Currently supports \code{"hg38"}/\code{"GRCh38"}.
+\strong{Default:} value set by \code{\link[=setMesaGenome]{setMesaGenome()}} (via internal \code{.getMesaGenome()}), or \code{NULL}.}
+
+\item{TxDb}{TxDb object or \code{character(1)}.
+Either an unquoted TxDb object or a string like
+\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}. If character, it is resolved at
+runtime.
+\strong{Default:} value set by \code{\link[=setMesaTxDb]{setMesaTxDb()}} (via \code{.getMesaTxDb()}), or for
+GRCh38/hg38 when \code{NULL}, use
+\code{TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
+if installed.}
+
+\item{annoDb}{\code{character(1)} or \code{NULL}.
+OrgDb package name (e.g., \code{"org.Hs.eg.db"}).
+\strong{Default:} value set by \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} (via \code{.getMesaAnnoDb()}), or for
+GRCh38/hg38 when \code{NULL}, use \code{"org.Hs.eg.db"} if installed.}
+
+\item{CpGislandsGR}{\code{GRanges} or \code{NULL}.
+CpG island regions for island/shore/shelf context.
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::hg38CpGIslands}).}
+
+\item{FantomRegionsGR}{\code{GRanges} or \code{NULL}.
+FANTOM enhancer regions for overlap counts.
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::FantomRegions}).}
 }
 \value{
 A tibble with columns:
@@ -59,7 +90,6 @@ This function requires a transcript database and OrgDb to annotate windows (via
 }
 }
 \examples{
-\donttest{
 # Ensure annotation defaults are available (GRCh38/hg38)
 setMesaGenome("hg38")
 
@@ -74,7 +104,6 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) \%>\%
   head()
-}
 
 }
 \seealso{
