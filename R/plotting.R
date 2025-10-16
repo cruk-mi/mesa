@@ -735,7 +735,6 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' [biomaRt::useMart()], [ComplexHeatmap::Heatmap()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic gene heatmap (beta) with defaults
@@ -755,14 +754,6 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'                   upstreamDist = 1000,
 #'                   downstreamDist = 2000)
 #'
-#' # Mouse example with explicit Ensembl mart (requires internet)
-#' # data(exampleMouse, package = "mesa")
-#' # exampleMouse %>% plotGeneHeatmap(
-#' #   gene = "Fbxl18",
-#' #   mart = biomaRt::useMart('ensembl', dataset = 'mmusculus_gene_ensembl',
-#' #                           host = 'https://jul2023.archive.ensembl.org')
-#' # )
-#' }
 #' 
 #' @export
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
@@ -1021,14 +1012,13 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
 #' set.seed(1)
 #' data.frame(
 #'   CpG_density = runif(10),
 #'   annotation  = rep(c("Upstream","GeneBody"), 5)
 #' ) %>%
 #'   makeGeneHeatmapRowAnnotation() 
-#' }
+#'   
 makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 
   annotationColDf <- rowAnnotationDF %>%
@@ -1145,7 +1135,6 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' @family annotation-summaries
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Beta >= 0.75, stacked bars per sample
@@ -1155,8 +1144,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' # NRPM >= 2, show within-sample proportions
 #' exampleTumourNormal %>%
 #'   plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
-#' }
-#' 
+#'   
 #' @export
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stack", normMethod = "nrpm"){
 
@@ -1258,7 +1246,6 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' @family heatmaps
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # By default uses NRPM
@@ -1268,7 +1255,6 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 #' exampleTumourNormal %>% 
 #'   plotCorrelationMatrix(normMethod = "beta",
 #'                         sampleAnnotation = c(tumour, patient))
-#' }
 #'
 #' @export
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
@@ -1368,7 +1354,6 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 #' @family dmr-plots
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Overlap of significant DMR sets across contrasts (default FDR 0.05)
@@ -1380,7 +1365,6 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 #' exampleTumourNormal %>%
 #'   calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") %>%
 #'   plotDMRUpset(removeVS = TRUE)
-#' }
 #'
 #' @export
 plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...){
@@ -1442,7 +1426,6 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Works with none, one, or multiple columns (unquoted tidyselect):
@@ -1462,7 +1445,7 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' exampleTumourNormal %>%
 #'   dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) %>%
 #'   mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
-#' }
+#'   
 getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL){
 
   if (rlang::quo_is_null(rlang::enquo(sampleAnnotation))) {

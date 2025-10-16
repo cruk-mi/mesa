@@ -41,7 +41,6 @@ Feature classes are taken from region annotations available on the windows
 if present). Bars are positioned according to \code{barType} (\code{stack}/\code{dodge}/\code{fill}).
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Beta >= 0.75, stacked bars per sample
@@ -51,8 +50,7 @@ exampleTumourNormal \%>\%
 # NRPM >= 2, show within-sample proportions
 exampleTumourNormal \%>\%
   plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
-}
-
+  
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}

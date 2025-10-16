@@ -25,14 +25,13 @@ qualitative palette; numeric columns use a continuous scale. Missing values are
 allowed and rendered per \strong{ComplexHeatmap} defaults.
 }
 \examples{
-\donttest{
 set.seed(1)
 data.frame(
   CpG_density = runif(10),
   annotation  = rep(c("Upstream","GeneBody"), 5)
 ) \%>\%
   makeGeneHeatmapRowAnnotation() 
-}
+  
 }
 \seealso{
 \code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}

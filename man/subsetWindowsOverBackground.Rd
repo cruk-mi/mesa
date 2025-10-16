@@ -9,7 +9,7 @@ subsetWindowsOverBackground(
   keepAbove = FALSE,
   samples = NULL,
   numWindows = NULL,
-  recalculateNumWindows = TRUE,
+  recalculateNumWindows = FALSE,
   FDRthres = 0.01,
   numAbove = 1
 )

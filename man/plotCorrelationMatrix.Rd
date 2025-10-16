@@ -69,7 +69,6 @@ For \code{"beta"}, entries below \code{minEnrichment} are set to \code{NA} to do
 low-enrichment windows.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # By default uses NRPM
@@ -79,7 +78,6 @@ exampleTumourNormal \%>\% plotCorrelationMatrix()
 exampleTumourNormal \%>\% 
   plotCorrelationMatrix(normMethod = "beta",
                         sampleAnnotation = c(tumour, patient))
-}
 
 }
 \seealso{
