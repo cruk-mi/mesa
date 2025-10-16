@@ -220,7 +220,6 @@ exampleTumourNormal \%>\%
   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
   slot("res") \%>\%
   names()
-
 }
 \seealso{
 \code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA}, \linkS4class{mesaUMAP},
