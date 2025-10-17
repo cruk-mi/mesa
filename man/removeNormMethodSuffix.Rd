@@ -23,7 +23,7 @@ A \code{data.frame} like \code{dataTable} but with cleaned column names (suffixe
 }
 \description{
 Clean wide tables (e.g., from \code{\link[=getDataTable]{getDataTable()}}) by stripping the trailing
-\verb{_\{normMethod\}} and optional \verb{_\{normMethod\}_means} suffixes from sample /
+\verb{_\{normMethod\}} or \verb{_\{normMethod\}_means} suffixes from sample /
 group-mean columns.
 }
 \details{

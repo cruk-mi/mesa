@@ -38,15 +38,15 @@ GRCh38/hg38 when \code{NULL}, use \code{"org.Hs.eg.db"} if installed.}
 
 \item{CpGislandsGR}{\code{GRanges} or \code{NULL}.
 CpG island regions for island/shore/shelf context.
-\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::hg38CpGIslands} if available).}
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::hg38CpGIslands}).}
 
 \item{FantomRegionsGR}{\code{GRanges} or \code{NULL}.
 FANTOM enhancer regions for overlap counts.
-\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::FantomRegions} if available).}
+\strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::FantomRegions}).}
 }
 \value{
 A tibble with the input windows augmented by ChIPseeker annotations and,
-when available, CpG island landscape and FANTOM overlap counts.
+when available, CpG island landscape and Fantom overlap.
 }
 \description{
 Uses \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}} to assign transcript-relative annotations
@@ -68,7 +68,6 @@ filled using the packages noted above when installed.
 \item \strong{Output columns:} Includes \code{annotation} (full label), \code{shortAnno} (without the
 trailing parenthetical), and—when contexts are provided—\code{landscape}
 (Island/Shore/Shelf/Open Sea) and \code{inFantom} (overlap count with FANTOM).
-Width/strand are dropped.
 }
 }
 \examples{
@@ -80,7 +79,7 @@ exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
   annotateWindows(genome = "hg38")
 
-# Or specify TxDb/annoDb explicitly (strings are resolved at runtime)
+# Or specify TxDb/annoDb explicitly
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
   annotateWindows(
@@ -89,16 +88,18 @@ exampleTumourNormal \%>\%
   )
 
 # Mouse example (mm10): supply mouse TxDb and OrgDb
-# data(exampleMouse, package = "mesa")
-# exampleMouse \%>\%
-#   getRegions() \%>\%
-#   annotateWindows(
-#     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-#     annoDb = "org.Mm.eg.db"
-#   )
+data(exampleMouse, package = "mesa")
+exampleMouse \%>\%
+  getRegions() \%>\%
+  annotateWindows(
+    TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+    annoDb = "org.Mm.eg.db"
+  )
 
 # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-# setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
+  setMesaGenome("hg38"); 
+  setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+  setMesaAnnoDb("org.Hs.eg.db")
 }
 
 }

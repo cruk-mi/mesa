@@ -8,7 +8,7 @@ calculateFractionReadsInGRanges(qseaSet, regionsToOverlap, numCountsNeeded)
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
-Input object providing per-window counts. \strong{Default:} none (must be supplied).}
+Input qseaSet. \strong{Default:} none (must be supplied).}
 
 \item{regionsToOverlap}{\code{GRanges} or \code{data.frame}.
 Regions to consider for overlap. Data frames must be coercible to \code{GRanges}
@@ -54,28 +54,26 @@ data(exampleTumourNormal, package = "mesa")
 # Using the shipped ultra-stable probes (GRCh38) as the region set
 exampleTumourNormal \%>\%
   calculateFractionReadsInGRanges(
-    regionsToOverlap = mesa::hg38UltraStableProbes,
+    regionsToOverlap = mesa::hg38CpGIslands,
     numCountsNeeded   = 5
   ) \%>\%
-  dplyr::select(sample_name, fraction) 
+  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
 
 # Define a small GRanges subset from the object's own windows
-exampleTumourNormal \%>\%
+gr <- exampleTumourNormal \%>\%
   qsea::getRegions() \%>\%
-  (\(gr) gr[seq_len(min(100L, length(gr)))])() \%>\%
-  (\(subgr)
-    calculateFractionReadsInGRanges(
+  head(n = 100)
+  
+calculateFractionReadsInGRanges(
       qseaSet           = exampleTumourNormal,
-      regionsToOverlap = subgr,
-      numCountsNeeded   = 3
-    )
-  ) \%>\%
-  dplyr::select(sample_name, fraction) 
+      regionsToOverlap  = gr,
+      numCountsNeeded   = 3) \%>\%
+  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
 
 }
 \seealso{
 \code{\link[qsea:qseaSet-class]{qsea::getCounts()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}},
-\link{hg38UltraStableProbes}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
+\link{hg38CpGIslands}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
 
 Other window-helpers: 
 \code{\link{convertToArrayBetaTable}()},

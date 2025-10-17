@@ -90,8 +90,8 @@ test_that("Making a GRCh38 qseaSet", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
-  if(!rlang::is_installed("MEDIPSData")){
-    skip("MEDIPSData Not installed")
+  if(!file.exists("/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")) {
+    skip("File not present")
   }
 
   sampleTable <- data.frame(sample_name = "Test1",

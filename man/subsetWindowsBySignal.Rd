@@ -68,7 +68,7 @@ data(exampleTumourNormal, package = "mesa")
 # Keep windows with median NRPM > 1 across all samples
 exampleTumourNormal \%>\%
   subsetWindowsBySignal(
-    fn = median,                # accepts na.rm
+    fn = median,
     threshold = 1,
     aboveThreshold = TRUE
   )
@@ -76,7 +76,7 @@ exampleTumourNormal \%>\%
 # Keep windows where the MIN beta < 0.5 in any sample
 exampleTumourNormal \%>\%
   subsetWindowsBySignal(
-    fn = min,                   # accepts na.rm
+    fn = min,
     threshold = 0.5,
     aboveThreshold = FALSE,
     normMethod = "beta"

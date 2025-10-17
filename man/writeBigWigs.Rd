@@ -14,7 +14,7 @@ writeBigWigs(
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
-Input object providing window coordinates and signal.
+A qseaSet object containing methylation-enriched sequencing data.
 \strong{Default:} none (must be supplied).}
 
 \item{folderName}{\code{character(1)}.
@@ -58,18 +58,18 @@ example data on GRCh38).
 data(exampleTumourNormal, package = "mesa")
 
 # Per-sample NRPM bigWigs
+td <- tempfile()
+dir.create(td)
 exampleTumourNormal \%>\%
-  { td <- tempfile(); dir.create(td);
-    writeBigWigs(., folderName = td, normMethod = "nrpm", useGroupMeans = FALSE);
-    list.files(td, pattern = "\\\\\\\\.bw$")
-  }
+  writeBigWigs(folderName = td, normMethod = "nrpm", useGroupMeans = FALSE)
+list.files(td, pattern = "\\\\\\\\.bw$")
 
 # Group-mean beta bigWigs (replace NA beta with 0)
+td2 <- tempfile()
+dir.create(td2)
 exampleTumourNormal \%>\%
-  { td <- tempfile(); dir.create(td);
-    writeBigWigs(., folderName = td, normMethod = "beta", useGroupMeans = TRUE, naVal = 0);
-    head(list.files(td, pattern = "\\\\\\\\.bw$"))
-  }
+  writeBigWigs(folderName = td2, normMethod = "beta", useGroupMeans = TRUE, naVal = 0)
+list.files(td, pattern = "\\\\\\\\.bw$")
 
 }
 \seealso{

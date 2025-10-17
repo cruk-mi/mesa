@@ -8,7 +8,7 @@ removeLibraryFactors(qseaSet)
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
-Input object whose library factors will be reset.
+A qseaSet object containing methylation-enriched sequencing data.
 \strong{Default:} none (must be supplied).}
 }
 \value{
@@ -31,12 +31,6 @@ data(exampleTumourNormal, package = "mesa")
 # Show current factors then reset to 1 and show again
 exampleTumourNormal \%>\%
   addLibraryInformation() \%>\%
-  pull(library_factor) \%>\%
-  head()
-
-exampleTumourNormal \%>\%
-  removeLibraryFactors() \%>\%
-  addLibraryInformation() \%>\%   # refresh cached summaries if needed
   pull(library_factor) \%>\%
   head()
 

@@ -9,7 +9,6 @@ subsetWindowsOverBackground(
   keepAbove = FALSE,
   samples = NULL,
   numWindows = NULL,
-  recalculateNumWindows = TRUE,
   FDRthres = 0.01,
   numAbove = 1
 )
@@ -29,12 +28,8 @@ against sample names. If \code{NULL}, all samples are tested.
 
 \item{numWindows}{\code{integer(1)} or \code{NULL}.
 Total number of windows in the genome used to compute the expected background.
-If \code{NULL}, it is estimated automatically.
+If \code{NULL}, it will use all the windows currently in the qseaSet.
 \strong{Default:} \code{NULL}.}
-
-\item{recalculateNumWindows}{\code{logical(1)}.
-Whether to recompute the number of windows via \code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}.
-\strong{Default:} \code{TRUE}.}
 
 \item{FDRthres}{\code{numeric(1)}.
 FDR threshold used to call windows significantly above background.
@@ -51,28 +46,33 @@ A filtered \code{qseaSet} containing only windows passing the criteria.
 \description{
 Identify genomic windows with significantly more reads than expected under a
 Poisson background model, given total reads per sample and the number of
-genome windows.
+genome windows. If \code{numWindows} is provided, then that value will be used as
+the total original number of windows under consideration for the false
+discovery rate, otherwise it will use the number of windows currently in the
+qseaSet.
 }
 \details{
 For each tested sample, an expected count per window is derived from its total
 reads and the supplied/estimated \code{numWindows}, and a Poisson test is used to
-flag windows above background. Windows are retained or removed based on
-\code{keepAbove} and the requirement that at least \code{numAbove} samples are significant
-at \code{FDRthres}.
+flag windows above background. This uses the \code{valid_fragments} column in the
+library information attached to the qseaSet, which is the number of fragments
+used in the generation of the original qseaSet. Windows are retained or
+removed based on \code{keepAbove} and the requirement that at least \code{numAbove}
+samples are significantat \code{FDRthres}.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
-# Keep windows above Poisson background in at least 2 samples whose names contain "Lung"
+# Keep windows above Poisson background in at least 2 samples whose names 
+# contain "Lung", assuming there were 9 million original windows
 exampleTumourNormal \%>\%
-  subsetWindowsOverBackground(keepAbove = TRUE, samples = "Lung", numAbove = 2)
+  subsetWindowsOverBackground(keepAbove = TRUE, samples = "Lung", 
+                              numAbove = 2, numWindows = 9e6 )
 
-# Drop windows above background (retain only background-like windows) across all samples
+# Drop windows above background (retain only background-like windows) across 
+# all samples, assuming there were 9 million original windows
 exampleTumourNormal \%>\%
-  subsetWindowsOverBackground(keepAbove = FALSE, FDRthres = 0.01)
-}
-
+  subsetWindowsOverBackground(keepAbove = FALSE, numWindows = 9e6)
 }
 \seealso{
 \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}

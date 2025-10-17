@@ -23,6 +23,7 @@ editor_options:
 * `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
 * `makeQset` now checks that the chromosomes provided match with those present in the BSgenome.
 * The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions.
+* `subsetWindowsOverBackground` no longer has the option to recalculate the number of windows, that must be provided.
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
@@ -46,6 +47,7 @@ editor_options:
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
 * Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range.
 * Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0.
+* `subsetWindowsOverBackground` should now work again
 
 # mesa 0.5.1
 

@@ -14,11 +14,11 @@ countWindowsAboveCutoff(
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
-Input object providing window-level signal.
+A qseaSet object containing methylation-enriched sequencing data.
 \strong{Default:} none (must be supplied).}
 
 \item{GRanges}{\code{GenomicRanges::GRanges}.
-Windows to evaluate (typically a subset of \code{qsea::getRegions(qseaSet)}).
+Windows to count over.
 \strong{Default:} none (must be supplied).}
 
 \item{samples}{\code{character()} or \code{NULL}.
