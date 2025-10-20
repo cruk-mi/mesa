@@ -80,13 +80,17 @@ with \pkg{mesa} for efficiency.
 }
 }
 \examples{
-# Sketch of usage (requires a real BAM and installed BSgenome):
- calculateCGEnrichment(
-   file = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"),
-   BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-   exportPath = tempdir(),
-   paired = TRUE
- )
+if (requireNamespace("MEDIPS", quietly = TRUE) &&
+    requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+  # Sketch of usage (requires MEDIPS and the GRCh38 BSgenome):
+  calculateCGEnrichment(
+    file = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"),
+    BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+    exportPath = tempdir(),
+    paired = TRUE
+  )
+}
+
 }
 \seealso{
 \code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},

@@ -152,15 +152,8 @@ Run PCA or UMAP on methylation signal matrices extracted from a
 \link[qsea:qseaSet-class]{qsea::qseaSet}. This is the core workhorse for dimensionality reduction;
 wrappers such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUMAP()}} provide simplified access.
 }
-\section{Functions}{
-\itemize{
-\item \code{getPCA()}: Principal component analysis of a qseaSet.
-
-\item \code{getUMAP()}: Uniform manifold approximation and projection of a qseaSet.
-
-}}
-\section{Details}{
-
+\details{
+:
 \itemize{
 \item For \code{method = "PCA"}, DR is performed via \code{\link[stats:prcomp]{stats::prcomp()}} with \code{center}
 and \code{scale} controls.
@@ -172,7 +165,13 @@ and \code{scale} controls.
 are performed and collected in \code{res}.
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{getPCA()}: Principal component analysis of a qseaSet.
 
+\item \code{getUMAP()}: Uniform manifold approximation and projection of a qseaSet.
+
+}}
 \examples{
 data(exampleTumourNormal, package = "mesa")
 

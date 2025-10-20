@@ -191,7 +191,7 @@ getUMAP <- function(qseaSet,
 #' * **params**: List of parameters used (method, selection/filter settings, etc.).
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
-#' @section Details:
+#' @details:
 #' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
 #'   and `scale` controls.  
 #' - For `method = "UMAP"`, DR is performed via [uwot::umap()].  

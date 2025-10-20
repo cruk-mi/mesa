@@ -84,6 +84,7 @@ Imports:
     biomaRt,
     hues,
     circlize,
+    S4Vectors,
     scales
 Depends:
     qsea,
