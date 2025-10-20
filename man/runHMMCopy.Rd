@@ -39,17 +39,19 @@ columns (\code{gc}, \code{map}) are consistent across the table.
 \donttest{
 # Minimal synthetic example: build a table and pipe into runHMMCopy()
 set.seed(1)
+n <- 2000L; w <- 5e4
 tibble::tibble(
-  chr    = rep(paste0("chr", 1:2), each = 5),
-  start  = seq(1, by = 1e6, length.out = 10),
-  end    = start + 1e6 - 1L,
-  width  = 1e6,
-  strand = "*",
-  gc     = runif(10, 0.3, 0.7),
-  map    = runif(10, 0.8, 1.0),
-  sampleA= rpois(10, 500)
+    chr     = factor(rep(c("chr1","chr2"), 
+                           each = n/2), 
+                           levels = c("chr1","chr2")),
+    start   = rep(seq(1, by = w, length.out = n/2), 2),
+    end     = start + w - 1L,
+    width   = w, strand = "*",
+    gc      = runif(n, 0.05, 0.95),        #' wide spread => stable LOESS
+    map     = runif(n, 0.60, 0.98),        #' avoid extremes / exact 1.0
+    sampleA = rpois(n, 500)
 ) \%>\%
-  runHMMCopy(colname = "sampleA", plotDir = tempdir())
+    runHMMCopy(colname = "sampleA", plotDir = NULL)
 }
 
 }

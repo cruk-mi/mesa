@@ -492,7 +492,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' @importFrom rlang :=
 #' @export
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NULL, numWindows = NULL,
-                                        recalculateNumWindows = TRUE, FDRthres = 0.01, numAbove = 1){
+                                        recalculateNumWindows = FALSE, FDRthres = 0.01, numAbove = 1){
 
 
   samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
