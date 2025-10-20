@@ -124,7 +124,6 @@ These defaults aim to keep categories visually separable for larger cohorts.
 }
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Basic PCA plot (PC1 vs PC2) with defaults
@@ -144,7 +143,7 @@ exampleTumourNormal \%>\%
   plotPCA(components = list(c(1, 3)),
           colour = "group",
           shape  = "tissue") 
-}
+          
 }
 \seealso{
 \code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}

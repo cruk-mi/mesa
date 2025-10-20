@@ -1059,7 +1059,6 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #' @family dimred-plotting
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic PCA plot (PC1 vs PC2) with defaults
@@ -1079,7 +1078,7 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #'   plotPCA(components = list(c(1, 3)),
 #'           colour = "group",
 #'           shape  = "tissue") 
-#' }
+#'           
 #' @export
 plotPCA.mesaDimRed <- function(object,
                     qseaSet = NULL,
@@ -1203,7 +1202,6 @@ plotPCA.mesaDimRed <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default UMAP (beta-normalised, top 1000 most variable windows)
@@ -1223,7 +1221,6 @@ plotPCA.mesaDimRed <- function(object,
 #'   plotUMAP(components = list(c(1, 2)),
 #'            colour = "group",
 #'            shape  = "tissue")
-#' }
 #'
 #' @export
 plotUMAP <- function(object,
@@ -1346,7 +1343,6 @@ plotUMAP <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # PCA: colour by group
@@ -1365,7 +1361,6 @@ plotUMAP <- function(object,
 #'   getPCA(nPC = 3) %>%
 #'   plotDimRed(colour = "group",
 #'              showSampleNames = TRUE) 
-#' }
 #'
 #' @export
 plotDimRed <- function(object,

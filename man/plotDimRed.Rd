@@ -114,7 +114,6 @@ Wrappers such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and
 for common use cases.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # PCA: colour by group
@@ -133,7 +132,6 @@ exampleTumourNormal \%>\%
   getPCA(nPC = 3) \%>\%
   plotDimRed(colour = "group",
              showSampleNames = TRUE) 
-}
 
 }
 \seealso{
