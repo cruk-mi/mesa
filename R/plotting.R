@@ -353,7 +353,6 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # One pipeline, no intermediate objects:
@@ -366,7 +365,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 #'     windowAnnotation = CpG_density
 #'   ) %>%
 #'   head()
-#' }
+#'   
 getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clusterRows = FALSE) {
   rowAnnotDf <- dataTab %>%
     plyranges::as_granges() %>%
@@ -452,7 +451,6 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Build window annotations and immediately feed them into makeHeatmapAnnotations()
@@ -470,7 +468,7 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #'     windowAnnotationDf = .,
 #'     useGroupMeans = FALSE
 #'   ) 
-#' }
+#'   
 makeHeatmapAnnotations <- function(qseaSet,
                                    sampleAnnotation = NULL,
                                    windowAnnotationDf = NULL,

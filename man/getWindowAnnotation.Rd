@@ -49,7 +49,6 @@ and \code{regions} provide overlapping information, columns from either source m
 selected via \code{windowAnnotation}. Use tidyselect to pick or pattern-match columns.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # One pipeline, no intermediate objects:
@@ -62,7 +61,7 @@ exampleTumourNormal \%>\%
     windowAnnotation = CpG_density
   ) \%>\%
   head()
-}
+  
 }
 \seealso{
 \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=getDataTable]{getDataTable()}}

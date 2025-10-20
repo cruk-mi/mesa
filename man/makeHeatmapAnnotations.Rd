@@ -59,7 +59,6 @@ qualitative palette and numeric variables are mapped to a continuous gradient.
 The function respects \code{useGroupMeans} to annotate either per-sample or per-group.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Build window annotations and immediately feed them into makeHeatmapAnnotations()
@@ -77,7 +76,7 @@ exampleTumourNormal \%>\%
     windowAnnotationDf = .,
     useGroupMeans = FALSE
   ) 
-}
+  
 }
 \seealso{
 \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}},
