@@ -95,7 +95,7 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 (see \code{BiocParallel::register()}).
 }
 \examples{
-
+\donttest{
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\%
 
@@ -109,96 +109,6 @@ exampleTumourNormal \%>\%
            plotDir       = tempdir()
      )
 
-
-if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-    data(exampleTumourNormal, package = "mesa")
-    
-    exampleTumourNormal \%>\%
-        {
-            st <- qsea::getSampleTable(.)
-            st$input_file <- system.file("extdata", "mini_chr22_multi_GRCh38.bam", package = "mesa")
-            qsea:::setSampleTable(., st)        # internal setter; fine for examples
-        } \%>\%
-        addHMMcopyCNV(
-            inputColumn       = "input_file",
-            windowSize        = 1e6,
-            hmmCopyGC         = gc_hg38_1000kb,
-            hmmCopyMap        = map_hg38_1000kb,
-            properPairsOnly   = TRUE,
-            parallel          = FALSE,
-            plotDir           = tempdir()
-        ) \%>\%
-        qsea::getCNV() \%>\%
-        utils::head() \%>\%
-        print()
-}
-
-if (requireNamespace("mesa", quietly = TRUE) &&
-    requireNamespace("qsea", quietly = TRUE) &&
-    requireNamespace("HMMcopy", quietly = TRUE) &&
-    requireNamespace("Rsamtools", quietly = TRUE)) {
-
-  data(exampleTumourNormal, package = "mesa")
-  qs <- exampleTumourNormal
-
-  # Create a tiny BAM on the fly (skipped on CRAN/BioC 
-    td  <- tempdir()
-    sam <- file.path(td, "toy_chr22.sam")
-    bam <- file.path(td, "toy_chr22.bam")
-
-    chr <- "22"; chr_len <- 50818468L
-    starts  <- 1e7 + (0:39) * 50000L
-    cigar   <- "100M"
-    seq100  <- paste(rep("A", 100), collapse = "")
-    qual100 <- paste(rep("I", 100), collapse = "")
-
-    con <- file(sam, "wt")
-    writeLines(c(
-      "@HD\tVN:1.6\tSO:coordinate",
-      paste0("@SQ\tSN:", chr, "\tLN:", chr_len),
-      vapply(seq_along(starts), function(i) {
-        paste0("r", i, "\t0\t", chr, "\t", starts[i], "\t60\t", cigar,
-               "\t*\t0\t0\t", seq100, "\t", qual100)
-      }, character(1))
-    ), con)
-    close(con)
-
-    Rsamtools::asBam(sam, destination = sub("\\\\.bam$", "", bam), overwrite = TRUE)
-    Rsamtools::indexBam(bam)
-  
-
-  # If \\donttest was skipped, fall back to the package demo BAM
-  if (!exists("bam") || !file.exists(bam)) {
-    bam <- system.file("extdata", "mini_chr22_multi_GRCh38.bam", package = "mesa")
-  }
-
-  st <- qsea::getSampleTable(qs)[1, , drop = FALSE]
-  st$input_file <- bam
-  qs <- qsea:::setSampleTable(qs, st)
-
-  win  <- 200000L
-  CNV_Regions <- qsea:::makeGenomeWindows(qsea:::getGenome(qs), "22", win)
-
-  set.seed(1)
-  n <- length(CNV_Regions)
-  gc_vals  <- pmax(0, pmin(1, 0.45 + sin(seq_len(n))/25 + rnorm(n, 0, 0.002)))
-  map_vals <- pmax(0, pmin(1, 0.96 - cos(seq_len(n))/60 + rnorm(n, 0, 0.001)))
-  gc_track  <- CNV_Regions; GenomicRanges::mcols(gc_track)$gc   <- gc_vals
-  map_track <- CNV_Regions; GenomicRanges::mcols(map_track)$map <- map_vals
-
-  qs2 <- addHMMcopyCNV(
-    qs,
-    inputColumn       = "input_file",
-    windowSize        = win,
-    hmmCopyGC         = gc_track,
-    hmmCopyMap        = map_track,
-    properPairsOnly   = FALSE,
-    fragmentLength    = 150L,
-    parallel          = FALSE,
-    plotDir           = NULL
-  )
-
-  head(qsea::getCNV(qs2))
 }
 
 }
