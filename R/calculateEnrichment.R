@@ -476,15 +476,13 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #' \donttest{
 #'  # Sketch (requires BAMs and a BSgenome):
 #'  data(exampleTumourNormal, package = "mesa")
-#'  qs <- exampleTumourNormal
-#'  qs <- addMedipsEnrichmentFactors(
-#'    qs, exportPath = tempdir(), nonEnrich = FALSE,
+#'  exampleTumourNormal %>%
+#'    addMedipsEnrichmentFactors(
+#'    exportPath = tempdir(), 
 #'    file_name = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"), 
-#'     nCores = 1,
-#'     paired = TRUE, 
-#'     chr.select = paste0("chr", 1:22)
-#'  )
-#'  head(qsea::getSampleTable(qs))
+#'    chr.select = paste0("chr", 1:22)
+#'  ) %>%
+#' getSampleTable()
 #' 
 #' 
 #' ## Minimal runnable example using the demo BAM included in {mesa}
