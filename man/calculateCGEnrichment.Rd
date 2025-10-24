@@ -81,13 +81,13 @@ with \pkg{mesa} for efficiency.
 }
 \examples{
 if (requireNamespace("MEDIPS", quietly = TRUE) &&
-    requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-  # Sketch of usage (requires MEDIPS and the GRCh38 BSgenome):
+    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+  
   calculateCGEnrichment(
-    file = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"),
-    BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+    file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+    BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",  
     exportPath = tempdir(),
-    paired = TRUE
+    paired     = FALSE                            
   )
 }
 

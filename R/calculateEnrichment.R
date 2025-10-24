@@ -118,22 +118,16 @@ calculateGenomicCGDistribution <- function(BSgenome){
 #'   \pkg{MEDIPS},  
 #'   \pkg{BSgenome}
 #'   
-#'   
-#' @importFrom GenomicRanges GRanges strand "strand<-"
-#' @importFrom IRanges IRanges
-#' @importFrom S4Vectors mcols
-#' @importFrom GenomeInfoDb seqlengths
-#' @importFrom BiocGenerics strand "strand<-"
 #'
 #' @examples
 #' if (requireNamespace("MEDIPS", quietly = TRUE) &&
-#'     requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#'   # Sketch of usage (requires MEDIPS and the GRCh38 BSgenome):
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#'   
 #'   calculateCGEnrichment(
-#'     file = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"),
-#'     BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+#'     file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+#'     BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",  
 #'     exportPath = tempdir(),
-#'     paired = TRUE
+#'     paired     = FALSE                            
 #'   )
 #' }
 #' 
@@ -474,51 +468,30 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #'
 #' @examples
 #' \donttest{
-#'  # Sketch (requires BAMs and a BSgenome):
-#'  data(exampleTumourNormal, package = "mesa")
-#'  exampleTumourNormal %>%
-#'    addMedipsEnrichmentFactors(
-#'    exportPath = tempdir(), 
-#'    file_name = system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa"), 
-#'    chr.select = paste0("chr", 1:22)
-#'  ) %>%
-#' getSampleTable()
-#' 
-#' 
-#' ## Minimal runnable example using the demo BAM included in {mesa}
-#' if (requireNamespace("qsea", quietly = TRUE) &&
-#'     requireNamespace("mesa", quietly = TRUE) &&
-#'     requireNamespace("MEDIPS", quietly = TRUE) &&
-#'     requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#'
-#'   library(qsea)
-#'
-#'   # 1. Locate a small bundled BAM file
-#'   bam_file <- system.file("extdata", "mini_chr22_GRCh38.bam", package = "mesa")
-#'
-#'   # 2. Build a minimal sample table with one pulldown (enriched) sample
-#'   sampleTable <- data.frame(
-#'     sample_name = "MiniSample",
-#'     file_name   = bam_file,
-#'     input_file  = bam_file,    # for simplicity; normally a separate Input
-#'     group       = "Tumour",
-#'     stringsAsFactors = FALSE
-#'   )
-#'
-#'   # 3. Create a qseaSet using the GRCh38 genome
-#'   qs <- qsea::createQseaSet(sampleTable, "BSgenome.Hsapiens.NCBI.GRCh38")
-#'
-#'   # 4. Add MEDIPS-style enrichment metrics (pulldown mode)
-#'   qs <- addMedipsEnrichmentFactors(qs,
-#'                                    nCores = 1,
-#'                                    nonEnrich = FALSE,
-#'                                    chr.select = "22")  # restrict to chr22
-#'
-#'   # 5. Inspect enrichment metrics appended to the sample table
-#'   qsea::getSampleTable(qs)[, c("sample_name", "relH", "GoGe", "nReads")]
+#'  if (requireNamespace("MEDIPS", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#'       
+#'       bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+#'       
+#'       data.frame(
+#'         sample_name = "hESC_Input_chr22",
+#'         file_name   = bam,
+#'         group       = "Input",
+#'         input_file  = bam,
+#'         stringsAsFactors = FALSE
+#'       ) %>%
+#'         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19") %>%
+#'         addMedipsEnrichmentFactors(
+#'           exportPath = tempdir(),
+#'           chr.select = paste0("chr22"),
+#'           paired     = FALSE
+#'           # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
+#'           # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
+#'         ) %>%
+#'         qsea::getSampleTable() %>%
+#'         print()
+#'     }
 #' }
-#' }
-#' 
 #' @export
 addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
                                        extend = 0, shift = 0, uniq = 0,
