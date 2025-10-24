@@ -76,21 +76,35 @@
 #' @family coverage
 #'
 #' @examples
-#' if (requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
-#' 
-#' regions <- GenomicRanges::GRanges("chr22", 
-#'                                   IRanges::IRanges(20000000, 20001000))
-#'  (
-#'     fileName = system.file("extdata", "mini_chr22.bam", package = "mesa"),
-#'     BSgenome = "BSgenome.Hsapiens.UCSC.hg19", # pass a string, not the object
-#'     regions  = regions,
-#'     minMapQual = 30, 
-#'     minInsertSize = 50, 
-#'     maxInsertSize = 1000, 
-#'     minReferenceLength = 30,
-#'     properPairsOnly = FALSE
-#'  )
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
+#'     requireNamespace("Rsamtools", quietly = TRUE)) {
 #'   
+#'   bam_src <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+#'   tmpdir  <- tempfile("bam_demo_"); dir.create(tmpdir)
+#'   bam     <- file.path(tmpdir, basename(bam_src))
+#'   file.copy(bam_src, bam, overwrite = TRUE)
+#'   if (!file.exists(paste0(bam_src, ".bai"))) {
+#'     Rsamtools::indexBam(bam)
+#'   } else {
+#'     file.copy(paste0(bam_src, ".bai"), paste0(bam, ".bai"), overwrite = TRUE)
+#'   }
+#'   
+#'   regs <- GenomicRanges::GRanges("chr22", IRanges::IRanges(20000000, 20001000))
+#'   
+#'   res <- getBamCoveragePairedAndUnpairedR1(
+#'     fileName            = bam,
+#'     BSgenome            = "BSgenome.Hsapiens.UCSC.hg19",
+#'     regions             = regs,
+#'     fragmentLength      = 150, 
+#'     minMapQual          = 30,
+#'     minInsertSize       = 50,
+#'     maxInsertSize       = 1000,
+#'     minReferenceLength  = 30,
+#'     properPairsOnly     = FALSE
+#'   )
+#'   
+#'   print(res$library)
 #' }
 #'
 #' @keywords internal
