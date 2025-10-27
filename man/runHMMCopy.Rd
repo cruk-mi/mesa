@@ -36,7 +36,7 @@ and returned as a \code{GRanges}. Ensure that the binning (\code{width}) and cov
 columns (\code{gc}, \code{map}) are consistent across the table.
 }
 \examples{
-\donttest{
+\dontrun{
 # Minimal synthetic example: build a table and pipe into runHMMCopy()
 set.seed(1)
 n <- 2000L; w <- 5e4

@@ -245,7 +245,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Minimal synthetic example: build a table and pipe into runHMMCopy()
 #' set.seed(1)
 #' n <- 2000L; w <- 5e4

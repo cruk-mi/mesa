@@ -477,7 +477,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' @family window-helpers
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Keep windows above Poisson background in at least 2 samples whose names contain "Lung"

@@ -86,7 +86,7 @@ on offsets/enrichment being recomputed.
 }
 }
 \examples{
-\donttest{
+\dontrun{
 data(exampleTumourNormal, package = "mesa")
 
 # Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet

@@ -82,7 +82,7 @@ then merges the results into the \verb{@libraries} slot (\verb{$file_name} for p
 \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
-\donttest{
+\dontrun{
  if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
       

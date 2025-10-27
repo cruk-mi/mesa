@@ -61,7 +61,7 @@ flag windows above background. Windows are retained or removed based on
 at \code{FDRthres}.
 }
 \examples{
-\donttest{
+\dontrun{
 data(exampleTumourNormal, package = "mesa")
 
 # Keep windows above Poisson background in at least 2 samples whose names contain "Lung"

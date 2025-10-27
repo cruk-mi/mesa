@@ -469,7 +469,7 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #'   [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  if (requireNamespace("MEDIPS", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
 #'       
