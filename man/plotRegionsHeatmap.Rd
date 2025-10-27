@@ -30,29 +30,31 @@ plotRegionsHeatmap(
 \item{qseaSet}{\code{qseaSet}.
 Input object containing windows and counts/betas.}
 
-\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
-If provided, only windows overlapping these regions are plotted; otherwise all windows are considered.
-\strong{Default:} \code{NULL}.}
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}),
+or \code{NULL}. If provided, only windows overlapping these regions are
+plotted; otherwise all windows are considered. \strong{Default:} \code{NULL}.}
 
 \item{normMethod}{\code{character(1)}.
 Which measure to plot, \code{"beta"} or \code{"nrpm"}.
 \strong{Default:} \code{"beta"}.}
 
 \item{sampleAnnotation}{\code{character()} or \code{NULL}.
-Names of columns from the sample table to display as column annotations (e.g., \code{c("tumour","tissue")}).
-\strong{Default:} \code{NULL}.}
+Names of columns from the sample table to display as column annotations
+(e.g., \code{c("tumour","tissue")}). \strong{Default:} \code{NULL}.}
 
 \item{windowAnnotation}{\code{character()} or \code{NULL}.
-Names of columns from region metadata (from the \code{qseaSet} regions or \code{regionsToOverlap}) to display as row annotations (e.g., \code{c("CpG_density")}).
-\strong{Default:} \code{NULL}.}
+Names of columns from region metadata (from the \code{qseaSet} regions or
+\code{regionsToOverlap}) to display as row annotations
+(e.g., \code{c("CpG_density")}). \strong{Default:} \code{NULL}.}
 
 \item{annotationColors}{\code{list} or \code{NA}.
-Optional named colour maps for annotations, e.g. \code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+Optional named colour maps for annotations, e.g.
+\code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
 \strong{Default:} \code{NA}.}
 
 \item{useGroupMeans}{\code{logical(1)}.
-If \code{TRUE}, average samples by the \code{group} column in the sample table (combine replicates).
-\strong{Default:} \code{FALSE}.}
+If \code{TRUE}, average samples by the \code{group} column in the sample table
+(combine replicates). \strong{Default:} \code{FALSE}.}
 
 \item{clusterRows}{\code{logical(1)}.
 Whether to cluster rows (windows).
@@ -71,12 +73,12 @@ Upper limit of the colour scale (used for \code{"nrpm"}; not applied to \code{"b
 \strong{Default:} \code{5}.}
 
 \item{clusterNum}{\code{integer(1)} or \code{NULL}.
-If set, cut the \strong{column} dendrogram into this many clusters and display cluster labels.
-\strong{Default:} \code{NULL}.}
+If set, cut the \strong{column} dendrogram into this many clusters and display
+cluster labels. \strong{Default:} \code{NULL}.}
 
 \item{clip}{\code{numeric(1)}.
-Cap values above this threshold before plotting (applies to \code{"nrpm"}, ignored for \code{"beta"}).
-\strong{Default:} \code{1e9}.}
+Cap values above this threshold before plotting (applies to \code{"nrpm"},
+ignored for \code{"beta"}). \strong{Default:} \code{1e9}.}
 
 \item{minDensity}{\code{numeric(1)}.
 Minimum \code{CpG_density} required to keep a window.
@@ -102,25 +104,28 @@ Clustering method for dendrograms (e.g., \code{"ward.D2"}).
 }
 \value{
 Draws a heatmap on the active device and (invisibly) returns the underlying
-\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition with
-\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
+\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further
+composition with \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
 }
 \description{
 Plot sample signal over a set of regions as a heatmap using \strong{ComplexHeatmap}.
-Regions are selected by overlap with \code{regionsToOverlap}, values are taken from
-the \code{qseaSet}, and optional annotations from the sample/region metadata can be added.
+Regions are selected by overlap with \code{regionsToOverlap}, values are taken
+from the \code{qseaSet}, and optional annotations from the sample/region metadata
+can be added.
 }
 \details{
-Windows are filtered by overlap (if \code{regionsToOverlap} is given) and by \code{minDensity}.
-For \code{"beta"}, low-enrichment values are set to \code{NA} using \code{minEnrichment}. For \code{"nrpm"},
-\code{clip} and \code{maxScale} help stabilise colour scaling for outliers. If \code{useGroupMeans = TRUE},
-samples are aggregated by \code{group} before plotting.
+Windows are filtered by overlap (if \code{regionsToOverlap} is given) and by
+\code{minDensity}. For \code{"beta"}, low-enrichment values are set to \code{NA} using
+\code{minEnrichment}. For \code{"nrpm"}, \code{clip} and \code{maxScale} help stabilise colour
+scaling for outliers. If \code{useGroupMeans = TRUE}, samples are aggregated by
+\code{group} before plotting.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
 # Compute regions (DMRs) to plot
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+DMRs <- exampleTumourNormal \%>\% 
+           calculateDMRs(variable = "tumour", contrasts = "first")
 
 # Basic heatmap of beta values over DMRs
 exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
@@ -133,29 +138,45 @@ exampleTumourNormal \%>\%
 
 # Group means, 2 column clusters, and custom annotation colours
 exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                   clusterRows = TRUE, 
-                   clusterNum = 2,
-                   sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-                    )
+  plotRegionsHeatmap(
+    regionsToOverlap = DMRs, 
+    clusterRows = TRUE, 
+    clusterNum = 2,
+    sampleAnnotation = tumour,
+    windowAnnotation = CpG_density,
+    annotationColors = list(
+      tumour = c(
+        "Tumour" = "firebrick4", 
+        "Normal" = "blue"
+      )
+    )
+  )
 
-# calculate DMRs to plot
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
-# plot these windows
+# Calculate DMRs to plot
+DMRs <- exampleTumourNormal \%>\% 
+          calculateDMRs(variable = "tumour", contrasts = "first")
+# Plot these windows
 exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
-# cluster the rows and add annotation
-exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
-# more complex example
+# Cluster the rows and add annotation
 exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                   clusterRows = TRUE, 
-                   clusterNum = 2,
-                   sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-                    )
+  plotRegionsHeatmap(DMRs, 
+                    clusterRows = TRUE, 
+                    sampleAnnotation = c(tumour, tissue))
+# More complex example
+exampleTumourNormal \%>\%
+  plotRegionsHeatmap(
+    regionsToOverlap = DMRs,
+    clusterRows      = TRUE,
+    clusterNum       = 2,
+    sampleAnnotation = tumour,
+    windowAnnotation = CpG_density,
+    annotationColors = list(
+      tumour = c(
+        "Tumour" = "firebrick4",
+        "Normal" = "blue"
+      )
+    )
+  )
 
 }
 \seealso{

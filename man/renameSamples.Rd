@@ -30,8 +30,10 @@ Replace sample names with values from a user-supplied column in the
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
+# Add a column with synthetic names and rename samples based on that column
 exampleTumourNormal \%>\%
-  dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(exampleTumourNormal))))) \%>\% # Add a column with synthetic names
-  renameSamples(newNameColumn = newName) # Rename samples based on that column
+  dplyr::mutate(newName = paste0("Sample", 
+  seq_len(nrow(qsea::getSampleTable(exampleTumourNormal))))) \%>\% 
+  renameSamples(newNameColumn = newName) 
 
 }

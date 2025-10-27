@@ -2,7 +2,8 @@
 % Please edit documentation in R/analyseDMRs.R
 \name{sliceDMRs}
 \alias{sliceDMRs}
-\title{Take the top most DMRs per contrast, based on those with the largest value of the selected metric}
+\title{Take the top most DMRs per contrast, based on those with the largest value
+of the selected metric}
 \usage{
 sliceDMRs(
   DMRs,
@@ -13,26 +14,36 @@ sliceDMRs(
 )
 }
 \arguments{
-\item{DMRs}{A data frame containing the output of calculateDMRs, potentially with multiple contrasts}
+\item{DMRs}{A data frame containing the output of calculateDMRs,
+potentially with multiple contrasts}
 
 \item{n}{How many DMRs to take of each contrast (if that many exists)}
 
-\item{metric}{Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start columns) or any other column in the data frame.
-If \code{adjPval} or \code{position} are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.}
+\item{metric}{Which metric to use to select the top DMRs. Options are
+deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start
+columns) or any other column in the data frame.
+If \code{adjPval} or \code{position} are used, then the window with the smallest
+value will be chosen, otherwise the largest value will be used.}
 
-\item{makePositive}{Whether to reverse the contrast when the window is hypomethylated in the contrast.}
+\item{makePositive}{Whether to reverse the contrast when the window is
+hypomethylated in the contrast.}
 
 \item{FDRthres}{Threshold on the adjusted p values}
 }
 \value{
-A data frame with the DMRs with the largest value of the selected metrics
+A data frame with the DMRs with the largest value of the selected
+metrics
 }
 \description{
-Take the top most DMRs per contrast, based on those with the largest value of the selected metric
+Take the top most DMRs per contrast, based on those with the largest value
+of the selected metric
 }
 \examples{
-# calculate some DMRs
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "type", contrasts = "all", keepContrastMeans = FALSE)
+# Calculate some DMRs
+DMRs <- exampleTumourNormal \%>\% 
+            calculateDMRs(variable = "type", 
+                          contrasts = "all", 
+                          keepContrastMeans = FALSE)
 # Find the DMRs with the largest deltaBeta between each comparison:
 DMRs \%>\% sliceDMRs(n = 1)
 # Or the windows with the largest log2FC: 

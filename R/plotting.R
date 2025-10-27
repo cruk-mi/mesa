@@ -1,43 +1,45 @@
 #' Heatmap of signal across selected genomic regions
 #'
 #' Plot sample signal over a set of regions as a heatmap using **ComplexHeatmap**.
-#' Regions are selected by overlap with `regionsToOverlap`, values are taken from
-#' the `qseaSet`, and optional annotations from the sample/region metadata can be added.
+#' Regions are selected by overlap with `regionsToOverlap`, values are taken 
+#' from the `qseaSet`, and optional annotations from the sample/region metadata 
+#' can be added.
 #'
 #' @param qseaSet `qseaSet`.  
 #'   Input object containing windows and counts/betas.
 #'
-#' @param regionsToOverlap `GRanges`, `data.frame` (coercible to `GRanges`), or `NULL`.  
-#'   If provided, only windows overlapping these regions are plotted; otherwise all windows are considered.  
-#'   **Default:** `NULL`.
+#' @param regionsToOverlap `GRanges`, `data.frame` (coercible to `GRanges`), 
+#'   or `NULL`. If provided, only windows overlapping these regions are 
+#'   plotted; otherwise all windows are considered. **Default:** `NULL`.
 #'
 #' @param normMethod `character(1)`.  
 #'   Which measure to plot, `"beta"` or `"nrpm"`.  
 #'   **Default:** `"beta"`.
 #'
 #' @param useGroupMeans `logical(1)`.  
-#'   If `TRUE`, average samples by the `group` column in the sample table (combine replicates).  
-#'   **Default:** `FALSE`.
+#'   If `TRUE`, average samples by the `group` column in the sample table 
+#'   (combine replicates). **Default:** `FALSE`.
 #'
 #' @param sampleAnnotation `character()` or `NULL`.  
-#'   Names of columns from the sample table to display as column annotations (e.g., `c("tumour","tissue")`).  
-#'   **Default:** `NULL`.
+#'   Names of columns from the sample table to display as column annotations 
+#'   (e.g., `c("tumour","tissue")`). **Default:** `NULL`.
 #'
 #' @param windowAnnotation `character()` or `NULL`.  
-#'   Names of columns from region metadata (from the `qseaSet` regions or `regionsToOverlap`) to display as row annotations (e.g., `c("CpG_density")`).  
-#'   **Default:** `NULL`.
+#'   Names of columns from region metadata (from the `qseaSet` regions or 
+#'   `regionsToOverlap`) to display as row annotations 
+#'   (e.g., `c("CpG_density")`). **Default:** `NULL`.
 #'
 #' @param clusterNum `integer(1)` or `NULL`.  
-#'   If set, cut the **column** dendrogram into this many clusters and display cluster labels.  
-#'   **Default:** `NULL`.
+#'   If set, cut the **column** dendrogram into this many clusters and display 
+#'   cluster labels. **Default:** `NULL`.
 #'
 #' @param maxScale `numeric(1)`.  
 #'   Upper limit of the colour scale (used for `"nrpm"`; not applied to `"beta"`).  
 #'   **Default:** `5`.
 #'
 #' @param clip `numeric(1)`.  
-#'   Cap values above this threshold before plotting (applies to `"nrpm"`, ignored for `"beta"`).  
-#'   **Default:** `1e9`.
+#'   Cap values above this threshold before plotting (applies to `"nrpm"`, 
+#'   ignored for `"beta"`). **Default:** `1e9`.
 #'
 #' @param minDensity `numeric(1)`.  
 #'   Minimum `CpG_density` required to keep a window.  
@@ -56,7 +58,8 @@
 #'   **Default:** `"ward.D2"`.
 #'
 #' @param annotationColors `list` or `NA`.  
-#'   Optional named colour maps for annotations, e.g. `list(tumour = c(Tumour = "firebrick4", Normal = "blue"))`.  
+#'   Optional named colour maps for annotations, e.g. 
+#'   `list(tumour = c(Tumour = "firebrick4", Normal = "blue"))`.  
 #'   **Default:** `NA`.
 #'
 #' @param minEnrichment `numeric(1)`.  
@@ -78,15 +81,16 @@
 #' @param ... Additional arguments forwarded to **ComplexHeatmap** constructors.
 #'
 #' @details
-#' Windows are filtered by overlap (if `regionsToOverlap` is given) and by `minDensity`.
-#' For `"beta"`, low-enrichment values are set to `NA` using `minEnrichment`. For `"nrpm"`,
-#' `clip` and `maxScale` help stabilise colour scaling for outliers. If `useGroupMeans = TRUE`,
-#' samples are aggregated by `group` before plotting.
+#' Windows are filtered by overlap (if `regionsToOverlap` is given) and by 
+#' `minDensity`. For `"beta"`, low-enrichment values are set to `NA` using 
+#' `minEnrichment`. For `"nrpm"`, `clip` and `maxScale` help stabilise colour 
+#' scaling for outliers. If `useGroupMeans = TRUE`, samples are aggregated by 
+#' `group` before plotting.
 #'
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
-#' **ComplexHeatmap** object (e.g., a `Heatmap`/`HeatmapList`) for further composition with
-#' [ComplexHeatmap::draw()].
+#' **ComplexHeatmap** object (e.g., a `Heatmap`/`HeatmapList`) for further 
+#' composition with [ComplexHeatmap::draw()].
 #'
 #' @seealso
 #' [qsea::makeTable()], [ComplexHeatmap::Heatmap()], [ComplexHeatmap::draw()],
@@ -96,7 +100,8 @@
 #' data(exampleTumourNormal, package = "mesa")
 #' 
 #' # Compute regions (DMRs) to plot
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
+#' DMRs <- exampleTumourNormal %>% 
+#'            calculateDMRs(variable = "tumour", contrasts = "first")
 #' 
 #' # Basic heatmap of beta values over DMRs
 #' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
@@ -109,31 +114,47 @@
 #' 
 #' # Group means, 2 column clusters, and custom annotation colours
 #' exampleTumourNormal %>% 
-#'   plotRegionsHeatmap(regionsToOverlap = DMRs, 
-#'                    clusterRows = TRUE, 
-#'                    clusterNum = 2,
-#'                    sampleAnnotation = tumour,
-#'                    windowAnnotation = CpG_density,
-#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-#'                     )
+#'   plotRegionsHeatmap(
+#'     regionsToOverlap = DMRs, 
+#'     clusterRows = TRUE, 
+#'     clusterNum = 2,
+#'     sampleAnnotation = tumour,
+#'     windowAnnotation = CpG_density,
+#'     annotationColors = list(
+#'       tumour = c(
+#'         "Tumour" = "firebrick4", 
+#'         "Normal" = "blue"
+#'       )
+#'     )
+#'   )
 #' 
 #' @export
 #' @examples
-#' # calculate DMRs to plot
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
-#' # plot these windows
+#' # Calculate DMRs to plot
+#' DMRs <- exampleTumourNormal %>% 
+#'           calculateDMRs(variable = "tumour", contrasts = "first")
+#' # Plot these windows
 #' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
-#' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
-#' # more complex example
+#' # Cluster the rows and add annotation
 #' exampleTumourNormal %>% 
-#'   plotRegionsHeatmap(regionsToOverlap = DMRs, 
-#'                    clusterRows = TRUE, 
-#'                    clusterNum = 2,
-#'                    sampleAnnotation = tumour,
-#'                    windowAnnotation = CpG_density,
-#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-#'                     )
+#'   plotRegionsHeatmap(DMRs, 
+#'                     clusterRows = TRUE, 
+#'                     sampleAnnotation = c(tumour, tissue))
+#' # More complex example
+#' exampleTumourNormal %>%
+#'   plotRegionsHeatmap(
+#'     regionsToOverlap = DMRs,
+#'     clusterRows      = TRUE,
+#'     clusterNum       = 2,
+#'     sampleAnnotation = tumour,
+#'     windowAnnotation = CpG_density,
+#'     annotationColors = list(
+#'       tumour = c(
+#'         "Tumour" = "firebrick4",
+#'         "Normal" = "blue"
+#'       )
+#'     )
+#'   )
 #' 
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
@@ -701,14 +722,13 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'   **Default:** `NA`.
 #'
 #' @param showSampleNames `logical(1)` or `NULL`.  
-#'   If `NULL`, names are shown when there are fewer than 50 samples; set `TRUE`/`FALSE` to force.  
-#'   **Default:** `NULL`.
+#'   If `NULL`, names are shown when there are fewer than 50 samples; set 
+#'   `TRUE`/`FALSE` to force. **Default:** `NULL`.
 #'
 #' @param mart `biomaRt::Mart` or `NULL`.  
-#'   Ensembl mart used to resolve gene coordinates. If `NULL`, attempts to use a mart
-#'   stored on the `qseaSet` (see [setMart()]); otherwise falls back to a default for
-#'   GRCh38/hg38 or hg19.  
-#'   **Default:** `NULL`.
+#'   Ensembl mart used to resolve gene coordinates. If `NULL`, attempts to use 
+#'   a mart stored on the `qseaSet` (see [setMart()]); otherwise falls back to 
+#'   a default for GRCh38/hg38 or hg19. **Default:** `NULL`.
 #'
 #' @param idType `character(1)` or `NULL`.  
 #'   Column in the mart to match `gene` against (needed for non-human/mouse setups).  
@@ -749,11 +769,18 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'
 #' # Custom colours and wider flanks
 #' exampleTumourNormal %>%
-#'   plotGeneHeatmap("HOXA9",
-#'                   sampleAnnotation  = tumour,
-#'                   annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
-#'                   upstreamDist = 1000,
-#'                   downstreamDist = 2000)
+#'   plotGeneHeatmap(
+#'     gene              = "HOXA9",
+#'     sampleAnnotation  = tumour,
+#'     annotationColors  = list(
+#'       tumour = c(
+#'         Tumour = "firebrick4",
+#'         Normal = "blue"
+#'       )
+#'     ),
+#'     upstreamDist      = 1000,
+#'     downstreamDist    = 2000
+#'   )
 #'
 #' # Mouse example with explicit Ensembl mart (requires internet)
 #' # data(exampleMouse, package = "mesa")

@@ -348,18 +348,28 @@ writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
   invisible(dataTable)
 }
 
-#' Take the top most DMRs per contrast, based on those with the largest value of the selected metric
+#' Take the top most DMRs per contrast, based on those with the largest value 
+#' of the selected metric
 #'
-#' @param DMRs  A data frame containing the output of calculateDMRs, potentially with multiple contrasts
+#' @param DMRs  A data frame containing the output of calculateDMRs, 
+#' potentially with multiple contrasts
 #' @param n How many DMRs to take of each contrast (if that many exists)
 #' @param FDRthres Threshold on the adjusted p values
-#' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start columns) or any other column in the data frame. 
-#' If `adjPval` or `position` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
-#' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast.
-#' @return A data frame with the DMRs with the largest value of the selected metrics
+#' @param metric Which metric to use to select the top DMRs. Options are 
+#' deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start 
+#' columns) or any other column in the data frame. 
+#' If `adjPval` or `position` are used, then the window with the smallest 
+#' value will be chosen, otherwise the largest value will be used.
+#' @param makePositive Whether to reverse the contrast when the window is 
+#' hypomethylated in the contrast.
+#' @return A data frame with the DMRs with the largest value of the selected 
+#' metrics
 #' @examples
-#' # calculate some DMRs
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "type", contrasts = "all", keepContrastMeans = FALSE)
+#' # Calculate some DMRs
+#' DMRs <- exampleTumourNormal %>% 
+#'             calculateDMRs(variable = "type", 
+#'                           contrasts = "all", 
+#'                           keepContrastMeans = FALSE)
 #' # Find the DMRs with the largest deltaBeta between each comparison:
 #' DMRs %>% sliceDMRs(n = 1)
 #' # Or the windows with the largest log2FC: 

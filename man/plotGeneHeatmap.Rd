@@ -80,14 +80,13 @@ Whether to cluster columns (samples).
 \strong{Default:} \code{TRUE}.}
 
 \item{mart}{\code{biomaRt::Mart} or \code{NULL}.
-Ensembl mart used to resolve gene coordinates. If \code{NULL}, attempts to use a mart
-stored on the \code{qseaSet} (see \code{\link[=setMart]{setMart()}}); otherwise falls back to a default for
-GRCh38/hg38 or hg19.
-\strong{Default:} \code{NULL}.}
+Ensembl mart used to resolve gene coordinates. If \code{NULL}, attempts to use
+a mart stored on the \code{qseaSet} (see \code{\link[=setMart]{setMart()}}); otherwise falls back to
+a default for GRCh38/hg38 or hg19. \strong{Default:} \code{NULL}.}
 
 \item{showSampleNames}{\code{logical(1)} or \code{NULL}.
-If \code{NULL}, names are shown when there are fewer than 50 samples; set \code{TRUE}/\code{FALSE} to force.
-\strong{Default:} \code{NULL}.}
+If \code{NULL}, names are shown when there are fewer than 50 samples; set
+\code{TRUE}/\code{FALSE} to force. \strong{Default:} \code{NULL}.}
 
 \item{downstreamDist}{\code{integer(1)}.
 Number of base pairs downstream of the gene to include.
@@ -132,11 +131,18 @@ exampleTumourNormal \%>\%
 
 # Custom colours and wider flanks
 exampleTumourNormal \%>\%
-  plotGeneHeatmap("HOXA9",
-                  sampleAnnotation  = tumour,
-                  annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
-                  upstreamDist = 1000,
-                  downstreamDist = 2000)
+  plotGeneHeatmap(
+    gene              = "HOXA9",
+    sampleAnnotation  = tumour,
+    annotationColors  = list(
+      tumour = c(
+        Tumour = "firebrick4",
+        Normal = "blue"
+      )
+    ),
+    upstreamDist      = 1000,
+    downstreamDist    = 2000
+  )
 
 # Mouse example with explicit Ensembl mart (requires internet)
 # data(exampleMouse, package = "mesa")
