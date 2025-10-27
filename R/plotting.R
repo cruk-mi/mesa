@@ -457,11 +457,11 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #'   filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) %>%
 #'   getDataTable(normMethod = "nrpm") %>%
 #'   dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-#'   getWindowAnnotation(
+#'   mesa:::getWindowAnnotation(
 #'     regions = qsea::getRegions(exampleTumourNormal)[1:50],
 #'     windowAnnotation = CpG_density
 #'   ) %>%
-#'   makeHeatmapAnnotations(
+#'   mesa:::makeHeatmapAnnotations(
 #'     qseaSet = exampleTumourNormal,
 #'     sampleAnnotation = group,
 #'     windowAnnotationDf = .,
@@ -1014,7 +1014,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 #'   CpG_density = runif(10),
 #'   annotation  = rep(c("Upstream","GeneBody"), 5)
 #' ) %>%
-#'   makeGeneHeatmapRowAnnotation() 
+#'   mesa:::makeGeneHeatmapRowAnnotation() 
 #'   
 makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 

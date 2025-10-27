@@ -66,11 +66,11 @@ exampleTumourNormal \%>\%
   filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
   getDataTable(normMethod = "nrpm") \%>\%
   dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
-  getWindowAnnotation(
+  mesa:::getWindowAnnotation(
     regions = qsea::getRegions(exampleTumourNormal)[1:50],
     windowAnnotation = CpG_density
   ) \%>\%
-  makeHeatmapAnnotations(
+  mesa:::makeHeatmapAnnotations(
     qseaSet = exampleTumourNormal,
     sampleAnnotation = group,
     windowAnnotationDf = .,

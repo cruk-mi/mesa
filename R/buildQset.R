@@ -92,7 +92,7 @@
 #'   
 #'   regs <- GenomicRanges::GRanges("chr22", IRanges::IRanges(20000000, 20001000))
 #'   
-#'   res <- getBamCoveragePairedAndUnpairedR1(
+#'   res <- mesa:::getBamCoveragePairedAndUnpairedR1(
 #'     fileName            = bam,
 #'     BSgenome            = "BSgenome.Hsapiens.UCSC.hg19",
 #'     regions             = regs,

@@ -30,7 +30,7 @@ data.frame(
   CpG_density = runif(10),
   annotation  = rep(c("Upstream","GeneBody"), 5)
 ) \%>\%
-  makeGeneHeatmapRowAnnotation() 
+  mesa:::makeGeneHeatmapRowAnnotation() 
   
 }
 \seealso{

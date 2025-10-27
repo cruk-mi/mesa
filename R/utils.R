@@ -278,7 +278,7 @@ remove_almost_empty_cols <- function(dat, prop)  {
 #'
 #' @examples
 #' old <- options(skip_long_checks = TRUE)
-#' skip_long_checks()  # will skip if option is TRUE
+#' mesa:::skip_long_checks()  # will skip if option is TRUE
 #' options(old)
 #' 
 #' @keywords internal
