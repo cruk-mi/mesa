@@ -81,7 +81,9 @@ with \pkg{mesa} for efficiency.
 }
 \examples{
 if (requireNamespace("MEDIPS", quietly = TRUE) &&
-    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+  requireNamespace("MEDIPSData", quietly = TRUE) &&
+  requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
+  require("GenomicRanges", quietly = TRUE)) {
   
   calculateCGEnrichment(
     file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
