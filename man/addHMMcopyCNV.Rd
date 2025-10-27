@@ -95,7 +95,7 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 (see \code{BiocParallel::register()}).
 }
 \examples{
-\donttest{
+\dontrun{
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\%
 

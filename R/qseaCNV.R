@@ -81,7 +81,7 @@
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #' exampleTumourNormal %>%
 #'
