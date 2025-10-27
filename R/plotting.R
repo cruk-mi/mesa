@@ -355,12 +355,11 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # One pipeline, no intermediate objects:
 #' exampleTumourNormal %>%
 #'   filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) %>%
 #'   getDataTable(normMethod = "nrpm") %>%
 #'   dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-#'   getWindowAnnotation(
+#'   mesa:::getWindowAnnotation(
 #'     regions = qsea::getRegions(exampleTumourNormal)[1:50],
 #'     windowAnnotation = CpG_density
 #'   ) %>%
