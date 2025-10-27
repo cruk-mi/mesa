@@ -9,11 +9,15 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  fig.height = 5.5,
+  collapse  = TRUE,
+  fig.height= 5.5,
   fig.width = 7,
-  comment = "#>"
+  comment   = "#>",
+  dev       = "png",
+  dev.args  = list(type = "cairo")   # <- headless-safe
 )
+if (!capabilities("X11")) options(bitmapType = "cairo")  # <- extra guard
+
 ```
 
 ```{r setup}
@@ -199,8 +203,16 @@ PCAplots3 <- plotPCA(pca1,
                      shape = "tumour", 
                      plotlyAnnotations = c("stage", "age", "gender"))
 
-plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
 ```
+
+```{r pca-plot, echo=FALSE}
+if (knitr::is_html_output()) {
+  plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
+} else {
+  PCAplots3$pca1$patient$PC1vsPC2
+}
+```
+
 
 Plotly plots are great for interactive use in html reports.\
 The downside of using them is that the legend often gets displayed in a complicated, unhelpful way and the formatting of the plot is often not as good and hard to control.\
