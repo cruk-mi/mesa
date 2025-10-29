@@ -115,3 +115,5 @@ biocViews: Sequencing, DNAMethylation, CpGIsland,
         CopyNumberVariation, DifferentialMethylation,
         Coverage, ChIPSeq, ChipOnChip
 Config/testthat/edition: 3
+URL: https://github.com/cruk-mi/mesa
+BugReports: https://github.com/cruk-mi/mesa
