@@ -1382,7 +1382,7 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 
   purrr::map(stats::setNames(colnames(temp),colnames(temp)),function(x){  which(temp[,x,drop = FALSE] <= minAdjPval)}) %>%
     UpSetR::fromList() %>%
-    UpSetR::upset(nsets = ncol(.), nintersects = 100, order.by = "freq", text.scale	 = 1.8, ...)
+    UpSetR::upset(nsets = ncol(.), nintersects = 100, order.by = "freq", text.scale = 1.8, ...)
 }
 
 
