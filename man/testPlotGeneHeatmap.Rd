@@ -2,13 +2,28 @@
 % Please edit documentation in R/plotting.R
 \name{testPlotGeneHeatmap}
 \alias{testPlotGeneHeatmap}
-\title{An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur}
+\title{Test wrapper for \code{plotGeneHeatmap} that skips on network errors}
 \usage{
 testPlotGeneHeatmap(...)
 }
 \arguments{
-\item{...}{Arguments to pass to plotGeneHeatmap}
+\item{...}{Arguments passed to \code{plotGeneHeatmap()}.}
+}
+\value{
+Invisibly returns \code{TRUE} when the plot call succeeds and the
+test is marked as succeeded. Otherwise, rethrows non-network errors.
 }
 \description{
-An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
+Calls \code{plotGeneHeatmap(...)} inside \code{tryCatch}. If a likely
+BiomaRt/network error occurs, the test is skipped instead of failing.
 }
+\details{
+Errors are matched case-insensitively against patterns such as
+"biomart", "SSL", "connection", "timeout", "could not resolve",
+"unexpected eof", and "http 500". On a match, the test is skipped via
+\code{testthat::skip()}.
+}
+\seealso{
+\code{\link{plotGeneHeatmap}}
+}
+\keyword{internal}

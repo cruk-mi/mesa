@@ -347,7 +347,21 @@ asValidGranges <- function(object){
 
 }
 
-#' This function captures a printed form of the object x, for use in error messages
-#' Taken from https://stackoverflow.com/a/26083626 by Richie Cotton
-#' @param x An object to capture
-print_and_capture <- function(x) {paste(utils::capture.output(print(x)), collapse = "\n") }
+#' Capture the printed representation of an object
+#'
+#' Utility that prints \code{x} and captures the console output as a single
+#' string. Handy for building informative error messages.
+#'
+#' @param x An object to capture.
+#'
+#' @return A length-1 character string with the printed form of \code{x},
+#'   lines joined by \code{"\n"}.
+#'
+#' @references
+#' Richie Cotton. "Capture R print output to a string." Stack Overflow.
+#' \url{https://stackoverflow.com/a/26083626}
+#'
+#' @keywords internal
+print_and_capture <- function(x) {
+  paste(utils::capture.output(print(x)), collapse = "\n")
+}
