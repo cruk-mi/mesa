@@ -1489,9 +1489,27 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
 }
 
 
-#' An internal wrapper around plotGeneHeatmap that catches biomart connection errors and skips the test if they occur
-#' 
-#' @param ... Arguments to pass to plotGeneHeatmap
+#' Test wrapper for \code{plotGeneHeatmap} that skips on network errors
+#'
+#' Calls \code{plotGeneHeatmap(...)} inside \code{tryCatch}. If a likely
+#' BiomaRt/network error occurs, the test is skipped instead of failing.
+#'
+#' @param ... Arguments passed to \code{plotGeneHeatmap()}.
+#'
+#' @details Errors are matched case-insensitively against patterns such as
+#'   "biomart", "SSL", "connection", "timeout", "could not resolve",
+#'   "unexpected eof", and "http 500". On a match, the test is skipped via
+#'   \code{testthat::skip()}.
+#'
+#' @return Invisibly returns \code{TRUE} when the plot call succeeds and the
+#'   test is marked as succeeded. Otherwise, rethrows non-network errors.
+#'
+#' @seealso \code{\link{plotGeneHeatmap}}
+#'
+#' @examples
+#' mesa:::testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10")
+#'
+#' @keywords internal
 testPlotGeneHeatmap <- function(...) {
   tryCatch({
     plotGeneHeatmap(...)

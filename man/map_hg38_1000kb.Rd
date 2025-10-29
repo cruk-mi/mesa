@@ -5,21 +5,48 @@
 \alias{map_hg38_1000kb}
 \alias{map_hg38_50kb}
 \alias{map_hg38_500kb}
-\title{GC content across the human genome build hg38/GRCh38}
+\title{Mappability across the human genome (hg38/GRCh38)}
+\format{
+One of:
+\enumerate{
+\item A \code{data.table}/\code{data.frame} with columns:
+\describe{
+\item{chrom}{Chromosome (e.g., "chr1", ..., "chrX", "chrY").}
+\item{start}{0-based start of the bin.}
+\item{end}{1-based end of the bin.}
+\item{map}{Average mappability in the bin (0–1).}
+}
+\item A \code{GRanges} with genomic bins and \code{mcols(.)$map} storing
+the average mappability (0–1) per bin.
+}
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 61775 rows and 4 columns.
+
+An object of class \code{data.table} (inherits from \code{data.frame}) with 6188 rows and 4 columns.
+}
 \source{
 \url{https://github.com/broadinstitute/ichorCNA}
 }
 \usage{
-map_hg38_1000kb
+data(map_hg38_1000kb); data(map_hg38_500kb); data(map_hg38_50kb)
 
 map_hg38_50kb
 
 map_hg38_500kb
 }
+\value{
+\code{map_hg38_1000kb}, \code{map_hg38_500kb}, and
+\code{map_hg38_50kb} return objects as described in \code{@format} with
+bin sizes of 1000 kb, 500 kb, and 50 kb, respectively.
+}
 \description{
-A set of data.table/GRanges object containing mapabillity values for fixed size windows across the genome
-Downloaded from ichorCNA,  https://github.com/broadinstitute/ichorCNA, formatted for hmmcopy.
-Note chromosomes are in size order, not numerical order.
-Each file contains the chromosome, start and end of the bin and an average GC content metric for that bin.
+Fixed-size bins with average mappability per bin. Bins are ordered by
+chromosome size (not strictly numeric).
+}
+\examples{
+data(map_hg38_50kb)
+class(map_hg38_50kb)
+head(map_hg38_50kb)
 }
 \keyword{datasets}
+\keyword{genomics}
