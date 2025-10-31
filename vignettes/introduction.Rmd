@@ -249,3 +249,8 @@ setMesaParallel(useParallel = TRUE, nCores = 2)
 The use of `nCores` here will set up a `MulticoreParam` architecture with that many cores (a reasonable default for Unix or Mac). Specify a different architecture with `BiocParallel::register` if you wish to vary this, please see the BiocParallel vignette for how to specify `vignette("Introduction_To_BiocParallel", package = "BiocParallel")`; the most recently registered instance will be used.
 
 Setting this parameter globally via `options` means that we don't have to explicitly call `parallel = TRUE` inside functions in order for them to paralellise across the available calls.
+
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```

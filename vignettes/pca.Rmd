@@ -401,3 +401,8 @@ qseaSetRandom |>
 ```
 
 As a final note, we state that UMAPs should be used with care, as they are easy to misinterpret.
+
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```
