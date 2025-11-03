@@ -134,11 +134,22 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   
   # two conditions should be the same, but really don't want this to happen as it 
   # leads to exponentially increasing numbers of rows 
-  if(any(overlappedRegions %>% duplicated()) || (length(overlappedRegions) != length(CNV_Regions))) {
-    duplicatedRegions <- utils::head(overlappedRegions[overlappedRegions %>% duplicated()])
-    stop(paste(c("CNV regions overlaps with multiple windows from the hmmCopyGC and/or hmmCopyMap objects! 
-    This probably means that your window sizes do not match. 
-    Showing first affected regions: \n", print_and_capture(duplicatedRegions))))
+  if (any(overlappedRegions %>% duplicated()) ||
+      (length(overlappedRegions) != length(CNV_Regions))) {
+    
+    duplicatedRegions <- utils::head(
+      overlappedRegions[overlappedRegions %>% duplicated()]
+    )
+    
+    stop(
+      sprintf(
+        "CNV regions overlap with multiple windows from the hmmCopyGC and/or \
+hmmCopyMap objects!\nThis probably means that your window sizes do not match.\n\
+Showing first affected regions:\n%s",
+        print_and_capture(duplicatedRegions)
+      ),
+      call. = FALSE
+    )
   }
   
   # this object is only used for this sanity check, not used directly again, so clean up
