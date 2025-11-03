@@ -372,46 +372,64 @@ poolSamples <- function(qseaSet, mergeString){
   newSet <- qseaSet %>%
     subsetQset(samplesToKeep = samplesToMerge)
 
-  newCounts <- sapply(newNames, function(x) {
-    rowSums(qseaSet@count_matrix[,startsWith(colnames(qseaSet@count_matrix), x), drop = FALSE])
-  }
+  newCounts <- vapply(
+    newNames,
+    function(x) {
+      rowSums(
+        qseaSet@count_matrix[
+          , startsWith(colnames(qseaSet@count_matrix), x),
+          drop = FALSE
+        ]
+      )
+    },
+    FUN.VALUE = numeric(nrow(qseaSet@count_matrix))
   )
 
-  newCNVvals <- sapply(newNames, function(x) {
-    #GenomicRanges::mcols(qseaSet@cnv)
-
-    columnsToKeep <- qseaSet %>%
-      qsea::getCNV() %>%
-      GenomicRanges::mcols() %>%
-      colnames() %>%
-      stringr::str_subset(x)
-
-    reducedMat <- qseaSet %>%
-      qsea::getCNV() %>%
-      GenomicRanges::mcols() %>%
-      as.matrix()
-
-    weights <- qseaSet@libraries$input_file[columnsToKeep, "total_fragments"]
-    weights <- weights/sum(weights)
-
-    # multiply each row by the weight, to average out the number of reads
-    rowSums(reducedMat[,columnsToKeep, drop = FALSE] %*% diag(weights) )
-  }
+  newCNVvals <- vapply(
+    newNames,
+    function(x) {
+      columnsToKeep <- qseaSet %>%
+        qsea::getCNV() %>%
+        GenomicRanges::mcols() %>%
+        colnames() %>%
+        stringr::str_subset(x)
+      
+      reducedMat <- qseaSet %>%
+        qsea::getCNV() %>%
+        GenomicRanges::mcols() %>%
+        as.matrix()
+      
+      weights <- qseaSet@libraries$input_file[columnsToKeep, "total_fragments"]
+      weights <- weights / sum(weights)
+      
+      rowSums(
+        reducedMat[, columnsToKeep, drop = FALSE] %*% diag(weights)
+      )
+    },
+    FUN.VALUE = numeric(nrow(GenomicRanges::mcols(qseaSet@cnv)))
   )
 
-  newZygosity <- sapply(newNames, function(x) {
-
-    columnsToKeep <- qseaSet %>%
-      qsea::getCNV() %>%
-      GenomicRanges::mcols() %>%
-      colnames() %>%
-      stringr::str_subset(x)
-
-    weights <- qseaSet@libraries$input_file[columnsToKeep, "total_fragments"]
-    weights <- weights/sum(weights)
-
-    colSums(qseaSet@zygosity[startsWith(rownames(qseaSet@zygosity), x),,drop = FALSE] * weights)
-  }
+  newZygosity <- vapply(
+    newNames,
+    function(x) {
+      columnsToKeep <- qseaSet %>%
+        qsea::getCNV() %>%
+        GenomicRanges::mcols() %>%
+        colnames() %>%
+        stringr::str_subset(x)
+      
+      weights <- qseaSet@libraries$input_file[columnsToKeep, "total_fragments"]
+      weights <- weights / sum(weights)
+      
+      colSums(
+        qseaSet@zygosity[
+          startsWith(rownames(qseaSet@zygosity), x),
+          ,
+          drop = FALSE
+        ] * weights
+      )
+    },
+    FUN.VALUE = numeric(ncol(qseaSet@zygosity))
   ) %>% t()
 
   newSet@count_matrix <- newCounts
