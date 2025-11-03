@@ -144,7 +144,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   }
 
   if (is.null(keepIndex) & minNRPM == 0 ) {
-    keepIndex = which(matrixStats::rowMaxs(qsea::getCounts(qseaSet %>% dplyr::filter(sample_name %in% samplesInContrasts))) >= minReadCount)
+    keepIndex <- which(matrixStats::rowMaxs(qsea::getCounts(qseaSet %>% dplyr::filter(sample_name %in% samplesInContrasts))) >= minReadCount)
   }
 
   if (is.null(keepIndex) & minNRPM >= 0) {
@@ -581,7 +581,7 @@ calculateDMRs <- function(qseaSet,
       ))
     } else if (stringr::str_detect(contrasts,"All_vs_|all_vs_")){
 
-      value2 = contrasts %>% stringr::str_remove("All_vs_|all_vs_")
+      value2 <- contrasts %>% stringr::str_remove("All_vs_|all_vs_")
       contrasts <- tibble::tibble(group1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
                                   group2 = value2)
       message(glue::glue(
@@ -589,7 +589,7 @@ calculateDMRs <- function(qseaSet,
       ))
     } else if (stringr::str_detect(contrasts,"_vs_All")){
 
-      value1 = contrasts %>% stringr::str_remove("_vs_All|_vs_all")
+      value1 <- contrasts %>% stringr::str_remove("_vs_All|_vs_all")
       contrasts <- tibble::tibble(group1 = value1,
                                   group2 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value1))
       message(glue::glue(

@@ -1407,7 +1407,7 @@ plotDimRed <- function(object,
       propVar <- round(propVar * 100, 2)
       plotData <- single@prcomp$x
     } else {
-      propVar = NULL
+      propVar <- NULL
       plotData <- single@points
     }
 
@@ -1428,7 +1428,7 @@ plotDimRed <- function(object,
         dplyr::mutate(NULLshape = "21")
 
       if (is.null(shapePalette)){
-        shapePalette = 21
+        shapePalette <- 21
       }
       
       shape <- "NULLshape"

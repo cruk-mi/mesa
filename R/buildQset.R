@@ -270,7 +270,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     message("Using high quality R1 unpaired reads as well as pairs")
 
     if (is.null(fragmentLength) | length(properPairsGRanges) >= length(R1GRanges) ) {
-      fragmentLength = stats::median(BiocGenerics::width(properPairsGRanges))
+      fragmentLength <- stats::median(BiocGenerics::width(properPairsGRanges))
       message(glue::glue("Estimating fragment length for {length(R1GRanges)} unpaired R1 reads as {fragmentLength}, based on {length(properPairsGRanges)} proper pairs."))
     } else{
       message(glue::glue("Setting unpaired fragment lengths to {fragmentLength}."))
@@ -313,7 +313,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     #dplyr::mutate(nProperPairs = tidyr::replace_na(nProperPairs, 0) ) %>%
     plyranges::as_granges()
 
-  enrichment = calculateCGEnrichmentGRanges(readGRanges,
+  enrichment <- calculateCGEnrichmentGRanges(readGRanges,
                                              BSgenome,
                                              chr.select = regions %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames())
 
@@ -423,14 +423,14 @@ addBamCoveragePairedAndUnpaired <- function(qs,
                                             minReferenceLength = 30,
                                             parallel = getMesaParallel(),
                                             properPairsOnly = FALSE) {
-  sampleTable = qsea::getSampleTable(qs)
-  Regions = qsea::getRegions(qs)
+  sampleTable <- qsea::getSampleTable(qs)
+  Regions <- qsea::getRegions(qs)
 
   if (parallel & (BiocParallel::bpworkers() > 1)) {
-    BPPARAM = BiocParallel::bpparam()
+    BPPARAM <- BiocParallel::bpparam()
     message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel.")
   } else {
-    BPPARAM = BiocParallel::SerialParam()
+    BPPARAM <- BiocParallel::SerialParam()
     message("Scanning one file at a time. Use e.g. setMesaParallel(nCores = 4) to parallelise this process.")
     }
 
@@ -450,7 +450,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 
   message("Generated objects")
 
-  coverage =  bamOutList %>%
+  coverage <- bamOutList %>%
     purrr::map_dfc(function(x) {
       purrr::pluck(x,"regionsGR") %>%
         tibble::as_tibble() %>%
@@ -473,15 +473,15 @@ addBamCoveragePairedAndUnpaired <- function(qs,
   #
   #   message("Calculated read coverage")
 
-  libraries = bamOutList %>% purrr::map_dfr(~ purrr::pluck(.,"library")) %>% as.data.frame()
+  libraries <- bamOutList %>% purrr::map_dfr(~ purrr::pluck(.,"library")) %>% as.data.frame()
   rownames(libraries) <- sampleTable$sample_name
 
-  param = list(minMapQual = minMapQual, minReferenceLength = minReferenceLength,
+  param <- list(minMapQual = minMapQual, minReferenceLength = minReferenceLength,
                maxInsertSize = maxInsertSize, minInsertSize = minInsertSize,
                properPairsOnly = properPairsOnly)
-  qs = qsea:::addParameters(qs, param)
-  qs = qsea:::setCounts(qs, count_matrix = coverage)
-  qs = qsea:::setLibrary(qs, "file_name", libraries)
+  qs <- qsea:::addParameters(qs, param)
+  qs <- qsea:::setCounts(qs, count_matrix = coverage)
+  qs <- qsea:::setLibrary(qs, "file_name", libraries)
 
   #GenomicRanges::mcols(qs@regions) <- cbind(GenomicRanges::mcols(qs@regions), regionAvgs)
 

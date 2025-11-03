@@ -37,18 +37,18 @@
 #'   
 #' @export
 calculateGenomicCGDistribution <- function(BSgenome){
-  dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
+  dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
   pdict0 <- Biostrings::PDict(CG)
   params <- methods::new("BSParams", X = dataset, FUN = Biostrings::countPDict, simplify = TRUE, exclude = c("rand", "chrUn"))
-  genome.CG = sum(BSgenome::bsapply(params, pdict = pdict0))
+  genome.CG <- sum(BSgenome::bsapply(params, pdict = pdict0))
   params <- methods::new("BSParams", X = dataset, FUN = Biostrings::alphabetFrequency, simplify = TRUE, exclude = c("rand", "chrUn"))
-  alphabet = BSgenome::bsapply(params)
-  genome.l = sum(as.numeric(alphabet))
-  genome.C = as.numeric(sum(alphabet[2,]))
-  genome.G = as.numeric(sum(alphabet[3,]))
-  genome.relH = genome.CG/genome.l * 100
-  genome.GoGe = (genome.CG * genome.l)/(genome.C * genome.G)
+  alphabet <- BSgenome::bsapply(params)
+  genome.l <- sum(as.numeric(alphabet))
+  genome.C <- as.numeric(sum(alphabet[2,]))
+  genome.G <- as.numeric(sum(alphabet[3,]))
+  genome.relH <- genome.CG/genome.l * 100
+  genome.GoGe <- (genome.CG * genome.l)/(genome.C * genome.G)
   return(data.frame(genome.relH = genome.relH, genome.GoGe = genome.GoGe))
 }
 
@@ -145,43 +145,43 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
     )
   }
 
-  dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
+  dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
 
   ## Read region file
-  fileName = basename(file)
-  path = dirname(file)
-  if (path == "") {path = getwd()}
+  fileName <- basename(file)
+  path <- dirname(file)
+  if (path == "") {path <- getwd()}
   if (!fileName %in% dir(path)) {
     stop(sprintf("File %s not found in %s", shQuote(fileName), shQuote(path)),
          call. = FALSE)
   }
 
-  if (!paired) {GRange.Reads = MEDIPS::getGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)} else
-  {GRange.Reads = MEDIPS::getPairedGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)}
+  if (!paired) {GRange.Reads <- MEDIPS::getGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)} else
+  {GRange.Reads <- MEDIPS::getPairedGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)}
 
   ## Sort chromosomes
-  if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) > 1) {chromosomes = gtools::mixedsort(unique(GenomeInfoDb::seqlevels(GRange.Reads)))}
-  if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) == 1) {chromosomes = unique(GenomeInfoDb::seqlevels(GRange.Reads))}
+  if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) > 1) {chromosomes <- gtools::mixedsort(unique(GenomeInfoDb::seqlevels(GRange.Reads)))}
+  if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) == 1) {chromosomes <- unique(GenomeInfoDb::seqlevels(GRange.Reads))}
 
-  chr_lengths = as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
+  chr_lengths <- as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
 
   IRanges::ranges(GRange.Reads) <- IRanges::restrict(IRanges::ranges(GRange.Reads), +1)
 
   ##Calculate CpG density for regions
-  total = length(chromosomes)
+  total <- length(chromosomes)
 
   readsChars <- unlist(Biostrings::getSeq(dataset, GRange.Reads, as.character = TRUE))
 
   # Faster to use stringr, as we are looking for exact matches.
-  regions.CG = sum(stringr::str_count(readsChars, stringr::fixed("CG")))
-  regions.C  = sum(stringr::str_count(readsChars, stringr::fixed("C")))
-  regions.G  = sum(stringr::str_count(readsChars, stringr::fixed("G")))
-  all.genomic = sum(stringr::str_length(readsChars))
+  regions.CG <- sum(stringr::str_count(readsChars, stringr::fixed("CG")))
+  regions.C  <- sum(stringr::str_count(readsChars, stringr::fixed("C")))
+  regions.G  <- sum(stringr::str_count(readsChars, stringr::fixed("G")))
+  all.genomic <- sum(stringr::str_length(readsChars))
 
   nReads <- length(readsChars)
 
-  regions.relH = as.numeric(regions.CG) / as.numeric(all.genomic) * 100
-  regions.GoGe = (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
+  regions.relH <- as.numeric(regions.CG) / as.numeric(all.genomic) * 100
+  regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
@@ -194,8 +194,8 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
   genome.relH <- genomicDistribution$genome.relH
   genome.GoGe <- genomicDistribution$genome.GoGe
 
-  enrichment.score.relH = regions.relH/genome.relH
-  enrichment.score.GoGe = regions.GoGe/genome.GoGe
+  enrichment.score.relH <- regions.relH/genome.relH
+  enrichment.score.GoGe <- regions.GoGe/genome.GoGe
 
   if (!is.null(exportPath)) {
     GRange.Reads %>%
@@ -333,11 +333,11 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
     )
   }
 
-  dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
+  dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
 
-  chromosomes = gtools::mixedsort(unique(GenomeInfoDb::seqlevels(readGRanges)))
+  chromosomes <- gtools::mixedsort(unique(GenomeInfoDb::seqlevels(readGRanges)))
 
-  chr_lengths = as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
+  chr_lengths <- as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
 
   if (all(is.na(GenomeInfoDb::seqlengths(readGRanges)))) {
     suppressWarnings(GenomeInfoDb::seqinfo(readGRanges) <- GenomeInfoDb::seqinfo(BSgenome::getBSgenome(BSgenome))[GenomeInfoDb::seqnames(GenomeInfoDb::seqinfo(readGRanges))])
@@ -347,18 +347,18 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
   IRanges::ranges(readGRanges) <- IRanges::restrict(IRanges::ranges(readGRanges), +1)
 
   ##Calculate CpG density for regions
-  total = length(chromosomes)
+  total <- length(chromosomes)
 
   readsChars <- unlist(Biostrings::getSeq(dataset, readGRanges, as.character = TRUE))
 
   # Faster to use stringr, as we are looking for exact matches.
-  regions.CG = sum(stringr::str_count(readsChars, stringr::fixed("CG")))
-  regions.C  = sum(stringr::str_count(readsChars, stringr::fixed("C")))
-  regions.G  = sum(stringr::str_count(readsChars, stringr::fixed("G")))
-  all.genomic = sum(stringr::str_length(readsChars))
+  regions.CG <- sum(stringr::str_count(readsChars, stringr::fixed("CG")))
+  regions.C  <- sum(stringr::str_count(readsChars, stringr::fixed("C")))
+  regions.G  <- sum(stringr::str_count(readsChars, stringr::fixed("G")))
+  all.genomic <- sum(stringr::str_length(readsChars))
 
-  regions.relH = as.numeric(regions.CG) / as.numeric(all.genomic) * 100
-  regions.GoGe = (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
+  regions.relH <- as.numeric(regions.CG) / as.numeric(all.genomic) * 100
+  regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
@@ -373,8 +373,8 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
   genome.relH <- genomicDistribution$genome.relH
   genome.GoGe <- genomicDistribution$genome.GoGe
 
-  enrichment.score.relH = regions.relH/genome.relH
-  enrichment.score.GoGe = regions.GoGe/genome.GoGe
+  enrichment.score.relH <- regions.relH/genome.relH
+  enrichment.score.GoGe <- regions.GoGe/genome.GoGe
 
   genomeCGranges <- getCGPositions(BSgenome, chr.select)
 
@@ -504,7 +504,7 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
                                        file_name = "file_name",
                                        nCores = 1){
 
-  BSgenome = qseaSet %>% qsea:::getGenome()
+  BSgenome <- qseaSet %>% qsea:::getGenome()
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
