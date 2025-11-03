@@ -347,8 +347,11 @@ makeQset <- function(sampleTable,
   windowsWithoutBlacklist <- windowsGRanges %>%
     plyranges::filter_by_non_overlaps(badRegions)
 
-  print(paste0("Considering ", length(windowsWithoutBlacklist), " regions with total size ",
-               sum(BiocGenerics::width(windowsWithoutBlacklist))))
+  message(
+    "Considering ", length(windowsWithoutBlacklist),
+    " regions with total size ",
+    sum(BiocGenerics::width(windowsWithoutBlacklist))
+  )
 
   #make the initial Qsea object, with the reduced set of windows, using the sampleTable
   qseaSet <- qsea::createQseaSet(sampleTable = sampleTable,
@@ -571,7 +574,7 @@ makeQset <- function(sampleTable,
   qseaSet@parameters$coverageMethod <- coverageMethod
   qseaSet@parameters$cnvMethod <- CNVmethod
 
-  print("qseaSet object generated successfully")
+  message("qseaSet object generated successfully")
 
   return(qseaSet)
 }

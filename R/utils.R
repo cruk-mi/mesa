@@ -363,5 +363,5 @@ asValidGranges <- function(object){
 #'
 #' @keywords internal
 print_and_capture <- function(x) {
-  paste(utils::capture.output(print(x)), collapse = "\n")
+  paste(utils::capture.output(methods::show(x)), collapse = "\n")
 }
