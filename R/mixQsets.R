@@ -264,12 +264,12 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #' @family sample-simulation
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #' 
 #' # Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
 #' exampleTumourNormal %>% 
-#'   mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
+#'   mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
 #'                        nReadsTotal = 100000,
 #'                        proportion1 = 0.5, proportion2 = 0.3,
 #'                        newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
@@ -282,7 +282,7 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #'
 #' # Mix three samples and return only the synthetic sample, with an explicit name and group.
 #' exampleTumourNormal %>%
-#'   mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
+#'   mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
 #'              nReadsTotal = 50000,
 #'              proportion1 = 0.1, proportion2 = 0.2,
 #'              newName     = "Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7",

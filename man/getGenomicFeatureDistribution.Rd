@@ -59,7 +59,6 @@ This function requires a transcript database and OrgDb to annotate windows (via
 }
 }
 \examples{
-\donttest{
 # Ensure annotation defaults are available (GRCh38/hg38)
 setMesaGenome("hg38")
 
@@ -74,7 +73,6 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) \%>\%
   head()
-}
 
 }
 \seealso{

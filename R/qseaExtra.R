@@ -165,7 +165,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' [qseaTableToChrGRanges()], [liftOverHg19()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
@@ -180,19 +179,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'     TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
 #'     annoDb = "org.Hs.eg.db"
 #'   )
-#'
-#' # Mouse example (mm10): supply mouse TxDb and OrgDb
-#' # data(exampleMouse, package = "mesa")
-#' # exampleMouse %>%
-#' #   getRegions() %>%
-#' #   annotateWindows(
-#' #     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-#' #     annoDb = "org.Mm.eg.db"
-#' #   )
-#'
-#' # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-#' # setMesaGenome("hg38"); setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); setMesaAnnoDb("org.Hs.eg.db")
-#' }
 #'
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
@@ -491,7 +477,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' @family window-helpers
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Keep windows above Poisson background in at least 2 samples whose names contain "Lung"
@@ -506,7 +492,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' @importFrom rlang :=
 #' @export
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NULL, numWindows = NULL,
-                                        recalculateNumWindows = TRUE, FDRthres = 0.01, numAbove = 1){
+                                        recalculateNumWindows = FALSE, FDRthres = 0.01, numAbove = 1){
 
 
   samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
@@ -1569,7 +1555,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @family annotation-summaries
 #'
 #' @examples
-#' \donttest{
 #' # Ensure annotation defaults are available (GRCh38/hg38)
 #' setMesaGenome("hg38")
 #'
@@ -1584,7 +1569,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) %>%
 #'   head()
-#' }
 #'
 #' @export
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){

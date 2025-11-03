@@ -103,6 +103,7 @@ Suggests:
     uwot,
     BSgenome.Hsapiens.NCBI.GRCh38,
     BSgenome.Hsapiens.UCSC.hg19,
+    BSgenome.Scerevisiae.UCSC.sacCer3,
     org.Hs.eg.db,
     org.Mm.eg.db,
     TxDb.Hsapiens.UCSC.hg38.knownGene,

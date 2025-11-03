@@ -80,15 +80,19 @@ with \pkg{mesa} for efficiency.
 }
 }
 \examples{
-\donttest{
-# Sketch of usage (requires a real BAM and installed BSgenome):
-# calculateCGEnrichment(
-#   file = "sample.bam",
-#   BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-#   exportPath = tempdir(),
-#   paired = TRUE
-# )
+if (requireNamespace("MEDIPS", quietly = TRUE) &&
+  requireNamespace("MEDIPSData", quietly = TRUE) &&
+  requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
+  require("GenomicRanges", quietly = TRUE)) {
+  
+  calculateCGEnrichment(
+    file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+    BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",  
+    exportPath = tempdir(),
+    paired     = FALSE                            
+  )
 }
+
 }
 \seealso{
 \code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},

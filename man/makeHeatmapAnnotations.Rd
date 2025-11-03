@@ -59,7 +59,6 @@ qualitative palette and numeric variables are mapped to a continuous gradient.
 The function respects \code{useGroupMeans} to annotate either per-sample or per-group.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Build window annotations and immediately feed them into makeHeatmapAnnotations()
@@ -67,17 +66,17 @@ exampleTumourNormal \%>\%
   filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
   getDataTable(normMethod = "nrpm") \%>\%
   dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
-  getWindowAnnotation(
+  mesa:::getWindowAnnotation(
     regions = qsea::getRegions(exampleTumourNormal)[1:50],
     windowAnnotation = CpG_density
   ) \%>\%
-  makeHeatmapAnnotations(
+  mesa:::makeHeatmapAnnotations(
     qseaSet = exampleTumourNormal,
     sampleAnnotation = group,
     windowAnnotationDf = .,
     useGroupMeans = FALSE
   ) 
-}
+  
 }
 \seealso{
 \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}},

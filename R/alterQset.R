@@ -345,7 +345,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' weighted means for rates).
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #' # Pool Tumour/Normal pairs by patient into a single sample per patient:
 #' # e.g., "Colon1_T","Colon1_N" -> "Colon1"

@@ -49,20 +49,18 @@ and \code{regions} provide overlapping information, columns from either source m
 selected via \code{windowAnnotation}. Use tidyselect to pick or pattern-match columns.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
-# One pipeline, no intermediate objects:
 exampleTumourNormal \%>\%
   filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
   getDataTable(normMethod = "nrpm") \%>\%
   dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
-  getWindowAnnotation(
+  mesa:::getWindowAnnotation(
     regions = qsea::getRegions(exampleTumourNormal)[1:50],
     windowAnnotation = CpG_density
   ) \%>\%
   head()
-}
+  
 }
 \seealso{
 \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=getDataTable]{getDataTable()}}

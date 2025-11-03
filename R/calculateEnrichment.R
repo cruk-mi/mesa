@@ -28,12 +28,14 @@
 #'   \pkg{Biostrings}
 #'
 #' @examples
-#' \donttest{
-#' # Example: compute genome-wide CpG metrics for GRCh38 (package must be installed)
-#' if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#'   calculateGenomicCGDistribution("BSgenome.Hsapiens.NCBI.GRCh38")
-#' }
-#' }
+#' # Example: compute genome-wide CpG metrics for a S. cerevisae genome. 
+#' # It could be done for GRCh38 genome instead, but it will take more time to
+#' # run (package must be installed)
+#' if (requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer3", quietly = TRUE)) {
+#'   calculateGenomicCGDistribution("BSgenome.Scerevisiae.UCSC.sacCer3")
+#'   }
+#'   
+#' @export
 calculateGenomicCGDistribution <- function(BSgenome){
   dataset = eval(parse(text=paste0(BSgenome,"::", BSgenome)))
   CG <- Biostrings::DNAStringSet("CG")
@@ -115,17 +117,22 @@ calculateGenomicCGDistribution <- function(BSgenome){
 #'   [calculateGenomicCGDistribution()],  
 #'   \pkg{MEDIPS},  
 #'   \pkg{BSgenome}
+#'   
 #'
 #' @examples
-#' \donttest{
-#' # Sketch of usage (requires a real BAM and installed BSgenome):
-#' # calculateCGEnrichment(
-#' #   file = "sample.bam",
-#' #   BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-#' #   exportPath = tempdir(),
-#' #   paired = TRUE
-#' # )
+#' if (requireNamespace("MEDIPS", quietly = TRUE) &&
+#'   requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'   requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
+#'   require("GenomicRanges", quietly = TRUE)) {
+#'   
+#'   calculateCGEnrichment(
+#'     file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+#'     BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",  
+#'     exportPath = tempdir(),
+#'     paired     = FALSE                            
+#'   )
 #' }
+#' 
 #' @export
 calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
                                    extend = 0, shift = 0, uniq = 0,
@@ -462,18 +469,31 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #'   [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
-#' \donttest{
-#' # Sketch (requires BAMs and a BSgenome):
-#' # data(exampleTumourNormal, package = "mesa")
-#' # qs <- exampleTumourNormal
-#' # qs <- addMedipsEnrichmentFactors(
-#' #   qs, exportPath = tempdir(), nonEnrich = FALSE,
-#' #   file_name = "file_name", nCores = 1,
-#' #   paired = TRUE, chr.select = paste0("chr", 1:22)
-#' # )
-#' # head(qsea::getSampleTable(qs))
+#' \dontrun{
+#'  if (requireNamespace("MEDIPS", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#'       
+#'       bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+#'       
+#'       data.frame(
+#'         sample_name = "hESC_Input_chr22",
+#'         file_name   = bam,
+#'         group       = "Input",
+#'         input_file  = bam,
+#'         stringsAsFactors = FALSE
+#'       ) %>%
+#'         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19") %>%
+#'         addMedipsEnrichmentFactors(
+#'           exportPath = tempdir(),
+#'           chr.select = paste0("chr22"),
+#'           paired     = FALSE
+#'           # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
+#'           # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
+#'         ) %>%
+#'         qsea::getSampleTable() %>%
+#'         print()
+#'     }
 #' }
-#' 
 #' @export
 addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
                                        extend = 0, shift = 0, uniq = 0,

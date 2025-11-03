@@ -9,7 +9,7 @@ subsetWindowsOverBackground(
   keepAbove = FALSE,
   samples = NULL,
   numWindows = NULL,
-  recalculateNumWindows = TRUE,
+  recalculateNumWindows = FALSE,
   FDRthres = 0.01,
   numAbove = 1
 )
@@ -61,7 +61,7 @@ flag windows above background. Windows are retained or removed based on
 at \code{FDRthres}.
 }
 \examples{
-\donttest{
+\dontrun{
 data(exampleTumourNormal, package = "mesa")
 
 # Keep windows above Poisson background in at least 2 samples whose names contain "Lung"
