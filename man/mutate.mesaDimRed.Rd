@@ -30,6 +30,8 @@ st <- data.frame(sample_name = c("A","B"),
 md <- mesaDimRed(res = list(), sampleTable = st,
                  samples = rownames(st), params = list())
 md2 <- mutate(md, group2 = paste0(group, "_2"))
-stopifnot("group2" \%in\% colnames(md2@sampleTable))
+stopifnot("group2" \%in\% colnames(
+  methods::slot(md2, "sampleTable")
+))
 
 }

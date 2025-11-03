@@ -26,19 +26,25 @@ Genomic coordinates and the number/order of regions are preserved. If no
 matching columns are found, the function is a no-op.
 }
 \examples{
-if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
+if (system.file("data", "exampleTumourNormal.rda",
+                package = "mesa") != "") {
   data(exampleTumourNormal, package = "mesa")
 
-  # Add toy fragment columns via plyranges, then drop them (pipe-only)
+  # Add toy fragment columns via plyranges, then drop them
+  gr <- qsea::getRegions(exampleTumourNormal)
+  gr <- plyranges::mutate(
+    gr,
+    avgFragmentLength = 150L,
+    avgFragmentMAPQ   = 60L
+  )
+  methods::slot(exampleTumourNormal, "regions") <- gr
+
   exampleTumourNormal \%>\%
-    { .@regions <- .@regions \%>\%
-        plyranges::mutate(avgFragmentLength = 150L,
-                          avgFragmentMAPQ   = 60L); . } \%>\%
     dropAvgFragDetails() \%>\%
     qsea::getRegions() \%>\%
     GenomicRanges::mcols() \%>\%
     colnames() \%>\%
-    grep("^avgFragment", ., value = TRUE)   # character(0) if removed
+    grep("^avgFragment", ., value = TRUE) # character(0) if removed
 }
 
 }

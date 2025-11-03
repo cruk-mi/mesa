@@ -272,7 +272,9 @@ setValidity("mesaUMAP", function(object) {
 #' md <- mesaDimRed(res = list(), sampleTable = st,
 #'                  samples = rownames(st), params = list())
 #' md2 <- mutate(md, group2 = paste0(group, "_2"))
-#' stopifnot("group2" %in% colnames(md2@sampleTable))
+#' stopifnot("group2" %in% colnames(
+#'   methods::slot(md2, "sampleTable")
+#' ))
 #'
 #' @importFrom dplyr mutate
 #' @importFrom tibble rownames_to_column column_to_rownames
