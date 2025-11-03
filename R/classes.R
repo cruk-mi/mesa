@@ -286,7 +286,7 @@ mutate.mesaDimRed <- function(.data, ...) {
     tibble::column_to_rownames(".rownameCol")
   
   if (!identical(.data@sampleTable$sample_name, newTable$sample_name)) {
-    stop(glue::glue("Error: sample_names cannot be changed with dplyr::mutate()."))
+    stop(glue::glue("sample_names cannot be changed with dplyr::mutate()."))
   }
   
   .data@sampleTable <- newTable

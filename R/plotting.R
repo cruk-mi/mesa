@@ -835,7 +835,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   }
 
   if (nrow(gene_details) != 1) {
-    stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart@biomart}."))
+    stop(glue::glue("{nrow(gene_details)} genes matching this name found in {mart@biomart}."))
   }
 
   message(glue::glue("Found {gene} on chromosome {gene_details$seqnames}, {gene_details$start} - {gene_details$end}"))
