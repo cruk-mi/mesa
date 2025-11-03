@@ -217,12 +217,16 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.2 & checkPVals) {
 
       if(is.null(covariates)){
-        warning("Warning! More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
+        warning("More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
            Set checkPVals = FALSE to ignore this.")
       } else {
 
-        stop("Error! More than 20% of windows have p-values of exactly 0, possibly an error! \n
-           Try not including covariates in the model if included, or set checkPVals = FALSE to ignore this if sure.")
+        stop(
+          "More than 20% of windows have p-values of exactly 0; this likely ",
+          "indicates a model issue.\n",
+          "Try removing covariates from the model (if any), or set ",
+          "checkPVals = FALSE to ignore this if you're sure."
+        )
       }
     }
   }

@@ -321,9 +321,9 @@ makeQset <- function(sampleTable,
     }
       
     stop(glue::glue(
-    "Chromosomes provided not found in the given BSgenome! \\
-    Showing first errors out of {length(unknownChr)}:
-    {paste(head(unknownChr), collapse = '\n    ')}"
+      "Chromosomes provided not found in the given BSgenome!\n",
+      "Showing first {length(unknownChr)} not found:\n",
+      "    {glue::glue_collapse(head(unknownChr), sep = '\n    ')}"
     ))
   }
   
