@@ -1,0 +1,119 @@
+Package: mesa
+Title: Methylation Enrichment Sequencing Analysis
+Version: 0.99.0
+Authors@R: c(
+    person(given = "Simon",
+           family = "Pearce",
+           role = c("aut"),
+           comment = c(ORCID = "0000-0002-1680-5538")),
+    person(given = "Steven",
+           family = "Hill",
+           role = c("aut", "cre"),
+           email = "stevenhill.work@gmail.com",
+           comment = c(ORCID = "0000-0002-5909-692X")),
+    person(given = "Paddy",
+           family = "Harker",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-2531-8774")),
+    person(given = "Kevin",
+           family = "Brennan",
+           role = "ctb",
+           email = "kevin.brennan@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0000-0001-9018-9852")),           
+    person(given = "Katarzyna",
+           family = "Kamieniecka",
+           role = "ctb"),
+    person(given = "Felipe",
+           family = "Perez Martinez",
+           role = "ctb",
+           email = "felipe.perezmartinez@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0009-0007-9138-3674")),
+    person(given = "Cancer Research UK National Biomarker Centre", 
+           role = c("cph", "fnd"))
+           )
+Description: A package for the analysis of methylation enrichment sequencing 
+    data (e.g. MBD-seq or MEDIP-seq). This allows for the window-based 
+    evaluation of methylation levels (using the 'qsea' package), including 
+    functions for determining differentially methylated regions. Many functions 
+    are provided for tidyverse style modification of the qseaSet objects 
+    originally defined in 'qsea'. 
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    plyranges,
+    magrittr,
+    limma,
+    glue,
+    ChIPseeker,
+    purrr,
+    progress,
+    tidyselect,
+    rlang,
+    GenomeInfoDb,
+    GenomicRanges,
+    BiocGenerics,
+    Biostrings,
+    gtools,
+    RColorBrewer,
+    pheatmap,
+    HMMcopy,
+    ggplot2,
+    janitor,
+    stats,
+    stringr,
+    methods,
+    graphics,
+    grDevices,
+    tibble,
+    tidyr,
+    BSgenome,
+    BiocParallel,
+    matrixStats,
+    IRanges,
+    GenomicAlignments,
+    data.table,
+    Rsamtools,
+    tools,
+    ComplexHeatmap,
+    readr,
+    memoise,
+    biomaRt,
+    hues,
+    circlize,
+    scales
+Depends:
+    qsea,
+    R (>= 4.3.0),
+    dplyr
+Suggests: 
+    rmarkdown,
+    knitr,
+    openxlsx,
+    testthat (>= 3.0.0),
+    UpSetR,
+    rtracklayer,
+    ggrepel,
+    MEDIPS,
+    workflows,
+    MEDIPSData,
+    uwot,
+    BSgenome.Hsapiens.NCBI.GRCh38,
+    BSgenome.Hsapiens.UCSC.hg19,
+    BSgenome.Scerevisiae.UCSC.sacCer3,
+    org.Hs.eg.db,
+    org.Mm.eg.db,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    TxDb.Mmusculus.UCSC.mm10.knownGene,
+    plotly
+VignetteBuilder: knitr
+biocViews: Sequencing, DNAMethylation, CpGIsland, 
+        Preprocessing, Normalization, QualityControl, Visualization,
+        CopyNumberVariation, DifferentialMethylation,
+        Coverage, ChIPSeq, ChipOnChip
+Config/testthat/edition: 3
+URL: https://github.com/cruk-mi/mesa
+BugReports: https://github.com/cruk-mi/mesa

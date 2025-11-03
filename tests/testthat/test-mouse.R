@@ -1,0 +1,55 @@
+test_that("Mouse plotting", {
+  
+  biomart_success <- try(biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org"))
+  biomart_success <- !class(biomart_success) == "try-error"
+  skip_if_not(biomart_success, "mart recieved try-error, biomart is possibly down or there is no internet connection.")
+  
+  expect_true("Mart" %in% class(exampleMouse %>% getMart()))
+
+  testPlotGeneHeatmap(exampleMouse, gene = "Fbxl18")
+  
+  #specify a different Mart:
+  testPlotGeneHeatmap(exampleMouse, 
+                                  gene = "Fbxl18",
+                                  mart = biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org")
+                                  )
+})
+
+test_that("Mouse annotation", {
+  
+  #expect an error if global settings not set
+  setMesaTxDb(NULL)
+  setMesaAnnoDb(NULL)
+  setMesaGenome(NULL)
+  expect_error(exampleMouse %>% 
+                 getBetaTable() %>% 
+                 annotateWindows()
+               )
+  
+  # should work if TxDb and annoDb are manually specified
+  tab1 <- expect_no_error(exampleMouse %>%
+                           getBetaTable() %>%
+                           annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+                                           annoDb = "org.Mm.eg.db"))
+  
+  expect_true(any(stringr::str_detect(tab1$SYMBOL,"Fbxl18")))
+  
+  # should work if TxDb is specified using the full object not a string
+  tab2 <- expect_no_error(exampleMouse %>%
+                           getBetaTable() %>%
+                           annotateWindows(TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+                                           annoDb = "org.Mm.eg.db"))
+  
+  expect_true(any(stringr::str_detect(tab2$SYMBOL,"Fbxl18")))
+  
+  # should also work if TxDb and annoDb are specified globally
+  setMesaTxDb("TxDb.Mmusculus.UCSC.mm10.knownGene")
+  setMesaAnnoDb("org.Mm.eg.db")
+  tab3 <- expect_no_error(exampleMouse %>%
+                           getBetaTable() %>%
+                           annotateWindows())
+  
+  expect_true(any(stringr::str_detect(tab3$SYMBOL,"Fbxl18")))
+  expect_equal(tab1, tab2)
+  expect_equal(tab1, tab3)
+})

@@ -1,0 +1,26 @@
+FROM bioconductor/bioconductor_docker:RELEASE_3_17
+
+WORKDIR /home/rstudio
+
+COPY --chown=rstudio:rstudio . /home/rstudio/
+
+RUN apt-get update
+RUN apt-get install -y qpdf
+
+RUN Rscript -e "install.packages('remotes')"
+RUN Rscript -e "remotes::install_version('dbplyr', version = '2.3.4')"
+RUN Rscript -e "install.packages(c('BiocManager','tidyverse', 'janitor', 'testthat'))"
+
+RUN Rscript -e "remotes::install_cran(c('qsea', 'MEDIPS','MEDIPSData'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('BSgenome.Hsapiens.NCBI.GRCh38' , 'TxDb.Hsapiens.UCSC.hg38.knownGene' ,'BSgenome.Hsapiens.UCSC.hg19', 'org.Hs.eg.db'), repos = BiocManager::repositories())"
+RUN Rscript -e "install.packages(c('gtools','knitr', 'uwot', 'memoise', 'rmarkdown', 'hues', 'knitr'))"
+RUN Rscript -e "remotes::install_cran(c('limma','plyranges', 'GenomeInfoDb'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('HMMcopy','ComplexHeatmap', 'Rsamtools'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('ChIPseeker', 'biomaRt'), repos = BiocManager::repositories())"
+RUN Rscript -e "remotes::install_cran(c('workflows', 'pheatmap', 'UpSetR', 'ggrepel', 'openxlsx'), repos = BiocManager::repositories())"
+
+RUN Rscript -e "remotes::install_cran(c('TxDb.Mmusculus.UCSC.mm10.knownGene' ,'org.Mm.eg.db'), repos = BiocManager::repositories())"
+RUN rm -rf /tmp/downloaded_packages
+
+RUN Rscript -e "remotes::install_version('irlba', type = 'source')"
+RUN Rscript -e "remotes::install_version('Matrix', type = 'source')"
