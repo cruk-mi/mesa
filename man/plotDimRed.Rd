@@ -6,7 +6,6 @@
 \usage{
 plotDimRed(
   object,
-  qseaSet = NULL,
   components = list(c(1, 2), c(2, 3)),
   colour = NULL,
   colourPalette = NULL,
@@ -24,11 +23,6 @@ plotDimRed(
 \arguments{
 \item{object}{\code{mesaDimRed}.
 A dimensionality reduction container returned by \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}}.}
-
-\item{qseaSet}{\code{qseaSet} or \code{NULL}.
-A qseaSet to use the \code{sampleTable} from, if different from the \code{sampleTable}
-already attached to the object. May be deprecated in the future.
-\strong{Default:} \code{NULL}.}
 
 \item{components}{\code{integer(2)} \strong{or} \code{list} of \code{integer(2)}.
 Component indices to plot (e.g. \code{c(1, 2)} for PC1 vs PC2). A list of pairs

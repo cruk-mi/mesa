@@ -43,7 +43,7 @@ Please note that the `qsea` package also has functions with the same names; the 
 The function `getPCA` calculates a PCA on a qseaSet:
 
 ```{r}
-pca1 <- getPCA(exampleTumourNormal)
+pca0 <- getPCA(exampleTumourNormal)
 ```
 
 By default, this will perform the PCA using beta values, and consider the 1000 most variable windows across all samples (or all windows if there are less than 1000).
@@ -51,7 +51,7 @@ By default, this will perform the PCA using beta values, and consider the 1000 m
 We then can use the `plotPCA()` function to plot the result.
 
 ```{r}
-plotPCA(pca1)
+plotPCA(pca0)
 ```
 
 The output of `getPCA()` is the PCA result object (technically a `mesaDimRed` object). This includes a copy of the `sampleTable`, detached from the original qseaSet.
@@ -63,7 +63,7 @@ As shown above, `plotPCA()` returns two separate plots by default; one for PC1 v
 In the same way as for a `qseaSet`, the sampleTable may be updated directly, using `mutate` or `left_join`.
 
 ```{r}
-pca1 <- pca1 |> 
+pca1 <- pca0 |> 
   mutate(transformed_age = scale(age) + 0.5)
 ```
 
@@ -268,7 +268,7 @@ Here, four different values have been used and the messages output tell you the 
 When plugging this output into `plotPCA`, plots are produced for all four PCA versions, with all options for the `colour` parameter:
 
 ```{r}
-PCAplots4 <- plotPCA(pca2, exampleTumourNormal, colour = c("patient", "age"), shape = "tumour") 
+PCAplots4 <- plotPCA(pca2, colour = c("patient", "age"), shape = "tumour") 
 
 PCAplots4$pca1$patient$PC1vsPC2
 
