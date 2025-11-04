@@ -7,7 +7,7 @@
 #' @keywords internal
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  getCGPositions <- memoise::memoise(getCGPositions)
+  getCGPositions <<- memoise::memoise(getCGPositions)
 }
 
 

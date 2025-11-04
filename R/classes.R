@@ -266,15 +266,13 @@ setValidity("mesaUMAP", function(object) {
 #' * Sample identity is preserved; attempts to alter `sample_name` are rejected.
 #'
 #' @examples
-#' st <- data.frame(sample_name = c("A","B"),
-#'                  group = c("X","Y"),
-#'                  row.names = "sample_name")
-#' md <- mesaDimRed(res = list(), sampleTable = st,
-#'                  samples = rownames(st), params = list())
-#' md2 <- mutate(md, group2 = paste0(group, "_2"))
-#' stopifnot("group2" %in% colnames(
-#'   methods::slot(md2, "sampleTable")
-#' ))
+#' data(exampleTumourNormal, package = "mesa")
+#' 
+#' md <- exampleTumourNormal %>% 
+#'   getPCA() %>%
+#'   mutate(group2 = paste0(group, "_2"))
+#'                  
+#' stopifnot("group2" %in% colnames(getSampleTable(md)))
 #'
 #' @importFrom dplyr mutate
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -327,13 +325,12 @@ mutate.mesaDimRed <- function(.data, ...) {
 #' * **sampleTable** updated with `y` via a left join.
 #'
 #' @examples
-#' st <- data.frame(sample_name = c("A","B"),
-#'                  group = c("X","Y"),
-#'                  row.names = "sample_name")
-#' md <- mesaDimRed(res = list(), sampleTable = st,
-#'                  samples = rownames(st), params = list())
-#' ann <- data.frame(rownameCol = c("A","B"), batch = c(1,2))
-#' md3 <- left_join(md, ann, by = "rownameCol")
+#' new <- data.frame(sample_name = c("Colon1_N", "Colon2_N"), foo = c(1,2))
+#' 
+#' exampleTumourNormal %>% 
+#'   getPCA() %>%
+#'   left_join(new, by = join_by(sample_name)) %>%
+#'   getSampleTable()
 #'
 #' @importFrom dplyr left_join
 #' @importFrom tibble rownames_to_column column_to_rownames
