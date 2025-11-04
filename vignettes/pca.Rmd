@@ -335,15 +335,17 @@ pca3 <- getPCA(exampleTumourNormal, returnDataTable = TRUE) # dataTable generate
 ```
 
 ```{r}
-pca1@dataTable # NULL
+methods::slot(pca1,"dataTable") # NULL
 
-pca3@dataTable # dataTable has been stored in output
+methods::slot(pca3, "dataTable") # dataTable has been stored in output
 ```
 
 We can then use the dataTable calculated in a previous `getPCA` call, but ask `getPCA` to return a different number of top windows:
 
 ```{r}
-pca4 <- getPCA(exampleTumourNormal, dataTable = pca3@dataTable, topVarNum = 250) 
+pca4 <- getPCA(exampleTumourNormal, 
+               dataTable = methods::slot(pca3, "dataTable"), 
+               topVarNum = 250) 
 ```
 
 ## Normalisation Method
@@ -401,3 +403,8 @@ qseaSetRandom |>
 ```
 
 As a final note, we state that UMAPs should be used with care, as they are easy to misinterpret.
+
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```

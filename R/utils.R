@@ -1,50 +1,3 @@
-#' Drop fragment detail columns from regions
-#'
-#' Remove region metadata columns whose names contain `"avgFragment"` (e.g.,
-#' `avgFragmentLength`, `avgFragmentMAPQ`) from the `regions` slot of a `qseaSet`,
-#' if present.
-#'
-#' @param qseaSet `qseaSet`.  
-#'   Input object to modify.  
-#'   **Default:** none (must be supplied).
-#'
-#' @details
-#' This operation only affects the **metadata columns** (`mcols`) of the regions.
-#' Genomic coordinates and the number/order of regions are preserved. If no
-#' matching columns are found, the function is a no-op.
-#'
-#' @return
-#' A `qseaSet` with its `regions` metadata updated (columns matching
-#' `"avgFragment"` removed if present).
-#'
-#' @seealso
-#' [qsea::getRegions()], [S4Vectors::mcols()], [dplyr::select()]
-#'
-#' @examples
-#' if (system.file("data","exampleTumourNormal.rda", package = "mesa") != "") {
-#'   data(exampleTumourNormal, package = "mesa")
-#'
-#'   # Add toy fragment columns via plyranges, then drop them (pipe-only)
-#'   exampleTumourNormal %>%
-#'     { .@regions <- .@regions %>%
-#'         plyranges::mutate(avgFragmentLength = 150L,
-#'                           avgFragmentMAPQ   = 60L); . } %>%
-#'     dropAvgFragDetails() %>%
-#'     qsea::getRegions() %>%
-#'     GenomicRanges::mcols() %>%
-#'     colnames() %>%
-#'     grep("^avgFragment", ., value = TRUE)   # character(0) if removed
-#' }
-#'
-#' @export
-dropAvgFragDetails <- function(qseaSet) {
-  qseaSet@regions <- qseaSet@regions %>%
-    dplyr::select(-tidyselect::matches("avgFragment"))
-
-  return(qseaSet)
-}
-
-
 #' Convert a makeTable-like data frame to GRanges (UCSC style)
 #'
 #' Coerce a table of windows to a \linkS4class{GRanges}. Two input layouts are
@@ -347,7 +300,21 @@ asValidGranges <- function(object){
 
 }
 
-#' This function captures a printed form of the object x, for use in error messages
-#' Taken from https://stackoverflow.com/a/26083626 by Richie Cotton
-#' @param x An object to capture
-print_and_capture <- function(x) {paste(utils::capture.output(print(x)), collapse = "\n") }
+#' Capture the printed representation of an object
+#'
+#' Utility that prints \code{x} and captures the console output as a single
+#' string. Handy for building informative error messages.
+#'
+#' @param x An object to capture.
+#'
+#' @return A length-1 character string with the printed form of \code{x},
+#'   lines joined by \code{"\n"}.
+#'
+#' @references
+#' Richie Cotton. "Capture R print output to a string." Stack Overflow.
+#' \url{https://stackoverflow.com/a/26083626}
+#'
+#' @keywords internal
+print_and_capture <- function(x) {
+  paste(utils::capture.output(methods::show(x)), collapse = "\n")
+}

@@ -151,7 +151,10 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
   fileName = basename(file)
   path = dirname(file)
   if (path == "") {path = getwd()}
-  if (!fileName %in% dir(path)) {stop(paste0("File", fileName, " not found in", path))}
+  if (!fileName %in% dir(path)) {
+    stop(sprintf("File %s not found in %s", shQuote(fileName), shQuote(path)),
+         call. = FALSE)
+  }
 
   if (!paired) {GRange.Reads = MEDIPS::getGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)} else
   {GRange.Reads = MEDIPS::getPairedGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)}

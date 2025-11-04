@@ -31,6 +31,7 @@ editor_options:
 * Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
 * Removed `colnames` function definion on a qseaSet, which was not working anyway.
+* Removed `dropAvgFragDetails` as no longer required.
 
 ### BUG FIXES
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
