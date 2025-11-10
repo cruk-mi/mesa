@@ -8,8 +8,8 @@ editor_options:
 
 ### ADDED
 * Many more examples for individual functions on their help pages, as well as a set of vignettes. [!14](https://github.com/cruk-mi/mesa/pull/14)
-* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
-* Objects with invalid slots will now throw informative errors.
+* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). [!43](https://github.com/cruk-mi/mesa/pull/43)
+* Objects with invalid slots will now throw informative errors. [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column. [!24](https://github.com/cruk-mi/mesa/pull/24)
 
 ### CHANGES
@@ -19,7 +19,7 @@ editor_options:
 * `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given. [!36](https://github.com/cruk-mi/mesa/pull/36)
 * `getSampleTable` is now defined for PCA/UMAP objects. [!11](https://github.com/cruk-mi/mesa/pull/11)
 * `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect. [!44](https://github.com/cruk-mi/mesa/pull/44)
-* Updated function documentation with examples, default parameter values, and more detailed descriptions.
+* Updated function documentation with examples, default parameter values, and more detailed descriptions. [!43](https://github.com/cruk-mi/mesa/pull/43)
 * `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`. [!48](https://github.com/cruk-mi/mesa/pull/48)
 * `makeQset` now checks that the chromosomes provided match with those present in the BSgenome. [!32](https://github.com/cruk-mi/mesa/pull/32)
 * The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions. [!32](https://github.com/cruk-mi/mesa/pull/32)
@@ -57,43 +57,43 @@ This is the first released version on github, following a lengthy period of inte
 * `summariseDMRsByGene` now correctly summarises genes when they have different positions or lengths in different windows.  [!5](https://github.com/cruk-mi/mesa/pull/5)
 * `plotCorrelationMatrix` no longer crashes when no annotation is being used.  [!5](https://github.com/cruk-mi/mesa/pull/5)
 
-# mesa 0.5.0
+# mesa 0.5.0 [!6](https://github.com/cruk-mi/mesa/pull/6)
 
 ### ADDED
-* Examples added for some functions, and documentation for some related functions merged. [!45](https://github.com/cruk-mi/mesa/pull/45)
-* Added more tests following inspection of `covr` coverage. [!49](https://github.com/cruk-mi/mesa/pull/49)
-* `getPCA()` and `getUMAP()` now return an object of class `mesaDimRed`, which wraps the previous list based output. This object now contains a copy of the sampleTable, which may be edited using `mutate` and `left_join`. [!51](https://github.com/cruk-mi/mesa/pull/51)
-* A new example qseaSet for a small portion of the mouse genome.  [!50](https://github.com/cruk-mi/mesa/pull/50)
-* Added the ability to specifying a biomaRt object directly on a qseaSet for used for finding gene annotation in `plotGeneHeatmap`.  [!50](https://github.com/cruk-mi/mesa/pull/50)
+* Examples added for some functions, and documentation for some related functions merged.
+* Added more tests following inspection of `covr` coverage.
+* `getPCA()` and `getUMAP()` now return an object of class `mesaDimRed`, which wraps the previous list based output. This object now contains a copy of the sampleTable, which may be edited using `mutate` and `left_join`.
+* A new example qseaSet for a small portion of the mouse genome.
+* Added the ability to specifying a biomaRt object directly on a qseaSet for used for finding gene annotation in `plotGeneHeatmap`.
 
 ### CHANGES
-* `plotPCA()` and `plotUMAP()` no longer require passing the qseaSet, as the sampleTable is stored in the object. [!51](https://github.com/cruk-mi/mesa/pull/51)
-* Added functions `setMesaGenome`, `setMesaTxDb` and `setMesaAnnoDb` to set global defaults for the annotation packages required by `annotateWindows`. This has the effect that `annotateWindows` will no longer assume hg38 by default with no arguments. [!50](https://github.com/cruk-mi/mesa/pull/50)
-* `summariseDMRsByGene` function now requires `annotateWindows` to have already been called on the DMRs (previously it called this internally if necessary).  [!50](https://github.com/cruk-mi/mesa/pull/50)
-* Reduced the number of messages produced when generating tables of data. [!52](https://github.com/cruk-mi/mesa/pull/52)
+* `plotPCA()` and `plotUMAP()` no longer require passing the qseaSet, as the sampleTable is stored in the object.
+* Added functions `setMesaGenome`, `setMesaTxDb` and `setMesaAnnoDb` to set global defaults for the annotation packages required by `annotateWindows`. This has the effect that `annotateWindows` will no longer assume hg38 by default with no arguments.
+* `summariseDMRsByGene` function now requires `annotateWindows` to have already been called on the DMRs (previously it called this internally if necessary).
+* Reduced the number of messages produced when generating tables of data.
 
 ### BUG FIXES
-* `poolSamples` now returns data frames instead of matrices in the libraries slot.  [!47](https://github.com/cruk-mi/mesa/pull/47)
-* `select` now works when dropping a column. [!46](https://github.com/cruk-mi/mesa/pull/46)
-*  PCA/UMAP functions now give a more informative error if there are insufficient regions or samples. [!49](https://github.com/cruk-mi/mesa/pull/49)
-* `downSample` now works correctly again following changes to how `table` and `enframe` interact. [!49](https://github.com/cruk-mi/mesa/pull/49)
-* `calculateDMRs` now correctly returns an empty data frame if no DMRs are found. [!6](https://github.com/cruk-mi/mesa/pull/6)
+* `poolSamples` now returns data frames instead of matrices in the libraries slot.
+* `select` now works when dropping a column. [!6](https://github.com/cruk-mi/mesa/pull/6)
+*  PCA/UMAP functions now give a more informative error if there are insufficient regions or samples.
+* `downSample` now works correctly again following changes to how `table` and `enframe` interact.
+* `calculateDMRs` now correctly returns an empty data frame if no DMRs are found.
 
 # mesa 0.4.1
 
 ### BUG FIXES
-* `plotPCA` now works when colouring by a factor variable. [!6](https://github.com/cruk-mi/mesa/pull/6)
-* `mutate` now cannot be used to change the sample_name in the sample table of a qseaSet which breaks the object. `renameQsetNames` or `renameSamples` must be used for this. [!6](https://github.com/cruk-mi/mesa/pull/6)
+* `plotPCA` now works when colouring by a factor variable.
+* `mutate` now cannot be used to change the sample_name in the sample table of a qseaSet which breaks the object. `renameQsetNames` or `renameSamples` must be used for this.
 
 ### CHANGES
-* HMMCopy related functions now take explicit input of the GC and mappability tracks, rather than having hardcoded internal hg38 objects, allowing for different genomes. [!42](https://github.com/cruk-mi/mesa/pull/42)
-* Removed the data objects `gc_hg38_10kb` and `map_hg38_10kb` (GC and mappability tracks for hg38 at 10kb resolution) for package size reasons. [!42](https://github.com/cruk-mi/mesa/pull/42)
+* HMMCopy related functions now take explicit input of the GC and mappability tracks, rather than having hardcoded internal hg38 objects, allowing for different genomes.
+* Removed the data objects `gc_hg38_10kb` and `map_hg38_10kb` (GC and mappability tracks for hg38 at 10kb resolution) for package size reasons.
 
 # mesa 0.4.0
 
 ### BUG FIXES
 
--   Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (#1). [!6](https://github.com/cruk-mi/mesa/pull/6)
+-   Fixed how the relative enrichment (relH/GoGe) calculation is performed (`addMedipsEnrichmentFactors`) when using the qsea default method for reads (#1).
 
 -   Filtering a `qseaSet` now works correctly when a `qseaSet` has no `cnv` data.
 
