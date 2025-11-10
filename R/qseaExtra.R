@@ -475,7 +475,7 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' library information attached to the qseaSet, which is the number of fragments
 #' used in the generation of the original qseaSet. Windows are retained or 
 #' removed based on `keepAbove` and the requirement that at least `numAbove` 
-#' samples are significantat `FDRthres`.
+#' samples are significant at `FDRthres`.
 #'
 #' @return A filtered `qseaSet` containing only windows passing the criteria.
 #'
