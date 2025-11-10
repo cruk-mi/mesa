@@ -71,7 +71,6 @@ trailing parenthetical), and—when contexts are provided—\code{landscape}
 }
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults

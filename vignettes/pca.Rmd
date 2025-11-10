@@ -9,11 +9,15 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  fig.height = 5.5,
+  collapse  = TRUE,
+  fig.height= 5.5,
   fig.width = 7,
-  comment = "#>"
+  comment   = "#>",
+  dev       = "png",
+  dev.args  = list(type = "cairo")   # <- headless-safe
 )
+if (!capabilities("X11")) options(bitmapType = "cairo")  # <- extra guard
+
 ```
 
 ```{r setup}
@@ -199,8 +203,16 @@ PCAplots3 <- plotPCA(pca1,
                      shape = "tumour", 
                      plotlyAnnotations = c("stage", "age", "gender"))
 
-plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
 ```
+
+```{r pca-plot, echo=FALSE}
+if (knitr::is_html_output()) {
+  plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
+} else {
+  PCAplots3$pca1$patient$PC1vsPC2
+}
+```
+
 
 Plotly plots are great for interactive use in html reports.\
 The downside of using them is that the legend often gets displayed in a complicated, unhelpful way and the formatting of the plot is often not as good and hard to control.\
@@ -323,15 +335,17 @@ pca3 <- getPCA(exampleTumourNormal, returnDataTable = TRUE) # dataTable generate
 ```
 
 ```{r}
-pca1@dataTable # NULL
+methods::slot(pca1,"dataTable") # NULL
 
-pca3@dataTable # dataTable has been stored in output
+methods::slot(pca3, "dataTable") # dataTable has been stored in output
 ```
 
 We can then use the dataTable calculated in a previous `getPCA` call, but ask `getPCA` to return a different number of top windows:
 
 ```{r}
-pca4 <- getPCA(exampleTumourNormal, dataTable = pca3@dataTable, topVarNum = 250) 
+pca4 <- getPCA(exampleTumourNormal, 
+               dataTable = methods::slot(pca3, "dataTable"), 
+               topVarNum = 250) 
 ```
 
 ## Normalisation Method
@@ -389,3 +403,8 @@ qseaSetRandom |>
 ```
 
 As a final note, we state that UMAPs should be used with care, as they are easy to misinterpret.
+
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```

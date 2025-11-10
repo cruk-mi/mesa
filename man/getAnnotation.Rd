@@ -37,7 +37,6 @@ tidy-evaluation. End-users can pass unquoted column names or character
 vectors directly.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Works with none, one, or multiple columns (unquoted tidyselect):
@@ -57,7 +56,7 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
   mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
-}
+  
 }
 \seealso{
 \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}

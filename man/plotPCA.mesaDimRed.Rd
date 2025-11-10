@@ -137,6 +137,7 @@ exampleTumourNormal \%>\%
   plotPCA(components = list(c(1, 3)),
           colour = "group",
           shape  = "tissue") 
+          
 }
 \seealso{
 \code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}

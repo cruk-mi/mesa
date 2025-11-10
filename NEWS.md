@@ -32,6 +32,7 @@ editor_options:
 * Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
 * Removed `colnames` function definion on a qseaSet, which was not working anyway.
+* Removed `dropAvgFragDetails` as no longer required.
 
 ### BUG FIXES
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
@@ -49,6 +50,7 @@ editor_options:
 * Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range.
 * Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0.
 * `subsetWindowsOverBackground` should now work again
+* `getDimRed` will no longer print `Peforming PCA...` messages for redundant values of `topVarNum`.
 
 # mesa 0.5.1
 

@@ -191,7 +191,7 @@ getUMAP <- function(qseaSet,
 #' * **params**: List of parameters used (method, selection/filter settings, etc.).
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
-#' @section Details:
+#' @details:
 #' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
 #'   and `scale` controls.  
 #' - For `method = "UMAP"`, DR is performed via [uwot::umap()].  
@@ -492,9 +492,7 @@ getDimRed <- function(qseaSet,
     dplyr::mutate(windowSdName = ifelse(!is.na(topVarNum), glue::glue("windowSd{dplyr::cur_group_id()}"), NA), .before = 1) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(windowSdName, topVarNum) %>%
-    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) %>%
-    dplyr::bind_rows(topVar) %>%
-    dplyr::distinct(topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, .keep_all = TRUE)
+    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) 
 
   rowSds <- function(x) {
     sqrt(rowSums((x - rowMeans(x)) ^ 2) / (ncol(x) - 1))
@@ -1071,6 +1069,7 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #'   plotPCA(components = list(c(1, 3)),
 #'           colour = "group",
 #'           shape  = "tissue") 
+#'           
 #' @export
 plotPCA.mesaDimRed <- function(object,
                     components = list(c(1, 2), c(2, 3)),

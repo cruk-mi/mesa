@@ -156,7 +156,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' [qseaTableToChrGRanges()], [liftOverHg19()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
@@ -1547,7 +1546,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @family annotation-summaries
 #'
 #' @examples
-#' \donttest{
 #' # Ensure annotation defaults are available (GRCh38/hg38)
 #' setMesaGenome("hg38")
 #'
@@ -1562,7 +1560,6 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'   getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) %>%
 #'   head()
-#' }
 #'
 #' @export
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){

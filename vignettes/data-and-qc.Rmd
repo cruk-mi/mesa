@@ -129,4 +129,7 @@ For hg38, these hyper-stable methylated probes are incorporated in a data object
 We find that these three metrics, `valid_fragments`, `relH` and `hyperStableEdgar` are the most important considerations. For 300bp windows on the human genome, with T7-MBD-seq, we require a `relH` of at least 2.5 and `hyperStableEdgar` value of at least 0.4 (40%). We may also apply a `valid_fragments` cutoff of 3000000, although most samples which pass the other two metrics will achieve this anyway.
 
 
-
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```
