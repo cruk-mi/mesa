@@ -81,21 +81,22 @@
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
-#' # Skeleton (requires real BAMs and GC/map tracks)
-#' # data(exampleTumourNormal, package = "mesa")
-#' # exampleTumourNormal %>%
-#' #   addHMMcopyCNV(
-#' #     inputColumn   = "input_file",
-#' #     windowSize    = 1e6,
-#' #     hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
-#' #     hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
-#' #     properPairsOnly = TRUE,
-#' #     parallel      = FALSE,
-#' #     plotDir       = tempdir()
-#' #   )
-#' }
+#' \dontrun{
+#' data(exampleTumourNormal, package = "mesa")
+#' exampleTumourNormal %>%
 #'
+#'     addHMMcopyCNV(
+#'            inputColumn = "input_file",
+#'            windowSize    = 1e6,
+#'            hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
+#'            hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
+#'            properPairsOnly = TRUE,
+#'            parallel      = FALSE,
+#'            plotDir       = tempdir()
+#'      )
+#' 
+#' }
+#' 
 #' @export
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
                           plotDir = NULL,
@@ -123,7 +124,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 
   #TODO something with zygosity
 
-  CNV_Regions = qsea:::makeGenomeWindows(qsea:::getGenome(qs), as.character(qsea::getChrNames(qs)), windowSize)
+  CNV_Regions <- qsea:::makeGenomeWindows(qsea:::getGenome(qs), as.character(qsea::getChrNames(qs)), windowSize)
 
   # check that the hmmcopy objects are appropriate; each CNV_Region window should
   # overlap exactly one GC/Map window. 
@@ -133,18 +134,29 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   
   # two conditions should be the same, but really don't want this to happen as it 
   # leads to exponentially increasing numbers of rows 
-  if(any(overlappedRegions %>% duplicated()) || (length(overlappedRegions) != length(CNV_Regions))) {
-    duplicatedRegions <- utils::head(overlappedRegions[overlappedRegions %>% duplicated()])
-    stop(paste(c("CNV regions overlaps with multiple windows from the hmmCopyGC and/or hmmCopyMap objects! 
-    This probably means that your window sizes do not match. 
-    Showing first affected regions: \n", print_and_capture(duplicatedRegions))))
+  if (any(overlappedRegions %>% duplicated()) ||
+      (length(overlappedRegions) != length(CNV_Regions))) {
+    
+    duplicatedRegions <- utils::head(
+      overlappedRegions[overlappedRegions %>% duplicated()]
+    )
+    
+    stop(
+      sprintf(
+        "CNV regions overlap with multiple windows from the hmmCopyGC and/or \
+hmmCopyMap objects!\nThis probably means that your window sizes do not match.\n\
+Showing first affected regions:\n%s",
+        print_and_capture(duplicatedRegions)
+      ),
+      call. = FALSE
+    )
   }
   
   # this object is only used for this sanity check, not used directly again, so clean up
   rm(overlappedRegions)
   
   if (parallel) {
-    BPPARAM = BiocParallel::bpparam()
+    BPPARAM <- BiocParallel::bpparam()
     message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel")
   }  else {BPPARAM = BiocParallel::SerialParam()}
 
@@ -158,15 +170,15 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 
   names(bamOutList) <- qsea::getSampleTable(qs)$sample_name
 
-  libraries = bamOutList %>%
+  libraries <- bamOutList %>%
     purrr::map_dfr(~ purrr::pluck(.,"library")) %>%
     as.data.frame()
 
   rownames(libraries) <- qsea::getSampleTable(qs)$sample_name
 
-  qs = qsea:::setLibrary(qs, "input_file", libraries)
+  qs <- qsea:::setLibrary(qs, "input_file", libraries)
 
-  counts =  bamOutList %>%
+  counts <-  bamOutList %>%
     purrr::map_dfc(function(x) {
       purrr::pluck(x,"regionsGR") %>%
         tibble::as_tibble() %>%
@@ -174,7 +186,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
     ) %>% as.matrix()
   colnames(counts) <- qsea::getSampleTable(qs)$sample_name
 
-  nf = apply(X = counts, MARGIN = 2, FUN = stats::median, na.rm = TRUE)
+  nf <- apply(X = counts, MARGIN = 2, FUN = stats::median, na.rm = TRUE)
   if (any(nf < 100, na.rm = TRUE)) {
     warning("Low coverage in CNV files. Consider larger CNV_window_size")
   }
@@ -182,11 +194,16 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   GenomicRanges::mcols(CNV_Regions) <- tibble::as_tibble(counts)
 
   CNV_RegionsWithReads <- CNV_Regions %>%
-    plyranges::join_overlap_left(hmmCopyGC) %>%
-    plyranges::join_overlap_left(hmmCopyMap) %>%
-    tibble::as_tibble() %>%
-    dplyr::rename(chr = seqnames) %>%
-    data.table::data.table()
+      plyranges::join_overlap_left(hmmCopyGC) %>%
+      plyranges::join_overlap_left(hmmCopyMap) %>%
+      tibble::as_tibble() %>%
+      dplyr::rename(chr = seqnames) %>%
+      dplyr::mutate(
+          gc  = as.numeric(gc),
+          map = as.numeric(map)
+      ) %>% 
+      data.table::data.table()
+  
 
   #try saving the raw CNV data in the qseaSet.
   #TODO would be better as a slot of its own, but can't seem to manage that into the S4 class
@@ -195,7 +212,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
   mergedCNV <- purrr::map(qsea::getSampleTable(qs)$sample_name, ~ runHMMCopy(CNV_RegionsWithReads, ., plotDir = plotDir)) %>%
     purrr::reduce(plyranges::join_overlap_inner)
 
-  qs = qsea:::setCNV(qs, mergedCNV)
+  qs <- qsea:::setCNV(qs, mergedCNV)
 
   if (length(qsea::getOffset(qs)) > 0 && !all(is.na(qsea::getOffset(qs))))
     warning("Consider recalculating offset based on new CNV values")
@@ -239,21 +256,23 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 #' @family CNV
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Minimal synthetic example: build a table and pipe into runHMMCopy()
 #' set.seed(1)
+#' n <- 2000L; w <- 5e4
 #' tibble::tibble(
-#'   chr    = rep(paste0("chr", 1:2), each = 5),
-#'   start  = seq(1, by = 1e6, length.out = 10),
-#'   end    = start + 1e6 - 1L,
-#'   width  = 1e6,
-#'   strand = "*",
-#'   gc     = runif(10, 0.3, 0.7),
-#'   map    = runif(10, 0.8, 1.0),
-#'   sampleA= rpois(10, 500)
+#'     chr     = factor(rep(c("chr1","chr2"), 
+#'                            each = n/2), 
+#'                            levels = c("chr1","chr2")),
+#'     start   = rep(seq(1, by = w, length.out = n/2), 2),
+#'     end     = start + w - 1L,
+#'     width   = w, strand = "*",
+#'     gc      = runif(n, 0.05, 0.95),        #' wide spread => stable LOESS
+#'     map     = runif(n, 0.60, 0.98),        #' avoid extremes / exact 1.0
+#'     sampleA = rpois(n, 500)
 #' ) %>%
-#'   runHMMCopy(colname = "sampleA", plotDir = tempdir())
-#' }
+#'     runHMMCopy(colname = "sampleA", plotDir = NULL)
+#'}
 #'
 #' @export
 runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){

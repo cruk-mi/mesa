@@ -118,7 +118,6 @@ aggregated by \code{group} prior to plotting. Column annotations can be added vi
 \code{sampleAnnotation}; colours can be customized via \code{annotationColors}.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Basic gene heatmap (beta) with defaults
@@ -138,14 +137,6 @@ exampleTumourNormal \%>\%
                   upstreamDist = 1000,
                   downstreamDist = 2000)
 
-# Mouse example with explicit Ensembl mart (requires internet)
-# data(exampleMouse, package = "mesa")
-# exampleMouse \%>\% plotGeneHeatmap(
-#   gene = "Fbxl18",
-#   mart = biomaRt::useMart('ensembl', dataset = 'mmusculus_gene_ensembl',
-#                           host = 'https://jul2023.archive.ensembl.org')
-# )
-}
 
 }
 \seealso{

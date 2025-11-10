@@ -191,7 +191,7 @@ getUMAP <- function(qseaSet,
 #' * **params**: List of parameters used (method, selection/filter settings, etc.).
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
-#' @section Details:
+#' @details:
 #' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
 #'   and `scale` controls.  
 #' - For `method = "UMAP"`, DR is performed via [uwot::umap()].  
@@ -1071,6 +1071,7 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #'   plotPCA(components = list(c(1, 3)),
 #'           colour = "group",
 #'           shape  = "tissue") 
+#'           
 #' @export
 plotPCA.mesaDimRed <- function(object,
                     components = list(c(1, 2), c(2, 3)),

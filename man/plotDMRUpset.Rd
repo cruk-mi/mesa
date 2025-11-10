@@ -43,7 +43,6 @@ subset with \code{string} if provided. The resulting membership matrix is visual
 with \strong{UpSetR}.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Overlap of significant DMR sets across contrasts (default FDR 0.05)
@@ -55,7 +54,6 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
   plotDMRUpset(removeVS = TRUE)
-}
 
 }
 \seealso{

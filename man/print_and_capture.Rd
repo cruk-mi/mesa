@@ -2,15 +2,23 @@
 % Please edit documentation in R/utils.R
 \name{print_and_capture}
 \alias{print_and_capture}
-\title{This function captures a printed form of the object x, for use in error messages
-Taken from https://stackoverflow.com/a/26083626 by Richie Cotton}
+\title{Capture the printed representation of an object}
 \usage{
 print_and_capture(x)
 }
 \arguments{
-\item{x}{An object to capture}
+\item{x}{An object to capture.}
+}
+\value{
+A length-1 character string with the printed form of \code{x},
+lines joined by \code{"\n"}.
 }
 \description{
-This function captures a printed form of the object x, for use in error messages
-Taken from https://stackoverflow.com/a/26083626 by Richie Cotton
+Utility that prints \code{x} and captures the console output as a single
+string. Handy for building informative error messages.
 }
+\references{
+Richie Cotton. "Capture R print output to a string." Stack Overflow.
+\url{https://stackoverflow.com/a/26083626}
+}
+\keyword{internal}

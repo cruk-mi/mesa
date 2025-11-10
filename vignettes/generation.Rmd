@@ -172,3 +172,7 @@ There are a couple of reasons why we therefore choose not to apply TMM:
 
 However, we note that these considerations might not apply for everyone; the `qsea::addLibraryFactors()` function may be used to apply this normalisation if required.
 
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```

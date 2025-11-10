@@ -28,8 +28,7 @@ Parameters used to compute \code{res}. \strong{Default:} none.}
 Optional numeric matrix/data used for DR.
 \strong{Default:} \code{data.frame()}.}
 
-\item{object}{\code{mesaDimRed}
-Object to display.}
+\item{object}{\code{mesaDimRed}}
 }
 \value{
 A \linkS4class{mesaDimRed} object:

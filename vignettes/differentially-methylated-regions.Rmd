@@ -393,3 +393,8 @@ exampleTumourNormal |>
 ```
 
 Note that the default clustering method to use for the dendrogram is set as `clusterMethod = "ward.D2"`; other options can be used.
+
+## Session info
+```{r session-info, echo=FALSE}
+sessionInfo()
+```
