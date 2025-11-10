@@ -15,12 +15,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 # Conda + mamba; conda-forge/bioconda only
-RUN conda update -n base -c defaults conda -y \
+RUN conda update -n base -c conda-forge conda -y \
  && conda install -n base -c conda-forge mamba -y \
  && conda config --system --remove-key channels || true \
  && conda config --system --remove-key default_channels || true \
- && conda config --system --add channels conda-forge \
  && conda config --system --add channels bioconda \
+ && conda config --system --add channels conda-forge \
+ && conda config --system --add default_channels conda-forge \
  && conda config --system --set channel_priority strict \
  && conda config --system --set add_pip_as_python_dependency false
 
