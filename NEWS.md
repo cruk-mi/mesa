@@ -7,75 +7,74 @@ editor_options:
 # dev
 
 ### ADDED
-* Many more examples for individual functions on their help pages, as well as a set of vignettes.
-* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP).
-* Objects with invalid slots will now throw informative errors.
-* Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column.
+* Many more examples for individual functions on their help pages, as well as a set of vignettes. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). [!43](https://github.com/cruk-mi/mesa/pull/43)
+* Objects with invalid slots will now throw informative errors. [!43](https://github.com/cruk-mi/mesa/pull/43)
+* Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column. [!24](https://github.com/cruk-mi/mesa/pull/24)
 
 ### CHANGES
-* Converted `plotPCA` into a submethod for the `qsea` defined method.
-* `plotPCA` gains a `verbose` option to turn off most of the messages produced.
-* `plotPCA` and `plotUMAP` now default to filled shapes rather than empty shapes if less than 6 shapes are required.
-* `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given.
-* `getSampleTable` is now defined for PCA/UMAP objects.
-* `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect.
-* Updated function documentation with examples, default parameter values, and more detailed descriptions.
-* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`.
-* `makeQset` now checks that the chromosomes provided match with those present in the BSgenome.
-* The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions.
-* `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead.
+* Converted `plotPCA` into a submethod for the `qsea` defined method. [!11](https://github.com/cruk-mi/mesa/pull/11)
+* `plotPCA` gains a `verbose` option to turn off most of the messages produced. [!11](https://github.com/cruk-mi/mesa/pull/11)
+* `plotPCA` and `plotUMAP` now default to filled shapes rather than empty shapes if less than 6 shapes are required. [!36](https://github.com/cruk-mi/mesa/pull/36)
+* `plotPCA` and `plotUMAP` can now specify the shapes used via `shapePalette`, even if no shape annotation is being given. [!36](https://github.com/cruk-mi/mesa/pull/36)
+* `getSampleTable` is now defined for PCA/UMAP objects. [!11](https://github.com/cruk-mi/mesa/pull/11)
+* `plotGeneHeatmap` now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect. [!44](https://github.com/cruk-mi/mesa/pull/44)
+* Updated function documentation with examples, default parameter values, and more detailed descriptions. [!43](https://github.com/cruk-mi/mesa/pull/43)
+* `fdrThres` changed to `FDRthres` in `calculateDMRs` and `subsetWindowsOverBackground`. [!48](https://github.com/cruk-mi/mesa/pull/48)
+* `makeQset` now checks that the chromosomes provided match with those present in the BSgenome. [!32](https://github.com/cruk-mi/mesa/pull/32)
+* The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions. [!32](https://github.com/cruk-mi/mesa/pull/32)
+* `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead. [!58](https://github.com/cruk-mi/mesa/pull/58)
 
 ### REMOVED
-* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38.
-* Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads.
-* Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation. 
-* Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions.
-* Removed `colnames` function definion on a qseaSet, which was not working anyway.
-* Removed `dropAvgFragDetails` as no longer required.
+* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation.  [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Removed `colnames` function definion on a qseaSet, which was not working anyway. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Removed `dropAvgFragDetails` as no longer required. [!63](https://github.com/cruk-mi/mesa/pull/63)
 
 ### BUG FIXES
-* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix.
-* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`.
-* `writeDMRsToBed` should now correctly export the files.
-* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window.
-* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting).
-* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation.
-* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.
-* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`.
-* When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes.
-* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes. 
-* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.  
-* Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame.
-* Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range.
-* Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0.
-* `getDimRed` will no longer print `Peforming PCA...` messages for redundant values of `topVarNum`.
+* `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Correctly pass the `...` inside `plotGeneHeatmap` and `plotRegionsHeatmap`. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* `writeDMRsToBed` should now correctly export the files. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Fixed error when `plotRegionsHeatmap` was given more than one region that overlapped one window. [!21](https://github.com/cruk-mi/mesa/pull/21)
+* Correct the message produced by `addMedipsEnrichmentFactors` (thanks @daonslog for reporting). [!14](https://github.com/cruk-mi/mesa/pull/14)
+* `makeQset`, `renameSamples` and `renameQsetNames` will no longer accept sample names that are not valid column names in R without quotation. [!31](https://github.com/cruk-mi/mesa/pull/31)
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges. [!21](https://github.com/cruk-mi/mesa/pull/21)
+* `plotPCA` now plots a shape column that contains NA values without needing to also specifying `NAshape`. [!36](https://github.com/cruk-mi/mesa/pull/36)
+* When no colour or shape annotation is provided, `plotPCA` and `plotUMAP` no longer print a NULLcol or NULLshape column in the legend when using filled shapes. [!36](https://github.com/cruk-mi/mesa/pull/36)
+* `plotPCA` and `plotUMAP` now show the fill colour as opposed to black points in the legend when using filled shapes.  [!36](https://github.com/cruk-mi/mesa/pull/36)
+* Correctly pass the `fragmentLength` when calling `makeQset` with the `CNVmethod = "MeCap"` option, and fix an issue with hg19 GRanges.   [!21](https://github.com/cruk-mi/mesa/pull/21)
+* Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame. [!29](https://github.com/cruk-mi/mesa/pull/29)
+* Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range. [!32](https://github.com/cruk-mi/mesa/pull/32)
+* Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0. [!55](https://github.com/cruk-mi/mesa/pull/55)
 
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
 
 ### BUG FIXES
-* `summariseDMRsByGene` now correctly summarises genes when they have different positions or lengths in different windows. 
-* `plotCorrelationMatrix` no longer crashes when no annotation is being used. 
+* `summariseDMRsByGene` now correctly summarises genes when they have different positions or lengths in different windows.  [!5](https://github.com/cruk-mi/mesa/pull/5)
+* `plotCorrelationMatrix` no longer crashes when no annotation is being used.  [!5](https://github.com/cruk-mi/mesa/pull/5)
 
-# mesa 0.5.0
+# mesa 0.5.0 [!6](https://github.com/cruk-mi/mesa/pull/6)
 
 ### ADDED
 * Examples added for some functions, and documentation for some related functions merged.
 * Added more tests following inspection of `covr` coverage.
 * `getPCA()` and `getUMAP()` now return an object of class `mesaDimRed`, which wraps the previous list based output. This object now contains a copy of the sampleTable, which may be edited using `mutate` and `left_join`.
-* A new example qseaSet for a small portion of the mouse genome. 
-* Added the ability to specifying a biomaRt object directly on a qseaSet for used for finding gene annotation in `plotGeneHeatmap`. 
+* A new example qseaSet for a small portion of the mouse genome.
+* Added the ability to specifying a biomaRt object directly on a qseaSet for used for finding gene annotation in `plotGeneHeatmap`.
 
 ### CHANGES
 * `plotPCA()` and `plotUMAP()` no longer require passing the qseaSet, as the sampleTable is stored in the object.
 * Added functions `setMesaGenome`, `setMesaTxDb` and `setMesaAnnoDb` to set global defaults for the annotation packages required by `annotateWindows`. This has the effect that `annotateWindows` will no longer assume hg38 by default with no arguments.
-* `summariseDMRsByGene` function now requires `annotateWindows` to have already been called on the DMRs (previously it called this internally if necessary). 
+* `summariseDMRsByGene` function now requires `annotateWindows` to have already been called on the DMRs (previously it called this internally if necessary).
 * Reduced the number of messages produced when generating tables of data.
 
 ### BUG FIXES
-* `poolSamples` now returns data frames instead of matrices in the libraries slot. 
-* `select` now works when dropping a column.
+* `poolSamples` now returns data frames instead of matrices in the libraries slot.
+* `select` now works when dropping a column. [!6](https://github.com/cruk-mi/mesa/pull/6)
 *  PCA/UMAP functions now give a more informative error if there are insufficient regions or samples.
 * `downSample` now works correctly again following changes to how `table` and `enframe` interact.
 * `calculateDMRs` now correctly returns an empty data frame if no DMRs are found.
@@ -83,7 +82,7 @@ This is the first released version on github, following a lengthy period of inte
 # mesa 0.4.1
 
 ### BUG FIXES
-* `plotPCA` now works when colouring by a factor variable
+* `plotPCA` now works when colouring by a factor variable.
 * `mutate` now cannot be used to change the sample_name in the sample table of a qseaSet which breaks the object. `renameQsetNames` or `renameSamples` must be used for this.
 
 ### CHANGES
@@ -179,7 +178,7 @@ This is the first released version on github, following a lengthy period of inte
 
 -   Authors updated to include Paddy Harker, Kevin Brennan and Katarzyna Kamieniecka.
 
--   Removed exporting of internal functions: `dropAvgFragDetails`, `getBamCoveragePairedAndUnpairedR1`, `mixThreeQsetSamples`, `getCGPositions`, `fitQseaGLM`, `getDMRsData`, `subsetWindowsOverBackground`
+-   Removed exporting of internal functions: `dropAvgFragDetails`, `getBamCoveragePairedAndUnpairedR1`, `mixThreeQsetSamples`, `getCGPositions`, `fitQseaGLM`, `getDMRsData`, `subsetWindowsOverBackground`.
 
 -   Renamed many functions throughout the package:
 
@@ -201,7 +200,7 @@ This is the first released version on github, following a lengthy period of inte
     | `relabelQset`                   | `renameSamples`                |
     | `summariseByGene`               | `summariseDMRsByGene`          |
 
--   Six functions have been replaced by different functions (detailed above)
+-   Six functions have been replaced by different functions (detailed above).
 
     +---------------------------+--------------------------+
     | Previous Function         | Replacement Function(s)  |
@@ -236,13 +235,13 @@ This is the first released version on github, following a lengthy period of inte
 
 -   Removed all references to `PooledControl` sample (previously suggested for normalisation).
 
--   Various R CMD check warning issues fixed.
+-   Various R CMD check warning issues fixed.[!6](https://github.com/cruk-mi/mesa/pull/6)
 
 -   `filterByOverlaps` no longer allows the option to take a list of window ID numbers.
 
 -   Fixed `addMedipsEnrichmentFactors` function inside `makeQset` when using the `"qseaPaired"` coverageMethod.
 
--   Fixed tests for `addMedipsEnrichmentFactors`
+-   Fixed tests for `addMedipsEnrichmentFactors`.
 
 # mesa 0.2.2
 
