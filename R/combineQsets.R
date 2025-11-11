@@ -264,7 +264,7 @@ combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, 
 
   combinedQset <- firstQset
 
-  for(i in 1:length(qseaSets)){
+  for(i in seq_along(qseaSets)){
     combinedQset <- combineQsets(combinedQset, qseaSets[[i]],
                                  checkParams = checkParams,
                                  regionsToKeep = regionsToKeep,

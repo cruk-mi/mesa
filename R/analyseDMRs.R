@@ -270,7 +270,7 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
     dataTable %>%
       dplyr::filter(!!dplyr::sym(x) <= FDRthres) %>%
       openxlsx::writeData(wb_DMR, sheetName, .)
-    openxlsx::addFilter(wb_DMR, sheetName, row = 1, cols = 1:ncol(dataTable))
+    openxlsx::addFilter(wb_DMR, sheetName, row = 1, cols = seq_len(ncol(dataTable)))
     openxlsx::freezePane(wb_DMR, sheetName,  firstRow = TRUE)
 
   }
@@ -381,18 +381,18 @@ sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRt
   if(deparse(substitute(metric)) %in% c("position")){
     out <- positiveDMRs %>% 
       dplyr::arrange(seqnames, start) %>% 
-      dplyr::slice(1:(!!n)) %>%
+      dplyr::slice_head(n = !!n) %>%
       dplyr::ungroup()
   } else if (deparse(substitute(metric)) %in% c("adjPval")){
     message(glue::glue("Choosing the windows with the smallest value of {rlang::ensym(metric)}"))
     out <- positiveDMRs %>% 
       dplyr::arrange({{metric}}) %>% 
-      dplyr::slice(1:(!!n)) %>%
+      dplyr::slice_head(n = !!n) %>%
       dplyr::ungroup()
   } else {
     out <- positiveDMRs %>% 
       dplyr::arrange(dplyr::desc({{metric}})) %>% 
-      dplyr::slice(1:(!!n)) %>%
+      dplyr::slice_head(n = !!n) %>%
       dplyr::ungroup()
   }
 
