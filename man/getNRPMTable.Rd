@@ -13,7 +13,7 @@ getNRPMTable(
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
-Input object containing window-level signal.
+A qseaSet object containing methylation-enriched sequencing data.
 \strong{Default:} none (must be supplied).}
 
 \item{useGroupMeans}{\code{logical(1)}.

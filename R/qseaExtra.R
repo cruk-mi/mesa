@@ -1,15 +1,9 @@
-# .onAttach <- function(libname, pkgname) {
-#   packageStartupMessage("Welcome to my methtools package!")
-# }
-
-
-# Internal: memoise on load
+# Internal: memoise getCGPositions so that it is cached as it takes a long time
 #' @keywords internal
 #' @noRd
 .onLoad <- function(libname, pkgname) {
   getCGPositions <<- memoise::memoise(getCGPositions)
 }
-
 
 #' Check whether an object is a qseaSet
 #'
@@ -36,7 +30,6 @@
 is.qseaSet <- function(x){
   return(inherits(x,"qseaSet"))
   }
-
 
 #' Set or get an Ensembl/BioMart handle on a qseaSet
 #'
@@ -104,7 +97,6 @@ setGeneric('getMart', function(object, ...) standardGeneric('getMart'))
 #' @export
 setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 
-
 #' Annotate genomic windows using ChIPseeker (with optional CpG/FANTOM context)
 #'
 #' Uses [ChIPseeker::annotatePeak()] to assign transcript-relative annotations
@@ -138,11 +130,11 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'
 #' @param CpGislandsGR `GRanges` or `NULL`.  
 #'   CpG island regions for island/shore/shelf context.  
-#'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::hg38CpGIslands` if available).
+#'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::hg38CpGIslands`).
 #'
 #' @param FantomRegionsGR `GRanges` or `NULL`.  
 #'   FANTOM enhancer regions for overlap counts.  
-#'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::FantomRegions` if available).
+#'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::FantomRegions`).
 #'
 #' @details
 #' * **Conversion:** Non-`GRanges` inputs are converted via [qseaTableToChrGRanges()].  
@@ -155,10 +147,9 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' * **Output columns:** Includes `annotation` (full label), `shortAnno` (without the
 #'   trailing parenthetical), and—when contexts are provided—`landscape`
 #'   (Island/Shore/Shelf/Open Sea) and `inFantom` (overlap count with FANTOM).
-#'   Width/strand are dropped.
 #'
 #' @return A tibble with the input windows augmented by ChIPseeker annotations and,
-#'   when available, CpG island landscape and FANTOM overlap counts.
+#'   when available, CpG island landscape and Fantom overlap.
 #'
 #' @seealso
 #' [ChIPseeker::annotatePeak()], [setMesaGenome()], [setMesaTxDb()], [setMesaAnnoDb()],
@@ -172,13 +163,27 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'   calculateDMRs(variable = "tumour", contrasts = "first") %>%
 #'   annotateWindows(genome = "hg38")
 #'
-#' # Or specify TxDb/annoDb explicitly (strings are resolved at runtime)
+#' # Or specify TxDb/annoDb explicitly
 #' exampleTumourNormal %>%
 #'   calculateDMRs(variable = "tumour", contrasts = "first") %>%
 #'   annotateWindows(
 #'     TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
 #'     annoDb = "org.Hs.eg.db"
 #'   )
+#'
+#' # Mouse example (mm10): supply mouse TxDb and OrgDb
+#' data(exampleMouse, package = "mesa")
+#' exampleMouse %>%
+#'   getRegions() %>%
+#'   annotateWindows(
+#'     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+#'     annoDb = "org.Mm.eg.db"
+#'   )
+#'
+#' # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
+#'   setMesaGenome("hg38"); 
+#'   setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+#'   setMesaAnnoDb("org.Hs.eg.db")
 #'
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
@@ -333,7 +338,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 #' # Keep windows with median NRPM > 1 across all samples
 #' exampleTumourNormal %>%
 #'   subsetWindowsBySignal(
-#'     fn = median,                # accepts na.rm
+#'     fn = median,
 #'     threshold = 1,
 #'     aboveThreshold = TRUE
 #'   )
@@ -341,7 +346,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 #' # Keep windows where the MIN beta < 0.5 in any sample
 #' exampleTumourNormal %>%
 #'   subsetWindowsBySignal(
-#'     fn = min,                   # accepts na.rm
+#'     fn = min,
 #'     threshold = 0.5,
 #'     aboveThreshold = FALSE,
 #'     normMethod = "beta"
@@ -430,7 +435,10 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #'
 #' Identify genomic windows with significantly more reads than expected under a
 #' Poisson background model, given total reads per sample and the number of
-#' genome windows.
+#' genome windows. If `numWindows` is provided, then that value will be used as
+#' the total original number of windows under consideration for the false 
+#' discovery rate, otherwise it will use the number of windows currently in the
+#' qseaSet.
 #'
 #' @param qseaSet `qseaSet`.  
 #'   Input object containing per-window read counts.
@@ -446,12 +454,8 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #'
 #' @param numWindows `integer(1)` or `NULL`.  
 #'   Total number of windows in the genome used to compute the expected background.
-#'   If `NULL`, it is estimated automatically.  
+#'   If `NULL`, it will use all the windows currently in the qseaSet.
 #'   **Default:** `NULL`.
-#'
-#' @param recalculateNumWindows `logical(1)`.  
-#'   Whether to recompute the number of windows via [qsea::createQseaSet()].  
-#'   **Default:** `TRUE`.
 #'
 #' @param FDRthres `numeric(1)`.  
 #'   FDR threshold used to call windows significantly above background.  
@@ -465,9 +469,11 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' @details
 #' For each tested sample, an expected count per window is derived from its total
 #' reads and the supplied/estimated `numWindows`, and a Poisson test is used to
-#' flag windows above background. Windows are retained or removed based on
-#' `keepAbove` and the requirement that at least `numAbove` samples are significant
-#' at `FDRthres`.
+#' flag windows above background. This uses the `valid_fragments` column in the 
+#' library information attached to the qseaSet, which is the number of fragments
+#' used in the generation of the original qseaSet. Windows are retained or 
+#' removed based on `keepAbove` and the requirement that at least `numAbove` 
+#' samples are significant at `FDRthres`.
 #'
 #' @return A filtered `qseaSet` containing only windows passing the criteria.
 #'
@@ -477,23 +483,23 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #' @family window-helpers
 #'
 #' @examples
-#' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Keep windows above Poisson background in at least 2 samples whose names contain "Lung"
+#' # Keep windows above Poisson background in at least 2 samples whose names 
+#' # contain "Lung", assuming there were 9 million original windows
 #' exampleTumourNormal %>%
-#'   subsetWindowsOverBackground(keepAbove = TRUE, samples = "Lung", numAbove = 2)
+#'   subsetWindowsOverBackground(keepAbove = TRUE, samples = "Lung", 
+#'                               numAbove = 2, numWindows = 9e6 )
 #'
-#' # Drop windows above background (retain only background-like windows) across all samples
+#' # Drop windows above background (retain only background-like windows) across 
+#' # all samples, assuming there were 9 million original windows
 #' exampleTumourNormal %>%
-#'   subsetWindowsOverBackground(keepAbove = FALSE, FDRthres = 0.01)
-#' }
-#'
+#'   subsetWindowsOverBackground(keepAbove = FALSE, numWindows = 9e6)
 #' @importFrom rlang :=
 #' @export
-subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NULL, numWindows = NULL,
-                                        recalculateNumWindows = FALSE, FDRthres = 0.01, numAbove = 1){
-
+subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, 
+                                        samples = NULL, numWindows = NULL,
+                                        FDRthres = 0.01, numAbove = 1){
 
   samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
 
@@ -517,52 +523,42 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, samples = NU
     qsea::getCounts()
 
   if (is.null(numWindows)) {
-
-    if (recalculateNumWindows) {
-
-      numWindows <- suppressWarnings(qsea::createQseaSet(sampleTable = qsea::getSampleTable(qseaSet),
-                                                   BSgenome = qseaSet@parameters$BSgenome,
-                                                   chr.select = qsea::getChrNames(qseaSet),
-                                                   window_size = qsea::getWindowSize(qseaSet))
-      ) %>%
-        qsea::getRegions() %>%
-        length()
-    } else {
       numWindows <- nrow(countMat)
-    }
   }
 
   fdrMat <- purrr::map_dfc(samples,
-                    function(x){
-
-                      totalNumReads <- qseaSet@libraries$file_name[x, "total_fragments"]
-                      lambda <- totalNumReads/numWindows
-                      pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
-                      fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
-                        tibble::enframe(name = "window") %>%
-                        dplyr::rename(!!x := value) %>%
-                        dplyr::select(-window)
-
-                    }
+              function(x){
+                totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
+                lambda <- totalNumReads/numWindows
+                pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
+                fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
+                  tibble::enframe(name = "window") %>%
+                  dplyr::rename(!!x := value) %>%
+                  dplyr::select(-window) 
+                }
   )
 
   if (keepAbove) {
-    windowsToKeep <- fdrMat %>%
+    indexToKeep <- fdrMat %>%
       {. <= FDRthres} %>%
       rowSums() %>%
       {. >= numAbove} %>%
       which()
   } else {
-    windowsToKeep <- fdrMat %>%
+    indexToKeep <- fdrMat %>%
       {. <= FDRthres} %>%
       rowSums() %>%
       {. < numAbove} %>%
       which()
   }
-
+  
+  windowsToKeep <- getRegions(qseaSet)[indexToKeep]
+  
+  print(windowsToKeep)
+  
   message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
 
-  return(invisible(filterByOverlaps(qseaSet, windowsToKeep)))
+  return(filterByOverlaps(qseaSet, windowsToKeep))
 
 }
 
@@ -740,7 +736,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' using a count threshold, not a direct fraction of raw reads.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object providing per-window counts. **Default:** none (must be supplied).
+#'   Input qseaSet. **Default:** none (must be supplied).
 #'
 #' @param regionsToOverlap `GRanges` or `data.frame`.  
 #'   Regions to consider for overlap. Data frames must be coercible to `GRanges`
@@ -761,7 +757,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'
 #' @seealso
 #' [qsea::getCounts()], [qsea::getSampleTable()], [filterByOverlaps()],
-#' [hg38UltraStableProbes], [subsetWindowsBySignal()]
+#' [hg38CpGIslands], [subsetWindowsBySignal()]
 #'
 #' @family window-helpers
 #'
@@ -771,23 +767,21 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' # Using the shipped ultra-stable probes (GRCh38) as the region set
 #' exampleTumourNormal %>%
 #'   calculateFractionReadsInGRanges(
-#'     regionsToOverlap = mesa::hg38UltraStableProbes,
+#'     regionsToOverlap = mesa::hg38CpGIslands,
 #'     numCountsNeeded   = 5
 #'   ) %>%
-#'   dplyr::select(sample_name, fraction) 
+#'   dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
 #'
 #' # Define a small GRanges subset from the object's own windows
-#' exampleTumourNormal %>%
+#' gr <- exampleTumourNormal %>%
 #'   qsea::getRegions() %>%
-#'   (\(gr) gr[seq_len(min(100L, length(gr)))])() %>%
-#'   (\(subgr)
-#'     calculateFractionReadsInGRanges(
+#'   head(n = 100)
+#'   
+#' calculateFractionReadsInGRanges(
 #'       qseaSet           = exampleTumourNormal,
-#'       regionsToOverlap = subgr,
-#'       numCountsNeeded   = 3
-#'     )
-#'   ) %>%
-#'   dplyr::select(sample_name, fraction) 
+#'       regionsToOverlap  = gr,
+#'       numCountsNeeded   = 3) %>%
+#'   dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
 #'
 #' @export
 calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
@@ -816,7 +810,7 @@ calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCounts
 #' Remove normalisation suffix from column names
 #'
 #' Clean wide tables (e.g., from [getDataTable()]) by stripping the trailing
-#' `_{normMethod}` and optional `_{normMethod}_means` suffixes from sample /
+#' `_{normMethod}` or `_{normMethod}_means` suffixes from sample /
 #' group-mean columns.
 #'
 #' @param dataTable `data.frame` or tibble.  
@@ -866,11 +860,11 @@ removeNormMethodSuffix <- function(dataTable, normMethod) {
 #' exceed a chosen threshold using the selected normalisation/measure.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object providing window-level signal.  
+#'   A qseaSet object containing methylation-enriched sequencing data.  
 #'   **Default:** none (must be supplied).
 #'
 #' @param GRanges `GenomicRanges::GRanges`.  
-#'   Windows to evaluate (typically a subset of `qsea::getRegions(qseaSet)`).  
+#'   Windows to count over.  
 #'   **Default:** none (must be supplied).
 #'
 #' @param samples `character()` or `NULL`.  
@@ -921,10 +915,6 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
     samples <- qsea::getSampleNames(qseaSet)
   }
 
-  clip <- function(x, a, b) {
-    a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)
-  }
-
   reducedData <- qseaSet %>%
     filterByOverlaps(GRanges) %>%
     qsea::makeTable(norm_methods = normMethod, samples = samples) %>%
@@ -947,7 +937,7 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
 #' **columns are genomic windows**, using one normalisation/measure.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object providing window-level signal.  
+#'   A qseaSet object containing methylation-enriched sequencing data. 
 #'   **Default:** none (must be supplied).
 #'
 #' @param normMethod `character(1)`.  
@@ -1014,7 +1004,7 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 #' Returns a window × sample (or group) table for downstream summaries/plots.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object containing window-level counts.  
+#'   A qseaSet object containing methylation-enriched sequencing data.
 #'   **Default:** none (must be supplied).
 #'
 #' @param useGroupMeans `logical(1)`.  
@@ -1081,7 +1071,7 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 #' for downstream summaries/plots.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object containing window-level signal.  
+#'   A qseaSet object containing methylation-enriched sequencing data.
 #'   **Default:** none (must be supplied).
 #'
 #' @param useGroupMeans `logical(1)`.  
@@ -1148,7 +1138,7 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #' downstream summaries/plots.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object containing window-level signal.  
+#'   A qseaSet object containing methylation-enriched sequencing data. 
 #'   **Default:** none (must be supplied).
 #'
 #' @param useGroupMeans `logical(1)`.  
@@ -1686,7 +1676,7 @@ getSampleGroups2 <- function(qseaSet){
 #' values per **sample** or **group means**.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object containing window-level signal.  
+#'   A qseaSet object containing methylation-enriched sequencing data.
 #'   **Default:** none (must be supplied).
 #'
 #' @param normMethod `character()`.  
@@ -1818,7 +1808,7 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' Export bigWig files with per-window scores for each sample (or group means).
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object providing window coordinates and signal.  
+#'   A qseaSet object containing methylation-enriched sequencing data.
 #'   **Default:** none (must be supplied).
 #'
 #' @param folderName `character(1)`.  
@@ -1864,18 +1854,18 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Per-sample NRPM bigWigs
+#' td <- tempfile()
+#' dir.create(td)
 #' exampleTumourNormal %>%
-#'   { td <- tempfile(); dir.create(td);
-#'     writeBigWigs(., folderName = td, normMethod = "nrpm", useGroupMeans = FALSE);
-#'     list.files(td, pattern = "\\\\.bw$")
-#'   }
+#'   writeBigWigs(folderName = td, normMethod = "nrpm", useGroupMeans = FALSE)
+#' list.files(td, pattern = "\\\\.bw$")
 #'
 #' # Group-mean beta bigWigs (replace NA beta with 0)
+#' td2 <- tempfile()
+#' dir.create(td2)
 #' exampleTumourNormal %>%
-#'   { td <- tempfile(); dir.create(td);
-#'     writeBigWigs(., folderName = td, normMethod = "beta", useGroupMeans = TRUE, naVal = 0);
-#'     head(list.files(td, pattern = "\\\\.bw$"))
-#'   }
+#'   writeBigWigs(folderName = td2, normMethod = "beta", useGroupMeans = TRUE, naVal = 0)
+#' list.files(td, pattern = "\\\\.bw$")
 #'
 #' @export
 writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){
@@ -1922,7 +1912,7 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
 #' keep beta unchanged; NRPM may change depending on downstream use.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Input object whose library factors will be reset.  
+#'   A qseaSet object containing methylation-enriched sequencing data.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
@@ -1945,12 +1935,6 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
 #' # Show current factors then reset to 1 and show again
 #' exampleTumourNormal %>%
 #'   addLibraryInformation() %>%
-#'   pull(library_factor) %>%
-#'   head()
-#'
-#' exampleTumourNormal %>%
-#'   removeLibraryFactors() %>%
-#'   addLibraryInformation() %>%   # refresh cached summaries if needed
 #'   pull(library_factor) %>%
 #'   head()
 #'

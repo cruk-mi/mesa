@@ -8,7 +8,7 @@ makeTransposedTable(qseaSet, normMethod = "nrpm", ...)
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
-Input object providing window-level signal.
+A qseaSet object containing methylation-enriched sequencing data.
 \strong{Default:} none (must be supplied).}
 
 \item{normMethod}{\code{character(1)}.
