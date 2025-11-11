@@ -509,9 +509,9 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, 
                                         samples = NULL, numWindows = NULL,
                                         FDRthres = 0.01, numAbove = 1){
-
+  
   samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
-
+  
   if (length(samples) == 1 & length(samplesNotInSet) > 0 & is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
@@ -521,47 +521,32 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
                     "))
   }
-
+  
   if (is.null(samples)) {
     samples <- qsea::getSampleNames(qseaSet)
   }
-
+  
   message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
-
+  
   countMat <- qseaSet %>%
     qsea::getCounts()
-
+  
   if (is.null(numWindows)) {
-
-    if (recalculateNumWindows) {
-
-      numWindows <- withCallingHandlers(
-        qsea::createQseaSet(
-          sampleTable = qsea::getSampleTable(qseaSet),
-          BSgenome    = qseaSet@parameters$BSgenome,
-          chr.select  = qsea::getChrNames(qseaSet),
-          window_size = qsea::getWindowSize(qseaSet)
-        ),
-        warning = function(w) invokeRestart("muffleWarning")
-      ) %>%
-        qsea::getRegions() %>%
-        length()
-    } else {
-      numWindows <- nrow(countMat)
+    numWindows <- nrow(countMat)
   }
-
+  
   fdrMat <- purrr::map_dfc(samples,
-              function(x){
-                totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
-                lambda <- totalNumReads/numWindows
-                pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
-                fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
-                  tibble::enframe(name = "window") %>%
-                  dplyr::rename(!!x := value) %>%
-                  dplyr::select(-window) 
-                }
+                           function(x){
+                             totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
+                             lambda <- totalNumReads/numWindows
+                             pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
+                             fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
+                               tibble::enframe(name = "window") %>%
+                               dplyr::rename(!!x := value) %>%
+                               dplyr::select(-window) 
+                           }
   )
-
+  
   if (keepAbove) {
     indexToKeep <- fdrMat %>%
       {. <= FDRthres} %>%
@@ -581,9 +566,9 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
   print(windowsToKeep)
   
   message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
-
+  
   return(filterByOverlaps(qseaSet, windowsToKeep))
-
+  
 }
 
 
