@@ -532,8 +532,6 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
     qsea::getCounts()
 
   if (is.null(numWindows)) {
-<<<<<<< HEAD
-=======
 
     if (recalculateNumWindows) {
 
@@ -549,7 +547,6 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
         qsea::getRegions() %>%
         length()
     } else {
->>>>>>> 31657af (Fixed 'Avoid 'suppressWarnings'/'*Messages' if possible' note)
       numWindows <- nrow(countMat)
   }
 
