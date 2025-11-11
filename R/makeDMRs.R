@@ -169,13 +169,18 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, without using parallelisation."))
   }
 
-  qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
-                                             design,
-                                             keep = keepIndex,
-                                             minRowSum = 0,
-                                             norm_method = "beta",
-                                             parallel = getMesaParallel(),
-                                             verbose = FALSE))
+  qseaGLM <- withCallingHandlers(
+    qsea::fitNBglm(
+      qseaSet,
+      design,
+      keep = keepIndex,
+      minRowSum = 0,
+      norm_method = "beta",
+      parallel = getMesaParallel(),
+      verbose = FALSE
+    ),
+    message = function(m) invokeRestart("muffleMessage")
+  )
 
   pb$tick()
 
@@ -206,12 +211,17 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
     limContrast <- limma::makeContrasts(contrasts = conName, levels = design)
 
-    qseaGLM <- suppressMessages(qsea::addContrast(qseaSet,
-                                                  qseaGLM,
-                                                  contrast = limContrast,
-                                                  name = conNameClean,
-                                                  parallel = getMesaParallel(),
-                                                  verbose = FALSE))
+    qseaGLM <- withCallingHandlers(
+      qsea::addContrast(
+        qseaSet,
+        qseaGLM,
+        contrast = limContrast,
+        name = conNameClean,
+        parallel = getMesaParallel(),
+        verbose = FALSE
+      ),
+      message = function(m) invokeRestart("muffleMessage")
+    )
 
     pb$tick()
     if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.2 & checkPVals) {

@@ -340,7 +340,10 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
   chr_lengths <- as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
 
   if (all(is.na(GenomeInfoDb::seqlengths(readGRanges)))) {
-    suppressWarnings(GenomeInfoDb::seqinfo(readGRanges) <- GenomeInfoDb::seqinfo(BSgenome::getBSgenome(BSgenome))[GenomeInfoDb::seqnames(GenomeInfoDb::seqinfo(readGRanges))])
+    GenomeInfoDb::seqinfo(readGRanges, pruning.mode = "coarse") <-
+      GenomeInfoDb::seqinfo(BSgenome::getBSgenome(BSgenome))[
+        GenomeInfoDb::seqnames(GenomeInfoDb::seqinfo(readGRanges))
+      ]
     readGRanges <- IRanges::trim(readGRanges)
   }
 

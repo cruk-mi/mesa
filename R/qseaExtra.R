@@ -412,8 +412,17 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
   }
 
-  #TODO think about catching the warnings more specifically. Mostly we want to catch the "no non-missing arguments to max; returning -Inf"
-  dataTable <- suppressWarnings(dataTable %>% dplyr::mutate(fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)))
+  dataTable <- withCallingHandlers(
+    dataTable %>%
+      dplyr::mutate(
+        fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)
+      ),
+    warning = function(w) {
+      if (grepl("no non-missing arguments to .*; returning -Inf", conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 
   if (aboveThreshold) {
     dataTable <- dataTable %>% dplyr::filter(fnValue >= !!threshold)
@@ -523,6 +532,24 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
     qsea::getCounts()
 
   if (is.null(numWindows)) {
+<<<<<<< HEAD
+=======
+
+    if (recalculateNumWindows) {
+
+      numWindows <- withCallingHandlers(
+        qsea::createQseaSet(
+          sampleTable = qsea::getSampleTable(qseaSet),
+          BSgenome    = qseaSet@parameters$BSgenome,
+          chr.select  = qsea::getChrNames(qseaSet),
+          window_size = qsea::getWindowSize(qseaSet)
+        ),
+        warning = function(w) invokeRestart("muffleWarning")
+      ) %>%
+        qsea::getRegions() %>%
+        length()
+    } else {
+>>>>>>> 31657af (Fixed 'Avoid 'suppressWarnings'/'*Messages' if possible' note)
       numWindows <- nrow(countMat)
   }
 
