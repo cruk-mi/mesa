@@ -58,7 +58,7 @@ flag windows above background. This uses the \code{valid_fragments} column in th
 library information attached to the qseaSet, which is the number of fragments
 used in the generation of the original qseaSet. Windows are retained or
 removed based on \code{keepAbove} and the requirement that at least \code{numAbove}
-samples are significantat \code{FDRthres}.
+samples are significant at \code{FDRthres}.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

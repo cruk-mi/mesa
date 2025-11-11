@@ -184,7 +184,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'   setMesaGenome("hg38"); 
 #'   setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
 #'   setMesaAnnoDb("org.Hs.eg.db")
-#' }
 #'
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 

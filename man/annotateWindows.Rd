@@ -99,7 +99,6 @@ exampleMouse \%>\%
   setMesaGenome("hg38"); 
   setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
   setMesaAnnoDb("org.Hs.eg.db")
-}
 
 }
 \seealso{
