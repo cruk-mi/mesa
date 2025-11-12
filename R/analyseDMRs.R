@@ -373,6 +373,11 @@ writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
 #' @export
 sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRthres = 0.05) {
   
+  n <- as.integer(n)
+  if (length(n) != 1L || is.na(n) || n < 0L) {
+    stop("`n` must be a single non-negative integer.")
+  }
+  
   positiveDMRs <- DMRs %>% 
     pivotDMRsLonger(makePositive = makePositive, FDRthres = FDRthres) %>% 
     dplyr::relocate(tidyselect::matches("means$"), .after = tidyselect::last_col()) %>%
