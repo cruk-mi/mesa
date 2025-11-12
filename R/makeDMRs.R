@@ -169,14 +169,6 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, without using parallelisation."))
   }
 
-<<<<<<< Updated upstream
-  qseaGLM <- withCallingHandlers(
-    qsea::fitNBglm(
-      qseaSet,
-      design,
-      keep = keepIndex,
-      minRowSum = 0,
-=======
   quiet_substrings <- c(
     "iteration",
     "selecting regions with at least 0 reads",
@@ -185,21 +177,15 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     "fitting GLMs",
     "regions converged"
   )
-  
+
   qseaGLM <- withCallingHandlers(
     qsea::fitNBglm(
       qseaSet, design,
       keep = keepIndex, minRowSum = 0,
->>>>>>> Stashed changes
       norm_method = "beta",
       parallel = getMesaParallel(),
       verbose = FALSE
     ),
-<<<<<<< Updated upstream
-    message = function(m) invokeRestart("muffleMessage")
-  )
-
-=======
     message = function(m) {
       msg <- conditionMessage(m)
       if (any(vapply(quiet_substrings, function(s) grepl(s, msg, fixed = TRUE), logical(1)))) {
@@ -207,8 +193,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
       }
     }
   )
-  
->>>>>>> Stashed changes
+
   pb$tick()
 
   # Yes, a for loop. The issue is that it adds repeatedly to the qseaGLM object, so can't be vectorised easily.
