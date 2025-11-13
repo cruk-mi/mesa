@@ -386,18 +386,18 @@ sliceDMRs <- function(DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRt
   if(deparse(substitute(metric)) %in% c("position")){
     out <- positiveDMRs %>% 
       dplyr::arrange(seqnames, start) %>% 
-      dplyr::slice_head(n = !!n) %>%
+      dplyr::slice_head(n = n) %>%
       dplyr::ungroup()
   } else if (deparse(substitute(metric)) %in% c("adjPval")){
     message(glue::glue("Choosing the windows with the smallest value of {rlang::ensym(metric)}"))
     out <- positiveDMRs %>% 
       dplyr::arrange({{metric}}) %>% 
-      dplyr::slice_head(n = !!n) %>%
+      dplyr::slice_head(n = n) %>%
       dplyr::ungroup()
   } else {
     out <- positiveDMRs %>% 
       dplyr::arrange(dplyr::desc({{metric}})) %>% 
-      dplyr::slice_head(n = !!n) %>%
+      dplyr::slice_head(n = n) %>%
       dplyr::ungroup()
   }
 
