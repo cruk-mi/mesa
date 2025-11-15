@@ -138,13 +138,13 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
     stop(glue::glue("Not enough reads in {sample2}, only {sampleColSums[sample2]} out of {nReads2 * onTargetFrac2} requested."))
   }
 
-  windows1 <- sample(rep(1:nrow(counts), counts[,sample1]), replace = FALSE, size = nReads1 * onTargetFrac1)
-  windows2 <- sample(rep(1:nrow(counts), counts[,sample2]), replace = FALSE, size = nReads2 * onTargetFrac2)
+  windows1 <- sample(rep(seq_len(nrow(counts)), counts[,sample1]), replace = FALSE, size = nReads1 * onTargetFrac1)
+  windows2 <- sample(rep(seq_len(nrow(counts)), counts[,sample2]), replace = FALSE, size = nReads2 * onTargetFrac2)
 
   newCounts <- c(windows1, windows2) %>%
     tibble::enframe(name = NULL, value = "window") %>%
     dplyr::count(window, name = "n") %>%
-    dplyr::left_join(tibble::tibble(window = 1:nrow(counts)),., copy = TRUE, by = "window") %>%
+    dplyr::left_join(tibble::tibble(window = seq_len(nrow(counts))),., copy = TRUE, by = "window") %>%
     dplyr::mutate(n = tidyr::replace_na(n,0)) %>%
     dplyr::select(n)
 
@@ -354,15 +354,15 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
     stop(glue::glue("Not enough reads in {sample3}, only {sampleColSums[sample3]} out of {nReads3 * onTargetFrac3} requested."))
   }
 
-  windows1 <- sample(rep(1:nrow(counts), counts[,sample1]), replace = FALSE, size = nReads1 * onTargetFrac1)
-  windows2 <- sample(rep(1:nrow(counts), counts[,sample2]), replace = FALSE, size = nReads2 * onTargetFrac2)
-  windows3 <- sample(rep(1:nrow(counts), counts[,sample3]), replace = FALSE, size = nReads3 * onTargetFrac3)
+  windows1 <- sample(rep(seq_len(nrow(counts)), counts[,sample1]), replace = FALSE, size = nReads1 * onTargetFrac1)
+  windows2 <- sample(rep(seq_len(nrow(counts)), counts[,sample2]), replace = FALSE, size = nReads2 * onTargetFrac2)
+  windows3 <- sample(rep(seq_len(nrow(counts)), counts[,sample3]), replace = FALSE, size = nReads3 * onTargetFrac3)
 
   newCounts <- c(windows1, windows2, windows3) %>%
     table() %>%
     tibble::enframe(name = "window") %>%
     dplyr::mutate(window = as.integer(window)) %>%
-    dplyr::left_join(tibble::tibble(window = 1:nrow(counts)),., copy = TRUE, by = "window") %>%
+    dplyr::left_join(tibble::tibble(window = seq_len(nrow(counts))),., copy = TRUE, by = "window") %>%
     dplyr::mutate(value = tidyr::replace_na(value,0)) %>%
     dplyr::select(value)
 

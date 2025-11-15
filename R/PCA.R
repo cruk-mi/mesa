@@ -295,8 +295,8 @@ getDimRed <- function(qseaSet,
       stop("At least one window in dataTable does not have a matching window in qseaSet.")
     }
 
-    testSamples <- samples[1:min(5, length(samples))]
-    inputValues <- dataTable[1:min(50, length(dataTable)), ]
+    testSamples <- samples[seq_len(min(5, length(samples)))]
+    inputValues <- dataTable[seq_len(min(50, length(dataTable))), ]
     testValues <- getDataTable(qseaSet %>%
                                  filter(sample_name %in% testSamples) %>%
                                  filterByOverlaps(inputValues),
@@ -612,7 +612,7 @@ getDimRed <- function(qseaSet,
                        ...) %>%
             as.data.frame()
 
-          colnames(uwotObj) <- paste0("UMAP",seq_along(1:ncol(uwotObj)))
+          colnames(uwotObj) <- paste0("UMAP",seq_len(ncol(uwotObj)))
 
           return(list(resObj =  list(x = uwotObj, windows = colnames(dataTable)), th = th))
 
@@ -763,7 +763,7 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
   if (hasNA) {
     usingFilled <- any(21:25 %in% shapePalette)
     defaultNA   <- if (usingFilled) 25 else 7
-    defaultInUse <- defaultNA %in% shapePalette[1:nShape]
+    defaultInUse <- defaultNA %in% shapePalette[seq_len(nShape)]
     
     if (is.null(NAshape)) {
       if (defaultInUse) {
@@ -785,7 +785,7 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
       }
       NAshape <- defaultNA
       
-    } else if (NAshape %in% shapePalette[1:nShape]) {
+    } else if (NAshape %in% shapePalette[seq_len(nShape)]) {
       paletteName <- if (exists("shapesInput")) shapesInput else NULL
       
       if (!is.null(paletteName) && paletteName %in% c("line-first", "filled-first")) {

@@ -622,7 +622,7 @@ downSample <- function(qseaSet, nReads){
   newCounts <- purrr::map_dfc(colnames(counts), function(colname){
         vec <- counts[,colname]
 
-        sample(rep(1:length(vec), vec), replace = FALSE, size = nReads) %>%
+        sample(rep(seq_along(vec), vec), replace = FALSE, size = nReads) %>%
           table() %>%
           tibble::enframe(name = "window") %>%
           dplyr::mutate(window = as.integer(window), value = as.integer(value)) %>%
