@@ -24,6 +24,8 @@ editor_options:
 * `makeQset` now checks that the chromosomes provided match with those present in the BSgenome. [!32](https://github.com/cruk-mi/mesa/pull/32)
 * The `"PairedAndR1s"` coverage method for `makeQset` will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when `_alt` chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions. [!32](https://github.com/cruk-mi/mesa/pull/32)
 * `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead. [!58](https://github.com/cruk-mi/mesa/pull/58)
+*  Swapped to use of `seq_along` rather than `1:n` throughout [!67](https://github.com/cruk-mi/mesa/pull/67)
+
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
