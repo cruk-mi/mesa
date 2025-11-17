@@ -2,7 +2,7 @@ name: Build Devcontainer Images
 
 on:
   push:
-    branches: [ codespace_env_implementation ]
+    branches: [ codespace_env_implementation, codespace_R_4_5_ggplot_4_0_0 ]
     paths:
       - '.devcontainer/**'
       - 'DESCRIPTION'

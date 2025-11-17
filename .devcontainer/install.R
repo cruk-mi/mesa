@@ -71,7 +71,7 @@ for (pkg in names(required)) {
 
 
 # --- Bioconductor 3.18 (set version only) ---
-BiocManager::install(version = "3.18", ask = FALSE)
+BiocManager::install(version = "3.22", ask = FALSE)
 
 # --- Enforce BH before fgsea ---
 ip <- installed.packages(lib.loc = user_lib)
