@@ -229,7 +229,7 @@ makeQset <- function(sampleTable,
   if(parallel) {
     if(BiocParallel::bpworkers() == 1){
       message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
-      parallel = FALSE
+      parallel <- FALSE
     } else {
       message(glue::glue("Detected parallel setup with {BiocParallel::bpworkers()} workers."))
     }
@@ -244,11 +244,11 @@ makeQset <- function(sampleTable,
     }
     
     if (fragmentType %in% c("Sheared","sheared") ) {
-      fragmentLength = 213
-      fragmentSD = 60
+      fragmentLength <- 213
+      fragmentSD <- 60
     } else if (fragmentType == "cfDNA") {
-      fragmentLength = 167
-      fragmentSD = 38
+      fragmentLength <- 167
+      fragmentSD <- 38
     } else {
       stop("fragmentType should be either Sheared or cfDNA.")}
   }
@@ -321,9 +321,9 @@ makeQset <- function(sampleTable,
     }
       
     stop(glue::glue(
-    "Chromosomes provided not found in the given BSgenome! \\
-    Showing first errors out of {length(unknownChr)}:
-    {paste(head(unknownChr), collapse = '\n    ')}"
+      "Chromosomes provided not found in the given BSgenome!\n",
+      "Showing first {length(unknownChr)} not found:\n",
+      "    {glue::glue_collapse(head(unknownChr), sep = '\n    ')}"
     ))
   }
   

@@ -209,7 +209,7 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
   }
 
   if (length(samplesToDrop) > 0 ) {
-    samplesToKeep = setdiff(qsea::getSampleNames(qseaSet), samplesToDrop)
+    samplesToKeep <- setdiff(qsea::getSampleNames(qseaSet), samplesToDrop)
   }
 
   newSet <- qseaSet

@@ -333,7 +333,7 @@ setMesaAnnoDb <- function(annoDb){
 setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE){
 
   if(!is.null(nCores) && nCores > 1) {
-    useParallel = TRUE
+    useParallel <- TRUE
     BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
   }
 

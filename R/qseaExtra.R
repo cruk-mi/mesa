@@ -210,7 +210,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
         call. = FALSE
       )
     }
-    TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+    TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
     }
 
   if(genome  %in% c("hg38","GRCh38") && is.null(annoDb)) {
@@ -220,16 +220,16 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
         call. = FALSE
       )
     }
-    annoDb = "org.Hs.eg.db"
+    annoDb <- "org.Hs.eg.db"
     }
 
   if(is.null(annoDb) && is.null(genome)) {
     stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
   }
   
-  if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR = mesa::hg38CpGIslands }
+  if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR <- mesa::hg38CpGIslands }
 
-  if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR = mesa::FantomRegions %>% plyranges::as_granges()}
+  if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR <- mesa::FantomRegions %>% plyranges::as_granges()}
 
   if(methods::is(dataTable,"GRanges")) {
     GRangesObject <- dataTable
@@ -412,8 +412,17 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
   }
 
-  #TODO think about catching the warnings more specifically. Mostly we want to catch the "no non-missing arguments to max; returning -Inf"
-  dataTable <- suppressWarnings(dataTable %>% dplyr::mutate(fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)))
+  dataTable <- withCallingHandlers(
+    dataTable %>%
+      dplyr::mutate(
+        fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)
+      ),
+    warning = function(w) {
+      if (grepl("no non-missing arguments to .*; returning -Inf", conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 
   if (aboveThreshold) {
     dataTable <- dataTable %>% dplyr::filter(fnValue >= !!threshold)
@@ -500,9 +509,9 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, 
                                         samples = NULL, numWindows = NULL,
                                         FDRthres = 0.01, numAbove = 1){
-
+  
   samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
-
+  
   if (length(samples) == 1 & length(samplesNotInSet) > 0 & is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
@@ -512,32 +521,32 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
                     "))
   }
-
+  
   if (is.null(samples)) {
     samples <- qsea::getSampleNames(qseaSet)
   }
-
+  
   message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
-
+  
   countMat <- qseaSet %>%
     qsea::getCounts()
-
+  
   if (is.null(numWindows)) {
-      numWindows <- nrow(countMat)
+    numWindows <- nrow(countMat)
   }
-
+  
   fdrMat <- purrr::map_dfc(samples,
-              function(x){
-                totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
-                lambda <- totalNumReads/numWindows
-                pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
-                fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
-                  tibble::enframe(name = "window") %>%
-                  dplyr::rename(!!x := value) %>%
-                  dplyr::select(-window) 
-                }
+                           function(x){
+                             totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
+                             lambda <- totalNumReads/numWindows
+                             pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
+                             fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
+                               tibble::enframe(name = "window") %>%
+                               dplyr::rename(!!x := value) %>%
+                               dplyr::select(-window) 
+                           }
   )
-
+  
   if (keepAbove) {
     indexToKeep <- fdrMat %>%
       {. <= FDRthres} %>%
@@ -557,9 +566,9 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
   print(windowsToKeep)
   
   message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
-
+  
   return(filterByOverlaps(qseaSet, windowsToKeep))
-
+  
 }
 
 
@@ -1319,11 +1328,11 @@ summariseAcrossWindows <- function(qseaSet,
     #TODO: Can we get multiple summary statistics in one go?
 
   if(is.null(fnName)) {
-    fnName = as.character(substitute(fn, env = environment()))
+    fnName <- as.character(substitute(fn, env = environment()))
   }
 
     #if suffix doesn't start with "_" then add that to the string
-    suffix = ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
+    suffix <- ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
 
     if(is.null(regionsToOverlap)) {
       regionsToOverlap <- qsea::getRegions(qseaSet)
@@ -1476,7 +1485,7 @@ addSummaryAcrossWindows <- function(qseaSet,
                                     minEnrichment = 3) {
 
   #need to catch function name when called like this...
-  fnName = as.character(substitute(fn, env = environment()))
+  fnName <- as.character(substitute(fn, env = environment()))
 
   summaryTable <- summariseAcrossWindows(qseaSet,
                                          regionsToOverlap = regionsToOverlap,

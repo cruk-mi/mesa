@@ -164,9 +164,9 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 
   if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
-  if (normMethod == "beta") {maxScale = min(clip,1)}
+  if (normMethod == "beta") {maxScale <- min(clip,1)}
 
-  col_fun = circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
+  col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
   clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
 
@@ -573,7 +573,7 @@ makeHeatmapAnnotations <- function(qseaSet,
     }
     )
 
-  annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
+  annotationColors <- c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
 
   if(all(!is.na(specifiedAnnotationColors))){
     if(!is.list(specifiedAnnotationColors)){
@@ -590,7 +590,7 @@ makeHeatmapAnnotations <- function(qseaSet,
             paste(collapse="\', \'")
           stop(glue::glue("Missing colors for level(s): \'{missingLevels}\' of annotation \'{i}\'."))
         }
-        annotationColors[[i]] = specifiedAnnotationColors[[i]]
+        annotationColors[[i]] <- specifiedAnnotationColors[[i]]
       }
     }
 
@@ -835,7 +835,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   }
 
   if (nrow(gene_details) != 1) {
-    stop(glue::glue("Error: {nrow(gene_details)} genes matching this name found in {mart@biomart}."))
+    stop(glue::glue("{nrow(gene_details)} genes matching this name found in {mart@biomart}."))
   }
 
   message(glue::glue("Found {gene} on chromosome {gene_details$seqnames}, {gene_details$start} - {gene_details$end}"))
@@ -853,7 +853,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   if (length(geneGR) == 0) {stop("No genomic region found!")}
   if (length(geneGR) > 1) {stop("Multiple genomic regions found!")}
 
-  if (normMethod == "beta") {maxScale = 1}
+  if (normMethod == "beta") {maxScale <- 1}
 
   dataTable <- qseaSet %>%
     filterByOverlaps(regionsToOverlap = geneGR) %>%
@@ -934,7 +934,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   }
 
   #Setting a colour palette for beta-values. Could make this optional I guess
-  col_fun = circlize::colorRamp2(seq(0, maxScale, length.out = 9),
+  col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9),
                                  RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
   if (clusterCols && !is.null(clusterNum) && clusterNum > 1) {
@@ -1078,7 +1078,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
       }
     )
 
-  annotationColors = c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
+  annotationColors <- c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
 
   annotation_legend_param_ls <- annotationColDf %>%
     colnames() %>%
@@ -1267,7 +1267,7 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
       filterByOverlaps(regionsToOverlap = regionsToOverlap)
   }
 
-  annotationDf = getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
+  annotationDf <- getAnnotation(qseaSet, sampleAnnotation = {{sampleAnnotation}}, useGroupMeans = useGroupMeans)
 
   if (ncol(annotationDf) == 0) {
     annotationDf <- NULL

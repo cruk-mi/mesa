@@ -134,9 +134,8 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
   if(!calcDispersionAll){
     qseaSet <- qseaSet %>%
-      filter(sample_name %in% samplesInContrasts)
-
-  } else {
+      filter(sample_name %in% samplesInContrasts) 
+    } else {
     numExtraSamples <- length(setdiff(qsea::getSampleNames(qseaSet), samplesInContrasts))
     if(numExtraSamples > 0){
         message(glue::glue("Calculating dispersion estimates including {numExtraSamples} samples that are not being used in contrasts."))
@@ -144,7 +143,13 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
   }
 
   if (is.null(keepIndex) & minNRPM == 0 ) {
-    keepIndex = which(matrixStats::rowMaxs(qsea::getCounts(qseaSet %>% dplyr::filter(sample_name %in% samplesInContrasts))) >= minReadCount)
+    
+    keepIndex <- qseaSet %>% 
+      dplyr::filter(sample_name %in% samplesInContrasts) %>%
+      qsea::getCounts() %>%
+      matrixStats::rowMaxs() %>%
+      { which(. >= minReadCount) }
+    
   }
 
   if (is.null(keepIndex) & minNRPM >= 0) {
@@ -169,13 +174,32 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
     message(glue::glue("Fitting initial GLM on {length(keepIndex)} windows, without using parallelisation."))
   }
 
-  qseaGLM <- suppressMessages(qsea::fitNBglm(qseaSet,
-                                             design,
-                                             keep = keepIndex,
-                                             minRowSum = 0,
-                                             norm_method = "beta",
-                                             parallel = getMesaParallel(),
-                                             verbose = FALSE))
+  quiet_substrings <- c(
+    "iteration",
+    "selecting regions with at least 0 reads",
+    "deriving normalization factors",
+    "initial fit to estimate dispersion",
+    "fitting GLMs",
+    "regions converged" 
+    ) %>%
+    paste(collapse = "|")
+
+  qseaGLM <- withCallingHandlers(
+    qsea::fitNBglm(
+      qseaSet,
+      design,
+      keep = keepIndex,
+      minRowSum = 0,
+      norm_method = "beta",
+      parallel = getMesaParallel(),
+      verbose = FALSE
+    ),
+    message = function(m) {
+      if (stringr::str_detect(conditionMessage(m), quiet_substrings)) {
+        invokeRestart("muffleMessage")
+      }
+    }
+  )
 
   pb$tick()
 
@@ -206,23 +230,36 @@ fitQseaGLM <- function(qseaSet, variable = NULL,  covariates = NULL,
 
     limContrast <- limma::makeContrasts(contrasts = conName, levels = design)
 
-    qseaGLM <- suppressMessages(qsea::addContrast(qseaSet,
-                                                  qseaGLM,
-                                                  contrast = limContrast,
-                                                  name = conNameClean,
-                                                  parallel = getMesaParallel(),
-                                                  verbose = FALSE))
+    qseaGLM <- withCallingHandlers(
+      qsea::addContrast(
+        qseaSet,
+        qseaGLM,
+        contrast = limContrast,
+        name = conNameClean,
+        parallel = getMesaParallel(),
+        verbose = FALSE
+      ),
+      message = function(m) {
+        if (stringr::str_detect(conditionMessage(m), quiet_substrings)) {
+          invokeRestart("muffleMessage")
+        }
+      }
+    )
 
     pb$tick()
     if (mean(qseaGLM@contrast[[conNameClean]]$LRT_pval == 0) >= 0.2 & checkPVals) {
 
       if(is.null(covariates)){
-        warning("Warning! More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
+        warning("More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
            Set checkPVals = FALSE to ignore this.")
       } else {
 
-        stop("Error! More than 20% of windows have p-values of exactly 0, possibly an error! \n
-           Try not including covariates in the model if included, or set checkPVals = FALSE to ignore this if sure.")
+        stop(
+          "More than 20% of windows have p-values of exactly 0; this likely ",
+          "indicates a model issue.\n",
+          "Try removing covariates from the model (if any), or set ",
+          "checkPVals = FALSE to ignore this if you're sure."
+        )
       }
     }
   }
@@ -416,28 +453,27 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
 makeAllContrasts <- function(qseaSet, variable){
   vals <- qseaSet %>%
     qsea::getSampleTable() %>%
-    filter(!is.na({{variable}})) %>%
+    dplyr::filter(!is.na({{variable}})) %>%
     dplyr::pull({{variable}}) %>%
     unique() %>%
     gtools::mixedsort()
 
   tidyr::expand_grid(group1 = vals, group2 = vals) %>%
-    filter(group1 < group2) %>%
+    dplyr::filter(group1 < group2) %>%
     return()
 }
 
 
 #' Fit GLM and return DMR data in one step
 #'
-#' High-level wrapper that calls [fitQseaGLM()] and [getDMRsData()] to fit a
-#' negative-binomial GLM and extract a DMR results table in one go.
+#' Calculate one or more contrasts to find Differentially Methylated Regions (DMRs).
 #'
 #' @param qseaSet `qseaSet`.  
 #'   Input object containing counts and sample metadata.
 #'
 #' @param variable `character(1)` or `NULL`.  
-#'   Sample-table column used as the primary explanatory variable for contrasts.  
-#'   **Default:** `NULL` (must be supplied unless `formula` is provided).
+#'   Sample-table column used as the primary explanatory variable for contrasts.
+#'   **Default:** `NULL` (must be supplied).
 #'
 #' @param covariates `character()` or `NULL`.  
 #'   Additional covariate column names (e.g., batch, patient).  
@@ -514,12 +550,16 @@ makeAllContrasts <- function(qseaSet, variable){
 #'   (via [makeAllContrasts()]);  
 #' * `"All_vs_X"` creates *each level vs X*;  
 #' * `"X_vs_All"` creates *X vs each other level*;  
-#' * `"first"` constructs only the first possible pair (based on factor order).  
+#' * `"first"` constructs only the first possible pair (based on factor order).
 #' Internally, this function:
-#' 1) filters windows by `minReadCount`/`minNRPM` (unless overridden inside the
-#'    GLM wrapper), 2) fits a NB-GLM with [fitQseaGLM()], 3) extracts a wide
-#'    DMR table with [getDMRsData()], and 4) prunes contrast means if
-#'    `keepContrastMeans = FALSE`.
+#' 1) filters windows by `minReadCount`/`minNRPM`, 2) fits a Negative Binomial 
+#'   Generalised Linear Model including dispersion estimates, 3) adds contrasts 
+#'   as requested, calculating adjusted p-values (`adjPval`), log2 fold changes 
+#'   (`log2FC`) and differences in beta values (`deltaBeta`), 4) creates an 
+#'   output table showing any window which is differentially methylated (with 
+#'   adjusted p-value below `FDRthres`) in at least one contrast. 
+#'   Additional columns will be added containing data values if `keepData` and 
+#'   `keepGroupMeans` are true. 
 #'
 #' @family DMR-detection
 #'
@@ -577,7 +617,7 @@ calculateDMRs <- function(qseaSet,
       ))
     } else if (stringr::str_detect(contrasts,"All_vs_|all_vs_")){
 
-      value2 = contrasts %>% stringr::str_remove("All_vs_|all_vs_")
+      value2 <- contrasts %>% stringr::str_remove("All_vs_|all_vs_")
       contrasts <- tibble::tibble(group1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
                                   group2 = value2)
       message(glue::glue(
@@ -585,7 +625,7 @@ calculateDMRs <- function(qseaSet,
       ))
     } else if (stringr::str_detect(contrasts,"_vs_All")){
 
-      value1 = contrasts %>% stringr::str_remove("_vs_All|_vs_all")
+      value1 <- contrasts %>% stringr::str_remove("_vs_All|_vs_all")
       contrasts <- tibble::tibble(group1 = value1,
                                   group2 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value1))
       message(glue::glue(
@@ -646,7 +686,7 @@ calculateDMRs <- function(qseaSet,
 
   if (!keepContrastMeans) {
 
-    contrastNames <- contrasts %>% {c(pull(.,group1), pull(.,group2))}
+    contrastNames <- contrasts %>% {c(dplyr::pull(.,group1), dplyr::pull(.,group2))}
     colsToRemove <- paste0(contrastNames, rep(c("_beta_means","_nrpm_means"),rep(length(contrastNames),2)))
 
     dataTable <- dataTable %>%

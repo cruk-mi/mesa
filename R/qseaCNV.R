@@ -158,7 +158,7 @@ Showing first affected regions:\n%s",
   if (parallel) {
     BPPARAM <- BiocParallel::bpparam()
     message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel")
-  }  else {BPPARAM = BiocParallel::SerialParam()}
+  }  else {BPPARAM <- BiocParallel::SerialParam()}
 
   bamOutList <- BiocParallel::bplapply(X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
                                        FUN = getBamCoveragePairedAndUnpairedR1,
