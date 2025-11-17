@@ -274,9 +274,6 @@ setValidity("mesaUMAP", function(object) {
 #'                  
 #' stopifnot("group2" %in% colnames(getSampleTable(md)))
 #'
-#' @importFrom dplyr mutate
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom glue glue
 #' @method mutate mesaDimRed
 #' @export
 mutate.mesaDimRed <- function(.data, ...) {
@@ -332,8 +329,6 @@ mutate.mesaDimRed <- function(.data, ...) {
 #'   left_join(new, by = join_by(sample_name)) %>%
 #'   getSampleTable()
 #'
-#' @importFrom dplyr left_join
-#' @importFrom tibble rownames_to_column column_to_rownames
 #' @method left_join mesaDimRed
 #' @export
 left_join.mesaDimRed <- function(x, y, by = NULL, copy = FALSE,

@@ -8,7 +8,10 @@ plotGenomicFeatureDistribution(
   qseaSet,
   cutoff = 1,
   barType = "stack",
-  normMethod = "nrpm"
+  normMethod = "nrpm",
+  genome = .getMesaGenome(),
+  TxDb = .getMesaTxDb(),
+  annoDb = .getMesaAnnoDb()
 )
 }
 \arguments{
@@ -26,6 +29,24 @@ Bar layout: one of \code{"stack"}, \code{"dodge"}, or \code{"fill"} (relative pr
 \item{normMethod}{\code{character(1)}.
 Normalisation/measure to threshold. One of \code{"nrpm"} or \code{"beta"}.
 \strong{Default:} \code{"nrpm"}.}
+
+\item{genome}{\code{character(1)} or \code{NULL}.
+Guides annotation defaults. Currently supports \code{"hg38"}/\code{"GRCh38"}.
+\strong{Default:} value set by \code{\link[=setMesaGenome]{setMesaGenome()}} (via internal \code{.getMesaGenome()}), or \code{NULL}.}
+
+\item{TxDb}{TxDb object or \code{character(1)}.
+Either an unquoted TxDb object or a string like
+\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}. If character, it is resolved at
+runtime.
+\strong{Default:} value set by \code{\link[=setMesaTxDb]{setMesaTxDb()}} (via \code{.getMesaTxDb()}), or for
+GRCh38/hg38 when \code{NULL}, use
+\code{TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene}
+if installed.}
+
+\item{annoDb}{\code{character(1)} or \code{NULL}.
+OrgDb package name (e.g., \code{"org.Hs.eg.db"}).
+\strong{Default:} value set by \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} (via \code{.getMesaAnnoDb()}), or for
+GRCh38/hg38 when \code{NULL}, use \code{"org.Hs.eg.db"} if installed.}
 }
 \value{
 A \code{ggplot2} object showing counts (or proportions, for \code{"fill"})
@@ -43,14 +64,21 @@ if present). Bars are positioned according to \code{barType} (\code{stack}/\code
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
-# Beta >= 0.75, stacked bars per sample
+# Beta >= 0.75, stacked bars per sample, using hg38 genome (which sets default 
+# annotation databases)
+
 exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+  plotGenomicFeatureDistribution(genome = "hg38", normMethod = "beta", cutoff = 0.75)
 
 # NRPM >= 2, show within-sample proportions
 exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
+  plotGenomicFeatureDistribution(genome = "hg38", cutoff = 2, barType = "fill")
   
+# You can also set defaults using setMesaGenome, setMesaTxDb and setMesaAnnoDb:
+setMesaGenome("hg38"); 
+setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+setMesaAnnoDb("org.Hs.eg.db")
+
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}

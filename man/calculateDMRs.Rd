@@ -28,7 +28,7 @@ Input object containing counts and sample metadata.}
 
 \item{variable}{\code{character(1)} or \code{NULL}.
 Sample-table column used as the primary explanatory variable for contrasts.
-\strong{Default:} \code{NULL} (must be supplied unless \code{formula} is provided).}
+\strong{Default:} \code{NULL} (must be supplied).}
 
 \item{covariates}{\code{character()} or \code{NULL}.
 Additional covariate column names (e.g., batch, patient).
@@ -104,8 +104,7 @@ A tibble with one row per \strong{significant} region/window containing:
 }
 }
 \description{
-High-level wrapper that calls \code{\link[=fitQseaGLM]{fitQseaGLM()}} and \code{\link[=getDMRsData]{getDMRsData()}} to fit a
-negative-binomial GLM and extract a DMR results table in one go.
+Calculate one or more contrasts to find Differentially Methylated Regions (DMRs).
 }
 \details{
 Contrast strings are parsed as follows:
@@ -119,10 +118,14 @@ Contrast strings are parsed as follows:
 Internally, this function:
 }
 \enumerate{
-\item filters windows by \code{minReadCount}/\code{minNRPM} (unless overridden inside the
-GLM wrapper), 2) fits a NB-GLM with \code{\link[=fitQseaGLM]{fitQseaGLM()}}, 3) extracts a wide
-DMR table with \code{\link[=getDMRsData]{getDMRsData()}}, and 4) prunes contrast means if
-\code{keepContrastMeans = FALSE}.
+\item filters windows by \code{minReadCount}/\code{minNRPM}, 2) fits a Negative Binomial
+Generalised Linear Model including dispersion estimates, 3) adds contrasts
+as requested, calculating adjusted p-values (\code{adjPval}), log2 fold changes
+(\code{log2FC}) and differences in beta values (\code{deltaBeta}), 4) creates an
+output table showing any window which is differentially methylated (with
+adjusted p-value below \code{FDRthres}) in at least one contrast.
+Additional columns will be added containing data values if \code{keepData} and
+\code{keepGroupMeans} are true.
 }
 }
 \examples{

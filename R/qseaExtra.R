@@ -561,7 +561,7 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
       which()
   }
   
-  windowsToKeep <- getRegions(qseaSet)[indexToKeep]
+  windowsToKeep <- qsea::getRegions(qseaSet)[indexToKeep]
   
   print(windowsToKeep)
   

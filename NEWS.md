@@ -26,9 +26,10 @@ editor_options:
 * `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead. [!58](https://github.com/cruk-mi/mesa/pull/58)
 * Swapped to use of `seq_along` rather than `1:n` throughout. [!67](https://github.com/cruk-mi/mesa/pull/67)
 * Be more specific in the use of message suppression. [!66](https://github.com/cruk-mi/mesa/pull/66)
+* Update `plotGenomicFeatureDistribution` to work for other genomes. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 ### REMOVED
-* Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Made `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation.  [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions. [!14](https://github.com/cruk-mi/mesa/pull/14)

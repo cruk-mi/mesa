@@ -1118,6 +1118,24 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #'   Normalisation/measure to threshold. One of `"nrpm"` or `"beta"`.  
 #'   **Default:** `"nrpm"`.
 #'
+#' @param genome `character(1)` or `NULL`.  
+#'   Guides annotation defaults. Currently supports `"hg38"`/`"GRCh38"`.  
+#'   **Default:** value set by [setMesaGenome()] (via internal `.getMesaGenome()`), or `NULL`.
+#'
+#' @param TxDb TxDb object or `character(1)`.  
+#'   Either an unquoted TxDb object or a string like
+#'   `"TxDb.Hsapiens.UCSC.hg38.knownGene"`. If character, it is resolved at
+#'   runtime.  
+#'   **Default:** value set by [setMesaTxDb()] (via `.getMesaTxDb()`), or for
+#'   GRCh38/hg38 when `NULL`, use
+#'   `TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene`
+#'   if installed.
+#'
+#' @param annoDb `character(1)` or `NULL`.  
+#'   OrgDb package name (e.g., `"org.Hs.eg.db"`).  
+#'   **Default:** value set by [setMesaAnnoDb()] (via `.getMesaAnnoDb()`), or for
+#'   GRCh38/hg38 when `NULL`, use `"org.Hs.eg.db"` if installed.
+#'
 #' @return A `ggplot2` object showing counts (or proportions, for `"fill"`)
 #'   of feature classes per sample above `cutoff`.
 #'
@@ -1134,54 +1152,99 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Beta >= 0.75, stacked bars per sample
+#' # Beta >= 0.75, stacked bars per sample, using hg38 genome (which sets default 
+#' # annotation databases)
+#' 
 #' exampleTumourNormal %>%
-#'   plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+#'   plotGenomicFeatureDistribution(genome = "hg38", normMethod = "beta", cutoff = 0.75)
 #'
 #' # NRPM >= 2, show within-sample proportions
 #' exampleTumourNormal %>%
-#'   plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
+#'   plotGenomicFeatureDistribution(genome = "hg38", cutoff = 2, barType = "fill")
 #'   
+#' # You can also set defaults using setMesaGenome, setMesaTxDb and setMesaAnnoDb:
+#' setMesaGenome("hg38"); 
+#' setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
+#' setMesaAnnoDb("org.Hs.eg.db")
+#'
 #' @export
-plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stack", normMethod = "nrpm"){
+plotGenomicFeatureDistribution <- function(qseaSet, 
+                                           cutoff = 1,
+                                           barType = "stack",
+                                           normMethod = "nrpm",
+                                           genome = .getMesaGenome(), 
+                                           TxDb = .getMesaTxDb(), 
+                                           annoDb = .getMesaAnnoDb()
+                                           ){
 
-  #TODO: Rewrite this function to work with any genome! Needs more options exposed (TxDb etc).
+  
+  if(!is.null(TxDb) & is.character(TxDb)){
+    TxDb <- eval(parse(text=paste0(TxDb,"::", TxDb)))
+  }
+  
+  if(is.null(TxDb) & is.null(genome)) {
+    stop("Please specify a TxDb or genome, this can be set globally using setMesaTxDb and/or setMesaGenome")
+  }
+  
+  if(is.null(genome)){
+    genome <- ""
+  }
+  
+  if(genome %in% c("hg38","GRCh38") && is.null(TxDb)) {
+    
+    if (!requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
+      stop(
+        "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\" must be installed to use this function. Please install and run again.",
+        call. = FALSE
+      )
+    }
+    TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+  }
+  
+  if(genome  %in% c("hg38","GRCh38") && is.null(annoDb)) {
+    if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+      stop(
+        "Package \"org.Hs.eg.db\" must be installed to use this function. Please install and run again.",
+        call. = FALSE
+      )
+    }
+    annoDb <- "org.Hs.eg.db"
+  }
+  
+  if(is.null(annoDb) && is.null(genome)) {
+    stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
+  }
   
   temp <- qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
-    # makeTable(keep = which(qsea::getCounts(.)[,sampleName] >= (0.75 * rpmFactor)), samples = sampleName, norm_methods = "nrpm") %>%
-    # filter(!!dplyr::sym(paste0(sampleName,"_nrpm")) >= cutoff) %>%
     qseaTableToChrGRanges() %>%
     ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
                              level = "gene",
-                             TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene,
-                             annoDb = "org.Hs.eg.db",
+                             TxDb = TxDb,
+                             annoDb = annoDb,
                              overlap = "all",
                              verbose = FALSE)
-
-  # temp2 <- temp@anno %>%
-  #   group_by(annoShort)
-
+  
   featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet),function(x){
     temp@anno %>%
-      dplyr::filter(!!dplyr::sym(paste0(x,"_",normMethod)) > cutoff) %>%
-      dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
       tibble::as_tibble() %>%
-      dplyr::pull(annoShort) %>%
-      table() %>%
-      tibble::enframe(name = "feature") %>%
-      dplyr::mutate(sample = x)
+      dplyr::filter(!!dplyr::sym(paste0(x,"_",normMethod)) > !!cutoff) %>%
+      dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
+      dplyr::count(annoShort) %>%
+      dplyr::mutate(sample = !!x)
   }
   )
 
   featureTable %>%
-    ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
+    ggplot2::ggplot(ggplot2::aes(y = n, x = sample, fill = annoShort)) +
     ggplot2::geom_bar(position = barType, stat = "identity") +
+    ggplot2::theme_bw() + 
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
     ggplot2::labs(x = "Sample",
                   y = "Fraction",
-                  legend = "Feature",
-                  subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}"))
+                  fill = "Feature",
+                  subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}")) +
+    hues::scale_fill_iwanthue()
 
 }
 
