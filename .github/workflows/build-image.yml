@@ -2,12 +2,10 @@ name: Build Devcontainer Images
 
 on:
   push:
-    branches: [ codespace_env_implementation ]
+    branches: [ codespace_env_implementation, dev, main ]
     paths:
       - '.devcontainer/**'
       - 'DESCRIPTION'
-      - 'package_list.txt'
-      - 'generate_package_list.R'
   workflow_dispatch:
 
 permissions:
