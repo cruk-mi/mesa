@@ -20,8 +20,9 @@
     }
   },
   "containerEnv": {
-    "R_REMOTES_NO_ERRORS_FROM_WARNINGS": "true"
+  "R_REMOTES_NO_ERRORS_FROM_WARNINGS": "true",
+  "R_LIBS_USER": "/home/vscode/R/x86_64-conda-linux-gnu-library/4.3"
   },
-  "postCreateCommand": "conda run -n mesa_env R -e \"if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_local('.', upgrade='never')\""
+  "postCreateCommand": "conda run -n mesa_env R -e \"user_lib <- Sys.getenv('R_LIBS_USER'); if (!nzchar(user_lib)) user_lib <- file.path(Sys.getenv('HOME'), 'R', 'library'); if (!dir.exists(user_lib)) dir.create(user_lib, recursive = TRUE); .libPaths(c(user_lib, .libPaths())); source('.devcontainer/install.R'); remotes::install_local('.', upgrade='never', lib = user_lib)\""
 }
 
