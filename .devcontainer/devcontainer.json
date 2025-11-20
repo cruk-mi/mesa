@@ -1,9 +1,8 @@
 {
-  "name": "mesa-dev",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-
+  "name": "R Bioconductor Dev (Codespaces)",
+  "image": "ghcr.io/cruk-mi/mesa/devcontainer:codespaces-slim",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,19 +11,18 @@
         "ms-python.python"
       ],
       "settings": {
-        "r.lsp.path": "R",
-        "r.rterm.option": ["--no-save", "--no-restore", "--quiet"],
-        "r.libPaths": ["/home/vscode/R/x86_64-pc-linux-gnu-library/4.3"]
+        "r.rterm.linux": "/opt/conda/envs/mesa_env/bin/R",
+        "r.lsp.path": "/opt/conda/envs/mesa_env/bin/R",
+        "r.alwaysUseActiveTerminal": true,
+        "r.bracketedPaste": true,
+        "r.plot.devArgs": { "width": 1200, "height": 500 }
       }
     }
   },
-
-  "remoteEnv": {
-    "R_LIBS_USER": "/home/vscode/R/x86_64-pc-linux-gnu-library/4.3"
+  "containerEnv": {
+  "R_REMOTES_NO_ERRORS_FROM_WARNINGS": "true",
+  "R_LIBS_USER": "/home/vscode/R/x86_64-conda-linux-gnu-library/4.3"
   },
-
-  "remoteUser": "vscode",
-
-  "postCreateCommand": "Rscript .devcontainer/install.R || true",
-  "postStartCommand": "Rscript -e 'if (!requireNamespace(\"ggtree\", quietly=TRUE) || !requireNamespace(\"devtools\", quietly=TRUE)) source(\".devcontainer/install.R\")'"
+  "postCreateCommand": "conda run -n mesa_env R -e \"user_lib <- Sys.getenv('R_LIBS_USER'); if (!nzchar(user_lib)) user_lib <- file.path(Sys.getenv('HOME'), 'R', 'library'); if (!dir.exists(user_lib)) dir.create(user_lib, recursive = TRUE); .libPaths(c(user_lib, .libPaths())); source('.devcontainer/install.R'); remotes::install_local('.', upgrade='never', lib = user_lib)\""
 }
+
