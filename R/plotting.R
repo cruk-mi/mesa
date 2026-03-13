@@ -1118,6 +1118,19 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #'   Normalisation/measure to threshold. One of `"nrpm"` or `"beta"`.  
 #'   **Default:** `"nrpm"`.
 #'
+#' @param genome `character(1)` or `NULL`.  
+#'   Genome build (e.g., `"hg38"`, `"hg19"`, `"mm10"`). If provided, uses
+#'   mesa's genome system via [getMesaTxDb()] and [getMesaAnnoDb()].
+#'   **Default:** `NULL` (uses `TxDb` and `annoDb` parameters).
+#'
+#' @param TxDb `TxDb` object or `NULL`.  
+#'   Transcript database for gene annotation. Ignored if `genome` is provided.
+#'   **Default:** `TxDb.Hsapiens.UCSC.hg38.knownGene` for backward compatibility.
+#'
+#' @param annoDb `character(1)` or `NULL`.  
+#'   Annotation database name (e.g., `"org.Hs.eg.db"`). Ignored if `genome` is provided.
+#'   **Default:** `"org.Hs.eg.db"`.
+#'   
 #' @return A `ggplot2` object showing counts (or proportions, for `"fill"`)
 #'   of feature classes per sample above `cutoff`.
 #'
@@ -1132,57 +1145,83 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' @family annotation-summaries
 #'
 #' @examples
+#' # Recommended workflow: set genome globally
+#' setMesaGenome("hg38") 
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Beta >= 0.75, stacked bars per sample
+#' # Uses global hg38 setting
 #' exampleTumourNormal %>%
 #'   plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 #'
-#' # NRPM >= 2, show within-sample proportions
+#' # Override for specific analysis
 #' exampleTumourNormal %>%
-#'   plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
+#'   plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+#'
+#' # Advanced: manual control (bypasses mesa genome system)
+#' exampleTumourNormal %>%
+#'   plotGenomicFeatureDistribution(
+#'     TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+#'     annoDb = "org.Mm.eg.db"
+#'   )
 #'   
 #' @export
-plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stack", normMethod = "nrpm"){
-
-  #TODO: Rewrite this function to work with any genome! Needs more options exposed (TxDb etc).
+plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack", 
+                                           normMethod = "nrpm", genome = NULL, 
+                                           TxDb = NULL, annoDb = NULL) {
+  
+  # Genome selection hierarchy:
+  # 1. Function parameter (genome) takes precedence
+  # 2. Global mesa genome setting
+  # 3. Manual TxDb/annoDb parameters
+  # 4. Default to hg38
+  
+  if (!is.null(genome)) {
+    # Use provided genome parameter
+    txdb <- getMesaTxDb(genome)
+    annodb <- getMesaAnnoDb(genome)
+  } else if (exists("mesa_genome") && !is.null(mesa_genome)) {  # or however mesa stores this
+    # Use global mesa genome setting
+    txdb <- getMesaTxDb()  # gets current global setting
+    annodb <- getMesaAnnoDb()
+  } else if (!is.null(TxDb) || !is.null(annoDb)) {
+    # Use manual parameters
+    txdb <- TxDb %||% TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+    annodb <- annoDb %||% "org.Hs.eg.db"
+  } else {
+    # Default fallback
+    txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+    annodb <- "org.Hs.eg.db"
+  }
   
   temp <- qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
-    # makeTable(keep = which(qsea::getCounts(.)[,sampleName] >= (0.75 * rpmFactor)), samples = sampleName, norm_methods = "nrpm") %>%
-    # filter(!!dplyr::sym(paste0(sampleName,"_nrpm")) >= cutoff) %>%
     qseaTableToChrGRanges() %>%
     ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
                              level = "gene",
-                             TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene,
-                             annoDb = "org.Hs.eg.db",
+                             TxDb = txdb,
+                             annoDb = annodb,
                              overlap = "all",
                              verbose = FALSE)
-
-  # temp2 <- temp@anno %>%
-  #   group_by(annoShort)
-
-  featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet),function(x){
+  
+  featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet), function(x) {
     temp@anno %>%
-      tibble::as_tibble() %>%
-      dplyr::filter(!!dplyr::sym(paste0(x,"_",normMethod)) > cutoff) %>%
+      tibble::as_tibble() %>%  # Convert before filter to avoid GRanges conversion
+      dplyr::filter(!!dplyr::sym(paste0(x, "_", normMethod)) > cutoff) %>%
       dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
       dplyr::pull(annoShort) %>%
       table() %>%
       tibble::enframe(name = "feature") %>%
       dplyr::mutate(sample = x)
-  }
-  )
-
+  })
+  
   featureTable %>%
     ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
     ggplot2::geom_bar(position = barType, stat = "identity") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
     ggplot2::labs(x = "Sample",
-                  y = "Fraction",
+                  y = "Fraction", 
                   legend = "Feature",
                   subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}"))
-
 }
 
 #' Sample correlation heatmap
