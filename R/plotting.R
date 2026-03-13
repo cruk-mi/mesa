@@ -1164,9 +1164,9 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , barType = "stac
 
   featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet),function(x){
     temp@anno %>%
+      tibble::as_tibble() %>%
       dplyr::filter(!!dplyr::sym(paste0(x,"_",normMethod)) > cutoff) %>%
       dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
-      tibble::as_tibble() %>%
       dplyr::pull(annoShort) %>%
       table() %>%
       tibble::enframe(name = "feature") %>%
