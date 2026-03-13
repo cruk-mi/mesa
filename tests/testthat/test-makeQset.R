@@ -161,7 +161,7 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
   expect_true("hyperStableEdgar" %in% (GRCh38testSet %>% addHyperStableFraction() %>% getSampleTable() %>% colnames()))
 
   expect_true("relH" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
-  expect_true("valid_fragment" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
+  expect_true("valid_fragments" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
 
   # check error is given if wrong size GC/map files given
   expect_error(makeQset(sampleTable,
@@ -173,9 +173,22 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
                         CNVmethod = "HMMdefault",
                         coverageMethod = "PairedAndR1s",
                         hmmCopyGC = mesa::gc_hg38_500kb,
-                        hmmCopyMap = mesa::gc_hg38_500kb,
-                        badRegions = NULL),
-                regexp = "CNV regions overlaps with multiple windows"
+                        hmmCopyMap = mesa::map_hg38_500kb,
+                        badRegions = NULL)
+  )
+  
+  # check error is given if right size GC/map files given
+  expect_no_error(makeQset(sampleTable,
+                        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+                        chrSelect = 22,
+                        windowSize = 200,
+                        CNVwindowSize = 500000,
+                        fragmentType = "cfDNA",
+                        CNVmethod = "None",
+                        coverageMethod = "PairedAndR1s",
+                        hmmCopyGC = mesa::gc_hg38_500kb,
+                        hmmCopyMap = mesa::map_hg38_500kb,
+                        badRegions = NULL)
   )
   
 })
