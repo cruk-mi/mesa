@@ -26,6 +26,7 @@ editor_options:
 * `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead. [!58](https://github.com/cruk-mi/mesa/pull/58)
 * Swapped to use of `seq_along` rather than `1:n` throughout. [!67](https://github.com/cruk-mi/mesa/pull/67)
 * Be more specific in the use of message suppression. [!66](https://github.com/cruk-mi/mesa/pull/66)
+* Made `plotGenomicFeatureDistribution` genome-agnostic by adding `genome`, `TxDb`, and `annoDb` parameters. Function now works with mesa's genome system via `setMesaGenome()` or custom genome builds. No longer limited to hg38. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
@@ -50,6 +51,8 @@ editor_options:
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame. [!29](https://github.com/cruk-mi/mesa/pull/29)
 * Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range. [!32](https://github.com/cruk-mi/mesa/pull/32)
 * Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0. [!55](https://github.com/cruk-mi/mesa/pull/55)
+* Fixed GRanges conversion error in `plotGenomicFeatureDistribution` that occurred with Bioconductor 3.21 when multiple chromosome columns existed after ChIPseeker annotation. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* Fixed makeQset validation tests to handle updated annotation database versions and focus on parameter validation rather than computational integration tests. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 # mesa 0.5.1
 
