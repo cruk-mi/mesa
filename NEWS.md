@@ -53,6 +53,7 @@ editor_options:
 * Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0. [!55](https://github.com/cruk-mi/mesa/pull/55)
 * Fixed GRanges conversion error in `plotGenomicFeatureDistribution` that occurred with Bioconductor 3.21 when multiple chromosome columns existed after ChIPseeker annotation. [!68](https://github.com/cruk-mi/mesa/pull/68)
 * Fixed makeQset validation tests to handle updated annotation database versions and focus on parameter validation rather than computational integration tests. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* Updated network error patterns in testPlotGeneHeatmap, preventing biomart HTP 503 error in test-makeQset.R:83:3. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 # mesa 0.5.1
 
