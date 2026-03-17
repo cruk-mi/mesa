@@ -1185,8 +1185,8 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
     annodb <- getMesaAnnoDb()
   } else if (!is.null(TxDb) || !is.null(annoDb)) {
     # Manual parameters
-    txdb <- TxDb %||% TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
-    annodb <- annoDb %||% "org.Hs.eg.db"
+    txdb <- if (is.null(TxDb)) TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene else TxDb
+    annodb <- if (is.null(annoDb)) "org.Hs.eg.db" else annoDb
   } else {
     # Default fallback
     txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
