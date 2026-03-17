@@ -9,6 +9,9 @@ getMesaTxDb(genome = NULL)
 \arguments{
 \item{genome}{Genome build, defaults to current setting}
 }
+\value{
+A TxDb object for the specified genome
+}
 \description{
 Get TxDb for current or specified genome
 }

@@ -9,6 +9,9 @@ getMesaAnnoDb(genome = NULL)
 \arguments{
 \item{genome}{Genome build, defaults to current setting}
 }
+\value{
+Character string of annotation database name (e.g., "org.Hs.eg.db", "org.Mm.eg.db")
+}
 \description{
 Get annotation DB for current or specified genome
 }
