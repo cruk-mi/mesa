@@ -8,7 +8,10 @@ plotGenomicFeatureDistribution(
   qseaSet,
   cutoff = 1,
   barType = "stack",
-  normMethod = "nrpm"
+  normMethod = "nrpm",
+  genome = NULL,
+  TxDb = NULL,
+  annoDb = NULL
 )
 }
 \arguments{
@@ -26,6 +29,19 @@ Bar layout: one of \code{"stack"}, \code{"dodge"}, or \code{"fill"} (relative pr
 \item{normMethod}{\code{character(1)}.
 Normalisation/measure to threshold. One of \code{"nrpm"} or \code{"beta"}.
 \strong{Default:} \code{"nrpm"}.}
+
+\item{genome}{\code{character(1)} or \code{NULL}.
+Genome build (e.g., \code{"hg38"}, \code{"hg19"}, \code{"mm10"}). If provided, uses
+mesa's genome system via \code{\link[=getMesaTxDb]{getMesaTxDb()}} and \code{\link[=getMesaAnnoDb]{getMesaAnnoDb()}}.
+\strong{Default:} \code{NULL} (uses \code{TxDb} and \code{annoDb} parameters).}
+
+\item{TxDb}{\code{TxDb} object or \code{NULL}.
+Transcript database for gene annotation. Ignored if \code{genome} is provided.
+\strong{Default:} \code{TxDb.Hsapiens.UCSC.hg38.knownGene} for backward compatibility.}
+
+\item{annoDb}{\code{character(1)} or \code{NULL}.
+Annotation database name (e.g., \code{"org.Hs.eg.db"}). Ignored if \code{genome} is provided.
+\strong{Default:} \code{"org.Hs.eg.db"}.}
 }
 \value{
 A \code{ggplot2} object showing counts (or proportions, for \code{"fill"})
@@ -41,15 +57,24 @@ Feature classes are taken from region annotations available on the windows
 if present). Bars are positioned according to \code{barType} (\code{stack}/\code{dodge}/\code{fill}).
 }
 \examples{
+# Recommended workflow: set genome globally
+setMesaGenome("hg38") 
 data(exampleTumourNormal, package = "mesa")
 
-# Beta >= 0.75, stacked bars per sample
+# Uses global hg38 setting
 exampleTumourNormal \%>\%
   plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 
-# NRPM >= 2, show within-sample proportions
+# Override for specific analysis
 exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(normMethod = "nrpm", cutoff = 2, barType = "fill")
+  plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+
+# Advanced: manual control (bypasses mesa genome system)
+exampleTumourNormal \%>\%
+  plotGenomicFeatureDistribution(
+    TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+    annoDb = "org.Mm.eg.db"
+  )
   
 }
 \seealso{

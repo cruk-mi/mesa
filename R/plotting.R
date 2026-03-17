@@ -1179,12 +1179,12 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
     # Use provided genome parameter
     txdb <- getMesaTxDb(genome)
     annodb <- getMesaAnnoDb(genome)
-  } else if (exists("mesa_genome") && !is.null(mesa_genome)) {  # or however mesa stores this
+  } else if (!is.null(getOption("mesa_genome"))) {
     # Use global mesa genome setting
-    txdb <- getMesaTxDb()  # gets current global setting
+    txdb <- getMesaTxDb()
     annodb <- getMesaAnnoDb()
   } else if (!is.null(TxDb) || !is.null(annoDb)) {
-    # Use manual parameters
+    # Manual parameters
     txdb <- TxDb %||% TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
     annodb <- annoDb %||% "org.Hs.eg.db"
   } else {

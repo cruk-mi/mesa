@@ -11,6 +11,8 @@ editor_options:
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Objects with invalid slots will now throw informative errors. [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column. [!24](https://github.com/cruk-mi/mesa/pull/24)
+* **Genome system infrastructure**: Added `getMesaGenome()`, `getMesaTxDb()`, and `getMesaAnnoDb()` functions to complete mesa's genome management system. Supports hg38, hg19, and mm10 with extensible architecture. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* **Genome-agnostic plotting**: `plotGenomicFeatureDistribution()` now supports multiple genomes via `genome`, `TxDb`, and `annoDb` parameters. Integrates with mesa genome system using `setMesaGenome()` for streamlined workflows. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method. [!11](https://github.com/cruk-mi/mesa/pull/11)
