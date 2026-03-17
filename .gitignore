@@ -8,3 +8,8 @@ inst/doc
 .RData
 vignettes/.build.timestamp
 vignettes/*_files
+^\.gitlab-ci\.yml$
+^\.gitlab/
+^docs/\.nojekyll$
+^\.devcontainer/
+^\.github/
