@@ -177,7 +177,7 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
                         badRegions = NULL)
   )
   
-  # check error is given if right size GC/map files given
+  # expect no error if right size GC/map files is given
   expect_no_error(makeQset(sampleTable,
                         BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
                         chrSelect = 22,
