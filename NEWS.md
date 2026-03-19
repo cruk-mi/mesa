@@ -11,8 +11,8 @@ editor_options:
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Objects with invalid slots will now throw informative errors. [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column. [!24](https://github.com/cruk-mi/mesa/pull/24)
-* **Genome system infrastructure**: Added `getMesaGenome()`, `getMesaTxDb()`, and `getMesaAnnoDb()` functions to complete mesa's genome management system. Supports hg38, hg19, and mm10 with extensible architecture. [!68](https://github.com/cruk-mi/mesa/pull/68)
-* **Genome-agnostic plotting**: `plotGenomicFeatureDistribution()` now supports multiple genomes via `genome`, `TxDb`, and `annoDb` parameters. Integrates with mesa genome system using `setMesaGenome()` for streamlined workflows. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* Added `getMesaGenome()`, `getMesaTxDb()`, and `getMesaAnnoDb()` functions to complete mesa's genome management system. Supports hg38, hg19, and mm10 with extensible architecture. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* `plotGenomicFeatureDistribution()` now supports multiple genomes via `genome`, `TxDb`, and `annoDb` parameters. Function now works with mesa's genome system via `setMesaGenome()` or custom genome builds. No longer limited to hg38. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method. [!11](https://github.com/cruk-mi/mesa/pull/11)
@@ -28,7 +28,6 @@ editor_options:
 * `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead. [!58](https://github.com/cruk-mi/mesa/pull/58)
 * Swapped to use of `seq_along` rather than `1:n` throughout. [!67](https://github.com/cruk-mi/mesa/pull/67)
 * Be more specific in the use of message suppression. [!66](https://github.com/cruk-mi/mesa/pull/66)
-* Made `plotGenomicFeatureDistribution` genome-agnostic by adding `genome`, `TxDb`, and `annoDb` parameters. Function now works with mesa's genome system via `setMesaGenome()` or custom genome builds. No longer limited to hg38. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
