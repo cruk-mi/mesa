@@ -2,7 +2,7 @@
 #' @keywords internal
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  getCGPositions <<- memoise::memoise(getCGPositions)
+  assign("getCGPositions", memoise::memoise(getCGPositions), envir = parent.env(environment()))
 }
 
 #' Check whether an object is a qseaSet
@@ -561,7 +561,7 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
       which()
   }
   
-  windowsToKeep <- getRegions(qseaSet)[indexToKeep]
+  windowsToKeep <- qsea::getRegions(qseaSet)[indexToKeep]
   
   print(windowsToKeep)
   

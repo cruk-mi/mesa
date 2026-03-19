@@ -11,6 +11,8 @@ editor_options:
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Objects with invalid slots will now throw informative errors. [!43](https://github.com/cruk-mi/mesa/pull/43)
 * Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column. [!24](https://github.com/cruk-mi/mesa/pull/24)
+* Added `getMesaGenome()`, `getMesaTxDb()`, and `getMesaAnnoDb()` functions to complete mesa's genome management system. Supports hg38, hg19, and mm10 with extensible architecture. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* `plotGenomicFeatureDistribution()` now supports multiple genomes via `genome`, `TxDb`, and `annoDb` parameters. Function now works with mesa's genome system via `setMesaGenome()` or custom genome builds. No longer limited to hg38. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method. [!11](https://github.com/cruk-mi/mesa/pull/11)
@@ -50,6 +52,9 @@ editor_options:
 * Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, [fixes issue #26](https://github.com/cruk-mi/mesa/issues/26) reported by @lbeltrame. [!29](https://github.com/cruk-mi/mesa/pull/29)
 * Fixed an issue where `makeQset` printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range. [!32](https://github.com/cruk-mi/mesa/pull/32)
 * Fixed plotting a shape inside `plotPCA` when using ggplot2 4.0.0. [!55](https://github.com/cruk-mi/mesa/pull/55)
+* Fixed GRanges conversion error in `plotGenomicFeatureDistribution` that occurred with Bioconductor 3.21 when multiple chromosome columns existed after ChIPseeker annotation. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* Fixed makeQset validation tests to handle updated annotation database versions and focus on parameter validation rather than computational integration tests. [!68](https://github.com/cruk-mi/mesa/pull/68)
+* Updated network error patterns in testPlotGeneHeatmap, preventing biomart HTP 503 error in test-makeQset.R:83:3. [!68](https://github.com/cruk-mi/mesa/pull/68)
 
 # mesa 0.5.1
 
