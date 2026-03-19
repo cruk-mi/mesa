@@ -39,7 +39,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #' result is unlisted. The returned object is tagged as `"hg38"`.
 #'
 #' @seealso
-#' [rtracklayer::liftOver()], [GenomicRanges::GRanges], [GenomeInfoDb::genome]
+#' [rtracklayer::liftOver()], [GenomicRanges::GRanges]
 #'
 #' @examples
 #' # Data.frame input; mix of 'chr' and no 'chr' is fine

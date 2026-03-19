@@ -924,11 +924,11 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   annoRow <- dataTable %>%
     dplyr::select(seqnames, start, end, CpG_density, window) %>%
     plyranges::as_granges() %>%
-    plyranges::mutate(annotation = dplyr::case_when(
-      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "+" ~ "Start",
-      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(end = start)) > 0 & geneStrand == "-" ~ "End",
-      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "+" ~ "End",
-      plyranges::count_overlaps(., gene_details_gr %>% plyranges::mutate(start = end)) > 0 & geneStrand == "-" ~ "Start",
+    dplyr::mutate(annotation = dplyr::case_when(
+      plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(end = start)) > 0 & geneStrand == "+" ~ "Start",
+      plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(end = start)) > 0 & geneStrand == "-" ~ "End",
+      plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(start = end)) > 0 & geneStrand == "+" ~ "End",
+      plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(start = end)) > 0 & geneStrand == "-" ~ "Start",
       plyranges::count_overlaps(., gene_details_gr) > 0 ~ "GeneBody",
       plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_upstream(upstreamDist)) > 0 ~ "Upstream",
       plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_downstream(downstreamDist)) > 0 ~ "Downstream"
