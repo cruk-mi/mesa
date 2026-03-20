@@ -12,7 +12,7 @@ getCGPositions(BSgenome, chr.select)
 \item{chr.select}{Character vector of chromosome names to include (e.g., \code{paste0("chr", 1:22)}).}
 }
 \value{
-A \linkS4class{GRanges} of motif positions.
+A \link[GenomicRanges]{GRanges-class} of motif positions.
 }
 \description{
 Convenience wrapper that returns genomic positions of the \code{"CG"} motif
