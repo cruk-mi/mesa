@@ -14,7 +14,7 @@ automatically if missing.
 \strong{Default:} none (must be supplied).}
 }
 \value{
-A \linkS4class{GRanges} in hg38 coordinates (with
+A \link[GenomicRanges]{GRanges-class} in hg38 coordinates (with
 \code{GenomeInfoDb::genome(x) <- "hg38"}). Intervals that cannot be mapped by the
 chain are dropped (i.e., may return fewer ranges than provided).
 }
@@ -45,5 +45,5 @@ liftOverHg19(gr)
 
 }
 \seealso{
-\code{\link[rtracklayer:liftOver]{rtracklayer::liftOver()}}, \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}, \link[GenomeInfoDb:seqinfo]{GenomeInfoDb::genome}
+\code{\link[rtracklayer:liftOver]{rtracklayer::liftOver()}}, \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}
 }

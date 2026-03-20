@@ -27,7 +27,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #'   **Default:** none (must be supplied).
 #'
 #' @return
-#' A \linkS4class{GRanges} in hg38 coordinates (with
+#' A \link[GenomicRanges]{GRanges-class} in hg38 coordinates (with
 #' `GenomeInfoDb::genome(x) <- "hg38"`). Intervals that cannot be mapped by the
 #' chain are dropped (i.e., may return fewer ranges than provided).
 #'
@@ -39,7 +39,7 @@ utils::globalVariables(c("chr", "seqnames", "start","end",".","annotation", "val
 #' result is unlisted. The returned object is tagged as `"hg38"`.
 #'
 #' @seealso
-#' [rtracklayer::liftOver()], [GenomicRanges::GRanges]
+#' [rtracklayer::liftOver()], [GenomicRanges::GRanges-class]
 #'
 #' @examples
 #' # Data.frame input; mix of 'chr' and no 'chr' is fine
