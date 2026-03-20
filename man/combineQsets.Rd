@@ -13,19 +13,50 @@ combineQsets(
 )
 }
 \arguments{
-\item{qseaSet1}{The first qseaSet object.}
+\item{qseaSet1}{\code{qseaSet} or \code{character(1)}
+Either a \code{qseaSet} object, or path to an \code{.rds} file containing one.}
 
-\item{qseaSet2}{The second qseaSet object.}
+\item{qseaSet2}{\code{qseaSet} or \code{character(1)}
+Either a \code{qseaSet} object, or path to an \code{.rds} file containing one.}
 
-\item{checkParams}{Whether to verify that all the parameters are identical in both objects}
+\item{checkParams}{\code{logical(1)}
+If \code{TRUE}, enforce identical global parameters across inputs.
+\strong{Default:} \code{FALSE}.}
 
-\item{regionsToKeep}{A GRanges object (or table coercible to one) to use to subset the samples. Helps keep RAM use down.}
+\item{regionsToKeep}{\code{GRanges} or coercible
+If supplied, restrict both \code{qseaSet1} and \code{qseaSet2} to these genomic
+regions before combining. Accepts a \code{GRanges} or a data frame with
+\code{seqnames}, \code{start}, \code{end}.
+\strong{Default:} \code{NULL}.}
 
-\item{dropDuplicates}{Whether to drop samples with the same name. Else renames them by adding "_Dup" to the end of the name.}
+\item{dropDuplicates}{\code{logical(1)}
+If \code{TRUE}, drop duplicate sample names. If \code{FALSE}, duplicates are
+retained but renamed with suffix \code{"_Dup"}.
+\strong{Default:} \code{FALSE}.}
 }
 \value{
-A qseaSet object, containing all the samples from both qseaSet objects.
+A \code{qseaSet} object containing:
+\itemize{
+\item Samples from both inputs.
+\item Regions restricted by \code{regionsToKeep} if supplied.
+\item Duplicates handled according to \code{dropDuplicates}.
+\item Global parameters optionally checked for consistency.
+}
 }
 \description{
-This function takes two qseaSets and combines them into one.
+Merge two \code{qseaSet} objects (or \code{.rds} files containing them) into a single
+\code{qseaSet}. This is the pairwise worker used internally by
+\code{\link[=combineQsetsList]{combineQsetsList()}}.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Split a cohort into Tumour and Normal, then combine back
+tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
+normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
+combineQsets(tumours, normals)
+
+}
+\seealso{
+\code{\link[=combineQsetsList]{combineQsetsList()}} for merging more than two inputs.
 }

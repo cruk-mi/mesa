@@ -1,6 +1,26 @@
-#' @describeIn getDimRed Generate a PCA from a qseaSet
-#' @export
+#' Generate a PCA from a qseaSet
 #'
+#' Convenience wrapper around [getDimRed()] with `method = "PCA"`.
+#'
+#' @describeIn getDimRed Principal component analysis of a qseaSet.
+#' @family dimred-helpers
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
+#' exampleTumourNormal %>%
+#'   getPCA()
+#'
+#' # Request only the top 3 PCs
+#' exampleTumourNormal %>%
+#'   getPCA(nPC = 3)
+#'
+#' # Use multiple cutoffs for most-variable windows (returns list of PCA results)
+#' exampleTumourNormal %>%
+#'   getPCA(topVarNum = c(10, 100, 500, NA)) %>%
+#'   slot("res") %>%
+#'   names()
+#' @export
 getPCA <- function(qseaSet,
                    dataTable = NULL,
                    regionsToOverlap = NULL,
@@ -13,7 +33,8 @@ getPCA <- function(qseaSet,
                    center = TRUE,
                    scale = FALSE,
                    nPC = 5,
-                   returnDataTable = FALSE) {
+                   returnDataTable = FALSE, 
+                   verbose = TRUE) {
 
   getDimRed(qseaSet = qseaSet,
             dataTable = dataTable,
@@ -28,12 +49,31 @@ getPCA <- function(qseaSet,
             center = center,
             scale = scale,
             nPC = nPC,
-            returnDataTable = returnDataTable)
+            returnDataTable = returnDataTable,
+            verbose = verbose)
 
 }
 
-#'@describeIn getDimRed Generate a UMAP from a qseaSet
-#'@export
+
+#' Generate a UMAP from a qseaSet
+#'
+#' Convenience wrapper around [getDimRed()] with `method = "UMAP"`.
+#'
+#' @describeIn getDimRed Uniform manifold approximation and projection of a qseaSet.
+#' @family dimred-helpers
+#' @examples
+#' # Quick demo on a small synthetic qseaSet
+#' qsea::getExampleQseaSet(repl = 20) %>%
+#'   getUMAP()
+#'
+#' # Alter UMAP hyperparameters
+#' qsea::getExampleQseaSet(repl = 20) %>%
+#'   getUMAP(n_neighbors = 5, min_dist = 1)
+#'
+#' # Use top 500 most variable windows only
+#' qsea::getExampleQseaSet(repl = 20) %>%
+#'   getUMAP(topVarNum = 500)
+#' @export
 getUMAP <- function(qseaSet,
                    dataTable = NULL,
                    regionsToOverlap = NULL,
@@ -44,6 +84,7 @@ getUMAP <- function(qseaSet,
                    topVarNum = 1000,
                    topVarSamples = NULL,
                    returnDataTable = FALSE,
+                   verbose = TRUE,
                    ...) {
 
   getDimRed(qseaSet = qseaSet,
@@ -61,29 +102,133 @@ getUMAP <- function(qseaSet,
 
 }
 
-#' The functions getPCA() and getUMAP() are dimensionality reduction techniques with a very similar syntax
-#' @param qseaSet A qseaSet object.
-#' @param dataTable A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from [getDataTable()]. It must have seqnames, start and end columns. Can also be a [GenomicRanges::GRanges()] object with normalised values in the metadata columns.
-#' @param method A character specifying method to use. Either "PCA" or "UMAP".
-#' @param regionsToOverlap Optional. Only windows in `qseaSet` overlapping `regionsToOverlap` will be considered. A [GenomicRanges::GRanges()] object or a data frame which can be coerced into a [GenomicRanges::GRanges()] object.
-#' @param normMethod What normalisation method to use. Typically a character giving name of predefined normalisation method (e.g. "beta" or "nrpm"). See [qsea::normMethod()].
-#' @param minEnrichment Minimum number of reads for beta values to not give NA. Passed to [getDataTable()].
-#' @param useGroupMeans Whether to average samples over the group column (i.e. combine replicates)
-#' @param minDensity A minimum CpG density level to filter out windows with values lower than.
-#' @param topVarNum Number of most variable windows to keep. Defaults to 1000. If value is NA, NULL, Inf or is at least as big as the available number of windows, then all available windows are used for the PCA/UMAP. Can also be a vector, in which case PCA/UMAP is performed for each component.
-#' @param topVarSamples Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case PCA/UMAP is performed for each list component. If `length(topVarNum) > 1`, list should be same length as `topVarNum` and each component will be matched with corresponding component of `topVarNum`.
-#' @param center A logical value indicating if windows should be centred to have mean zero (for method PCA only). Default is TRUE.
-#' @param scale A logical value indicating if windows should be scaled to have unit variance (for method PCA only). Default is FALSE.
-#' @param nPC Number of principal components to be calculated (for method PCA only). Default is 5.
-#' @param returnDataTable A logical value indicating if the table of normalised values (generated by [getDataTable()] or by processing the input `dataTable`) should be returned as part of the output. See below for details.
-#' @param ... Other parameters to pass to [uwot::umap()] function.
-#' @return A mesaDimRed object with the following components:
-#' \item{res}{A named list where each component is a PCA or UMAP object. List names correspond to entries in the `params$topVar` component of the output.}
-#' \item{samples}{Names of the samples analysed.}
-#' \item{dataTable}{If `returnDataTable = TRUE`, the table of normalised values. The table will contain windows after filtering based on `regionsToOverlap` and `minDensity`, but prior to filtering based on `topVarNum`. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the `params$topVar` component of the output.}
-#' \item{params}{A list of the parameters used.}
-#' \item{sampleTable}{A copy of the sampleTable from the qseaSet.}
+
+#' Dimensionality reduction for qseaSets
 #'
+#' Run PCA or UMAP on methylation signal matrices extracted from a
+#' [qsea::qseaSet]. This is the core workhorse for dimensionality reduction;
+#' wrappers such as [getPCA()] and [getUMAP()] provide simplified access.
+#'
+#' @param qseaSet `qseaSet`.  
+#'   Input object providing windows, counts and `sampleTable`.
+#'
+#' @param dataTable `data.frame` or `GRanges` or `NULL`.  
+#'   Normalised values with windows in rows and samples in columns. Must contain
+#'   `seqnames`, `start`, `end` (if `data.frame`), or metadata columns with
+#'   values (if `GRanges`). If `NULL`, the matrix is derived internally (see
+#'   `normMethod`, `minEnrichment`).  
+#'   **Default:** `NULL`.
+#'
+#' @param method `character(1)`. One of `"PCA"` or `"UMAP"`.  
+#'   **Default:** `"PCA"`.
+#'
+#' @param regionsToOverlap `GRanges`, coercible `data.frame`, or `NULL`.  
+#'   If supplied, only windows overlapping these regions are used.  
+#'   **Default:** `NULL`.
+#'
+#' @param normMethod `character(1)`.  
+#'   Name of predefined normalisation (e.g., `"beta"`, `"nrpm"`); passed to
+#'   [qsea::normMethod()] when `dataTable = NULL`.  
+#'   **Default:** `"beta"`.
+#'
+#' @param minEnrichment `numeric(1)`.  
+#'   Minimum reads required for beta values to be non-`NA`; forwarded to
+#'   [getDataTable()] when building data internally.  
+#'   **Default:** `3`.
+#'
+#' @param useGroupMeans `logical(1)`.  
+#'   If `TRUE`, average samples within the `group` column (combine replicates)
+#'   before DR.  
+#'   **Default:** `FALSE`.
+#'
+#' @param minDensity `numeric(1)`.  
+#'   Minimum CpG density; windows below this are removed.  
+#'   **Default:** `0`.
+#'
+#' @param topVarNum `numeric(1)` or `integer(1)` or `Inf` or `NULL` **or** a vector.  
+#'   Keep the `topVarNum` most variable windows (by SD). If `NA`, `NULL`, `Inf`,
+#'   or `>=` available windows, use all. If a vector, DR is run once per value
+#'   and results are returned in a list.  
+#'   **Default:** `1000`.
+#'
+#' @param topVarSamples `NULL`, `character()`, `list`, or `regex` string.  
+#'   Samples used to compute variability. If `NULL`/`NA`, use all samples. If a
+#'   vector/regex, select matching samples. If a `list`, perform DR per list
+#'   element (should match `length(topVarNum)` when vectorised).  
+#'   **Default:** `NULL`.
+#'
+#' @param center `logical(1)`.  
+#'   Centre features to mean zero (PCA only).  
+#'   **Default:** `TRUE`.
+#'
+#' @param scale `logical(1)`.  
+#'   Scale features to unit variance (PCA only).  
+#'   **Default:** `FALSE`.
+#'
+#' @param nPC `integer(1)`.  
+#'   Number of principal components to compute (PCA only).  
+#'   **Default:** `5`.
+#'
+#' @param returnDataTable `logical(1)`.  
+#'   If `TRUE`, include the matrix used for DR in the return object.  
+#'   **Default:** `FALSE`.
+#'   
+#' @param verbose `logical(1)`.  
+#'   If `TRUE`, print messages regarding the function execution.  
+#'   **Default:** `TRUE`.
+#'   
+#' @param ... Additional arguments passed to [uwot::umap()] (when `method="UMAP"`),
+#'   e.g. `n_neighbors`, `min_dist`, `metric`.
+#'
+#' @return A [`mesaDimRed`] object with:
+#' * **res**: Named list of DR results; each element is a [`mesaPCA`] (for PCA)
+#'   or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
+#' * **samples**: Character vector of sample IDs used.
+#' * **dataTable** (optional): The numeric matrix used for DR when
+#'   `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
+#'   `minDensity`, removal of rows with missing values, and may include columns
+#'   of window SDs when applicable (named per `params$topVar`).
+#' * **params**: List of parameters used (method, selection/filter settings, etc.).
+#' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
+#'
+#' @details:
+#' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
+#'   and `scale` controls.  
+#' - For `method = "UMAP"`, DR is performed via [uwot::umap()].  
+#' - Prior to DR, optional filtering is applied: enrichment cut-off
+#'   (`minEnrichment`), CpG density (`minDensity`), region restriction
+#'   (`regionsToOverlap`), and most-variable windows (`topVarNum`).  
+#' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple DR runs
+#'   are performed and collected in `res`.
+#'
+#' @seealso
+#' [getPCA()], [getUMAP()], [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class],
+#' [qsea::normMethod()], [uwot::umap()], [stats::prcomp()]
+#'
+#' @family dimred-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # PCA on default beta-normalised matrix, keep 3 PCs
+#' exampleTumourNormal %>%
+#'   getDimRed(method = "PCA", nPC = 3)
+#'
+#' # UMAP on the top 500 most variable windows
+#' exampleTumourNormal %>%
+#'   getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
+#'
+#' # Restrict DR to a set of regions (coerced from data.frame)
+#' regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
+#' exampleTumourNormal %>%
+#'   getDimRed(method = "PCA", regionsToOverlap = regs)
+#'
+#' # Vectorised topVarNum runs (returns a list of results)
+#' exampleTumourNormal %>%
+#'   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) %>%
+#'   slot("res") %>%
+#'   names()
+#' @export
 getDimRed <- function(qseaSet,
                       dataTable = NULL,
                       method = "PCA",
@@ -98,6 +243,7 @@ getDimRed <- function(qseaSet,
                       scale = FALSE,
                       nPC = 5,
                       returnDataTable = FALSE,
+                      verbose = TRUE,
                       ...) {
 
   if (!("qseaSet" %in% class(qseaSet))) {
@@ -149,8 +295,8 @@ getDimRed <- function(qseaSet,
       stop("At least one window in dataTable does not have a matching window in qseaSet.")
     }
 
-    testSamples <- samples[1:min(5, length(samples))]
-    inputValues <- dataTable[1:min(50, length(dataTable)), ]
+    testSamples <- samples[seq_len(min(5, length(samples)))]
+    inputValues <- dataTable[seq_len(min(50, length(dataTable))), ]
     testValues <- getDataTable(qseaSet %>%
                                  filter(sample_name %in% testSamples) %>%
                                  filterByOverlaps(inputValues),
@@ -175,8 +321,10 @@ getDimRed <- function(qseaSet,
     initialNumWindows <- getWindows(qseaSet) %>% length()
   }
 
+  if(verbose){
   message(glue::glue("------------------------------
                      Initial number of windows = {initialNumWindows}."))
+  }
 
   if (!is.null(regionsToOverlap)) {
     regionsToOverlap <- regionsToOverlap %>%
@@ -189,29 +337,36 @@ getDimRed <- function(qseaSet,
         filterByOverlaps(regionsToOverlap = regionsToOverlap)
 
       numWindowsRemovedRegionOverlap <- initialNumWindows - length(getWindows(qseaSet))
-      message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(getRegions(qseaSet))} windows remaining."))
+      if(verbose) {
+        message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(getRegions(qseaSet))} windows remaining."))
+      }
 
+        
     } else {
       dataTable <- dataTable %>%
         plyranges::filter_by_overlaps(y = regionsToOverlap)
 
       numWindowsRemovedRegionOverlap <- initialNumWindows - length(dataTable)
-      message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(dataTable)} windows remaining."))
+      if(verbose) {
+        message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(dataTable)} windows remaining."))
+      }
     }
   } else {
     numWindowsRemovedRegionOverlap <- NULL
   }
 
   if (is.null(dataTable)) {
-    message("-----------")
+    if(verbose) { message("-----------") }
     dataTable <- qseaSet %>%
       filterWindows(CpG_density >= minDensity) %>%
       getDataTable(normMethod = normMethod, useGroupMeans = useGroupMeans)
-    message("-----------")
+    if(verbose) { message("-----------") }
 
     if (minDensity > 0) {
       numWindowsRemovedMinDensity <- length(getWindows(qseaSet)) - nrow(dataTable)
-      message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
+      if(verbose) {
+        message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
+      }
     } else {
       numWindowsRemovedMinDensity <- NULL
     }
@@ -229,7 +384,9 @@ getDimRed <- function(qseaSet,
 
     if (minDensity > 0) {
       numWindowsRemovedMinDensity <- currentNumWindows - nrow(dataTable)
-      message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
+      if(verbose) {
+        message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
+      }
     } else {
       numWindowsRemovedMinDensity <- NULL
     }
@@ -244,11 +401,15 @@ getDimRed <- function(qseaSet,
   numWindowsRemovedMissingVals <- currentNumWindows - nrow(dataTable)
 
   if (numWindowsRemovedMissingVals > 0) {
-    message(glue::glue("Filtered out {numWindowsRemovedMissingVals} windows with at least one missing value: {nrow(dataTable)} windows remaining.
+    if(verbose){
+      message(glue::glue("Filtered out {numWindowsRemovedMissingVals} windows with at least one missing value: {nrow(dataTable)} windows remaining.
                        ------------------------------"))
+    }
   } else {
-    message(glue::glue("No windows have missing values.
+    if(verbose){
+      message(glue::glue("No windows have missing values.
             ------------------------------"))
+    }
   }
 
   if (nrow(dataTable) <= 2) {
@@ -331,9 +492,7 @@ getDimRed <- function(qseaSet,
     dplyr::mutate(windowSdName = ifelse(!is.na(topVarNum), glue::glue("windowSd{dplyr::cur_group_id()}"), NA), .before = 1) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(windowSdName, topVarNum) %>%
-    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) %>%
-    dplyr::bind_rows(topVar) %>%
-    dplyr::distinct(topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, .keep_all = TRUE)
+    dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1) 
 
   rowSds <- function(x) {
     sqrt(rowSums((x - rowMeans(x)) ^ 2) / (ncol(x) - 1))
@@ -349,13 +508,17 @@ getDimRed <- function(qseaSet,
       purrr::imap(function(tVS, nm) {
 
         if (length(setdiff(samples, tVS)) == 0) {
-          message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {groupString}s:
+          if (verbose) {
+            message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {groupString}s:
                            {paste0(tVS, collapse = ', ')}.
                            -> column name {nm}."))
+          }
         } else {
-          message(glue::glue("Calculating standard deviation for each window across {length(tVS)} of {length(samples)} {groupString}s:
+          if(verbose) {
+            message(glue::glue("Calculating standard deviation for each window across {length(tVS)} of {length(samples)} {groupString}s:
                            {paste0(tVS, collapse = ', ')}.
                            -> column name {nm}."))
+          }
         }
 
         if (length(tVS) <= 2) {
@@ -394,20 +557,26 @@ getDimRed <- function(qseaSet,
 
           if (length(topVarSamples) == length(samples)) {
 
-            message(glue::glue("------------------------------
+            if(verbose) {
+              message(glue::glue("------------------------------
                              Filtering windows based on standard deviation across all {length(topVarSamples)} {groupString}s ({windowSdName}).
                              Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
+            }
           } else {
-            message(glue::glue("------------------------------
+
+            if(verbose) {
+              message(glue::glue("------------------------------
                              Filtering windows based on standard deviation across {length(topVarSamples)} {groupString}s ({windowSdName}).
                              Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
+            }
           }
-
 
         } else {
 
-          message(glue::glue("------------------------------
+          if(verbose){
+            message(glue::glue("------------------------------
                              No filtering of windows based on window standard deviation."))
+          }
           th <- NA
         }
 
@@ -416,8 +585,10 @@ getDimRed <- function(qseaSet,
           tibble::column_to_rownames("window") %>%
           dplyr::select(tidyr::all_of(samples))
 
-        message(glue::glue("Performing {method} with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
+        if(verbose) {
+          message(glue::glue("Performing {method} with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
                            -> {resName}."))
+        }
 
         dataTable <- dataTable %>%
           t()
@@ -441,7 +612,7 @@ getDimRed <- function(qseaSet,
                        ...) %>%
             as.data.frame()
 
-          colnames(uwotObj) <- paste0("UMAP",seq_along(1:ncol(uwotObj)))
+          colnames(uwotObj) <- paste0("UMAP",seq_len(ncol(uwotObj)))
 
           return(list(resObj =  list(x = uwotObj, windows = colnames(dataTable)), th = th))
 
@@ -461,7 +632,7 @@ getDimRed <- function(qseaSet,
     }) %>%
     purrr::list_flatten()
 
-  message("------------------------------")
+  if(verbose) { message("------------------------------") }
 
   th <- purrr::map(res, "th") %>%
     unlist()
@@ -511,8 +682,6 @@ getDimRed <- function(qseaSet,
 
   }
 
-
-
   windowFilteringList <- list(initial = initialNumWindows,
                               notInRegionsToOverlap = numWindowsRemovedRegionOverlap,
                               belowMinDensity = numWindowsRemovedMinDensity,
@@ -530,88 +699,132 @@ getDimRed <- function(qseaSet,
 }
 
 
-getShapeScale <- function(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = 7) {
-
+getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType = NULL, NAshape = NULL) {
+  
   if (shape == "NULLshape") {
-    my_scale_shape <- ggplot2::scale_shape_identity(na.value = NAshape)
-
-  } else {
-
-    nShape <- plotData %>% pull(shape) %>% setdiff(NA) %>%  unique() %>% length()
-
-    if (is.null(shapePalette)) {
-      if (!is.null(colourScaleType) && colourScaleType == "diverging") {
-        if (any(is.na(plotData %>% pull(shape)))) {
-          shapePalette <- c(21, 24, 22, 23)
-          NAshape <- 25
-        } else {
-          shapePalette <- c(21, 24, 22, 23, 25)
-        }
-        if (nShape > length(shapePalette)) {
-          stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
-        }
-
-      } else {
-        shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
-        if (nShape > length(shapePalette)) {
-          stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default is {length(shapePalette)} unique values."))
-        }
-      }
-
-    } else if (is.numeric(shapePalette)) {
-      if (nShape > length(shapePalette)) {
-        stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the `shapePalette` argument only has {length(shapePalette)} unique values."))
-      }
-      if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
-        stop("'shapePalette' argument can either contain integers between 0 and 20 (line or filled shapes), or between 21 and 25 (filled shapes with borders), but not both.")
-      }
-      if (any(21:25 %in% shapePalette)) {
-        NAshape <- 25
-      }
-
-    } else if (is.character(shapePalette)) {
-      shapesInput <- shapePalette
-      if (shapePalette == "filled+border") {
-        if (any(is.na(plotData %>% pull(shape)))) {
-          shapePalette <- c(21, 24, 22, 23)
-          NAshape <- 25
-        } else {
-          shapePalette <- c(21, 24, 22, 23, 25)
-        }
-      } else {
-        if (shapePalette == "line-first") {
-          shapePalette <- c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18)
-        } else if (shapePalette == "filled-first") {
-          shapePalette <- c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12)
-        } else if (shapePalette == "mixture") {
-          shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
-        } else {
-          stop("`shapePalette` argument can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
-        }
-
-        if (colourScaleType == "diverging") {
-          warning(glue::glue("Using the '{shapesInput}' colour scale with a divergent colour scale may lead to points around zero on the colour scale being almost invisible."))
-        }
-      }
-      if (nShape > length(shapePalette)) {
-        stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; there are only {length(shapePalette)} shapes available with argument `shapePalette` = '{shapesInput}'."))
-      }
-    } else {
-      stop("`shapePalette` argument is not in a valid format. It can take the following character values: 'line-first', 'filled-first', 'mixture' or 'filled+border'; or can be numeric or NULL.")
-    }
-
-    if(!is.null(NAshape)) {
-      if (NAshape %in% shapePalette[1:nShape] & any(is.na(plotData %>% pull(!!shape)))) {
-        stop(glue::glue("NA shape value (={NAshape}) is already being used for a '{shape}' category. Values in use: {paste0(shapePalette[1:nShape], collapse = ', ')}."))
-      }
-    }
-
-    my_scale_shape <- ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
+    return(ggplot2::scale_shape_manual(values = shapePalette, guide = "none"))
   }
+  
+  shapeVals <- dplyr::pull(plotData, {{shape}})
+  nShape    <- shapeVals %>% setdiff(NA) %>% unique() %>% length()
+  hasNA     <- any(is.na(shapeVals))
+  
+  if (is.null(shapePalette)) {
+    if (!is.null(colourScaleType) && colourScaleType == "diverging") {
+      shapePalette <- if (hasNA) c(21, 24, 22, 23) else c(21, 24, 22, 23, 25)
+      if (nShape > length(shapePalette)) {
+        stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
+      }
 
-  return(my_scale_shape)
-
+    } else if (nShape <= 4 && hasNA) {
+      shapePalette <- c(21, 24, 22, 23)
+    } else if (nShape <= 5 && !hasNA) {
+      shapePalette <- c(21, 24, 22, 23, 25)
+    } else if (hasNA) {
+      shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
+    } else {
+      shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12, 7)
+    }
+    if (nShape > length(shapePalette)) {
+      stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; {if (hasNA) 'with' else 'without'} NAs present, the maximum allowed by default is {length(shapePalette)}."))
+    }
+  } else if (is.numeric(shapePalette)) {
+    if (nShape > length(shapePalette)) {
+      stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; `shapePalette` only has {length(shapePalette)} values."))
+    }
+    if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
+      stop("'shapePalette' must contain either 0-20 (unfilled) OR 21-25 (filled), not both.")
+    }
+    
+  } else if (is.character(shapePalette)) {
+    shapesInput <- shapePalette
+    if (shapePalette == "filled+border") {
+      shapePalette <- if (hasNA) c(21, 24, 22, 23) else c(21, 24, 22, 23, 25)
+    } else {
+      shapePalette <- switch(
+        shapePalette,
+        "line-first"   = c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18),
+        "filled-first" = c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12),
+        "mixture"      = c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12),
+        stop("`shapePalette` must be 'line-first', 'filled-first', 'mixture', 'filled+border', numeric, or NULL.")
+      )
+      if (colourScaleType == "diverging") {
+        warning(glue::glue("Using '{shapesInput}' palette with a divergent colour scale may reduce visibility near zero."))
+      }
+    }
+    if (nShape > length(shapePalette)) {
+      stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; only {length(shapePalette)} shapes available with `shapePalette` = '{shapesInput}'."))
+    }
+    
+  } else {
+    stop("`shapePalette` must be 'line-first', 'filled-first', 'mixture', 'filled+border', numeric, or NULL.")
+  }
+  
+  if (hasNA) {
+    usingFilled <- any(21:25 %in% shapePalette)
+    defaultNA   <- if (usingFilled) 25 else 7
+    defaultInUse <- defaultNA %in% shapePalette[seq_len(nShape)]
+    
+    if (is.null(NAshape)) {
+      if (defaultInUse) {
+        stop(glue::glue(
+          "The default NAshape = {defaultNA} is already in use within the shapePalette. ",
+          "Specify a different NAshape or remove the default shape from the shapePalette."
+        ))
+      }
+      NAshape <- defaultNA
+      
+    } else if ((!usingFilled && NAshape %in% 21:25) || (usingFilled && NAshape %in% 0:20)) {
+      warning(glue::glue(
+        "'shapePalette' is using {if (usingFilled) 'filled' else 'unfilled'} shapes, ",
+        "but specified NAshape = {NAshape} is from the {if (!usingFilled) 'filled' else 'unfilled'} set. ",
+        "Resetting NAshape to default = {defaultNA} for {if (usingFilled) 'filled' else 'unfilled'} shapes."
+      ))
+      if (defaultInUse) {
+        stop(glue::glue("The default NAshape = {defaultNA} is also already in use within the shapePalette."))
+      }
+      NAshape <- defaultNA
+      
+    } else if (NAshape %in% shapePalette[seq_len(nShape)]) {
+      paletteName <- if (exists("shapesInput")) shapesInput else NULL
+      
+      if (!is.null(paletteName) && paletteName %in% c("line-first", "filled-first")) {
+        if (defaultInUse) {
+          stop(glue::glue(
+            "Both the specified NAshape = {NAshape} and the default NAshape = {defaultNA} ",
+            "are already in use within the shapePalette."
+          ))
+        }
+        warning(glue::glue(
+          "Specified NAshape = {NAshape} is already in use in the shapePalette. ",
+          "Because palette = '{paletteName}' has a fixed order, NAshape has been reset to default = {defaultNA}."
+        ))
+        NAshape <- defaultNA
+      } else {
+        if (defaultInUse) {
+          stop(glue::glue(
+            "Both the specified NAshape = {NAshape} and the default NAshape = {defaultNA} ",
+            "are already in use within the shapePalette."
+          ))
+        }
+        warning(glue::glue(
+          "Specified NAshape = {NAshape} is already in use in the shapePalette. ",
+          "Replacing that entry in the shapePalette with the default NAshape = {defaultNA} at the end, ",
+          "and keeping NAshape = {NAshape} for missing values."
+        ))
+        clash_idx <- match(NAshape, shapePalette)
+        shapePalette <- c(shapePalette[-clash_idx], defaultNA)
+      }
+    }
+    
+  } else {
+    NAshape <- NA
+  }
+  
+  
+  ggplot2::scale_shape_manual(values = shapePalette, na.value = NAshape)
 }
+
 
 getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
 
@@ -641,84 +854,92 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
     filledShapes <- FALSE 
   }
   
-  if (is.null(cols)) {
-    if (colourScaleType == "qualitative") {
-      my_scale_colour <- if (filledShapes) {
-        hues::scale_fill_iwanthue(na.value = NAcolour)
-      } else {
-        hues::scale_colour_iwanthue(na.value = NAcolour)
-      }
-    } else if (colourScaleType == "sequential_non_neg") {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_viridis_c(na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_viridis_c(na.value = NAcolour)
-      }
-    } else if (colourScaleType == "sequential_non_pos") {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_viridis_c(direction = -1, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_viridis_c(direction = -1, na.value = NAcolour)
-      }
-    } else if (colourScaleType == "diverging") {
-      cols <- RColorBrewer::brewer.pal(9, "RdBu") %>% rev()
-      cols[5] <- "grey90"
-    }
-
-  } else {
-    if (colourScaleType == "qualitative") {
-      nCol <- plotData %>% pull(cV) %>% setdiff(NA) %>% unique() %>% length()
-      if (nCol > length(cols)) {
-        stop(glue::glue("`colour` variable '{cV}' has {nCol} unique values; the `colourPalette` argument only has {length(cols)} unique values."))
-      }
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_manual(values = cols, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_manual(values = cols, na.value = NAcolour)
-      }
-
-    } else if (colourScaleType == "sequential_non_neg" | colourScaleType == "sequential_non_pos") {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_gradientn(colours = cols, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_gradientn(colours = cols, na.value = NAcolour)
-      }
-    }
-  }
-
-  if (colourScaleType == "diverging") {
-
-    cVdat <- plotData[[cV]]
-
-    if (symDivColourScale) {
-      maxCV <- max(cVdat, na.rm = TRUE)
-      minCV <- min(cVdat, na.rm = TRUE)
-      absMinCV <- abs(minCV)
-      if (abs(minCV) < maxCV) {
-        # minimum (negative) value is smaller in magnitude than the largest (positive) value; colour scale needs to be extended beyond the minimum value
-        vals <- scales::rescale(c(-maxCV, 0, maxCV),
-                                to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1))
-      } else {
-        # minimum (negative) value is larger in magnitude than the largest (positive) value; colour scale needs to be extended beyond the maximum value
-        vals <- scales::rescale(c(minCV, 0, -minCV),
-                                to = c(0, 1 +  (absMinCV - maxCV) / (absMinCV + maxCV)))
-      }
-
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_gradientn(colours = cols, values = vals, na.value = NAcolour)
-      } else {
-        ggplot2::scale_colour_gradientn(colours = cols, values = vals, na.value = NAcolour)
-      }
-
+  if (length(cV) == 1 && cV == "NULLcol") {
+    my_scale_colour <- if (filledShapes) {
+      ggplot2::scale_fill_identity()
     } else {
-      my_scale_colour <- if (filledShapes) {
-        ggplot2::scale_fill_gradientn(colours = cols,
-                                      values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
-                                      na.value = NAcolour)
+      ggplot2::scale_colour_identity()
+    }
+  } else {
+    if (is.null(cols)) {
+      if (colourScaleType == "qualitative") {
+        my_scale_colour <- if (filledShapes) {
+          hues::scale_fill_iwanthue(na.value = NAcolour)
+        } else {
+          hues::scale_colour_iwanthue(na.value = NAcolour)
+        }
+      } else if (colourScaleType == "sequential_non_neg") {
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_viridis_c(na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_viridis_c(na.value = NAcolour)
+        }
+      } else if (colourScaleType == "sequential_non_pos") {
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_viridis_c(direction = -1, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_viridis_c(direction = -1, na.value = NAcolour)
+        }
+      } else if (colourScaleType == "diverging") {
+        cols <- RColorBrewer::brewer.pal(9, "RdBu") %>% rev()
+        cols[5] <- "grey90"
+      }
+      
+    } else {
+      if (colourScaleType == "qualitative") {
+        nCol <- plotData %>% pull(cV) %>% setdiff(NA) %>% unique() %>% length()
+        if (nCol > length(cols)) {
+          stop(glue::glue("`colour` variable '{cV}' has {nCol} unique values; the `colourPalette` argument only has {length(cols)} unique values."))
+        }
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_manual(values = cols, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_manual(values = cols, na.value = NAcolour)
+        }
+        
+      } else if (colourScaleType == "sequential_non_neg" | colourScaleType == "sequential_non_pos") {
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_gradientn(colours = cols, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_gradientn(colours = cols, na.value = NAcolour)
+        }
+      }
+    }
+    
+    if (colourScaleType == "diverging") {
+      
+      cVdat <- plotData[[cV]]
+      
+      if (symDivColourScale) {
+        maxCV <- max(cVdat, na.rm = TRUE)
+        minCV <- min(cVdat, na.rm = TRUE)
+        absMinCV <- abs(minCV)
+        if (abs(minCV) < maxCV) {
+          # minimum (negative) value is smaller in magnitude than the largest (positive) value; colour scale needs to be extended beyond the minimum value
+          vals <- scales::rescale(c(-maxCV, 0, maxCV),
+                                  to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1))
+        } else {
+          # minimum (negative) value is larger in magnitude than the largest (positive) value; colour scale needs to be extended beyond the maximum value
+          vals <- scales::rescale(c(minCV, 0, -minCV),
+                                  to = c(0, 1 +  (absMinCV - maxCV) / (absMinCV + maxCV)))
+        }
+        
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_gradientn(colours = cols, values = vals, na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_gradientn(colours = cols, values = vals, na.value = NAcolour)
+        }
+        
       } else {
-        ggplot2::scale_colour_gradientn(colours = cols,
+        my_scale_colour <- if (filledShapes) {
+          ggplot2::scale_fill_gradientn(colours = cols,
                                         values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
                                         na.value = NAcolour)
+        } else {
+          ggplot2::scale_colour_gradientn(colours = cols,
+                                          values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
+                                          na.value = NAcolour)
+        }
       }
     }
   }
@@ -727,32 +948,130 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
 
 }
 
-#' This function takes the output of [getPCA()] and produces plots.
-#' @param object The output from [getPCA()].
-#' @param qseaSet The qseaSet object used to generate `object`.
-#' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
-#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
-#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
-#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
-#' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
-#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
-#' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
-#' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
-#' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
-#'     * "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
-#'     * "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
-#'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
-#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
-#' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
-#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
-#' @param showSampleNames Logical indicating whether to show the sample names.
-#' @param pointSize Numeric value to set the size of the points. Default is 2.
-#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
-#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
-#' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
+getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
+  filledShapes <- any(my_scale_shape$palette(1) %in% 21:25)
+  
+  if (filledShapes &&
+      !(cV %in% c("NULLcol", shape)) &&
+      colourScaleType == "qualitative") {
+    my_legend_params <- ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
+  } else {
+    my_legend_params <- NULL
+  }
+  return(my_legend_params)
+}
+
+#' Plot principal component analysis (PCA) results
+#'
+#' Generate publication-ready plots from the output of [getPCA()]. The function
+#' supports flexible visual encodings (colour, shape, size) of sample-level
+#' metadata and can return multiple plots across different PC pairs and
+#' annotation variables.
+#'
+#' @param object `mesaDimRed`.  
+#'   A dimensionality-reduction container returned by [getPCA()].
+#' @param components `integer(2)` **or** `list` of `integer(2)`.  
+#'   PC indices to plot (e.g. `c(1, 2)` for PC1 vs PC2), or a list of such pairs
+#'   to produce multiple plots.  
+#'   **Default:** `list(c(1, 2), c(2, 3))`.
+#'
+#' @param colour `NULL` or `character()` .  
+#'   Name(s) of sample-table variable(s) mapped to point colour; one plot per
+#'   variable.  
+#'   **Default:** `NULL` (no colour mapping).
+#'
+#' @param colourPalette `NULL` or `character()`.  
+#'   Palette used for colouring points. If `NULL`, a suitable default is chosen.  
+#'   **Default:** `NULL`.
+#'
+#' @param NAcolour `character(1)`.  
+#'   Colour for missing values in `colour`.  
+#'   **Default:** `"grey50"`.
+#'
+#' @param symDivColourScale `logical(1)`.  
+#'   If `TRUE`, diverging colour scales are centred symmetrically around zero.
+#'   Ignored for non-diverging scales.  
+#'   **Default:** `FALSE`.
+#'
+#' @param shape `NULL` or `character(1)`.  
+#'   Sample-table variable mapped to point shape (single variable only).  
+#'   **Default:** `NULL`.
+#'   
+#' @param shapePalette `NULL`, `character(1)`, or `numeric()`.  
+#'   Shapes used for categories of the `shape` variable. Options:  
+#'   * A numeric vector of base‐R shape codes.  
+#'     - 0–20: line/filled shapes.  
+#'     - 21–25: filled shapes with a border (border colour = black).  
+#'   * A keyword, with internally defined sets:  
+#'     - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19 categories**).  
+#'     - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19 categories**).  
+#'     - `"mixture"`: mixture of line and filled shapes (**max 19 categories**).  
+#'     - `"filled+border"`: filled+border shapes (**max 5 categories, or 4 if NAs in `shape`**).  
+#'   * `NULL`: choose automatically (`"mixture"` for non-diverging/none; `"filled+border"`
+#'     for diverging colour scales).  
+#'   **Default:** `NULL`.
+#'   
+#' @param NAshape `NULL` or `numeric(1)`.  
+#'   Shape for missing values in `shape`. If `NULL`, uses `7`, or `25` when
+#'   `"filled+border"` is active.  
+#'   **Default:** `NULL`.
+#'
+#' @param showSampleNames `logical(1)`.  
+#'   Overlay sample names on points.  
+#'   **Default:** `FALSE`.
+#'
+#' @param pointSize `numeric(1)`.  
+#'   Point size.  
+#'   **Default:** `2`.
+#'
+#' @param alpha `numeric(1)`.  
+#'   Point transparency in `[0, 1]`.  
+#'   **Default:** `1`.
+#'
+#' @param plotlyAnnotations `character()` .  
+#'   Column names from the sample table to add as tooltips when converting to
+#'   interactive `plotly`.  
+#'   **Default:** `""` (empty string).
+#'
+#' @return A `list` of `ggplot` objects—one per combination of `components`
+#'   pairs and `colour` variables—each depicting the chosen PCs with requested
+#'   aesthetics. Specifically:
+#'   * one plot per `components` pair × per `colour` variable;
+#'   * shapes/labels applied per `shape`/`showSampleNames`;
+#'   * consistent axis labelling (PC variance if available).
+#'
+#' @details
+#' **Shape defaults**  
+#' * `"mixture"` is used for non-diverging or discrete colour scales (or no colour).  
+#' * `"filled+border"` is used for diverging colour scales.  
+#' These defaults aim to keep categories visually separable for larger cohorts.
+#'
+#' @seealso [getPCA()], [plotUMAP()], [plotDimRed()], [qsea::getSampleTable()]
+#' @family dimred-plotting
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # Basic PCA plot (PC1 vs PC2) with defaults
+#' exampleTumourNormal %>%
+#'   getPCA() %>%
+#'   plotPCA()
+#'
+#' # Colour by sample group; show names
+#' exampleTumourNormal %>%
+#'   getPCA() %>%
+#'   plotPCA(colour = "group",
+#'           showSampleNames = TRUE)
+#'
+#' # Plot PC1 vs PC3; shape by tissue
+#' exampleTumourNormal %>%
+#'   getPCA() %>%
+#'   plotPCA(components = list(c(1, 3)),
+#'           colour = "group",
+#'           shape  = "tissue") 
+#'           
 #' @export
-plotPCA <- function(object,
-                    qseaSet = NULL,
+plotPCA.mesaDimRed <- function(object,
                     components = list(c(1, 2), c(2, 3)),
                     colour = NULL,
                     colourPalette = NULL,
@@ -767,7 +1086,6 @@ plotPCA <- function(object,
                     plotlyAnnotations = "") {
 
   out <- plotDimRed(object = object,
-             qseaSet = qseaSet,
              components = components,
              colour = {{colour}},
              colourPalette = colourPalette,
@@ -784,33 +1102,111 @@ plotPCA <- function(object,
   return(out)
 }
 
-#' This function takes the output of [getUMAP()] and produces plots.
-#' @param object The output from [getUMAP()].
-#' @param qseaSet The qseaSet object used to generate `object`.
-#' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
-#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
-#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
-#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
-#' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
-#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
-#' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
-#' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
-#' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
-#'     * "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
-#'     * "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
-#'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
-#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
-#' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
-#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
-#' @param showSampleNames Logical indicating whether to show the sample names.
-#' @param pointSize Numeric value to set the size of the points. Default is 2.
-#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
-#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
-#' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
-#' @export
+#' Plot UMAP results
 #'
+#' Convenience wrapper around [plotDimRed()] for UMAP embeddings returned by
+#' [getUMAP()]. Supports flexible visual encodings (colour, shape, size) of
+#' sample-level metadata, and can return multiple plots across UMAP component
+#' pairs and annotation variables.
+#'
+#' @param object `mesaDimRed`.  
+#'   A dimensionality-reduction container returned by [getUMAP()].
+#'
+#' @param components `integer(2)` **or** `list` of `integer(2)`.  
+#'   UMAP indices to plot (e.g. `c(1, 2)` for UMAP1 vs UMAP2), or a list of such
+#'   pairs to produce multiple plots.  
+#'   **Default:** `list(c(1, 2))`.
+#'
+#' @param colour `NULL` or `character()`.  
+#'   Name(s) of sample-table variable(s) mapped to point colour; one plot per
+#'   variable.  
+#'   **Default:** `NULL` (no colour mapping).
+#'
+#' @param colourPalette `NULL` or `character()`.  
+#'   Palette used for colouring points. If `NULL`, a suitable default is chosen.  
+#'   **Default:** `NULL`.
+#'
+#' @param NAcolour `character(1)`.  
+#'   Colour for missing values in `colour`.  
+#'   **Default:** `"grey50"`.
+#'
+#' @param symDivColourScale `logical(1)`.  
+#'   If `TRUE`, diverging colour scales are centred symmetrically around zero.
+#'   Ignored for non-diverging scales.  
+#'   **Default:** `FALSE`.
+#'
+#' @param shape `NULL` or `character(1)`.  
+#'   Sample-table variable mapped to point shape (single variable only).  
+#'   **Default:** `NULL`.
+#'
+#' @param shapePalette `NULL`, `character(1)`, or `numeric()`.  
+#'   Shapes used for categories of the `shape` variable. Options:  
+#'   * A numeric vector of base-R shape codes.  
+#'     - 0–20: line/filled shapes.  
+#'     - 21–25: filled shapes with a border (border colour = black).  
+#'   * A keyword, with internally defined sets:  
+#'     - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19 categories**).  
+#'     - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19 categories**).  
+#'     - `"mixture"`: mixture of line and filled shapes (**max 19 categories**).  
+#'     - `"filled+border"`: filled+border shapes (**max 5 categories, or 4 if NAs in `shape`**).  
+#'   * `NULL`: choose automatically (`"mixture"` for non-diverging/none; `"filled+border"`
+#'     for diverging colour scales).  
+#'   **Default:** `NULL`.
+#'
+#' @param NAshape `NULL` or `numeric(1)`.  
+#'   Shape for missing values in `shape`. If `NULL`, uses `7`, or `25` when
+#'   `"filled+border"` is active.  
+#'   **Default:** `NULL`.
+#'
+#' @param showSampleNames `logical(1)`.  
+#'   Overlay sample names on points.  
+#'   **Default:** `FALSE`.
+#'
+#' @param pointSize `numeric(1)`.  
+#'   Point size.  
+#'   **Default:** `2`.
+#'
+#' @param alpha `numeric(1)`.  
+#'   Point transparency in `[0, 1]`.  
+#'   **Default:** `1`.
+#'
+#' @param plotlyAnnotations `character()`.  
+#'   Column names from the sample table to add as tooltips when converting to
+#'   interactive `plotly`.  
+#'   **Default:** `""` (empty string).
+#'
+#' @return A `list` of `ggplot` objects—one per combination of `components`
+#'   pairs and `colour` variables—each depicting the chosen UMAP dimensions with
+#'   requested aesthetics. Specifically:
+#'   * one plot per `components` pair × per `colour` variable;  
+#'   * shapes/labels applied per `shape`/`showSampleNames`;  
+#'   * consistent axis labelling (UMAP1/UMAP2 etc.).
+#'
+#' @family dimred-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # Default UMAP (beta-normalised, top 1000 most variable windows)
+#' exampleTumourNormal %>%
+#'   getUMAP(n_neighbors = 5, min_dist = 1) %>%
+#'   plotUMAP()
+#'
+#' # Colour by group; show names
+#' exampleTumourNormal %>%
+#'   getUMAP(n_neighbors = 5, min_dist = 1) %>%
+#'   plotUMAP(colour = "group",
+#'            showSampleNames = TRUE)
+#'
+#' # Custom components and shape mapping
+#' exampleTumourNormal %>%
+#'   getUMAP(n_neighbors = 5, min_dist = 1) %>%
+#'   plotUMAP(components = list(c(1, 2)),
+#'            colour = "group",
+#'            shape  = "tissue")
+#'
+#' @export
 plotUMAP <- function(object,
-                     qseaSet = NULL,
                      components = list(c(1, 2)),
                      colour = NULL,
                      colourPalette = NULL,
@@ -825,7 +1221,6 @@ plotUMAP <- function(object,
                      plotlyAnnotations = "") {
 
   out <- plotDimRed(object = object,
-             qseaSet = qseaSet,
              components = components,
              colour = colour,
              colourPalette = colourPalette,
@@ -842,32 +1237,109 @@ plotUMAP <- function(object,
   return(out)
 }
 
-#' This function takes the output of [getPCA()] or [getUMAP()] and produces plots.
-#' @param object The output from [getPCA()] or [getUMAP()].
-#' @param qseaSet The qseaSet object used to generate `object`.
-#' @param components Vector of the two components to plot, or a list of vectors to make multiple plots. Default is to produce plots for PC1 vs PC2 and PC2 vs PC3 for PCA and UMAP1 vs UMAP2 for UMAP.
-#' @param colour Character vector of variable names from the qseaSet sample table for setting the colour of the points (samples). Separate plots are made for each variable.
-#' @param colourPalette Character vector giving the colour palette to use for the points (samples). Defaults are used if not supplied.
-#' @param NAcolour Colour to use for NA values in the `colour` variable. Default is "grey50".
-#' @param symDivColourScale Logical indicating if a diverging colour scale should be symmetric around zero (ignored if a diverging colour scale is not used).
-#' @param shape Character giving variable name from the qseaSet sample table for setting the shape of the points (samples). Can only accept a single variable name.
-#' @param shapePalette Shapes to use for the points (samples) for each category of the `shape` variable. Can be one of the following options:
-#' * A numeric vector specifying the set of shapes. Can be either integers between 0 and 20 (line or filled shapes) or integers between 21 and 25 (filled shapes with a border; border colour is set to black).
-#' * A character specifying which types of shapes to use (with the exact set of shapes set internally by the function). Either:
-#'     * "line-first" (15 line shapes, then 4 filled shapes; max. 19 categories).
-#'     * "filled-first" (4 filled shapes, then 15 line shapes; max. 19 categories).
-#'     * "mixture" (mixture of line and filled shapes; max. 19 categories).
-#'     * "filled+border" (max. 5 categories, or 4 if there are NAs in the `shape` variable).
-#' * NULL; defaults are used which is the "mixture" set of shapes for non-diverging colour scales (or no colour scale) and "filled+border" for diverging colour scales.
-#' @param NAshape Shape to use for NA values in the `shape` variable. Default is shape 7, or shape 25 if filled shapes with a border are being used.
-#' @param showSampleNames Logical indicating whether to show the sample names.
-#' @param pointSize Numeric value to set the size of the points. Default is 2.
-#' @param alpha Numeric value between 0 and 1 to set alpha of points. Default is 1.
-#' @param plotlyAnnotations Vector of columns to annotate for plotly, e.g. c("group","tissue")
-#' @return A list of ggplot objects: one for each combination of `object@res`, `colour` and `components`.
+
+#' Plot dimensionality reduction results
 #'
+#' Visualise PCA or UMAP coordinates stored in a [mesaDimRed] object.  
+#' Wrappers such as [plotPCA()] and [plotUMAP()] provide convenient shortcuts
+#' for common use cases.
+#'
+#' @param object `mesaDimRed`.  
+#'   A dimensionality reduction container returned by [getPCA()] or [getUMAP()].
+#'
+#' @param components `integer(2)` **or** `list` of `integer(2)`.  
+#'   Component indices to plot (e.g. `c(1, 2)` for PC1 vs PC2). A list of pairs
+#'   generates multiple plots.  
+#'   **Default:** `list(c(1, 2), c(2, 3))` for PCA, `list(c(1, 2))` for UMAP.
+#'
+#' @param colour `NULL` or `character()`.  
+#'   Name(s) of sample-table variable(s) mapped to point colour. One plot is
+#'   produced per variable.  
+#'   **Default:** `NULL` (no colouring).
+#'
+#' @param colourPalette `NULL` or `character()`.  
+#'   Palette for point colours. If `NULL`, defaults are selected automatically.  
+#'   **Default:** `NULL`.
+#'
+#' @param NAcolour `character(1)`.  
+#'   Colour for missing values in `colour`.  
+#'   **Default:** `"grey50"`.
+#'
+#' @param symDivColourScale `logical(1)`.  
+#'   If `TRUE`, diverging colour scales are centred symmetrically around zero.  
+#'   Ignored for non-diverging scales.  
+#'   **Default:** `FALSE`.
+#'
+#' @param shape `NULL` or `character(1)`.  
+#'   Sample-table variable mapped to point shape. Only one variable supported.  
+#'   **Default:** `NULL`.
+#'
+#' @param shapePalette `NULL`, `character(1)`, or `numeric()`.  
+#'   Shapes used for categories of the `shape` variable. Options:  
+#'   * A numeric vector of base-R shape codes:  
+#'     - 0–20: line/filled shapes.  
+#'     - 21–25: filled shapes with borders (border colour = black).  
+#'   * A keyword:  
+#'     - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19 categories**).  
+#'     - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19 categories**).  
+#'     - `"mixture"`: mixture of line and filled shapes (**max 19 categories**).  
+#'     - `"filled+border"`: filled+border shapes (**max 5 categories; 4 if NAs in `shape`**).  
+#'   * `NULL`: automatic choice—`"mixture"` unless a diverging colour scale is
+#'     used, in which case `"filled+border"`.  
+#'   **Default:** `NULL`.
+#'
+#' @param NAshape `NULL` or `numeric(1)`.  
+#'   Shape used for missing values in `shape`. If `NULL`, defaults to `7`, or `25`
+#'   when `"filled+border"` is active.  
+#'   **Default:** `NULL`.
+#'
+#' @param showSampleNames `logical(1)`.  
+#'   If `TRUE`, overlay sample names on points.  
+#'   **Default:** `FALSE`.
+#'
+#' @param pointSize `numeric(1)`.  
+#'   Size of plotted points.  
+#'   **Default:** `2`.
+#'
+#' @param alpha `numeric(1)`.  
+#'   Transparency of points in `[0, 1]`.  
+#'   **Default:** `1`.
+#'
+#' @param plotlyAnnotations `character()`.  
+#'   Column names from the sample table used as tooltips when converting plots
+#'   to interactive `plotly`.  
+#'   **Default:** `""` (empty string).
+#'
+#' @return A `list` of `ggplot2` objects, one for each combination of:  
+#'   * component pairs in `components`, and  
+#'   * variables specified in `colour`.  
+#'
+#' Each plot depicts the requested dimensions with aesthetics mapped as specified.
+#'
+#' @family dimred-helpers
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#'
+#' # PCA: colour by group
+#' exampleTumourNormal %>%
+#'   getPCA(nPC = 3) %>%
+#'   plotDimRed(colour = "group")
+#'
+#' # UMAP: colour by group, shape by tissue
+#' exampleTumourNormal %>%
+#'   getUMAP(n_neighbors = 5, min_dist = 1) %>%
+#'   plotDimRed(colour = "group",
+#'              shape = "tissue") 
+#'
+#' # Show sample names
+#' exampleTumourNormal %>%
+#'   getPCA(nPC = 3) %>%
+#'   plotDimRed(colour = "group",
+#'              showSampleNames = TRUE) 
+#'
+#' @export
 plotDimRed <- function(object,
-                    qseaSet = NULL,
                     components = list(c(1, 2), c(2, 3)),
                     colour = NULL,
                     colourPalette = NULL,
@@ -885,16 +1357,9 @@ plotDimRed <- function(object,
   if (!inherits(object,"mesaDimRed")) {
     stop("First argument should be the output from the getPCA()/getUMAP() functions in mesa.")
   }
-
-  if (!is.null(qseaSet)) {
-    if (!is.qseaSet(qseaSet)) {
-      stop("Second argument should be a qseaSet")
-    }
-    sampleTable <- qseaSet %>% qsea::getSampleTable()
-  } else {
-    sampleTable <- object@sampleTable
-  }
-
+  
+  sampleTable <- object@sampleTable
+  
   if (!is.null(colour)){
     colDiff <- setdiff(colour, colnames(sampleTable))
     if(length(colDiff) > 0){
@@ -942,7 +1407,7 @@ plotDimRed <- function(object,
       propVar <- round(propVar * 100, 2)
       plotData <- single@prcomp$x
     } else {
-      propVar = NULL
+      propVar <- NULL
       plotData <- single@points
     }
 
@@ -954,18 +1419,18 @@ plotDimRed <- function(object,
       stop("`colourPalette` argument is non-NULL, but `colour` argument is NULL.")
     }
 
-    if (!is.null(shapePalette) & is.null(shape)) {
-      stop("`shapePalette` argument is non-NULL, but `shape` argument is NULL.")
-    }
-
     if (!is.null(shape) & length(shape) > 1) {
       stop("Argument `shape` can only be of length one.")
     }
 
     if (is.null(shape)) {
       plotData <- plotData %>%
-        dplyr::mutate(NULLshape = 16)
+        dplyr::mutate(NULLshape = "21")
 
+      if (is.null(shapePalette)){
+        shapePalette <- 21
+      }
+      
       shape <- "NULLshape"
     }
 
@@ -976,7 +1441,7 @@ plotDimRed <- function(object,
       colour <- "NULLcol"
     }
 
-    makePlot <- function(components, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape) {
+    makePlot <- function(components, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params) {
 
       env <- new.env(parent = globalenv())
       env$plotData <- plotData
@@ -1010,6 +1475,7 @@ plotDimRed <- function(object,
         my_geom_point +
         my_scale_colour +
         my_scale_shape +
+        my_legend_params +
         ggplot2::ggtitle(glue::glue("{object@params$method} for {length(object@samples)} samples using {titleString}."),
                          subtitle = subtitleString) +
         ggplot2::theme_bw() +
@@ -1035,13 +1501,15 @@ plotDimRed <- function(object,
 
     if (length(colour) == 1 && colour == "NULLcol") {
 
-      my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType = NULL, NAshape = NAshape)
+      my_scale_shape <- getShapeScale(plotData, shape, shapePalette, NAshape = NAshape)
 
       my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
-      my_scale_colour <- ggplot2::scale_colour_identity()
+      my_scale_colour <- getColourScale(cV = colour, my_scale_shape = my_scale_shape)
+      
+      my_legend_params <- getLegendParams(colour, shape, my_scale_shape)
 
-      ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape)
+      ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
 
       return(ggp)
 
@@ -1060,13 +1528,15 @@ plotDimRed <- function(object,
           stop(glue::glue("The variable `{cV}` can not be mapped to a colour scale."))
         }
 
-        my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType)
+        my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType, NAshape = NAshape)
 
         my_geom_point <- getGeomPoint(cV, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
 
         my_scale_colour <- getColourScale(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour = NAcolour, symDivColourScale = symDivColourScale)
+        
+        my_legend_params <- getLegendParams(cV, shape, my_scale_shape, colourScaleType)
 
-        ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape)
+        ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
 
         return(ggp)
 

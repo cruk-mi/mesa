@@ -2,27 +2,85 @@
 % Please edit documentation in R/plotting.R
 \name{plotGenomicFeatureDistribution}
 \alias{plotGenomicFeatureDistribution}
-\title{This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it}
+\title{Distribution of windows across genomic features}
 \usage{
 plotGenomicFeatureDistribution(
   qseaSet,
   cutoff = 1,
   barType = "stack",
-  normMethod = "nrpm"
+  normMethod = "nrpm",
+  genome = NULL,
+  TxDb = NULL,
+  annoDb = NULL
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing windows and signal (beta or nrpm).}
 
-\item{cutoff}{The cutoff to use on the windows for each sample}
+\item{cutoff}{\code{numeric(1)}.
+Threshold applied to the chosen normalisation measure per window.
+\strong{Default:} \code{1}.}
 
-\item{barType}{What type of bars to use for the plot (stack, dodge, fill)}
+\item{barType}{\code{character(1)}.
+Bar layout: one of \code{"stack"}, \code{"dodge"}, or \code{"fill"} (relative proportions).
+\strong{Default:} \code{"stack"}.}
 
-\item{normMethod}{Normalisation method to use}
+\item{normMethod}{\code{character(1)}.
+Normalisation/measure to threshold. One of \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
+
+\item{genome}{\code{character(1)} or \code{NULL}.
+Genome build (e.g., \code{"hg38"}, \code{"hg19"}, \code{"mm10"}). If provided, uses
+mesa's genome system via \code{\link[=getMesaTxDb]{getMesaTxDb()}} and \code{\link[=getMesaAnnoDb]{getMesaAnnoDb()}}.
+\strong{Default:} \code{NULL} (uses \code{TxDb} and \code{annoDb} parameters).}
+
+\item{TxDb}{\code{TxDb} object or \code{NULL}.
+Transcript database for gene annotation. Ignored if \code{genome} is provided.
+\strong{Default:} \code{TxDb.Hsapiens.UCSC.hg38.knownGene} for backward compatibility.}
+
+\item{annoDb}{\code{character(1)} or \code{NULL}.
+Annotation database name (e.g., \code{"org.Hs.eg.db"}). Ignored if \code{genome} is provided.
+\strong{Default:} \code{"org.Hs.eg.db"}.}
 }
 \value{
-A plot of the distribution
+A \code{ggplot2} object showing counts (or proportions, for \code{"fill"})
+of feature classes per sample above \code{cutoff}.
 }
 \description{
-This function takes a qseaSet and extracts the distribution of the genomic features of all the windows over a cutoff, and plots it
+Annotate windows (e.g., promoters/exons/introns) and plot the distribution
+per sample as stacked/dodged/filled bars.
 }
+\details{
+Feature classes are taken from region annotations available on the windows
+(e.g., columns produced by \code{\link[=annotateWindows]{annotateWindows()}} such as \code{shortAnno}/\code{annotation},
+if present). Bars are positioned according to \code{barType} (\code{stack}/\code{dodge}/\code{fill}).
+}
+\examples{
+# Recommended workflow: set genome globally
+setMesaGenome("hg38") 
+data(exampleTumourNormal, package = "mesa")
+
+# Uses global hg38 setting
+exampleTumourNormal \%>\%
+  plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+
+# Override for specific analysis
+exampleTumourNormal \%>\%
+  plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+
+# Advanced: manual control (bypasses mesa genome system)
+exampleTumourNormal \%>\%
+  plotGenomicFeatureDistribution(
+    TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+    annoDb = "org.Mm.eg.db"
+  )
+  
+}
+\seealso{
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}
+
+Other annotation-summaries: 
+\code{\link{getGenomicFeatureDistribution}()}
+}
+\concept{annotation-summaries}

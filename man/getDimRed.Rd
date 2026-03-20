@@ -4,7 +4,7 @@
 \alias{getPCA}
 \alias{getUMAP}
 \alias{getDimRed}
-\title{The functions getPCA() and getUMAP() are dimensionality reduction techniques with a very similar syntax}
+\title{Generate a PCA from a qseaSet}
 \usage{
 getPCA(
   qseaSet,
@@ -19,7 +19,8 @@ getPCA(
   center = TRUE,
   scale = FALSE,
   nPC = 5,
-  returnDataTable = FALSE
+  returnDataTable = FALSE,
+  verbose = TRUE
 )
 
 getUMAP(
@@ -33,6 +34,7 @@ getUMAP(
   topVarNum = 1000,
   topVarSamples = NULL,
   returnDataTable = FALSE,
+  verbose = TRUE,
   ...
 )
 
@@ -51,55 +53,187 @@ getDimRed(
   scale = FALSE,
   nPC = 5,
   returnDataTable = FALSE,
+  verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{qseaSet}{A qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object providing windows, counts and \code{sampleTable}.}
 
-\item{dataTable}{A data frame of normalised values for a set of windows (rows) and samples (columns), e.g. from \code{\link[=getDataTable]{getDataTable()}}. It must have seqnames, start and end columns. Can also be a \code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}} object with normalised values in the metadata columns.}
+\item{dataTable}{\code{data.frame} or \code{GRanges} or \code{NULL}.
+Normalised values with windows in rows and samples in columns. Must contain
+\code{seqnames}, \code{start}, \code{end} (if \code{data.frame}), or metadata columns with
+values (if \code{GRanges}). If \code{NULL}, the matrix is derived internally (see
+\code{normMethod}, \code{minEnrichment}).
+\strong{Default:} \code{NULL}.}
 
-\item{regionsToOverlap}{Optional. Only windows in \code{qseaSet} overlapping \code{regionsToOverlap} will be considered. A \code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}} object or a data frame which can be coerced into a \code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}} object.}
+\item{regionsToOverlap}{\code{GRanges}, coercible \code{data.frame}, or \code{NULL}.
+If supplied, only windows overlapping these regions are used.
+\strong{Default:} \code{NULL}.}
 
-\item{normMethod}{What normalisation method to use. Typically a character giving name of predefined normalisation method (e.g. "beta" or "nrpm"). See \code{\link[qsea:normMethod]{qsea::normMethod()}}.}
+\item{normMethod}{\code{character(1)}.
+Name of predefined normalisation (e.g., \code{"beta"}, \code{"nrpm"}); passed to
+\code{\link[qsea:normMethod]{qsea::normMethod()}} when \code{dataTable = NULL}.
+\strong{Default:} \code{"beta"}.}
 
-\item{minEnrichment}{Minimum number of reads for beta values to not give NA. Passed to \code{\link[=getDataTable]{getDataTable()}}.}
+\item{minEnrichment}{\code{numeric(1)}.
+Minimum reads required for beta values to be non-\code{NA}; forwarded to
+\code{\link[=getDataTable]{getDataTable()}} when building data internally.
+\strong{Default:} \code{3}.}
 
-\item{useGroupMeans}{Whether to average samples over the group column (i.e. combine replicates)}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, average samples within the \code{group} column (combine replicates)
+before DR.
+\strong{Default:} \code{FALSE}.}
 
-\item{minDensity}{A minimum CpG density level to filter out windows with values lower than.}
+\item{minDensity}{\code{numeric(1)}.
+Minimum CpG density; windows below this are removed.
+\strong{Default:} \code{0}.}
 
-\item{topVarNum}{Number of most variable windows to keep. Defaults to 1000. If value is NA, NULL, Inf or is at least as big as the available number of windows, then all available windows are used for the PCA/UMAP. Can also be a vector, in which case PCA/UMAP is performed for each component.}
+\item{topVarNum}{\code{numeric(1)} or \code{integer(1)} or \code{Inf} or \code{NULL} \strong{or} a vector.
+Keep the \code{topVarNum} most variable windows (by SD). If \code{NA}, \code{NULL}, \code{Inf},
+or \code{>=} available windows, use all. If a vector, DR is run once per value
+and results are returned in a list.
+\strong{Default:} \code{1000}.}
 
-\item{topVarSamples}{Samples to use to determine variability. Either NULL or NA (use all samples; default), a character vector of sample names or a regular expression to match sample names on. Can also be a list, in which case PCA/UMAP is performed for each list component. If \code{length(topVarNum) > 1}, list should be same length as \code{topVarNum} and each component will be matched with corresponding component of \code{topVarNum}.}
+\item{topVarSamples}{\code{NULL}, \code{character()}, \code{list}, or \code{regex} string.
+Samples used to compute variability. If \code{NULL}/\code{NA}, use all samples. If a
+vector/regex, select matching samples. If a \code{list}, perform DR per list
+element (should match \code{length(topVarNum)} when vectorised).
+\strong{Default:} \code{NULL}.}
 
-\item{center}{A logical value indicating if windows should be centred to have mean zero (for method PCA only). Default is TRUE.}
+\item{center}{\code{logical(1)}.
+Centre features to mean zero (PCA only).
+\strong{Default:} \code{TRUE}.}
 
-\item{scale}{A logical value indicating if windows should be scaled to have unit variance (for method PCA only). Default is FALSE.}
+\item{scale}{\code{logical(1)}.
+Scale features to unit variance (PCA only).
+\strong{Default:} \code{FALSE}.}
 
-\item{nPC}{Number of principal components to be calculated (for method PCA only). Default is 5.}
+\item{nPC}{\code{integer(1)}.
+Number of principal components to compute (PCA only).
+\strong{Default:} \code{5}.}
 
-\item{returnDataTable}{A logical value indicating if the table of normalised values (generated by \code{\link[=getDataTable]{getDataTable()}} or by processing the input \code{dataTable}) should be returned as part of the output. See below for details.}
+\item{returnDataTable}{\code{logical(1)}.
+If \code{TRUE}, include the matrix used for DR in the return object.
+\strong{Default:} \code{FALSE}.}
 
-\item{...}{Other parameters to pass to \code{\link[uwot:umap]{uwot::umap()}} function.}
+\item{verbose}{\code{logical(1)}.
+If \code{TRUE}, print messages regarding the function execution.
+\strong{Default:} \code{TRUE}.}
 
-\item{method}{A character specifying method to use. Either "PCA" or "UMAP".}
+\item{...}{Additional arguments passed to \code{\link[uwot:umap]{uwot::umap()}} (when \code{method="UMAP"}),
+e.g. \code{n_neighbors}, \code{min_dist}, \code{metric}.}
+
+\item{method}{\code{character(1)}. One of \code{"PCA"} or \code{"UMAP"}.
+\strong{Default:} \code{"PCA"}.}
 }
 \value{
-A mesaDimRed object with the following components:
-\item{res}{A named list where each component is a PCA or UMAP object. List names correspond to entries in the \code{params$topVar} component of the output.}
-\item{samples}{Names of the samples analysed.}
-\item{dataTable}{If \code{returnDataTable = TRUE}, the table of normalised values. The table will contain windows after filtering based on \code{regionsToOverlap} and \code{minDensity}, but prior to filtering based on \code{topVarNum}. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the \code{params$topVar} component of the output.}
-\item{params}{A list of the parameters used.}
-\item{sampleTable}{A copy of the sampleTable from the qseaSet.}
+A \code{\link{mesaDimRed}} object with:
+\itemize{
+\item \strong{res}: Named list of DR results; each element is a \code{\link{mesaPCA}} (for PCA)
+or \code{\link{mesaUMAP}} (for UMAP). Names correspond to entries in \code{params$topVar}.
+\item \strong{samples}: Character vector of sample IDs used.
+\item \strong{dataTable} (optional): The numeric matrix used for DR when
+\code{returnDataTable = TRUE}. It reflects filtering by \code{regionsToOverlap} and
+\code{minDensity}, removal of rows with missing values, and may include columns
+of window SDs when applicable (named per \code{params$topVar}).
+\item \strong{params}: List of parameters used (method, selection/filter settings, etc.).
+\item \strong{sampleTable}: Copy of \code{qsea::getSampleTable(qseaSet)}.
+}
 }
 \description{
-The functions getPCA() and getUMAP() are dimensionality reduction techniques with a very similar syntax
+Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{method = "PCA"}.
+
+Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{method = "UMAP"}.
+
+Run PCA or UMAP on methylation signal matrices extracted from a
+\link[qsea:qseaSet-class]{qsea::qseaSet}. This is the core workhorse for dimensionality reduction;
+wrappers such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUMAP()}} provide simplified access.
+}
+\details{
+:
+\itemize{
+\item For \code{method = "PCA"}, DR is performed via \code{\link[stats:prcomp]{stats::prcomp()}} with \code{center}
+and \code{scale} controls.
+\item For \code{method = "UMAP"}, DR is performed via \code{\link[uwot:umap]{uwot::umap()}}.
+\item Prior to DR, optional filtering is applied: enrichment cut-off
+(\code{minEnrichment}), CpG density (\code{minDensity}), region restriction
+(\code{regionsToOverlap}), and most-variable windows (\code{topVarNum}).
+\item When \code{topVarNum} or \code{topVarSamples} are vectorised/lists, multiple DR runs
+are performed and collected in \code{res}.
+}
 }
 \section{Functions}{
 \itemize{
-\item \code{getPCA()}: Generate a PCA from a qseaSet
+\item \code{getPCA()}: Principal component analysis of a qseaSet.
 
-\item \code{getUMAP()}: Generate a UMAP from a qseaSet
+\item \code{getUMAP()}: Uniform manifold approximation and projection of a qseaSet.
 
 }}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
+exampleTumourNormal \%>\%
+  getPCA()
+
+# Request only the top 3 PCs
+exampleTumourNormal \%>\%
+  getPCA(nPC = 3)
+
+# Use multiple cutoffs for most-variable windows (returns list of PCA results)
+exampleTumourNormal \%>\%
+  getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
+  slot("res") \%>\%
+  names()
+# Quick demo on a small synthetic qseaSet
+qsea::getExampleQseaSet(repl = 20) \%>\%
+  getUMAP()
+
+# Alter UMAP hyperparameters
+qsea::getExampleQseaSet(repl = 20) \%>\%
+  getUMAP(n_neighbors = 5, min_dist = 1)
+
+# Use top 500 most variable windows only
+qsea::getExampleQseaSet(repl = 20) \%>\%
+  getUMAP(topVarNum = 500)
+data(exampleTumourNormal, package = "mesa")
+
+# PCA on default beta-normalised matrix, keep 3 PCs
+exampleTumourNormal \%>\%
+  getDimRed(method = "PCA", nPC = 3)
+
+# UMAP on the top 500 most variable windows
+exampleTumourNormal \%>\%
+  getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
+
+# Restrict DR to a set of regions (coerced from data.frame)
+regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
+exampleTumourNormal \%>\%
+  getDimRed(method = "PCA", regionsToOverlap = regs)
+
+# Vectorised topVarNum runs (returns a list of results)
+exampleTumourNormal \%>\%
+  getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
+  slot("res") \%>\%
+  names()
+}
+\seealso{
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA}, \linkS4class{mesaUMAP},
+\code{\link[qsea:normMethod]{qsea::normMethod()}}, \code{\link[uwot:umap]{uwot::umap()}}, \code{\link[stats:prcomp]{stats::prcomp()}}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+}
+\concept{dimred-helpers}

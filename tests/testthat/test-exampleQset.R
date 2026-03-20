@@ -56,34 +56,27 @@ test_that("Annotation getting works", {
 
 test_that("Testing hg38 related annotation/plotting functions", {
 
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE))
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = FALSE))
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c("tumour","type"),  useGroupMeans = FALSE))
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = FALSE))
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c("tumour","type"),  useGroupMeans = FALSE)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = FALSE)
 
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE))
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = TRUE))
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE)
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = TRUE)
 
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE, showSampleNames = FALSE))
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = TRUE, showSampleNames = FALSE)
 
-  expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
-  expect_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
+  expect_error(testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c("tumour","type"), useGroupMeans = TRUE))
+  expect_error(testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type), useGroupMeans = TRUE))
 
-  expect_no_error(plotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
-                               annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"))))
+  testPlotGeneHeatmap(exampleTumourNormal %>% mutate(group = tumour), gene = "HOXA10", sampleAnnotation = c(tumour,type),
+                               annotationColors = list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4")))
 
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10"))
-
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm"))
-
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3))
-
-  expect_no_error(exampleTumourNormal %>%
-                    plotGeneHeatmap(gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
-                                    sampleAnnotation = "tumour" ))
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10")
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm")
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3)
+  testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
+                                    sampleAnnotation = "tumour" )
 
   expect_no_error(exampleTumourNormal %>%
                     plotCNVheatmap(tumour))
@@ -172,8 +165,32 @@ test_that("Analysing DMRs", {
                  pivotDMRsLonger() %>%
                  annotateWindows(genome = "hg38") %>%
                  summariseDMRsByGene() %>%
-                 dim(),c(21,4))
+                 ncol(),4)
 
+  expect_no_error(DMRs <- exampleTumourNormal %>%
+                    filter(type %in% c("LUAD","LUSC","CRC")) %>%
+                    calculateDMRs(variable = "type",
+                                  contrasts = "all"))
+  
+  expect_equal(DMRs %>% sliceDMRs(n = 1) %>% nrow(), 6)
+  expect_equal(DMRs %>% sliceDMRs(n = 2) %>% nrow(), 12)
+  
+  DMRs_log2 <- DMRs %>% sliceDMRs(n = 1, metric = log2FC)
+  DMRs_adjPval <- DMRs %>% sliceDMRs(n = 1, metric = adjPval)
+  DMRs_deltaBeta <- DMRs %>% sliceDMRs(n = 1, metric = deltaBeta)
+  DMRs_position <- DMRs %>% sliceDMRs(n = 1, metric = position)
+  
+  expect_false(all(DMRs_log2$start == DMRs_adjPval$start))
+  expect_false(all(DMRs_log2$start == DMRs_deltaBeta$start))
+  expect_false(all(DMRs_adjPval$start == DMRs_deltaBeta$start))
+  expect_false(all(DMRs_adjPval$start == DMRs_position$start))
+
+  expect_no_error(DMRs %>% 
+                    writeDMRsToBed(tempdir()))
+  
+  expect_no_error(DMRs %>% 
+                    writeDMRsToExcel(paste0(tempdir(),"/test.xlsx")))
+  
 })
 
 test_that("Multiple DMRs", {

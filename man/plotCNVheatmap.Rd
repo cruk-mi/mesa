@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaCNV.R
 \name{plotCNVheatmap}
 \alias{plotCNVheatmap}
-\title{This function takes a qseaSet and plots a heatmap of the calculated CNV}
+\title{CNV heatmap across samples}
 \usage{
 plotCNVheatmap(
   qseaSet,
@@ -12,17 +12,62 @@ plotCNVheatmap(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing per-window CNV tracks (e.g., created by
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or \code{qsea::addCNV()}).}
 
-\item{sampleAnnotation}{Columns of the sampleTable to use to annotation the plot with.}
+\item{sampleAnnotation}{tidyselect specification, \code{character()}, or \code{NULL}.
+Sample-table columns to display as column annotations (e.g., \code{c("tumour","type")}
+or bare helpers \verb{tumour, type}).
+\strong{Default:} \code{NULL}.}
 
-\item{annotationColors}{A list specifying some or all of the colours to use for the annotations.}
+\item{annotationColors}{\code{list} or \code{NA}.
+Optional mapping of levels → colours to override auto palettes, e.g.
+\code{list(tumour = c(Tumour = "firebrick4", Normal = "blue"))}.
+\strong{Default:} \code{NA}.}
 
-\item{clusterRows}{Whether to cluster the rows of the heatmap}
+\item{clusterRows}{\code{logical(1)}.
+Cluster rows (windows) before plotting.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A heatmap with the calculated number of chromosomes for each samples
+Draws a heatmap on the active device and (invisibly) returns the underlying
+\strong{ComplexHeatmap} object for further composition with
+\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
 }
 \description{
-This function takes a qseaSet and plots a heatmap of the calculated CNV
+Plot per-window copy-number estimates stored in a \code{qseaSet} as a heatmap
+using \strong{ComplexHeatmap}. Each column is a sample; rows are genome windows.
 }
+\details{
+Assumes CNV values are available per window and sample. Rows are windows
+(typically in genomic order if \code{clusterRows = FALSE}), columns are samples.
+Sample annotations (and optional colours) are added when \code{sampleAnnotation}
+and \code{annotationColors} are provided.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Basic CNV heatmap with sample annotations
+exampleTumourNormal \%>\%
+  plotCNVheatmap(sampleAnnotation = c(tumour, type))
+
+# Custom annotation colours; disable row clustering
+exampleTumourNormal \%>\%
+  plotCNVheatmap(
+    sampleAnnotation = tumour,
+    annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+    clusterRows = FALSE
+  )
+
+}
+\seealso{
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
+\code{\link[qsea:addCNV]{qsea::addCNV()}}
+
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{removeCNV}()},
+\code{\link{runHMMCopy}()}
+}
+\concept{CNV}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{calculateCGEnrichmentGRanges}
 \alias{calculateCGEnrichmentGRanges}
-\title{This function takes a GRanges object and calculates the enrichment scores.}
+\title{CpG enrichment from GRanges of reads (MEDIPS-style)}
 \usage{
 calculateCGEnrichmentGRanges(
   readGRanges = NULL,
@@ -11,15 +11,65 @@ calculateCGEnrichmentGRanges(
 )
 }
 \arguments{
-\item{readGRanges}{A GRanges object containing the span of each fragment of DNA}
+\item{readGRanges}{\code{GRanges}
+Genomic ranges representing fragments (each range = one fragment).
+\strong{Default:} \code{NULL} (must be supplied).}
 
-\item{BSgenome}{Which BSgenome to use (GRCh38 is cached for speed)}
+\item{BSgenome}{\code{character(1)}
+Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
+The package must be installed and loadable.
+\strong{Default:} \code{NULL}.}
 
-\item{chr.select}{Which chromosomes to use in global calculation}
+\item{chr.select}{\code{character()} or \code{NULL}
+Vector of chromosomes to restrict motif calculation.
+\strong{Default:} \code{NULL} (use all chromosomes).}
 }
 \value{
-A data frame containing the relH, GoGe and number of reads values for the samples
+A \code{tibble} with one row and the following columns:
+\itemize{
+\item \strong{relH} — sample relH normalised by genome relH.
+\item \strong{GoGe} — sample GoGe normalised by genome GoGe.
+\item \strong{nReads} — total reads (fragments).
+\item \strong{nReadsWithoutPattern} — reads lacking \code{"CG"} motif.
+\item \strong{n100bpReads} — reads with length ≥ 100 bp.
+\item \strong{n100bpReadsWithoutPattern} — reads ≥ 100 bp lacking \code{"CG"}.
+}
 }
 \description{
-This function takes a GRanges object and calculates the enrichment scores.
+Compute CpG enrichment metrics (\strong{relH} and \strong{GoGe}) from a
+\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} of read spans, using the specified BSgenome.
+Useful when reads are already represented as genomic ranges rather than
+extracted directly from a BAM file.
+}
+\details{
+relH and GoGe are computed by counting \code{"CG"} dinucleotides in the provided
+fragments and normalising by genome-wide expectations (from
+\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}}).
+Unlike \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, this function assumes reads are already
+summarised as genomic ranges.
+}
+\examples{
+# Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
+if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
+  n <- 200
+  gr <- GenomicRanges::GRanges(
+    seqnames = rep(1, n),
+    ranges   = IRanges::IRanges(
+      start = sample(1e6:2e6, n),
+      width = sample(80:180, n, replace = TRUE)
+    ),
+    strand = "*"
+  )
+  calculateCGEnrichmentGRanges(
+    readGRanges = gr,
+    BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
+    chr.select  = 1
+  )
+}
+}
+\seealso{
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
+\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
+\pkg{GenomicRanges},
+\pkg{BSgenome}
 }

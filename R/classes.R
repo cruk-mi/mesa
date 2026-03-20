@@ -1,15 +1,34 @@
 methods::setOldClass("prcomp")
 
-#' @title The MesaDimRed class
-#' @description
-#' This is a class for containing the results of a dimensionality reduction on a qseaSet
+# ==============================
+# mesaDimRed
+# ==============================
+
+#' Dimensionality reduction results container
 #'
-#' @slot res The results, a list containing individual PCA/UMAP objects.
-#' @slot sampleTable A sampleTable from the qseaSet.
-#' @slot samples A character vector of the samples used.
-#' @slot params The parameters used during construction.
-#' @slot dataTable The data used to construct the PCA/UMAP object (optional).
-#' @export
+#' Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
+#' computed on a common set of samples.
+#'
+#' @slot res `list`  
+#'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
+#'
+#' @slot sampleTable `data.frame`  
+#'   Sample annotations; row names are sample IDs.
+#'
+#' @slot samples `character()`  
+#'   Vector of sample IDs used.
+#'
+#' @slot params `list`  
+#'   Parameters used to generate results in `res`.
+#'
+#' @slot dataTable `data.frame`  
+#'   Optional matrix/data used to compute DR (for reproducibility).
+#'
+#' @name mesaDimRed-class
+#' @aliases mesaDimRed-class
+#' @rdname mesaDimRed-class
+#' @seealso [mesaPCA-class], [mesaUMAP-class]
+#' @exportClass mesaDimRed
 setClass("mesaDimRed",
          slots = c(
            res = "list",
@@ -19,123 +38,309 @@ setClass("mesaDimRed",
            dataTable = "data.frame"
          )
 )
-#' @title Constructor function of a mesaDimRed object.
-#' @description Constructor function of a mesaDimRed object.
-#' @param res The results, a list containing individual PCA/UMAP objects.
-#' @param sampleTable A sampleTable from the qseaSet.
-#' @param samples A character vector of the samples used.
-#' @param params The parameters used during construction.
-#' @param dataTable The data used to construct the PCA/UMAP object (optional).
-#' @return A `mesaDimRed` object.
+
+
+#' Construct a `mesaDimRed` object
+#'
+#' @param res `list`  
+#'   DR result objects. **Default:** none. `res` must be supplied.
+#'
+#' @param sampleTable `data.frame`  
+#'   Sample annotations; row names must be sample IDs. **Default:** none.
+#'
+#' @param samples `character()`  
+#'   Sample IDs included. **Default:** none.
+#'
+#' @param params `list`  
+#'   Parameters used to compute `res`. **Default:** none.
+#'
+#' @param dataTable `data.frame`  
+#'   Optional numeric matrix/data used for DR.  
+#'   **Default:** `data.frame()`.
+#'
+#' @return A [mesaDimRed-class] object:
+#' * stores DR results in `res`,
+#' * carries sample metadata in `sampleTable`,
+#' * records the samples in `samples`,
+#' * and persists parameters/data in `params` / `dataTable`.
+#'
+#' @examples
+#' st <- data.frame(sample_name = c("S1","S2"),
+#'                  group = c("A","B"),
+#'                  row.names = "sample_name")
+#' md <- mesaDimRed(res = list(), sampleTable = st,
+#'                  samples = rownames(st), params = list(),
+#'                  dataTable = data.frame())
+#' md
+#'
+#' @rdname mesaDimRed-class
 #' @export
 mesaDimRed <-  function(res, sampleTable, samples, params, dataTable = data.frame()) {
   methods::new("mesaDimRed", res = res, sampleTable = sampleTable, samples = samples, params = params, dataTable = dataTable)
 }
 
-#' @title The mesaPCA class
-#' @description
-#' This is a class for containing a PCA object calculated on a qseaSet
+
+#' @rdname mesaDimRed-class
+#' @param object `mesaDimRed`  
+setMethod("show", "mesaDimRed", function(object) {
+  cat("Object containing ", length(object@res),
+      " dimensionality reduction objects for ",
+      length(object@samples), " samples", sep = "")
+  cat("\n")
+})
+
+# Validity check
+setValidity("mesaDimRed", function(object) {
+  if (!is.data.frame(object@sampleTable)) return("`sampleTable` must be a data.frame")
+  if (!is.character(object@samples)) return("`samples` must be character")
+  TRUE
+})
+
+setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
+
+setMethod("getSampleTable", "mesaDimRed", function(object) {
+  object@sampleTable
+})
+
+# ==============================
+# mesaPCA
+# ==============================
+
+#' PCA results container
 #'
-#' @slot prcomp A principal component object output from [stats::prcomp()]
-#' @slot windows A character vector of the windows used.
-#' @export
+#' Stores a PCA fit (from [stats::prcomp()]) computed over methylation windows.
+#'
+#' @slot prcomp `prcomp`  
+#'   A PCA fit returned by [stats::prcomp()].
+#'
+#' @slot windows `character()`  
+#'   Window IDs used in the PCA.
+#'
+#' @name mesaPCA-class
+#' @aliases mesaPCA-class
+#' @rdname mesaPCA-class
+#' @seealso [mesaDimRed-class]
+#' @exportClass mesaPCA
 setClass("mesaPCA",
          slots = c(
            prcomp = "prcomp",
            windows = "character"
          )
 )
-#' @title Constructor function of a mesaPCA object.
-#' @description Constructor function of a mesaPCA object.
-#' @param prcomp A principal component object output from [stats::prcomp()]
-#' @param windows A character vector of the windows used.
 
-#' @return A `mesaPCA` object.
+
+#' Construct a `mesaPCA` object
+#'
+#' @param prcomp `prcomp`  
+#'   PCA fit from [stats::prcomp()]. **Default:** none.
+#'
+#' @param windows `character()`  
+#'   Window IDs used. **Default:** none.
+#'
+#' @return A [mesaPCA-class] object containing the PCA fit and window IDs.
+#'
+#' @examples
+#' set.seed(1)
+#' x <- matrix(rnorm(20), nrow = 5, ncol = 4,
+#'             dimnames = list(paste0("S",1:5), paste0("W",1:4)))
+#' pc <- stats::prcomp(x, center = TRUE, scale. = FALSE)
+#' mp <- mesaPCA(prcomp = pc, windows = colnames(x))
+#' mp
+#'
+#' @rdname mesaPCA-class
 #' @export
 mesaPCA <-  function(prcomp, windows) {
   methods::new("mesaPCA", prcomp = prcomp, windows = windows)
 }
 
 
+#' @rdname mesaPCA-class
+#' @param object `mesaPCA`
+setMethod("show", "mesaPCA", function(object) {
+  n <- tryCatch(nrow(object@prcomp$x), error = function(e) NA_integer_)
+  cat("PCA result for ", n,
+      " samples calculated over ", length(object@windows),
+      " windows", sep = "")
+  cat("\n")
+})
+
+# Validity check
+setValidity("mesaPCA", function(object) {
+  if (!inherits(object@prcomp, "prcomp")) return("`prcomp` must be a stats::prcomp object")
+  if (!is.character(object@windows)) return("`windows` must be character")
+  TRUE
+})
 
 
-#' @title The mesaUMAP class
-#' @description
-#' This is a class for containing UMAP objects calculated on a qseaSet
+
+# ==============================
+# mesaUMAP
+# ==============================
+
+#' UMAP results container
 #'
-#' @slot points Data frame containing one row for each sample, with the positions in UMAP space.
-#' @slot windows A character vector of the windows used.
-#' @export
+#' Stores per-sample coordinates from a UMAP embedding computed over methylation
+#' windows.
+#'
+#' @slot points `data.frame`  
+#'   One row per sample with UMAP coordinates (e.g., `UMAP1`, `UMAP2`).
+#'   Row names are sample IDs.
+#'
+#' @slot windows `character()`  
+#'   Window IDs used to compute the embedding.
+#'
+#' @name mesaUMAP-class
+#' @aliases mesaUMAP-class
+#' @rdname mesaUMAP-class
+#' @seealso [mesaDimRed-class]
+#' @exportClass mesaUMAP
+
 setClass("mesaUMAP",
          slots = c(
            points = "data.frame",
            windows = "character"
          )
 )
-#' @title Constructor function of a mesaUMAP object.
-#' @description Constructor function of a mesaUMAP object.
-#' @param points Data frame containing one row for each sample, with the positions in UMAP space.
-#' @param windows A character vector of the windows used.
 
-#' @return A `mesaUMAP` object.
+
+#' Construct a `mesaUMAP` object
+#'
+#' @param points `data.frame`  
+#'   One row per sample with positions in UMAP space (row names = sample IDs).
+#'   **Default:** none.
+#'
+#' @param windows `character()`  
+#'   Window IDs used. **Default:** none.
+#'
+#' @return A [mesaUMAP-class] object containing UMAP coordinates and window IDs.
+#'
+#' @examples
+#' pts <- data.frame(UMAP1 = c(0.1, -0.2, 0.0),
+#'                   UMAP2 = c(0.3,  0.1, -0.1))
+#' rownames(pts) <- paste0("S", 1:3)
+#' mu <- mesaUMAP(points = pts, windows = c("w1","w2","w3"))
+#' mu
+#'
+#' @rdname mesaUMAP-class
 #' @export
 mesaUMAP <-  function(points, windows) {
   methods::new("mesaUMAP", points = points, windows = windows)
 }
 
+
+#' @rdname mesaUMAP-class
+#' @param object `mesaUMAP`
 setMethod("show", "mesaUMAP", function(object) {
-  cat("UMAP result for ", nrow(object@points), "samples calculated over ", length(object@windows), " windows", sep = "")
+  cat("UMAP result for ", nrow(object@points),
+      " samples calculated over ", length(object@windows),
+      " windows", sep = "")
+  cat("\n")
 })
 
-setMethod("show", "mesaPCA", function(object) {
-  cat("PCA result for ", nrow(object@prcomp$x), "samples calculated over ", length(object@windows), " windows", sep = "")
+# Validity check
+setValidity("mesaUMAP", function(object) {
+  if (!is.data.frame(object@points)) return("`points` must be a data.frame")
+  if (!is.character(object@windows)) return("`windows` must be character")
+  TRUE
 })
 
-setMethod("show", "mesaDimRed", function(object) {
-  cat("Object containing ", length(object@res)," dimensionality reduction objects for ", length(object@samples), " samples", sep = "")
-})
 
 
-#' This function extends the dplyr function mutate to act on a mesaDimRed sampleTable.
-#' @method mutate mesaDimRed
+# ==============================
+# S3 methods for dplyr verbs
+# ==============================
+
+#' Mutate the sample table of a mesaDimRed
+#'
+#' Extend [dplyr::mutate()] to operate on the `sampleTable` slot of a
+#' [mesaDimRed-class] object.
+#'
+#' @param .data `mesaDimRed`  
+#'   Object to modify.
+#'
+#' @param ...  
+#'   Arguments passed to [dplyr::mutate()].
+#'
+#' @return A `mesaDimRed` object:
+#' * **sampleTable** updated with the mutated columns.
+#' * Sample identity is preserved; attempts to alter `sample_name` are rejected.
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' 
+#' md <- exampleTumourNormal %>% 
+#'   getPCA() %>%
+#'   mutate(group2 = paste0(group, "_2"))
+#'                  
+#' stopifnot("group2" %in% colnames(getSampleTable(md)))
+#'
 #' @importFrom dplyr mutate
-#' @param .data A mesaDimRed to mutate
-#' @param ... Other arguments to pass to dplyr::mutate
-#' @return A mesaDimRed object with the sampleTable changed by a call to dplyr::mutate
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom glue glue
+#' @method mutate mesaDimRed
 #' @export
-mutate.mesaDimRed <- function(.data, ...){
-
+mutate.mesaDimRed <- function(.data, ...) {
   newTable <- .data@sampleTable  %>%
     tibble::rownames_to_column(".rownameCol") %>%
     dplyr::mutate(...) %>%
     tibble::column_to_rownames(".rownameCol")
-
-  if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-    stop(glue::glue("Error: sample_names cannot be changed with dplyr::mutate()."))
+  
+  if (!identical(.data@sampleTable$sample_name, newTable$sample_name)) {
+    stop(glue::glue("sample_names cannot be changed with dplyr::mutate()."))
   }
-
+  
   .data@sampleTable <- newTable
-
+  
   return(.data)}
 
-#' This function extends the dplyr function left_join to act on mesaDimRed sampleTable.
-#' @method left_join mesaDimRed
-#' @importFrom dplyr left_join
-#' @param x A mesaDimRed to join data onto the sampleTable of
-#' @param y A data frame to join with the sampleTable
-#' @param by A character vector of variables to join by. If NULL, will perform a join on all common variables.
-#' @param copy If x and y are not from the same data source, and copy is TRUE, then y will be copied into the same src as x.
-#' This allows you to join tables across srcs, but it is a potentially expensive operation so you must opt into it.
-#' @param suffix 	If there are non-joined duplicate variables in x and y, these suffixes will be added to the output to disambiguate them. Should be a character vector of length 2.
-#' @param ... Other arguments to pass to dplyr::left_join
-#' @param keep Should the join keys from both x and y be preserved in the output?
-#' @return A mesaDimRed object with the sampleTable changed by a call to dplyr::left_join
-#' @export
-left_join.mesaDimRed <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y"), keep = NULL, ...){
 
+#' Left-join onto the sample table of a mesaDimRed
+#'
+#' Extend [dplyr::left_join()] to operate on the `sampleTable` slot of a
+#' [mesaDimRed-class] object.
+#'
+#' @param x `mesaDimRed`
+#'   Object whose `sampleTable` will be joined.
+#'
+#' @param y `data.frame`
+#'   Table to join.
+#'
+#' @param by `character()` or `NULL`
+#'   Join columns; see [dplyr::left_join()]. **Default:** `NULL`.
+#'
+#' @param copy `logical(1)`  
+#'   See [dplyr::left_join()]. **Default:** `FALSE`.
+#'
+#' @param suffix `character(2)`  
+#'   Suffixes appended to overlapping non-join column names.  
+#'   **Default:** `c(".x", ".y")`.
+#'
+#' @param keep `logical(1)` or `NULL`  
+#'   Retain join keys from both tables. **Default:** `NULL`.
+#'
+#' @param ...  
+#'   Additional arguments to [dplyr::left_join()].
+#'
+#' @return A `mesaDimRed` object:
+#' * **sampleTable** updated with `y` via a left join.
+#'
+#' @examples
+#' new <- data.frame(sample_name = c("Colon1_N", "Colon2_N"), foo = c(1,2))
+#' 
+#' exampleTumourNormal %>% 
+#'   getPCA() %>%
+#'   left_join(new, by = join_by(sample_name)) %>%
+#'   getSampleTable()
+#'
+#' @importFrom dplyr left_join
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @method left_join mesaDimRed
+#' @export
+left_join.mesaDimRed <- function(x, y, by = NULL, copy = FALSE,
+                                 suffix = c(".x",".y"), keep = NULL, ...) {
   x@sampleTable <- x@sampleTable %>%
     tibble::rownames_to_column("rownameCol") %>%
-    dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep,...) %>%
+    dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%
     tibble::column_to_rownames("rownameCol")
-
+  
   return(x)}

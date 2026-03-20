@@ -2,7 +2,7 @@
 % Please edit documentation in R/mixQsets.R
 \name{mixThreeQsetSamples}
 \alias{mixThreeQsetSamples}
-\title{This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.}
+\title{Mix three samples to generate a synthetic qseaSet sample}
 \usage{
 mixThreeQsetSamples(
   qseaSet,
@@ -19,31 +19,110 @@ mixThreeQsetSamples(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+The input object containing the three source samples.}
 
-\item{sample1}{First sample name, from which to take proportion of samples}
+\item{sample1, }{sample2, sample3 \code{character(1)}.
+Sample names to mix (must exist in \code{qseaSet}).}
 
-\item{sample2}{Second sample name}
+\item{nReadsTotal}{\code{integer(1)}.
+Total number of reads to simulate in the mixed sample. Must be \verb{>= 0}.}
 
-\item{sample3}{Third sample name}
+\item{proportion1}{\code{numeric(1)}.
+Proportion taken from \code{sample1}. Must be in \verb{[0, 1]}.
+\strong{Default:} none (must be supplied).}
 
-\item{nReadsTotal}{Number of reads in total to have after mixing}
+\item{proportion2}{\code{numeric(1)}.
+Proportion taken from \code{sample2}. Must be in \verb{[0, 1]}.
+\strong{Default:} none (must be supplied).
 
-\item{proportion1}{The proportion to take from sample1}
+The proportion from \code{sample3} is computed as \code{1 - proportion1 - proportion2}.
+The sum \code{proportion1 + proportion2} must be \strong{strictly less than 1} (so that
+\code{sample3} gets a non-negative share).}
 
-\item{proportion2}{The proportion to take from sample2}
+\item{newName}{\code{character(1)} or \code{NULL}.
+Name for the new synthetic sample.
+\strong{Default:} \code{NULL} (auto-generated, e.g., \code{"Mix3_<s1>_<s2>_<s3>_<p1>_<p2>"}).}
 
-\item{newName}{A name to give the new sample}
+\item{groupName}{\code{character(1)} or \code{NULL}.
+Group name recorded in the \code{sampleTable} for the new sample.
+\strong{Default:} \code{NULL} (uses \code{newName}).}
 
-\item{groupName}{A name to use in the group column in the sampleTable}
+\item{onlyNew}{\code{logical(1)}.
+If \code{TRUE}, return only the synthetic mixture. If \code{FALSE}, append it to the
+original \code{qseaSet}.
+\strong{Default:} \code{FALSE}.}
 
-\item{onlyNew}{Whether to only return the new sample.}
-
-\item{renormalise}{Whether to renormalise the result. Speeds up the process when you are repeatedly subsampling, only need to do it once at the end.}
+\item{renormalise}{\code{logical(1)}.
+Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. For batching multiple
+mixtures, consider \code{FALSE} and normalise once at the end.
+\strong{Default:} \code{TRUE}.}
 }
 \value{
-A qseaSet object with an extra
+A \code{qseaSet} containing the new synthetic sample:
+\itemize{
+\item If \code{onlyNew = TRUE}, a \code{qseaSet} with \strong{one} (mixed) sample.
+\item If \code{onlyNew = FALSE}, the input \code{qseaSet} \strong{plus} the mixed sample.
+The \code{sampleTable}, counts, and dependent slots are updated consistently.
+}
 }
 \description{
-This function takes a qseaSet and makes a new sample by mixing three samples. Currently internal only as untested.
+Create a new synthetic sample in a \code{qseaSet} by mixing reads from \strong{three}
+existing samples according to user-specified proportions. Useful for simple
+mixture simulations; currently intended for internal use.
 }
+\details{
+Note that if the qseaSet windows have been filtered prior to using this,
+the fraction of fragments present in the current qseaSet is calculated,
+such that the total number of reads would have been approximately \code{nReadsTotal}.
+E.g. if there are 50\% of the total fragments in the windows present in the current samples,
+0.5*\code{nReadsTotal} fragments will be sampled.
+\itemize{
+\item Validates that \code{sample1}, \code{sample2}, \code{sample3} exist; \code{nReadsTotal >= 0};
+\verb{proportion1, proportion2 ∈ [0, 1]}; and \verb{proportion1 + proportion2 ≤ 1}.
+\item The mixing strategy follows the package implementation (proportional
+allocation / sampling); use \code{renormalise = TRUE} if downstream steps rely
+on offsets/enrichment being recomputed.
+}
+}
+\examples{
+\dontrun{
+data(exampleTumourNormal, package = "mesa")
+
+# Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
+exampleTumourNormal \%>\% 
+  mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
+                       nReadsTotal = 100000,
+                       proportion1 = 0.5, proportion2 = 0.3,
+                       newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
+                       renormalise = FALSE) \%>\%   
+  # Only a few reads are included in this small subset of windows (78):
+  getCountTable() \%>\% 
+  pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) \%>\% 
+  sum()
+
+
+# Mix three samples and return only the synthetic sample, with an explicit name and group.
+exampleTumourNormal \%>\%
+  mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
+             nReadsTotal = 50000,
+             proportion1 = 0.1, proportion2 = 0.2,
+             newName     = "Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7",
+             groupName   = "Synthetic",
+             onlyNew     = TRUE ,
+             renormalise = FALSE) \%>\%
+  # Only a few reads are included in this small subset of windows (29):
+  getCountTable() \%>\% 
+  dplyr::pull(Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7) \%>\% 
+  sum()
+}
+
+}
+\seealso{
+\code{\link[=mixSamples]{mixSamples()}} (two-sample mixture), \code{\link[=addNormalisation]{addNormalisation()}}
+
+Other sample-simulation: 
+\code{\link{mixSamples}()}
+}
+\concept{sample-simulation}
+\keyword{internal}

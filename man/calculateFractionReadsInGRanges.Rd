@@ -2,17 +2,83 @@
 % Please edit documentation in R/qseaExtra.R
 \name{calculateFractionReadsInGRanges}
 \alias{calculateFractionReadsInGRanges}
-\title{This function calculates the fraction of reads in a qseaSet object which are present in a GRanges object}
+\title{Fraction of thresholded windows overlapping a set of regions}
 \usage{
-calculateFractionReadsInGRanges(qseaSet, windowsToConsider, numCountsNeeded)
+calculateFractionReadsInGRanges(qseaSet, regionsToOverlap, numCountsNeeded)
 }
 \arguments{
-\item{qseaSet}{A qseaSet}
+\item{qseaSet}{\code{qseaSet}.
+Input qseaSet. \strong{Default:} none (must be supplied).}
 
-\item{windowsToConsider}{Which windows to consider, as a GRanges object}
+\item{regionsToOverlap}{\code{GRanges} or \code{data.frame}.
+Regions to consider for overlap. Data frames must be coercible to \code{GRanges}
+(e.g., have \code{seqnames}/\code{start}/\code{end} or \code{chr}/\code{window_start}/\code{window_end}).
+\strong{Default:} none (must be supplied).}
 
-\item{numCountsNeeded}{Minimum number of reads required to consider that window}
+\item{numCountsNeeded}{\code{integer(1)}.
+Minimum reads per window for it to count toward the fraction.
+\strong{Default:} none (must be supplied).}
+}
+\value{
+A tibble with one row per sample containing:
+\itemize{
+\item \code{sample_name}
+\item \code{initialOverBackNum} — windows \code{>=} threshold genome-wide
+\item \code{afterOverBackNum} — windows \code{>=} threshold within \code{regionsToOverlap}
+\item \code{fraction} — \code{afterOverBackNum / initialOverBackNum}
+followed by columns from the sample table (left-joined by \code{sample_name}).
+}
 }
 \description{
-This function calculates the fraction of reads in a qseaSet object which are present in a GRanges object
+For each sample, compute the proportion of \strong{windows} with counts
+\verb{>= numCountsNeeded} that overlap \code{regionsToOverlap}, relative to all
+windows with counts \verb{>= numCountsNeeded} in that sample.
 }
+\details{
+Operates on the window × sample count matrix from \code{\link[qsea:qseaSet-class]{qsea::getCounts()}}.
+Counts are converted to a logical indicator (count \verb{>= numCountsNeeded})
+and summed per sample:
+\itemize{
+\item \code{initialOverBackNum}: windows meeting the threshold genome-wide.
+\item \code{afterOverBackNum}: windows meeting the threshold \strong{within}
+\code{regionsToOverlap} (via \code{\link[=filterByOverlaps]{filterByOverlaps()}}).
+The reported \code{fraction} is \code{afterOverBackNum / initialOverBackNum}.
+}
+
+\strong{Note:} despite the function name, this computes a \strong{window-based} fraction
+using a count threshold, not a direct fraction of raw reads.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Using the shipped ultra-stable probes (GRCh38) as the region set
+exampleTumourNormal \%>\%
+  calculateFractionReadsInGRanges(
+    regionsToOverlap = mesa::hg38CpGIslands,
+    numCountsNeeded   = 5
+  ) \%>\%
+  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
+
+# Define a small GRanges subset from the object's own windows
+gr <- exampleTumourNormal \%>\%
+  qsea::getRegions() \%>\%
+  head(n = 100)
+  
+calculateFractionReadsInGRanges(
+      qseaSet           = exampleTumourNormal,
+      regionsToOverlap  = gr,
+      numCountsNeeded   = 3) \%>\%
+  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
+
+}
+\seealso{
+\code{\link[qsea:qseaSet-class]{qsea::getCounts()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}},
+\link{hg38CpGIslands}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
+
+Other window-helpers: 
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{downSample}()},
+\code{\link{subsetWindowsBySignal}()},
+\code{\link{subsetWindowsOverBackground}()}
+}
+\concept{window-helpers}

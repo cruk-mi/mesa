@@ -2,20 +2,64 @@
 % Please edit documentation in R/qseaExtra.R
 \name{makeTransposedTable}
 \alias{makeTransposedTable}
-\title{This function takes a qseaSet and makes a wide transposed table, suitable for using for machine learning}
+\title{Make a wide sample-by-window table}
 \usage{
 makeTransposedTable(qseaSet, normMethod = "nrpm", ...)
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+A qseaSet object containing methylation-enriched sequencing data.
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{What normalisation method to use}
+\item{normMethod}{\code{character(1)}.
+Measure to extract. Common choices include \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{...}{Other columns to add from the sampleTable in the output (along with sample_name). Must specify normMethod if using. Can use everything() for all columns.}
+\item{...}{tidyselect specification or \code{character()}.
+Optional columns from the sample table to append as additional features
+(e.g., \verb{group, tumour} or \code{c("group","tumour")}).
+\strong{Default:} none.}
 }
 \value{
-A table
+A tibble with one row per sample and one column per genomic window, plus any
+appended sample-level metadata.
 }
 \description{
-This function takes a qseaSet and makes a wide transposed table, suitable for using for machine learning
+Create a wide table for ML/visualisation where \strong{rows are samples} and
+\strong{columns are genomic windows}, using one normalisation/measure.
 }
+\details{
+Internally obtains a window × sample matrix for \code{normMethod}, transposes it
+to sample × window, and (if requested) appends selected sample-table columns.
+Window columns are typically named \code{"chr:start-end"}. If measure suffixes
+are present in column names, they may be cleaned to bare sample/window names
+(see \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}).
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# NRPM features (sample × first few windows) with a group column appended
+exampleTumourNormal \%>\%
+  makeTransposedTable(normMethod = "nrpm", group) \%>\%
+  dplyr::select(1:6) \%>\%
+  head()
+
+# Beta features; inspect dimensions
+exampleTumourNormal \%>\%
+  makeTransposedTable(normMethod = "beta") \%>\%
+  dim()
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}, \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}, \code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
+
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{removeLibraryFactors}()},
+\code{\link{removeNormMethodSuffix}()}
+}
+\concept{table-helpers}

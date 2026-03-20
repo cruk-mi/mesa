@@ -1,21 +1,19 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.5.1
+Version: 0.99.0
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
-           role = c("aut", "cre"),
-           email = "simon.pearce@cruk.manchester.ac.uk",
+           role = c("aut"),
            comment = c(ORCID = "0000-0002-1680-5538")),
     person(given = "Steven",
            family = "Hill",
-           role = "aut",
-           email = "steven.hill@cruk.manchester.ac.uk",
+           role = c("aut", "cre"),
+           email = "stevenhill.work@gmail.com",
            comment = c(ORCID = "0000-0002-5909-692X")),
     person(given = "Paddy",
            family = "Harker",
            role = "ctb",
-           email = "patrick.harker@cruk.manchester.ac.uk",
            comment = c(ORCID = "0000-0002-2531-8774")),
     person(given = "Kevin",
            family = "Brennan",
@@ -24,15 +22,27 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-9018-9852")),           
     person(given = "Katarzyna",
            family = "Kamieniecka",
-           role = "ctb")    
+           role = "ctb"),
+    person(given = "Felipe",
+           family = "Perez Martinez",
+           role = "ctb",
+           email = "felipe.perezmartinez@cruk.manchester.ac.uk",
+           comment = c(ORCID = "0009-0007-9138-3674")),
+    person(given = "Cancer Research UK National Biomarker Centre", 
+           role = c("cph", "fnd"))
            )
-Description: Analysis tools for methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq), building off the qsea package.
+Description: A package for the analysis of methylation enrichment sequencing 
+    data (e.g. MBD-seq or MEDIP-seq). This allows for the window-based 
+    evaluation of methylation levels (using the 'qsea' package), including 
+    functions for determining differentially methylated regions. Many functions 
+    are provided for tidyverse style modification of the qseaSet objects 
+    originally defined in 'qsea'. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Imports:
     plyranges,
     magrittr,
@@ -77,7 +87,7 @@ Imports:
     scales
 Depends:
     qsea,
-    R (>= 4.1.0),
+    R (>= 4.3.0),
     dplyr
 Suggests: 
     rmarkdown,
@@ -93,12 +103,18 @@ Suggests:
     uwot,
     BSgenome.Hsapiens.NCBI.GRCh38,
     BSgenome.Hsapiens.UCSC.hg19,
+    BSgenome.Scerevisiae.UCSC.sacCer3,
     org.Hs.eg.db,
     org.Mm.eg.db,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
-    TxDb.Mmusculus.UCSC.mm10.knownGene
+    TxDb.Hsapiens.UCSC.hg19.knownGene,
+    TxDb.Mmusculus.UCSC.mm10.knownGene,
+    plotly
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,
-        CopyNumberVariation, DifferentialMethylation
+        CopyNumberVariation, DifferentialMethylation,
+        Coverage, ChIPSeq, ChipOnChip
 Config/testthat/edition: 3
+URL: https://github.com/cruk-mi/mesa
+BugReports: https://github.com/cruk-mi/mesa

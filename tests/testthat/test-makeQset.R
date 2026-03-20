@@ -35,8 +35,8 @@ test_that("Making a hg19 qseaSet", {
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 541532)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
-
-  expect_no_error(testSet %>% plotGeneHeatmap("JAM2"))
+  
+  testPlotGeneHeatmap(testSet, "JAM2")
 
 })
 
@@ -79,8 +79,8 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
   expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
 
   expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
-
-  expect_no_error(testSet %>% plotGeneHeatmap("EWSR1"))
+  
+  testPlotGeneHeatmap(testSet, "EWSR1")
 
 })
 
@@ -90,8 +90,8 @@ test_that("Making a GRCh38 qseaSet", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
-  if(!rlang::is_installed("MEDIPSData")){
-    skip("MEDIPSData Not installed")
+  if(!file.exists("/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")) {
+    skip("File not present")
   }
 
   sampleTable <- data.frame(sample_name = "Test1",
@@ -128,6 +128,10 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
 
+  if(!file.exists("/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")){
+    skip("Only run on internal server")
+  }
+
   sampleTable <- data.frame(sample_name = "Test1",
                             group = "Group1",
                             file_name = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam",
@@ -156,21 +160,53 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 
   expect_true("hyperStableEdgar" %in% (GRCh38testSet %>% addHyperStableFraction() %>% getSampleTable() %>% colnames()))
 
-  expect_true("relH" %in% (randomSet %>% getSampleQCSummary() %>% colnames()))
-  expect_true("valid_fragment" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
+  expect_true("relH" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
+  expect_true("valid_fragments" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
 
+  # check error is given if wrong size GC/map files given
+  expect_error(makeQset(sampleTable,
+                        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+                        chrSelect = 22,
+                        windowSize = 200,
+                        CNVwindowSize = 1000000,
+                        fragmentType = "cfDNA",
+                        CNVmethod = "HMMdefault",
+                        coverageMethod = "PairedAndR1s",
+                        hmmCopyGC = mesa::gc_hg38_500kb,
+                        hmmCopyMap = mesa::map_hg38_500kb,
+                        badRegions = NULL)
+  )
+  
+  # expect no error if right size GC/map files is given
+  expect_no_error(makeQset(sampleTable,
+                        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+                        chrSelect = 22,
+                        windowSize = 200,
+                        CNVwindowSize = 500000,
+                        fragmentType = "cfDNA",
+                        CNVmethod = "None",
+                        coverageMethod = "PairedAndR1s",
+                        hmmCopyGC = mesa::gc_hg38_500kb,
+                        hmmCopyMap = mesa::map_hg38_500kb,
+                        badRegions = NULL)
+  )
+  
 })
 
 test_that("calculateCGEnrichment works", {
 
-enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+  if(!rlang::is_installed("MEDIPSData")){
+    skip("MEDIPSData Not installed")
+  }  
+  
+  enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
                        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
                        exportPath = NULL,
                        extend = 0, shift = 0, uniq = 0,
                        chr.select = "chr22", paired = TRUE)
 
-expect_equal(enr$nReads, 636130)
-expect_equal(enr$relH, 3.353462, tolerance = 5)
-expect_equal(enr$GoGe, 1.631612, tolerance = 5)
+  expect_equal(enr$nReads, 636130)
+  expect_equal(enr$relH, 3.353462, tolerance = 5)
+  expect_equal(enr$GoGe, 1.631612, tolerance = 5)
 
 })

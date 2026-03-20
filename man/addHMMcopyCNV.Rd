@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaCNV.R
 \name{addHMMcopyCNV}
 \alias{addHMMcopyCNV}
-\title{Calculate and add CNV based on HMMcopy, on individual samples}
+\title{Add per-sample CNV calls to a qseaSet using HMMcopy}
 \usage{
 addHMMcopyCNV(
   qs,
@@ -21,36 +21,108 @@ addHMMcopyCNV(
 )
 }
 \arguments{
-\item{qs}{The qseaSet object}
+\item{qs}{\code{qseaSet}.
+Input object whose samples will receive CNV tracks.}
 
-\item{inputColumn}{Which column of the sample table contains the link to the bam file}
+\item{inputColumn}{\code{character(1)}.
+Column in the sample table containing BAM paths (e.g. \code{"input_file"}).
+\strong{Default:} \code{"input_file"}.}
 
-\item{windowSize}{What window size to use (only 50000, 500000 or 1000000 work at the moment)}
+\item{windowSize}{\code{integer(1)}.
+CNV bin size in bp. Allowed values: \code{50000}, \code{500000}, \code{1000000}.
+\strong{Default:} \code{1000000}.}
 
-\item{fragmentLength}{Fragment length to extend reads to if not paired}
+\item{fragmentLength}{\code{integer(1)} or \code{NULL}.
+Length to extend unpaired R1 reads; if \code{NULL}, estimate from proper pairs.
+\strong{Default:} \code{NULL}.}
 
-\item{plotDir}{A directory to export individual HMMcopy plots to.}
+\item{plotDir}{\code{character(1)} or \code{NULL}.
+Directory to write per-sample PDF diagnostics; if \code{NULL}, no plots are saved.
+\strong{Default:} \code{NULL}.}
 
-\item{parallel}{Whether to use parallelisation}
+\item{parallel}{\code{logical(1)}.
+Use the registered \strong{BiocParallel} backend when \code{TRUE}; otherwise run serially.
+\strong{Default:} \code{getMesaParallel()}.}
 
-\item{maxInsertSize}{For paired reads, only keep them if they are below a maximum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.}
+\item{maxInsertSize}{\code{integer(1)}.
+Maximum insert size to accept for proper pairs (bp).
+\strong{Default:} \code{1000}.}
 
-\item{minInsertSize}{For paired reads, only keep them if they are above a minimum length. Can be used for cfDNA size selection. Applies to Input samples as well as MeCap.}
+\item{minInsertSize}{\code{integer(1)}.
+Minimum insert size to accept for proper pairs (bp).
+\strong{Default:} \code{50}.}
 
-\item{minReferenceLength}{A minimum distance on the genome to keep the read. bwa by default gives 19bp as minimum for a read, which is quite short.}
+\item{minReferenceLength}{\code{integer(1)}.
+Minimum aligned reference span for unpaired R1 (bp).
+\strong{Default:} \code{30}.}
 
-\item{minMapQual}{Minimum mapping quality to include a read (on either end if proper pair)}
+\item{minMapQual}{\code{integer(1)}.
+Minimum MAPQ; for pairs, either end meeting the cutoff is accepted.
+\strong{Default:} \code{30}.}
 
-\item{properPairsOnly}{Whether to only keep properly paired reads, or to keep high-quality (MAPQ 30+) unpaired R1s as well. Set to TRUE for size selection.}
+\item{properPairsOnly}{\code{logical(1)}.
+If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine proper pairs with high-quality R1.
+\strong{Default:} \code{FALSE}.}
 
-\item{hmmCopyGC}{Object containing GC content per window in the genome, for hmmcopy}
+\item{hmmCopyGC}{\code{GRanges} or \code{NULL}.
+Precomputed GC content track binned at \code{windowSize}.
+\strong{Default:} \code{NULL}.}
 
-\item{hmmCopyMap}{Object containing mapability content per window in the genome, for hmmcopy}
+\item{hmmCopyMap}{\code{GRanges} or \code{NULL}.
+Precomputed mappability track binned at \code{windowSize}.
+\strong{Default:} \code{NULL}.}
 }
 \value{
-A qseaGLM object
+The input \code{qseaSet} with CNV information attached, including:
+\itemize{
+\item per-window CNV tracks accessible via downstream CNV accessors,
+\item library/sample tables updated with relevant CNV/coverage summaries,
+\item (optionally) per-sample diagnostic PDFs if \code{plotDir} is provided.
+}
 }
 \description{
-This calculates and adds CNV to a qseaSet based on just using HMMcopy on each sample, with default parameters.
-Only works for hg38/GRCh38!
+Runs a CNV pipeline on each sample: counts fragments in fixed-size genomic
+windows, normalises for GC and mappability (HMMcopy), segments, and stores
+per-window copy-number in the \code{qseaSet}. Supports parallel execution.
+Only GRCh38/hg38 is currently supported.
 }
+\details{
+Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
+HMMcopy (\code{HMMcopy::correctReadcount()} followed by \code{HMMcopy::HMMsegment()}), and
+merged back into the \code{qseaSet}. You must supply GC/mappability tracks binned at
+the same \code{windowSize} (or use package-provided defaults where applicable).
+When \code{parallel = TRUE}, computation uses the currently registered backend
+(see \code{BiocParallel::register()}).
+}
+\examples{
+\dontrun{
+data(exampleTumourNormal, package = "mesa")
+exampleTumourNormal \%>\%
+
+    addHMMcopyCNV(
+           inputColumn = "input_file",
+           windowSize    = 1e6,
+           hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
+           hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
+           properPairsOnly = TRUE,
+           parallel      = FALSE,
+           plotDir       = tempdir()
+     )
+
+}
+
+}
+\seealso{
+\code{runHMMcopy()},
+\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
+\code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),
+\code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}},
+\code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}},
+\code{\link[BiocParallel:register]{BiocParallel::register()}}
+
+Other CNV: 
+\code{\link{plotCNVheatmap}()},
+\code{\link{removeCNV}()},
+\code{\link{runHMMCopy}()}
+}
+\concept{CNV}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/qseaExtra.R
 \name{writeBigWigs}
 \alias{writeBigWigs}
-\title{This function takes a qseaSet and writes individual bigWig files with the coverage over each window.}
+\title{Write bigWig tracks per sample or group}
 \usage{
 writeBigWigs(
   qseaSet,
@@ -13,19 +13,66 @@ writeBigWigs(
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+A qseaSet object containing methylation-enriched sequencing data.
+\strong{Default:} none (must be supplied).}
 
-\item{folderName}{A folder to save the output bigWig files into}
+\item{folderName}{\code{character(1)}.
+Output directory where \code{.bw} files will be written (created if missing).
+\strong{Default:} none (must be supplied).}
 
-\item{normMethod}{What normalisation method to use (e.g. nrpm or beta)}
+\item{normMethod}{\code{character(1)}.
+Normalisation/measure to export. Common choices: \code{"nrpm"} or \code{"beta"}.
+\strong{Default:} \code{"nrpm"}.}
 
-\item{useGroupMeans}{Whether to average over the replicates in the group}
+\item{useGroupMeans}{\code{logical(1)}.
+If \code{TRUE}, export group-mean tracks instead of per-sample tracks.
+\strong{Default:} \code{FALSE}.}
 
-\item{naVal}{A value to replace NA values with (for beta values).}
+\item{naVal}{\code{numeric(1)}.
+Value used to replace \code{NA} scores prior to export (useful for beta).
+\strong{Default:} \code{0}.}
 }
 \value{
-A set of bigWig files for each sample in the qseaSet, with coverage over all the windows in the qseaSet
+(Invisibly) \code{NULL}. Files are written to \code{folderName}.
 }
 \description{
-This function takes a qseaSet and writes individual bigWig files with the coverage over each window.
+Export bigWig files with per-window scores for each sample (or group means).
 }
+\details{
+For each sample (or group), the function pairs the per-window scores from
+\code{qseaSet} with the corresponding window genomic coordinates and writes a
+bigWig via \strong{rtracklayer}. When exporting beta, windows failing the minimum
+read threshold used to compute beta may be \code{NA}; these are replaced by
+\code{naVal} before writing.
+
+\strong{File naming.} Output files are typically named using the sample (or group)
+name and the method, e.g. \code{"<sample>_<method>.bw"} or
+\code{"<group>_<method>_means.bw"} when \code{useGroupMeans = TRUE}.
+
+\strong{Seqinfo.} bigWig export requires chromosome lengths; ensure the window
+GRanges in \code{qseaSet} carries valid \code{seqinfo} (this is the case for the
+example data on GRCh38).
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Per-sample NRPM bigWigs
+td <- tempfile()
+dir.create(td)
+exampleTumourNormal \%>\%
+  writeBigWigs(folderName = td, normMethod = "nrpm", useGroupMeans = FALSE)
+list.files(td, pattern = "\\\\\\\\.bw$")
+
+# Group-mean beta bigWigs (replace NA beta with 0)
+td2 <- tempfile()
+dir.create(td2)
+exampleTumourNormal \%>\%
+  writeBigWigs(folderName = td2, normMethod = "beta", useGroupMeans = TRUE, naVal = 0)
+list.files(td, pattern = "\\\\\\\\.bw$")
+
+}
+\seealso{
+\code{\link[=getDataTable]{getDataTable()}}
+}
+\concept{io}

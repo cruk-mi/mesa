@@ -2,36 +2,85 @@
 % Please edit documentation in R/qseaExtra.R
 \name{subsetWindowsOverBackground}
 \alias{subsetWindowsOverBackground}
-\title{This function takes a qseaSet and finds which windows have more reads than would be expected if the reads followed a Poisson distribution over the whole genome.}
+\title{Subset windows above Poisson background}
 \usage{
 subsetWindowsOverBackground(
   qseaSet,
   keepAbove = FALSE,
   samples = NULL,
   numWindows = NULL,
-  recalculateNumWindows = TRUE,
-  fdrThres = 0.01,
+  FDRthres = 0.01,
   numAbove = 1
 )
 }
 \arguments{
-\item{qseaSet}{The qseaSet object.}
+\item{qseaSet}{\code{qseaSet}.
+Input object containing per-window read counts.}
 
-\item{keepAbove}{Boolean, if true, then keep only the windows that are above the background, if false then remove them.}
+\item{keepAbove}{\code{logical(1)}.
+If \code{TRUE}, \strong{keep} windows above background; if \code{FALSE}, \strong{remove} them.
+\strong{Default:} \code{FALSE}.}
 
-\item{samples}{A vector of samples to remove, or a character string to match and remove.}
+\item{samples}{\code{character()} or \code{NULL}.
+Vector of sample names to test, or a single string used as a pattern matched
+against sample names. If \code{NULL}, all samples are tested.
+\strong{Default:} \code{NULL}.}
 
-\item{numWindows}{The number of windows in the whole genome.}
+\item{numWindows}{\code{integer(1)} or \code{NULL}.
+Total number of windows in the genome used to compute the expected background.
+If \code{NULL}, it will use all the windows currently in the qseaSet.
+\strong{Default:} \code{NULL}.}
 
-\item{recalculateNumWindows}{Whether to recalculate the number of windows based on the whole genome.}
+\item{FDRthres}{\code{numeric(1)}.
+FDR threshold used to call windows significantly above background.
+\strong{Default:} \code{0.01}.}
 
-\item{fdrThres}{What FDR p-value to filter windows out based on.}
-
-\item{numAbove}{How many samples need to be above the background level in a window to keep/remove it.}
+\item{numAbove}{\code{integer(1)}.
+Minimum number of tested samples that must exceed background in a window
+to keep/drop it (depending on \code{keepAbove}).
+\strong{Default:} \code{1}.}
 }
 \value{
-A qseaSet object, with only a subset of the windows.
+A filtered \code{qseaSet} containing only windows passing the criteria.
 }
 \description{
-#' Moved to internal function as of January 2023, think whether want to keep it or not.
+Identify genomic windows with significantly more reads than expected under a
+Poisson background model, given total reads per sample and the number of
+genome windows. If \code{numWindows} is provided, then that value will be used as
+the total original number of windows under consideration for the false
+discovery rate, otherwise it will use the number of windows currently in the
+qseaSet.
 }
+\details{
+For each tested sample, an expected count per window is derived from its total
+reads and the supplied/estimated \code{numWindows}, and a Poisson test is used to
+flag windows above background. This uses the \code{valid_fragments} column in the
+library information attached to the qseaSet, which is the number of fragments
+used in the generation of the original qseaSet. Windows are retained or
+removed based on \code{keepAbove} and the requirement that at least \code{numAbove}
+samples are significant at \code{FDRthres}.
+}
+\examples{
+data(exampleTumourNormal, package = "mesa")
+
+# Keep windows above Poisson background in at least 2 samples whose names 
+# contain "Lung", assuming there were 9 million original windows
+exampleTumourNormal \%>\%
+  subsetWindowsOverBackground(keepAbove = TRUE, samples = "Lung", 
+                              numAbove = 2, numWindows = 9e6 )
+
+# Drop windows above background (retain only background-like windows) across 
+# all samples, assuming there were 9 million original windows
+exampleTumourNormal \%>\%
+  subsetWindowsOverBackground(keepAbove = FALSE, numWindows = 9e6)
+}
+\seealso{
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
+
+Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{downSample}()},
+\code{\link{subsetWindowsBySignal}()}
+}
+\concept{window-helpers}
