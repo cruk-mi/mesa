@@ -637,7 +637,6 @@ makeHeatmapAnnotations <- function(qseaSet,
   return(list(sample = sampleAnnot, window = windowAnnot))
 }
 
-#'
 #' Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
 #' **ComplexHeatmap**. The gene can be given as a HGNC symbol or Ensembl ID.
 #'
@@ -735,23 +734,31 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic gene heatmap (beta) with defaults
-#' exampleTumourNormal %>% plotGeneHeatmap("HOXA9")
+#' tryCatch(
+#'   exampleTumourNormal %>% plotGeneHeatmap("HOXA9"),
+#'   error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
+#' )
 #'
 #' # Add sample annotations (tidyselect bare names) and cluster columns into 2 groups
-#' exampleTumourNormal %>%
-#'   plotGeneHeatmap("HOXA9",
-#'                   sampleAnnotation = c(tumour, tissue),
-#'                   clusterNum = 2)
+#' tryCatch(
+#'   exampleTumourNormal %>%
+#'     plotGeneHeatmap("HOXA9",
+#'                     sampleAnnotation = c(tumour, tissue),
+#'                     clusterNum = 2),
+#'   error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
+#' )
 #'
 #' # Custom colours and wider flanks
-#' exampleTumourNormal %>%
-#'   plotGeneHeatmap("HOXA9",
-#'                   sampleAnnotation  = tumour,
-#'                   annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
-#'                   upstreamDist = 1000,
-#'                   downstreamDist = 2000)
+#' tryCatch(
+#'   exampleTumourNormal %>%
+#'     plotGeneHeatmap("HOXA9",
+#'                     sampleAnnotation  = tumour,
+#'                     annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+#'                     upstreamDist = 1000,
+#'                     downstreamDist = 2000),
+#'   error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
+#' )
 #'
-#' 
 #' @export
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
@@ -762,17 +769,36 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             downstreamDist = 1000, 
                             idType = NULL,
                             ...){
-
+  
+  # Define retry rate up front so it can be reused for both useMart and getBM
+  rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
+  
+  # Wrap useMart with retry + graceful NULL fallback on failure
+  safeUseMart <- purrr::possibly(
+    purrr::insistently(biomaRt::useMart, rate = rate, quiet = TRUE),
+    otherwise = NULL
+  )
+  
   if (!is.null(getMart(qseaSet))) { mart <- getMart(qseaSet) }
-
-  if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg38|GRCh38")){
-    mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl', host = "https://jul2022.archive.ensembl.org")
-  } else if(is.null(mart) & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"Hsapiens") & stringr::str_detect(qseaSet %>% qsea:::getGenome(),"hg19|GRCh37")) {
-    mart <- biomaRt::useMart('ensembl', dataset='hsapiens_gene_ensembl', host = "https://feb2014.archive.ensembl.org")
-  } else if(is.null(mart)){
+  
+  if (is.null(mart) & stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
+      stringr::str_detect(qsea:::getGenome(qseaSet), "hg38|GRCh38")) {
+    mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
+                        host = "https://jul2022.archive.ensembl.org")
+  } else if (is.null(mart) & stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
+             stringr::str_detect(qsea:::getGenome(qseaSet), "hg19|GRCh37")) {
+    mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
+                        host = "https://feb2014.archive.ensembl.org")
+  } else if (is.null(mart)) {
     stop("Please specify a mart object for biomaRt.")
   }
-
+  
+  # If all useMart retries failed, stop with an informative message
+  if (is.null(mart)) {
+    stop("Could not connect to Ensembl via biomaRt after multiple attempts. ",
+         "Please check your internet connection or supply a mart object directly via the `mart` argument.")
+  }
+  
   if(is.null(idType)) {
     
     if (stringr::str_detect(gene,"^ENS.*G")) {
@@ -786,15 +812,12 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
            This must be a valid attribute for the given mart, see biomaRt::listAttributes.")
     }
   }
-
-
-  rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
-
+  
   # Use purrr::insistently wrapped in purrr::possibly for biomart retry logic
   safeBiomartLookup <-
     purrr::possibly(purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
                     otherwise = NULL)
-
+  
   bm_result <- safeBiomartLookup(
     mart = mart,
     attributes = c('hgnc_symbol', 'description', 'chromosome_name',
@@ -802,59 +825,59 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     filters = idType,
     values = gene
   )
-
+  
   if (is.null(bm_result)) {
     stop(
       "Could not retrieve gene information from biomart after multiple attempts. Please check your internet connection or try again later."
     )
   }
-
+  
   gene_details <- bm_result %>%
     dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
-
+  
   qseaSetChr <- qseaSet %>%
     qsea::getRegions() %>%
     GenomeInfoDb::seqinfo() %>%
     GenomeInfoDb::seqnames() %>%
     stringr::str_detect("chr") %>%
     any()
-
+  
   windowsChr <- gene_details %>%
     pull(seqnames) %>%
     stringr::str_detect("chr") %>%
     any()
-
+  
   if (qseaSetChr & !windowsChr) {
     gene_details <- gene_details %>%
       dplyr::mutate(seqnames = paste0("chr", seqnames))
   }
-
+  
   if (nrow(gene_details) > 1) {
     gene_details <- gene_details %>%
       filter(seqnames %in% GenomeInfoDb::seqlevels(qseaSet@regions))
   }
-
+  
   if (nrow(gene_details) != 1) {
     stop(glue::glue("{nrow(gene_details)} genes matching this name found in {mart@biomart}."))
   }
-
+  
   message(glue::glue("Found {gene} on chromosome {gene_details$seqnames}, {gene_details$start} - {gene_details$end}"))
   
   gene_details_gr <- gene_details %>%
     plyranges::as_granges()
-
+  
   geneGR <- gene_details %>%
     plyranges::as_granges() %>%
     plyranges::anchor_5p() %>%
     plyranges::stretch(downstreamDist) %>%
     plyranges::anchor_3p() %>%
     plyranges::stretch(upstreamDist)
-
+  
   if (length(geneGR) == 0) {stop("No genomic region found!")}
   if (length(geneGR) > 1) {stop("Multiple genomic regions found!")}
-
+  
   if (normMethod == "beta") {maxScale <- 1}
-
+  
   dataTable <- qseaSet %>%
     filterByOverlaps(regionsToOverlap = geneGR) %>%
     filterWindows(CpG_density >= minDensity) %>%
@@ -864,20 +887,20 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     ) %>%
     dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
     dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
-
+  
   if (useGroupMeans) {
     colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
   } else {
     colsToFind <- qseaSet %>% qsea::getSampleNames()
   }
-
+  
   numData <- dataTable %>%
     tibble::column_to_rownames("window") %>%
     dplyr::select(tidyselect::all_of(colsToFind)) %>%
     janitor::remove_empty(which = "cols", quiet = FALSE)
-
+  
   if (!useGroupMeans) {
-
+    
     colAnnot <- qseaSet %>%
       filter(sample_name %in% !!(colnames(numData))) %>%
       makeHeatmapAnnotations(sampleOrientation = "column",
@@ -885,7 +908,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                              specifiedAnnotationColors = annotationColors,
                              sampleAnnotation = {{sampleAnnotation}} ) %>%
       purrr::pluck("sample")
-
+    
   } else {
     colAnnot <- qseaSet %>%
       filter(group %in% !!(colnames(numData))) %>%
@@ -895,9 +918,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                              sampleAnnotation = {{sampleAnnotation}} ) %>%
       purrr::pluck("sample")
   }
-
+  
   geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
-
+  
   annoRow <- dataTable %>%
     dplyr::select(seqnames, start, end, CpG_density, window) %>%
     plyranges::as_granges() %>%
@@ -914,17 +937,17 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     as.data.frame() %>%
     dplyr::select(window, CpG_density, annotation) %>%
     tibble::column_to_rownames("window")
-
+  
   windowSize <- qseaSet %>% qsea::getWindowSize()
-
+  
   rowSplit <- dataTable %>%
     tibble::as_tibble() %>%
     mutate(gap = cumsum(ifelse(start - tidyr::replace_na(dplyr::lag(start),0) > !!windowSize,1,0))) %>%
     pull(gap)
-
+  
   #Make row annotation object
   rowAnnot <- makeGeneHeatmapRowAnnotation(annoRow)
-
+  
   #Set the cell border line width depending on the number of rows or columns, as pheatmap does.
   #Can't have gridlines for genes with too many windows, as the resulting heatmap is just grey (i.e., all you see is borders)
   if (nrow(numData) > 100 || ncol(numData) > 100) {
@@ -932,18 +955,17 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
   } else {
     rectGpParam <- grid::gpar(col = "grey", lwd = 1)
   }
-
+  
   #Setting a colour palette for beta-values. Could make this optional I guess
   col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9),
-                                 RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
-
+                                  RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
+  
   if (clusterCols && !is.null(clusterNum) && clusterNum > 1) {
     colSplit <- clusterNum
   } else {
     colSplit <- NULL
   }
-
-
+  
   if (is.null(showSampleNames)) {
     if (ncol(numData) > 50) {
       showSampleNames <- FALSE
@@ -951,37 +973,37 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
       showSampleNames <- TRUE
     }
   }
-
+  
   annotName <- dplyr::case_when(normMethod == "beta" ~ "Beta value",
                                 normMethod == "nrpm" ~ "NRPM",
                                 TRUE ~ stringr::str_to_title(normMethod)
-                                )
-
+  )
+  
   ComplexHeatmap::Heatmap(matrix = as.matrix(numData),
-                            rect_gp = rectGpParam,
-                            name = annotName,
-                            cluster_rows = FALSE,
-                            cluster_columns = clusterCols,
-                            left_annotation = rowAnnot,
-                            top_annotation = colAnnot,
-                            col = col_fun,
-                            show_row_names = FALSE,
-                            show_column_names = showSampleNames,
-                            clustering_method_rows = "ward.D2",
-                            clustering_method_columns = "ward.D2",
-                            row_split = rowSplit,
-                            row_title = NULL,
-                            column_split = colSplit,
-                            column_title = NULL,
-                            na_col = "lightgrey",
-                            heatmap_legend_param = list(legend_direction = "vertical",
-                                                        at = seq(0, maxScale, length.out = 6) %>% round(1)),
-                            ...
-                            ) %>%
+                          rect_gp = rectGpParam,
+                          name = annotName,
+                          cluster_rows = FALSE,
+                          cluster_columns = clusterCols,
+                          left_annotation = rowAnnot,
+                          top_annotation = colAnnot,
+                          col = col_fun,
+                          show_row_names = FALSE,
+                          show_column_names = showSampleNames,
+                          clustering_method_rows = "ward.D2",
+                          clustering_method_columns = "ward.D2",
+                          row_split = rowSplit,
+                          row_title = NULL,
+                          column_split = colSplit,
+                          column_title = NULL,
+                          na_col = "lightgrey",
+                          heatmap_legend_param = list(legend_direction = "vertical",
+                                                      at = seq(0, maxScale, length.out = 6) %>% round(1)),
+                          ...
+  ) %>%
     ComplexHeatmap::draw(heatmap_legend_side = "right",
                          annotation_legend_side = "right",
                          column_title = glue::glue("{annotName} for {gene}"))
-
+  
   return(invisible(numData))
 }
 
