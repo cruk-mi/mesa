@@ -1,0 +1,12 @@
+^\.github$
+^\.gitlab$
+^\.gitlab-ci\.yml$
+^\.devcontainer$
+^Dockerfile$
+^Dockerfile_dependencies_only$
+^installDependencies\.R$
+^data-raw$
+
+^docs$
+^docs/\.nojekyll$
+
