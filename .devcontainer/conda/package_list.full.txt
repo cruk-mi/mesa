@@ -1,11 +1,11 @@
-r-base=4.3
+# full: slim + all annotation/genome packages for complete analysis
+# R version is injected by Dockerfile from versions.env — do NOT pin r-base here
+
+# --- Bioconductor core (same as slim) ---
 bioconductor-biocgenerics
 bioconductor-biocparallel
 bioconductor-biomart
 bioconductor-biostrings
-bioconductor-bsgenome
-bioconductor-bsgenome.hsapiens.ncbi.grch38
-bioconductor-bsgenome.hsapiens.ucsc.hg19
 bioconductor-chipseeker
 bioconductor-complexheatmap
 bioconductor-genomeinfodb
@@ -15,19 +15,26 @@ bioconductor-hmmcopy
 bioconductor-iranges
 bioconductor-limma
 bioconductor-medips
-bioconductor-medipsdata
-bioconductor-org.hs.eg.db
-bioconductor-org.mm.eg.db
 bioconductor-plyranges
 bioconductor-qsea
 bioconductor-rsamtools
 bioconductor-rtracklayer
+
+# --- Bioconductor annotation (full only — large packages) ---
+bioconductor-bsgenome
+bioconductor-bsgenome.hsapiens.ncbi.grch38
+bioconductor-bsgenome.hsapiens.ucsc.hg19
+bioconductor-medipsdata
+bioconductor-org.hs.eg.db
+bioconductor-org.mm.eg.db
 bioconductor-txdb.hsapiens.ucsc.hg38.knowngene
 bioconductor-txdb.mmusculus.ucsc.mm10.knowngene
+
+# --- CRAN (same as slim) ---
 r-circlize
 r-data.table
 r-dplyr
-r-ggplot2<4
+r-ggplot2
 r-ggrepel
 r-glue
 r-gtools
@@ -55,4 +62,3 @@ r-upsetr
 r-uwot
 r-workflows
 r-devtools
-

@@ -1,42 +1,67 @@
-# Ensure user library path exists
+# ============================================================
+# install.R
+# Purpose: Install R packages not managed by conda inside the
+#          Codespaces container. Called once by postCreateCommand.
+#
+# DO NOT hardcode R or Bioconductor version numbers here.
+# Both are read from environment variables set by the conda
+# activation script (written by the Dockerfile from versions.env).
+# ============================================================
+
+# --- User library setup -------------------------------------
 user_lib <- Sys.getenv("R_LIBS_USER")
+if (!nzchar(user_lib)) {
+  # Fallback: construct path dynamically if env var not set
+  user_lib <- file.path(
+    Sys.getenv("HOME"), "R",
+    paste0(version[["arch"]], "-conda-linux-gnu-library"),
+    paste0(version[["major"]], ".", substr(version[["minor"]], 1, 1))
+  )
+}
 if (!dir.exists(user_lib)) {
   dir.create(user_lib, recursive = TRUE, showWarnings = FALSE)
 }
 .libPaths(c(user_lib, .libPaths()))
 
+# --- Read versions from environment -------------------------
+# Set by Dockerfile via conda activation script
+r_ver   <- Sys.getenv("R_VERSION",   unset = paste0(version$major, ".", substr(version$minor, 1, 1)))
+bioc_ver <- Sys.getenv("BIOC_VERSION", unset = "3.22")
+
+message(sprintf("── Environment: R %s  |  Bioc %s ──────────────────", r_ver, bioc_ver))
+message(sprintf("── Installing to: %s", user_lib))
+
+# --- Package repositories -----------------------------------
+# Posit Package Manager provides pre-built Linux binaries —
+# critical for fast builds (avoids compiling from source)
 options(
-  repos = c(CRAN = "https://cloud.r-project.org"),
-  install.packages.check.source = "no" # don’t “update” to source if binary differs
+  repos = c(
+    RSPM = "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+    CRAN = "https://cloud.r-project.org"
+  ),
+  install.packages.check.source = "no"
 )
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS = "true")
 
-# --- Bootstrap remotes + BiocManager ---
+# --- Bootstrap remotes + BiocManager ------------------------
 if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes", lib = user_lib, repos = "https://cloud.r-project.org")
+  install.packages("remotes", lib = user_lib)
 }
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager", lib = user_lib, repos = "https://cloud.r-project.org")
+  install.packages("BiocManager", lib = user_lib)
 }
 
-# --- Pin CRAN critical versions ---
-remotes::install_version("BH", version = "1.81.0-1", lib = user_lib,
-                         repos = "https://cloud.r-project.org", type = "source", upgrade = "never")
-remotes::install_version("ggplot2", version = "4.0.0", lib = user_lib,
-                         repos = "https://cloud.r-project.org", type = "source", upgrade = "never")
-remotes::install_version("ggiraph", version = "0.9.1", lib = user_lib,
-                         repos = "https://cloud.r-project.org", upgrade = "never")
+# --- Set Bioconductor version --------------------------------
+# Version read from env var — no hardcoding needed
+BiocManager::install(version = bioc_ver, ask = FALSE)
+message(sprintf("✅ Bioconductor version set to: %s", BiocManager::version()))
 
-# --- Install ggtree (dev version, requires pinned deps) ---
-remotes::install_github("YuLab-SMU/ggtree", lib = user_lib, upgrade = "never")
+# --- Install devtools ----------------------------------------
+install.packages("devtools", lib = user_lib,
+                 dependencies = TRUE,
+                 INSTALL_opts = "--no-multiarch")
 
-# --- Install devtools (needed for devtools::test) ---
-install.packages("devtools", lib = user_lib, repos = "https://cloud.r-project.org",
-                 dependencies = TRUE, INSTALL_opts = "--no-multiarch")
-
-message("✅ Core graphics stack ready: BH 1.81.0-1, ggplot2 4.0.0, ggiraph 0.9.1, ggtree dev")
-
-# --- CRAN core deps (without full tidyverse) ---
+# --- Core CRAN packages -------------------------------------
 install.packages(c(
   "httr", "png", "RCurl", "igraph", "ggraph",
   "rlang", "dplyr", "tibble", "tidyr", "readr",
@@ -44,54 +69,11 @@ install.packages(c(
   "Rcpp", "RcppAnnoy", "RcppProgress", "uwot"
 ), lib = user_lib, update = FALSE)
 
-# --- Sanity check before Bioconductor installs ---
-ip <- installed.packages(lib.loc = user_lib)
-
-required <- list(
-  BH       = "1.81.0-1", # pinned for fgsea
-  ggplot2  = "4.0.0",    # required for ggtree >= 3.99.0
-  ggiraph  = "0.9.1",    # required for ggtree dev
-  ggtree   = NA,         # dev version, skip version check
-  devtools = NA          # latest ok
-)
-
-for (pkg in names(required)) {
-  if (!pkg %in% rownames(ip)) {
-    stop("❌ Package ", pkg, " is not installed in ", user_lib)
-  }
-  target_ver <- required[[pkg]]
-  if (!is.na(target_ver)) {
-    inst_ver <- ip[pkg, "Version"]
-    if (inst_ver != target_ver) {
-      stop("❌ Package ", pkg, " version mismatch: installed ", inst_ver,
-           " but expected ", target_ver)
-    }
-  }
-}
-
-
-# --- Bioconductor 3.18 (set version only) ---
-BiocManager::install(version = "3.18", ask = FALSE)
-
-# --- Enforce BH before fgsea ---
-ip <- installed.packages(lib.loc = user_lib)
-if (!"BH" %in% rownames(ip) || ip["BH", "Version"] != "1.81.0-1") {
-  message("⚠️ Reinstalling BH 1.81.0-1 to satisfy fgsea build...")
-  remove.packages("BH", lib = user_lib)  # clean out any wrong version
-  remotes::install_version("BH",
-                           version = "1.81.0-1",
-                           lib = user_lib,
-                           repos = "https://cloud.r-project.org",
-                           type = "source",
-                           upgrade = "never"
-  )
-}
-
-# --- Critical Bioc packages ---
+# --- Critical Bioc packages ---------------------------------
 BiocManager::install("fgsea", lib = user_lib, ask = FALSE, update = FALSE)
 BiocManager::install("qsea",  lib = user_lib, ask = FALSE, update = FALSE)
 
-# Core Bioconductor packages
+# Core infrastructure
 BiocManager::install(c(
   "BiocGenerics", "GenomeInfoDb", "IRanges", "S4Vectors",
   "Biostrings", "GenomicRanges", "Rhtslib", "Rsamtools",
@@ -106,21 +88,24 @@ BiocManager::install(c(
   "org.Mm.eg.db"
 ), lib = user_lib, ask = FALSE, update = FALSE)
 
-# High-level analysis packages
+# High-level analysis
 BiocManager::install(c(
   "qsea", "MEDIPS", "ChIPseeker", "clusterProfiler",
   "DOSE", "GOSemSim", "enrichplot", "ReactomePA",
   "treeio", "tidytree"
 ), lib = user_lib, ask = FALSE, update = FALSE)
 
-# --- Additional test/runtime dependencies ---
+# --- Additional packages ------------------------------------
 install.packages(c(
   "pheatmap", "janitor", "hues"
-), lib = user_lib, repos = "https://cloud.r-project.org")
+), lib = user_lib)
 
 BiocManager::install(c(
   "plyranges", "ComplexHeatmap", "biomaRt", "circlize"
 ), lib = user_lib, ask = FALSE, update = FALSE)
 
+# --- ggtree (dev version) -----------------------------------
+# Requires ggplot2 >= 4.0.0 — confirmed available in Bioc 3.22
+remotes::install_github("YuLab-SMU/ggtree", lib = user_lib, upgrade = "never")
 
-message("✅ Full R dev environment ready in: ", user_lib)
+message(sprintf("✅ Full R dev environment ready in: %s", user_lib))

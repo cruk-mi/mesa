@@ -1,4 +1,11 @@
-r-base=4.3
+# slim: core packages needed for development and testing
+# R version is injected by Dockerfile from versions.env — do NOT pin r-base here
+# R packages with breaking version history are commented with the reason
+
+# --- R base (version set by Dockerfile ARG) ---
+# r-base is passed via --override-channels at build time
+
+# --- Bioconductor core ---
 bioconductor-biocgenerics
 bioconductor-biocparallel
 bioconductor-biomart
@@ -16,10 +23,12 @@ bioconductor-plyranges
 bioconductor-qsea
 bioconductor-rsamtools
 bioconductor-rtracklayer
+
+# --- CRAN ---
 r-circlize
 r-data.table
 r-dplyr
-r-ggplot2<4
+r-ggplot2
 r-ggrepel
 r-glue
 r-gtools
