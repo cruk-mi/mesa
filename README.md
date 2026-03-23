@@ -12,9 +12,44 @@ Development was undertaken internally between September 2022 and March 2024; the
 
 The package is under active development with plans to submit to BioConductor, and a full vignette is under construction. If you are interested in using the package, we're happy to hear from you.
 
+
 ## Install the package
-Currently, the easiest way to install the package is with devtools:
-```{r}
+
+mesa requires R ≥ 4.5.0 and Bioconductor 3.22. The easiest way to install
+mesa and all its dependencies in one step is with the provided installer script:
+```r
+source("https://raw.githubusercontent.com/cruk-mi/mesa/main/inst/scripts/install_mesa.R")
+```
+
+This script automatically sets the correct Bioconductor version for your R
+installation, installs mesa with all dependencies, and validates that your
+environment is consistent.
+
+**Manual installation:**
+
+If you prefer to install manually:
+```r
+# 1. Install BiocManager if needed
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+# 2. Set Bioconductor to the correct version for your R
+BiocManager::install(ask = FALSE)
+
+# 3. Install mesa
+BiocManager::install("cruk-mi/mesa", dependencies = TRUE)
+
+# 4. Verify everything is consistent
+BiocManager::valid()
+```
+
+**Development version:**
+
+To install the latest development version directly from GitHub:
+```r
 install.packages("devtools")
 devtools::install_github("cruk-mi/mesa")
 ```
+
+> ⚠️ The development version may be unstable. Use the installer script above
+> for a validated installation.
