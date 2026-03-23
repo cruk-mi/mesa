@@ -1,6 +1,4 @@
 ^\.github$
-^\.gitlab$
-^\.gitlab-ci\.yml$
 ^\.devcontainer$
 ^Dockerfile$
 ^Dockerfile_dependencies_only$
