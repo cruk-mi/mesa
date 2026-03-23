@@ -83,9 +83,49 @@ if (isTRUE(check)) {
   out_of_date <- names(check$out_of_date)
   too_new     <- names(check$too_new)
 
+  
   if (length(out_of_date) > 0) {
-    message(sprintf("   Updating %d out-of-date package(s)...", length(out_of_date)))
-    BiocManager::install(out_of_date, update = TRUE, ask = FALSE)
+    message(sprintf("   Updating %d out-of-date package(s): %s",
+                    length(out_of_date),
+                    paste(out_of_date, collapse = ", ")))
+    
+    # Special case: BiocManager cannot update itself mid-session.
+    # Install it but tell the user they need to restart R to apply it.
+    biocmanager_needs_update <- "BiocManager" %in% out_of_date
+    other_out_of_date <- setdiff(out_of_date, "BiocManager")
+    
+    # Update everything except BiocManager first
+    if (length(other_out_of_date) > 0) {
+      BiocManager::install(other_out_of_date, update = TRUE, ask = FALSE)
+    }
+    
+    # Handle BiocManager separately
+    if (biocmanager_needs_update) {
+      install.packages("BiocManager", repos = "https://cloud.r-project.org")
+      message(
+        "   ℹ️  BiocManager was updated but requires an R session restart to take effect.\n",
+        "   Please restart R and run BiocManager::valid() to confirm."
+      )
+    }
+    
+    # Re-check after updating everything else
+    recheck <- BiocManager::valid(checkBuilt = TRUE)
+    if (isTRUE(recheck) || identical(names(recheck$out_of_date), "BiocManager")) {
+      message(sprintf(
+        "✅ Environment consistent with Bioconductor %s",
+        BiocManager::version()
+      ))
+    } else {
+      remaining <- setdiff(names(recheck$out_of_date), "BiocManager")
+      if (length(remaining) > 0) {
+        message(sprintf(
+          "⚠️  %d package(s) still out of date: %s\n%s",
+          length(remaining),
+          paste(remaining, collapse = ", "),
+          "   Run BiocManager::install(ask=FALSE, update=TRUE) to fix."
+        ))
+      }
+    }
   }
 
   if (length(too_new) > 0) {
