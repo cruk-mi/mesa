@@ -6,6 +6,8 @@
 # the correct Bioconductor version for your R installation.
 # You do not need to update this script when R or Bioc releases.
 #
+# Works on: personal laptops, HPC shared systems, Docker containers.
+#
 # Usage (run once before first use):
 #
 #   From GitHub (recommended):
@@ -44,7 +46,7 @@ message(sprintf(
   R.version$major,
   substr(R.version$minor, 1, 1)
 ))
-BiocManager::install(ask = FALSE)
+suppressWarnings(BiocManager::install(ask = FALSE))
 message(sprintf("   Bioconductor: %s ✓", BiocManager::version()))
 
 # --- Install remotes ----------------------------------------
@@ -63,11 +65,36 @@ remotes::install_github(
 # --- Validate and fix environment ---------------------------
 message("── Validating environment ──────────────────────────────────")
 
+# Helper: identify which library paths are writable by the current user.
+# Works universally — on a laptop all paths are typically writable;
+# on HPC the system library is read-only and correctly excluded.
+get_writable_libs <- function() {
+  Filter(function(p) file.access(p, mode = 2) == 0, .libPaths())
+}
+
+# Helper: given a named list from BiocManager::valid()$out_of_date or
+# $too_new, split packages into those the user can update (writable lib)
+# and those they cannot (read-only system lib).
+split_by_writability <- function(pkg_list) {
+  writable <- get_writable_libs()
+  can_update <- vapply(names(pkg_list), function(pkg) {
+    pkg_lib <- pkg_list[[pkg]]["LibPath"]
+    any(vapply(writable, function(lib) {
+      grepl(lib, pkg_lib, fixed = TRUE)
+    }, logical(1)))
+  }, logical(1))
+  list(
+    user   = names(pkg_list)[can_update],
+    system = names(pkg_list)[!can_update]
+  )
+}
+
 fix_environment <- function(max_attempts = 3) {
   
   for (attempt in seq_len(max_attempts)) {
     
-    check <- BiocManager::valid(checkBuilt = TRUE)
+    # Suppress BiocManager's own warning — we report results ourselves
+    check <- suppressWarnings(BiocManager::valid(checkBuilt = TRUE))
     
     # All good
     if (isTRUE(check)) {
@@ -78,28 +105,27 @@ fix_environment <- function(max_attempts = 3) {
       return(invisible(TRUE))
     }
     
-    # In fix_environment(), replace the out_of_date block opening with:
-    out_of_date <- names(check$out_of_date)
+    # Split out-of-date packages by whether the user can update them
+    ood_split <- split_by_writability(check$out_of_date)
+    user_ood   <- ood_split$user
+    system_ood <- ood_split$system
     
-    # Filter out packages that are out-of-date only in the system library
-    # (read-only — we cannot update them, and they don't affect functionality
-    # because the user library takes precedence)
-    system_lib  <- tail(.libPaths(), 1)   # system lib is always last
-    user_ood    <- out_of_date[vapply(out_of_date, function(pkg) {
-      pkg_lib <- check$out_of_date[[pkg]]["LibPath"]
-      !grepl(system_lib, pkg_lib, fixed = TRUE)
-    }, logical(1))]
+    # Report read-only packages clearly — not a user problem
+    # This handles HPC system libraries gracefully without
+    # confusing laptop users (who will never hit this case)
+    if (length(system_ood) > 0) {
+      message(sprintf(
+        "   ℹ️  %d package(s) out of date in a read-only library (cannot update): %s\n      This is expected on shared systems (HPC, managed desktops).",
+        length(system_ood),
+        paste(system_ood, collapse = ", ")
+      ))
+    }
     
-    # Only act on packages in the user library
-    out_of_date <- user_ood
-    too_new     <- names(check$too_new)
-    
-    # ── Handle "too new" ──────────────────────────────────
-    # Happens when CRAN releases a patch between Bioc cycles.
-    # BiocManager itself is a common false positive here —
-    # CRAN version is often ahead of what Bioc expects.
-    # This is cosmetic and never affects functionality.
-    real_too_new <- setdiff(too_new, "BiocManager")
+    # Report "too new" packages — usually cosmetic
+    # BiocManager itself is a common false positive: CRAN releases
+    # patch versions faster than Bioc cycles, harmless to ignore
+    too_new_split <- split_by_writability(check$too_new)
+    real_too_new  <- setdiff(too_new_split$user, "BiocManager")
     if (length(real_too_new) > 0) {
       message(sprintf(
         "   ℹ️  %d package(s) newer than Bioc %s expects (usually harmless): %s",
@@ -109,9 +135,8 @@ fix_environment <- function(max_attempts = 3) {
       ))
     }
     
-    # ── Handle out-of-date ────────────────────────────────
-    if (length(out_of_date) == 0) {
-      # Only BiocManager too_new was the issue — treat as clean
+    # Nothing the user can act on — environment is effectively clean
+    if (length(user_ood) == 0) {
       message(sprintf(
         "✅ Environment consistent with Bioconductor %s",
         BiocManager::version()
@@ -119,38 +144,36 @@ fix_environment <- function(max_attempts = 3) {
       return(invisible(TRUE))
     }
     
-    # ── Special case: BiocManager updating itself ─────────
-    # BiocManager can install a newer version to disk but the
-    # running session keeps the old version in memory.
-    # We install it via install.packages() and tell the user
-    # to restart — we cannot do more within the same session.
-    biocmanager_only <- identical(out_of_date, "BiocManager")
-    if (biocmanager_only) {
+    # ── Special case: BiocManager updating itself ─────────────────
+    # BiocManager installs a newer version to disk but the running
+    # session keeps the old version in memory until R is restarted.
+    if (identical(user_ood, "BiocManager")) {
       message("   Updating BiocManager...")
       install.packages("BiocManager", repos = "https://cloud.r-project.org")
-      message(paste(
-        "   ℹ️  BiocManager was updated on disk but the current session",
-        "still holds the old version in memory.\n",
-        "  Please restart R and run BiocManager::valid() to confirm.",
-        "  Everything else is correctly installed."
-      ))
+      message(
+        "   ℹ️  BiocManager updated on disk. Please restart R and run\n",
+        "      BiocManager::valid() to confirm. Everything else is installed."
+      )
       return(invisible(TRUE))
     }
     
-    # ── General out-of-date packages ──────────────────────
+    # ── General out-of-date packages in user library ───────────────
     message(sprintf(
       "   Attempt %d/%d: updating %d out-of-date package(s): %s",
       attempt, max_attempts,
-      length(out_of_date),
-      paste(out_of_date, collapse = ", ")
+      length(user_ood),
+      paste(user_ood, collapse = ", ")
     ))
-    BiocManager::install(out_of_date, update = TRUE, ask = FALSE)
+    suppressWarnings(
+      BiocManager::install(user_ood, update = TRUE, ask = FALSE)
+    )
   }
   
-  # If we get here, max attempts reached with packages still out of date
-  remaining_check <- BiocManager::valid(checkBuilt = TRUE)
+  # Max attempts reached — report anything still outstanding
+  remaining_check <- suppressWarnings(BiocManager::valid(checkBuilt = TRUE))
   if (!isTRUE(remaining_check)) {
-    remaining <- setdiff(names(remaining_check$out_of_date), "BiocManager")
+    remaining_ood <- split_by_writability(remaining_check$out_of_date)$user
+    remaining     <- setdiff(remaining_ood, "BiocManager")
     if (length(remaining) > 0) {
       message(sprintf(
         "⚠️  %d package(s) still out of date after %d attempts: %s\n%s",
@@ -158,6 +181,12 @@ fix_environment <- function(max_attempts = 3) {
         max_attempts,
         paste(remaining, collapse = ", "),
         "   Run BiocManager::install(ask=FALSE, update=TRUE) to fix manually."
+      ))
+    } else {
+      # Only system packages or BiocManager left — effectively clean
+      message(sprintf(
+        "✅ Environment consistent with Bioconductor %s",
+        BiocManager::version()
       ))
     }
   }
