@@ -78,7 +78,20 @@ fix_environment <- function(max_attempts = 3) {
       return(invisible(TRUE))
     }
     
+    # In fix_environment(), replace the out_of_date block opening with:
     out_of_date <- names(check$out_of_date)
+    
+    # Filter out packages that are out-of-date only in the system library
+    # (read-only — we cannot update them, and they don't affect functionality
+    # because the user library takes precedence)
+    system_lib  <- tail(.libPaths(), 1)   # system lib is always last
+    user_ood    <- out_of_date[vapply(out_of_date, function(pkg) {
+      pkg_lib <- check$out_of_date[[pkg]]["LibPath"]
+      !grepl(system_lib, pkg_lib, fixed = TRUE)
+    }, logical(1))]
+    
+    # Only act on packages in the user library
+    out_of_date <- user_ood
     too_new     <- names(check$too_new)
     
     # ── Handle "too new" ──────────────────────────────────
