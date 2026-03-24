@@ -13,11 +13,8 @@ knitr::opts_chunk$set(
   fig.height= 5.5,
   fig.width = 7,
   comment   = "#>",
-  dev       = "png",
-  dev.args  = list(type = "cairo")   # <- headless-safe
+  dev       = "png"
 )
-if (!capabilities("X11")) options(bitmapType = "cairo")  # <- extra guard
-
 ```
 
 ```{r setup}

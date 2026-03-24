@@ -40,6 +40,7 @@ editor_options:
 * Removed `colnames` function definion on a qseaSet, which was not working anyway. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Removed `dropAvgFragDetails` as no longer required. [!63](https://github.com/cruk-mi/mesa/pull/63)
 * Removed GitLab CI files; updated `.Rbuildignore` to exclude `.github`, `.devcontainer`, `docs/` and other non-package files from the build — silences related `R CMD check` notes. [!70](https://github.com/cruk-mi/mesa/pull/70)
+* Removed `installDependencies.R`. [!72](https://github.com/cruk-mi/mesa/pull/72)
 
 ### BUG FIXES
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix. [!14](https://github.com/cruk-mi/mesa/pull/14)
