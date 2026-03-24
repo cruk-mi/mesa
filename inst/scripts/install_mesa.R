@@ -19,10 +19,7 @@
 # ============================================================
 
 # --- Check minimum R version --------------------------------
-# This is the oldest R version mesa has ever supported.
-# It is intentionally conservative — users on newer R are fine.
 minimum_r <- "4.3.0"
-
 if (getRversion() < minimum_r) {
   stop(sprintf(
     "mesa requires R >= %s. You are running %s.\n%s",
@@ -36,16 +33,12 @@ message("── mesa installer ────────────────�
 message(sprintf("   R version : %s", R.version$version.string))
 
 # --- Bootstrap BiocManager ----------------------------------
-# BiocManager is the only package we need to install manually.
-# Everything else flows from it.
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
   message("   Installing BiocManager...")
   install.packages("BiocManager", repos = "https://cloud.r-project.org")
 }
 
 # --- Set correct Bioc version for this R --------------------
-# BiocManager knows which Bioc release matches the user's R version.
-# No version number needed here — it always picks the right one.
 message(sprintf(
   "   Bioconductor: setting to latest release for R %s.%s...",
   R.version$major,
@@ -63,91 +56,100 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
 message("── Installing mesa from GitHub ─────────────────────────────")
 remotes::install_github(
   "cruk-mi/mesa",
-  dependencies = TRUE,  # installs Imports + Suggests automatically
+  dependencies = TRUE,
   upgrade      = "never"
 )
 
-# --- Validate environment consistency -----------------------
-# BiocManager::valid() checks that all installed packages are
-# the correct versions for the active Bioc release.
-# Out-of-date packages can cause subtle bugs — always fix them.
+# --- Validate and fix environment ---------------------------
 message("── Validating environment ──────────────────────────────────")
-check <- BiocManager::valid(checkBuilt = TRUE)
 
-if (isTRUE(check)) {
-  message(sprintf(
-    "✅ Environment consistent with Bioconductor %s",
-    BiocManager::version()
-  ))
-} else {
-  out_of_date <- names(check$out_of_date)
-  too_new     <- names(check$too_new)
-
+fix_environment <- function(max_attempts = 3) {
   
-  if (length(out_of_date) > 0) {
-    message(sprintf("   Updating %d out-of-date package(s): %s",
-                    length(out_of_date),
-                    paste(out_of_date, collapse = ", ")))
+  for (attempt in seq_len(max_attempts)) {
     
-    # Special case: BiocManager cannot update itself mid-session.
-    # Install it but tell the user they need to restart R to apply it.
-    biocmanager_needs_update <- "BiocManager" %in% out_of_date
-    other_out_of_date <- setdiff(out_of_date, "BiocManager")
+    check <- BiocManager::valid(checkBuilt = TRUE)
     
-    # Update everything except BiocManager first
-    if (length(other_out_of_date) > 0) {
-      BiocManager::install(other_out_of_date, update = TRUE, ask = FALSE)
-    }
-    
-    # Handle BiocManager separately
-    if (biocmanager_needs_update) {
-      install.packages("BiocManager", repos = "https://cloud.r-project.org")
-      message(
-        "   ℹ️  BiocManager was updated but requires an R session restart to take effect.\n",
-        "   Please restart R and run BiocManager::valid() to confirm."
-      )
-    }
-    
-    # Re-check after updating everything else
-    recheck <- BiocManager::valid(checkBuilt = TRUE)
-    if (isTRUE(recheck) || identical(names(recheck$out_of_date), "BiocManager")) {
+    # All good
+    if (isTRUE(check)) {
       message(sprintf(
         "✅ Environment consistent with Bioconductor %s",
         BiocManager::version()
       ))
-    } else {
-      remaining <- setdiff(names(recheck$out_of_date), "BiocManager")
-      if (length(remaining) > 0) {
-        message(sprintf(
-          "⚠️  %d package(s) still out of date: %s\n%s",
-          length(remaining),
-          paste(remaining, collapse = ", "),
-          "   Run BiocManager::install(ask=FALSE, update=TRUE) to fix."
-        ))
-      }
+      return(invisible(TRUE))
+    }
+    
+    out_of_date <- names(check$out_of_date)
+    too_new     <- names(check$too_new)
+    
+    # ── Handle "too new" ──────────────────────────────────
+    # Happens when CRAN releases a patch between Bioc cycles.
+    # BiocManager itself is a common false positive here —
+    # CRAN version is often ahead of what Bioc expects.
+    # This is cosmetic and never affects functionality.
+    real_too_new <- setdiff(too_new, "BiocManager")
+    if (length(real_too_new) > 0) {
+      message(sprintf(
+        "   ℹ️  %d package(s) newer than Bioc %s expects (usually harmless): %s",
+        length(real_too_new),
+        BiocManager::version(),
+        paste(real_too_new, collapse = ", ")
+      ))
+    }
+    
+    # ── Handle out-of-date ────────────────────────────────
+    if (length(out_of_date) == 0) {
+      # Only BiocManager too_new was the issue — treat as clean
+      message(sprintf(
+        "✅ Environment consistent with Bioconductor %s",
+        BiocManager::version()
+      ))
+      return(invisible(TRUE))
+    }
+    
+    # ── Special case: BiocManager updating itself ─────────
+    # BiocManager can install a newer version to disk but the
+    # running session keeps the old version in memory.
+    # We install it via install.packages() and tell the user
+    # to restart — we cannot do more within the same session.
+    biocmanager_only <- identical(out_of_date, "BiocManager")
+    if (biocmanager_only) {
+      message("   Updating BiocManager...")
+      install.packages("BiocManager", repos = "https://cloud.r-project.org")
+      message(paste(
+        "   ℹ️  BiocManager was updated on disk but the current session",
+        "still holds the old version in memory.\n",
+        "  Please restart R and run BiocManager::valid() to confirm.",
+        "  Everything else is correctly installed."
+      ))
+      return(invisible(TRUE))
+    }
+    
+    # ── General out-of-date packages ──────────────────────
+    message(sprintf(
+      "   Attempt %d/%d: updating %d out-of-date package(s): %s",
+      attempt, max_attempts,
+      length(out_of_date),
+      paste(out_of_date, collapse = ", ")
+    ))
+    BiocManager::install(out_of_date, update = TRUE, ask = FALSE)
+  }
+  
+  # If we get here, max attempts reached with packages still out of date
+  remaining_check <- BiocManager::valid(checkBuilt = TRUE)
+  if (!isTRUE(remaining_check)) {
+    remaining <- setdiff(names(remaining_check$out_of_date), "BiocManager")
+    if (length(remaining) > 0) {
+      message(sprintf(
+        "⚠️  %d package(s) still out of date after %d attempts: %s\n%s",
+        length(remaining),
+        max_attempts,
+        paste(remaining, collapse = ", "),
+        "   Run BiocManager::install(ask=FALSE, update=TRUE) to fix manually."
+      ))
     }
   }
-
-  if (length(too_new) > 0) {
-    # "too new" means the user has a newer version than Bioc expects.
-    # This usually happens when CRAN releases a patch between Bioc cycles.
-    # It's rarely a real problem — just report it.
-    message(sprintf(
-      "   ℹ️  %d package(s) newer than Bioc %s expects: %s",
-      length(too_new),
-      BiocManager::version(),
-      paste(too_new, collapse = ", ")
-    ))
-    message("   This is usually harmless. If mesa fails, try:")
-    message(sprintf(
-      "   BiocManager::install(c(%s), force = TRUE)",
-      paste0('"', too_new, '"', collapse = ", ")
-    ))
-  }
-
-  message("✅ Done. Run BiocManager::valid() to confirm.")
 }
 
-message(sprintf(
-  "\n✅ mesa is ready. Load it with: library(mesa)\n"
-))
+fix_environment()
+
+message(sprintf("\n✅ mesa is ready. Load it with: library(mesa)\n"))
