@@ -13,7 +13,8 @@ editor_options:
 * Added a function `sliceDMRs` to take the 'top' DMRs in each contrast, based on a specified ranking column. [!24](https://github.com/cruk-mi/mesa/pull/24)
 * Added `getMesaGenome()`, `getMesaTxDb()`, and `getMesaAnnoDb()` functions to complete mesa's genome management system. Supports hg38, hg19, and mm10 with extensible architecture. [!68](https://github.com/cruk-mi/mesa/pull/68)
 * `plotGenomicFeatureDistribution()` now supports multiple genomes via `genome`, `TxDb`, and `annoDb` parameters. Function now works with mesa's genome system via `setMesaGenome()` or custom genome builds. No longer limited to hg38. [!68](https://github.com/cruk-mi/mesa/pull/68)
-
+* Added `inst/scripts/install_mesa.R`: one-shot installer that automatically sets the correct Bioconductor version and validates environment consistency — see README for usage.  [!72](https://github.com/cruk-mi/mesa/pull/72)
+  
 ### CHANGES
 * Converted `plotPCA` into a submethod for the `qsea` defined method. [!11](https://github.com/cruk-mi/mesa/pull/11)
 * `plotPCA` gains a `verbose` option to turn off most of the messages produced. [!11](https://github.com/cruk-mi/mesa/pull/11)
@@ -28,6 +29,8 @@ editor_options:
 * `plotPCA` and `plotUMAP` no longer take the `qseaSet` as an input. The PCA/UMAP object has a copy of the `sampleTable` which may be modified instead. [!58](https://github.com/cruk-mi/mesa/pull/58)
 * Swapped to use of `seq_along` rather than `1:n` throughout. [!67](https://github.com/cruk-mi/mesa/pull/67)
 * Be more specific in the use of message suppression. [!66](https://github.com/cruk-mi/mesa/pull/66)
+* Updated `actions/checkout@v2` to `v4`; added system info step to CI for easier debugging. [!71](https://github.com/cruk-mi/mesa/pull/71)
+* Bumped minimum R requirement to 4.5.0 (Bioconductor 3.22).  [!72](https://github.com/cruk-mi/mesa/pull/72)
 
 ### REMOVED
 * Made `plotGenomicFeatureDistribution` and `getGenomicFeatureDistribution` internal as they currently only work for hg38. [!14](https://github.com/cruk-mi/mesa/pull/14)
@@ -36,6 +39,7 @@ editor_options:
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Removed `colnames` function definion on a qseaSet, which was not working anyway. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Removed `dropAvgFragDetails` as no longer required. [!63](https://github.com/cruk-mi/mesa/pull/63)
+* Removed GitLab CI files; updated `.Rbuildignore` to exclude `.github`, `.devcontainer`, `docs/` and other non-package files from the build — silences related `R CMD check` notes. [!70](https://github.com/cruk-mi/mesa/pull/70)
 
 ### BUG FIXES
 * `makeTransposedTable` no longer adds `chr` to the window names even if they already had a `chr` prefix. [!14](https://github.com/cruk-mi/mesa/pull/14)
@@ -55,7 +59,12 @@ editor_options:
 * Fixed GRanges conversion error in `plotGenomicFeatureDistribution` that occurred with Bioconductor 3.21 when multiple chromosome columns existed after ChIPseeker annotation. [!68](https://github.com/cruk-mi/mesa/pull/68)
 * Fixed makeQset validation tests to handle updated annotation database versions and focus on parameter validation rather than computational integration tests. [!68](https://github.com/cruk-mi/mesa/pull/68)
 * Updated network error patterns in testPlotGeneHeatmap, preventing biomart HTP 503 error in test-makeQset.R:83:3. [!68](https://github.com/cruk-mi/mesa/pull/68)
-
+* Fixed `plotGeneHeatmap()` examples to handle transient Ensembl connection errors during `R CMD check`. [!70](https://github.com/cruk-mi/mesa/pull/70)
+* Fixed pkgdown deployment failure on GitHub Actions caused by git ownership mismatch in Docker containers. [!71](https://github.com/cruk-mi/mesa/pull/71)
+* Fixed `plyranges::mutate()` calls throughout the package — plyranges 1.30 no longer re-exports `dplyr::mutate()`.  [!72](https://github.com/cruk-mi/mesa/pull/72)
+* Fixed broken `GRanges-class` Rd cross-references in `liftOverHg19()`, `getCGPositions()`, and `qseaTableToChrGRanges()`.  [!72](https://github.com/cruk-mi/mesa/pull/72)
+* Fixed `plotGeneHeatmap()` examples failing during `R CMD check` due to transient Ensembl connection timeouts.  [!72](https://github.com/cruk-mi/mesa/pull/72)
+  
 # mesa 0.5.1
 
 This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.
