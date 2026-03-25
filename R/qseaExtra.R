@@ -254,7 +254,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 
   if(!is.null(CpGislandsGR)){
   grAnno <- grAnno %>%
-    plyranges::mutate(nIslands = plyranges::count_overlaps(., CpGislandsGR),
+    dplyr::mutate(nIslands = plyranges::count_overlaps(., CpGislandsGR),
            nShore = plyranges::count_overlaps(., plyranges::flank_left(CpGislandsGR, width = 2000)) +
                     plyranges::count_overlaps(., plyranges::flank_right(CpGislandsGR, width = 2000)),
            nShelf = plyranges::count_overlaps(., plyranges::shift_left(plyranges::flank_left(CpGislandsGR, width = 2000), 2000)) +
@@ -267,7 +267,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 
   if(!is.null(FantomRegionsGR)){
    grAnno <- grAnno %>%
-    plyranges::mutate(inFantom = plyranges::count_overlaps(., FantomRegionsGR))
+    dplyr::mutate(inFantom = plyranges::count_overlaps(., FantomRegionsGR))
   }
 
   dfAnno <- grAnno %>%

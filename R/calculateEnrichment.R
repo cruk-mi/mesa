@@ -250,7 +250,7 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
 #' @param BSgenome Character(1). BSgenome package name.
 #' @param chr.select Character vector of chromosome names to include (e.g., \code{paste0("chr", 1:22)}).
 #'
-#' @return A \linkS4class{GRanges} of motif positions.
+#' @return A \link[GenomicRanges]{GRanges-class} of motif positions.
 #'
 #' @seealso \code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
 #'

@@ -160,7 +160,9 @@ test_that("Analysing DMRs", {
                  pivotDMRsLonger() %>%
                  summariseDMRsByContrast() %>%
                  dim(),c(3,4))
-
+  
+  skip_if_not_installed("org.Hs.eg.db")  # skip, before calling annotateWindows 
+                                        # if org.Hs.eg.db is not installed
   expect_equal(DMRs %>%
                  pivotDMRsLonger() %>%
                  annotateWindows(genome = "hg38") %>%

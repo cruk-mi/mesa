@@ -1,6 +1,6 @@
 #' Convert a makeTable-like data frame to GRanges (UCSC style)
 #'
-#' Coerce a table of windows to a \linkS4class{GRanges}. Two input layouts are
+#' Coerce a table of windows to a \link[GenomicRanges]{GRanges-class}. Two input layouts are
 #' supported:
 #' - `chr`, `window_start`, `window_end` (as in `qsea::makeTable()` output), or
 #' - `seqnames`, `start`, `end`.

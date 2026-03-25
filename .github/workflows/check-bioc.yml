@@ -22,7 +22,15 @@
 
 on:
   push:
+    paths:
+        - 'R/**'
+        - 'tests/**'
+        - 'vignettes/**'
+        - 'inst/**'
+        - 'DESCRIPTION'
+        - 'NAMESPACE'
   pull_request:
+  workflow_dispatch:
 
 name: R-CMD-check-bioc
 
@@ -52,9 +60,7 @@ jobs:
       fail-fast: true
       matrix:
         config:
-          - { os: ubuntu-latest, r: '4.3.1', bioc: '3.18', cont: "bioconductor/bioconductor_docker:RELEASE_3_18", rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest" }
-    ##      - { os: macOS-latest, r: '4.3.1', bioc: '3.18'}
-    ##      - { os: windows-latest, r: '4.3.1', bioc: '3.18'}
+          - { os: ubuntu-latest, r: '4.5.1', bioc: '3.22', cont: "bioconductor/bioconductor_docker:RELEASE_3_22", rspm: "https://packagemanager.posit.co/cran/__linux__/jammy/latest" }
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       RSPM: ${{ matrix.config.rspm }}
@@ -84,8 +90,10 @@ jobs:
           echo "Git version: $(git --version)"
           echo "Runner OS: $RUNNER_OS"
           echo "Runner image: $ImageVersion"
-          echo "Workspace owner: $(stat -c '%U' $GITHUB_WORKSPACE)"
           echo "Current user: $(whoami)"
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            echo "Workspace owner: $(stat -c '%U' $GITHUB_WORKSPACE)"
+          fi
 
       ## R is already included in the Bioconductor docker images
       - name: Setup R from r-lib

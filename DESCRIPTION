@@ -87,7 +87,7 @@ Imports:
     scales
 Depends:
     qsea,
-    R (>= 4.3.0),
+    R (>= 4.5.0),
     dplyr
 Suggests: 
     rmarkdown,
