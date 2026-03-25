@@ -5,7 +5,7 @@ tumour/normal, multiple runs) and need to be combined into one container."><!-- 
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -30,7 +30,7 @@ tumour/normal, multiple runs) and need to be combined into one container."><!-- 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -55,20 +55,20 @@ tumour/normal, multiple runs) and need to be combined into one container."><!-- 
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Combine multiple qseaSets</h1>
-    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/R/combineQsets.R" class="external-link"><code>R/combineQsets.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/R/combineQsets.R" class="external-link"><code>R/combineQsets.R</code></a></small>
     <div class="hidden name"><code>combineQsetsList.Rd</code></div>
     </div>
 
@@ -90,33 +90,35 @@ tumour/normal, multiple runs) and need to be combined into one container.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>qseaSets</dt>
+
+
+<dl><dt id="arg-qseasets">qseaSets<a class="anchor" aria-label="anchor" href="#arg-qseasets"></a></dt>
 <dd><p><code>list</code>
 List of <code>qseaSet</code> objects, or <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> paths to <code>.rds</code> files
 containing <code>qseaSet</code> objects. <strong>Default:</strong> none (must be supplied).</p></dd>
 
 
-<dt>firstQset</dt>
+<dt id="arg-firstqset">firstQset<a class="anchor" aria-label="anchor" href="#arg-firstqset"></a></dt>
 <dd><p><code>qseaSet</code> or <code>character(1)</code>
 Optional initial <code>qseaSet</code> to merge into. If a <code>character(1)</code> ending in
 <code>.rds</code>, it is loaded via <code><a href="https://readr.tidyverse.org/reference/read_rds.html" class="external-link">readr::read_rds()</a></code>.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>dropDuplicates</dt>
+<dt id="arg-dropduplicates">dropDuplicates<a class="anchor" aria-label="anchor" href="#arg-dropduplicates"></a></dt>
 <dd><p><code>logical(1)</code>
 If <code>TRUE</code>, drop samples with duplicated names across inputs. If <code>FALSE</code>,
 duplicates are renamed by appending <code>"_Dup"</code>.
 <strong>Default:</strong> <code>TRUE</code>.</p></dd>
 
 
-<dt>checkParams</dt>
+<dt id="arg-checkparams">checkParams<a class="anchor" aria-label="anchor" href="#arg-checkparams"></a></dt>
 <dd><p><code>logical(1)</code>
 Verify that global parameters are identical across inputs.
 <strong>Default:</strong> <code>TRUE</code>.</p></dd>
 
 
-<dt>regionsToKeep</dt>
+<dt id="arg-regionstokeep">regionsToKeep<a class="anchor" aria-label="anchor" href="#arg-regionstokeep"></a></dt>
 <dd><p><code>GRanges</code> or coercible
 If supplied, restrict each <code>qseaSet</code> to these genomic regions <em>before</em>
 combining (saves memory). Accepts <code>GRanges</code> or a data frame with
@@ -126,9 +128,7 @@ combining (saves memory). Accepts <code>GRanges</code> or a data frame with
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>qseaSet</code> object:</p><ul><li><p><strong>Combined samples</strong> from all inputs (or from <code>firstQset</code> plus inputs).</p></li>
+    <p>A <code>qseaSet</code> object:</p><ul><li><p><strong>Combined samples</strong> from all inputs (or from <code>firstQset</code> plus inputs).</p></li>
 <li><p><strong>Duplicates</strong> handled according to <code>dropDuplicates</code>.</p></li>
 <li><p><strong>Regions</strong> optionally prefiltered by <code>regionsToKeep</code> prior to merge.</p></li>
 </ul></div>
@@ -168,15 +168,15 @@ combining (saves memory). Accepts <code>GRanges</code> or a data frame with
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

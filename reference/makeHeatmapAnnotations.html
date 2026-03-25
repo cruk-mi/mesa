@@ -4,7 +4,7 @@ and windows with automatic colour handling for categorical and numeric variables
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -29,7 +29,7 @@ and windows with automatic colour handling for categorical and numeric variables
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -54,20 +54,20 @@ and windows with automatic colour handling for categorical and numeric variables
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create ComplexHeatmap annotation objects (samples and windows)</h1>
-    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/R/plotting.R" class="external-link"><code>R/plotting.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/R/plotting.R" class="external-link"><code>R/plotting.R</code></a></small>
     <div class="hidden name"><code>makeHeatmapAnnotations.Rd</code></div>
     </div>
 
@@ -90,45 +90,47 @@ and windows with automatic colour handling for categorical and numeric variables
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>qseaSet</dt>
+
+
+<dl><dt id="arg-qseaset">qseaSet<a class="anchor" aria-label="anchor" href="#arg-qseaset"></a></dt>
 <dd><p><code>qseaSet</code>.
 The input object from which sample metadata are taken.</p></dd>
 
 
-<dt>sampleAnnotation</dt>
+<dt id="arg-sampleannotation">sampleAnnotation<a class="anchor" aria-label="anchor" href="#arg-sampleannotation"></a></dt>
 <dd><p>tidyselect specification or <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> or <code>NULL</code>.
 Columns from the sample table to annotate (unquoted helpers like <code>group</code>, <code>tumour</code>,
 or a character vector of names).
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>windowAnnotationDf</dt>
+<dt id="arg-windowannotationdf">windowAnnotationDf<a class="anchor" aria-label="anchor" href="#arg-windowannotationdf"></a></dt>
 <dd><p><code>data.frame</code> or <code>NULL</code>.
 Row annotations aligned to windows (e.g., output of <code><a href="getWindowAnnotation.html">getWindowAnnotation()</a></code>).
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>useGroupMeans</dt>
+<dt id="arg-usegroupmeans">useGroupMeans<a class="anchor" aria-label="anchor" href="#arg-usegroupmeans"></a></dt>
 <dd><p><code>logical(1)</code>.
 If <code>TRUE</code>, annotate groups instead of individual samples (using the <code>group</code>
 column of the sample table).
 <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
-<dt>specifiedAnnotationColors</dt>
+<dt id="arg-specifiedannotationcolors">specifiedAnnotationColors<a class="anchor" aria-label="anchor" href="#arg-specifiedannotationcolors"></a></dt>
 <dd><p><code>list</code> or <code>NA</code>.
 Optional mapping of levels → colours to override auto-generated palettes,
 e.g. <code>list(tumour = c(Tumour = "firebrick4", Normal = "blue"))</code>.
 <strong>Default:</strong> <code>NA</code>.</p></dd>
 
 
-<dt>windowOrientation</dt>
+<dt id="arg-windoworientation">windowOrientation<a class="anchor" aria-label="anchor" href="#arg-windoworientation"></a></dt>
 <dd><p><code>character(1)</code>.
 Orientation for window (row) annotations: <code>"row"</code> or <code>"column"</code>.
 <strong>Default:</strong> <code>"row"</code>.</p></dd>
 
 
-<dt>sampleOrientation</dt>
+<dt id="arg-sampleorientation">sampleOrientation<a class="anchor" aria-label="anchor" href="#arg-sampleorientation"></a></dt>
 <dd><p><code>character(1)</code>.
 Orientation for sample (column) annotations: <code>"column"</code> or <code>"row"</code>.
 <strong>Default:</strong> <code>"column"</code>.</p></dd>
@@ -136,12 +138,8 @@ Orientation for sample (column) annotations: <code>"column"</code> or <code>"row
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>list(sample = &lt;HeatmapAnnotation|NULL&gt;, window = &lt;HeatmapAnnotation|NULL&gt;)</code></p>
-
-
-<p>ready to pass to <code>ComplexHeatmap::Heatmap(...)</code>.</p>
+    <p><code>list(sample = &lt;HeatmapAnnotation|NULL&gt;, window = &lt;HeatmapAnnotation|NULL&gt;)</code>
+ready to pass to <code>ComplexHeatmap::Heatmap(...)</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -214,15 +212,15 @@ The function respects <code>useGroupMeans</code> to annotate either per-sample o
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

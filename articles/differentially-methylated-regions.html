@@ -12,14 +12,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Differentially Methylated Regions and Annotatation">
-<meta property="og:description" content="mesa">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -45,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -74,7 +73,7 @@
 <li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -85,7 +84,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -94,7 +93,7 @@
 Annotatation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/vignettes/differentially-methylated-regions.Rmd" class="external-link"><code>vignettes/differentially-methylated-regions.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/vignettes/differentially-methylated-regions.Rmd" class="external-link"><code>vignettes/differentially-methylated-regions.Rmd</code></a></small>
       <div class="hidden name"><code>differentially-methylated-regions.Rmd</code></div>
 
     </div>
@@ -177,6 +176,7 @@ as <code>"all"</code> or <code>"first"</code>:</p>
 <span>                contrasts <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Calculating the first possible contrast on the tumour column.</span></span>
 <span><span class="co">#&gt; Generating table of nrpm values for 819 regions across 10 samples.</span></span>
+<span><span class="co">#&gt; Loading required namespace: GenomeInfoDb</span></span>
 <span><span class="co">#&gt; Fitting initial GLM on 309 windows, using 2 cores</span></span>
 <span><span class="co">#&gt; Performing contrast Normal_vs_Tumour</span></span>
 <span><span class="co">#&gt; Contrasts Complete</span></span>
@@ -501,12 +501,12 @@ plotting a volcano plot:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Log2 Fold Change"</span>,</span>
 <span>       y <span class="op">=</span> <span class="st">"-Log10 Adjusted P Value"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
-<p>We can also use the <span class="math inline">\(\Delta
-\beta\)</span>, the difference between the average beta values between
-the two sets of samples. This can be a more useful metric, as it
-characterises windows that have clearly changed in levels of
-methylation.</p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672"></p>
+<p>We can also use the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>β</mi></mrow><annotation encoding="application/x-tex">\Delta \beta</annotation></semantics></math>,
+the difference between the average beta values between the two sets of
+samples. This can be a more useful metric, as it characterises windows
+that have clearly changed in levels of methylation.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allWindows</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -515,7 +515,7 @@ methylation.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Difference in average Beta Values"</span>,</span>
 <span>       y <span class="op">=</span> <span class="st">"-Log10 Adjusted P Value"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="672"></p>
 <p>These two metrics are correlated, but do sometimes differ,
 particularly in regions that have beta values close to 1 in one or both
 samples. This is not particularly noticeable in this small subset of the
@@ -527,7 +527,7 @@ data though.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Log2 Fold Change"</span>,</span>
 <span>       y <span class="op">=</span> <span class="st">"Difference in average Beta Values"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 </div>
 <div class="section level2">
@@ -546,15 +546,28 @@ one way of which is to use the default hg38 annotation by specifying
 <span>  <span class="fu"><a href="../reference/annotateWindows.html">annotateWindows</a></span><span class="op">(</span>genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: hg38 ...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: hg38 ...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: hg38 ...</span></span>
 <span><span class="co">#&gt; Loading required package: org.Hs.eg.db</span></span>
 <span><span class="co">#&gt; Loading required package: AnnotationDbi</span></span>
 <span><span class="co">#&gt; Loading required package: stats4</span></span>
 <span><span class="co">#&gt; Loading required package: BiocGenerics</span></span>
+<span><span class="co">#&gt; Loading required package: generics</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'generics'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     explain</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
+<span><span class="co">#&gt;     setequal, union</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     combine, intersect, setdiff, union</span></span>
+<span><span class="co">#&gt;     combine</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     IQR, mad, sd, var, xtabs</span></span>
@@ -562,10 +575,10 @@ one way of which is to use the default hg38 annotation by specifying
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
 <span><span class="co">#&gt;     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
-<span><span class="co">#&gt;     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,</span></span>
-<span><span class="co">#&gt;     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,</span></span>
-<span><span class="co">#&gt;     Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,</span></span>
-<span><span class="co">#&gt;     table, tapply, union, unique, unsplit, which.max, which.min</span></span>
+<span><span class="co">#&gt;     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
+<span><span class="co">#&gt;     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
+<span><span class="co">#&gt;     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
+<span><span class="co">#&gt;     unsplit, which.max, which.min</span></span>
 <span><span class="co">#&gt; Loading required package: Biobase</span></span>
 <span><span class="co">#&gt; Welcome to Bioconductor</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -630,13 +643,13 @@ on, and that some genes are very large.</p>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 7        26<span style="text-decoration: underline;">147</span>701 26<span style="text-decoration: underline;">148</span>000         -<span style="color: #BB0000; text-decoration: underline;">4</span><span style="color: #BB0000;">198</span> ENSG00000050344 NFE2L3   NFE2 like …</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 7        27<span style="text-decoration: underline;">044</span>101 27<span style="text-decoration: underline;">044</span>400        -<span style="color: #BB0000; text-decoration: underline;">48</span><span style="color: #BB0000;">862</span> ENSG00000005020 SKAP2    src kinase…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 7        27<span style="text-decoration: underline;">102</span>001 27<span style="text-decoration: underline;">102</span>300           383 ENSG00000105996 HOXA2    homeobox A2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 7        27<span style="text-decoration: underline;">102</span>301 27<span style="text-decoration: underline;">102</span>600            83 ENSG00000105996 HOXA2    homeobox A2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 7        27<span style="text-decoration: underline;">102</span>901 27<span style="text-decoration: underline;">103</span>200          -<span style="color: #BB0000;">218</span> ENSG00000105996 HOXA2    homeobox A2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 7        27<span style="text-decoration: underline;">103</span>501 27<span style="text-decoration: underline;">103</span>800          -<span style="color: #BB0000;">818</span> ENSG00000105996 HOXA2    homeobox A2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 7        27<span style="text-decoration: underline;">103</span>801 27<span style="text-decoration: underline;">104</span>100         -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">118</span> ENSG00000105996 HOXA2    homeobox A2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 7        27<span style="text-decoration: underline;">108</span>301 27<span style="text-decoration: underline;">108</span>600         <span style="text-decoration: underline;">10</span>995 ENSG00000105997 HOXA3    homeobox A3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 7        27<span style="text-decoration: underline;">108</span>601 27<span style="text-decoration: underline;">108</span>900         <span style="text-decoration: underline;">10</span>695 ENSG00000105997 HOXA3    homeobox A3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 7        27<span style="text-decoration: underline;">102</span>001 27<span style="text-decoration: underline;">102</span>300          <span style="text-decoration: underline;">5</span>922 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 7        27<span style="text-decoration: underline;">102</span>301 27<span style="text-decoration: underline;">102</span>600          <span style="text-decoration: underline;">6</span>222 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 7        27<span style="text-decoration: underline;">102</span>901 27<span style="text-decoration: underline;">103</span>200          <span style="text-decoration: underline;">6</span>822 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 7        27<span style="text-decoration: underline;">103</span>501 27<span style="text-decoration: underline;">103</span>800          <span style="text-decoration: underline;">7</span>422 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 7        27<span style="text-decoration: underline;">103</span>801 27<span style="text-decoration: underline;">104</span>100          <span style="text-decoration: underline;">7</span>722 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 7        27<span style="text-decoration: underline;">108</span>301 27<span style="text-decoration: underline;">108</span>600         <span style="text-decoration: underline;">12</span>222 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 7        27<span style="text-decoration: underline;">108</span>601 27<span style="text-decoration: underline;">108</span>900         <span style="text-decoration: underline;">12</span>522 ENSG00000233429 HOTAIRM1 HOXA trans…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 7        27<span style="text-decoration: underline;">124</span>201 27<span style="text-decoration: underline;">124</span>500          <span style="text-decoration: underline;">2</span>284 <span style="color: #BB0000;">NA</span>              HOXA-AS2 HOXA clust…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more rows</span></span></span></code></pre></div>
 <p>The <code>annotation</code> column gives a long-form explanation of
@@ -650,14 +663,14 @@ e.g. Intron/Exon/Promoter.</p>
 <span><span class="co">#&gt;       start SYMBOL   shortAnno         annotation                               </span></span>
 <span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 26<span style="text-decoration: underline;">147</span>701 NFE2L3   Distal Intergenic Distal Intergenic                        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 27<span style="text-decoration: underline;">044</span>101 SKAP2    Distal Intergenic Distal Intergenic                        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 27<span style="text-decoration: underline;">102</span>001 HOXA2    Promoter          Promoter (&lt;=1kb)                         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 27<span style="text-decoration: underline;">102</span>301 HOXA2    Promoter          Promoter (&lt;=1kb)                         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 27<span style="text-decoration: underline;">102</span>901 HOXA2    Promoter          Promoter (&lt;=1kb)                         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 27<span style="text-decoration: underline;">103</span>501 HOXA2    Promoter          Promoter (&lt;=1kb)                         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 27<span style="text-decoration: underline;">103</span>801 HOXA2    Promoter          Promoter (1-2kb)                         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 27<span style="text-decoration: underline;">108</span>301 HOXA3    Exon              Exon (ENST00000396352.8/3200, exon 3 of …</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 27<span style="text-decoration: underline;">108</span>601 HOXA3    Exon              Exon (ENST00000396352.8/3200, exon 3 of …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 27<span style="text-decoration: underline;">044</span>101 SKAP2    Intron            Intron (ENST00000748166.1/ENST0000074816…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 27<span style="text-decoration: underline;">102</span>001 HOTAIRM1 Exon              Exon (ENST00000222718.7/3199, exon 1 of …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 27<span style="text-decoration: underline;">102</span>301 HOTAIRM1 5' UTR            5' UTR                                   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 27<span style="text-decoration: underline;">102</span>901 HOTAIRM1 Intron            Intron (ENST00000716605.1/100506311, int…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 27<span style="text-decoration: underline;">103</span>501 HOTAIRM1 Intron            Intron (ENST00000716605.1/100506311, int…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 27<span style="text-decoration: underline;">103</span>801 HOTAIRM1 Intron            Intron (ENST00000716605.1/100506311, int…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 27<span style="text-decoration: underline;">108</span>301 HOTAIRM1 Exon              Exon (ENST00000396352.8/3200, exon 3 of …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 27<span style="text-decoration: underline;">108</span>601 HOTAIRM1 Exon              Exon (ENST00000396352.8/3200, exon 3 of …</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 27<span style="text-decoration: underline;">124</span>201 HOXA-AS2 Exon              Exon (ENST00000517550.1/285943, exon 3 o…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more rows</span></span></span></code></pre></div>
 <p>Details of the full location of the gene are provided, including how
@@ -667,18 +680,18 @@ annotations.</p>
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">geneChr</span>, <span class="va">geneStart</span>, <span class="va">geneEnd</span>, <span class="va">geneLength</span>, <span class="va">geneStrand</span>, <span class="va">geneId</span>, <span class="va">transcriptId</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 7</span></span></span>
-<span><span class="co">#&gt;    geneChr geneStart  geneEnd geneLength geneStrand geneId transcriptId     </span></span>
-<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>       7  26<span style="text-decoration: underline;">152</span>198 26<span style="text-decoration: underline;">187</span>137      <span style="text-decoration: underline;">34</span>940          1 9603   ENST00000056233.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>       7  26<span style="text-decoration: underline;">738</span>840 26<span style="text-decoration: underline;">995</span>239     <span style="text-decoration: underline;">256</span>400          2 8935   ENST00000432747.1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>       7  27<span style="text-decoration: underline;">100</span>354 27<span style="text-decoration: underline;">102</span>683       <span style="text-decoration: underline;">2</span>330          2 3199   ENST00000222718.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>       7  27<span style="text-decoration: underline;">100</span>354 27<span style="text-decoration: underline;">102</span>683       <span style="text-decoration: underline;">2</span>330          2 3199   ENST00000222718.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>       7  27<span style="text-decoration: underline;">100</span>354 27<span style="text-decoration: underline;">102</span>683       <span style="text-decoration: underline;">2</span>330          2 3199   ENST00000222718.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>       7  27<span style="text-decoration: underline;">100</span>354 27<span style="text-decoration: underline;">102</span>683       <span style="text-decoration: underline;">2</span>330          2 3199   ENST00000222718.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>       7  27<span style="text-decoration: underline;">100</span>354 27<span style="text-decoration: underline;">102</span>683       <span style="text-decoration: underline;">2</span>330          2 3199   ENST00000222718.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>       7  27<span style="text-decoration: underline;">106</span>184 27<span style="text-decoration: underline;">119</span>595      <span style="text-decoration: underline;">13</span>412          2 3200   ENST00000396352.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>       7  27<span style="text-decoration: underline;">106</span>184 27<span style="text-decoration: underline;">119</span>595      <span style="text-decoration: underline;">13</span>412          2 3200   ENST00000396352.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>       7  27<span style="text-decoration: underline;">121</span>917 27<span style="text-decoration: underline;">128</span>760       <span style="text-decoration: underline;">6</span>844          1 285943 ENST00000517550.1</span></span>
+<span><span class="co">#&gt;    geneChr geneStart  geneEnd geneLength geneStrand geneId    transcriptId     </span></span>
+<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>       7  26<span style="text-decoration: underline;">152</span>198 26<span style="text-decoration: underline;">187</span>137      <span style="text-decoration: underline;">34</span>940          1 9603      ENST00000056233.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>       7  26<span style="text-decoration: underline;">738</span>840 26<span style="text-decoration: underline;">995</span>239     <span style="text-decoration: underline;">256</span>400          2 8935      ENST00000432747.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>       7  27<span style="text-decoration: underline;">096</span>079 27<span style="text-decoration: underline;">122</span>885      <span style="text-decoration: underline;">26</span>807          1 100506311 ENST00000716605.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>       7  27<span style="text-decoration: underline;">121</span>917 27<span style="text-decoration: underline;">128</span>760       <span style="text-decoration: underline;">6</span>844          1 285943    ENST00000517550.1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more rows</span></span></span></code></pre></div>
 <p>Finally, for hg38, the function also returns several columns
 regarding whether the region lies within a CpG “island” (characterised
@@ -724,6 +737,10 @@ instance for this example mouse dataset:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/annotateWindows.html">annotateWindows</a></span><span class="op">(</span>TxDb <span class="op">=</span> <span class="st">"TxDb.Mmusculus.UCSC.mm10.knownGene"</span>,</span>
 <span>                  annoDb <span class="op">=</span> <span class="st">"org.Mm.eg.db"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt;&gt; Update txdb in cache...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: mm10 ...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: mm10 ...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: mm10 ...</span></span>
 <span><span class="co">#&gt; Loading required package: org.Mm.eg.db</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 'select()' returned 1:1 mapping between keys and columns</span></span>
@@ -755,6 +772,9 @@ appropriately:</p>
 <code class="sourceCode R"><span><span class="va">exampleMouse</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/annotateWindows.html">annotateWindows</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: mm10 ...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: mm10 ...</span></span>
+<span><span class="co">#&gt; &gt;&gt; Using Genome: mm10 ...</span></span>
 <span><span class="co">#&gt; 'select()' returned 1:1 mapping between keys and columns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 153 × 17</span></span></span>
 <span><span class="co">#&gt;    seqnames     start       end CpG_density annotation geneChr geneStart geneEnd</span></span>
@@ -927,8 +947,30 @@ useful for showing the intersections between a set of data, in a more
 generalisable form than a venn diagram.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/plotDMRUpset.html">plotDMRUpset</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-29-1.png" width="672"></p>
+<span>  <span class="fu"><a href="../reference/plotDMRUpset.html">plotDMRUpset</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">UpSetR</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">UpSetR</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<span><span class="co">#&gt; Warning: The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">UpSetR</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-29-1.png" class="r-plt" alt="" width="672"></p>
 <div class="section level3">
 <h3 id="summarising-by-gene">Summarising by Gene<a class="anchor" aria-label="anchor" href="#summarising-by-gene"></a>
 </h3>
@@ -940,20 +982,19 @@ strands).</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/summariseDMRsByGene.html">summariseDMRsByGene</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 4</span></span></span>
-<span><span class="co">#&gt;    ENSEMBL         SYMBOL    GENENAME                                   n</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> ENSG00000253405 EVX1-AS   EVX1 antisense RNA                         6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="color: #BB0000;">NA</span>              HOTTIP    HOXA distal transcript antisense RNA       6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> ENSG00000105996 HOXA2     homeobox A2                                5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ENSG00000240990 HOXA11-AS HOXA11 antisense RNA                       5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ENSG00000105997 HOXA3     homeobox A3                                2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> ENSG00000106038 EVX1      even-skipped homeobox 1                    2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="color: #BB0000;">NA</span>              HOXA-AS2  HOXA cluster antisense RNA 2               2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ENSG00000005020 SKAP2     src kinase associated phosphoprotein 2     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ENSG00000050344 NFE2L3    NFE2 like bZIP transcription factor 3      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ENSG00000122592 HOXA7     homeobox A7                                1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> ENSG00000254369 HOXA-AS3  HOXA cluster antisense RNA 3               1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
+<span><span class="co">#&gt;    ENSEMBL         SYMBOL    GENENAME                                          n</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> ENSG00000233429 HOTAIRM1  HOXA transcript antisense RNA, myeloid-speci…     7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> ENSG00000253405 EVX1-AS   EVX1 antisense RNA                                6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="color: #BB0000;">NA</span>              HOTTIP    HOXA distal transcript antisense RNA              6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ENSG00000240990 HOXA11-AS HOXA11 antisense RNA                              5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ENSG00000106038 EVX1      even-skipped homeobox 1                           2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="color: #BB0000;">NA</span>              HOXA-AS2  HOXA cluster antisense RNA 2                      2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> ENSG00000005020 SKAP2     src kinase associated phosphoprotein 2            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ENSG00000050344 NFE2L3    NFE2 like bZIP transcription factor 3             1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ENSG00000122592 HOXA7     homeobox A7                                       1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ENSG00000254369 HOXA-AS3  HOXA cluster antisense RNA 3                      1</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -971,7 +1012,7 @@ second argument.</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-31-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-31-1.png" class="r-plt" alt="" width="672"></p>
 <p>We can add sample annotation bars to the top of the heatmap by using
 the sampleAnnotation option:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
@@ -982,7 +1023,7 @@ the sampleAnnotation option:</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-32-1.png" width="672">
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-32-1.png" class="r-plt" alt="" width="672">
 Note that the annotation option allows for tidy evaluation, so we can
 also specify the columns unquoted:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
@@ -992,7 +1033,7 @@ also specify the columns unquoted:</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-33-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-33-1.png" class="r-plt" alt="" width="672"></p>
 <p>The default is to plot beta values, but you can change that via the
 <code>normMethod</code> option, for instance to get normalised reads per
 million <code>nrpm</code>:</p>
@@ -1004,7 +1045,7 @@ million <code>nrpm</code>:</p>
 <span><span class="co">#&gt; Generating table of nrpm values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-34-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-34-1.png" class="r-plt" alt="" width="672"></p>
 <p>This <code>normMethod</code> option occurs in a number of functions
 throughout the package, with the typical choices of <code>counts</code>,
 <code>nrpm</code> or <code>beta</code> (other options exist within
@@ -1025,7 +1066,7 @@ being chosen automatically):</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-35-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-35-1.png" class="r-plt" alt="" width="672"></p>
 <p>Or both variables:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotColours</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"Tumour"</span> <span class="op">=</span> <span class="st">"firebrick4"</span><span class="op">)</span>,</span>
@@ -1040,7 +1081,7 @@ being chosen automatically):</p>
 <span><span class="co">#&gt; Generating table of beta values for 23 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-36-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-36-1.png" class="r-plt" alt="" width="672"></p>
 <p>Rows can be clustered using the <code>clusterRows = TRUE</code>
 option:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
@@ -1055,7 +1096,7 @@ option:</p>
 <span><span class="co">#&gt; No empty rows to remove.</span></span>
 <span><span class="co">#&gt; No almost empty rows to remove.</span></span>
 <span><span class="co">#&gt; No almost empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-37-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-37-1.png" class="r-plt" alt="" width="672"></p>
 <p>While the columns can be controlled with <code>clusterCols</code>. By
 default the columns are clustered but the rows not, mostly to save
 computational speed. The number of clusters to break the column
@@ -1071,20 +1112,20 @@ dendrogram into can be controlled using <code>clusterNum</code>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-38-1.png" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/unnamed-chunk-38-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note that the default clustering method to use for the dendrogram is
 set as <code>clusterMethod = "ward.D2"</code>; other options can be
 used.</p>
 <div class="section level3">
 <h3 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h3>
-<pre><code><span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
@@ -1102,191 +1143,187 @@ used.</p>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] org.Mm.eg.db_3.18.0  org.Hs.eg.db_3.18.0  AnnotationDbi_1.64.1</span></span>
-<span><span class="co">#&gt;  [4] IRanges_2.36.0       S4Vectors_0.40.2     Biobase_2.62.0      </span></span>
-<span><span class="co">#&gt;  [7] BiocGenerics_0.48.1  ggplot2_3.5.0        mesa_0.99.0         </span></span>
-<span><span class="co">#&gt; [10] dplyr_1.1.4          qsea_1.28.0         </span></span>
+<span><span class="co">#&gt;  [1] org.Mm.eg.db_3.22.0  org.Hs.eg.db_3.22.0  AnnotationDbi_1.72.0</span></span>
+<span><span class="co">#&gt;  [4] IRanges_2.44.0       S4Vectors_0.48.0     Biobase_2.70.0      </span></span>
+<span><span class="co">#&gt;  [7] BiocGenerics_0.56.0  generics_0.1.4       ggplot2_4.0.2       </span></span>
+<span><span class="co">#&gt; [10] mesa_0.99.0          dplyr_1.2.0          qsea_1.36.0         </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] splines_4.3.3                            </span></span>
-<span><span class="co">#&gt;   [2] BiocIO_1.12.0                            </span></span>
-<span><span class="co">#&gt;   [3] bitops_1.0-7                             </span></span>
-<span><span class="co">#&gt;   [4] ggplotify_0.1.2                          </span></span>
-<span><span class="co">#&gt;   [5] filelock_1.0.3                           </span></span>
-<span><span class="co">#&gt;   [6] tibble_3.2.1                             </span></span>
-<span><span class="co">#&gt;   [7] polyclip_1.10-6                          </span></span>
-<span><span class="co">#&gt;   [8] janitor_2.2.0                            </span></span>
-<span><span class="co">#&gt;   [9] XML_3.99-0.16.1                          </span></span>
-<span><span class="co">#&gt;  [10] lifecycle_1.0.4                          </span></span>
+<span><span class="co">#&gt;   [1] splines_4.5.2                            </span></span>
+<span><span class="co">#&gt;   [2] BiocIO_1.20.0                            </span></span>
+<span><span class="co">#&gt;   [3] bitops_1.0-9                             </span></span>
+<span><span class="co">#&gt;   [4] ggplotify_0.1.3                          </span></span>
+<span><span class="co">#&gt;   [5] tibble_3.3.1                             </span></span>
+<span><span class="co">#&gt;   [6] R.oo_1.27.1                              </span></span>
+<span><span class="co">#&gt;   [7] polyclip_1.10-7                          </span></span>
+<span><span class="co">#&gt;   [8] janitor_2.2.1                            </span></span>
+<span><span class="co">#&gt;   [9] XML_3.99-0.23                            </span></span>
+<span><span class="co">#&gt;  [10] lifecycle_1.0.5                          </span></span>
 <span><span class="co">#&gt;  [11] doParallel_1.0.17                        </span></span>
-<span><span class="co">#&gt;  [12] lattice_0.22-6                           </span></span>
-<span><span class="co">#&gt;  [13] MASS_7.3-60.0.1                          </span></span>
-<span><span class="co">#&gt;  [14] magrittr_2.0.3                           </span></span>
-<span><span class="co">#&gt;  [15] limma_3.58.1                             </span></span>
-<span><span class="co">#&gt;  [16] sass_0.4.9                               </span></span>
-<span><span class="co">#&gt;  [17] rmarkdown_2.26                           </span></span>
-<span><span class="co">#&gt;  [18] plotrix_3.8-4                            </span></span>
+<span><span class="co">#&gt;  [12] lattice_0.22-9                           </span></span>
+<span><span class="co">#&gt;  [13] MASS_7.3-65                              </span></span>
+<span><span class="co">#&gt;  [14] magrittr_2.0.4                           </span></span>
+<span><span class="co">#&gt;  [15] limma_3.66.0                             </span></span>
+<span><span class="co">#&gt;  [16] sass_0.4.10                              </span></span>
+<span><span class="co">#&gt;  [17] rmarkdown_2.30                           </span></span>
+<span><span class="co">#&gt;  [18] plotrix_3.8-14                           </span></span>
 <span><span class="co">#&gt;  [19] jquerylib_0.1.4                          </span></span>
-<span><span class="co">#&gt;  [20] yaml_2.3.8                               </span></span>
-<span><span class="co">#&gt;  [21] cowplot_1.1.3                            </span></span>
-<span><span class="co">#&gt;  [22] DBI_1.2.2                                </span></span>
-<span><span class="co">#&gt;  [23] RColorBrewer_1.1-3                       </span></span>
-<span><span class="co">#&gt;  [24] lubridate_1.9.3                          </span></span>
-<span><span class="co">#&gt;  [25] abind_1.4-5                              </span></span>
-<span><span class="co">#&gt;  [26] zlibbioc_1.48.2                          </span></span>
-<span><span class="co">#&gt;  [27] GenomicRanges_1.54.1                     </span></span>
-<span><span class="co">#&gt;  [28] purrr_1.0.2                              </span></span>
-<span><span class="co">#&gt;  [29] ggraph_2.2.1                             </span></span>
-<span><span class="co">#&gt;  [30] RCurl_1.98-1.14                          </span></span>
-<span><span class="co">#&gt;  [31] yulab.utils_0.1.4                        </span></span>
-<span><span class="co">#&gt;  [32] tweenr_2.0.3                             </span></span>
-<span><span class="co">#&gt;  [33] rappdirs_0.3.3                           </span></span>
-<span><span class="co">#&gt;  [34] circlize_0.4.16                          </span></span>
-<span><span class="co">#&gt;  [35] GenomeInfoDbData_1.2.11                  </span></span>
-<span><span class="co">#&gt;  [36] enrichplot_1.22.0                        </span></span>
-<span><span class="co">#&gt;  [37] ggrepel_0.9.5                            </span></span>
-<span><span class="co">#&gt;  [38] tidytree_0.4.6                           </span></span>
-<span><span class="co">#&gt;  [39] pkgdown_2.0.9                            </span></span>
-<span><span class="co">#&gt;  [40] ChIPseeker_1.38.0                        </span></span>
-<span><span class="co">#&gt;  [41] codetools_0.2-20                         </span></span>
-<span><span class="co">#&gt;  [42] DelayedArray_0.28.0                      </span></span>
-<span><span class="co">#&gt;  [43] DOSE_3.28.2                              </span></span>
-<span><span class="co">#&gt;  [44] xml2_1.3.6                               </span></span>
-<span><span class="co">#&gt;  [45] ggforce_0.4.2                            </span></span>
+<span><span class="co">#&gt;  [20] yaml_2.3.12                              </span></span>
+<span><span class="co">#&gt;  [21] otel_0.2.0                               </span></span>
+<span><span class="co">#&gt;  [22] ggtangle_0.1.1                           </span></span>
+<span><span class="co">#&gt;  [23] cowplot_1.2.0                            </span></span>
+<span><span class="co">#&gt;  [24] DBI_1.3.0                                </span></span>
+<span><span class="co">#&gt;  [25] RColorBrewer_1.1-3                       </span></span>
+<span><span class="co">#&gt;  [26] lubridate_1.9.5                          </span></span>
+<span><span class="co">#&gt;  [27] abind_1.4-8                              </span></span>
+<span><span class="co">#&gt;  [28] GenomicRanges_1.62.1                     </span></span>
+<span><span class="co">#&gt;  [29] purrr_1.2.1                              </span></span>
+<span><span class="co">#&gt;  [30] R.utils_2.13.0                           </span></span>
+<span><span class="co">#&gt;  [31] RCurl_1.98-1.18                          </span></span>
+<span><span class="co">#&gt;  [32] yulab.utils_0.2.4                        </span></span>
+<span><span class="co">#&gt;  [33] tweenr_2.0.3                             </span></span>
+<span><span class="co">#&gt;  [34] rappdirs_0.3.4                           </span></span>
+<span><span class="co">#&gt;  [35] circlize_0.4.17                          </span></span>
+<span><span class="co">#&gt;  [36] gdtools_0.5.0                            </span></span>
+<span><span class="co">#&gt;  [37] enrichplot_1.30.5                        </span></span>
+<span><span class="co">#&gt;  [38] ggrepel_0.9.8                            </span></span>
+<span><span class="co">#&gt;  [39] tidytree_0.4.7                           </span></span>
+<span><span class="co">#&gt;  [40] pkgdown_2.2.0                            </span></span>
+<span><span class="co">#&gt;  [41] ChIPseeker_1.46.1                        </span></span>
+<span><span class="co">#&gt;  [42] codetools_0.2-20                         </span></span>
+<span><span class="co">#&gt;  [43] DelayedArray_0.36.0                      </span></span>
+<span><span class="co">#&gt;  [44] DOSE_4.4.0                               </span></span>
+<span><span class="co">#&gt;  [45] ggforce_0.5.0                            </span></span>
 <span><span class="co">#&gt;  [46] shape_1.4.6.1                            </span></span>
 <span><span class="co">#&gt;  [47] tidyselect_1.2.1                         </span></span>
-<span><span class="co">#&gt;  [48] aplot_0.2.2                              </span></span>
-<span><span class="co">#&gt;  [49] HMMcopy_1.44.0                           </span></span>
-<span><span class="co">#&gt;  [50] farver_2.1.1                             </span></span>
-<span><span class="co">#&gt;  [51] viridis_0.6.5                            </span></span>
-<span><span class="co">#&gt;  [52] matrixStats_1.3.0                        </span></span>
-<span><span class="co">#&gt;  [53] BiocFileCache_2.10.2                     </span></span>
-<span><span class="co">#&gt;  [54] GenomicAlignments_1.38.2                 </span></span>
-<span><span class="co">#&gt;  [55] jsonlite_1.8.8                           </span></span>
-<span><span class="co">#&gt;  [56] GetoptLong_1.0.5                         </span></span>
-<span><span class="co">#&gt;  [57] tidygraph_1.3.1                          </span></span>
-<span><span class="co">#&gt;  [58] iterators_1.0.14                         </span></span>
-<span><span class="co">#&gt;  [59] systemfonts_1.0.6                        </span></span>
-<span><span class="co">#&gt;  [60] foreach_1.5.2                            </span></span>
-<span><span class="co">#&gt;  [61] tools_4.3.3                              </span></span>
+<span><span class="co">#&gt;  [48] aplot_0.2.9                              </span></span>
+<span><span class="co">#&gt;  [49] UCSC.utils_1.6.1                         </span></span>
+<span><span class="co">#&gt;  [50] HMMcopy_1.52.0                           </span></span>
+<span><span class="co">#&gt;  [51] farver_2.1.2                             </span></span>
+<span><span class="co">#&gt;  [52] matrixStats_1.5.0                        </span></span>
+<span><span class="co">#&gt;  [53] Seqinfo_1.0.0                            </span></span>
+<span><span class="co">#&gt;  [54] GenomicAlignments_1.46.0                 </span></span>
+<span><span class="co">#&gt;  [55] jsonlite_2.0.0                           </span></span>
+<span><span class="co">#&gt;  [56] GetoptLong_1.1.0                         </span></span>
+<span><span class="co">#&gt;  [57] iterators_1.0.14                         </span></span>
+<span><span class="co">#&gt;  [58] systemfonts_1.3.2                        </span></span>
+<span><span class="co">#&gt;  [59] foreach_1.5.2                            </span></span>
+<span><span class="co">#&gt;  [60] tools_4.5.2                              </span></span>
+<span><span class="co">#&gt;  [61] ggnewscale_0.5.2                         </span></span>
 <span><span class="co">#&gt;  [62] progress_1.2.3                           </span></span>
-<span><span class="co">#&gt;  [63] treeio_1.26.0                            </span></span>
-<span><span class="co">#&gt;  [64] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2  </span></span>
-<span><span class="co">#&gt;  [65] ragg_1.3.0                               </span></span>
-<span><span class="co">#&gt;  [66] Rcpp_1.0.12                              </span></span>
-<span><span class="co">#&gt;  [67] glue_1.7.0                               </span></span>
+<span><span class="co">#&gt;  [63] treeio_1.34.0                            </span></span>
+<span><span class="co">#&gt;  [64] TxDb.Hsapiens.UCSC.hg19.knownGene_3.22.1 </span></span>
+<span><span class="co">#&gt;  [65] ragg_1.5.2                               </span></span>
+<span><span class="co">#&gt;  [66] Rcpp_1.1.1                               </span></span>
+<span><span class="co">#&gt;  [67] glue_1.8.0                               </span></span>
 <span><span class="co">#&gt;  [68] gridExtra_2.3                            </span></span>
-<span><span class="co">#&gt;  [69] SparseArray_1.2.4                        </span></span>
-<span><span class="co">#&gt;  [70] xfun_0.43                                </span></span>
-<span><span class="co">#&gt;  [71] qvalue_2.34.0                            </span></span>
-<span><span class="co">#&gt;  [72] MatrixGenerics_1.14.0                    </span></span>
-<span><span class="co">#&gt;  [73] GenomeInfoDb_1.38.8                      </span></span>
-<span><span class="co">#&gt;  [74] withr_3.0.0                              </span></span>
-<span><span class="co">#&gt;  [75] fastmap_1.1.1                            </span></span>
-<span><span class="co">#&gt;  [76] boot_1.3-30                              </span></span>
-<span><span class="co">#&gt;  [77] fansi_1.0.6                              </span></span>
-<span><span class="co">#&gt;  [78] caTools_1.18.2                           </span></span>
-<span><span class="co">#&gt;  [79] digest_0.6.35                            </span></span>
-<span><span class="co">#&gt;  [80] timechange_0.3.0                         </span></span>
-<span><span class="co">#&gt;  [81] R6_2.5.1                                 </span></span>
-<span><span class="co">#&gt;  [82] gridGraphics_0.5-1                       </span></span>
-<span><span class="co">#&gt;  [83] textshaping_0.3.7                        </span></span>
-<span><span class="co">#&gt;  [84] colorspace_2.1-0                         </span></span>
-<span><span class="co">#&gt;  [85] GO.db_3.18.0                             </span></span>
-<span><span class="co">#&gt;  [86] gtools_3.9.5                             </span></span>
-<span><span class="co">#&gt;  [87] biomaRt_2.58.2                           </span></span>
-<span><span class="co">#&gt;  [88] RSQLite_2.3.6                            </span></span>
+<span><span class="co">#&gt;  [69] SparseArray_1.10.9                       </span></span>
+<span><span class="co">#&gt;  [70] xfun_0.57                                </span></span>
+<span><span class="co">#&gt;  [71] qvalue_2.42.0                            </span></span>
+<span><span class="co">#&gt;  [72] MatrixGenerics_1.22.0                    </span></span>
+<span><span class="co">#&gt;  [73] GenomeInfoDb_1.46.2                      </span></span>
+<span><span class="co">#&gt;  [74] withr_3.0.2                              </span></span>
+<span><span class="co">#&gt;  [75] fastmap_1.2.0                            </span></span>
+<span><span class="co">#&gt;  [76] boot_1.3-32                              </span></span>
+<span><span class="co">#&gt;  [77] caTools_1.18.3                           </span></span>
+<span><span class="co">#&gt;  [78] digest_0.6.39                            </span></span>
+<span><span class="co">#&gt;  [79] timechange_0.4.0                         </span></span>
+<span><span class="co">#&gt;  [80] R6_2.6.1                                 </span></span>
+<span><span class="co">#&gt;  [81] gridGraphics_0.5-1                       </span></span>
+<span><span class="co">#&gt;  [82] colorspace_2.1-2                         </span></span>
+<span><span class="co">#&gt;  [83] textshaping_1.0.5                        </span></span>
+<span><span class="co">#&gt;  [84] GO.db_3.22.0                             </span></span>
+<span><span class="co">#&gt;  [85] gtools_3.9.5                             </span></span>
+<span><span class="co">#&gt;  [86] RSQLite_2.4.6                            </span></span>
+<span><span class="co">#&gt;  [87] cigarillo_1.0.0                          </span></span>
+<span><span class="co">#&gt;  [88] R.methodsS3_1.8.2                        </span></span>
 <span><span class="co">#&gt;  [89] UpSetR_1.4.0                             </span></span>
-<span><span class="co">#&gt;  [90] utf8_1.2.4                               </span></span>
-<span><span class="co">#&gt;  [91] tidyr_1.3.1                              </span></span>
-<span><span class="co">#&gt;  [92] generics_0.1.3                           </span></span>
-<span><span class="co">#&gt;  [93] data.table_1.15.4                        </span></span>
-<span><span class="co">#&gt;  [94] rtracklayer_1.62.0                       </span></span>
+<span><span class="co">#&gt;  [90] utf8_1.2.6                               </span></span>
+<span><span class="co">#&gt;  [91] tidyr_1.3.2                              </span></span>
+<span><span class="co">#&gt;  [92] fontLiberation_0.1.0                     </span></span>
+<span><span class="co">#&gt;  [93] data.table_1.18.2.1                      </span></span>
+<span><span class="co">#&gt;  [94] rtracklayer_1.70.1                       </span></span>
 <span><span class="co">#&gt;  [95] prettyunits_1.2.0                        </span></span>
-<span><span class="co">#&gt;  [96] graphlayouts_1.1.1                       </span></span>
-<span><span class="co">#&gt;  [97] httr_1.4.7                               </span></span>
-<span><span class="co">#&gt;  [98] htmlwidgets_1.6.4                        </span></span>
-<span><span class="co">#&gt;  [99] S4Arrays_1.2.1                           </span></span>
-<span><span class="co">#&gt; [100] scatterpie_0.2.2                         </span></span>
-<span><span class="co">#&gt; [101] pkgconfig_2.0.3                          </span></span>
-<span><span class="co">#&gt; [102] gtable_0.3.5                             </span></span>
-<span><span class="co">#&gt; [103] blob_1.2.4                               </span></span>
-<span><span class="co">#&gt; [104] ComplexHeatmap_2.18.0                    </span></span>
-<span><span class="co">#&gt; [105] XVector_0.42.0                           </span></span>
-<span><span class="co">#&gt; [106] shadowtext_0.1.3                         </span></span>
-<span><span class="co">#&gt; [107] htmltools_0.5.8.1                        </span></span>
-<span><span class="co">#&gt; [108] fgsea_1.28.0                             </span></span>
-<span><span class="co">#&gt; [109] clue_0.3-65                              </span></span>
-<span><span class="co">#&gt; [110] plyranges_1.22.0                         </span></span>
-<span><span class="co">#&gt; [111] scales_1.3.0                             </span></span>
+<span><span class="co">#&gt;  [96] httr_1.4.8                               </span></span>
+<span><span class="co">#&gt;  [97] htmlwidgets_1.6.4                        </span></span>
+<span><span class="co">#&gt;  [98] S4Arrays_1.10.1                          </span></span>
+<span><span class="co">#&gt;  [99] scatterpie_0.2.6                         </span></span>
+<span><span class="co">#&gt; [100] pkgconfig_2.0.3                          </span></span>
+<span><span class="co">#&gt; [101] gtable_0.3.6                             </span></span>
+<span><span class="co">#&gt; [102] blob_1.3.0                               </span></span>
+<span><span class="co">#&gt; [103] ComplexHeatmap_2.26.1                    </span></span>
+<span><span class="co">#&gt; [104] S7_0.2.1                                 </span></span>
+<span><span class="co">#&gt; [105] XVector_0.50.0                           </span></span>
+<span><span class="co">#&gt; [106] htmltools_0.5.9                          </span></span>
+<span><span class="co">#&gt; [107] fontBitstreamVera_0.1.1                  </span></span>
+<span><span class="co">#&gt; [108] fgsea_1.36.2                             </span></span>
+<span><span class="co">#&gt; [109] clue_0.3-67                              </span></span>
+<span><span class="co">#&gt; [110] plyranges_1.30.1                         </span></span>
+<span><span class="co">#&gt; [111] scales_1.4.0                             </span></span>
 <span><span class="co">#&gt; [112] hues_0.2.0                               </span></span>
-<span><span class="co">#&gt; [113] TxDb.Hsapiens.UCSC.hg38.knownGene_3.18.0 </span></span>
-<span><span class="co">#&gt; [114] png_0.1-8                                </span></span>
+<span><span class="co">#&gt; [113] TxDb.Hsapiens.UCSC.hg38.knownGene_3.22.0 </span></span>
+<span><span class="co">#&gt; [114] png_0.1-9                                </span></span>
 <span><span class="co">#&gt; [115] snakecase_0.11.1                         </span></span>
-<span><span class="co">#&gt; [116] ggfun_0.1.4                              </span></span>
-<span><span class="co">#&gt; [117] knitr_1.46                               </span></span>
-<span><span class="co">#&gt; [118] reshape2_1.4.4                           </span></span>
-<span><span class="co">#&gt; [119] rjson_0.2.21                             </span></span>
-<span><span class="co">#&gt; [120] nlme_3.1-164                             </span></span>
-<span><span class="co">#&gt; [121] curl_5.2.1                               </span></span>
-<span><span class="co">#&gt; [122] GlobalOptions_0.1.2                      </span></span>
-<span><span class="co">#&gt; [123] cachem_1.0.8                             </span></span>
-<span><span class="co">#&gt; [124] zoo_1.8-12                               </span></span>
-<span><span class="co">#&gt; [125] stringr_1.5.1                            </span></span>
-<span><span class="co">#&gt; [126] KernSmooth_2.23-22                       </span></span>
-<span><span class="co">#&gt; [127] parallel_4.3.3                           </span></span>
-<span><span class="co">#&gt; [128] HDO.db_0.99.1                            </span></span>
-<span><span class="co">#&gt; [129] restfulr_0.0.15                          </span></span>
-<span><span class="co">#&gt; [130] desc_1.4.3                               </span></span>
-<span><span class="co">#&gt; [131] pillar_1.9.0                             </span></span>
-<span><span class="co">#&gt; [132] grid_4.3.3                               </span></span>
-<span><span class="co">#&gt; [133] vctrs_0.6.5                              </span></span>
-<span><span class="co">#&gt; [134] gplots_3.1.3.1                           </span></span>
-<span><span class="co">#&gt; [135] dbplyr_2.5.0                             </span></span>
-<span><span class="co">#&gt; [136] cluster_2.1.6                            </span></span>
-<span><span class="co">#&gt; [137] evaluate_0.23                            </span></span>
-<span><span class="co">#&gt; [138] GenomicFeatures_1.54.4                   </span></span>
-<span><span class="co">#&gt; [139] cli_3.6.2                                </span></span>
-<span><span class="co">#&gt; [140] compiler_4.3.3                           </span></span>
-<span><span class="co">#&gt; [141] Rsamtools_2.18.0                         </span></span>
-<span><span class="co">#&gt; [142] rlang_1.1.3                              </span></span>
-<span><span class="co">#&gt; [143] crayon_1.5.2                             </span></span>
-<span><span class="co">#&gt; [144] labeling_0.4.3                           </span></span>
-<span><span class="co">#&gt; [145] plyr_1.8.9                               </span></span>
-<span><span class="co">#&gt; [146] fs_1.6.3                                 </span></span>
-<span><span class="co">#&gt; [147] TxDb.Mmusculus.UCSC.mm10.knownGene_3.10.0</span></span>
-<span><span class="co">#&gt; [148] stringi_1.8.3                            </span></span>
-<span><span class="co">#&gt; [149] viridisLite_0.4.2                        </span></span>
-<span><span class="co">#&gt; [150] BiocParallel_1.36.0                      </span></span>
-<span><span class="co">#&gt; [151] munsell_0.5.1                            </span></span>
-<span><span class="co">#&gt; [152] Biostrings_2.70.3                        </span></span>
-<span><span class="co">#&gt; [153] lazyeval_0.2.2                           </span></span>
-<span><span class="co">#&gt; [154] GOSemSim_2.28.1                          </span></span>
-<span><span class="co">#&gt; [155] Matrix_1.6-5                             </span></span>
-<span><span class="co">#&gt; [156] BSgenome_1.70.2                          </span></span>
-<span><span class="co">#&gt; [157] hms_1.1.3                                </span></span>
-<span><span class="co">#&gt; [158] patchwork_1.2.0                          </span></span>
-<span><span class="co">#&gt; [159] bit64_4.0.5                              </span></span>
-<span><span class="co">#&gt; [160] KEGGREST_1.42.0                          </span></span>
-<span><span class="co">#&gt; [161] statmod_1.5.0                            </span></span>
-<span><span class="co">#&gt; [162] SummarizedExperiment_1.32.0              </span></span>
-<span><span class="co">#&gt; [163] highr_0.10                               </span></span>
-<span><span class="co">#&gt; [164] igraph_2.0.3                             </span></span>
-<span><span class="co">#&gt; [165] memoise_2.0.1                            </span></span>
-<span><span class="co">#&gt; [166] bslib_0.7.0                              </span></span>
-<span><span class="co">#&gt; [167] ggtree_3.10.1                            </span></span>
-<span><span class="co">#&gt; [168] fastmatch_1.1-4                          </span></span>
-<span><span class="co">#&gt; [169] bit_4.0.5                                </span></span>
-<span><span class="co">#&gt; [170] ape_5.8</span></span></code></pre>
+<span><span class="co">#&gt; [116] ggfun_0.2.0                              </span></span>
+<span><span class="co">#&gt; [117] knitr_1.51                               </span></span>
+<span><span class="co">#&gt; [118] reshape2_1.4.5                           </span></span>
+<span><span class="co">#&gt; [119] rjson_0.2.23                             </span></span>
+<span><span class="co">#&gt; [120] nlme_3.1-168                             </span></span>
+<span><span class="co">#&gt; [121] curl_7.0.0                               </span></span>
+<span><span class="co">#&gt; [122] GlobalOptions_0.1.3                      </span></span>
+<span><span class="co">#&gt; [123] cachem_1.1.0                             </span></span>
+<span><span class="co">#&gt; [124] zoo_1.8-15                               </span></span>
+<span><span class="co">#&gt; [125] stringr_1.6.0                            </span></span>
+<span><span class="co">#&gt; [126] KernSmooth_2.23-26                       </span></span>
+<span><span class="co">#&gt; [127] parallel_4.5.2                           </span></span>
+<span><span class="co">#&gt; [128] restfulr_0.0.16                          </span></span>
+<span><span class="co">#&gt; [129] desc_1.4.3                               </span></span>
+<span><span class="co">#&gt; [130] pillar_1.11.1                            </span></span>
+<span><span class="co">#&gt; [131] grid_4.5.2                               </span></span>
+<span><span class="co">#&gt; [132] vctrs_0.7.2                              </span></span>
+<span><span class="co">#&gt; [133] gplots_3.3.0                             </span></span>
+<span><span class="co">#&gt; [134] tidydr_0.0.6                             </span></span>
+<span><span class="co">#&gt; [135] cluster_2.1.8.2                          </span></span>
+<span><span class="co">#&gt; [136] evaluate_1.0.5                           </span></span>
+<span><span class="co">#&gt; [137] GenomicFeatures_1.62.0                   </span></span>
+<span><span class="co">#&gt; [138] cli_3.6.5                                </span></span>
+<span><span class="co">#&gt; [139] compiler_4.5.2                           </span></span>
+<span><span class="co">#&gt; [140] Rsamtools_2.26.0                         </span></span>
+<span><span class="co">#&gt; [141] rlang_1.1.7                              </span></span>
+<span><span class="co">#&gt; [142] crayon_1.5.3                             </span></span>
+<span><span class="co">#&gt; [143] labeling_0.4.3                           </span></span>
+<span><span class="co">#&gt; [144] plyr_1.8.9                               </span></span>
+<span><span class="co">#&gt; [145] fs_2.0.1                                 </span></span>
+<span><span class="co">#&gt; [146] TxDb.Mmusculus.UCSC.mm10.knownGene_3.10.0</span></span>
+<span><span class="co">#&gt; [147] ggiraph_0.9.6                            </span></span>
+<span><span class="co">#&gt; [148] stringi_1.8.7                            </span></span>
+<span><span class="co">#&gt; [149] BiocParallel_1.44.0                      </span></span>
+<span><span class="co">#&gt; [150] Biostrings_2.78.0                        </span></span>
+<span><span class="co">#&gt; [151] lazyeval_0.2.2                           </span></span>
+<span><span class="co">#&gt; [152] GOSemSim_2.36.0                          </span></span>
+<span><span class="co">#&gt; [153] fontquiver_0.2.1                         </span></span>
+<span><span class="co">#&gt; [154] Matrix_1.7-5                             </span></span>
+<span><span class="co">#&gt; [155] BSgenome_1.78.0                          </span></span>
+<span><span class="co">#&gt; [156] hms_1.1.4                                </span></span>
+<span><span class="co">#&gt; [157] patchwork_1.3.2                          </span></span>
+<span><span class="co">#&gt; [158] bit64_4.6.0-1                            </span></span>
+<span><span class="co">#&gt; [159] KEGGREST_1.50.0                          </span></span>
+<span><span class="co">#&gt; [160] statmod_1.5.1                            </span></span>
+<span><span class="co">#&gt; [161] SummarizedExperiment_1.40.0              </span></span>
+<span><span class="co">#&gt; [162] igraph_2.2.2                             </span></span>
+<span><span class="co">#&gt; [163] memoise_2.0.1                            </span></span>
+<span><span class="co">#&gt; [164] bslib_0.10.0                             </span></span>
+<span><span class="co">#&gt; [165] ggtree_4.0.5                             </span></span>
+<span><span class="co">#&gt; [166] fastmatch_1.1-8                          </span></span>
+<span><span class="co">#&gt; [167] bit_4.6.0                                </span></span>
+<span><span class="co">#&gt; [168] ape_5.8-1</span></span></code></pre>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -1299,16 +1336,16 @@ used.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

@@ -12,14 +12,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Generating qseaSets">
-<meta property="og:description" content="mesa">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -45,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -74,7 +73,7 @@
 <li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -85,7 +84,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -93,7 +92,7 @@
       <h1 data-toc-skip>Generating qseaSets</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/vignettes/generation.Rmd" class="external-link"><code>vignettes/generation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/vignettes/generation.Rmd" class="external-link"><code>vignettes/generation.Rmd</code></a></small>
       <div class="hidden name"><code>generation.Rmd</code></div>
 
     </div>
@@ -249,10 +248,19 @@ fragment length and SD values.</p>
 <span>   fragmentSD <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>   CNVmethod <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; Attaching package: 'generics'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     combine, intersect, setdiff, union</span></span>
+<span><span class="co">#&gt;     explain</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
+<span><span class="co">#&gt;     setequal, union</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     combine</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     IQR, mad, sd, var, xtabs</span></span>
@@ -260,10 +268,10 @@ fragment length and SD values.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
 <span><span class="co">#&gt;     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
-<span><span class="co">#&gt;     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,</span></span>
-<span><span class="co">#&gt;     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,</span></span>
-<span><span class="co">#&gt;     Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,</span></span>
-<span><span class="co">#&gt;     table, tapply, union, unique, unsplit, which.max, which.min</span></span>
+<span><span class="co">#&gt;     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
+<span><span class="co">#&gt;     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
+<span><span class="co">#&gt;     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
+<span><span class="co">#&gt;     unsplit, which.max, which.min</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'S4Vectors'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
@@ -285,11 +293,6 @@ fragment length and SD values.</p>
 <span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     strsplit</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'rtracklayer'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:BiocIO':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     FileForFormat</span></span>
 <span><span class="co">#&gt; Considering 541532 regions with total size 162459600</span></span>
 <span><span class="co">#&gt; ==== Creating qsea set ====</span></span>
 <span><span class="co">#&gt; restricting analysis on chr20, chr21, chr22</span></span>
@@ -304,24 +307,36 @@ fragment length and SD values.</p>
 <span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
 <span><span class="co">#&gt; Dropping 20294 proper pairs that have neither read with mapq &gt;= 10</span></span>
 <span><span class="co">#&gt; Dropping 179 proper pairs that do not lie within [70, 1000]</span></span>
+<span><span class="co">#&gt; Warning in call_new_fun_in_cigarillo("cigarWidthAlongReferenceSpace", "cigar_extent_along_ref", : cigarWidthAlongReferenceSpace() is formally deprecated in GenomicAlignments</span></span>
+<span><span class="co">#&gt;   &gt;= 1.45.5 and replaced with the cigar_extent_along_ref() function from the</span></span>
+<span><span class="co">#&gt;   new cigarillo package</span></span>
 <span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
 <span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 186, based on 879638 proper pairs.</span></span>
 <span><span class="co">#&gt; Reading NSCLC_MeDIP_2N_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
 <span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
 <span><span class="co">#&gt; Dropping 22848 proper pairs that have neither read with mapq &gt;= 10</span></span>
 <span><span class="co">#&gt; Dropping 312 proper pairs that do not lie within [70, 1000]</span></span>
+<span><span class="co">#&gt; Warning in call_new_fun_in_cigarillo("cigarWidthAlongReferenceSpace", "cigar_extent_along_ref", : cigarWidthAlongReferenceSpace() is formally deprecated in GenomicAlignments</span></span>
+<span><span class="co">#&gt;   &gt;= 1.45.5 and replaced with the cigar_extent_along_ref() function from the</span></span>
+<span><span class="co">#&gt;   new cigarillo package</span></span>
 <span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
 <span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 188, based on 1132561 proper pairs.</span></span>
 <span><span class="co">#&gt; Reading NSCLC_MeDIP_1T_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
 <span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
 <span><span class="co">#&gt; Dropping 12436 proper pairs that have neither read with mapq &gt;= 10</span></span>
 <span><span class="co">#&gt; Dropping 146 proper pairs that do not lie within [70, 1000]</span></span>
+<span><span class="co">#&gt; Warning in call_new_fun_in_cigarillo("cigarWidthAlongReferenceSpace", "cigar_extent_along_ref", : cigarWidthAlongReferenceSpace() is formally deprecated in GenomicAlignments</span></span>
+<span><span class="co">#&gt;   &gt;= 1.45.5 and replaced with the cigar_extent_along_ref() function from the</span></span>
+<span><span class="co">#&gt;   new cigarillo package</span></span>
 <span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
 <span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 183, based on 637854 proper pairs.</span></span>
 <span><span class="co">#&gt; Reading NSCLC_MeDIP_2T_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
 <span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
 <span><span class="co">#&gt; Dropping 11131 proper pairs that have neither read with mapq &gt;= 10</span></span>
 <span><span class="co">#&gt; Dropping 168 proper pairs that do not lie within [70, 1000]</span></span>
+<span><span class="co">#&gt; Warning in call_new_fun_in_cigarillo("cigarWidthAlongReferenceSpace", "cigar_extent_along_ref", : cigarWidthAlongReferenceSpace() is formally deprecated in GenomicAlignments</span></span>
+<span><span class="co">#&gt;   &gt;= 1.45.5 and replaced with the cigar_extent_along_ref() function from the</span></span>
+<span><span class="co">#&gt;   new cigarillo package</span></span>
 <span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
 <span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 189, based on 632731 proper pairs.</span></span>
 <span><span class="co">#&gt; Generated objects</span></span>
@@ -597,10 +612,14 @@ This works on a global assumption on the typical methylation levels
 across the human genome - that the majority of the isolated CGs are
 methylated while the majority of CpG islands are unmethylated. This
 blind calibration method therefore assumes that 76% of regions with a
-<code>CpG_density</code> of 1 are expected to be fully methylated (<span class="math inline">\(\beta = 1\)</span>), while 25% of regions with a
-<code>CpG_density</code> of 15 are fully unmethylated (<span class="math inline">\(\beta = 0\)</span>). A straight line is then fit
-between these two densities. This method is the only one implemented
-here, as it does not require additional data.</p>
+<code>CpG_density</code> of 1 are expected to be fully methylated
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\beta = 1</annotation></semantics></math>),
+while 25% of regions with a <code>CpG_density</code> of 15 are fully
+unmethylated
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\beta = 0</annotation></semantics></math>).
+A straight line is then fit between these two densities. This method is
+the only one implemented here, as it does not require additional
+data.</p>
 <p>We have found this blind calibration sufficient for the human genome,
 including being able to build classifiers using methylation arrays as
 our data source.</p>
@@ -677,13 +696,13 @@ used to apply this normalisation if required.</p>
 <div class="section level3">
 <h3 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h3>
-<pre><code><span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
@@ -701,72 +720,70 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] BSgenome.Hsapiens.UCSC.hg19_1.4.3 BSgenome_1.70.2                  </span></span>
-<span><span class="co">#&gt;  [3] rtracklayer_1.62.0                BiocIO_1.12.0                    </span></span>
-<span><span class="co">#&gt;  [5] Biostrings_2.70.3                 XVector_0.42.0                   </span></span>
-<span><span class="co">#&gt;  [7] GenomicRanges_1.54.1              GenomeInfoDb_1.38.8              </span></span>
-<span><span class="co">#&gt;  [9] IRanges_2.36.0                    S4Vectors_0.40.2                 </span></span>
-<span><span class="co">#&gt; [11] BiocGenerics_0.48.1               tibble_3.2.1                     </span></span>
-<span><span class="co">#&gt; [13] stringr_1.5.1                     mesa_0.99.0                      </span></span>
-<span><span class="co">#&gt; [15] dplyr_1.1.4                       qsea_1.28.0                      </span></span>
+<span><span class="co">#&gt;  [1] BSgenome.Hsapiens.UCSC.hg19_1.4.3 BSgenome_1.78.0                  </span></span>
+<span><span class="co">#&gt;  [3] rtracklayer_1.70.1                BiocIO_1.20.0                    </span></span>
+<span><span class="co">#&gt;  [5] Biostrings_2.78.0                 XVector_0.50.0                   </span></span>
+<span><span class="co">#&gt;  [7] GenomicRanges_1.62.1              Seqinfo_1.0.0                    </span></span>
+<span><span class="co">#&gt;  [9] IRanges_2.44.0                    S4Vectors_0.48.0                 </span></span>
+<span><span class="co">#&gt; [11] BiocGenerics_0.56.0               generics_0.1.4                   </span></span>
+<span><span class="co">#&gt; [13] tibble_3.3.1                      stringr_1.6.0                    </span></span>
+<span><span class="co">#&gt; [15] mesa_0.99.0                       dplyr_1.2.0                      </span></span>
+<span><span class="co">#&gt; [17] qsea_1.36.0                      </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] DBI_1.2.2                   bitops_1.0-7               </span></span>
-<span><span class="co">#&gt;  [3] biomaRt_2.58.2              HMMcopy_1.44.0             </span></span>
-<span><span class="co">#&gt;  [5] rlang_1.1.3                 magrittr_2.0.3             </span></span>
-<span><span class="co">#&gt;  [7] MEDIPS_1.54.0               matrixStats_1.3.0          </span></span>
-<span><span class="co">#&gt;  [9] compiler_4.3.3              RSQLite_2.3.6              </span></span>
-<span><span class="co">#&gt; [11] png_0.1-8                   systemfonts_1.0.6          </span></span>
-<span><span class="co">#&gt; [13] vctrs_0.6.5                 pkgconfig_2.0.3            </span></span>
-<span><span class="co">#&gt; [15] crayon_1.5.2                fastmap_1.1.1              </span></span>
-<span><span class="co">#&gt; [17] dbplyr_2.5.0                utf8_1.2.4                 </span></span>
-<span><span class="co">#&gt; [19] Rsamtools_2.18.0            rmarkdown_2.26             </span></span>
-<span><span class="co">#&gt; [21] preprocessCore_1.64.0       ragg_1.3.0                 </span></span>
-<span><span class="co">#&gt; [23] purrr_1.0.2                 bit_4.0.5                  </span></span>
-<span><span class="co">#&gt; [25] xfun_0.43                   zlibbioc_1.48.2            </span></span>
-<span><span class="co">#&gt; [27] cachem_1.0.8                jsonlite_1.8.8             </span></span>
-<span><span class="co">#&gt; [29] progress_1.2.3              blob_1.2.4                 </span></span>
-<span><span class="co">#&gt; [31] DelayedArray_0.28.0         BiocParallel_1.36.0        </span></span>
-<span><span class="co">#&gt; [33] parallel_4.3.3              prettyunits_1.2.0          </span></span>
-<span><span class="co">#&gt; [35] R6_2.5.1                    plyranges_1.22.0           </span></span>
-<span><span class="co">#&gt; [37] bslib_0.7.0                 stringi_1.8.3              </span></span>
-<span><span class="co">#&gt; [39] limma_3.58.1                DNAcopy_1.76.0             </span></span>
-<span><span class="co">#&gt; [41] jquerylib_0.1.4             SummarizedExperiment_1.32.0</span></span>
-<span><span class="co">#&gt; [43] knitr_1.46                  zoo_1.8-12                 </span></span>
-<span><span class="co">#&gt; [45] Matrix_1.6-5                tidyselect_1.2.1           </span></span>
-<span><span class="co">#&gt; [47] abind_1.4-5                 yaml_2.3.8                 </span></span>
-<span><span class="co">#&gt; [49] codetools_0.2-20            curl_5.2.1                 </span></span>
-<span><span class="co">#&gt; [51] lattice_0.22-6              withr_3.0.0                </span></span>
-<span><span class="co">#&gt; [53] Biobase_2.62.0              KEGGREST_1.42.0            </span></span>
-<span><span class="co">#&gt; [55] evaluate_0.23               desc_1.4.3                 </span></span>
-<span><span class="co">#&gt; [57] BiocFileCache_2.10.2        xml2_1.3.6                 </span></span>
-<span><span class="co">#&gt; [59] pillar_1.9.0                filelock_1.0.3             </span></span>
-<span><span class="co">#&gt; [61] MatrixGenerics_1.14.0       generics_0.1.3             </span></span>
-<span><span class="co">#&gt; [63] RCurl_1.98-1.14             hms_1.1.3                  </span></span>
-<span><span class="co">#&gt; [65] gtools_3.9.5                glue_1.7.0                 </span></span>
-<span><span class="co">#&gt; [67] tools_4.3.3                 data.table_1.15.4          </span></span>
-<span><span class="co">#&gt; [69] GenomicAlignments_1.38.2    fs_1.6.3                   </span></span>
-<span><span class="co">#&gt; [71] XML_3.99-0.16.1             grid_4.3.3                 </span></span>
-<span><span class="co">#&gt; [73] MEDIPSData_1.38.0           AnnotationDbi_1.64.1       </span></span>
-<span><span class="co">#&gt; [75] GenomeInfoDbData_1.2.11     restfulr_0.0.15            </span></span>
-<span><span class="co">#&gt; [77] cli_3.6.2                   rappdirs_0.3.3             </span></span>
-<span><span class="co">#&gt; [79] textshaping_0.3.7           fansi_1.0.6                </span></span>
-<span><span class="co">#&gt; [81] S4Arrays_1.2.1              sass_0.4.9                 </span></span>
-<span><span class="co">#&gt; [83] digest_0.6.35               SparseArray_1.2.4          </span></span>
-<span><span class="co">#&gt; [85] rjson_0.2.21                htmlwidgets_1.6.4          </span></span>
-<span><span class="co">#&gt; [87] memoise_2.0.1               htmltools_0.5.8.1          </span></span>
-<span><span class="co">#&gt; [89] pkgdown_2.0.9               lifecycle_1.0.4            </span></span>
-<span><span class="co">#&gt; [91] httr_1.4.7                  statmod_1.5.0              </span></span>
-<span><span class="co">#&gt; [93] bit64_4.0.5</span></span></code></pre>
+<span><span class="co">#&gt;  [1] DBI_1.3.0                   bitops_1.0-9               </span></span>
+<span><span class="co">#&gt;  [3] httr2_1.2.2                 biomaRt_2.66.2             </span></span>
+<span><span class="co">#&gt;  [5] HMMcopy_1.52.0              rlang_1.1.7                </span></span>
+<span><span class="co">#&gt;  [7] magrittr_2.0.4              MEDIPS_1.62.0              </span></span>
+<span><span class="co">#&gt;  [9] otel_0.2.0                  matrixStats_1.5.0          </span></span>
+<span><span class="co">#&gt; [11] compiler_4.5.2              RSQLite_2.4.6              </span></span>
+<span><span class="co">#&gt; [13] png_0.1-9                   systemfonts_1.3.2          </span></span>
+<span><span class="co">#&gt; [15] vctrs_0.7.2                 pkgconfig_2.0.3            </span></span>
+<span><span class="co">#&gt; [17] crayon_1.5.3                fastmap_1.2.0              </span></span>
+<span><span class="co">#&gt; [19] dbplyr_2.5.2                Rsamtools_2.26.0           </span></span>
+<span><span class="co">#&gt; [21] rmarkdown_2.30              preprocessCore_1.72.0      </span></span>
+<span><span class="co">#&gt; [23] UCSC.utils_1.6.1            ragg_1.5.2                 </span></span>
+<span><span class="co">#&gt; [25] purrr_1.2.1                 bit_4.6.0                  </span></span>
+<span><span class="co">#&gt; [27] xfun_0.57                   cachem_1.1.0               </span></span>
+<span><span class="co">#&gt; [29] cigarillo_1.0.0             GenomeInfoDb_1.46.2        </span></span>
+<span><span class="co">#&gt; [31] jsonlite_2.0.0              progress_1.2.3             </span></span>
+<span><span class="co">#&gt; [33] blob_1.3.0                  DelayedArray_0.36.0        </span></span>
+<span><span class="co">#&gt; [35] BiocParallel_1.44.0         parallel_4.5.2             </span></span>
+<span><span class="co">#&gt; [37] prettyunits_1.2.0           R6_2.6.1                   </span></span>
+<span><span class="co">#&gt; [39] plyranges_1.30.1            bslib_0.10.0               </span></span>
+<span><span class="co">#&gt; [41] stringi_1.8.7               limma_3.66.0               </span></span>
+<span><span class="co">#&gt; [43] DNAcopy_1.84.0              jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [45] SummarizedExperiment_1.40.0 knitr_1.51                 </span></span>
+<span><span class="co">#&gt; [47] zoo_1.8-15                  Matrix_1.7-5               </span></span>
+<span><span class="co">#&gt; [49] tidyselect_1.2.1            abind_1.4-8                </span></span>
+<span><span class="co">#&gt; [51] yaml_2.3.12                 codetools_0.2-20           </span></span>
+<span><span class="co">#&gt; [53] curl_7.0.0                  lattice_0.22-9             </span></span>
+<span><span class="co">#&gt; [55] withr_3.0.2                 Biobase_2.70.0             </span></span>
+<span><span class="co">#&gt; [57] KEGGREST_1.50.0             evaluate_1.0.5             </span></span>
+<span><span class="co">#&gt; [59] desc_1.4.3                  BiocFileCache_3.0.0        </span></span>
+<span><span class="co">#&gt; [61] pillar_1.11.1               filelock_1.0.3             </span></span>
+<span><span class="co">#&gt; [63] MatrixGenerics_1.22.0       RCurl_1.98-1.18            </span></span>
+<span><span class="co">#&gt; [65] hms_1.1.4                   gtools_3.9.5               </span></span>
+<span><span class="co">#&gt; [67] glue_1.8.0                  tools_4.5.2                </span></span>
+<span><span class="co">#&gt; [69] data.table_1.18.2.1         GenomicAlignments_1.46.0   </span></span>
+<span><span class="co">#&gt; [71] fs_2.0.1                    XML_3.99-0.23              </span></span>
+<span><span class="co">#&gt; [73] grid_4.5.2                  MEDIPSData_1.46.0          </span></span>
+<span><span class="co">#&gt; [75] AnnotationDbi_1.72.0        restfulr_0.0.16            </span></span>
+<span><span class="co">#&gt; [77] cli_3.6.5                   rappdirs_0.3.4             </span></span>
+<span><span class="co">#&gt; [79] textshaping_1.0.5           S4Arrays_1.10.1            </span></span>
+<span><span class="co">#&gt; [81] sass_0.4.10                 digest_0.6.39              </span></span>
+<span><span class="co">#&gt; [83] SparseArray_1.10.9          rjson_0.2.23               </span></span>
+<span><span class="co">#&gt; [85] htmlwidgets_1.6.4           memoise_2.0.1              </span></span>
+<span><span class="co">#&gt; [87] htmltools_0.5.9             pkgdown_2.2.0              </span></span>
+<span><span class="co">#&gt; [89] lifecycle_1.0.5             httr_1.4.8                 </span></span>
+<span><span class="co">#&gt; [91] statmod_1.5.1               bit64_4.6.0-1</span></span></code></pre>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -779,16 +796,16 @@ used to apply this normalisation if required.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

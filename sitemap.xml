@@ -1,372 +1,126 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>/articles/data-and-qc.html</loc>
-  </url>
-  <url>
-    <loc>/articles/differentially-methylated-regions.html</loc>
-  </url>
-  <url>
-    <loc>/articles/generation.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/introduction.html</loc>
-  </url>
-  <url>
-    <loc>/articles/pca.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/BSgenome.CpG.distribution.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ENCODEbadRegions.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FantomRegions.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addBamCoveragePairedAndUnpaired.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addHMMcopyCNV.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addHyperStableFraction.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addLibraryInformation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addMedipsEnrichmentFactors.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addNormalisation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addSummaryAcrossWindows.html</loc>
-  </url>
-  <url>
-    <loc>/reference/alterQsetOverlap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/annotateWindows.html</loc>
-  </url>
-  <url>
-    <loc>/reference/arrange.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/asValidGranges.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculateCGEnrichment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculateCGEnrichmentGRanges.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculateDMRs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculateFractionReadsInGRanges.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculateGenomicCGDistribution.html</loc>
-  </url>
-  <url>
-    <loc>/reference/colnames-qseaSet-method.html</loc>
-  </url>
-  <url>
-    <loc>/reference/combineQsets.html</loc>
-  </url>
-  <url>
-    <loc>/reference/combineQsetsList.html</loc>
-  </url>
-  <url>
-    <loc>/reference/convertToArrayBetaTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/countWindowsAboveCutoff.html</loc>
-  </url>
-  <url>
-    <loc>/reference/downSample.html</loc>
-  </url>
-  <url>
-    <loc>/reference/exampleMouse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/exampleTumourNormal.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filter.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterWindows.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fitQseaGLM.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gc_hg38_1000kb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getAnnotation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getBetaTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getCGPositions.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getCountTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getDMRsData.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getDataTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getDimRed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getGenomicFeatureDistribution.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getMesaAnnoDb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getMesaGenome.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getMesaTxDb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getNRPMTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getPattern.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getSampleGroups2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getSampleQCSummary.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getWindowAnnotation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getWindowNames.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getWindows.html</loc>
-  </url>
-  <url>
-    <loc>/reference/hg19ToHg38.over.chain.html</loc>
-  </url>
-  <url>
-    <loc>/reference/hg38CpGIslands.html</loc>
-  </url>
-  <url>
-    <loc>/reference/hg38UltraStableProbes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/hg38_450kArrayGR.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/is.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/left_join.mesaDimRed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/left_join.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/liftOverHg19.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeAllContrasts.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeGeneHeatmapRowAnnotation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeHeatmapAnnotations.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeQset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeTransposedTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/map_hg38_1000kb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mesaDimRed-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mesaPCA-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mesaUMAP-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mixSamples.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mixThreeQsetSamples.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mutate.mesaDimRed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mutate.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pivotDMRsLonger.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotCNVheatmap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotCorrelationMatrix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotDMRUpset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotDimRed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotGeneHeatmap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotGenomicFeatureDistribution.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotPCA.mesaDimRed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotRegionsHeatmap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotUMAP.html</loc>
-  </url>
-  <url>
-    <loc>/reference/poolSamples.html</loc>
-  </url>
-  <url>
-    <loc>/reference/print_and_capture.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pull.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/qseaTableToChrGRanges.html</loc>
-  </url>
-  <url>
-    <loc>/reference/removeCNV.html</loc>
-  </url>
-  <url>
-    <loc>/reference/removeLibraryFactors.html</loc>
-  </url>
-  <url>
-    <loc>/reference/removeNormMethodSuffix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/remove_almost_empty_cols.html</loc>
-  </url>
-  <url>
-    <loc>/reference/renameQsetNames.html</loc>
-  </url>
-  <url>
-    <loc>/reference/renameSamples.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runHMMCopy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/select.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/selectQset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/setMart.html</loc>
-  </url>
-  <url>
-    <loc>/reference/setMesaAnnoDb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/setMesaGenome.html</loc>
-  </url>
-  <url>
-    <loc>/reference/setMesaParallel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/setMesaTxDb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sliceDMRs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sort.qseaSet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/subsetQset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/subsetWindowsBySignal.html</loc>
-  </url>
-  <url>
-    <loc>/reference/subsetWindowsOverBackground.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summariseAcrossWindows.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summariseDMRsByContrast.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summariseDMRsByGene.html</loc>
-  </url>
-  <url>
-    <loc>/reference/testPlotGeneHeatmap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/writeBigWigs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/writeDMRsToBed.html</loc>
-  </url>
-  <url>
-    <loc>/reference/writeDMRsToExcel.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>/articles/data-and-qc.html</loc></url>
+<url><loc>/articles/differentially-methylated-regions.html</loc></url>
+<url><loc>/articles/generation.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/introduction.html</loc></url>
+<url><loc>/articles/pca.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/BSgenome.CpG.distribution.html</loc></url>
+<url><loc>/reference/ENCODEbadRegions.html</loc></url>
+<url><loc>/reference/FantomRegions.html</loc></url>
+<url><loc>/reference/addBamCoveragePairedAndUnpaired.html</loc></url>
+<url><loc>/reference/addHMMcopyCNV.html</loc></url>
+<url><loc>/reference/addHyperStableFraction.html</loc></url>
+<url><loc>/reference/addLibraryInformation.html</loc></url>
+<url><loc>/reference/addMedipsEnrichmentFactors.html</loc></url>
+<url><loc>/reference/addNormalisation.html</loc></url>
+<url><loc>/reference/addSummaryAcrossWindows.html</loc></url>
+<url><loc>/reference/alterQsetOverlap.html</loc></url>
+<url><loc>/reference/annotateWindows.html</loc></url>
+<url><loc>/reference/arrange.qseaSet.html</loc></url>
+<url><loc>/reference/asValidGranges.html</loc></url>
+<url><loc>/reference/calculateCGEnrichment.html</loc></url>
+<url><loc>/reference/calculateCGEnrichmentGRanges.html</loc></url>
+<url><loc>/reference/calculateDMRs.html</loc></url>
+<url><loc>/reference/calculateFractionReadsInGRanges.html</loc></url>
+<url><loc>/reference/calculateGenomicCGDistribution.html</loc></url>
+<url><loc>/reference/colnames-qseaSet-method.html</loc></url>
+<url><loc>/reference/combineQsets.html</loc></url>
+<url><loc>/reference/combineQsetsList.html</loc></url>
+<url><loc>/reference/convertToArrayBetaTable.html</loc></url>
+<url><loc>/reference/countWindowsAboveCutoff.html</loc></url>
+<url><loc>/reference/downSample.html</loc></url>
+<url><loc>/reference/exampleMouse.html</loc></url>
+<url><loc>/reference/exampleTumourNormal.html</loc></url>
+<url><loc>/reference/filter.qseaSet.html</loc></url>
+<url><loc>/reference/filterWindows.html</loc></url>
+<url><loc>/reference/fitQseaGLM.html</loc></url>
+<url><loc>/reference/gc_hg38_1000kb.html</loc></url>
+<url><loc>/reference/getAnnotation.html</loc></url>
+<url><loc>/reference/getBetaTable.html</loc></url>
+<url><loc>/reference/getCGPositions.html</loc></url>
+<url><loc>/reference/getCountTable.html</loc></url>
+<url><loc>/reference/getDMRsData.html</loc></url>
+<url><loc>/reference/getDataTable.html</loc></url>
+<url><loc>/reference/getDimRed.html</loc></url>
+<url><loc>/reference/getGenomicFeatureDistribution.html</loc></url>
+<url><loc>/reference/getMesaAnnoDb.html</loc></url>
+<url><loc>/reference/getMesaGenome.html</loc></url>
+<url><loc>/reference/getMesaTxDb.html</loc></url>
+<url><loc>/reference/getNRPMTable.html</loc></url>
+<url><loc>/reference/getPattern.html</loc></url>
+<url><loc>/reference/getSampleGroups2.html</loc></url>
+<url><loc>/reference/getSampleQCSummary.html</loc></url>
+<url><loc>/reference/getWindowAnnotation.html</loc></url>
+<url><loc>/reference/getWindowNames.html</loc></url>
+<url><loc>/reference/getWindows.html</loc></url>
+<url><loc>/reference/hg19ToHg38.over.chain.html</loc></url>
+<url><loc>/reference/hg38CpGIslands.html</loc></url>
+<url><loc>/reference/hg38UltraStableProbes.html</loc></url>
+<url><loc>/reference/hg38_450kArrayGR.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/is.qseaSet.html</loc></url>
+<url><loc>/reference/left_join.mesaDimRed.html</loc></url>
+<url><loc>/reference/left_join.qseaSet.html</loc></url>
+<url><loc>/reference/liftOverHg19.html</loc></url>
+<url><loc>/reference/makeAllContrasts.html</loc></url>
+<url><loc>/reference/makeGeneHeatmapRowAnnotation.html</loc></url>
+<url><loc>/reference/makeHeatmapAnnotations.html</loc></url>
+<url><loc>/reference/makeQset.html</loc></url>
+<url><loc>/reference/makeTransposedTable.html</loc></url>
+<url><loc>/reference/map_hg38_1000kb.html</loc></url>
+<url><loc>/reference/mesaDimRed-class.html</loc></url>
+<url><loc>/reference/mesaPCA-class.html</loc></url>
+<url><loc>/reference/mesaUMAP-class.html</loc></url>
+<url><loc>/reference/mixSamples.html</loc></url>
+<url><loc>/reference/mixThreeQsetSamples.html</loc></url>
+<url><loc>/reference/mutate.mesaDimRed.html</loc></url>
+<url><loc>/reference/mutate.qseaSet.html</loc></url>
+<url><loc>/reference/pipe.html</loc></url>
+<url><loc>/reference/pivotDMRsLonger.html</loc></url>
+<url><loc>/reference/plotCNVheatmap.html</loc></url>
+<url><loc>/reference/plotCorrelationMatrix.html</loc></url>
+<url><loc>/reference/plotDMRUpset.html</loc></url>
+<url><loc>/reference/plotDimRed.html</loc></url>
+<url><loc>/reference/plotGeneHeatmap.html</loc></url>
+<url><loc>/reference/plotGenomicFeatureDistribution.html</loc></url>
+<url><loc>/reference/plotPCA.mesaDimRed.html</loc></url>
+<url><loc>/reference/plotRegionsHeatmap.html</loc></url>
+<url><loc>/reference/plotUMAP.html</loc></url>
+<url><loc>/reference/poolSamples.html</loc></url>
+<url><loc>/reference/print_and_capture.html</loc></url>
+<url><loc>/reference/pull.qseaSet.html</loc></url>
+<url><loc>/reference/qseaTableToChrGRanges.html</loc></url>
+<url><loc>/reference/removeCNV.html</loc></url>
+<url><loc>/reference/removeLibraryFactors.html</loc></url>
+<url><loc>/reference/removeNormMethodSuffix.html</loc></url>
+<url><loc>/reference/remove_almost_empty_cols.html</loc></url>
+<url><loc>/reference/renameQsetNames.html</loc></url>
+<url><loc>/reference/renameSamples.html</loc></url>
+<url><loc>/reference/runHMMCopy.html</loc></url>
+<url><loc>/reference/select.qseaSet.html</loc></url>
+<url><loc>/reference/selectQset.html</loc></url>
+<url><loc>/reference/setMart.html</loc></url>
+<url><loc>/reference/setMesaAnnoDb.html</loc></url>
+<url><loc>/reference/setMesaGenome.html</loc></url>
+<url><loc>/reference/setMesaParallel.html</loc></url>
+<url><loc>/reference/setMesaTxDb.html</loc></url>
+<url><loc>/reference/sliceDMRs.html</loc></url>
+<url><loc>/reference/sort.qseaSet.html</loc></url>
+<url><loc>/reference/subsetQset.html</loc></url>
+<url><loc>/reference/subsetWindowsBySignal.html</loc></url>
+<url><loc>/reference/subsetWindowsOverBackground.html</loc></url>
+<url><loc>/reference/summariseAcrossWindows.html</loc></url>
+<url><loc>/reference/summariseDMRsByContrast.html</loc></url>
+<url><loc>/reference/summariseDMRsByGene.html</loc></url>
+<url><loc>/reference/testPlotGeneHeatmap.html</loc></url>
+<url><loc>/reference/writeBigWigs.html</loc></url>
+<url><loc>/reference/writeDMRsToBed.html</loc></url>
+<url><loc>/reference/writeDMRsToExcel.html</loc></url>
 </urlset>
+

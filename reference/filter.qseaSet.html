@@ -4,7 +4,7 @@ predicates applied to its sampleTable."><!-- mathjax --><script src="https://cdn
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -29,7 +29,7 @@ predicates applied to its sampleTable."><!-- mathjax --><script src="https://cdn
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -54,20 +54,20 @@ predicates applied to its sampleTable."><!-- mathjax --><script src="https://cdn
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Filter samples in a qseaSet</h1>
-    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/R/dplyrVerbs.R" class="external-link"><code>R/dplyrVerbs.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/R/dplyrVerbs.R" class="external-link"><code>R/dplyrVerbs.R</code></a></small>
     <div class="hidden name"><code>filter.qseaSet.Rd</code></div>
     </div>
 
@@ -77,24 +77,26 @@ predicates applied to its <code>sampleTable</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for qseaSet</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'qseaSet'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.data</span>, <span class="va">...</span>, .preserve <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>.data</dt>
+
+
+<dl><dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
 <dd><p><code>qseaSet</code>
 A <code>qseaSet</code> object whose samples are to be filtered.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Predicate expressions passed to <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code>, evaluated on the
 <code>sampleTable</code>. For example, <code>age &gt; 65</code>, <code>tissue == "Colon"</code>.
 <strong>Default:</strong> none (no filtering).</p></dd>
 
 
-<dt>.preserve</dt>
+<dt id="arg--preserve">.preserve<a class="anchor" aria-label="anchor" href="#arg--preserve"></a></dt>
 <dd><p><code>logical(1)</code>
 Placeholder argument for compatibility with <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code>. Ignored
 here since grouping is not implemented.
@@ -103,9 +105,7 @@ here since grouping is not implemented.
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>qseaSet</code> object containing only the samples whose
+    <p>A <code>qseaSet</code> object containing only the samples whose
 <code>sampleTable</code> rows satisfied the filter expressions. If no samples
 remain, an empty <code>qseaSet</code> is returned (with a message but not an error).</p>
     </div>
@@ -182,15 +182,15 @@ Grouped filtering (<code>group_by</code>) is not supported for <code>qseaSet</co
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

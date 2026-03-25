@@ -5,7 +5,7 @@ tidyselect helpers while preserving key identifiers."><!-- mathjax --><script sr
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -30,7 +30,7 @@ tidyselect helpers while preserving key identifiers."><!-- mathjax --><script sr
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -55,20 +55,20 @@ tidyselect helpers while preserving key identifiers."><!-- mathjax --><script sr
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Select or rename columns in a qseaSet sample table</h1>
-    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/R/dplyrVerbs.R" class="external-link"><code>R/dplyrVerbs.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/R/dplyrVerbs.R" class="external-link"><code>R/dplyrVerbs.R</code></a></small>
     <div class="hidden name"><code>select.qseaSet.Rd</code></div>
     </div>
 
@@ -79,18 +79,20 @@ tidyselect helpers while preserving key identifiers.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for qseaSet</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'qseaSet'</span></span>
 <span><span class="fu">select</span><span class="op">(</span><span class="va">.data</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>.data</dt>
+
+
+<dl><dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
 <dd><p><code>qseaSet</code>.
 A qseaSet object whose <code>sampleTable</code> columns will be selected or renamed.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code>, supports tidyselect helpers
 (e.g., <code><a href="https://dplyr.tidyverse.org/reference/reexports.html" class="external-link">dplyr::matches()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/reexports.html" class="external-link">dplyr::starts_with()</a></code>).
 Negative selection (<code>-col</code>) is supported, but <code>sample_name</code> and <code>group</code>
@@ -100,9 +102,7 @@ cannot be removed.
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>qseaSet</code> with its <code>sampleTable</code> updated:</p><ul><li><p>contains only selected/renamed columns,</p></li>
+    <p>A <code>qseaSet</code> with its <code>sampleTable</code> updated:</p><ul><li><p>contains only selected/renamed columns,</p></li>
 <li><p>always includes <code>sample_name</code> and <code>group</code> (if available).</p></li>
 </ul></div>
     <div id="details">
@@ -200,15 +200,15 @@ first if present).</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

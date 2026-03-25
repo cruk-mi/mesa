@@ -12,14 +12,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Dimensionality Reduction - PCAs and UMAPs">
-<meta property="og:description" content="mesa">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -45,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -74,7 +73,7 @@
 <li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -85,18 +84,18 @@
 </div>
 <!--/.navbar -->
 
-      
 
-      </header><link href="pca_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
-<script src="pca_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="pca_files/plotly-binding-4.10.4/plotly.js"></script><script src="pca_files/typedarray-0.1/typedarray.min.js"></script><link href="pca_files/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
-<script src="pca_files/crosstalk-1.2.1/js/crosstalk.min.js"></script><link href="pca_files/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
-<script src="pca_files/plotly-main-2.11.1/plotly-latest.min.js"></script><div class="row">
+
+      </header><link href="pca_files/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="pca_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="pca_files/plotly-binding-4.12.0/plotly.js"></script><script src="pca_files/typedarray-0.1/typedarray.min.js"></script><link href="pca_files/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="pca_files/crosstalk-1.2.2/js/crosstalk.min.js"></script><link href="pca_files/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="pca_files/plotly-main-2.25.2/plotly-latest.min.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Dimensionality Reduction - PCAs and UMAPs</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/vignettes/pca.Rmd" class="external-link"><code>vignettes/pca.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/vignettes/pca.Rmd" class="external-link"><code>vignettes/pca.Rmd</code></a></small>
       <div class="hidden name"><code>pca.Rmd</code></div>
 
     </div>
@@ -173,10 +172,10 @@ result.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-3-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-3-2.png" class="r-plt" alt="" width="672"></p>
 <p>The output of <code><a href="../reference/getDimRed.html">getPCA()</a></code> is the PCA result object
 (technically a <code>mesaDimRed</code> object). This includes a copy of
 the <code>sampleTable</code>, detached from the original qseaSet.</p>
@@ -214,26 +213,26 @@ Only one variable can be specified for <code>shape</code>.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$patient$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-5-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-5-2.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$age</span></span>
 <span><span class="co">#&gt; $pca1$age$PC1vsPC2</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-5-3.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-5-3.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$age$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-5-4.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-5-4.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$transformed_age</span></span>
 <span><span class="co">#&gt; $pca1$transformed_age$PC1vsPC2</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-5-5.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-5-5.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$transformed_age$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-5-6.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-5-6.png" class="r-plt" alt="" width="672"></p>
 <p>Here, many PCA plots have been produced and displayed (PC1 vs PC2 and
 PC2 vs PC2 for three different colour variable annotations. To have more
 control over which plots are displayed you can save the plots to a
@@ -244,15 +243,15 @@ variable and then choose which ones to display.</p>
 <span>                     shape <span class="op">=</span> <span class="st">"tumour"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-6-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-6-2.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-6-3.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-6-3.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="colour-and-shape-palettes">Colour and shape palettes<a class="anchor" aria-label="anchor" href="#colour-and-shape-palettes"></a>
@@ -271,11 +270,11 @@ seen below (and we also replot the above version for comparison).</p>
 <code class="sourceCode R"><span><span class="va">PCAplots2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, colour <span class="op">=</span> <span class="st">"transformed_age"</span>, shape <span class="op">=</span> <span class="st">"tumour"</span>, symDivColourScale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots2</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-7-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-7-2.png" class="r-plt" alt="" width="672"></p>
 <p>By default, filled shapes (21-25) with a black outline are used for
 points unless a categorical variable with more than 5 categories
 (including NA) is set to the shape, in which case the unfilled shapes
@@ -295,10 +294,10 @@ shapes and the colour aesthetic for unfilled shapes in the underlying
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-8-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>,</span>
 <span>        colour <span class="op">=</span> <span class="st">"tumour"</span>,</span>
@@ -306,10 +305,10 @@ shapes and the colour aesthetic for unfilled shapes in the underlying
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-9-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-9-2.png" class="r-plt" alt="" width="672"></p>
 <p>It is possible to specify your own colour and shape palettes using
 the <code>colourPalette</code> and <code>shapePalette</code>
 arguments.</p>
@@ -322,10 +321,10 @@ arguments.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-10-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-10-2.png" class="r-plt" alt="" width="672"></p>
 <p>These can be a named vector, in order to specify which value of the
 annotation gets which colour/shape:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -337,10 +336,10 @@ annotation gets which colour/shape:</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-11-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/unnamed-chunk-11-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-11-2.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="na-values">NA values<a class="anchor" aria-label="anchor" href="#na-values"></a>
@@ -357,13 +356,13 @@ be changed using the <code>NAshape</code> argument).</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$stage</span></span>
 <span><span class="co">#&gt; $pca1$stage$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, shape <span class="op">=</span> <span class="st">"stage"</span>, NAshape <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-12-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-12-2.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="components">Components<a class="anchor" aria-label="anchor" href="#components"></a>
@@ -389,7 +388,7 @@ has a default value of 2.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, </span>
@@ -400,7 +399,7 @@ has a default value of 2.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-13-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-13-2.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="text-annotations">Text annotations<a class="anchor" aria-label="anchor" href="#text-annotations"></a>
@@ -416,7 +415,7 @@ has a default value of 2.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="672"></p>
 <p>Alternatively, <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> can be used to
 generate an interactive version of the plot which gives information for
 each point when you rollover the point with the mouse. The
@@ -431,7 +430,7 @@ annotations.</p>
 <span>                     shape <span class="op">=</span> <span class="st">"tumour"</span>, </span>
 <span>                     plotlyAnnotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stage"</span>, <span class="st">"age"</span>, <span class="st">"gender"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="plotly html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:672px;height:528px;"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"data":[{"x":[-1.7265582180330998],"y":[1.7189002408956693],"text":"PC1: -1.7265582<br />PC2:  1.71890024<br />sample_name: Colon1_N<br />stage: NA<br />age: 80<br />gender: F<br />patient: Colon1<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(80,63,68,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon1,Normal)","legendgroup":"(Colon1,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-3.2120851807763131],"y":[0.78271340788048538],"text":"PC1: -3.2120852<br />PC2:  0.78271341<br />sample_name: Colon1_T<br />stage: III<br />age: 80<br />gender: F<br />patient: Colon1<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(80,63,68,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon1,Tumour)","legendgroup":"(Colon1,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0.21936956450435074],"y":[0.61910259202113604],"text":"PC1:  0.2193696<br />PC2:  0.61910259<br />sample_name: Colon2_N<br />stage: NA<br />age: 67<br />gender: F<br />patient: Colon2<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(150,79,184,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon2,Normal)","legendgroup":"(Colon2,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-1.0028419177448482],"y":[0.66701624412419402],"text":"PC1: -1.0028419<br />PC2:  0.66701624<br />sample_name: Colon2_T<br />stage: IV<br />age: 67<br />gender: F<br />patient: Colon2<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(150,79,184,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon2,Tumour)","legendgroup":"(Colon2,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8640092987925319],"y":[0.090531968102153415],"text":"PC1:  1.8640093<br />PC2:  0.09053197<br />sample_name: Lung1_N<br />stage: NA<br />age: 64<br />gender: F<br />patient: Lung1<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(151,178,183,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung1,Normal)","legendgroup":"(Lung1,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0.87821945448173477],"y":[-0.28376153171472956],"text":"PC1:  0.8782195<br />PC2: -0.28376153<br />sample_name: Lung1_T<br />stage: IIA<br />age: 64<br />gender: F<br />patient: Lung1<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(151,178,183,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung1,Tumour)","legendgroup":"(Lung1,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2.0129143988682872],"y":[0.60350249059376226],"text":"PC1:  2.0129144<br />PC2:  0.60350249<br />sample_name: Lung2_N<br />stage: NA<br />age: 71<br />gender: F<br />patient: Lung2<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(148,191,88,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung2,Normal)","legendgroup":"(Lung2,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-0.82443270205659713],"y":[-3.893412134413591],"text":"PC1: -0.8244327<br />PC2: -3.89341213<br />sample_name: Lung2_T<br />stage: IA<br />age: 71<br />gender: F<br />patient: Lung2<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(148,191,88,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung2,Tumour)","legendgroup":"(Lung2,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8941051162676681],"y":[0.82108106224004618],"text":"PC1:  1.8941051<br />PC2:  0.82108106<br />sample_name: Lung3_N<br />stage: NA<br />age: 72<br />gender: M<br />patient: Lung3<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(198,98,77,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung3,Normal)","legendgroup":"(Lung3,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-0.1026998143037143],"y":[-1.1256743397291267],"text":"PC1: -0.1026998<br />PC2: -1.12567434<br />sample_name: Lung3_T<br />stage: IB<br />age: 72<br />gender: M<br />patient: Lung3<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(198,98,77,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung3,Tumour)","legendgroup":"(Lung3,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":41.902864259028647,"r":7.3059360730593621,"b":39.25280199252802,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722},"title":{"text":"PCA for 10 samples using all 599 windows.","font":{"color":"rgba(0,0,0,1)","family":"","size":16.604400166044005},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.4733351597585429,2.2741643778505169],"tickmode":"array","ticktext":["-3","-2","-1","0","1","2"],"tickvals":[-3,-2,-1,0,1,2],"categoryorder":"array","categoryarray":["-3","-2","-1","0","1","2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296806,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"PC1 (24.14%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.1740277531790539,1.9995158596611322],"tickmode":"array","ticktext":["-4","-2","0"],"tickvals":[-4,-2,0],"categoryorder":"array","categoryarray":["-4","-2","0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"PC2 (19.68%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176002,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"patient<br />tumour","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2b4a585a019d":{"x":{},"y":{},"label":{},"stage":{},"age":{},"gender":{},"fill":{},"shape":{},"type":"scatter"}},"cur_data":"2b4a585a019d","visdat":{"2b4a585a019d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><p>Plotly plots are great for interactive use in html reports.<br>
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"data":[{"x":[-1.7265582180330981],"y":[1.7189002408956675],"text":"PC1: -1.7265582<br />PC2:  1.71890024<br />sample_name: Colon1_N<br />stage: NA<br />age: 80<br />gender: F<br />patient: Colon1<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(80,63,68,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon1,Normal)","legendgroup":"(Colon1,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-3.2120851807763087],"y":[0.78271340788048649],"text":"PC1: -3.2120852<br />PC2:  0.78271341<br />sample_name: Colon1_T<br />stage: III<br />age: 80<br />gender: F<br />patient: Colon1<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(80,63,68,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon1,Tumour)","legendgroup":"(Colon1,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0.21936956450435041],"y":[0.61910259202113604],"text":"PC1:  0.2193696<br />PC2:  0.61910259<br />sample_name: Colon2_N<br />stage: NA<br />age: 67<br />gender: F<br />patient: Colon2<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(150,79,184,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon2,Normal)","legendgroup":"(Colon2,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-1.002841917744848],"y":[0.66701624412419225],"text":"PC1: -1.0028419<br />PC2:  0.66701624<br />sample_name: Colon2_T<br />stage: IV<br />age: 67<br />gender: F<br />patient: Colon2<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(150,79,184,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Colon2,Tumour)","legendgroup":"(Colon2,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8640092987925301],"y":[0.090531968102152915],"text":"PC1:  1.8640093<br />PC2:  0.09053197<br />sample_name: Lung1_N<br />stage: NA<br />age: 64<br />gender: F<br />patient: Lung1<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(151,178,183,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung1,Normal)","legendgroup":"(Lung1,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0.87821945448173522],"y":[-0.28376153171472879],"text":"PC1:  0.8782195<br />PC2: -0.28376153<br />sample_name: Lung1_T<br />stage: IIA<br />age: 64<br />gender: F<br />patient: Lung1<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(151,178,183,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung1,Tumour)","legendgroup":"(Lung1,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2.0129143988682858],"y":[0.60350249059376104],"text":"PC1:  2.0129144<br />PC2:  0.60350249<br />sample_name: Lung2_N<br />stage: NA<br />age: 71<br />gender: F<br />patient: Lung2<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(148,191,88,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung2,Normal)","legendgroup":"(Lung2,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-0.82443270205660046],"y":[-3.8934121344135888],"text":"PC1: -0.8244327<br />PC2: -3.89341213<br />sample_name: Lung2_T<br />stage: IA<br />age: 71<br />gender: F<br />patient: Lung2<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(148,191,88,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung2,Tumour)","legendgroup":"(Lung2,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8941051162676668],"y":[0.82108106224004518],"text":"PC1:  1.8941051<br />PC2:  0.82108106<br />sample_name: Lung3_N<br />stage: NA<br />age: 72<br />gender: M<br />patient: Lung3<br />tumour: Normal","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(198,98,77,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung3,Normal)","legendgroup":"(Lung3,Normal)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-0.10269981430371455],"y":[-1.1256743397291249],"text":"PC1: -0.1026998<br />PC2: -1.12567434<br />sample_name: Lung3_T<br />stage: IB<br />age: 72<br />gender: M<br />patient: Lung3<br />tumour: Tumour","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(198,98,77,1)","opacity":1,"size":7.559055118110237,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"(Lung3,Tumour)","legendgroup":"(Lung3,Tumour)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.910336239103366,"r":7.3059360730593621,"b":37.260273972602747,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722},"title":{"text":"PCA for 10 samples using all 599 windows.","font":{"color":"rgba(0,0,0,1)","family":"","size":16.604400166044005},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.4733351597585385,2.2741643778505156],"tickmode":"array","ticktext":["-3","-2","-1","0","1","2"],"tickvals":[-3,-2,-1,4.4408920985006262e-16,1,2],"categoryorder":"array","categoryarray":["-3","-2","-1","0","1","2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296806,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"PC1 (24.14%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.1740277531790513,1.9995158596611304],"tickmode":"array","ticktext":["-4","-2","0"],"tickvals":[-4,-2,0],"categoryorder":"array","categoryarray":["-4","-2","0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"PC2 (19.68%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"rgba(255,255,255,1)","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176002,"linetype":"solid"},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"patient<br />tumour","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118722}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2ebe13a8b7bd":{"x":{},"y":{},"label":{},"stage":{},"age":{},"gender":{},"fill":{},"shape":{},"type":"scatter"}},"cur_data":"2ebe13a8b7bd","visdat":{"2ebe13a8b7bd":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><p>Plotly plots are great for interactive use in html reports.<br>
 The downside of using them is that the legend often gets displayed in a
 complicated, unhelpful way and the formatting of the plot is often not
 as good and hard to control.<br>
@@ -549,19 +548,19 @@ produced for all four PCA versions, with all options for the
 <code class="sourceCode R"><span><span class="va">PCAplots4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca2</span>, colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient"</span>, <span class="st">"age"</span><span class="op">)</span>, shape <span class="op">=</span> <span class="st">"tumour"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-18-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca2</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-18-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-18-2.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca3</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC2vsPC3</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-18-3.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-18-3.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca4</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-18-4.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-18-4.png" class="r-plt" alt="" width="672"></p>
 <p>If you specify a value larger than the number of available windows,
 then PCA will be performed with all available windows and redundant
 values will be ignored:</p>
@@ -806,13 +805,13 @@ the <code>beta</code> values, which correct this to some extent.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tissue</span></span>
 <span><span class="co">#&gt; $pca1$tissue$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-28-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca_nrpm</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"tissue"</span>, shape <span class="op">=</span> <span class="st">"tumour"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tissue</span></span>
 <span><span class="co">#&gt; $pca1$tissue$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-28-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-28-2.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="filtering-regions">Filtering regions<a class="anchor" aria-label="anchor" href="#filtering-regions"></a>
@@ -891,7 +890,7 @@ functions:</p>
 <span><span class="co">#&gt; $umap1</span></span>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-30-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-30-1.png" class="r-plt" alt="" width="672"></p>
 <p>The vast majority of the options for <code>getUMAP</code> are the
 same as for <code>getPCA</code>, but while the PCA algorithm has no
 further options, the UMAP algorithm has a number of options which can
@@ -930,7 +929,7 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; $umap1</span></span>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-31-1.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-31-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">qseaSetRandom</span> <span class="op">|&gt;</span></span>
@@ -955,20 +954,20 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; $umap1</span></span>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/unnamed-chunk-31-2.png" width="672"></p>
+<p><img src="pca_files/figure-html/unnamed-chunk-31-2.png" class="r-plt" alt="" width="672"></p>
 <p>As a final note, we state that UMAPs should be used with care, as
 they are easy to misinterpret.</p>
 </div>
 <div class="section level2">
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<pre><code><span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
@@ -985,69 +984,68 @@ they are easy to misinterpret.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] mesa_0.99.0   dplyr_1.1.4   qsea_1.28.0   ggplot2_3.5.0</span></span>
+<span><span class="co">#&gt; [1] mesa_0.99.0   dplyr_1.2.0   qsea_1.36.0   ggplot2_4.0.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] tidyselect_1.2.1            viridisLite_0.4.2          </span></span>
-<span><span class="co">#&gt;   [3] farver_2.1.1                Biostrings_2.70.3          </span></span>
-<span><span class="co">#&gt;   [5] bitops_1.0-7                lazyeval_0.2.2             </span></span>
-<span><span class="co">#&gt;   [7] fastmap_1.1.1               RCurl_1.98-1.14            </span></span>
-<span><span class="co">#&gt;   [9] GenomicAlignments_1.38.2    XML_3.99-0.16.1            </span></span>
-<span><span class="co">#&gt;  [11] digest_0.6.35               lifecycle_1.0.4            </span></span>
-<span><span class="co">#&gt;  [13] plyranges_1.22.0            statmod_1.5.0              </span></span>
-<span><span class="co">#&gt;  [15] magrittr_2.0.3              compiler_4.3.3             </span></span>
-<span><span class="co">#&gt;  [17] rlang_1.1.3                 sass_0.4.9                 </span></span>
-<span><span class="co">#&gt;  [19] tools_4.3.3                 utf8_1.2.4                 </span></span>
-<span><span class="co">#&gt;  [21] yaml_2.3.8                  data.table_1.15.4          </span></span>
-<span><span class="co">#&gt;  [23] FNN_1.1.4                   rtracklayer_1.62.0         </span></span>
-<span><span class="co">#&gt;  [25] knitr_1.46                  S4Arrays_1.2.1             </span></span>
-<span><span class="co">#&gt;  [27] labeling_0.4.3              htmlwidgets_1.6.4          </span></span>
-<span><span class="co">#&gt;  [29] DelayedArray_0.28.0         RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt;  [31] abind_1.4-5                 BiocParallel_1.36.0        </span></span>
-<span><span class="co">#&gt;  [33] HMMcopy_1.44.0              withr_3.0.0                </span></span>
-<span><span class="co">#&gt;  [35] purrr_1.0.2                 BiocGenerics_0.48.1        </span></span>
-<span><span class="co">#&gt;  [37] desc_1.4.3                  grid_4.3.3                 </span></span>
-<span><span class="co">#&gt;  [39] stats4_4.3.3                fansi_1.0.6                </span></span>
-<span><span class="co">#&gt;  [41] colorspace_2.1-0            scales_1.3.0               </span></span>
-<span><span class="co">#&gt;  [43] gtools_3.9.5                SummarizedExperiment_1.32.0</span></span>
-<span><span class="co">#&gt;  [45] cli_3.6.2                   rmarkdown_2.26             </span></span>
-<span><span class="co">#&gt;  [47] crayon_1.5.2                ragg_1.3.0                 </span></span>
-<span><span class="co">#&gt;  [49] generics_0.1.3              httr_1.4.7                 </span></span>
-<span><span class="co">#&gt;  [51] rjson_0.2.21                cachem_1.0.8               </span></span>
-<span><span class="co">#&gt;  [53] stringr_1.5.1               zlibbioc_1.48.2            </span></span>
-<span><span class="co">#&gt;  [55] parallel_4.3.3              XVector_0.42.0             </span></span>
-<span><span class="co">#&gt;  [57] restfulr_0.0.15             matrixStats_1.3.0          </span></span>
-<span><span class="co">#&gt;  [59] vctrs_0.6.5                 Matrix_1.6-5               </span></span>
-<span><span class="co">#&gt;  [61] jsonlite_1.8.8              IRanges_2.36.0             </span></span>
-<span><span class="co">#&gt;  [63] S4Vectors_0.40.2            ggrepel_0.9.5              </span></span>
-<span><span class="co">#&gt;  [65] irlba_2.3.5.1               crosstalk_1.2.1            </span></span>
-<span><span class="co">#&gt;  [67] hues_0.2.0                  systemfonts_1.0.6          </span></span>
-<span><span class="co">#&gt;  [69] plotly_4.10.4               limma_3.58.1               </span></span>
-<span><span class="co">#&gt;  [71] jquerylib_0.1.4             tidyr_1.3.1                </span></span>
-<span><span class="co">#&gt;  [73] glue_1.7.0                  pkgdown_2.0.9              </span></span>
-<span><span class="co">#&gt;  [75] codetools_0.2-20            uwot_0.2.2                 </span></span>
-<span><span class="co">#&gt;  [77] stringi_1.8.3               gtable_0.3.5               </span></span>
-<span><span class="co">#&gt;  [79] GenomeInfoDb_1.38.8         BiocIO_1.12.0              </span></span>
-<span><span class="co">#&gt;  [81] GenomicRanges_1.54.1        munsell_0.5.1              </span></span>
-<span><span class="co">#&gt;  [83] tibble_3.2.1                pillar_1.9.0               </span></span>
-<span><span class="co">#&gt;  [85] htmltools_0.5.8.1           GenomeInfoDbData_1.2.11    </span></span>
-<span><span class="co">#&gt;  [87] BSgenome_1.70.2             R6_2.5.1                   </span></span>
-<span><span class="co">#&gt;  [89] textshaping_0.3.7           evaluate_0.23              </span></span>
-<span><span class="co">#&gt;  [91] lattice_0.22-6              Biobase_2.62.0             </span></span>
-<span><span class="co">#&gt;  [93] highr_0.10                  Rsamtools_2.18.0           </span></span>
-<span><span class="co">#&gt;  [95] memoise_2.0.1               bslib_0.7.0                </span></span>
-<span><span class="co">#&gt;  [97] Rcpp_1.0.12                 SparseArray_1.2.4          </span></span>
-<span><span class="co">#&gt;  [99] xfun_0.43                   fs_1.6.3                   </span></span>
-<span><span class="co">#&gt; [101] MatrixGenerics_1.14.0       zoo_1.8-12                 </span></span>
-<span><span class="co">#&gt; [103] pkgconfig_2.0.3</span></span></code></pre>
+<span><span class="co">#&gt;   [1] bitops_1.0-9                HMMcopy_1.52.0             </span></span>
+<span><span class="co">#&gt;   [3] rlang_1.1.7                 magrittr_2.0.4             </span></span>
+<span><span class="co">#&gt;   [5] otel_0.2.0                  matrixStats_1.5.0          </span></span>
+<span><span class="co">#&gt;   [7] compiler_4.5.2              systemfonts_1.3.2          </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.7.2                 stringr_1.6.0              </span></span>
+<span><span class="co">#&gt;  [11] pkgconfig_2.0.3             crayon_1.5.3               </span></span>
+<span><span class="co">#&gt;  [13] fastmap_1.2.0               hues_0.2.0                 </span></span>
+<span><span class="co">#&gt;  [15] XVector_0.50.0              labeling_0.4.3             </span></span>
+<span><span class="co">#&gt;  [17] utf8_1.2.6                  Rsamtools_2.26.0           </span></span>
+<span><span class="co">#&gt;  [19] rmarkdown_2.30              UCSC.utils_1.6.1           </span></span>
+<span><span class="co">#&gt;  [21] ragg_1.5.2                  purrr_1.2.1                </span></span>
+<span><span class="co">#&gt;  [23] xfun_0.57                   cachem_1.1.0               </span></span>
+<span><span class="co">#&gt;  [25] cigarillo_1.0.0             GenomeInfoDb_1.46.2        </span></span>
+<span><span class="co">#&gt;  [27] jsonlite_2.0.0              DelayedArray_0.36.0        </span></span>
+<span><span class="co">#&gt;  [29] BiocParallel_1.44.0         irlba_2.3.7                </span></span>
+<span><span class="co">#&gt;  [31] parallel_4.5.2              R6_2.6.1                   </span></span>
+<span><span class="co">#&gt;  [33] plyranges_1.30.1            bslib_0.10.0               </span></span>
+<span><span class="co">#&gt;  [35] stringi_1.8.7               RColorBrewer_1.1-3         </span></span>
+<span><span class="co">#&gt;  [37] limma_3.66.0                rtracklayer_1.70.1         </span></span>
+<span><span class="co">#&gt;  [39] GenomicRanges_1.62.1        jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt;  [41] Rcpp_1.1.1                  Seqinfo_1.0.0              </span></span>
+<span><span class="co">#&gt;  [43] SummarizedExperiment_1.40.0 knitr_1.51                 </span></span>
+<span><span class="co">#&gt;  [45] zoo_1.8-15                  IRanges_2.44.0             </span></span>
+<span><span class="co">#&gt;  [47] FNN_1.1.4.1                 Matrix_1.7-5               </span></span>
+<span><span class="co">#&gt;  [49] tidyselect_1.2.1            abind_1.4-8                </span></span>
+<span><span class="co">#&gt;  [51] yaml_2.3.12                 codetools_0.2-20           </span></span>
+<span><span class="co">#&gt;  [53] curl_7.0.0                  lattice_0.22-9             </span></span>
+<span><span class="co">#&gt;  [55] tibble_3.3.1                Biobase_2.70.0             </span></span>
+<span><span class="co">#&gt;  [57] withr_3.0.2                 S7_0.2.1                   </span></span>
+<span><span class="co">#&gt;  [59] evaluate_1.0.5              desc_1.4.3                 </span></span>
+<span><span class="co">#&gt;  [61] Biostrings_2.78.0           pillar_1.11.1              </span></span>
+<span><span class="co">#&gt;  [63] MatrixGenerics_1.22.0       stats4_4.5.2               </span></span>
+<span><span class="co">#&gt;  [65] plotly_4.12.0               generics_0.1.4             </span></span>
+<span><span class="co">#&gt;  [67] RCurl_1.98-1.18             S4Vectors_0.48.0           </span></span>
+<span><span class="co">#&gt;  [69] scales_1.4.0                gtools_3.9.5               </span></span>
+<span><span class="co">#&gt;  [71] glue_1.8.0                  lazyeval_0.2.2             </span></span>
+<span><span class="co">#&gt;  [73] tools_4.5.2                 BiocIO_1.20.0              </span></span>
+<span><span class="co">#&gt;  [75] data.table_1.18.2.1         RSpectra_0.16-2            </span></span>
+<span><span class="co">#&gt;  [77] BSgenome_1.78.0             GenomicAlignments_1.46.0   </span></span>
+<span><span class="co">#&gt;  [79] fs_2.0.1                    XML_3.99-0.23              </span></span>
+<span><span class="co">#&gt;  [81] grid_4.5.2                  tidyr_1.3.2                </span></span>
+<span><span class="co">#&gt;  [83] crosstalk_1.2.2             colorspace_2.1-2           </span></span>
+<span><span class="co">#&gt;  [85] restfulr_0.0.16             cli_3.6.5                  </span></span>
+<span><span class="co">#&gt;  [87] textshaping_1.0.5           S4Arrays_1.10.1            </span></span>
+<span><span class="co">#&gt;  [89] viridisLite_0.4.3           uwot_0.2.4                 </span></span>
+<span><span class="co">#&gt;  [91] gtable_0.3.6                sass_0.4.10                </span></span>
+<span><span class="co">#&gt;  [93] digest_0.6.39               BiocGenerics_0.56.0        </span></span>
+<span><span class="co">#&gt;  [95] SparseArray_1.10.9          ggrepel_0.9.8              </span></span>
+<span><span class="co">#&gt;  [97] rjson_0.2.23                htmlwidgets_1.6.4          </span></span>
+<span><span class="co">#&gt;  [99] farver_2.1.2                memoise_2.0.1              </span></span>
+<span><span class="co">#&gt; [101] htmltools_0.5.9             pkgdown_2.2.0              </span></span>
+<span><span class="co">#&gt; [103] lifecycle_1.0.5             httr_1.4.8                 </span></span>
+<span><span class="co">#&gt; [105] statmod_1.5.1</span></span></code></pre>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -1060,16 +1058,16 @@ they are easy to misinterpret.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

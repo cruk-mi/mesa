@@ -6,7 +6,7 @@ selected methods. This is typically the first step in a mesa/qsea workflow."><!-
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -31,7 +31,7 @@ selected methods. This is typically the first step in a mesa/qsea workflow."><!-
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -56,20 +56,20 @@ selected methods. This is typically the first step in a mesa/qsea workflow."><!-
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/cruk-mi/mesa/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Construct an initial qseaSet from BAMs and metadata</h1>
-    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/HEAD/R/makeQset.R" class="external-link"><code>R/makeQset.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/cruk-mi/mesa/blob/main/R/makeQset.R" class="external-link"><code>R/makeQset.R</code></a></small>
     <div class="hidden name"><code>makeQset.Rd</code></div>
     </div>
 
@@ -108,7 +108,9 @@ selected methods. This is typically the first step in a mesa/qsea workflow.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sampleTable</dt>
+
+
+<dl><dt id="arg-sampletable">sampleTable<a class="anchor" aria-label="anchor" href="#arg-sampletable"></a></dt>
 <dd><p><code>data.frame</code>.
 Must contain <code>sample_name</code>, <code>file_name</code>, and <code>group</code>. If <code>CNVmethod</code>
 requires inputs, also <code>input_file</code>. Additional columns are preserved as
@@ -116,39 +118,39 @@ sample metadata.
 <strong>Default:</strong> none (must be supplied).</p></dd>
 
 
-<dt>BSgenome</dt>
+<dt id="arg-bsgenome">BSgenome<a class="anchor" aria-label="anchor" href="#arg-bsgenome"></a></dt>
 <dd><p><code>character(1)</code> or <code>NULL</code>.
 BSgenome package string (e.g., <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>).
 See <code><a href="https://rdrr.io/pkg/BSgenome/man/available.genomes.html" class="external-link">BSgenome::available.genomes()</a></code>.
 <strong>Default:</strong> <code>NULL</code> (must be supplied).</p></dd>
 
 
-<dt>chrSelect</dt>
+<dt id="arg-chrselect">chrSelect<a class="anchor" aria-label="anchor" href="#arg-chrselect"></a></dt>
 <dd><p><code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code> or <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>.
 Chromosomes to include.
 <strong>Default:</strong> <code>1:22</code>.</p></dd>
 
 
-<dt>windowSize</dt>
+<dt id="arg-windowsize">windowSize<a class="anchor" aria-label="anchor" href="#arg-windowsize"></a></dt>
 <dd><p><code>integer(1)</code>.
 Window size in bp for tiling the genome.
 <strong>Default:</strong> <code>300</code>.</p></dd>
 
 
-<dt>CNVwindowSize</dt>
+<dt id="arg-cnvwindowsize">CNVwindowSize<a class="anchor" aria-label="anchor" href="#arg-cnvwindowsize"></a></dt>
 <dd><p><code>integer(1)</code>.
 Copy number variation (CNV) window size (bp).
 <strong>Default:</strong> <code>1e6</code>.</p></dd>
 
 
-<dt>fragmentType</dt>
+<dt id="arg-fragmenttype">fragmentType<a class="anchor" aria-label="anchor" href="#arg-fragmenttype"></a></dt>
 <dd><p><code>character(1)</code> or <code>NULL</code>.
 If <code>"Sheared"</code> or <code>"cfDNA"</code>, sets defaults for <code>fragmentLength</code>/<code>fragmentSD</code>;
 otherwise both must be supplied explicitly.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>fragmentLength</dt>
+<dt id="arg-fragmentlength">fragmentLength<a class="anchor" aria-label="anchor" href="#arg-fragmentlength"></a></dt>
 <dd><p><code>numeric(1)</code> or <code>NULL</code>.
 Average fragment length (bp). This is used to extend single-end reads if
 used, but also strongly affects the CpG density calculation, which will
@@ -156,7 +158,7 @@ strongly impact the beta value estimation.
 <strong>Default:</strong> <code>NULL</code> (inferred from <code>fragmentType</code> or must be provided).</p></dd>
 
 
-<dt>fragmentSD</dt>
+<dt id="arg-fragmentsd">fragmentSD<a class="anchor" aria-label="anchor" href="#arg-fragmentsd"></a></dt>
 <dd><p><code>numeric(1)</code> or <code>NULL</code>.
 Standard deviation of fragment length (bp). Used to calculate the window
 based CpG density calculation, which will strongly impact the beta value
@@ -164,26 +166,26 @@ estimation.
 <strong>Default:</strong> <code>NULL</code> (inferred from <code>fragmentType</code> or must be provided).</p></dd>
 
 
-<dt>CNVmethod</dt>
+<dt id="arg-cnvmethod">CNVmethod<a class="anchor" aria-label="anchor" href="#arg-cnvmethod"></a></dt>
 <dd><p><code>character(1)</code>.
 One of <code>"HMMdefault"</code>, <code>"qseaInput"</code>, <code>"MeCap"</code>, <code>"None"</code>.
 <strong>Default:</strong> <code>"HMMdefault"</code>.</p></dd>
 
 
-<dt>coverageMethod</dt>
+<dt id="arg-coveragemethod">coverageMethod<a class="anchor" aria-label="anchor" href="#arg-coveragemethod"></a></dt>
 <dd><p><code>character(1)</code>.
 One of <code>"PairedAndR1s"</code> (mesa) or <code>"qseaPaired"</code> (qsea).
 <strong>Default:</strong> <code>"PairedAndR1s"</code>.</p></dd>
 
 
-<dt>minMapQual</dt>
+<dt id="arg-minmapqual">minMapQual<a class="anchor" aria-label="anchor" href="#arg-minmapqual"></a></dt>
 <dd><p><code>integer(1)</code>.
 Minimum MAPQ to retain a read. For <code>"PairedAndR1s"</code>, a pair is kept if
 either end passes when properly paired and MAPQ tags are set.
 <strong>Default:</strong> <code>10</code>.</p></dd>
 
 
-<dt>minInsertSize</dt>
+<dt id="arg-mininsertsize">minInsertSize<a class="anchor" aria-label="anchor" href="#arg-mininsertsize"></a></dt>
 <dd><p><code>integer(1)</code>.
 Minimum absolute insert size for proper pairs (bp).
 Only applies to coverageMethod = "PairedAndR1s", and applies to Input
@@ -191,7 +193,7 @@ samples as well as MeCap.
 <strong>Default:</strong> <code>70</code>.</p></dd>
 
 
-<dt>maxInsertSize</dt>
+<dt id="arg-maxinsertsize">maxInsertSize<a class="anchor" aria-label="anchor" href="#arg-maxinsertsize"></a></dt>
 <dd><p><code>integer(1)</code>.
 Maximum absolute insert size for proper pairs (bp).
 Only applies to coverageMethod = "PairedAndR1s", and applies to Input
@@ -199,7 +201,7 @@ samples as well as MeCap.
 <strong>Default:</strong> <code>1000</code>.</p></dd>
 
 
-<dt>minReferenceLength</dt>
+<dt id="arg-minreferencelength">minReferenceLength<a class="anchor" aria-label="anchor" href="#arg-minreferencelength"></a></dt>
 <dd><p><code>integer(1)</code>.
 A minimum mapped distance on the genome to keep an read. This is to avoid
 very short reads that may be due to mapping artefacts. Note that with
@@ -210,7 +212,7 @@ samples as well as MeCap.
 <strong>Default:</strong> <code>30</code>.</p></dd>
 
 
-<dt>badRegions</dt>
+<dt id="arg-badregions">badRegions<a class="anchor" aria-label="anchor" href="#arg-badregions"></a></dt>
 <dd><p><code>GRanges</code> or <code>NULL</code>.
 Genomic regions to exclude (blacklist). These regions will be removed from
 the output. Note a set of GRCh38 windows identified by ENCODE are provided
@@ -218,13 +220,13 @@ in the <a href="ENCODEbadRegions.html">ENCODEbadRegions</a> data object.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>properPairsOnly</dt>
+<dt id="arg-properpairsonly">properPairsOnly<a class="anchor" aria-label="anchor" href="#arg-properpairsonly"></a></dt>
 <dd><p><code>logical(1)</code>.
 If <code>TRUE</code>, use only proper pairs (stricter size selection).
 <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
-<dt>hmmCopyGC</dt>
+<dt id="arg-hmmcopygc">hmmCopyGC<a class="anchor" aria-label="anchor" href="#arg-hmmcopygc"></a></dt>
 <dd><p><code>data.frame</code> or <code>NULL</code>.
 GC content per CNV bin (size = <code>CNVwindowSize</code>) for HMMcopy.
 Required if using the <code>CNVmethod = "HMMdefault"</code> option <em>unless</em> you are
@@ -233,7 +235,7 @@ Must be a dataframe with columns <code>chr</code>, <code>start</code>, <code>end
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>hmmCopyMap</dt>
+<dt id="arg-hmmcopymap">hmmCopyMap<a class="anchor" aria-label="anchor" href="#arg-hmmcopymap"></a></dt>
 <dd><p><code>data.frame</code> or <code>NULL</code>.
 Mappability per CNV bin (size = <code>CNVwindowSize</code>) for HMMcopy.
 Required if using the <code>CNVmethod = "HMMdefault"</code> option <em>unless</em> you are
@@ -242,7 +244,7 @@ Must be a dataframe with columns <code>chr</code>, <code>start</code>, <code>end
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
-<dt>maxPatternDensity</dt>
+<dt id="arg-maxpatterndensity">maxPatternDensity<a class="anchor" aria-label="anchor" href="#arg-maxpatterndensity"></a></dt>
 <dd><p><code>numeric(1)</code>.
 Maximum pattern density (e.g., CpG) to consider a window for background
 offset calculation. Regions above this are excluded from the calculation.
@@ -251,14 +253,14 @@ have a high average genomic CG content.
 <strong>Default:</strong> <code>0.05</code>.</p></dd>
 
 
-<dt>enrichmentMethod</dt>
+<dt id="arg-enrichmentmethod">enrichmentMethod<a class="anchor" aria-label="anchor" href="#arg-enrichmentmethod"></a></dt>
 <dd><p><code>character(1)</code>.
 Method for calculating enrichment for target pattern (e.g. CpG).
 See <code><a href="addNormalisation.html">addNormalisation()</a></code> for details.
 <strong>Default:</strong> <code>"blind1-15"</code>.</p></dd>
 
 
-<dt>parallel</dt>
+<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p><code>logical(1)</code>.
 Use the registered BiocParallel backend (<code>TRUE</code>) or run serially (<code>FALSE</code>).
 See <code><a href="https://rdrr.io/pkg/BiocParallel/man/register.html" class="external-link">BiocParallel::register()</a></code>.
@@ -267,9 +269,7 @@ See <code><a href="https://rdrr.io/pkg/BiocParallel/man/register.html" class="ex
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>qseaSet</code> containing:</p><ul><li><p>tiled (and optionally blacklisted) genomic windows;</p></li>
+    <p>A <code>qseaSet</code> containing:</p><ul><li><p>tiled (and optionally blacklisted) genomic windows;</p></li>
 <li><p>the input <code>sampleTable</code> as sample metadata;</p></li>
 <li><p>loaded coverage according to <code>coverageMethod</code>;</p></li>
 <li><p>CNV results depending on <code>CNVmethod</code>;</p></li>
@@ -357,12 +357,26 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Dropping 20294 proper pairs that have neither read with mapq &gt;= 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Dropping 179 proper pairs that do not lie within [70, 1000]</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>There was 1 warning in `dplyr::filter()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `GenomicAlignments::cigarWidthAlongReferenceSpace(cigar) &gt;=</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   minReferenceLength`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning in `call_new_fun_in_cigarillo()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> cigarWidthAlongReferenceSpace() is formally deprecated in GenomicAlignments</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   &gt;= 1.45.5 and replaced with the cigar_extent_along_ref() function from the</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   new cigarillo package</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using high quality R1 unpaired reads as well as pairs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Estimating fragment length for 0 unpaired R1 reads as 186, based on 879638 proper pairs.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading NSCLC_MeDIP_1T_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Dropping 12436 proper pairs that have neither read with mapq &gt;= 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Dropping 146 proper pairs that do not lie within [70, 1000]</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>There was 1 warning in `dplyr::filter()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `GenomicAlignments::cigarWidthAlongReferenceSpace(cigar) &gt;=</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   minReferenceLength`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning in `call_new_fun_in_cigarillo()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> cigarWidthAlongReferenceSpace() is formally deprecated in GenomicAlignments</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   &gt;= 1.45.5 and replaced with the cigar_extent_along_ref() function from the</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   new cigarillo package</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using high quality R1 unpaired reads as well as pairs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Estimating fragment length for 0 unpaired R1 reads as 183, based on 637854 proper pairs.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generated objects</span>
@@ -404,15 +418,15 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 
