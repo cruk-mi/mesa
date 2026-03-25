@@ -5,6 +5,7 @@ on:
     paths:
       - '.devcontainer/**'
       - 'DESCRIPTION'
+      - '.github/workflows/**'
   workflow_dispatch:
 permissions:
   contents: read
