@@ -1,7 +1,7 @@
 name: Build Devcontainer Images
 on:
   push:
-    branches: [ update_to_R_4.5, dev, main ]
+    branches: [ dev, main ]
     paths:
       - '.devcontainer/**'
       - 'DESCRIPTION'
