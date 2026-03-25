@@ -1,7 +1,7 @@
 name: Build Devcontainer Images
 on:
   push:
-    branches: [ codespace_env_implementation, dev, main ]
+    branches: [ upgrade_to_R_4.5, dev, main ]
     paths:
       - '.devcontainer/**'
       - 'DESCRIPTION'
