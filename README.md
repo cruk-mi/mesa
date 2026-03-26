@@ -15,19 +15,8 @@ The package is under active development with plans to submit to BioConductor, an
 
 ## Install the package
 
-mesa requires R ≥ 4.5.0 and Bioconductor 3.22. The easiest way to install
-mesa and all its dependencies in one step is with the provided installer script:
-```r
-source("https://raw.githubusercontent.com/cruk-mi/mesa/main/inst/scripts/install_mesa.R")
-```
-
-This script automatically sets the correct Bioconductor version for your R
-installation, installs mesa with all dependencies, and validates that your
-environment is consistent.
-
 **Manual installation:**
 
-If you prefer to install manually:
 ```r
 # 1. Install BiocManager if needed
 if (!requireNamespace("BiocManager", quietly = TRUE))
