@@ -124,7 +124,10 @@
 #' # plot these windows
 #' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
 #' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, 
+#'                                            clusterRows = TRUE, 
+#'                                            sampleAnnotation = c(tumour, tissue)
+#'                                            )
 #' # more complex example
 #' exampleTumourNormal %>% 
 #'   plotRegionsHeatmap(regionsToOverlap = DMRs, 

@@ -359,7 +359,9 @@ writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
 #' @return A data frame with the DMRs with the largest value of the selected metrics
 #' @examples
 #' # calculate some DMRs
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "type", contrasts = "all", keepContrastMeans = FALSE)
+#' DMRs <- exampleTumourNormal %>% 
+#'   calculateDMRs(variable = "type", contrasts = "all", 
+#'                 keepContrastMeans = FALSE)
 #' # Find the DMRs with the largest deltaBeta between each comparison:
 #' DMRs %>% sliceDMRs(n = 1)
 #' # Or the windows with the largest log2FC: 
