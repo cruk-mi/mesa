@@ -103,7 +103,7 @@ Clustering method for dendrograms (e.g., \code{"ward.D2"}).
 \value{
 Draws a heatmap on the active device and (invisibly) returns the underlying
 \strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition with
-\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
+\code{\link[ComplexHeatmap]{draw}}.
 }
 \description{
 Plot sample signal over a set of regions as a heatmap using \strong{ComplexHeatmap}.
@@ -159,6 +159,6 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}},
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap]{draw}},
 \code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }

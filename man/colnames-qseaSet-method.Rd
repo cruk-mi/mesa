@@ -15,7 +15,7 @@ The qseaSet object whose \code{sampleTable} column names are to be retrieved.}
 A character vector containing the column names of the sample table.
 }
 \description{
-S4 method for \code{\link[BiocGenerics:row_colnames]{BiocGenerics::colnames()}} that returns the column names of a
+S4 method for \code{\link[BiocGenerics]{colnames}} that returns the column names of a
 \code{qseaSet}'s sample metadata table (i.e., \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}).
 }
 \examples{

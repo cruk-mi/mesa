@@ -55,7 +55,7 @@ filterByNonOverlaps(exampleTumourNormal, regionsToOverlap = gr)
 
 }
 \seealso{
-\code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_overlaps()}},
-\code{\link[plyranges:ranges-filter-overlaps]{plyranges::filter_by_non_overlaps()}},
-\code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}}
+\code{\link[plyranges]{filter_by_overlaps}},
+\code{\link[plyranges]{filter_by_non_overlaps}},
+\code{\link[GenomicRanges]{GRanges-class}}
 }

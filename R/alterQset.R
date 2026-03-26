@@ -28,10 +28,10 @@
 #' other uses `"1"`. Only the **window set** is filtered; sample metadata and
 #' counts are subset accordingly.
 #'
-#' @seealso
-#'   [plyranges::filter_by_overlaps()],
-#'   [plyranges::filter_by_non_overlaps()],
-#'   [GenomicRanges::GRanges()]
+#' @seealso 
+#' \code{\link[plyranges]{filter_by_overlaps}},
+#' \code{\link[plyranges]{filter_by_non_overlaps}},
+#' \code{\link[GenomicRanges]{GRanges-class}}
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")

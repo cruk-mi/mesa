@@ -33,7 +33,7 @@ Cluster rows (windows) before plotting.
 \value{
 Draws a heatmap on the active device and (invisibly) returns the underlying
 \strong{ComplexHeatmap} object for further composition with
-\code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
+\code{\link[ComplexHeatmap]{draw}}.
 }
 \description{
 Plot per-window copy-number estimates stored in a \code{qseaSet} as a heatmap
@@ -62,7 +62,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap]{Heatmap}},
 \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
 Other CNV: 

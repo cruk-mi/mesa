@@ -24,7 +24,7 @@
 #' @return A `GRanges` with `seqnames` in UCSC style. The genome is unset.
 #'
 #' @seealso
-#' [qsea::makeTable()], [plyranges::as_granges()],
+#' [qsea::makeTable()], \code{\link[plyranges]{as_granges}},
 #' [GenomeInfoDb::seqlevelsStyle()]
 #'
 #' @examples
@@ -261,7 +261,7 @@ skip_long_checks <- function() {
 #' Errors if no supported schema is found.
 #'
 #' @seealso
-#' [plyranges::as_granges()], [qseaTableToChrGRanges()]
+#' \code{\link[plyranges]{as_granges}}, \code{\link{qseaTableToChrGRanges}}
 #'
 #' @examples
 #' # From GRanges (passes through)
