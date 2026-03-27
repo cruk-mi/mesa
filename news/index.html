@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
       </span>
     </div>
 
@@ -69,6 +69,146 @@
       <small>Source: <a href="https://github.com/cruk-mi/mesa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.99.1" id="mesa-0991">mesa 0.99.1<a class="anchor" aria-label="anchor" href="#mesa-0991"></a></h2>
+<ul><li>Fixed Rd cross-references to use <code>\code{\link[pkg]{function}}</code> syntax — R-devel (4.6) is stricter about package-anchored topic resolution. (<a href="https://github.com/cruk-mi/mesa/pull/73" class="external-link">#73</a>)</li>
+<li>Wrapped long example lines in <code>hg38UltraStableProbes</code>, <code>plotRegionsHeatmap</code>, <code>renameSamples</code>, and <code>sliceDMRs</code> documentation to stay within 100 characters. (<a href="https://github.com/cruk-mi/mesa/pull/73" class="external-link">#73</a>)</li>
+<li>Removed <code>inst/scripts/install_mesa.R</code> — standard <code><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">BiocManager::install()</a></code> is sufficient for installation. (<a href="https://github.com/cruk-mi/mesa/pull/73" class="external-link">#73</a>)</li>
+<li>Verified compatibility with R 4.6 / Bioconductor 3.23 devel — 0 errors, 0 warnings on <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> and <code><a href="https://rdrr.io/pkg/BiocCheck/man/BiocCheck.html" class="external-link">BiocCheck::BiocCheck()</a></code>. (<a href="https://github.com/cruk-mi/mesa/pull/73" class="external-link">#73</a>)</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.99.0" id="mesa-0990">mesa 0.99.0<a class="anchor" aria-label="anchor" href="#mesa-0990"></a></h2>
+<div class="section level4">
+<h4 id="added-0-99-0">ADDED<a class="anchor" aria-label="anchor" href="#added-0-99-0"></a></h4>
+<ul><li>Many more examples for individual functions on their help pages, as well as a set of vignettes. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). <a href="https://github.com/cruk-mi/mesa/pull/43" class="external-link">!43</a>
+</li>
+<li>Objects with invalid slots will now throw informative errors. <a href="https://github.com/cruk-mi/mesa/pull/43" class="external-link">!43</a>
+</li>
+<li>Added a function <code>sliceDMRs</code> to take the ‘top’ DMRs in each contrast, based on a specified ranking column. <a href="https://github.com/cruk-mi/mesa/pull/24" class="external-link">!24</a>
+</li>
+<li>Added <code><a href="../reference/getMesaGenome.html">getMesaGenome()</a></code>, <code><a href="../reference/getMesaTxDb.html">getMesaTxDb()</a></code>, and <code><a href="../reference/getMesaAnnoDb.html">getMesaAnnoDb()</a></code> functions to complete mesa’s genome management system. Supports hg38, hg19, and mm10 with extensible architecture. <a href="https://github.com/cruk-mi/mesa/pull/68" class="external-link">!68</a>
+</li>
+<li>
+<code><a href="../reference/plotGenomicFeatureDistribution.html">plotGenomicFeatureDistribution()</a></code> now supports multiple genomes via <code>genome</code>, <code>TxDb</code>, and <code>annoDb</code> parameters. Function now works with mesa’s genome system via <code><a href="../reference/setMesaGenome.html">setMesaGenome()</a></code> or custom genome builds. No longer limited to hg38. <a href="https://github.com/cruk-mi/mesa/pull/68" class="external-link">!68</a>
+</li>
+<li>Added <code>inst/scripts/install_mesa.R</code>: one-shot installer that automatically sets the correct Bioconductor version and validates environment consistency — see README for usage. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+</li>
+</ul></div>
+<div class="section level4">
+<h4 id="changes-0-99-0">CHANGES<a class="anchor" aria-label="anchor" href="#changes-0-99-0"></a></h4>
+<ul><li>Converted <code>plotPCA</code> into a submethod for the <code>qsea</code> defined method. <a href="https://github.com/cruk-mi/mesa/pull/11" class="external-link">!11</a>
+</li>
+<li>
+<code>plotPCA</code> gains a <code>verbose</code> option to turn off most of the messages produced. <a href="https://github.com/cruk-mi/mesa/pull/11" class="external-link">!11</a>
+</li>
+<li>
+<code>plotPCA</code> and <code>plotUMAP</code> now default to filled shapes rather than empty shapes if less than 6 shapes are required. <a href="https://github.com/cruk-mi/mesa/pull/36" class="external-link">!36</a>
+</li>
+<li>
+<code>plotPCA</code> and <code>plotUMAP</code> can now specify the shapes used via <code>shapePalette</code>, even if no shape annotation is being given. <a href="https://github.com/cruk-mi/mesa/pull/36" class="external-link">!36</a>
+</li>
+<li>
+<code>getSampleTable</code> is now defined for PCA/UMAP objects. <a href="https://github.com/cruk-mi/mesa/pull/11" class="external-link">!11</a>
+</li>
+<li>
+<code>plotGeneHeatmap</code> now automatically retries if it fails to connect to biomaRt, and fails with a clear error message if it cannot connect. <a href="https://github.com/cruk-mi/mesa/pull/44" class="external-link">!44</a>
+</li>
+<li>Updated function documentation with examples, default parameter values, and more detailed descriptions. <a href="https://github.com/cruk-mi/mesa/pull/43" class="external-link">!43</a>
+</li>
+<li>
+<code>fdrThres</code> changed to <code>FDRthres</code> in <code>calculateDMRs</code> and <code>subsetWindowsOverBackground</code>. <a href="https://github.com/cruk-mi/mesa/pull/48" class="external-link">!48</a>
+</li>
+<li>
+<code>makeQset</code> now checks that the chromosomes provided match with those present in the BSgenome. <a href="https://github.com/cruk-mi/mesa/pull/32" class="external-link">!32</a>
+</li>
+<li>The <code>"PairedAndR1s"</code> coverage method for <code>makeQset</code> will now only process reads that are present in the regions, this should reduce memory requirements and fix issues when <code>_alt</code> chromosomes exist in the bam files. This means the fragment size measurements are now only calculated over the selected regions. <a href="https://github.com/cruk-mi/mesa/pull/32" class="external-link">!32</a>
+</li>
+<li>
+<code>plotPCA</code> and <code>plotUMAP</code> no longer take the <code>qseaSet</code> as an input. The PCA/UMAP object has a copy of the <code>sampleTable</code> which may be modified instead. <a href="https://github.com/cruk-mi/mesa/pull/58" class="external-link">!58</a>
+</li>
+<li>Swapped to use of <code>seq_along</code> rather than <code>1:n</code> throughout. <a href="https://github.com/cruk-mi/mesa/pull/67" class="external-link">!67</a>
+</li>
+<li>Be more specific in the use of message suppression. <a href="https://github.com/cruk-mi/mesa/pull/66" class="external-link">!66</a>
+</li>
+<li>Updated <code>actions/checkout@v2</code> to <code>v4</code>; added system info step to CI for easier debugging. <a href="https://github.com/cruk-mi/mesa/pull/71" class="external-link">!71</a>
+</li>
+<li>Bumped minimum R requirement to 4.5.0 (Bioconductor 3.22). <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+</li>
+</ul></div>
+<div class="section level4">
+<h4 id="removed-0-99-0">REMOVED<a class="anchor" aria-label="anchor" href="#removed-0-99-0"></a></h4>
+<ul><li>Made <code>plotGenomicFeatureDistribution</code> and <code>getGenomicFeatureDistribution</code> internal as they currently only work for hg38. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Made <code>calculateFractionReadsInGRanges</code> internal as it seems to be returning the fraction of windows that overlap not reads. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Made <code>countWindowsAboveCutoff</code> internal as it needs the arguments renaming and better documentation. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Removed internal functions<code>getAnnotationDataFrame</code> and <code>getAnnotationDataFrameIndividual</code> as they are superseded by <code>getAnnotation</code> and the shift to tidy evaluation via <code>sampleAnnotation</code> in the plotting functions. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Removed <code>colnames</code> function definion on a qseaSet, which was not working anyway. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Removed <code>dropAvgFragDetails</code> as no longer required. <a href="https://github.com/cruk-mi/mesa/pull/63" class="external-link">!63</a>
+</li>
+<li>Removed GitLab CI files; updated <code>.Rbuildignore</code> to exclude <code>.github</code>, <code>.devcontainer</code>, <code>docs/</code> and other non-package files from the build — silences related <code>R CMD check</code> notes. <a href="https://github.com/cruk-mi/mesa/pull/70" class="external-link">!70</a>
+</li>
+<li>Removed <code>installDependencies.R</code>. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+</li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-0-99-0">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-0"></a></h4>
+<ul><li>
+<code>makeTransposedTable</code> no longer adds <code>chr</code> to the window names even if they already had a <code>chr</code> prefix. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Correctly pass the <code>...</code> inside <code>plotGeneHeatmap</code> and <code>plotRegionsHeatmap</code>. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>
+<code>writeDMRsToBed</code> should now correctly export the files. <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>Fixed error when <code>plotRegionsHeatmap</code> was given more than one region that overlapped one window. <a href="https://github.com/cruk-mi/mesa/pull/21" class="external-link">!21</a>
+</li>
+<li>Correct the message produced by <code>addMedipsEnrichmentFactors</code> (thanks <a href="https://github.com/daonslog" class="external-link">@daonslog</a> for reporting). <a href="https://github.com/cruk-mi/mesa/pull/14" class="external-link">!14</a>
+</li>
+<li>
+<code>makeQset</code>, <code>renameSamples</code> and <code>renameQsetNames</code> will no longer accept sample names that are not valid column names in R without quotation. <a href="https://github.com/cruk-mi/mesa/pull/31" class="external-link">!31</a>
+</li>
+<li>Correctly pass the <code>fragmentLength</code> when calling <code>makeQset</code> with the <code>CNVmethod = "MeCap"</code> option, and fix an issue with hg19 GRanges. <a href="https://github.com/cruk-mi/mesa/pull/21" class="external-link">!21</a>
+</li>
+<li>
+<code>plotPCA</code> now plots a shape column that contains NA values without needing to also specifying <code>NAshape</code>. <a href="https://github.com/cruk-mi/mesa/pull/36" class="external-link">!36</a>
+</li>
+<li>When no colour or shape annotation is provided, <code>plotPCA</code> and <code>plotUMAP</code> no longer print a NULLcol or NULLshape column in the legend when using filled shapes. <a href="https://github.com/cruk-mi/mesa/pull/36" class="external-link">!36</a>
+</li>
+<li>
+<code>plotPCA</code> and <code>plotUMAP</code> now show the fill colour as opposed to black points in the legend when using filled shapes. <a href="https://github.com/cruk-mi/mesa/pull/36" class="external-link">!36</a>
+</li>
+<li>Correctly pass the <code>fragmentLength</code> when calling <code>makeQset</code> with the <code>CNVmethod = "MeCap"</code> option, and fix an issue with hg19 GRanges. <a href="https://github.com/cruk-mi/mesa/pull/21" class="external-link">!21</a>
+</li>
+<li>Prevent exponentially increasing numbers of rows in CNV object when incorrect hmmCopy objects are provided, <a href="https://github.com/cruk-mi/mesa/issues/26" class="external-link">fixes issue </a><a href="https://github.com/cruk-mi/mesa/issues/26" class="external-link">#26</a> reported by <a href="https://github.com/lbeltrame" class="external-link">@lbeltrame</a>. <a href="https://github.com/cruk-mi/mesa/pull/29" class="external-link">!29</a>
+</li>
+<li>Fixed an issue where <code>makeQset</code> printed the wrong number of paired reads being filtered out due to having an insert size outside of the selected size range. <a href="https://github.com/cruk-mi/mesa/pull/32" class="external-link">!32</a>
+</li>
+<li>Fixed plotting a shape inside <code>plotPCA</code> when using ggplot2 4.0.0. <a href="https://github.com/cruk-mi/mesa/pull/55" class="external-link">!55</a>
+</li>
+<li>Fixed GRanges conversion error in <code>plotGenomicFeatureDistribution</code> that occurred with Bioconductor 3.21 when multiple chromosome columns existed after ChIPseeker annotation. <a href="https://github.com/cruk-mi/mesa/pull/68" class="external-link">!68</a>
+</li>
+<li>Fixed makeQset validation tests to handle updated annotation database versions and focus on parameter validation rather than computational integration tests. <a href="https://github.com/cruk-mi/mesa/pull/68" class="external-link">!68</a>
+</li>
+<li>Updated network error patterns in testPlotGeneHeatmap, preventing biomart HTP 503 error in test-makeQset.R:83:3. <a href="https://github.com/cruk-mi/mesa/pull/68" class="external-link">!68</a>
+</li>
+<li>Fixed <code><a href="../reference/plotGeneHeatmap.html">plotGeneHeatmap()</a></code> examples to handle transient Ensembl connection errors during <code>R CMD check</code>. <a href="https://github.com/cruk-mi/mesa/pull/70" class="external-link">!70</a>
+</li>
+<li>Fixed pkgdown deployment failure on GitHub Actions caused by git ownership mismatch in Docker containers. <a href="https://github.com/cruk-mi/mesa/pull/71" class="external-link">!71</a>
+</li>
+<li>Fixed <code>plyranges::mutate()</code> calls throughout the package — plyranges 1.30 no longer re-exports <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+</li>
+<li>Fixed broken <code>GRanges-class</code> Rd cross-references in <code><a href="../reference/liftOverHg19.html">liftOverHg19()</a></code>, <code><a href="../reference/getCGPositions.html">getCGPositions()</a></code>, and <code><a href="../reference/qseaTableToChrGRanges.html">qseaTableToChrGRanges()</a></code>. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+</li>
+<li>Fixed <code><a href="../reference/plotGeneHeatmap.html">plotGeneHeatmap()</a></code> examples failing during <code>R CMD check</code> due to transient Ensembl connection timeouts. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="mesa-051">mesa 0.5.1<a class="anchor" aria-label="anchor" href="#mesa-051"></a></h2>
 <p>This is the first released version on github, following a lengthy period of internal development. Many things have changed in a major overhaul of the package.</p>
