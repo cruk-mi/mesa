@@ -50,6 +50,6 @@ data.frame(seqnames = c("chr3","4"),
 
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[plyranges:ranges-construct]{plyranges::as_granges()}},
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[plyranges]{as_granges}},
 \code{\link[GenomeInfoDb:seqlevelsStyle]{GenomeInfoDb::seqlevelsStyle()}}
 }

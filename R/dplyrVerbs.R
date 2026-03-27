@@ -532,7 +532,7 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE){
 
 #' Column names of a qseaSet sample table
 #'
-#' S4 method for [BiocGenerics::colnames()] that returns the column names of a
+#' S4 method for \code{\link[BiocGenerics]{colnames}} that returns the column names of a
 #' `qseaSet`'s sample metadata table (i.e., [qsea::getSampleTable()]).
 #'
 #' @param x `qseaSet`.  

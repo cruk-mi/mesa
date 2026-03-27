@@ -366,10 +366,10 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL){
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
 #' **ComplexHeatmap** object for further composition with
-#' [ComplexHeatmap::draw()].
+#' \code{\link[ComplexHeatmap]{draw}}.
 #'
 #' @seealso
-#' [addHMMcopyCNV()], \code{runHMMcopy()}, [ComplexHeatmap::Heatmap()],
+#' [addHMMcopyCNV()], \code{runHMMcopy()}, \code{\link[ComplexHeatmap]{Heatmap}},
 #' [qsea::addCNV()]
 #'
 #' @family CNV

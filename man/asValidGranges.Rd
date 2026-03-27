@@ -37,5 +37,5 @@ data.frame(chr = "1", window_start = 1000, window_end = 1100) \%>\%
   asValidGranges()
 }
 \seealso{
-\code{\link[plyranges:ranges-construct]{plyranges::as_granges()}}, \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}
+\code{\link[plyranges]{as_granges}}, \code{\link{qseaTableToChrGRanges}}
 }

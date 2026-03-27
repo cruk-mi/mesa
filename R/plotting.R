@@ -86,10 +86,10 @@
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
 #' **ComplexHeatmap** object (e.g., a `Heatmap`/`HeatmapList`) for further composition with
-#' [ComplexHeatmap::draw()].
+#' \code{\link[ComplexHeatmap]{draw}}.
 #'
 #' @seealso
-#' [qsea::makeTable()], [ComplexHeatmap::Heatmap()], [ComplexHeatmap::draw()],
+#' [qsea::makeTable()], [ComplexHeatmap::Heatmap()], \code{\link[ComplexHeatmap]{draw}},
 #' [calculateDMRs()], [getSampleTable()], [getWindows()]
 #'
 #' @examples
@@ -124,7 +124,10 @@
 #' # plot these windows
 #' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
 #' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, clusterRows = TRUE, sampleAnnotation = c(tumour, tissue))
+#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, 
+#'                                            clusterRows = TRUE, 
+#'                                            sampleAnnotation = c(tumour, tissue)
+#'                                            )
 #' # more complex example
 #' exampleTumourNormal %>% 
 #'   plotRegionsHeatmap(regionsToOverlap = DMRs, 
@@ -724,7 +727,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
 #' **ComplexHeatmap** object (e.g., a `Heatmap`/`HeatmapList`) for further composition
-#' with [ComplexHeatmap::draw()].
+#' with \code{\link[ComplexHeatmap]{draw}}.
 #'
 #' @seealso
 #' [plotRegionsHeatmap()], [getSampleTable()], [setMart()],  

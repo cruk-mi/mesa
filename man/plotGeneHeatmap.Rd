@@ -102,7 +102,7 @@ Column in the mart to match \code{gene} against (needed for non-human/mouse setu
 \value{
 Draws a heatmap on the active device and (invisibly) returns the underlying
 \strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition
-with \code{\link[ComplexHeatmap:draw-dispatch]{ComplexHeatmap::draw()}}.
+with \code{\link[ComplexHeatmap]{draw}}.
 }
 \description{
 Plot sample signal over windows spanning a gene (± flanks) as a heatmap using

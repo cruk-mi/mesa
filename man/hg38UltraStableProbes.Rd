@@ -50,7 +50,8 @@ GenomeInfoDb::genome(hg38UltraStableProbes)  # empty
 
 # Harmonise style/metadata if needed
 gr <- hg38UltraStableProbes
-GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC"  # or "NCBI" / "Ensembl" for 1,2... instead of chr1, chr2...
+GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC"  # or "NCBI" / "Ensembl" 
+#' #   (for 1,2... instead of chr1, chr2...)
 GenomeInfoDb::genome(gr) <- "hg38"  # or "GRCh38"
 
 # Count overlaps with a toy region

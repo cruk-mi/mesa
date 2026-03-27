@@ -28,10 +28,10 @@
 #' other uses `"1"`. Only the **window set** is filtered; sample metadata and
 #' counts are subset accordingly.
 #'
-#' @seealso
-#'   [plyranges::filter_by_overlaps()],
-#'   [plyranges::filter_by_non_overlaps()],
-#'   [GenomicRanges::GRanges()]
+#' @seealso 
+#' \code{\link[plyranges]{filter_by_overlaps}},
+#' \code{\link[plyranges]{filter_by_non_overlaps}},
+#' \code{\link[GenomicRanges]{GRanges-class}}
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
@@ -515,9 +515,9 @@ poolSamples <- function(qseaSet, mergeString){
 #' data(exampleTumourNormal, package = "mesa")
 #' 
 #' exampleTumourNormal %>%
-#'   dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(exampleTumourNormal))))) %>% # Add a column with synthetic names
-#'   renameSamples(newNameColumn = newName) # Rename samples based on that column
-#'
+#'   dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(.))))) %>%
+#'   renameSamples(newNameColumn = "newName")
+#'   
 #' @export
 renameSamples <- function(qseaSet, newNameColumn){
 
