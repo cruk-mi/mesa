@@ -4,7 +4,22 @@ editor_options:
     wrap: sentence
 ---
 
-# dev
+# mesa 0.99.1
+
+* Fixed Rd cross-references to use `\code{\link[pkg]{function}}` syntax —
+  R-devel (4.6) is stricter about package-anchored topic resolution. 
+  ([#73](https://github.com/cruk-mi/mesa/pull/73))
+* Wrapped long example lines in `hg38UltraStableProbes`, `plotRegionsHeatmap`,
+  `renameSamples`, and `sliceDMRs` documentation to stay within 100 characters. 
+  ([#73](https://github.com/cruk-mi/mesa/pull/73))
+* Removed `inst/scripts/install_mesa.R` — standard `BiocManager::install()`
+  is sufficient for installation. 
+  ([#73](https://github.com/cruk-mi/mesa/pull/73))
+* Verified compatibility with R 4.6 / Bioconductor 3.23 devel — 0 errors,
+  0 warnings on `devtools::check()` and `BiocCheck::BiocCheck()`. 
+  ([#73](https://github.com/cruk-mi/mesa/pull/73))
+
+# mesa 0.99.0
 
 ### ADDED
 * Many more examples for individual functions on their help pages, as well as a set of vignettes. [!14](https://github.com/cruk-mi/mesa/pull/14)
