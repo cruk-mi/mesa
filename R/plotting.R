@@ -93,6 +93,7 @@
 #' [calculateDMRs()], [getSampleTable()], [getWindows()]
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #' 
 #' # Compute regions (DMRs) to plot
@@ -116,28 +117,8 @@
 #'                    windowAnnotation = CpG_density,
 #'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
 #'                     )
-#' 
+#' }
 #' @export
-#' @examples
-#' # calculate DMRs to plot
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
-#' # plot these windows
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
-#' # cluster the rows and add annotation
-#' exampleTumourNormal %>% plotRegionsHeatmap(DMRs, 
-#'                                            clusterRows = TRUE, 
-#'                                            sampleAnnotation = c(tumour, tissue)
-#'                                            )
-#' # more complex example
-#' exampleTumourNormal %>% 
-#'   plotRegionsHeatmap(regionsToOverlap = DMRs, 
-#'                    clusterRows = TRUE, 
-#'                    clusterNum = 2,
-#'                    sampleAnnotation = tumour,
-#'                    windowAnnotation = CpG_density,
-#'                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-#'                     )
-#' 
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
                                 sampleAnnotation = NULL,
@@ -734,6 +715,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' [biomaRt::useMart()], [ComplexHeatmap::Heatmap()]
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic gene heatmap (beta) with defaults
@@ -761,6 +743,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'                     downstreamDist = 2000),
 #'   error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 #' )
+#' }
 #'
 #' @export
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
@@ -1170,6 +1153,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' @family annotation-summaries
 #'
 #' @examples
+#' \donttest{
 #' # Recommended workflow: set genome globally
 #' setMesaGenome("hg38") 
 #' data(exampleTumourNormal, package = "mesa")
@@ -1188,6 +1172,7 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #'     TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
 #'     annoDb = "org.Mm.eg.db"
 #'   )
+#' }
 #'   
 #' @export
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack", 

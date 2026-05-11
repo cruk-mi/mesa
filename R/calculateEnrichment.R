@@ -306,6 +306,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #'   \pkg{BSgenome}
 #'
 #' @examples
+#' \donttest{
 #' # Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
 #' if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
 #'   n <- 200
@@ -322,6 +323,7 @@ getCGPositions <- function(BSgenome, chr.select){
 #'     BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
 #'     chr.select  = 1
 #'   )
+#' }
 #' }
 #' @export
 calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){

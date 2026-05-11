@@ -177,6 +177,7 @@
 #' [addHMMcopyCNV()], [setMesaParallel()], [BSgenome::available.genomes()]
 #'
 #' @examples
+#' \donttest{
 #' # Minimal runnable sketch if MEDIPSData is installed
 #' if (requireNamespace("MEDIPSData", quietly = TRUE)) {
 #'   sampleTable <- data.frame(
@@ -202,6 +203,7 @@
 #'       properPairsOnly   = FALSE,
 #'       minMapQual        = 10
 #'     )
+#' }
 #' }
 #' @export
 makeQset <- function(sampleTable,
