@@ -173,6 +173,7 @@ are performed and collected in \code{res}.
 
 }}
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
@@ -188,6 +189,8 @@ exampleTumourNormal \%>\%
   getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
   slot("res") \%>\%
   names()
+}
+\donttest{
 # Quick demo on a small synthetic qseaSet
 qsea::getExampleQseaSet(repl = 20) \%>\%
   getUMAP()
@@ -199,6 +202,8 @@ qsea::getExampleQseaSet(repl = 20) \%>\%
 # Use top 500 most variable windows only
 qsea::getExampleQseaSet(repl = 20) \%>\%
   getUMAP(topVarNum = 500)
+}
+\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # PCA on default beta-normalised matrix, keep 3 PCs
@@ -219,6 +224,7 @@ exampleTumourNormal \%>\%
   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
   slot("res") \%>\%
   names()
+}
 }
 \seealso{
 \code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA}, \linkS4class{mesaUMAP},
