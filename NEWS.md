@@ -4,6 +4,20 @@ editor_options:
     wrap: sentence
 ---
 
+# mesa 0.99.2
+
+### BUG FIXES
+* Wrapped slow examples (>5 s) in `\donttest{}` across `getPCA()`, `getUMAP()`,
+  `getDimRed()`, `plotUMAP()`, `plotDimRed()`, `makeQset()`, `annotateWindows()`,
+  `getGenomicFeatureDistribution()`, `plotRegionsHeatmap()`, `plotGeneHeatmap()`,
+  `plotGenomicFeatureDistribution()`, `summariseDMRsByGene()`, `writeDMRsToExcel()`,
+  `writeDMRsToBed()`, and `calculateCGEnrichmentGRanges()` — fixes R CMD check
+  TIMEOUT on Bioconductor build machines.
+  ([#74](https://github.com/cruk-mi/mesa/pull/74))
+* Removed duplicate `@examples` block in `plotRegionsHeatmap()` that caused
+  identical examples to appear twice in the generated Rd file.
+  ([#74](https://github.com/cruk-mi/mesa/pull/74))
+
 # mesa 0.99.1
 
 * Fixed Rd cross-references to use `\code{\link[pkg]{function}}` syntax —
