@@ -248,7 +248,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
             if (is.null(covariates)) {
                 warning("More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
            Set checkPVals = FALSE to ignore this.")
-            } else {
+ } else {
                 stop(
                     "More than 20% of windows have p-values of exactly 0; this likely ",
                     "indicates a model issue.\n",
