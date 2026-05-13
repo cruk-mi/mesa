@@ -227,9 +227,15 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
     stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
   }
   
-  if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR <- mesa::hg38CpGIslands }
+  if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) {
+    utils::data("hg38CpGIslands", package = "mesa", envir = environment())
+    CpGislandsGR <- hg38CpGIslands
+  }
 
-  if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR <- mesa::FantomRegions %>% plyranges::as_granges()}
+  if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) {
+    utils::data("FantomRegions", package = "mesa", envir = environment())
+    FantomRegionsGR <- FantomRegions %>% plyranges::as_granges()
+  }
 
   if(methods::is(dataTable,"GRanges")) {
     GRangesObject <- dataTable
@@ -702,9 +708,11 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
   if(is.character(arrayDetails)){
     if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38"){
-      arrayObject <- mesa::hg38_450kArrayGR
+      utils::data("hg38_450kArrayGR", package = "mesa", envir = environment())
+      arrayObject <- hg38_450kArrayGR
     } else if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38"){
-      arrayObject <- mesa::hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+      utils::data("hg38_450kArrayGR", package = "mesa", envir = environment())
+      arrayObject <- hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
     }
     else {stop("Only Infinium450k implemented currently as a string.")}
 

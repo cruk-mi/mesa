@@ -184,9 +184,11 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
   regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-    genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+    utils::data("BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution", package = "mesa", envir = environment())
+    genomicDistribution <- BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
   } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
-    genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
+    utils::data("BSgenome.Hsapiens.UCSC.hg19.CpG.distribution", package = "mesa", envir = environment())
+    genomicDistribution <- BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
   } else {
     genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
   }
@@ -364,11 +366,14 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
   regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-    genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+    utils::data("BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution", package = "mesa", envir = environment())
+    genomicDistribution <- BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
   } else  if (BSgenome == "BSgenome.Mmusculus.UCSC.mm10") {
-    genomicDistribution <- mesa::BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
+    utils::data("BSgenome.Mmusculus.UCSC.mm10.CpG.distribution", package = "mesa", envir = environment())
+    genomicDistribution <- BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
   } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
-    genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
+    utils::data("BSgenome.Hsapiens.UCSC.hg19.CpG.distribution", package = "mesa", envir = environment())
+    genomicDistribution <- BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
   } else {
     genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
   }

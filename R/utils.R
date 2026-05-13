@@ -318,3 +318,16 @@ asValidGranges <- function(object){
 print_and_capture <- function(x) {
   paste(utils::capture.output(methods::show(x)), collapse = "\n")
 }
+
+# Suppress "no visible binding for global variable" notes arising from
+# utils::data() calls that load package data objects into the local environment.
+utils::globalVariables(c(
+  "BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution",
+  "BSgenome.Hsapiens.UCSC.hg19.CpG.distribution",
+  "BSgenome.Mmusculus.UCSC.mm10.CpG.distribution",
+  "hg38CpGIslands",
+  "FantomRegions",
+  "hg38_450kArrayGR",
+  "hg38UltraStableProbes",
+  "hg19ToHg38.over.chain"
+))

@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(mesa)
 library(ggplot2)
+data("exampleTumourNormal", package = "mesa")
+data("exampleMouse", package = "mesa")
 ```
 
 # Differentially Methylated Regions

@@ -13,13 +13,14 @@ knitr::opts_chunk$set(
   fig.height= 5.5,
   fig.width = 7,
   comment   = "#>",
-  dev       = "png"
+  dev       = "pdf"
 )
 ```
 
 ```{r setup}
 library(ggplot2)
 library(mesa)
+data("exampleTumourNormal", package = "mesa")
 ```
 
 One essential functionality in the analysis of large scale datasets is the ability to perform dimensionality reduction techniques and plot the outputs, such as Principal Component Analysis (PCA), t-distributed Stochastic Neighbor Embedding (t-SNE) or Uniform Manifold Approximation and Projection (UMAPs). The mesa package currently supports functionality for PCAs and UMAPs.

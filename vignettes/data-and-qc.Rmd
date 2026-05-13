@@ -20,6 +20,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(stringr)
+data("exampleTumourNormal", package = "mesa")
 ```
 
 # Generating tables of values from a qseaSet

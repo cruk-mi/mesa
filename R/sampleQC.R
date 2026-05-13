@@ -79,7 +79,10 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
   }
 
   hyperStableBetaTable <- qseaSet %>%
-    filterByOverlaps(mesa::hg38UltraStableProbes) %>%
+    filterByOverlaps({
+      utils::data("hg38UltraStableProbes", package = "mesa", envir = environment())
+      hg38UltraStableProbes
+    }) %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.)) %>%
     dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
     dplyr::filter(CpG_density >= !!minDensity) %>%

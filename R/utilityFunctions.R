@@ -71,7 +71,8 @@ liftOverHg19 <- function(grOrDf){
     plyranges::as_granges()
 
   message("Performing coordinate liftover from hg19 to hg38")
-  liftover_result <- rtracklayer::liftOver(regions, mesa::hg19ToHg38.over.chain)
+  utils::data("hg19ToHg38.over.chain", package = "mesa", envir = environment())
+  liftover_result <- rtracklayer::liftOver(regions, hg19ToHg38.over.chain)
   GenomeInfoDb::genome(liftover_result) <- "hg38"
 
   return(unlist(liftover_result))
