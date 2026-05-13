@@ -19,6 +19,6 @@
 #'
 #' # Chain multiple transformations
 #' 1:10 %>%
-#'   mean() %>%
-#'   round(1)
+#'     mean() %>%
+#'     round(1)
 NULL
