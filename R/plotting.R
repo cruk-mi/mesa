@@ -120,55 +120,58 @@
 #' }
 #' @export
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
-                                normMethod = "beta",
-                                sampleAnnotation = NULL,
-                                windowAnnotation = NULL,
-                                annotationColors = NA,
-                                useGroupMeans = FALSE,
-                                clusterRows = FALSE,
-                                clusterCols = TRUE,
-                                minEnrichment = 3,
-                                maxScale = 5,
-                                clusterNum = NULL,
-                                clip = 1000000000,
-                                minDensity = 0,
-                                annotationPosition = "right",
-                                title = NULL,
-                                showSampleNames = NULL,
-                                clusterMethod = "ward.D2", ...) {
-
-  if (is.null(regionsToOverlap)) {
-    regionsToOverlap <- qseaSet %>%
-      qsea::getRegions()
-  }
-
-  regionsToOverlap <- asValidGranges(regionsToOverlap)
-
-  if (length(regionsToOverlap) > 20000) {stop("More than 20000 regions requested.")}
-
-  if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
-
-  if (normMethod == "beta") {maxScale <- min(clip,1)}
-
-  col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
-
-  clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
-
-  if (!is.list(annotationColors)) {
-
-    namesVec <- names(annotationColors)
-    names(namesVec) <- namesVec
-
-    purrr::map(namesVec, function(x){
-      usedValues <- qseaSet %>%
-        qsea::getSampleTable() %>%
-        dplyr::pull(x) %>%
-        unique()
-      return(x = annotationColors[[x]][usedValues])
+    normMethod = "beta",
+    sampleAnnotation = NULL,
+    windowAnnotation = NULL,
+    annotationColors = NA,
+    useGroupMeans = FALSE,
+    clusterRows = FALSE,
+    clusterCols = TRUE,
+    minEnrichment = 3,
+    maxScale = 5,
+    clusterNum = NULL,
+    clip = 1000000000,
+    minDensity = 0,
+    annotationPosition = "right",
+    title = NULL,
+    showSampleNames = NULL,
+    clusterMethod = "ward.D2", ...) {
+    if (is.null(regionsToOverlap)) {
+        regionsToOverlap <- qseaSet %>%
+            qsea::getRegions()
     }
-    )
 
-  }
+    regionsToOverlap <- asValidGranges(regionsToOverlap)
+
+    if (length(regionsToOverlap) > 20000) {
+        stop("More than 20000 regions requested.")
+    }
+
+    if (length(regionsToOverlap) == 0) {
+        stop("No genomic regions given!")
+    }
+
+    if (normMethod == "beta") {
+        maxScale <- min(clip, 1)
+    }
+
+    col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
+
+    clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
+
+    if (!is.list(annotationColors)) {
+        namesVec <- names(annotationColors)
+        names(namesVec) <- namesVec
+
+        purrr::map(namesVec, function(x) {
+            usedValues <- qseaSet %>%
+                qsea::getSampleTable() %>%
+                dplyr::pull(x) %>%
+                unique()
+            return(x = annotationColors[[x]][usedValues])
+        }
+        )
+    }
 
   # define a function that removes rows that have 1 row.
   remove_almost_empty_rows <- function(dat)  {
@@ -453,17 +456,17 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #'   ) 
 #'   
 makeHeatmapAnnotations <- function(qseaSet,
-                                   sampleAnnotation = NULL,
-                                   windowAnnotationDf = NULL,
-                                   useGroupMeans = FALSE,
-                                   specifiedAnnotationColors = NA,
-                                   windowOrientation = "row",
-                                   sampleOrientation = "column"){
-
-  sampleAnnotationDf <- getAnnotation(qseaSet,
-                                      sampleAnnotation = {{sampleAnnotation}},
-                                      useGroupMeans = useGroupMeans) %>%
-    dplyr::mutate_if(is.character, as.factor)
+    sampleAnnotation = NULL,
+    windowAnnotationDf = NULL,
+    useGroupMeans = FALSE,
+    specifiedAnnotationColors = NA,
+    windowOrientation = "row",
+    sampleOrientation = "column") {
+    sampleAnnotationDf <- getAnnotation(qseaSet,
+        sampleAnnotation = {{ sampleAnnotation }},
+        useGroupMeans = useGroupMeans
+    ) %>%
+        dplyr::mutate_if(is.character, as.factor)
 
   if(is.null(windowAnnotationDf)){
     windowAnnotationDf <- data.frame()
@@ -1175,63 +1178,66 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF){
 #' }
 #'   
 #' @export
-plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack", 
-                                           normMethod = "nrpm", genome = NULL, 
-                                           TxDb = NULL, annoDb = NULL) {
-  
-  # Genome selection hierarchy:
-  # 1. Function parameter (genome) takes precedence
-  # 2. Global mesa genome setting
-  # 3. Manual TxDb/annoDb parameters
-  # 4. Default to hg38
-  
-  if (!is.null(genome)) {
-    # Use provided genome parameter
-    txdb <- getMesaTxDb(genome)
-    annodb <- getMesaAnnoDb(genome)
-  } else if (!is.null(getOption("mesa_genome"))) {
-    # Use global mesa genome setting
-    txdb <- getMesaTxDb()
-    annodb <- getMesaAnnoDb()
-  } else if (!is.null(TxDb) || !is.null(annoDb)) {
-    # Manual parameters
-    txdb <- if (is.null(TxDb)) TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene else TxDb
-    annodb <- if (is.null(annoDb)) "org.Hs.eg.db" else annoDb
-  } else {
-    # Default fallback
-    txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
-    annodb <- "org.Hs.eg.db"
-  }
-  
-  temp <- qseaSet %>%
-    qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
-    qseaTableToChrGRanges() %>%
-    ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
-                             level = "gene",
-                             TxDb = txdb,
-                             annoDb = annodb,
-                             overlap = "all",
-                             verbose = FALSE)
-  
-  featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet), function(x) {
-    temp@anno %>%
-      tibble::as_tibble() %>%  # Convert before filter to avoid GRanges conversion
-      dplyr::filter(!!dplyr::sym(paste0(x, "_", normMethod)) > cutoff) %>%
-      dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
-      dplyr::pull(annoShort) %>%
-      table() %>%
-      tibble::enframe(name = "feature") %>%
-      dplyr::mutate(sample = x)
-  })
-  
-  featureTable %>%
-    ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
-    ggplot2::geom_bar(position = barType, stat = "identity") +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
-    ggplot2::labs(x = "Sample",
-                  y = "Fraction", 
-                  legend = "Feature",
-                  subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}"))
+plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack",
+    normMethod = "nrpm", genome = NULL,
+    TxDb = NULL, annoDb = NULL) {
+    # Genome selection hierarchy:
+    # 1. Function parameter (genome) takes precedence
+    # 2. Global mesa genome setting
+    # 3. Manual TxDb/annoDb parameters
+    # 4. Default to hg38
+
+    if (!is.null(genome)) {
+        # Use provided genome parameter
+        txdb <- getMesaTxDb(genome)
+        annodb <- getMesaAnnoDb(genome)
+    } else if (!is.null(getOption("mesa_genome"))) {
+        # Use global mesa genome setting
+        txdb <- getMesaTxDb()
+        annodb <- getMesaAnnoDb()
+    } else if (!is.null(TxDb) || !is.null(annoDb)) {
+        # Manual parameters
+        txdb <- if (is.null(TxDb)) TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene else TxDb
+        annodb <- if (is.null(annoDb)) "org.Hs.eg.db" else annoDb
+    } else {
+        # Default fallback
+        txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+        annodb <- "org.Hs.eg.db"
+    }
+
+    temp <- qseaSet %>%
+        qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
+        qseaTableToChrGRanges() %>%
+        ChIPseeker::annotatePeak(
+            tssRegion = c(-2000, 500),
+            level = "gene",
+            TxDb = txdb,
+            annoDb = annodb,
+            overlap = "all",
+            verbose = FALSE
+        )
+
+    featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet), function(x) {
+        temp@anno %>%
+            tibble::as_tibble() %>% # Convert before filter to avoid GRanges conversion
+            dplyr::filter(!!dplyr::sym(paste0(x, "_", normMethod)) > cutoff) %>%
+            dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
+            dplyr::pull(annoShort) %>%
+            table() %>%
+            tibble::enframe(name = "feature") %>%
+            dplyr::mutate(sample = x)
+    })
+
+    featureTable %>%
+        ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
+        ggplot2::geom_bar(position = barType, stat = "identity") +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
+        ggplot2::labs(
+            x = "Sample",
+            y = "Fraction",
+            legend = "Feature",
+            subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}")
+        )
 }
 
 #' Sample correlation heatmap
@@ -1304,11 +1310,10 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
 #'
 #' @export
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
-                                  minEnrichment = 3, annotationColors = NA, minDensity = 0, ...){
-
-  ##TODO: Swap from pheatmap to ComplexHeatmap 
-  if (!is.null(regionsToOverlap)) {
-    regionsToOverlap <- asValidGranges(regionsToOverlap)
+    minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
+    ## TODO: Swap from pheatmap to ComplexHeatmap
+    if (!is.null(regionsToOverlap)) {
+        regionsToOverlap <- asValidGranges(regionsToOverlap)
 
     if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
