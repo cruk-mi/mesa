@@ -24,19 +24,19 @@
 #' }
 #' @export
 getPCA <- function(qseaSet,
-                    dataTable = NULL,
-                    regionsToOverlap = NULL,
-                    normMethod = "beta",
-                    minEnrichment = 3,
-                    useGroupMeans = FALSE,
-                    minDensity = 0,
-                    topVarNum = 1000,
-                    topVarSamples = NULL,
-                    center = TRUE,
-                    scale = FALSE,
-                    nPC = 5,
-                    returnDataTable = FALSE,
-                    verbose = TRUE) {
+                   dataTable = NULL,
+                   regionsToOverlap = NULL,
+                   normMethod = "beta",
+                   minEnrichment = 3,
+                   useGroupMeans = FALSE,
+                   minDensity = 0,
+                   topVarNum = 1000,
+                   topVarSamples = NULL,
+                   center = TRUE,
+                   scale = FALSE,
+                   nPC = 5,
+                   returnDataTable = FALSE,
+                   verbose = TRUE) {
 
     getDimRed(qseaSet = qseaSet,
         dataTable = dataTable,
@@ -288,12 +288,12 @@ getDimRed <- function(qseaSet,
         if (useGroupMeans) {
             if (!all(samples %in% names(qsea::getSampleGroups(qseaSet)))) {
                 stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
-                (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
+             (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
             }
         } else {
             if (!all(samples %in% qsea::getSampleNames(qseaSet))) {
                 stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
-                (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
+             (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
             }
         }
 
@@ -329,7 +329,7 @@ getDimRed <- function(qseaSet,
 
     if (verbose) {
         message(glue::glue("------------------------------
-                        Initial number of windows = {initialNumWindows}."))
+                     Initial number of windows = {initialNumWindows}."))
     }
 
     if (!is.null(regionsToOverlap)) {
@@ -409,7 +409,7 @@ getDimRed <- function(qseaSet,
     if (numWindowsRemovedMissingVals > 0) {
         if (verbose) {
             message(glue::glue("Filtered out {numWindowsRemovedMissingVals} windows with at least one missing value: {nrow(dataTable)} windows remaining.
-                        ------------------------------"))
+                       ------------------------------"))
         }
     } else {
         if (verbose) {
@@ -516,14 +516,14 @@ getDimRed <- function(qseaSet,
                 if (length(setdiff(samples, tVS)) == 0) {
                     if (verbose) {
                         message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {groupString}s:
-                            {paste0(tVS, collapse = ', ')}.
-                            -> column name {nm}."))
+                           {paste0(tVS, collapse = ', ')}.
+                           -> column name {nm}."))
                     }
                 } else {
                     if (verbose) {
                         message(glue::glue("Calculating standard deviation for each window across {length(tVS)} of {length(samples)} {groupString}s:
-                            {paste0(tVS, collapse = ', ')}.
-                            -> column name {nm}."))
+                           {paste0(tVS, collapse = ', ')}.
+                           -> column name {nm}."))
                     }
                 }
 
@@ -565,15 +565,15 @@ getDimRed <- function(qseaSet,
 
                         if (verbose) {
                             message(glue::glue("------------------------------
-                                Filtering windows based on standard deviation across all {length(topVarSamples)} {groupString}s ({windowSdName}).
-                                Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
+                             Filtering windows based on standard deviation across all {length(topVarSamples)} {groupString}s ({windowSdName}).
+                             Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
                         }
                     } else {
 
                         if (verbose) {
                             message(glue::glue("------------------------------
-                                Filtering windows based on standard deviation across {length(topVarSamples)} {groupString}s ({windowSdName}).
-                                Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
+                             Filtering windows based on standard deviation across {length(topVarSamples)} {groupString}s ({windowSdName}).
+                             Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
                         }
                     }
 
@@ -581,7 +581,7 @@ getDimRed <- function(qseaSet,
 
                     if (verbose) {
                         message(glue::glue("------------------------------
-                                No filtering of windows based on window standard deviation."))
+                             No filtering of windows based on window standard deviation."))
                     }
                     th <- NA
                 }
@@ -593,7 +593,7 @@ getDimRed <- function(qseaSet,
 
                 if (verbose) {
                     message(glue::glue("Performing {method} with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
-                            -> {resName}."))
+                           -> {resName}."))
                 }
 
                 dataTable <- dataTable %>%
@@ -1078,18 +1078,18 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #'
 #' @export
 plotPCA.mesaDimRed <- function(object,
-                                components = list(c(1, 2), c(2, 3)),
-                                colour = NULL,
-                                colourPalette = NULL,
-                                NAcolour = "grey50",
-                                symDivColourScale = FALSE,
-                                shape = NULL,
-                                shapePalette = NULL,
-                                NAshape = NULL,
-                                showSampleNames = FALSE,
-                                pointSize = 2,
-                                alpha = 1,
-                                plotlyAnnotations = "") {
+                               components = list(c(1, 2), c(2, 3)),
+                               colour = NULL,
+                               colourPalette = NULL,
+                               NAcolour = "grey50",
+                               symDivColourScale = FALSE,
+                               shape = NULL,
+                               shapePalette = NULL,
+                               NAshape = NULL,
+                               showSampleNames = FALSE,
+                               pointSize = 2,
+                               alpha = 1,
+                               plotlyAnnotations = "") {
 
     out <- plotDimRed(object = object,
         components = components,
@@ -1350,18 +1350,18 @@ plotUMAP <- function(object,
 #'
 #' @export
 plotDimRed <- function(object,
-                        components = list(c(1, 2), c(2, 3)),
-                        colour = NULL,
-                        colourPalette = NULL,
-                        NAcolour = "grey50",
-                        symDivColourScale = FALSE,
-                        shape = NULL,
-                        shapePalette = NULL,
-                        NAshape = NULL,
-                        showSampleNames = FALSE,
-                        pointSize = 2,
-                        alpha = 1,
-                        plotlyAnnotations = ""
+                       components = list(c(1, 2), c(2, 3)),
+                       colour = NULL,
+                       colourPalette = NULL,
+                       NAcolour = "grey50",
+                       symDivColourScale = FALSE,
+                       shape = NULL,
+                       shapePalette = NULL,
+                       NAshape = NULL,
+                       showSampleNames = FALSE,
+                       pointSize = 2,
+                       alpha = 1,
+                       plotlyAnnotations = ""
 ) {
 
     if (!inherits(object, "mesaDimRed")) {
@@ -1375,7 +1375,7 @@ plotDimRed <- function(object,
         if (length(colDiff) > 0) {
             stop(glue::glue("Can't colour by {colDiff}, as it is not present in the sampleTable!
 
-                        ")) # empty line is required here
+                      ")) # empty line is required here
         }
     }
 
@@ -1384,7 +1384,7 @@ plotDimRed <- function(object,
         if (length(colDiff) > 0) {
             stop(glue::glue("Can't set shapes by {colDiff}, as it is not present in the sampleTable!
 
-                        ")) # empty line is required here
+                      ")) # empty line is required here
         }
     }
 
