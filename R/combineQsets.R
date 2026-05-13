@@ -148,7 +148,7 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
 
         ## TODO Check intersection properly to make sure they are exactly start/end together
         message(glue::glue("Regions are not identical: {length(regions1)} and {length(regions2)} regions.
-                           Taking intersection of {length(regions1 %>% plyranges::filter_by_overlaps(regions2))} regions."))
+Taking intersection of {length(regions1 %>% plyranges::filter_by_overlaps(regions2))} regions."))
     }
 
     if (is.character(all.equal(qsea::getRegions(qseaSet1)$CpG_density, qsea::getRegions(qseaSet2)$CpG_density))) {

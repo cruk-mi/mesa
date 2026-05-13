@@ -120,23 +120,22 @@
 #' }
 #' @export
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
-                                normMethod = "beta",
-                                sampleAnnotation = NULL,
-                                windowAnnotation = NULL,
-                                annotationColors = NA,
-                                useGroupMeans = FALSE,
-                                clusterRows = FALSE,
-                                clusterCols = TRUE,
-                                minEnrichment = 3,
-                                maxScale = 5,
-                                clusterNum = NULL,
-                                clip = 1000000000,
-                                minDensity = 0,
-                                annotationPosition = "right",
-                                title = NULL,
-                                showSampleNames = NULL,
-                                clusterMethod = "ward.D2", ...) {
-
+    normMethod = "beta",
+    sampleAnnotation = NULL,
+    windowAnnotation = NULL,
+    annotationColors = NA,
+    useGroupMeans = FALSE,
+    clusterRows = FALSE,
+    clusterCols = TRUE,
+    minEnrichment = 3,
+    maxScale = 5,
+    clusterNum = NULL,
+    clip = 1000000000,
+    minDensity = 0,
+    annotationPosition = "right",
+    title = NULL,
+    showSampleNames = NULL,
+    clusterMethod = "ward.D2", ...) {
     if (is.null(regionsToOverlap)) {
         regionsToOverlap <- qseaSet %>%
             qsea::getRegions()
@@ -144,18 +143,23 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 
     regionsToOverlap <- asValidGranges(regionsToOverlap)
 
-    if (length(regionsToOverlap) > 20000) {stop("More than 20000 regions requested.")}
+    if (length(regionsToOverlap) > 20000) {
+        stop("More than 20000 regions requested.")
+    }
 
-    if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
+    if (length(regionsToOverlap) == 0) {
+        stop("No genomic regions given!")
+    }
 
-    if (normMethod == "beta") {maxScale <- min(clip, 1)}
+    if (normMethod == "beta") {
+        maxScale <- min(clip, 1)
+    }
 
     col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
     clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
 
     if (!is.list(annotationColors)) {
-
         namesVec <- names(annotationColors)
         names(namesVec) <- namesVec
 
@@ -167,100 +171,98 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
             return(x = annotationColors[[x]][usedValues])
         }
         )
-
     }
 
-    # define a function that removes rows that have 1 row.
-    remove_almost_empty_rows <- function(dat) {
-        mask_keep <- rowSums(is.na(dat)) != (ncol(dat) - 1)
-        janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "rows", reason = "almost empty")
-        return(dat[mask_keep, , drop = FALSE])
-    }
+  # define a function that removes rows that have 1 row.
+  remove_almost_empty_rows <- function(dat)  {
+    mask_keep <- rowSums(is.na(dat)) != (ncol(dat) - 1)
+    janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "rows", reason = "almost empty")
+    return(dat[mask_keep, , drop = FALSE])
+  }
 
-    dataTab <- qseaSet %>%
-        filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
-        filterWindows(CpG_density >= minDensity) %>%
-        getDataTable(normMethod = normMethod,
-            useGroupMeans = useGroupMeans,
-            minEnrichment = minEnrichment
-        ) %>%
-        dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-        dplyr::mutate_all(~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
+  dataTab <- qseaSet %>%
+    filterByOverlaps(regionsToOverlap = regionsToOverlap) %>%
+    filterWindows(CpG_density >= minDensity) %>%
+    getDataTable(normMethod = normMethod,
+                 useGroupMeans = useGroupMeans,
+                 minEnrichment = minEnrichment
+    ) %>%
+    dplyr::mutate(window = paste0(seqnames, ":",start, "-",end)) %>%
+    dplyr::mutate_all( ~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
 
-    if (useGroupMeans) {
-        colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
-    } else {
-        colsToFind <- qseaSet %>% qsea::getSampleNames()
-    }
+  if (useGroupMeans) {
+    colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
+  } else {
+    colsToFind <- qseaSet %>% qsea::getSampleNames()
+  }
 
-    numData <- dataTab %>%
-        tibble::column_to_rownames("window") %>%
-        dplyr::select(tidyselect::all_of(colsToFind)) %>%
-        clipFn(a = 0, b = clip) %>%
-        janitor::remove_empty(which = "cols", quiet = FALSE) %>%
-        janitor::remove_empty(which = "rows", quiet = FALSE)
+  numData <- dataTab %>%
+    tibble::column_to_rownames("window") %>%
+    dplyr::select(tidyselect::all_of(colsToFind)) %>%
+    clipFn(a = 0, b = clip) %>%
+    janitor::remove_empty(which = "cols", quiet = FALSE) %>%
+    janitor::remove_empty(which = "rows", quiet = FALSE)
 
-    if (clusterRows) {
-        numData <- numData %>%
-            remove_almost_empty_rows()
-    }
+  if (clusterRows) {
+    numData <- numData %>%
+      remove_almost_empty_rows()
+  }
 
-    dataTab <- dataTab %>%
-        filter(window %in% rownames(numData))
+  dataTab <- dataTab %>%
+    filter(window %in% rownames(numData))
 
-    windowAnnotationDf <- getWindowAnnotation(dataTab, regions = regionsToOverlap,
-        windowAnnotation = {{ windowAnnotation }},
-        clusterRows = clusterRows)
+  windowAnnotationDf <- getWindowAnnotation(dataTab, regions = regionsToOverlap,
+                                            windowAnnotation = {{windowAnnotation}},
+                                            clusterRows = clusterRows)
 
-    # Ensure regions order is maintained if not clustering.
-    numData <- numData[rownames(windowAnnotationDf), ]
+  # Ensure regions order is maintained if not clustering.
+  numData <- numData[rownames(windowAnnotationDf),]
 
-    if (!useGroupMeans) {
+  if (!useGroupMeans) {
 
-        annots <- qseaSet %>%
-            filter(sample_name %in% !!(colnames(numData))) %>%
-            makeHeatmapAnnotations(useGroupMeans = useGroupMeans,
-                specifiedAnnotationColors = annotationColors,
-                sampleAnnotation = {{ sampleAnnotation }},
-                windowAnnotationDf = windowAnnotationDf)
+    annots <- qseaSet %>%
+      filter(sample_name %in% !!(colnames(numData))) %>%
+      makeHeatmapAnnotations(useGroupMeans = useGroupMeans,
+                             specifiedAnnotationColors = annotationColors,
+                             sampleAnnotation = {{sampleAnnotation}},
+                             windowAnnotationDf = windowAnnotationDf)
 
-    } else {
-        annots <- qseaSet %>%
-            filter(group %in% !!(colnames(numData))) %>%
-            makeHeatmapAnnotations(useGroupMeans = useGroupMeans,
-                specifiedAnnotationColors = annotationColors,
-                sampleAnnotation = {{ sampleAnnotation }},
-                windowAnnotationDf = windowAnnotationDf)
-    }
+  } else {
+    annots <- qseaSet %>%
+      filter(group %in% !!(colnames(numData))) %>%
+      makeHeatmapAnnotations(useGroupMeans = useGroupMeans,
+                             specifiedAnnotationColors = annotationColors,
+                             sampleAnnotation = {{sampleAnnotation}},
+                             windowAnnotationDf = windowAnnotationDf )
+  }
 
-    colAnnot <- annots$sample
-    rowAnnot <- annots$window
+  colAnnot <- annots$sample
+  rowAnnot <- annots$window
 
-    if (ncol(dataTab) == 1) {
-        clusterCols <- FALSE
-    }
+  if (ncol(dataTab) == 1) {
+    clusterCols <- FALSE
+  }
 
-    if (clusterRows) {
-        dataTab <- remove_almost_empty_rows(dataTab)
-    }
+  if (clusterRows) {
+    dataTab <- remove_almost_empty_rows(dataTab)
+  }
 
-    if (clusterCols && !is.null(clusterNum) && clusterNum > 1) {
-        colSplit <- clusterNum
-    } else {
-        colSplit <- NULL
-    }
+  if (clusterCols && !is.null(clusterNum) && clusterNum > 1) {
+    colSplit <- clusterNum
+  } else {
+    colSplit <- NULL
+  }
 
-    annotName <- dplyr::case_when(normMethod == "beta" ~ "Beta value",
-        normMethod == "nrpm" ~ "NRPM",
-        TRUE ~ stringr::str_to_title(normMethod)
-    )
+  annotName <- dplyr::case_when(normMethod == "beta" ~ "Beta value",
+                                normMethod == "nrpm" ~ "NRPM",
+                                TRUE ~ stringr::str_to_title(normMethod)
+  )
 
-    if (is.null(showSampleNames)) {
-        if (ncol(numData) > 50) {
-            showSampleNames <- FALSE
-        } else {
-            showSampleNames <- TRUE
-        }
+  if (is.null(showSampleNames)) {
+    if (ncol(numData) > 50) {
+      showSampleNames <- FALSE
+    }  else {
+      showSampleNames <- TRUE
     }
 
     if (clusterRows) {
@@ -453,16 +455,16 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #'     )
 #'
 makeHeatmapAnnotations <- function(qseaSet,
-                                    sampleAnnotation = NULL,
-                                    windowAnnotationDf = NULL,
-                                    useGroupMeans = FALSE,
-                                    specifiedAnnotationColors = NA,
-                                    windowOrientation = "row",
-                                    sampleOrientation = "column") {
-
+    sampleAnnotation = NULL,
+    windowAnnotationDf = NULL,
+    useGroupMeans = FALSE,
+    specifiedAnnotationColors = NA,
+    windowOrientation = "row",
+    sampleOrientation = "column") {
     sampleAnnotationDf <- getAnnotation(qseaSet,
         sampleAnnotation = {{ sampleAnnotation }},
-        useGroupMeans = useGroupMeans) %>%
+        useGroupMeans = useGroupMeans
+    ) %>%
         dplyr::mutate_if(is.character, as.factor)
 
     if (is.null(windowAnnotationDf)) {
@@ -1176,9 +1178,8 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'
 #' @export
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack",
-                                            normMethod = "nrpm", genome = NULL,
-                                            TxDb = NULL, annoDb = NULL) {
-
+    normMethod = "nrpm", genome = NULL,
+    TxDb = NULL, annoDb = NULL) {
     # Genome selection hierarchy:
     # 1. Function parameter (genome) takes precedence
     # 2. Global mesa genome setting
@@ -1206,12 +1207,14 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
     temp <- qseaSet %>%
         qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
         qseaTableToChrGRanges() %>%
-        ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
+        ChIPseeker::annotatePeak(
+            tssRegion = c(-2000, 500),
             level = "gene",
             TxDb = txdb,
             annoDb = annodb,
             overlap = "all",
-            verbose = FALSE)
+            verbose = FALSE
+        )
 
     featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet), function(x) {
         temp@anno %>%
@@ -1228,10 +1231,12 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
         ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
         ggplot2::geom_bar(position = barType, stat = "identity") +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
-        ggplot2::labs(x = "Sample",
+        ggplot2::labs(
+            x = "Sample",
             y = "Fraction",
             legend = "Feature",
-            subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}"))
+            subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}")
+        )
 }
 
 #' Sample correlation heatmap
@@ -1304,8 +1309,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
 #'
 #' @export
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
-                                    minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
-
+    minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
     ## TODO: Swap from pheatmap to ComplexHeatmap
     if (!is.null(regionsToOverlap)) {
         regionsToOverlap <- asValidGranges(regionsToOverlap)
@@ -1557,14 +1561,14 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
 #'
 #' @keywords internal
 testPlotGeneHeatmap <- function(...) {
-    tryCatch({
-        plotGeneHeatmap(...)
-        testthat::succeed()
-    }, error = function(e) {
-        if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http [45][0-9][0-9]|service unavailable|req_perform")) {
-            testthat::skip("Connection to biomart failed, skipping test.")
-        } else {
-            stop(e)
-        }
-    })
+  tryCatch({
+    plotGeneHeatmap(...)
+    testthat::succeed()
+  }, error = function(e) {
+    if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http [45][0-9][0-9]|service unavailable|req_perform")) {
+      testthat::skip("Connection to biomart failed, skipping test.")
+    } else {
+      stop(e)
+    }
+  })
 }

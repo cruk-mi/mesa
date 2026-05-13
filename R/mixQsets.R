@@ -100,8 +100,8 @@
 #'
 #' @export
 mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
-                       onlyNew = FALSE,
-                       renormalise = TRUE) {
+    onlyNew = FALSE,
+    renormalise = TRUE) {
     qsea:::checkSamples(qseaSet, c(sample1, sample2))
 
     if (is.null(newName)) {
