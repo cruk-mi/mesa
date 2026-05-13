@@ -418,7 +418,7 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
     if (nrow(nonUniqueWindowsDf) > 0) {
         stop(glue::glue("Non-unique annotations found in window annotations:
          {paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}
-                    "))
+"))
     }
     rowAnnotDfdistinct %>%
         tibble::column_to_rownames("window")
@@ -853,7 +853,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
             idType <- "mgi_symbol"
         } else {
             stop("Please specify idType for genomes that are not human or mouse.
-           This must be a valid attribute for the given mart, see biomaRt::listAttributes.")
+This must be a valid attribute for the given mart, see biomaRt::listAttributes.")
         }
     }
 

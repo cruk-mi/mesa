@@ -276,11 +276,11 @@ makeQset <- function(sampleTable,
 
     if (any(asValidNames != sampleTable$sample_name)) {
         stop(glue::glue("sample_name column must be valid names for columns in R without quoting.
-  See the help for base::make.names, but generally use only letters, numbers,
-  underscores and dots, and names can't start with a number.
-  Issues were found with:
+See the help for base::make.names, but generally use only letters, numbers,
+underscores and dots, and names can't start with a number.
+Issues were found with:
     {paste(sampleTable$sample_name[sampleTable$sample_name != asValidNames], collapse = '\n    ')}
-   "))
+"))
     }
 
     if (!all(file.exists(sampleTable$file_name))) {
