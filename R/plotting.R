@@ -142,22 +142,22 @@
 #'     )
 #'
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
-                               normMethod = "beta",
-                               sampleAnnotation = NULL,
-                               windowAnnotation = NULL,
-                               annotationColors = NA,
-                               useGroupMeans = FALSE,
-                               clusterRows = FALSE,
-                               clusterCols = TRUE,
-                               minEnrichment = 3,
-                               maxScale = 5,
-                               clusterNum = NULL,
-                               clip = 1000000000,
-                               minDensity = 0,
-                               annotationPosition = "right",
-                               title = NULL,
-                               showSampleNames = NULL,
-                               clusterMethod = "ward.D2", ...) {
+    normMethod = "beta",
+    sampleAnnotation = NULL,
+    windowAnnotation = NULL,
+    annotationColors = NA,
+    useGroupMeans = FALSE,
+    clusterRows = FALSE,
+    clusterCols = TRUE,
+    minEnrichment = 3,
+    maxScale = 5,
+    clusterNum = NULL,
+    clip = 1000000000,
+    minDensity = 0,
+    annotationPosition = "right",
+    title = NULL,
+    showSampleNames = NULL,
+    clusterMethod = "ward.D2", ...) {
     if (is.null(regionsToOverlap)) {
         regionsToOverlap <- qseaSet %>%
             qsea::getRegions()
@@ -493,12 +493,12 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #'     )
 #'
 makeHeatmapAnnotations <- function(qseaSet,
-                                   sampleAnnotation = NULL,
-                                   windowAnnotationDf = NULL,
-                                   useGroupMeans = FALSE,
-                                   specifiedAnnotationColors = NA,
-                                   windowOrientation = "row",
-                                   sampleOrientation = "column") {
+    sampleAnnotation = NULL,
+    windowAnnotationDf = NULL,
+    useGroupMeans = FALSE,
+    specifiedAnnotationColors = NA,
+    windowOrientation = "row",
+    sampleOrientation = "column") {
     sampleAnnotationDf <- getAnnotation(qseaSet,
         sampleAnnotation = {{ sampleAnnotation }},
         useGroupMeans = useGroupMeans
@@ -1263,8 +1263,8 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'
 #' @export
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack",
-                                           normMethod = "nrpm", genome = NULL,
-                                           TxDb = NULL, annoDb = NULL) {
+    normMethod = "nrpm", genome = NULL,
+    TxDb = NULL, annoDb = NULL) {
     # Genome selection hierarchy:
     # 1. Function parameter (genome) takes precedence
     # 2. Global mesa genome setting
@@ -1396,7 +1396,7 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
 #'
 #' @export
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
-                                  minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
+    minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
     ## TODO: Swap from pheatmap to ComplexHeatmap
     if (!is.null(regionsToOverlap)) {
         regionsToOverlap <- asValidGranges(regionsToOverlap)

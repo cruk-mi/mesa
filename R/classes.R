@@ -362,7 +362,7 @@ mutate.mesaDimRed <- function(.data, ...) {
 #' @method left_join mesaDimRed
 #' @export
 left_join.mesaDimRed <- function(x, y, by = NULL, copy = FALSE,
-                                 suffix = c(".x", ".y"), keep = NULL, ...) {
+    suffix = c(".x", ".y"), keep = NULL, ...) {
     x@sampleTable <- x@sampleTable %>%
         tibble::rownames_to_column("rownameCol") %>%
         dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%

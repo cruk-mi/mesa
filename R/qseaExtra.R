@@ -1346,14 +1346,14 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #'
 #' @export
 summariseAcrossWindows <- function(qseaSet,
-                                   regionsToOverlap = NULL,
-                                   fn = mean,
-                                   addSampleTable = TRUE,
-                                   normMethod = c("nrpm", "beta"),
-                                   naMethod = "na.rm",
-                                   minEnrichment = 3,
-                                   suffix = "",
-                                   fnName = NULL) {
+    regionsToOverlap = NULL,
+    fn = mean,
+    addSampleTable = TRUE,
+    normMethod = c("nrpm", "beta"),
+    naMethod = "na.rm",
+    minEnrichment = 3,
+    suffix = "",
+    fnName = NULL) {
     # TODO: Can we get multiple summary statistics in one go?
 
     if (is.null(fnName)) {

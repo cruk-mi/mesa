@@ -342,7 +342,7 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) 
 
     if (useParallel & verbose) {
         message(glue::glue("Parallelisation turned on for the functions in the mesa package, currently using {BiocParallel::bpworkers()} cores.
-                       Control the number of cores by calling BiocParallel::register."))
+Control the number of cores by calling BiocParallel::register."))
     } else if (verbose) {
         message("Parallelisation turned off for all functions in the mesa package.")
     }

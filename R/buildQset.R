@@ -110,8 +110,8 @@
 #' @keywords internal
 #' @noRd
 getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, regions = NULL, fragmentLength = NULL,
-                                              minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
-                                              minReferenceLength = 30, properPairsOnly = FALSE) {
+    minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
+    minReferenceLength = 30, properPairsOnly = FALSE) {
     if (is.null(BSgenome)) {
         stop("Please provide the BSgenome to use.")
     }
