@@ -10,14 +10,14 @@
 #' \describe{
 #'   \item{Probe_ID}{Character cg identifier for the probe/locus (e.g., `"cg11733071"`).}
 #' }
-#' 
+#'
 #' @details
 #' - **Seqnames:** numeric chromosomes `"1"`–`"22"` (no `"chr"` prefix; UCSC style
-#'   can be set if needed).  
-#' - **Strand:** `"*"` for all ranges.  
-#' - **Widths:** 3 bp windows (probe CpG ±1 bp).  
+#'   can be set if needed).
+#' - **Strand:** `"*"` for all ranges.
+#' - **Widths:** 3 bp windows (probe CpG ±1 bp).
 #' - **Genome metadata:** currently unset; set to `"hg38"` if you need an explicit
-#'   tag.  
+#'   tag.
 #'
 #' When combining with other `GRanges`, harmonise styles/metadata as needed, e.g.
 #' use `GenomeInfoDb::seqlevelsStyle()` to convert to `"UCSC"` (`"chr1"`, …) and
@@ -39,18 +39,18 @@
 #'
 #' # Basic overview
 #' hg38UltraStableProbes
-#' length(hg38UltraStableProbes)             # 974
-#' all(GenomicRanges::width(hg38UltraStableProbes) == 3)  # TRUE (3-bp windows)
+#' length(hg38UltraStableProbes) # 974
+#' all(GenomicRanges::width(hg38UltraStableProbes) == 3) # TRUE (3-bp windows)
 #'
 #' # The object uses numeric chromosomes and an unset genome tag
 #' GenomeInfoDb::seqlevels(hg38UltraStableProbes)[1:5]
-#' GenomeInfoDb::genome(hg38UltraStableProbes)  # empty
+#' GenomeInfoDb::genome(hg38UltraStableProbes) # empty
 #'
 #' # Harmonise style/metadata if needed
 #' gr <- hg38UltraStableProbes
-#' GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC"  # or "NCBI" / "Ensembl" 
+#' GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC" # or "NCBI" / "Ensembl"
 #' #' #   (for 1,2... instead of chr1, chr2...)
-#' GenomeInfoDb::genome(gr) <- "hg38"  # or "GRCh38"
+#' GenomeInfoDb::genome(gr) <- "hg38" # or "GRCh38"
 #'
 #' # Count overlaps with a toy region
 #' toy <- GenomicRanges::GRanges("1", IRanges::IRanges(951160, 951170))
@@ -58,6 +58,5 @@
 #'
 #' # With UCSC-style example
 #' toy_ucsc <- GenomicRanges::GRanges("chr1", IRanges::IRanges(951160, 951170))
-#' GenomicRanges::countOverlaps(toy_ucsc, gr)   # after style harmonisation above
+#' GenomicRanges::countOverlaps(toy_ucsc, gr) # after style harmonisation above
 "hg38UltraStableProbes"
-

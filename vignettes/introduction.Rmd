@@ -9,9 +9,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  dev = "pdf"
+    collapse = TRUE,
+    comment = "#>",
+    dev = "pdf"
 )
 ```
 
@@ -62,16 +62,16 @@ The sample table is the sample metadata (data about the data). This is a data fr
 We access the sample table using the function `getSampleTable`:
 
 ```{r}
-qseaSet |> 
-  getSampleTable() |>
-  as_tibble()
+qseaSet |>
+    getSampleTable() |>
+    as_tibble()
 ```
 
 We can also get a vector of the samples present inside the qseaSet by using `getSampleNames`:
 
 ```{r}
-qseaSet |> 
-  getSampleNames()
+qseaSet |>
+    getSampleNames()
 ```
 
 As the sample table is so important, mesa extends a number of `dplyr` (tidyverse) functions that let you modify it. 
@@ -79,52 +79,51 @@ For instance, if we want to add a new column to the sample table, we can use `mu
 
 ```{r}
 qseaSet |>
-  mutate(new_column = "New") |>
-  getSampleTable()
+    mutate(new_column = "New") |>
+    getSampleTable()
 ```
 
 Sometimes you have further information about some or all samples that you want to include, at which point you can use `left_join` to combine with a new data frame. Missing data is fine, and you can join on a different column by using `by`.
 
 ```{r}
-tumourVAFdata <- tribble(~sample_name, ~VAF, #VAF = Variant Allele Frequency
-                         "Colon1_T",23,
-                         "Colon2_T",40,
-                         "Lung1_T",15,
-                         "Lung3_T",5)
+tumourVAFdata <- tribble(~sample_name, ~VAF, # VAF = Variant Allele Frequency
+    "Colon1_T", 23,
+    "Colon2_T", 40,
+    "Lung1_T", 15,
+    "Lung3_T", 5)
 
 qseaSet |>
-  left_join(tumourVAFdata, by = join_by(sample_name)) |>
-  getSampleTable() |>
-  dplyr::select(sample_name, VAF)
-
+    left_join(tumourVAFdata, by = join_by(sample_name)) |>
+    getSampleTable() |>
+    dplyr::select(sample_name, VAF)
 ```
 
 We can filter the samples present in the qseaSet by using the `filter` function. This takes the sample table, filters using the logical criteria given, and returns a qseaSet with (potentially) fewer samples. All the subcomponents of the qseaSet are reduced appropriately behind the scenes.
 
 ```{r}
 qseaSet |>
-  filter(tumour == "Tumour")
+    filter(tumour == "Tumour")
 ```
 
 There are also functions for sorting the names of the qseaSet: `sort` and `arrange` are implemented:
 
 ```{r}
 qseaSet |>
-  arrange(tumour)
+    arrange(tumour)
 ```
 
 We can also alter columns of the sample table via the `select` function from `dplyr`. This may be used in both positive or negative selection modes. Note that select will always retain the columns `sample_name` and `group` in the output, as they are required for a valid qseaSet.
 
 ```{r}
 qseaSet |>
-  dplyr::select(tumour) |>
-  getSampleTable()
+    dplyr::select(tumour) |>
+    getSampleTable()
 ```
 
 ```{r}
 qseaSet |>
-  dplyr::select(-tumour) |>
-  getSampleTable()
+    dplyr::select(-tumour) |>
+    getSampleTable()
 ```
 
 Note as usual in R, all of these functions won't change the original object, and need to be assigned to a new variable (or the same variable). 
@@ -134,8 +133,8 @@ The counts matrix holds how many fragments of DNA (which may be a single read or
 
 ```{r}
 qseaSet |>
-  getCounts() |>
-  head()
+    getCounts() |>
+    head()
 ```
 
 Note that this object does not have any information as to where each window is located. That information is all kept inside the regions slot (see below). The separate vignette `vignette("data-and-qc")` details how to access tables of data.
@@ -146,17 +145,17 @@ For DNA methylation this also contains a column called `CpG_density`, which is a
 
 ```{r}
 qseaSet |>
-  getWindows()
+    getWindows()
 ```
 
 We can filter the regions of the qseaSet by using the `filterWindows` function. Again, this uses `dplyr::filter` to do the logical subsetting. This function can also use the `seqnames` (i.e. the chromosome), `start` or `end` columns to filter on.
 
 ```{r}
 qseaSet |>
-  filterWindows(CpG_density >= 10)
+    filterWindows(CpG_density >= 10)
 
 qseaSet |>
-  filterWindows(start >= 26000000)
+    filterWindows(start >= 26000000)
 ```
 
 We can also use an already existing GRanges object (or a data frame that has the columns `seqnames`, `start` and `end`) to perform the intersection with by using `filterByOverlaps` (this calls the `plyranges` function `filter_by_overlaps`):
@@ -165,14 +164,14 @@ We can also use an already existing GRanges object (or a data frame that has the
 regionOfInterest <- data.frame(seqnames = 7, start = 25000000, end = 26000000)
 
 qseaSet |>
-  filterByOverlaps(regionOfInterest)
+    filterByOverlaps(regionOfInterest)
 ```
 
 There also exists a `filterByNonOverlaps` function, which will keep regions which do not overlap with the function (using the plyranges function `filter_by_overlaps`):
 
 ```{r}
 qseaSet |>
-  filterByNonOverlaps(regionOfInterest)
+    filterByNonOverlaps(regionOfInterest)
 ```
 
 ## Library Information
@@ -181,10 +180,10 @@ We can use the `addLibraryInformation` function to move these onto the sampleTab
 
 ```{r}
 qseaSet |>
-  addLibraryInformation() |>
-  getSampleTable() |>
-  as_tibble() |>
-  dplyr::select(sample_name, total_fragments, valid_fragments, relH)
+    addLibraryInformation() |>
+    getSampleTable() |>
+    as_tibble() |>
+    dplyr::select(sample_name, total_fragments, valid_fragments, relH)
 ```
 
 These columns are detailed as so:
@@ -214,8 +213,8 @@ We can access the copy number variation through the `qsea` function `getCNV`:
 
 ```{r}
 qseaSet |>
-  getCNV() |> 
-  head()
+    getCNV() |>
+    head()
 ```
 
 Here you can see that many of the values are 0 (or close to), which represents no significant copy number variation from neutral. 
@@ -224,7 +223,7 @@ The copy number variation can be plotted using the function `plotCNVheatmap` (no
 
 ```{r, fig.height = 5, fig.width = 6}
 qseaSet %>%
-  plotCNVheatmap()
+    plotCNVheatmap()
 ```
 
 ## Parameters, Enrichment, Zygosity
