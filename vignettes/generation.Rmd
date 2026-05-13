@@ -9,9 +9,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  dev = "pdf"
+    collapse = TRUE,
+    comment = "#>",
+    dev = "pdf"
 )
 ```
 
@@ -50,7 +50,7 @@ sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
     "Normal2", "Normal1", "Normal", "Patient2", system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
     "Tumour1", "Tumour1", "Tumour", "Patient1", system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
     "Tumour2", "Tumour2", "Tumour", "Patient2", system.file("extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)
-    )
+)
 ```
 
 ## Making a qseaSet
@@ -69,12 +69,12 @@ For our hg19 example data, we set `BSgenome = "BSgenome.Hsapiens.UCSC.hg19"`, sp
 
 ```{r, eval = requireNamespace("BSgenome.Hsapiens.UCSC.hg19")}
 makeQset(sampleTable,
-   BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-   chrSelect = paste0("chr",20:22),
-   windowSize = 300,
-   fragmentLength = 200,
-   fragmentSD = 50,
-   CNVmethod = "none")
+    BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+    chrSelect = paste0("chr", 20:22),
+    windowSize = 300,
+    fragmentLength = 200,
+    fragmentSD = 50,
+    CNVmethod = "none")
 ```
 
 A range of messages are produced as output during this process. One thing to note is that by default the process is performed without parallelisation, this can be controlled via the `setMesaParallel` function and will vastly speed up the process when multiple cores are available (but use more RAM). 
