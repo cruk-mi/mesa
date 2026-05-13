@@ -204,7 +204,7 @@ PCAplots3 <- plotPCA(pca1,
 
 ```{r pca-plot, echo=FALSE}
 if (knitr::is_html_output() && interactive()) {
-    plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
+  plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
 } else {
     PCAplots3$pca1$patient$PC1vsPC2
 }
