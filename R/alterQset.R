@@ -304,11 +304,11 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
     if (any(asValidNames != renamedNames)) {
         stop(glue::glue("Sample names must be valid names for columns in R without quoting.
-  See the help for base::make.names, but generally use only letters, numbers,
-  underscores and dots, and names can't start with a number.
-  Issues were found with:
+See the help for base::make.names, but generally use only letters, numbers,
+underscores and dots, and names can't start with a number.
+Issues were found with:
     {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
-   "))
+"))
     }
 
     if (any(duplicated(renamedNames))) {
@@ -558,11 +558,11 @@ renameSamples <- function(qseaSet, newNameColumn) {
 
     if (any(asValidNames != renamedNames)) {
         stop(glue::glue("Sample names must be valid names for columns in R without quoting.
-  See the help for base::make.names, but generally use only letters, numbers,
-  underscores and dots, and names can't start with a number.
-  Issues were found with:
+See the help for base::make.names, but generally use only letters, numbers,
+underscores and dots, and names can't start with a number.
+Issues were found with:
     {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
-   "))
+"))
     }
 
     if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
