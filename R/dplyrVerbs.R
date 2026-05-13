@@ -54,7 +54,6 @@
 #'
 #' @export
 filter.qseaSet <- function(.data, ..., .preserve = FALSE) {
-
     namesToKeep <- .data %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column() %>%
@@ -62,7 +61,6 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE) {
         dplyr::pull(sample_name)
 
     return(subsetQset(.data, samplesToKeep = namesToKeep))
-
 }
 
 
@@ -117,7 +115,6 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE) {
 #'
 #' @export
 mutate.qseaSet <- function(.data, ...) {
-
     newTable <- .data %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column(".rownameCol") %>%
@@ -136,7 +133,8 @@ mutate.qseaSet <- function(.data, ...) {
 
     .data@sampleTable <- newTable
 
-    return(.data)}
+    return(.data)
+}
 
 
 #' Left join data onto a qseaSet sample table
@@ -197,14 +195,14 @@ mutate.qseaSet <- function(.data, ...) {
 #'
 #' @export
 left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), keep = NULL, ...) {
-
     x@sampleTable <- x %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column("rownameCol") %>%
         dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%
         tibble::column_to_rownames("rownameCol")
 
-    return(x)}
+    return(x)
+}
 
 
 #' Select or rename columns in a qseaSet sample table
@@ -264,7 +262,9 @@ left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".
 #'     qsea::getSampleTable()
 #'
 #' @export
-select.qseaSet <- function(.data, ...) {selectQset(.data, ...)}
+select.qseaSet <- function(.data, ...) {
+    selectQset(.data, ...)
+}
 
 
 #' Select or rename columns of a qseaSet sample table
@@ -366,7 +366,6 @@ selectQset <- function(qseaSet, ...) {
 #'
 #' @export
 pull.qseaSet <- function(.data, var = -1, name = NULL, ...) {
-
     .data <- .data %>% qsea::getSampleTable()
 
     # code copied directly from dplyr::pull
@@ -377,7 +376,6 @@ pull.qseaSet <- function(.data, var = -1, name = NULL, ...) {
     }
     name <- tidyselect::vars_pull(names(.data), !!name)
     rlang::set_names(.data[[var]], nm = .data[[name]])
-
 }
 
 
@@ -418,11 +416,9 @@ pull.qseaSet <- function(.data, var = -1, name = NULL, ...) {
 #'
 #' @export
 sort.qseaSet <- function(x, decreasing = FALSE, ...) {
-
     x %>%
         subsetQset(samplesToKeep = (x %>% qsea::getSampleNames() %>% gtools::mixedsort(decreasing = decreasing))) %>%
         return()
-
 }
 
 
@@ -461,7 +457,6 @@ sort.qseaSet <- function(x, decreasing = FALSE, ...) {
 #'
 #' @export
 filterWindows <- function(qseaSet, ...) {
-
     reducedRegions <- qseaSet %>%
         qsea::getRegions() %>%
         tibble::as_tibble() %>%
@@ -471,7 +466,6 @@ filterWindows <- function(qseaSet, ...) {
     qseaSet %>%
         filterByOverlaps(reducedRegions) %>%
         return()
-
 }
 
 
@@ -517,7 +511,6 @@ filterWindows <- function(qseaSet, ...) {
 #'
 #' @export
 arrange.qseaSet <- function(.data, ..., .by_group = FALSE) {
-
     sampleOrder <- .data %>%
         qsea::getSampleTable() %>%
         dplyr::arrange(...) %>%
@@ -526,7 +519,6 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE) {
     .data %>%
         subsetQset(samplesToKeep = sampleOrder) %>%
         return()
-
 }
 
 
@@ -558,4 +550,3 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE) {
 setMethod("colnames", "qseaSet", function(x) {
     colnames(qsea::getSampleTable(x))
 })
-

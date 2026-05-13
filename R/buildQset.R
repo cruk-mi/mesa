@@ -79,9 +79,9 @@
 #' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
 #'     requireNamespace("Rsamtools", quietly = TRUE)) {
-#'
 #'     bam_src <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
-#'     tmpdir <- tempfile("bam_demo_"); dir.create(tmpdir)
+#'     tmpdir <- tempfile("bam_demo_")
+#'     dir.create(tmpdir)
 #'     bam <- file.path(tmpdir, basename(bam_src))
 #'     file.copy(bam_src, bam, overwrite = TRUE)
 #'     if (!file.exists(paste0(bam_src, ".bai"))) {
@@ -110,9 +110,8 @@
 #' @keywords internal
 #' @noRd
 getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, regions = NULL, fragmentLength = NULL,
-                                                minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
-                                                minReferenceLength = 30, properPairsOnly = FALSE) {
-
+                                              minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
+                                              minReferenceLength = 30, properPairsOnly = FALSE) {
     if (is.null(BSgenome)) {
         stop("Please provide the BSgenome to use.")
     }
@@ -141,20 +140,17 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     }
 
     if (properPairsOnly) {
-
         myParam <- Rsamtools::ScanBamParam(
             what = c("qname", "flag", "strand", "rname", "pos", "mapq", "cigar", "isize"),
             which = regions %>% plyranges::reduce_ranges(),
             tag = "MQ"
         )
     } else {
-
         myParam <- Rsamtools::ScanBamParam(
             what = c("flag", "strand", "rname", "pos", "mapq", "cigar", "isize"),
             which = regions %>% plyranges::reduce_ranges(),
             tag = "MQ"
         )
-
     }
 
     readBamData <- Rsamtools::scanBam(file = fileName, param = myParam)
@@ -164,7 +160,6 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
         message(glue::glue("No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only."))
 
         readBamData <- readBamData %>% purrr::map(~ purrr::discard_at(., "tag"))
-
     }
 
     readDF <- readBamData %>%
@@ -173,8 +168,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
                 as.data.frame() %>%
                 tibble::as_tibble() %>%
                 dplyr::bind_cols(., tibble::as_tibble(Rsamtools::bamFlagAsBitMatrix(.$flag)))
-        }
-        )
+        })
 
     if (!("MQ" %in% colnames(readDF))) {
         readDF <- readDF %>% mutate(MQ = NA)
@@ -183,10 +177,10 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     # remove the chr if present in the bam file but not in the regions
     if (!any(stringr::str_detect(regions %>% GenomeInfoDb::seqlevels(), "chr"))) {
         readDF <- readDF %>%
-            dplyr::mutate(rname = stringr::str_replace(rname, "chrM", "chrMT"),
+            dplyr::mutate(
+                rname = stringr::str_replace(rname, "chrM", "chrMT"),
                 rname = stringr::str_remove(rname, "chr")
             )
-
     }
 
     numInitialReads <- nrow(readDF)
@@ -195,24 +189,29 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
     # Finds "proper pairs" with at least one read over the quality threshold.
     properPairsGRanges <- readDF %>%
-        dplyr::filter(isProperPair == 1, isUnmappedQuery == 0, isSupplementaryAlignment == 0,
+        dplyr::filter(
+            isProperPair == 1, isUnmappedQuery == 0, isSupplementaryAlignment == 0,
             isSecondaryAlignment == 0, isDuplicate == 0, hasUnmappedMate == 0,
-            isNotPassingQualityControls == 0) %>% # get proper paired reads
+            isNotPassingQualityControls == 0
+        ) %>% # get proper paired reads
         dplyr::filter(strand == "+") %>% # keep only the part of the pair that is on the positive strand
         dplyr::mutate(seqnames = rname, start = pos, end = pos + isize - 1) %>%
         plyranges::as_granges()
 
     if (properPairsOnly) {
-
         shouldBeProperPairsGRanges <- readDF %>%
-            dplyr::filter(isProperPair == 0, isUnmappedQuery == 0, isSupplementaryAlignment == 0,
+            dplyr::filter(
+                isProperPair == 0, isUnmappedQuery == 0, isSupplementaryAlignment == 0,
                 isSecondaryAlignment == 0, isDuplicate == 0, hasUnmappedMate == 0,
                 isNotPassingQualityControls == 0,
-                abs(isize) <= maxInsertSize, abs(isize) >= minInsertSize) %>%
+                abs(isize) <= maxInsertSize, abs(isize) >= minInsertSize
+            ) %>%
             dplyr::group_by(qname) %>% # this grouping is a expensive operation, so filter as much as possible beforehand.
-            dplyr::mutate(nStrands = length(unique(strand)),
+            dplyr::mutate(
+                nStrands = length(unique(strand)),
                 nSign = length(sign(isize)),
-                inOut = sum(ifelse(strand == "+", 1, -1) * sign(isize))) %>%
+                inOut = sum(ifelse(strand == "+", 1, -1) * sign(isize))
+            ) %>%
             dplyr::filter(inOut == 2, nSign == 2, nStrands == 2) %>% # filter to just reads that meet the proper pair criteria
             dplyr::ungroup() %>%
             dplyr::filter(strand == "+") %>% # keep only the part of the pair that is on the positive strand
@@ -224,7 +223,6 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
         properPairsGRanges <- properPairsGRanges %>%
             plyranges::bind_ranges(shouldBeProperPairsGRanges)
-
     }
 
     numPairsInit <- length(properPairsGRanges)
@@ -240,8 +238,10 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
     # Filters out ones that are too big.
     properPairsGRanges <- properPairsGRanges %>%
-        dplyr::filter(abs(isize) <= maxInsertSize,
-            abs(isize) >= minInsertSize)
+        dplyr::filter(
+            abs(isize) <= maxInsertSize,
+            abs(isize) >= minInsertSize
+        )
 
     numPairsWithinSize <- length(properPairsGRanges)
 
@@ -250,23 +250,26 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     }
 
     R1GRanges <- readDF %>%
-        dplyr::filter(isProperPair == 0, isUnmappedQuery == 0, isFirstMateRead == 1 | isPaired == 0, isSupplementaryAlignment == 0,
-            isSecondaryAlignment == 0, isDuplicate == 0, isNotPassingQualityControls == 0) %>% # get R1s that aren't proper pairs
+        dplyr::filter(
+            isProperPair == 0, isUnmappedQuery == 0, isFirstMateRead == 1 | isPaired == 0, isSupplementaryAlignment == 0,
+            isSecondaryAlignment == 0, isDuplicate == 0, isNotPassingQualityControls == 0
+        ) %>% # get R1s that aren't proper pairs
         dplyr::mutate(seqnames = rname, start = pos, end = pos) %>%
         plyranges::as_granges()
 
     numR1sInit <- length(R1GRanges)
 
     R1GRanges <- R1GRanges %>%
-        dplyr::filter(mapq >= minMapQual, # require good mapq and at least minReferenceLength distance mapped onto the genome
-            GenomicAlignments::cigarWidthAlongReferenceSpace(cigar) >= minReferenceLength)
+        dplyr::filter(
+            mapq >= minMapQual, # require good mapq and at least minReferenceLength distance mapped onto the genome
+            GenomicAlignments::cigarWidthAlongReferenceSpace(cigar) >= minReferenceLength
+        )
 
     numR1sMAPQAndLength <- length(R1GRanges)
 
     rm(readDF)
 
     if (!properPairsOnly) {
-
         message("Using high quality R1 unpaired reads as well as pairs")
 
         if (is.null(fragmentLength) | length(properPairsGRanges) >= length(R1GRanges)) {
@@ -281,13 +284,10 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
             plyranges::stretch(extend = fragmentLength)
 
         readGRanges <- c(properPairsGRanges, R1GRanges)
-
     } else {
-
         message("Ignoring R1 unpaired reads, using proper pairs only")
         readGRanges <- properPairsGRanges
     }
-
 
 
     regions <- regions %>%
@@ -315,7 +315,8 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
     enrichment <- calculateCGEnrichmentGRanges(readGRanges,
         BSgenome,
-        chr.select = regions %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames())
+        chr.select = regions %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames()
+    )
 
     distributionParameters <- data.frame(
         qsea_initial_reads = numInitialReads,
@@ -343,9 +344,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
     }
 
     return(list(regionsGR = regionsOut, library = distributionParameters))
-
 }
-
 
 
 #' Add coverage to a qseaSet using proper pairs and/or high-quality R1 reads
@@ -438,13 +437,15 @@ addBamCoveragePairedAndUnpaired <- function(qs,
         GenomeInfoDb::seqnames() %>%
         levels()) # memoise this once, for using in all the getBamCoveragePairedAndUnpairedR1 function.
 
-    bamOutList <- BiocParallel::bplapply(X = sampleTable[, "file_name"],
+    bamOutList <- BiocParallel::bplapply(
+        X = sampleTable[, "file_name"],
         FUN = getBamCoveragePairedAndUnpairedR1,
         BSgenome = qsea:::getGenome(qs),
         regions = Regions,
         fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,
         minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,
-        minMapQual = minMapQual, BPPARAM = BPPARAM, properPairsOnly = properPairsOnly)
+        minMapQual = minMapQual, BPPARAM = BPPARAM, properPairsOnly = properPairsOnly
+    )
 
     names(bamOutList) <- sampleTable$sample_name
 
@@ -454,8 +455,9 @@ addBamCoveragePairedAndUnpaired <- function(qs,
         purrr::map_dfc(function(x) {
             purrr::pluck(x, "regionsGR") %>%
                 tibble::as_tibble() %>%
-                dplyr::pull(counts)  }
-        ) %>% as.matrix()
+                dplyr::pull(counts)
+        }) %>%
+        as.matrix()
     colnames(coverage) <- sampleTable$sample_name
 
     message("Calculated coverage")
@@ -473,12 +475,16 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     #
     #   message("Calculated read coverage")
 
-    libraries <- bamOutList %>% purrr::map_dfr(~ purrr::pluck(., "library")) %>% as.data.frame()
+    libraries <- bamOutList %>%
+        purrr::map_dfr(~ purrr::pluck(., "library")) %>%
+        as.data.frame()
     rownames(libraries) <- sampleTable$sample_name
 
-    param <- list(minMapQual = minMapQual, minReferenceLength = minReferenceLength,
+    param <- list(
+        minMapQual = minMapQual, minReferenceLength = minReferenceLength,
         maxInsertSize = maxInsertSize, minInsertSize = minInsertSize,
-        properPairsOnly = properPairsOnly)
+        properPairsOnly = properPairsOnly
+    )
     qs <- qsea:::addParameters(qs, param)
     qs <- qsea:::setCounts(qs, count_matrix = coverage)
     qs <- qsea:::setLibrary(qs, "file_name", libraries)
@@ -557,14 +563,12 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'
 #' @export
 addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15", maxPatternDensity = 0.05) {
-
     # do not calculate the TMM normalisation, set all to be 0.
     qseaSet <- qsea::addLibraryFactors(qseaSet, factors = 1)
 
     qseaSet <- qsea::addOffset(qseaSet, enrichmentPattern = getPattern(qseaSet), maxPatternDensity = maxPatternDensity)
 
     if (enrichmentMethod == "blind1-15") {
-
         wd <- which(qsea::getRegions(qseaSet)$CpG_density >= 1 &
             qsea::getRegions(qseaSet)$CpG_density <= 15)
         signal <- (15 - qsea::getRegions(qseaSet)$CpG_density[wd]) * .55 / 15 + .25
@@ -579,7 +583,6 @@ addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15", maxPattern
 
         # store the enrichment method used
         qseaSet@parameters$enrichmentMethod <- "blind1-15"
-
     } else if (enrichmentMethod == "none") {
         qseaSet@parameters$enrichmentMethod <- "none"
     } else {

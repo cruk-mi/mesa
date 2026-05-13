@@ -49,7 +49,6 @@
 #' @rdname alterQsetOverlap
 #' @export
 filterByOverlaps <- function(qseaSet, regionsToOverlap) {
-
     if (is.data.frame(regionsToOverlap)) {
         if (length(intersect(colnames(regionsToOverlap), c("seqnames", "start", "end"))) != 3) {
             stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
@@ -58,15 +57,30 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap) {
 
     regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
 
-    qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
-    windowsChr <- regionsToOverlap %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+    qseaSetChr <- qseaSet %>%
+        qsea::getRegions() %>%
+        GenomeInfoDb::seqinfo() %>%
+        GenomeInfoDb::seqnames() %>%
+        stringr::str_detect("chr") %>%
+        any()
+    windowsChr <- regionsToOverlap %>%
+        GenomeInfoDb::seqinfo() %>%
+        GenomeInfoDb::seqnames() %>%
+        stringr::str_detect("chr") %>%
+        any()
 
     if (qseaSetChr & !windowsChr) {
-        regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr", seqnames)) %>% plyranges::as_granges()
+        regionsToOverlap <- regionsToOverlap %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
+            plyranges::as_granges()
     }
 
     if (!qseaSetChr & windowsChr) {
-        regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>% plyranges::as_granges()
+        regionsToOverlap <- regionsToOverlap %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
+            plyranges::as_granges()
     }
 
     qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions, regionsToOverlap) > 0), , drop = FALSE]
@@ -79,7 +93,6 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap) {
 #' @rdname alterQsetOverlap
 #' @export
 filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
-
     if (is.data.frame(regionsToOverlap)) {
         if (length(intersect(colnames(regionsToOverlap), c("seqnames", "start", "end"))) != 3) {
             stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
@@ -88,15 +101,30 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
 
     regionsToOverlap <- plyranges::as_granges(regionsToOverlap)
 
-    qseaSetChr <- qseaSet %>% qsea::getRegions() %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
-    windowsChr <- regionsToOverlap %>% GenomeInfoDb::seqinfo() %>% GenomeInfoDb::seqnames() %>% stringr::str_detect("chr") %>% any()
+    qseaSetChr <- qseaSet %>%
+        qsea::getRegions() %>%
+        GenomeInfoDb::seqinfo() %>%
+        GenomeInfoDb::seqnames() %>%
+        stringr::str_detect("chr") %>%
+        any()
+    windowsChr <- regionsToOverlap %>%
+        GenomeInfoDb::seqinfo() %>%
+        GenomeInfoDb::seqnames() %>%
+        stringr::str_detect("chr") %>%
+        any()
 
     if (qseaSetChr & !windowsChr) {
-        regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr", seqnames)) %>% plyranges::as_granges()
+        regionsToOverlap <- regionsToOverlap %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
+            plyranges::as_granges()
     }
 
     if (!qseaSetChr & windowsChr) {
-        regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>% plyranges::as_granges()
+        regionsToOverlap <- regionsToOverlap %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
+            plyranges::as_granges()
     }
 
     GRangesToKeep <- qsea::getRegions(qseaSet) %>%
@@ -130,23 +158,23 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
 #'
 #' @export
 addLibraryInformation <- function(qseaSet) {
-
     curColNames <- qseaSet %>%
         qsea::getSampleTable() %>%
         colnames()
 
-    qseaSet@sampleTable <- cbind(qseaSet@sampleTable,
+    qseaSet@sampleTable <- cbind(
+        qseaSet@sampleTable,
         qseaSet@libraries$file_name %>%
             dplyr::select(-tidyselect::any_of(curColNames))
     )
 
     if ("input_file" %in% names(qseaSet@libraries)) {
-
         curColNames <- qseaSet %>%
             qsea::getSampleTable() %>%
             colnames()
 
-        qseaSet@sampleTable <- cbind(qseaSet@sampleTable,
+        qseaSet@sampleTable <- cbind(
+            qseaSet@sampleTable,
             qseaSet@libraries$input_file %>%
                 dplyr::rename_with(~ paste0("input_", .x)) %>%
                 dplyr::select(-tidyselect::any_of(curColNames)) %>%
@@ -192,7 +220,6 @@ addLibraryInformation <- function(qseaSet) {
 #'
 #' @export
 subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL) {
-
     if (length(samplesToKeep) == 0 & length(samplesToDrop) == 0) {
         message("No samples remaining, returning an empty qseaSet.")
     }
@@ -258,11 +285,11 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL) {
 #' # Replace "T" with "Tumour" in sample names
 #' renameQsetNames(exampleTumourNormal,
 #'     pattern = "T",
-#'     replacement = "Tumour")
+#'     replacement = "Tumour"
+#' )
 #'
 #' @export
 renameQsetNames <- function(qseaSet, pattern, replacement = "") {
-
     renamedNames <- qseaSet %>%
         qsea::getSampleTable() %>%
         dplyr::pull(sample_name) %>%
@@ -277,11 +304,11 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
     if (any(asValidNames != renamedNames)) {
         stop(glue::glue("Sample names must be valid names for columns in R without quoting.
-    See the help for base::make.names, but generally use only letters, numbers,
-    underscores and dots, and names can't start with a number.
-    Issues were found with:
+  See the help for base::make.names, but generally use only letters, numbers,
+  underscores and dots, and names can't start with a number.
+  Issues were found with:
     {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
-    "))
+   "))
     }
 
     if (any(duplicated(renamedNames))) {
@@ -292,8 +319,10 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 
     newQSet@sampleTable <- newQSet@sampleTable %>%
         tibble::remove_rownames() %>%
-        dplyr::mutate(sample_name = stringr::str_replace_all(sample_name, pattern, replacement),
-            rownameCol = sample_name) %>%
+        dplyr::mutate(
+            sample_name = stringr::str_replace_all(sample_name, pattern, replacement),
+            rownameCol = sample_name
+        ) %>%
         tibble::column_to_rownames("rownameCol")
 
     rownames(newQSet@zygosity) <- stringr::str_replace_all(rownames(newQSet@zygosity), pattern, replacement)
@@ -353,7 +382,6 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' }
 #' @export
 poolSamples <- function(qseaSet, mergeString) {
-
     ## TODO: rewrite this function to use a column.
     ## TODO: check this actually works!
     ## TODO: make sure it works in general
@@ -423,8 +451,7 @@ poolSamples <- function(qseaSet, mergeString) {
 
             colSums(
                 qseaSet@zygosity[
-                    startsWith(rownames(qseaSet@zygosity), x),
-                    ,
+                    startsWith(rownames(qseaSet@zygosity), x), ,
                     drop = FALSE
                 ] * weights
             )
@@ -441,42 +468,40 @@ poolSamples <- function(qseaSet, mergeString) {
             dplyr::select(-tidyselect::matches("file_name|input_file")) %>%
             dplyr::mutate(
                 sample_name = x,
-                rownameCol = x) %>%
+                rownameCol = x
+            ) %>%
             dplyr::distinct() %>%
             dplyr::slice(1) %>%
             tibble::remove_rownames() %>%
             tibble::column_to_rownames("rownameCol")
-    }
-    )
+    })
 
     newSet@sampleTable <- newSampleTable
 
     newLibrariesFile <- purrr::map_dfr(newNames, function(x) {
         qseaSet@libraries$file_name[startsWith(rownames(qseaSet@sampleTable), x), ] %>%
             tibble::as_tibble() %>%
-            dplyr::summarise(dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~ stats::weighted.mean(.x, total_fragments)),
+            dplyr::summarise(
+                dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~ stats::weighted.mean(.x, total_fragments)),
                 dplyr::across(tidyselect::any_of(tidyselect::matches("reads|pairs|r1s|fragments")), ~ sum(.x))
             ) %>%
             dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
             tibble::remove_rownames() %>%
             tibble::column_to_rownames("rownameCol")
-
-    }
-    )
+    })
 
     newLibrariesInput <- purrr::map_dfr(newNames, function(x) {
         qseaSet@libraries$input_file[startsWith(rownames(qseaSet@sampleTable), x), ] %>%
             tibble::as_tibble() %>%
             dplyr::mutate(total_fragments2 = total_fragments) %>%
-            dplyr::summarise(dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~ stats::weighted.mean(.x, total_fragments)),
+            dplyr::summarise(
+                dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~ stats::weighted.mean(.x, total_fragments)),
                 dplyr::across(tidyselect::any_of(tidyselect::matches("reads|pairs|r1s|fragments")), ~ sum(.x))
             ) %>%
             dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
             tibble::remove_rownames() %>%
             tibble::column_to_rownames("rownameCol")
-
-    }
-    )
+    })
 
     newSet@libraries$file_name <- as.data.frame(newLibrariesFile)
     newSet@libraries$input_file <- as.data.frame(newLibrariesInput)
@@ -488,7 +513,6 @@ poolSamples <- function(qseaSet, mergeString) {
         addNormalisation(enrichmentMethod = "blind1-15")
 
     return(finalSet)
-
 }
 
 
@@ -520,10 +544,11 @@ poolSamples <- function(qseaSet, mergeString) {
 #'
 #' @export
 renameSamples <- function(qseaSet, newNameColumn) {
-
     newNameColumn <- rlang::enquo(newNameColumn)
 
-    renamedNames <- qseaSet %>% qsea::getSampleTable() %>% dplyr::pull(!!newNameColumn)
+    renamedNames <- qseaSet %>%
+        qsea::getSampleTable() %>%
+        dplyr::pull(!!newNameColumn)
 
     if (any(is.na(renamedNames))) {
         stop(glue::glue("NAs present in the new sample name column"))
@@ -533,11 +558,11 @@ renameSamples <- function(qseaSet, newNameColumn) {
 
     if (any(asValidNames != renamedNames)) {
         stop(glue::glue("Sample names must be valid names for columns in R without quoting.
-    See the help for base::make.names, but generally use only letters, numbers,
-    underscores and dots, and names can't start with a number.
-    Issues were found with:
+  See the help for base::make.names, but generally use only letters, numbers,
+  underscores and dots, and names can't start with a number.
+  Issues were found with:
     {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
-    "))
+   "))
     }
 
     if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
@@ -548,9 +573,12 @@ renameSamples <- function(qseaSet, newNameColumn) {
         stop(glue::glue("Duplicate sample_name now present: {renamedNames[duplicated(renamedNames)]}"))
     }
     newQSet <- qseaSet
-    newQSet@sampleTable <- newQSet@sampleTable %>% tibble::remove_rownames() %>%
-        dplyr::mutate(sample_name = renamedNames,
-            rownameCol = renamedNames) %>%
+    newQSet@sampleTable <- newQSet@sampleTable %>%
+        tibble::remove_rownames() %>%
+        dplyr::mutate(
+            sample_name = renamedNames,
+            rownameCol = renamedNames
+        ) %>%
         tibble::column_to_rownames("rownameCol")
 
     rownames(newQSet@zygosity) <- renamedNames

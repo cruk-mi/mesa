@@ -44,7 +44,6 @@
 #'
 #' @export
 combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep = NULL, dropDuplicates = FALSE) {
-
     if (is.character(qseaSet1)) {
         if (length(qseaSet1) == 1 & tools::file_ext(qseaSet1) == "rds") { # has to be after first if, else errors if it is a qseaSet
             message(glue::glue("Character string given, loading {qseaSet1}"))
@@ -92,13 +91,11 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     }
 
     if (all(sampleNames2 %in% sampleNames1)) {
-
         message("All names in common, returning first qseaSet")
         return(qseaSet1)
     }
 
     if (all(sampleNames1 %in% sampleNames2)) {
-
         message("All names in common, returning second qseaSet")
         return(qseaSet2)
     }
@@ -119,27 +116,39 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     slots1 <- methods::slotNames(qseaSet1)
     slots2 <- methods::slotNames(qseaSet2)
 
-    if (!identical(slots1, slots2)) {stop("Objects have different slots!")}
+    if (!identical(slots1, slots2)) {
+        stop("Objects have different slots!")
+    }
     # if (!identical(qseaSet1@parameters, qseaSet2@parameters)) {stop("Parameters are not the same, use checkParams = FALSE to combine anyway.")}
 
     parameters1 <- tibble::as_tibble(qseaSet1@parameters) %>% dplyr::select(order(colnames(.)))
     parameters2 <- tibble::as_tibble(qseaSet2@parameters) %>% dplyr::select(order(colnames(.)))
 
-    if (!all(identical(GenomeInfoDb::seqnames(qseaSet1@regions),
-        GenomeInfoDb::seqnames(qseaSet2@regions)),
-    identical(IRanges::ranges(qseaSet1@regions),
-        IRanges::ranges(qseaSet2@regions)))) {
-
-        regions1 <- qseaSet1 %>% qsea::getRegions() %>% tibble::as_tibble() %>% plyranges::as_granges()
-        regions2 <- qseaSet2 %>% qsea::getRegions() %>% tibble::as_tibble() %>% plyranges::as_granges() # stop complaint if genome name not identical
+    if (!all(
+        identical(
+            GenomeInfoDb::seqnames(qseaSet1@regions),
+            GenomeInfoDb::seqnames(qseaSet2@regions)
+        ),
+        identical(
+            IRanges::ranges(qseaSet1@regions),
+            IRanges::ranges(qseaSet2@regions)
+        )
+    )) {
+        regions1 <- qseaSet1 %>%
+            qsea::getRegions() %>%
+            tibble::as_tibble() %>%
+            plyranges::as_granges()
+        regions2 <- qseaSet2 %>%
+            qsea::getRegions() %>%
+            tibble::as_tibble() %>%
+            plyranges::as_granges() # stop complaint if genome name not identical
 
         qseaSet1 <- qseaSet1 %>% filterByOverlaps(regions1 %>% plyranges::filter_by_overlaps(regions2))
         qseaSet2 <- qseaSet2 %>% filterByOverlaps(regions1 %>% plyranges::filter_by_overlaps(regions2))
 
         ## TODO Check intersection properly to make sure they are exactly start/end together
         message(glue::glue("Regions are not identical: {length(regions1)} and {length(regions2)} regions.
-                            Taking intersection of {length(regions1 %>% plyranges::filter_by_overlaps(regions2))} regions."))
-
+                           Taking intersection of {length(regions1 %>% plyranges::filter_by_overlaps(regions2))} regions."))
     }
 
     if (is.character(all.equal(qsea::getRegions(qseaSet1)$CpG_density, qsea::getRegions(qseaSet2)$CpG_density))) {
@@ -147,15 +156,23 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     }
 
     if (checkParams) {
+        if (!all(parameters1 == parameters2)) {
+            stop("Parameters are not the same!")
+        }
 
-        if (!all(parameters1 == parameters2)) {stop("Parameters are not the same!")}
 
-
-        if (!identical(names(qseaSet1@enrichment), names(qseaSet2@enrichment))) {stop("Enrichment entries are not the same")}
-        if (qseaSet1@enrichment$pattern_name != qseaSet2@enrichment$pattern_name) {stop("Pattern names are different")}
-        if (!identical(qseaSet1@enrichment$density, qseaSet2@enrichment$density)) {stop("Enrichment density is different.")}
-        if (!identical(qseaSet1@enrichment$n, qseaSet2@enrichment$n)) {stop("Enrichment n is different")}
-
+        if (!identical(names(qseaSet1@enrichment), names(qseaSet2@enrichment))) {
+            stop("Enrichment entries are not the same")
+        }
+        if (qseaSet1@enrichment$pattern_name != qseaSet2@enrichment$pattern_name) {
+            stop("Pattern names are different")
+        }
+        if (!identical(qseaSet1@enrichment$density, qseaSet2@enrichment$density)) {
+            stop("Enrichment density is different.")
+        }
+        if (!identical(qseaSet1@enrichment$n, qseaSet2@enrichment$n)) {
+            stop("Enrichment n is different")
+        }
     }
 
     newQSet <- qseaSet1
@@ -177,7 +194,6 @@ combineQsets <- function(qseaSet1, qseaSet2, checkParams = FALSE, regionsToKeep 
     newQSet@libraries$file_name <- dplyr::bind_rows(as.data.frame(df1), as.data.frame(df2))
 
     if ("input_file" %in% names(qseaSet1@libraries)) {
-
         df1 <- qseaSet1@libraries$input_file
         df2 <- qseaSet2@libraries$input_file
 
@@ -268,7 +284,8 @@ combineQsetsList <- function(qseaSets, firstQset = NULL, dropDuplicates = TRUE, 
         combinedQset <- combineQsets(combinedQset, qseaSets[[i]],
             checkParams = checkParams,
             regionsToKeep = regionsToKeep,
-            dropDuplicates = dropDuplicates)
+            dropDuplicates = dropDuplicates
+        )
     }
     return(combinedQset)
 }
