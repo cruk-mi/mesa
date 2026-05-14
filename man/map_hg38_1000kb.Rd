@@ -30,9 +30,9 @@ An object of class \code{data.table} (inherits from \code{data.frame}) with 6188
 \usage{
 data(map_hg38_1000kb); data(map_hg38_500kb); data(map_hg38_50kb)
 
-map_hg38_50kb
+data(map_hg38_50kb)
 
-map_hg38_500kb
+data(map_hg38_500kb)
 }
 \value{
 \code{map_hg38_1000kb}, \code{map_hg38_500kb}, and

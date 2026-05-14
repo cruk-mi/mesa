@@ -8,7 +8,7 @@
 A chain object to liftOver hg19 to hg38
 }
 \usage{
-hg19ToHg38.over.chain
+data(hg19ToHg38.over.chain)
 }
 \description{
 A chain object to liftOver hg19 to hg38

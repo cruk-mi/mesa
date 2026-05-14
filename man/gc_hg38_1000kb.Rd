@@ -30,9 +30,9 @@ An object of class \code{data.table} (inherits from \code{data.frame}) with 6188
 \usage{
 data(gc_hg38_1000kb); data(gc_hg38_500kb); data(gc_hg38_50kb)
 
-gc_hg38_50kb
+data(gc_hg38_50kb)
 
-gc_hg38_500kb
+data(gc_hg38_500kb)
 }
 \value{
 \code{gc_hg38_1000kb}, \code{gc_hg38_500kb}, and \code{gc_hg38_50kb}

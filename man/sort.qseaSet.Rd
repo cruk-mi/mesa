@@ -37,7 +37,7 @@ exampleTumourNormal \%>\% sort(decreasing = TRUE)
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\code{\link[qsea:getSampleNames]{qsea::getSampleNames()}},
 \code{\link[=subsetQset]{subsetQset()}},
 \code{\link[gtools:mixedsort]{gtools::mixedsort()}}
 }

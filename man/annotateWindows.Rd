@@ -73,6 +73,7 @@ trailing parenthetical), and—when contexts are provided—\code{landscape}
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
+\donttest{
 # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
 exampleTumourNormal \%>\%
     calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
@@ -99,6 +100,7 @@ exampleMouse \%>\%
 setMesaGenome("hg38")
 setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene")
 setMesaAnnoDb("org.Hs.eg.db")
+}
 
 }
 \seealso{

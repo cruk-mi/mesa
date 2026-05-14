@@ -65,9 +65,9 @@ exampleTumourNormal \%>\%
 \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap]{Heatmap}},
 \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
-Other CNV: 
-\code{\link{addHMMcopyCNV}()},
-\code{\link{removeCNV}()},
-\code{\link{runHMMCopy}()}
+Other CNV:
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}},
+\code{\link[=removeCNV]{removeCNV()}},
+\code{\link[=runHMMCopy]{runHMMCopy()}}
 }
 \concept{CNV}

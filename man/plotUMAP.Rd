@@ -136,8 +136,8 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-Other dimred-helpers: 
-\code{\link{getPCA}()},
-\code{\link{plotDimRed}()}
+Other dimred-helpers:
+\code{\link[=getPCA]{getPCA()}},
+\code{\link[=plotDimRed]{plotDimRed()}}
 }
 \concept{dimred-helpers}

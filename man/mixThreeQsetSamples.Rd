@@ -123,8 +123,8 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=mixSamples]{mixSamples()}} (two-sample mixture), \code{\link[=addNormalisation]{addNormalisation()}}
 
-Other sample-simulation: 
-\code{\link{mixSamples}()}
+Other sample-simulation:
+\code{\link[=mixSamples]{mixSamples()}}
 }
 \concept{sample-simulation}
 \keyword{internal}

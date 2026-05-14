@@ -22,7 +22,7 @@ Window IDs used. \strong{Default:} none.}
 \item{object}{\code{mesaUMAP}}
 }
 \value{
-A \linkS4class{mesaUMAP} object containing UMAP coordinates and window IDs.
+A \link[=mesaUMAP-class]{mesaUMAP} object containing UMAP coordinates and window IDs.
 }
 \description{
 Stores per-sample coordinates from a UMAP embedding computed over methylation
@@ -50,5 +50,5 @@ mu
 
 }
 \seealso{
-\linkS4class{mesaDimRed}
+\link[=mesaDimRed-class]{mesaDimRed}
 }

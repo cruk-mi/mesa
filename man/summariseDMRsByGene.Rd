@@ -37,10 +37,10 @@ exampleTumourNormal \%>\%
 \code{\link[=annotateWindows]{annotateWindows()}},
 \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

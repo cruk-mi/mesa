@@ -144,6 +144,6 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}
 }
 \concept{dimred-plotting}

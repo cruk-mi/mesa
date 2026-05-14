@@ -12,7 +12,7 @@ A GRanges object with 485541 ranges and 2 metadata columns:
 }
 }
 \usage{
-hg38_450kArrayGR
+data(hg38_450kArrayGR)
 }
 \description{
 A GRanges object containing the Illumina Infinium 450k array probe locations for hg38

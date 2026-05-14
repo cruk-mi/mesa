@@ -46,13 +46,13 @@ data.frame(S1_nrpm = 1:2, Tumour_nrpm_means = 3:4) \%>\%
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=selectQset]{selectQset()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}
 
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getCountTable}()},
-\code{\link{getDataTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{getSampleGroups2}()},
-\code{\link{makeTransposedTable}()},
-\code{\link{removeLibraryFactors}()}
+Other table-helpers:
+\code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=getCountTable]{getCountTable()}},
+\code{\link[=getDataTable]{getDataTable()}},
+\code{\link[=getNRPMTable]{getNRPMTable()}},
+\code{\link[=getSampleGroups2]{getSampleGroups2()}},
+\code{\link[=makeTransposedTable]{makeTransposedTable()}},
+\code{\link[=removeLibraryFactors]{removeLibraryFactors()}}
 }
 \concept{table-helpers}

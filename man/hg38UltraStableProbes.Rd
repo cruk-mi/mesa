@@ -14,7 +14,7 @@ A \code{GRanges} object with 974 ranges and 1 metadata column:
 Processed from public array resources following Edgar et al. (2014).
 }
 \usage{
-hg38UltraStableProbes
+data(hg38UltraStableProbes)
 }
 \description{
 Genomic loci that are consistently methylated (“ultra-stable”) across many human tissues

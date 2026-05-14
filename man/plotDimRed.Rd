@@ -104,7 +104,7 @@ Each plot depicts the requested dimensions with aesthetics mapped as specified.
 }
 \description{
 Visualise PCA or UMAP coordinates stored in a \link{mesaDimRed} object.
-Wrappers such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
+Wrappers such as \code{\link[BiocGenerics:plotPCA]{plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
 for common use cases.
 }
 \examples{
@@ -133,8 +133,8 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-Other dimred-helpers: 
-\code{\link{getPCA}()},
-\code{\link{plotUMAP}()}
+Other dimred-helpers:
+\code{\link[=getPCA]{getPCA()}},
+\code{\link[=plotUMAP]{plotUMAP()}}
 }
 \concept{dimred-helpers}

@@ -118,7 +118,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}, \code{\link[=addNormalisation]{addNormalisation()}}
 
-Other sample-simulation: 
-\code{\link{mixThreeQsetSamples}()}
+Other sample-simulation:
+\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}
 }
 \concept{sample-simulation}

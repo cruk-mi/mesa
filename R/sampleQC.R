@@ -46,6 +46,7 @@
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
+#' data(hg38UltraStableProbes, package = "mesa")
 #'
 #' # Run only if the example windows overlap the ultra-stable probes
 #' exampleTumourNormal %>%
@@ -53,7 +54,7 @@
 #'         has_ov <- sum(
 #'             GenomicRanges::countOverlaps(
 #'                 qsea::getRegions(.),
-#'                 mesa::hg38UltraStableProbes
+#'                 hg38UltraStableProbes
 #'             )
 #'         ) > 0
 #'

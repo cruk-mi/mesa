@@ -46,6 +46,7 @@ is returned.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
+data(hg38UltraStableProbes, package = "mesa")
 
 # Run only if the example windows overlap the ultra-stable probes
 exampleTumourNormal \%>\%
@@ -53,7 +54,7 @@ exampleTumourNormal \%>\%
         has_ov <- sum(
             GenomicRanges::countOverlaps(
                 qsea::getRegions(.),
-                mesa::hg38UltraStableProbes
+                hg38UltraStableProbes
             )
         ) > 0
 
@@ -76,6 +77,6 @@ surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[qsea:getSampleNames]{qsea::getSampleNames()}},
 \link{hg38UltraStableProbes}, \code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }

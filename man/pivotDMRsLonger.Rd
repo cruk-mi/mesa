@@ -48,10 +48,10 @@ exampleTumourNormal \%>\%
 \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}},
 \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
-Other DMR-helpers: 
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

@@ -31,7 +31,7 @@ Optional numeric matrix/data used for DR.
 \item{object}{\code{mesaDimRed}}
 }
 \value{
-A \linkS4class{mesaDimRed} object:
+A \link[=mesaDimRed-class]{mesaDimRed} object:
 \itemize{
 \item stores DR results in \code{res},
 \item carries sample metadata in \code{sampleTable},
@@ -47,7 +47,7 @@ computed on a common set of samples.
 
 \describe{
 \item{\code{res}}{\code{list}
-Individual DR result objects (e.g., \linkS4class{mesaPCA}, \linkS4class{mesaUMAP}).}
+Individual DR result objects (e.g., \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}).}
 
 \item{\code{sampleTable}}{\code{data.frame}
 Sample annotations; row names are sample IDs.}
@@ -77,5 +77,5 @@ md
 
 }
 \seealso{
-\linkS4class{mesaPCA}, \linkS4class{mesaUMAP}
+\link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}
 }
