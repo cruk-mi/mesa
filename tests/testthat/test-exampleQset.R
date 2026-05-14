@@ -1,3 +1,5 @@
+data("exampleTumourNormal", package = "mesa")
+
 test_that("Annotation getting works", {
   expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = tumour, useGroupMeans = FALSE) %>% dim(), c(10, 1))
   expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = "tumour", useGroupMeans = FALSE) %>% dim(), c(10, 1))

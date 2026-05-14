@@ -1,3 +1,5 @@
+data("exampleTumourNormal", package = "mesa")
+
 test_that("liftOver", {
   region <- data.frame(seqnames = 1, start = 2000000, end = 2100000)
 

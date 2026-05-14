@@ -1,3 +1,5 @@
+data("exampleTumourNormal", package = "mesa")
+
 test_that("Calculating DMRs", {
   BiocParallel::SerialParam()
 

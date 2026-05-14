@@ -1,3 +1,5 @@
+data("exampleMouse", package = "mesa")
+
 test_that("Mouse plotting", {
   biomart_success <- try(biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl", host = "https://jul2023.archive.ensembl.org"))
   biomart_success <- !class(biomart_success) == "try-error"
