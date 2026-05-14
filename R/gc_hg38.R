@@ -24,10 +24,13 @@
 #' 500 kb, and 50 kb, respectively.
 #' @source <https://github.com/broadinstitute/ichorCNA>
 #' @keywords datasets genomics
+#' @export
 "gc_hg38_1000kb"
 
 #' @rdname gc_hg38_1000kb
+#' @export
 "gc_hg38_50kb"
 
 #' @rdname gc_hg38_1000kb
+#' @export
 "gc_hg38_500kb"
