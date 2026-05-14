@@ -434,6 +434,12 @@ Issues were found with:
         # this is included in the addHMMcopyCNV method more efficiently, don't need to call it there.
         qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
     } else if (CNVmethod == "HMMdefault") {
+        utils::data("gc_hg38_1000kb", package = "mesa", envir = environment())
+        utils::data("gc_hg38_500kb", package = "mesa", envir = environment())
+        utils::data("gc_hg38_50kb", package = "mesa", envir = environment())
+        utils::data("map_hg38_1000kb", package = "mesa", envir = environment())
+        utils::data("map_hg38_500kb", package = "mesa", envir = environment())
+        utils::data("map_hg38_50kb", package = "mesa", envir = environment())
         if (is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
             if (CNVwindowSize == 1000000) {
                 hmmCopyGC <- gc_hg38_1000kb
