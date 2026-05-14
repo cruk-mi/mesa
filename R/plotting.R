@@ -417,7 +417,7 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 
     if (nrow(nonUniqueWindowsDf) > 0) {
         stop(glue::glue("Non-unique annotations found in window annotations:
-         {paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}
+{paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}
 "))
     }
     rowAnnotDfdistinct %>%
