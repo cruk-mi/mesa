@@ -35,7 +35,7 @@
 #' [addHyperStableFraction()]
 #'
 #' @examples
-#' data(hg38UltraStableProbes)
+#' data(hg38UltraStableProbes, package = "mesa")
 #'
 #' # Basic overview
 #' hg38UltraStableProbes
@@ -59,5 +59,4 @@
 #' # With UCSC-style example
 #' toy_ucsc <- GenomicRanges::GRanges("chr1", IRanges::IRanges(951160, 951170))
 #' GenomicRanges::countOverlaps(toy_ucsc, gr) # after style harmonisation above
-#' @export
 "hg38UltraStableProbes"

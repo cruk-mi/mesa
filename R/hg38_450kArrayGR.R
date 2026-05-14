@@ -7,5 +7,4 @@
 #'   \item{ID}{Array probe ID}
 #'   \item{MASK_general}{A field suggesting whether the probe could be unreliable (if TRUE) due to some kind of technical issue}
 #' }
-#' @export
 "hg38_450kArrayGR"
