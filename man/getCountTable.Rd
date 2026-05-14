@@ -43,21 +43,21 @@ data(exampleTumourNormal, package = "mesa")
 
 # Per-sample counts (first rows/columns)
 exampleTumourNormal \%>\%
-  getCountTable() \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getCountTable() \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Group means instead of individual samples
 exampleTumourNormal \%>\%
-  getCountTable(useGroupMeans = TRUE) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getCountTable(useGroupMeans = TRUE) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Keep the method suffix in column names
 exampleTumourNormal \%>\%
-  getCountTable(addMethodSuffix = TRUE) \%>\%
-  names() \%>\%
-  head()
+    getCountTable(addMethodSuffix = TRUE) \%>\%
+    names() \%>\%
+    head()
 
 }
 \seealso{

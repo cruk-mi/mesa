@@ -75,30 +75,30 @@ data(exampleTumourNormal, package = "mesa")
 
 # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
-  annotateWindows(genome = "hg38")
+    calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+    annotateWindows(genome = "hg38")
 
 # Or specify TxDb/annoDb explicitly
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
-  annotateWindows(
-    TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-    annoDb = "org.Hs.eg.db"
-  )
+    calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+    annotateWindows(
+        TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db"
+    )
 
 # Mouse example (mm10): supply mouse TxDb and OrgDb
 data(exampleMouse, package = "mesa")
 exampleMouse \%>\%
-  getRegions() \%>\%
-  annotateWindows(
-    TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-    annoDb = "org.Mm.eg.db"
-  )
+    getRegions() \%>\%
+    annotateWindows(
+        TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+        annoDb = "org.Mm.eg.db"
+    )
 
 # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-  setMesaGenome("hg38"); 
-  setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
-  setMesaAnnoDb("org.Hs.eg.db")
+setMesaGenome("hg38")
+setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene")
+setMesaAnnoDb("org.Hs.eg.db")
 
 }
 \seealso{

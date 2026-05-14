@@ -37,16 +37,20 @@ needed (e.g., \code{GenomeInfoDb::genome(gr) <- "hg38"}).
 }
 \examples{
 # From makeTable-like columns
-data.frame(chr = c("1","2"),
-           window_start = c(100, 500),
-           window_end   = c(200, 600)) \%>\%
-  qseaTableToChrGRanges()
+data.frame(
+    chr = c("1", "2"),
+    window_start = c(100, 500),
+    window_end = c(200, 600)
+) \%>\%
+    qseaTableToChrGRanges()
 
 # From seqnames/start/end; adds 'chr' if missing
-data.frame(seqnames = c("chr3","4"),
-           start = c(1000, 2000),
-           end   = c(1100, 2100)) \%>\%
-  qseaTableToChrGRanges()
+data.frame(
+    seqnames = c("chr3", "4"),
+    start = c(1000, 2000),
+    end = c(1100, 2100)
+) \%>\%
+    qseaTableToChrGRanges()
 
 }
 \seealso{

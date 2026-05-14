@@ -38,13 +38,13 @@ data(exampleTumourNormal, package = "mesa")
 
 # Use the built-in keyword for 450k probes (GRCh38)
 exampleTumourNormal \%>\%
-  convertToArrayBetaTable(arrayDetails = "Infinium450k") \%>\%
-  head()
+    convertToArrayBetaTable(arrayDetails = "Infinium450k") \%>\%
+    head()
 
 # Supply an explicit GRanges of 450k probes (must have metadata column 'ID')
 exampleTumourNormal \%>\%
-  convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
-  head()
+    convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
+    head()
 
 }
 \seealso{

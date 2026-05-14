@@ -49,22 +49,24 @@ data(exampleTumourNormal, package = "mesa")
 
 # Run only if the example windows overlap the ultra-stable probes
 exampleTumourNormal \%>\%
-{
-  has_ov <- sum(
-    GenomicRanges::countOverlaps(
-      qsea::getRegions(.),
-      mesa::hg38UltraStableProbes
-    )
-  ) > 0
+    {
+        has_ov <- sum(
+            GenomicRanges::countOverlaps(
+                qsea::getRegions(.),
+                mesa::hg38UltraStableProbes
+            )
+        ) > 0
 
-  if (has_ov) addHyperStableFraction(.) else {
-    message("No overlap with hg38UltraStableProbes in this toy dataset; skipping.")
-    .
-  }
-} \%>\%
-qsea::getSampleTable() \%>\%
-dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) \%>\%
-head()
+        if (has_ov) {
+            addHyperStableFraction(.)
+        } else {
+            message("No overlap with hg38UltraStableProbes in this toy dataset; skipping.")
+            .
+        }
+    } \%>\%
+    qsea::getSampleTable() \%>\%
+    dplyr::select(sample_name, dplyr::any_of("hyperStableEdgar")) \%>\%
+    head()
 
 }
 \references{

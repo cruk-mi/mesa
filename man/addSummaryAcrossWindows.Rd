@@ -69,37 +69,37 @@ summary function (and include \code{suffix} when provided).
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
-# Add mean NRPM and beta across all windows 
+# Add mean NRPM and beta across all windows
 exampleTumourNormal \%>\%
-  addSummaryAcrossWindows(
-    fn         = mean,
-    normMethod = c("nrpm","beta")
-  ) \%>\%
-  getSampleTable()
+    addSummaryAcrossWindows(
+        fn         = mean,
+        normMethod = c("nrpm", "beta")
+    ) \%>\%
+    getSampleTable()
 
 # Maximum NRPM across a small genomic slice
 exampleTumourNormal \%>\%
-  addSummaryAcrossWindows(
-    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
-    fn         = max,
-    normMethod = "nrpm"
-  ) \%>\%
-  getSampleTable()
+    addSummaryAcrossWindows(
+        regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+        fn = max,
+        normMethod = "nrpm"
+    ) \%>\%
+    getSampleTable()
 
 # Add summaries repeatedly with different regions using a suffix
 exampleTumourNormal \%>\%
-  addSummaryAcrossWindows(
-    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
-    fn         = median,
-    normMethod = "nrpm",
-    suffix     = "subset"
-  ) \%>\%
-  addSummaryAcrossWindows(
-    fn         = median,
-    normMethod = "nrpm",
-    suffix     = "all"
-  ) \%>\%
-  getSampleTable()
+    addSummaryAcrossWindows(
+        regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+        fn = median,
+        normMethod = "nrpm",
+        suffix = "subset"
+    ) \%>\%
+    addSummaryAcrossWindows(
+        fn         = median,
+        normMethod = "nrpm",
+        suffix     = "all"
+    ) \%>\%
+    getSampleTable()
 
 }
 \seealso{

@@ -38,8 +38,10 @@ Window IDs used in the PCA.}
 
 \examples{
 set.seed(1)
-x <- matrix(rnorm(20), nrow = 5, ncol = 4,
-            dimnames = list(paste0("S",1:5), paste0("W",1:4)))
+x <- matrix(rnorm(20),
+    nrow = 5, ncol = 4,
+    dimnames = list(paste0("S", 1:5), paste0("W", 1:4))
+)
 pc <- stats::prcomp(x, center = TRUE, scale. = FALSE)
 mp <- mesaPCA(prcomp = pc, windows = colnames(x))
 mp

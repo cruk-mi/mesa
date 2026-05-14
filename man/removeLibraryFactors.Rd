@@ -30,9 +30,9 @@ data(exampleTumourNormal, package = "mesa")
 
 # Show current factors then reset to 1 and show again
 exampleTumourNormal \%>\%
-  addLibraryInformation() \%>\%
-  pull(library_factor) \%>\%
-  head()
+    addLibraryInformation() \%>\%
+    pull(library_factor) \%>\%
+    head()
 
 }
 \seealso{

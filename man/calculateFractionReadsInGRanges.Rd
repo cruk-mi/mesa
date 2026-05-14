@@ -53,22 +53,23 @@ data(exampleTumourNormal, package = "mesa")
 
 # Using the shipped ultra-stable probes (GRCh38) as the region set
 exampleTumourNormal \%>\%
-  calculateFractionReadsInGRanges(
-    regionsToOverlap = mesa::hg38CpGIslands,
-    numCountsNeeded   = 5
-  ) \%>\%
-  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
+    calculateFractionReadsInGRanges(
+        regionsToOverlap = mesa::hg38CpGIslands,
+        numCountsNeeded = 5
+    ) \%>\%
+    dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction)
 
 # Define a small GRanges subset from the object's own windows
 gr <- exampleTumourNormal \%>\%
-  qsea::getRegions() \%>\%
-  head(n = 100)
-  
+    qsea::getRegions() \%>\%
+    head(n = 100)
+
 calculateFractionReadsInGRanges(
-      qseaSet           = exampleTumourNormal,
-      regionsToOverlap  = gr,
-      numCountsNeeded   = 3) \%>\%
-  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
+    qseaSet           = exampleTumourNormal,
+    regionsToOverlap  = gr,
+    numCountsNeeded   = 3
+) \%>\%
+    dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction)
 
 }
 \seealso{

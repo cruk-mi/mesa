@@ -19,7 +19,9 @@ Convenience wrapper for \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, re
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
-exampleTumourNormal \%>\% getWindows() \%>\% head()
+exampleTumourNormal \%>\%
+    getWindows() \%>\%
+    head()
 
 }
 \seealso{

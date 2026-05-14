@@ -50,29 +50,29 @@ data(exampleTumourNormal, package = "mesa")
 
 # Per-sample beta (first rows/columns), with a minimum read threshold
 exampleTumourNormal \%>\%
-  getBetaTable(minEnrichment = 3) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getBetaTable(minEnrichment = 3) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Group means instead of individual samples
 exampleTumourNormal \%>\%
-  getBetaTable(useGroupMeans = TRUE, minEnrichment = 3) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getBetaTable(useGroupMeans = TRUE, minEnrichment = 3) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Keep the method suffix in column names
 exampleTumourNormal \%>\%
-  getBetaTable(addMethodSuffix = TRUE) \%>\%
-  names() \%>\%
-  head()
+    getBetaTable(addMethodSuffix = TRUE) \%>\%
+    names() \%>\%
+    head()
 
 # Inspect how many NAs arise from the minEnrichment filter
 exampleTumourNormal \%>\%
-  getBetaTable(minEnrichment = 5) \%>\%
-  dplyr::select(dplyr::where(is.numeric)) \%>\%
-  is.na() \%>\%
-  colSums() \%>\%
-  head()
+    getBetaTable(minEnrichment = 5) \%>\%
+    dplyr::select(dplyr::where(is.numeric)) \%>\%
+    is.na() \%>\%
+    colSums() \%>\%
+    head()
 
 }
 \seealso{

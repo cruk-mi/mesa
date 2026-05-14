@@ -112,20 +112,24 @@ data(exampleTumourNormal, package = "mesa")
 
 # PCA: colour by group
 exampleTumourNormal \%>\%
-  getPCA(nPC = 3) \%>\%
-  plotDimRed(colour = "group")
+    getPCA(nPC = 3) \%>\%
+    plotDimRed(colour = "group")
 
 # UMAP: colour by group, shape by tissue
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-  plotDimRed(colour = "group",
-             shape = "tissue") 
+    getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+    plotDimRed(
+        colour = "group",
+        shape = "tissue"
+    )
 
 # Show sample names
 exampleTumourNormal \%>\%
-  getPCA(nPC = 3) \%>\%
-  plotDimRed(colour = "group",
-             showSampleNames = TRUE) 
+    getPCA(nPC = 3) \%>\%
+    plotDimRed(
+        colour = "group",
+        showSampleNames = TRUE
+    )
 
 }
 \seealso{

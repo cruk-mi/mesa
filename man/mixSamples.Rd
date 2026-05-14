@@ -86,33 +86,33 @@ data(exampleTumourNormal, package = "mesa")
 
 
 # Mix two samples 50/50 into ~100k total fragments; append to the qseaSet
-exampleTumourNormal \%>\% 
-  mixSamples("Colon1_T", 
-             "Colon1_N", 
-             nReadsTotal = 100000, 
-             proportion = 0.5, 
-             renormalise = FALSE) \%>\%
-                           
-# Only a few reads are included in this small subset of windows (82):
- getCountTable() \%>\% 
- pull(Mix_Colon1_T_Colon1_N_0.5) \%>\% 
- sum()
+exampleTumourNormal \%>\%
+    mixSamples("Colon1_T",
+        "Colon1_N",
+        nReadsTotal = 100000,
+        proportion = 0.5,
+        renormalise = FALSE
+    ) \%>\%
+    # Only a few reads are included in this small subset of windows (82):
+    getCountTable() \%>\%
+    pull(Mix_Colon1_T_Colon1_N_0.5) \%>\%
+    sum()
 
 
 # Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group
 exampleTumourNormal \%>\%
-  mixSamples("Colon1_T", "Colon1_N",
-             nReadsTotal = 50000,
-             proportion  = 0.8,
-             newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
-             groupName   = "Synthetic",
-             onlyNew     = TRUE ,
-             renormalise = FALSE) \%>\%
-             
-  # Only a few reads are included in this small subset of windows (45):
-  getCountTable() \%>\% 
-  dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\% 
-  sum()
+    mixSamples("Colon1_T", "Colon1_N",
+        nReadsTotal = 50000,
+        proportion  = 0.8,
+        newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
+        groupName   = "Synthetic",
+        onlyNew     = TRUE,
+        renormalise = FALSE
+    ) \%>\%
+    # Only a few reads are included in this small subset of windows (45):
+    getCountTable() \%>\%
+    dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\%
+    sum()
 
 }
 \seealso{

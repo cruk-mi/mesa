@@ -29,8 +29,8 @@ data(exampleTumourNormal, package = "mesa")
 
 # Internal helper (not exported): inspect structure of the mapping
 exampleTumourNormal \%>\%
-  mesa:::getSampleGroups2() 
-  
+    mesa:::getSampleGroups2()
+
 }
 \seealso{
 \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}

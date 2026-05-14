@@ -52,7 +52,7 @@ Merge two \code{qseaSet} objects (or \code{.rds} files containing them) into a s
 data(exampleTumourNormal, package = "mesa")
 
 # Split a cohort into Tumour and Normal, then combine back
-tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
+tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour")
 normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
 combineQsets(tumours, normals)
 

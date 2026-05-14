@@ -63,12 +63,16 @@ Optional matrix/data used to compute DR (for reproducibility).}
 }}
 
 \examples{
-st <- data.frame(sample_name = c("S1","S2"),
-                 group = c("A","B"),
-                 row.names = "sample_name")
-md <- mesaDimRed(res = list(), sampleTable = st,
-                 samples = rownames(st), params = list(),
-                 dataTable = data.frame())
+st <- data.frame(
+    sample_name = c("S1", "S2"),
+    group = c("A", "B"),
+    row.names = "sample_name"
+)
+md <- mesaDimRed(
+    res = list(), sampleTable = st,
+    samples = rownames(st), params = list(),
+    dataTable = data.frame()
+)
 md
 
 }

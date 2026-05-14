@@ -35,17 +35,17 @@ data(exampleTumourNormal, package = "mesa")
 set.seed(1)
 # Downsample to 100 fragments per sample, then check per-sample totals
 exampleTumourNormal \%>\%
-  downSample(100) \%>\%
-  getCountTable() \%>\%
-  dplyr::select(tidyselect::matches("_[NT]")) \%>\%
-  colSums() \%>\%
-  range()  # should be ~ c(100, 100) if all samples had >= 100 reads
+    downSample(100) \%>\%
+    getCountTable() \%>\%
+    dplyr::select(tidyselect::matches("_[NT]")) \%>\%
+    colSums() \%>\%
+    range() # should be ~ c(100, 100) if all samples had >= 100 reads
 
 # Also inspect the updated library sizes recorded in the sample table
 exampleTumourNormal \%>\%
-  downSample(100) \%>\%
-  qsea::getSampleTable() \%>\%
-  dplyr::select(patient, type, gender)
+    downSample(100) \%>\%
+    qsea::getSampleTable() \%>\%
+    dplyr::select(patient, type, gender)
 
 }
 \seealso{

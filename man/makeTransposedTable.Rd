@@ -40,14 +40,14 @@ data(exampleTumourNormal, package = "mesa")
 
 # NRPM features (sample × first few windows) with a group column appended
 exampleTumourNormal \%>\%
-  makeTransposedTable(normMethod = "nrpm", group) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    makeTransposedTable(normMethod = "nrpm", group) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Beta features; inspect dimensions
 exampleTumourNormal \%>\%
-  makeTransposedTable(normMethod = "beta") \%>\%
-  dim()
+    makeTransposedTable(normMethod = "beta") \%>\%
+    dim()
 
 }
 \seealso{

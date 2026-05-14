@@ -63,16 +63,18 @@ samples are significant at \code{FDRthres}.
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
-# Keep windows above Poisson background in at least 2 samples whose names 
+# Keep windows above Poisson background in at least 2 samples whose names
 # contain "Lung", assuming there were 9 million original windows
 exampleTumourNormal \%>\%
-  subsetWindowsOverBackground(keepAbove = TRUE, samples = "Lung", 
-                              numAbove = 2, numWindows = 9e6 )
+    subsetWindowsOverBackground(
+        keepAbove = TRUE, samples = "Lung",
+        numAbove = 2, numWindows = 9e6
+    )
 
-# Drop windows above background (retain only background-like windows) across 
+# Drop windows above background (retain only background-like windows) across
 # all samples, assuming there were 9 million original windows
 exampleTumourNormal \%>\%
-  subsetWindowsOverBackground(keepAbove = FALSE, numWindows = 9e6)
+    subsetWindowsOverBackground(keepAbove = FALSE, numWindows = 9e6)
 }
 \seealso{
 \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}

@@ -67,38 +67,38 @@ data(exampleTumourNormal, package = "mesa")
 
 # Keep windows with median NRPM > 1 across all samples
 exampleTumourNormal \%>\%
-  subsetWindowsBySignal(
-    fn = median,
-    threshold = 1,
-    aboveThreshold = TRUE
-  )
+    subsetWindowsBySignal(
+        fn = median,
+        threshold = 1,
+        aboveThreshold = TRUE
+    )
 
 # Keep windows where the MIN beta < 0.5 in any sample
 exampleTumourNormal \%>\%
-  subsetWindowsBySignal(
-    fn = min,
-    threshold = 0.5,
-    aboveThreshold = FALSE,
-    normMethod = "beta"
-  )
+    subsetWindowsBySignal(
+        fn = min,
+        threshold = 0.5,
+        aboveThreshold = FALSE,
+        normMethod = "beta"
+    )
 
 # Restrict to samples whose names contain "Lung"
 exampleTumourNormal \%>\%
-  subsetWindowsBySignal(
-    fn = median,
-    threshold = 1,
-    aboveThreshold = TRUE,
-    samples = "Lung"
-  )
+    subsetWindowsBySignal(
+        fn = median,
+        threshold = 1,
+        aboveThreshold = TRUE,
+        samples = "Lung"
+    )
 
 # Use group means instead of individual samples
 exampleTumourNormal \%>\%
-  subsetWindowsBySignal(
-    fn = median,
-    threshold = 1,
-    aboveThreshold = TRUE,
-    useGroupMeans = TRUE
-  )
+    subsetWindowsBySignal(
+        fn = median,
+        threshold = 1,
+        aboveThreshold = TRUE,
+        useGroupMeans = TRUE
+    )
 
 }
 \seealso{

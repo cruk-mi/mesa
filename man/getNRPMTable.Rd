@@ -44,21 +44,21 @@ data(exampleTumourNormal, package = "mesa")
 
 # Per-sample NRPM (first rows/columns)
 exampleTumourNormal \%>\%
-  getNRPMTable() \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getNRPMTable() \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Group means instead of individual samples
 exampleTumourNormal \%>\%
-  getNRPMTable(useGroupMeans = TRUE) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getNRPMTable(useGroupMeans = TRUE) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Keep the method suffix in column names
 exampleTumourNormal \%>\%
-  getNRPMTable(addMethodSuffix = TRUE) \%>\%
-  names() \%>\%
-  head()
+    getNRPMTable(addMethodSuffix = TRUE) \%>\%
+    names() \%>\%
+    head()
 
 }
 \seealso{

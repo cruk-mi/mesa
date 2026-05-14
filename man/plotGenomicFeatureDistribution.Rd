@@ -58,24 +58,24 @@ if present). Bars are positioned according to \code{barType} (\code{stack}/\code
 }
 \examples{
 # Recommended workflow: set genome globally
-setMesaGenome("hg38") 
+setMesaGenome("hg38")
 data(exampleTumourNormal, package = "mesa")
 
 # Uses global hg38 setting
 exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+    plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 
 # Override for specific analysis
 exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+    plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
 
 # Advanced: manual control (bypasses mesa genome system)
 exampleTumourNormal \%>\%
-  plotGenomicFeatureDistribution(
-    TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
-    annoDb = "org.Mm.eg.db"
-  )
-  
+    plotGenomicFeatureDistribution(
+        TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+        annoDb = "org.Mm.eg.db"
+    )
+
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}

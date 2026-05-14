@@ -47,11 +47,11 @@ Extend \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to operate on the \c
 \linkS4class{mesaDimRed} object.
 }
 \examples{
-new <- data.frame(sample_name = c("Colon1_N", "Colon2_N"), foo = c(1,2))
+new <- data.frame(sample_name = c("Colon1_N", "Colon2_N"), foo = c(1, 2))
 
-exampleTumourNormal \%>\% 
-  getPCA() \%>\%
-  left_join(new, by = join_by(sample_name)) \%>\%
-  getSampleTable()
+exampleTumourNormal \%>\%
+    getPCA() \%>\%
+    left_join(new, by = join_by(sample_name)) \%>\%
+    getSampleTable()
 
 }

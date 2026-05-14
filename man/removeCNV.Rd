@@ -27,9 +27,9 @@ data(exampleTumourNormal, package = "mesa")
 
 # Zero out CNV and inspect the first rows
 exampleTumourNormal \%>\%
-  removeCNV() \%>\%
-  getCNV() \%>\%
-  utils::head()
+    removeCNV() \%>\%
+    getCNV() \%>\%
+    utils::head()
 
 }
 \seealso{

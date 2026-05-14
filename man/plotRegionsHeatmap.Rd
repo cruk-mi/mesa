@@ -126,39 +126,42 @@ DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts =
 exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
 
 # Cluster rows, add sample and window annotations
-exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(DMRs, 
-                     clusterRows = TRUE, 
-                     sampleAnnotation = c(tumour, tissue))
+exampleTumourNormal \%>\%
+    plotRegionsHeatmap(DMRs,
+        clusterRows = TRUE,
+        sampleAnnotation = c(tumour, tissue)
+    )
 
 # Group means, 2 column clusters, and custom annotation colours
-exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                   clusterRows = TRUE, 
-                   clusterNum = 2,
-                   sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-                    )
+exampleTumourNormal \%>\%
+    plotRegionsHeatmap(
+        regionsToOverlap = DMRs,
+        clusterRows = TRUE,
+        clusterNum = 2,
+        sampleAnnotation = tumour,
+        windowAnnotation = CpG_density,
+        annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+    )
 
 # calculate DMRs to plot
 DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
 # plot these windows
 exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
 # cluster the rows and add annotation
-exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs, 
-                                           clusterRows = TRUE, 
-                                           sampleAnnotation = c(tumour, tissue)
-                                           )
+exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs,
+    clusterRows = TRUE,
+    sampleAnnotation = c(tumour, tissue)
+)
 # more complex example
-exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                   clusterRows = TRUE, 
-                   clusterNum = 2,
-                   sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-                    )
+exampleTumourNormal \%>\%
+    plotRegionsHeatmap(
+        regionsToOverlap = DMRs,
+        clusterRows = TRUE,
+        clusterNum = 2,
+        sampleAnnotation = tumour,
+        windowAnnotation = CpG_density,
+        annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+    )
 
 }
 \seealso{

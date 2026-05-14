@@ -66,13 +66,13 @@ data(exampleTumourNormal, package = "mesa")
 
 # NRPM-based context summary
 exampleTumourNormal \%>\%
-  getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
-  head()
+    getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
+    head()
 
 # Beta-based summary (apply a minimum enrichment for non-NA betas)
 exampleTumourNormal \%>\%
-  getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) \%>\%
-  head()
+    getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) \%>\%
+    head()
 
 }
 \seealso{

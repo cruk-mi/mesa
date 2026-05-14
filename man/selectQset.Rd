@@ -33,18 +33,18 @@ data(exampleTumourNormal, package = "mesa")
 
 # Keep only sample_name and group
 exampleTumourNormal \%>\%
-  selectQset(sample_name, group) \%>\%
-  qsea::getSampleTable()
+    selectQset(sample_name, group) \%>\%
+    qsea::getSampleTable()
 
 # Select and rename a column
 exampleTumourNormal \%>\%
-  selectQset(age, tumour_type = tumour) \%>\%
-  qsea::getSampleTable()
+    selectQset(age, tumour_type = tumour) \%>\%
+    qsea::getSampleTable()
 
 # Use tidyselect helpers
 exampleTumourNormal \%>\%
-  selectQset(matches("s")) \%>\%
-  qsea::getSampleTable()
+    selectQset(matches("s")) \%>\%
+    qsea::getSampleTable()
 
 }
 \seealso{
