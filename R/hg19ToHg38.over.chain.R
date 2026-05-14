@@ -3,5 +3,5 @@
 #' A chain object to liftOver hg19 to hg38
 #'
 #' @format A chain object to liftOver hg19 to hg38
-#' @export
+
 "hg19ToHg38.over.chain"

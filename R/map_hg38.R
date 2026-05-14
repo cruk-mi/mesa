@@ -24,13 +24,10 @@
 #' bin sizes of 1000 kb, 500 kb, and 50 kb, respectively.
 #' @source <https://github.com/broadinstitute/ichorCNA>
 #' @keywords datasets genomics
-#' @export
 "map_hg38_1000kb"
 
 #' @rdname map_hg38_1000kb
-#' @export
 "map_hg38_50kb"
 
 #' @rdname map_hg38_1000kb
-#' @export
 "map_hg38_500kb"

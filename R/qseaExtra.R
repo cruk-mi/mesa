@@ -793,10 +793,11 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Using the shipped ultra-stable probes (GRCh38) as the region set
+#' # Using the shipped CpG islands (GRCh38) as the region set
+#' data(hg38CpGIslands, package = "mesa")
 #' exampleTumourNormal %>%
 #'     calculateFractionReadsInGRanges(
-#'         regionsToOverlap = mesa::hg38CpGIslands,
+#'         regionsToOverlap = hg38CpGIslands,
 #'         numCountsNeeded = 5
 #'     ) %>%
 #'     dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction)

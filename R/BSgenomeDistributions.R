@@ -4,15 +4,12 @@
 #'
 #' @rdname BSgenome.CpG.distribution
 #' @format A data frame with 1 row and 2 columns
-#' @export
 "BSgenome.Hsapiens.UCSC.hg19.CpG.distribution"
 
 #' @rdname BSgenome.CpG.distribution
 #' @format A data frame with 1 row and 2 columns
-#' @export
 "BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution"
 
 #' @rdname BSgenome.CpG.distribution
 #' @format A data frame with 1 row and 2 columns
-#' @export
 "BSgenome.Mmusculus.UCSC.mm10.CpG.distribution"
