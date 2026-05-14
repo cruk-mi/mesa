@@ -4,8 +4,7 @@
 #' and diseases, mapped to GRCh38. Regions correspond to Illumina array probe loci
 #' (cg identifiers) derived as in Edgar et al. (2014), and are intended for QC and summary
 #' metrics (e.g., [addHyperStableFraction()]).
-#'
-#' @format
+#'#' @docType data#' @format
 #' A `GRanges` object with 974 ranges and 1 metadata column:
 #' \describe{
 #'   \item{Probe_ID}{Character cg identifier for the probe/locus (e.g., `"cg11733071"`).}

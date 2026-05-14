@@ -710,8 +710,9 @@ downSample <- function(qseaSet, nReads) {
 #'     head()
 #'
 #' # Supply an explicit GRanges of 450k probes (must have metadata column 'ID')
+#' data(hg38_450kArrayGR, package = "mesa")
 #' exampleTumourNormal %>%
-#'     convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) %>%
+#'     convertToArrayBetaTable(arrayDetails = hg38_450kArrayGR) %>%
 #'     head()
 #'
 #' @export

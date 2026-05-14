@@ -2,6 +2,7 @@
 #'
 #' A chain object to liftOver hg19 to hg38
 #'
+#' @docType data
 #' @format A chain object to liftOver hg19 to hg38
 
 "hg19ToHg38.over.chain"

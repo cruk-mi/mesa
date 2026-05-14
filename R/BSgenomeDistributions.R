@@ -2,6 +2,7 @@
 #'
 #' A data frame containing cached relH and GoGe values for different BSgenomes, generated with calculateGenomicCGDistribution
 #'
+#' @docType data
 #' @rdname BSgenome.CpG.distribution
 #' @format A data frame with 1 row and 2 columns
 "BSgenome.Hsapiens.UCSC.hg19.CpG.distribution"
