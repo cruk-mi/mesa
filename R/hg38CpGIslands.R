@@ -11,4 +11,5 @@
 #'   \item{perGc}{Percent of Cs or Gs in the island}
 #'   \item{obsExp}{Unclear what this column means}
 #' }
+#' @export
 "hg38CpGIslands"
