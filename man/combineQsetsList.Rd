@@ -54,7 +54,7 @@ tumour/normal, multiple runs) and need to be combined into one container.
 data(exampleTumourNormal, package = "mesa")
 
 # Split a cohort into Tumour and Normal, create a list with them, then combine back
-tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour") 
+tumours <- exampleTumourNormal \%>\% filter(tumour == "Tumour")
 normals <- exampleTumourNormal \%>\% filter(tumour == "Normal")
 qsetList <- list(tumours, normals)
 combineQsetsList(qsetList)

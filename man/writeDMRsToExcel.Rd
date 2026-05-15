@@ -40,22 +40,22 @@ data(exampleTumourNormal, package = "mesa")
 
 # Minimal example: write results for a single contrast
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
-  writeDMRsToExcel(path = file.path(tempdir(),"test.xlsx"))
-  
-# With multiple contrasts and annotation 
+    calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
+    writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
+
+# With multiple contrasts and annotation
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToExcel(path = file.path(tempdir(),"test.xlsx"))
+    calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+    annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+    writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
 }
 \seealso{
 \code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
 }
 \concept{DMR-helpers}

@@ -30,21 +30,21 @@ data(exampleTumourNormal, package = "mesa")
 
 # Show current factors then reset to 1 and show again
 exampleTumourNormal \%>\%
-  addLibraryInformation() \%>\%
-  pull(library_factor) \%>\%
-  head()
+    addLibraryInformation() \%>\%
+    pull(library_factor) \%>\%
+    head()
 
 }
 \seealso{
 \code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}
 
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getCountTable}()},
-\code{\link{getDataTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{getSampleGroups2}()},
-\code{\link{makeTransposedTable}()},
-\code{\link{removeNormMethodSuffix}()}
+Other table-helpers:
+\code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=getCountTable]{getCountTable()}},
+\code{\link[=getDataTable]{getDataTable()}},
+\code{\link[=getNRPMTable]{getNRPMTable()}},
+\code{\link[=getSampleGroups2]{getSampleGroups2()}},
+\code{\link[=makeTransposedTable]{makeTransposedTable()}},
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 }
 \concept{table-helpers}

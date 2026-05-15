@@ -149,7 +149,7 @@ Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{meth
 Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{method = "UMAP"}.
 
 Run PCA or UMAP on methylation signal matrices extracted from a
-\link[qsea:qseaSet-class]{qsea::qseaSet}. This is the core workhorse for dimensionality reduction;
+\link[qsea:qseaSet]{qsea::qseaSet}. This is the core workhorse for dimensionality reduction;
 wrappers such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUMAP()}} provide simplified access.
 }
 \details{
@@ -177,63 +177,55 @@ data(exampleTumourNormal, package = "mesa")
 
 # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
 exampleTumourNormal \%>\%
-  getPCA()
+    getPCA()
 
 # Request only the top 3 PCs
 exampleTumourNormal \%>\%
-  getPCA(nPC = 3)
+    getPCA(nPC = 3)
 
 # Use multiple cutoffs for most-variable windows (returns list of PCA results)
 exampleTumourNormal \%>\%
-  getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
-  slot("res") \%>\%
-  names()
+    getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
+    slot("res") \%>\%
+    names()
 # Quick demo on a small synthetic qseaSet
 qsea::getExampleQseaSet(repl = 20) \%>\%
-  getUMAP()
+    getUMAP()
 
 # Alter UMAP hyperparameters
 qsea::getExampleQseaSet(repl = 20) \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1)
+    getUMAP(n_neighbors = 5, min_dist = 1)
 
 # Use top 500 most variable windows only
 qsea::getExampleQseaSet(repl = 20) \%>\%
-  getUMAP(topVarNum = 500)
+    getUMAP(topVarNum = 500)
 data(exampleTumourNormal, package = "mesa")
 
 # PCA on default beta-normalised matrix, keep 3 PCs
 exampleTumourNormal \%>\%
-  getDimRed(method = "PCA", nPC = 3)
+    getDimRed(method = "PCA", nPC = 3)
 
 # UMAP on the top 500 most variable windows
 exampleTumourNormal \%>\%
-  getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
+    getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
 
 # Restrict DR to a set of regions (coerced from data.frame)
 regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 exampleTumourNormal \%>\%
-  getDimRed(method = "PCA", regionsToOverlap = regs)
+    getDimRed(method = "PCA", regionsToOverlap = regs)
 
 # Vectorised topVarNum runs (returns a list of results)
 exampleTumourNormal \%>\%
-  getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
-  slot("res") \%>\%
-  names()
+    getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
+    slot("res") \%>\%
+    names()
 }
 \seealso{
-\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA}, \linkS4class{mesaUMAP},
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \link[=mesaDimRed-class]{mesaDimRed}, \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP},
 \code{\link[qsea:normMethod]{qsea::normMethod()}}, \code{\link[uwot:umap]{uwot::umap()}}, \code{\link[stats:prcomp]{stats::prcomp()}}
 
-Other dimred-helpers: 
-\code{\link{plotDimRed}()},
-\code{\link{plotUMAP}()}
-
-Other dimred-helpers: 
-\code{\link{plotDimRed}()},
-\code{\link{plotUMAP}()}
-
-Other dimred-helpers: 
-\code{\link{plotDimRed}()},
-\code{\link{plotUMAP}()}
+Other dimred-helpers:
+\code{\link[=plotDimRed]{plotDimRed()}},
+\code{\link[=plotUMAP]{plotUMAP()}}
 }
 \concept{dimred-helpers}

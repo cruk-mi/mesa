@@ -50,24 +50,24 @@ data(exampleTumourNormal, package = "mesa")
 
 # Basic CNV heatmap with sample annotations
 exampleTumourNormal \%>\%
-  plotCNVheatmap(sampleAnnotation = c(tumour, type))
+    plotCNVheatmap(sampleAnnotation = c(tumour, type))
 
 # Custom annotation colours; disable row clustering
 exampleTumourNormal \%>\%
-  plotCNVheatmap(
-    sampleAnnotation = tumour,
-    annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
-    clusterRows = FALSE
-  )
+    plotCNVheatmap(
+        sampleAnnotation = tumour,
+        annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+        clusterRows = FALSE
+    )
 
 }
 \seealso{
 \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap]{Heatmap}},
 \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
-Other CNV: 
-\code{\link{addHMMcopyCNV}()},
-\code{\link{removeCNV}()},
-\code{\link{runHMMCopy}()}
+Other CNV:
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}},
+\code{\link[=removeCNV]{removeCNV()}},
+\code{\link[=runHMMCopy]{runHMMCopy()}}
 }
 \concept{CNV}

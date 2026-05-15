@@ -22,10 +22,10 @@ Object whose \code{sampleTable} will be joined.}
 Table to join.}
 
 \item{by}{\code{character()} or \code{NULL}
-Join columns; see \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. \strong{Default:} \code{NULL}.}
+Join columns; see \code{\link[dplyr:left_join]{dplyr::left_join()}}. \strong{Default:} \code{NULL}.}
 
 \item{copy}{\code{logical(1)}
-See \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. \strong{Default:} \code{FALSE}.}
+See \code{\link[dplyr:left_join]{dplyr::left_join()}}. \strong{Default:} \code{FALSE}.}
 
 \item{suffix}{\code{character(2)}
 Suffixes appended to overlapping non-join column names.
@@ -34,7 +34,7 @@ Suffixes appended to overlapping non-join column names.
 \item{keep}{\code{logical(1)} or \code{NULL}
 Retain join keys from both tables. \strong{Default:} \code{NULL}.}
 
-\item{...}{Additional arguments to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}.}
+\item{...}{Additional arguments to \code{\link[dplyr:left_join]{dplyr::left_join()}}.}
 }
 \value{
 A \code{mesaDimRed} object:
@@ -43,15 +43,15 @@ A \code{mesaDimRed} object:
 }
 }
 \description{
-Extend \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to operate on the \code{sampleTable} slot of a
-\linkS4class{mesaDimRed} object.
+Extend \code{\link[dplyr:left_join]{dplyr::left_join()}} to operate on the \code{sampleTable} slot of a
+\link[=mesaDimRed-class]{mesaDimRed} object.
 }
 \examples{
-new <- data.frame(sample_name = c("Colon1_N", "Colon2_N"), foo = c(1,2))
+new <- data.frame(sample_name = c("Colon1_N", "Colon2_N"), foo = c(1, 2))
 
-exampleTumourNormal \%>\% 
-  getPCA() \%>\%
-  left_join(new, by = join_by(sample_name)) \%>\%
-  getSampleTable()
+exampleTumourNormal \%>\%
+    getPCA() \%>\%
+    left_join(new, by = join_by(sample_name)) \%>\%
+    getSampleTable()
 
 }

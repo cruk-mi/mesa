@@ -122,32 +122,34 @@ data(exampleTumourNormal, package = "mesa")
 
 # Basic gene heatmap (beta) with defaults
 tryCatch(
-  exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9"),
-  error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
+    exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9"),
+    error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 )
 
 # Add sample annotations (tidyselect bare names) and cluster columns into 2 groups
 tryCatch(
-  exampleTumourNormal \%>\%
-    plotGeneHeatmap("HOXA9",
-                    sampleAnnotation = c(tumour, tissue),
-                    clusterNum = 2),
-  error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
+    exampleTumourNormal \%>\%
+        plotGeneHeatmap("HOXA9",
+            sampleAnnotation = c(tumour, tissue),
+            clusterNum = 2
+        ),
+    error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 )
 
 # Custom colours and wider flanks
 tryCatch(
-  exampleTumourNormal \%>\%
-    plotGeneHeatmap("HOXA9",
-                    sampleAnnotation  = tumour,
-                    annotationColors  = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
-                    upstreamDist = 1000,
-                    downstreamDist = 2000),
-  error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
+    exampleTumourNormal \%>\%
+        plotGeneHeatmap("HOXA9",
+            sampleAnnotation = tumour,
+            annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+            upstreamDist = 1000,
+            downstreamDist = 2000
+        ),
+    error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 )
 
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=setMart]{setMart()}},
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[qsea:getSampleTable]{getSampleTable()}}, \code{\link[=setMart]{setMart()}},
 \code{\link[biomaRt:useMart]{biomaRt::useMart()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
 }

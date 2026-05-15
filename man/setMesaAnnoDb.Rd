@@ -30,14 +30,14 @@ the genome and TxDb, respectively.
 \examples{
 # Set default annoDb for human (only if the package is installed)
 if (requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-  setMesaAnnoDb("org.Hs.eg.db")
-  getOption("mesa_annoDb")
+    setMesaAnnoDb("org.Hs.eg.db")
+    getOption("mesa_annoDb")
 }
 
 # Set default annoDb for mouse (only if the package is installed)
 if (requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
-  setMesaAnnoDb("org.Mm.eg.db")
-  getOption("mesa_annoDb")
+    setMesaAnnoDb("org.Mm.eg.db")
+    getOption("mesa_annoDb")
 }
 
 # Unset the default annoDb

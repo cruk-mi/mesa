@@ -26,19 +26,21 @@ data(exampleTumourNormal, package = "mesa")
 
 # Summarise DMRs with explicit annotation databases
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-                  annoDb = "org.Hs.eg.db") \%>\%
-  summariseDMRsByGene()
+    calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+    annotateWindows(
+        TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db"
+    ) \%>\%
+    summariseDMRsByGene()
 }
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}},
 \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

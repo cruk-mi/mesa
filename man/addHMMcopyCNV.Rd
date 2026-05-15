@@ -98,17 +98,15 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 \dontrun{
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\%
-
     addHMMcopyCNV(
-           inputColumn = "input_file",
-           windowSize    = 1e6,
-           hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
-           hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
-           properPairsOnly = TRUE,
-           parallel      = FALSE,
-           plotDir       = tempdir()
-     )
-
+        inputColumn = "input_file",
+        windowSize = 1e6,
+        hmmCopyGC = gc_hg38_1000kb, # GRanges with 'gc' column
+        hmmCopyMap = map_hg38_1000kb, # GRanges with 'map' column
+        properPairsOnly = TRUE,
+        parallel = FALSE,
+        plotDir = tempdir()
+    )
 }
 
 }
@@ -120,9 +118,9 @@ exampleTumourNormal \%>\%
 \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}},
 \code{\link[BiocParallel:register]{BiocParallel::register()}}
 
-Other CNV: 
-\code{\link{plotCNVheatmap}()},
-\code{\link{removeCNV}()},
-\code{\link{runHMMCopy}()}
+Other CNV:
+\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
+\code{\link[=removeCNV]{removeCNV()}},
+\code{\link[=runHMMCopy]{runHMMCopy()}}
 }
 \concept{CNV}

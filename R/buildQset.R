@@ -414,6 +414,21 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 #'   [BiocParallel::register()]
 #'
 #' @family coverage
+#' @examples
+#' \dontrun{
+#' sample_table <- data.frame(
+#'     sample_name = "sample1",
+#'     file_name = "/path/to/sample1.bam",
+#'     group = "tumour",
+#'     stringsAsFactors = FALSE
+#' )
+#' qs <- qsea::createQseaSet(
+#'     sampleTable = sample_table,
+#'     BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+#'     window_size = 300
+#' )
+#' qs <- addBamCoveragePairedAndUnpaired(qs)
+#' }
 #' @export
 addBamCoveragePairedAndUnpaired <- function(qs,
                                             fragmentLength = NULL,

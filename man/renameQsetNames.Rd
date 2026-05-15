@@ -33,8 +33,9 @@ and the \code{sampleTable}).
 data(exampleTumourNormal, package = "mesa")
 
 # Replace "T" with "Tumour" in sample names
-renameQsetNames(exampleTumourNormal, 
-                pattern = "T",
-                replacement = "Tumour")
+renameQsetNames(exampleTumourNormal,
+    pattern = "T",
+    replacement = "Tumour"
+)
 
 }

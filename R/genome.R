@@ -1,6 +1,8 @@
 #' Get current mesa genome setting
 #' @return Character string of current genome setting (e.g., "hg38", "hg19", "mm10")
-#' @export 
+#' @examples
+#' getMesaGenome()
+#' @export
 getMesaGenome <- function() {
   getOption("mesa_genome", "hg38")
 }
@@ -8,6 +10,10 @@ getMesaGenome <- function() {
 #' Get TxDb for current or specified genome
 #' @param genome Genome build, defaults to current setting
 #' @return A TxDb object for the specified genome
+#' @examples
+#' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
+#'     getMesaTxDb()
+#' }
 #' @export
 getMesaTxDb <- function(genome = NULL) {
   if (is.null(genome)) genome <- getMesaGenome()
@@ -23,6 +29,8 @@ getMesaTxDb <- function(genome = NULL) {
 #' Get annotation DB for current or specified genome
 #' @param genome Genome build, defaults to current setting
 #' @return Character string of annotation database name (e.g., "org.Hs.eg.db", "org.Mm.eg.db")
+#' @examples
+#' getMesaAnnoDb()
 #' @export
 getMesaAnnoDb <- function(genome = NULL) {
   if (is.null(genome)) genome <- getMesaGenome()

@@ -40,26 +40,26 @@ data(exampleTumourNormal, package = "mesa")
 
 # NRPM features (sample × first few windows) with a group column appended
 exampleTumourNormal \%>\%
-  makeTransposedTable(normMethod = "nrpm", group) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    makeTransposedTable(normMethod = "nrpm", group) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Beta features; inspect dimensions
 exampleTumourNormal \%>\%
-  makeTransposedTable(normMethod = "beta") \%>\%
-  dim()
+    makeTransposedTable(normMethod = "beta") \%>\%
+    dim()
 
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}, \code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
 
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getCountTable}()},
-\code{\link{getDataTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{getSampleGroups2}()},
-\code{\link{removeLibraryFactors}()},
-\code{\link{removeNormMethodSuffix}()}
+Other table-helpers:
+\code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=getCountTable]{getCountTable()}},
+\code{\link[=getDataTable]{getDataTable()}},
+\code{\link[=getNRPMTable]{getNRPMTable()}},
+\code{\link[=getSampleGroups2]{getSampleGroups2()}},
+\code{\link[=removeLibraryFactors]{removeLibraryFactors()}},
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 }
 \concept{table-helpers}

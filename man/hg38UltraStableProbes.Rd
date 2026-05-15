@@ -41,18 +41,18 @@ data(hg38UltraStableProbes)
 
 # Basic overview
 hg38UltraStableProbes
-length(hg38UltraStableProbes)             # 974
-all(GenomicRanges::width(hg38UltraStableProbes) == 3)  # TRUE (3-bp windows)
+length(hg38UltraStableProbes) # 974
+all(GenomicRanges::width(hg38UltraStableProbes) == 3) # TRUE (3-bp windows)
 
 # The object uses numeric chromosomes and an unset genome tag
 GenomeInfoDb::seqlevels(hg38UltraStableProbes)[1:5]
-GenomeInfoDb::genome(hg38UltraStableProbes)  # empty
+GenomeInfoDb::genome(hg38UltraStableProbes) # empty
 
 # Harmonise style/metadata if needed
 gr <- hg38UltraStableProbes
-GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC"  # or "NCBI" / "Ensembl" 
+GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC" # or "NCBI" / "Ensembl"
 #' #   (for 1,2... instead of chr1, chr2...)
-GenomeInfoDb::genome(gr) <- "hg38"  # or "GRCh38"
+GenomeInfoDb::genome(gr) <- "hg38" # or "GRCh38"
 
 # Count overlaps with a toy region
 toy <- GenomicRanges::GRanges("1", IRanges::IRanges(951160, 951170))
@@ -60,7 +60,7 @@ GenomicRanges::countOverlaps(toy, hg38UltraStableProbes)
 
 # With UCSC-style example
 toy_ucsc <- GenomicRanges::GRanges("chr1", IRanges::IRanges(951160, 951170))
-GenomicRanges::countOverlaps(toy_ucsc, gr)   # after style harmonisation above
+GenomicRanges::countOverlaps(toy_ucsc, gr) # after style harmonisation above
 }
 \references{
 Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).

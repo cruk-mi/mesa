@@ -21,7 +21,7 @@ right-hand side (RHS) call.
 
 # Chain multiple transformations
 1:10 \%>\%
-  mean() \%>\%
-  round(1)
+    mean() \%>\%
+    round(1)
 }
 \keyword{internal}

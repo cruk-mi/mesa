@@ -74,6 +74,6 @@ surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[qsea:getSampleNames]{qsea::getSampleNames()}},
 \link{hg38UltraStableProbes}, \code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }

@@ -16,7 +16,7 @@ A character vector containing the column names of the sample table.
 }
 \description{
 S4 method for \code{\link[BiocGenerics]{colnames}} that returns the column names of a
-\code{qseaSet}'s sample metadata table (i.e., \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}).
+\code{qseaSet}'s sample metadata table (i.e., \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}).
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
@@ -26,6 +26,6 @@ colnames(exampleTumourNormal)
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
-\code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}}
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}},
+\code{\link[qsea:getSampleNames]{qsea::getSampleNames()}}
 }

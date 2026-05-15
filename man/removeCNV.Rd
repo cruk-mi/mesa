@@ -27,17 +27,17 @@ data(exampleTumourNormal, package = "mesa")
 
 # Zero out CNV and inspect the first rows
 exampleTumourNormal \%>\%
-  removeCNV() \%>\%
-  getCNV() \%>\%
-  utils::head()
+    removeCNV() \%>\%
+    getCNV() \%>\%
+    utils::head()
 
 }
 \seealso{
 \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[=plotCNVheatmap]{plotCNVheatmap()}}, \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
-Other CNV: 
-\code{\link{addHMMcopyCNV}()},
-\code{\link{plotCNVheatmap}()},
-\code{\link{runHMMCopy}()}
+Other CNV:
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}},
+\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
+\code{\link[=runHMMCopy]{runHMMCopy()}}
 }
 \concept{CNV}

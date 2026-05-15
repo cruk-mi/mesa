@@ -67,39 +67,39 @@ data(exampleTumourNormal, package = "mesa")
 
 # Default: NRPM per window (first few columns)
 exampleTumourNormal \%>\%
-  getDataTable() \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getDataTable() \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Multiple methods together (suffixes retained automatically)
 exampleTumourNormal \%>\%
-  getDataTable(normMethod = c("nrpm","beta"), minEnrichment = 3) \%>\%
-  dplyr::select(1:8) \%>\%
-  head()
+    getDataTable(normMethod = c("nrpm", "beta"), minEnrichment = 3) \%>\%
+    dplyr::select(1:8) \%>\%
+    head()
 
 # Group means instead of individual samples
 exampleTumourNormal \%>\%
-  getDataTable(useGroupMeans = TRUE, normMethod = "nrpm") \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getDataTable(useGroupMeans = TRUE, normMethod = "nrpm") \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Keep (or later remove) the method suffix
 exampleTumourNormal \%>\%
-  getDataTable(normMethod = "nrpm", addMethodSuffix = TRUE) \%>\%
-  names() \%>\%
-  head()
+    getDataTable(normMethod = "nrpm", addMethodSuffix = TRUE) \%>\%
+    names() \%>\%
+    head()
 
 }
 \seealso{
 \code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}}, \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getCountTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{getSampleGroups2}()},
-\code{\link{makeTransposedTable}()},
-\code{\link{removeLibraryFactors}()},
-\code{\link{removeNormMethodSuffix}()}
+Other table-helpers:
+\code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=getCountTable]{getCountTable()}},
+\code{\link[=getNRPMTable]{getNRPMTable()}},
+\code{\link[=getSampleGroups2]{getSampleGroups2()}},
+\code{\link[=makeTransposedTable]{makeTransposedTable()}},
+\code{\link[=removeLibraryFactors]{removeLibraryFactors()}},
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 }
 \concept{table-helpers}

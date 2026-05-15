@@ -15,3 +15,6 @@ Character string of annotation database name (e.g., "org.Hs.eg.db", "org.Mm.eg.d
 \description{
 Get annotation DB for current or specified genome
 }
+\examples{
+getMesaAnnoDb()
+}
