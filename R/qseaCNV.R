@@ -97,7 +97,8 @@
 #' }
 #'
 #' @export
-addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
+addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
+    fragmentLength = NULL,
     plotDir = NULL,
     parallel = getMesaParallel(),
     maxInsertSize = 1000,
@@ -120,7 +121,11 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 
     # TODO something with zygosity
 
-    CNV_Regions <- qsea:::makeGenomeWindows(qsea:::getGenome(qs), as.character(qsea::getChrNames(qs)), windowSize)
+    CNV_Regions <- qsea:::makeGenomeWindows(
+        qsea:::getGenome(qs),
+        as.character(qsea::getChrNames(qs)),
+        windowSize
+    )
 
     # check that the hmmcopy objects are appropriate; each CNV_Region window should
     # overlap exactly one GC/Map window.
@@ -138,9 +143,13 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
 
         stop(
             sprintf(
-                "CNV regions overlap with multiple windows from the hmmCopyGC and/or \
-hmmCopyMap objects!\nThis probably means that your window sizes do not match.\n\
-Showing first affected regions:\n%s",
+                paste0(
+                    "CNV regions overlap with multiple windows from the ",
+                    "hmmCopyGC and/or hmmCopyMap objects!\n",
+                    "This probably means that your window ",
+                    "sizes do not match.\n",
+                    "Showing first affected regions:\n%s"
+                ),
                 print_and_capture(duplicatedRegions)
             ),
             call. = FALSE
@@ -152,7 +161,11 @@ Showing first affected regions:\n%s",
 
     if (parallel) {
         BPPARAM <- BiocParallel::bpparam()
-        message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel")
+        message(
+            "Scanning up to ",
+            BiocParallel::bpnworkers(BPPARAM),
+            " files in parallel"
+        )
     } else {
         BPPARAM <- BiocParallel::SerialParam()
     }
@@ -162,9 +175,13 @@ Showing first affected regions:\n%s",
         FUN = getBamCoveragePairedAndUnpairedR1,
         BSgenome = qsea:::getGenome(qs),
         regions = CNV_Regions,
-        fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,
-        minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,
-        minMapQual = minMapQual, properPairsOnly = properPairsOnly, BPPARAM = BPPARAM
+        fragmentLength = fragmentLength,
+        maxInsertSize = maxInsertSize,
+        minInsertSize = minInsertSize,
+        minReferenceLength = minReferenceLength,
+        minMapQual = minMapQual,
+        properPairsOnly = properPairsOnly,
+        BPPARAM = BPPARAM
     )
 
     names(bamOutList) <- qsea::getSampleTable(qs)$sample_name
@@ -209,7 +226,10 @@ Showing first affected regions:\n%s",
     # TODO would be better as a slot of its own, but can't seem to manage that into the S4 class
     qs@libraries$input_counts <- CNV_RegionsWithReads
 
-    mergedCNV <- purrr::map(qsea::getSampleTable(qs)$sample_name, ~ runHMMCopy(CNV_RegionsWithReads, ., plotDir = plotDir)) %>%
+    mergedCNV <- purrr::map(
+        qsea::getSampleTable(qs)$sample_name,
+        ~ runHMMCopy(CNV_RegionsWithReads, ., plotDir = plotDir)
+    ) %>%
         purrr::reduce(plyranges::join_overlap_inner)
 
     qs <- qsea:::setCNV(qs, mergedCNV)
@@ -218,7 +238,10 @@ Showing first affected regions:\n%s",
         warning("Consider recalculating offset based on new CNV values")
     }
     if ("seqPref" %in% names(GenomicRanges::mcols(qsea::getRegions(qs)))) {
-        warning("Consider recalculating sequence ", "preference based on new CNV values")
+        warning(
+            "Consider recalculating sequence ",
+            "preference based on new CNV values"
+        )
     }
     return(qs)
 }
@@ -285,9 +308,13 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
     }
 
     correctOutput <- CNV_RegionsWithReads %>%
-        dplyr::select(chr, start, end, width, strand, gc, map, tidyselect::any_of(colname)) %>%
+        dplyr::select(
+            chr, start, end, width, strand, gc, map, tidyselect::any_of(colname)
+        ) %>%
         dplyr::rename(reads = tidyselect::all_of(colname)) %>%
-        HMMcopy::correctReadcount(mappability = 0.9, samplesize = 50000, verbose = FALSE)
+        HMMcopy::correctReadcount(
+            mappability = 0.9, samplesize = 50000, verbose = FALSE
+        )
 
     initParam <- HMMcopy::HMMsegment(correctOutput,
         param = NULL, autosomes = NULL,
@@ -305,13 +332,17 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
 
     out <- hmmseg$segs %>%
         dplyr::left_join(endMusDf, by = "state") %>%
-        dplyr::mutate(chr = factor(chr, levels = (CNV_RegionsWithReads %>% pull(chr) %>% levels()))) %>%
+        dplyr::mutate(chr = factor(
+            chr, levels = CNV_RegionsWithReads %>% pull(chr) %>% levels()
+        )) %>%
         dplyr::arrange(chr, start) %>%
         dplyr::rename(seqnames = chr) %>%
         dplyr::select(seqnames, start, end, CNV) %>%
         plyranges::as_granges()
 
-    colnames(GenomicRanges::mcols(out)) <- stringr::str_replace(colnames(GenomicRanges::mcols(out)), "CNV", colname)
+    colnames(GenomicRanges::mcols(out)) <- stringr::str_replace(
+        colnames(GenomicRanges::mcols(out)), "CNV", colname
+    )
 
     tttt <- hmmseg$state %>%
         tibble::as_tibble() %>%
@@ -319,7 +350,9 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         dplyr::left_join(endMusDf, by = "state")
 
     if (!is.null(plotDir)) {
-        grDevices::pdf(glue::glue("{plotDir}/{colname}.pdf"), width = 9, height = 9)
+        grDevices::pdf(
+            glue::glue("{plotDir}/{colname}.pdf"), width = 9, height = 9
+        )
         plot(correctOutput$copy,
             col = "black",
             xlab = "Window (over chr1 to chr22)",
@@ -328,7 +361,10 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         graphics::points(tttt$CNV, col = "red", lwd = 0.5)
         graphics::title(
             main = glue::glue("Copy number estimated via HMMcopy."),
-            sub = "Black circles are HMMcopy mappability and gc normalised values."
+            sub = paste0(
+                "Black circles are HMMcopy mappability",
+                " and gc normalised values."
+            )
         )
         grDevices::dev.off()
     }
@@ -412,7 +448,9 @@ plotCNVheatmap <- function(qseaSet,
     chr <- qseaSet %>%
         qsea::getCNV() %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(seqnames = factor(seqnames, levels = gtools::mixedsort(levels(seqnames)))) %>%
+        dplyr::mutate(seqnames = factor(
+            seqnames, levels = gtools::mixedsort(levels(seqnames))
+        )) %>%
         dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
         dplyr::arrange(seqnames) %>%
         tibble::remove_rownames() %>%
@@ -425,14 +463,21 @@ plotCNVheatmap <- function(qseaSet,
         purrr::set_names(chr.levs))
 
     # Make top_annotation bar indicating chromosomes
-    topAnnot <- ComplexHeatmap::HeatmapAnnotation(chr = chr, col = chr.cols, show_legend = FALSE, show_annotation_name = FALSE)
+    topAnnot <- ComplexHeatmap::HeatmapAnnotation(
+        chr = chr,
+        col = chr.cols,
+        show_legend = FALSE,
+        show_annotation_name = FALSE
+    )
 
     CNVmatrix <- qseaSet %>%
         qsea::getCNV() %>%
         tibble::as_tibble(rownames = NULL) %>%
         dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
         tibble::column_to_rownames("window") %>%
-        dplyr::select(tidyselect::all_of(qseaSet %>% qsea::getSampleNames())) %>%
+        dplyr::select(
+            tidyselect::all_of(qseaSet %>% qsea::getSampleNames())
+        ) %>%
         as.matrix() %>%
         t()
 
@@ -489,7 +534,9 @@ plotCNVheatmap <- function(qseaSet,
 removeCNV <- function(qseaSet) {
     qseaSet@cnv <- qseaSet@cnv %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(dplyr::across(-c(seqnames, start, end, width, strand), ~ . * 0)) %>%
+        dplyr::mutate(
+            dplyr::across(-c(seqnames, start, end, width, strand), ~ . * 0)
+        ) %>%
         plyranges::as_granges()
 
     return(qseaSet)
