@@ -188,88 +188,133 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' }
 #'
 #' @export
-annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMesaTxDb(), 
-                            annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
-                            FantomRegionsGR = NULL) {
+annotateWindows <- function(dataTable, genome = .getMesaGenome(),
+    TxDb = .getMesaTxDb(), annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
+    FantomRegionsGR = NULL) {
 
-    if(!is.null(TxDb) & is.character(TxDb)){
-    TxDb <- eval(parse(text=paste0(TxDb,"::", TxDb)))
+    if (!is.null(TxDb) & is.character(TxDb)) {
+        TxDb <- eval(parse(text = paste0(TxDb, "::", TxDb)))
     }
 
-    if(is.null(TxDb) & is.null(genome)) {
-    stop("Please specify a TxDb or genome, this can be set globally using setMesaTxDb and/or setMesaGenome")
-    }
-
-    if(is.null(genome)){
-    genome <- ""
-    }
-
-    if(genome %in% c("hg38","GRCh38") && is.null(TxDb)) {
-
-    if (!requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
+    if (is.null(TxDb) & is.null(genome)) {
         stop(
-        "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\" must be installed to use this function. Please install and run again.",
-        call. = FALSE
+            "Please specify a TxDb or genome, this can be set globally ",
+            "using setMesaTxDb and/or setMesaGenome"
         )
     }
-    TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+
+    if (is.null(genome)) {
+        genome <- ""
     }
 
-    if(genome  %in% c("hg38","GRCh38") && is.null(annoDb)) {
-    if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-        stop(
-        "Package \"org.Hs.eg.db\" must be installed to use this function. Please install and run again.",
-        call. = FALSE
+    if (genome %in% c("hg38", "GRCh38") && is.null(TxDb)) {
+        if (!requireNamespace(
+            "TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE
+        )) {
+            stop(
+                paste0(
+                    "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\"",
+                    " must be installed to use this function.",
+                    " Please install and run again."
+                ),
+                call. = FALSE
+            )
+        }
+        TxDb <- getExportedValue(
+            "TxDb.Hsapiens.UCSC.hg38.knownGene",
+            "TxDb.Hsapiens.UCSC.hg38.knownGene"
         )
     }
-    annoDb <- "org.Hs.eg.db"
+
+    if (genome %in% c("hg38", "GRCh38") && is.null(annoDb)) {
+        if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+            stop(
+                paste0(
+                    "Package \"org.Hs.eg.db\" must be installed to use",
+                    " this function. Please install and run again."
+                ),
+                call. = FALSE
+            )
+        }
+        annoDb <- "org.Hs.eg.db"
     }
 
-    if(is.null(annoDb) && is.null(genome)) {
-    stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
+    if (is.null(annoDb) && is.null(genome)) {
+        stop(
+            "Please specify a annoDb or genome, this can be set globally ",
+            "using setMesaannoDb and/or setMesaGenome"
+        )
     }
 
-    if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR <- mesa::hg38CpGIslands }
+    if (genome %in% c("hg38", "GRCh38") && is.null(CpGislandsGR)) {
+        utils::data("hg38CpGIslands", package = "mesa", envir = environment())
+        CpGislandsGR <- hg38CpGIslands
+    }
 
-    if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR <- mesa::FantomRegions %>% plyranges::as_granges()}
+    if (genome %in% c("hg38", "GRCh38") && is.null(FantomRegionsGR)) {
+        utils::data("FantomRegions", package = "mesa", envir = environment())
+        FantomRegionsGR <- FantomRegions %>% plyranges::as_granges()
+    }
 
-    if(methods::is(dataTable,"GRanges")) {
-    GRangesObject <- dataTable
-    } else{
-    GRangesObject <- dataTable %>%
-        qseaTableToChrGRanges()
+    if (methods::is(dataTable, "GRanges")) {
+        GRangesObject <- dataTable
+    } else {
+        GRangesObject <- dataTable %>%
+            qseaTableToChrGRanges()
     }
 
     chipseekerData <- GRangesObject %>%
-    ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
-                                level = "transcript", # changed from gene to transcript to stop it outputting some genes as being >10Mb long
-                                TxDb = TxDb,
-                                annoDb = annoDb,
-                                overlap = "all",
-                                verbose = FALSE)
+        ChIPseeker::annotatePeak(
+            tssRegion = c(-2000, 500),
+            # changed from gene to transcript to stop it outputting
+            # some genes as being >10Mb long
+            level = "transcript",
+            TxDb = TxDb,
+            annoDb = annoDb,
+            overlap = "all",
+            verbose = FALSE
+        )
 
     grAnno <- chipseekerData@anno %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
-    plyranges::as_granges()
+        tibble::as_tibble() %>%
+        dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
+        plyranges::as_granges()
 
 
-    if(!is.null(CpGislandsGR)){
-    grAnno <- grAnno %>%
-    dplyr::mutate(nIslands = plyranges::count_overlaps(., CpGislandsGR),
-            nShore = plyranges::count_overlaps(., plyranges::flank_left(CpGislandsGR, width = 2000)) +
-                    plyranges::count_overlaps(., plyranges::flank_right(CpGislandsGR, width = 2000)),
-            nShelf = plyranges::count_overlaps(., plyranges::shift_left(plyranges::flank_left(CpGislandsGR, width = 2000), 2000)) +
-                    plyranges::count_overlaps(., plyranges::shift_right(plyranges::flank_right(CpGislandsGR, width = 2000), 2000))) %>%
-    dplyr::mutate(landscape = dplyr::case_when(nIslands > 0 ~ "Island",
-                                                nShore > 0 ~ "Shore",
-                                                nShelf > 0 ~ "Shelf",
-                                                TRUE ~ "Open Sea"))
+    if (!is.null(CpGislandsGR)) {
+        grAnno <- grAnno %>%
+            dplyr::mutate(
+                nIslands = plyranges::count_overlaps(., CpGislandsGR),
+                nShore = plyranges::count_overlaps(
+                    ., plyranges::flank_left(CpGislandsGR, width = 2000)
+                ) +
+                    plyranges::count_overlaps(
+                        ., plyranges::flank_right(CpGislandsGR, width = 2000)
+                    ),
+                nShelf = plyranges::count_overlaps(
+                    .,
+                    plyranges::shift_left(
+                        plyranges::flank_left(CpGislandsGR, width = 2000), 2000
+                    )
+                ) +
+                    plyranges::count_overlaps(
+                        .,
+                        plyranges::shift_right(
+                            plyranges::flank_right(CpGislandsGR, width = 2000), 2000
+                        )
+                    )
+            ) %>%
+            dplyr::mutate(landscape = dplyr::case_when(
+                nIslands > 0 ~ "Island",
+                nShore > 0 ~ "Shore",
+                nShelf > 0 ~ "Shelf",
+                TRUE ~ "Open Sea"
+            ))
     }
 
-    if(!is.null(FantomRegionsGR)){
-    grAnno <- grAnno %>%
-    dplyr::mutate(inFantom = plyranges::count_overlaps(., FantomRegionsGR))
+    if (!is.null(FantomRegionsGR)) {
+        grAnno <- grAnno %>%
+            dplyr::mutate(inFantom = plyranges::count_overlaps(., FantomRegionsGR))
     }
 
     dfAnno <- grAnno %>%
@@ -1576,8 +1621,10 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @export
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
 
-    #TODO: This requires the annotateWindows parameters to be exposed to not require setMesaTxDb and setMesaAnnoDb.
-    #TODO: Ensure this works when landscape is not present, as that is optional output from annotateWindows
+    # TODO: This requires the annotateWindows parameters to be exposed
+    # to not require setMesaTxDb and setMesaAnnoDb.
+    # TODO: Ensure this works when landscape is not present,
+    # as that is optional output from annotateWindows
 
     temp <- qseaSet %>%
     getDataTable(normMethod = normMethod,
@@ -1765,10 +1812,11 @@ getSampleGroups2 <- function(qseaSet){
 #'   head()
 #'
 #' @export
-getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
+getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
+    minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE) {
 
-    if(!is.qseaSet(qseaSet)){
-    stop("Please provide a qseaSet as the first argument.")
+    if (!is.qseaSet(qseaSet)) {
+        stop("Please provide a qseaSet as the first argument.")
     }
 
     if(qseaSet %>% qsea::getRegions() %>% length() == 0){
