@@ -43,22 +43,22 @@
 #' @export
 qseaTableToChrGRanges <- function(dataTable) {
 
-  if ("window_start" %in% colnames(dataTable) ) {
-    outGRanges <- dataTable %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(chr = as.character(chr)) %>%
-      dplyr::mutate(seqnames = ifelse(stringr::str_detect(chr,"chr"),chr,paste0("chr", chr)), start = window_start, end = window_end) %>%
-      plyranges::as_granges()
+    if ("window_start" %in% colnames(dataTable) ) {
+        outGRanges <- dataTable %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(chr = as.character(chr)) %>%
+            dplyr::mutate(seqnames = ifelse(stringr::str_detect(chr,"chr"),chr,paste0("chr", chr)), start = window_start, end = window_end) %>%
+            plyranges::as_granges()
 
-  } else if ("start" %in% colnames(dataTable)) {
-    outGRanges <- dataTable %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(seqnames = as.character(seqnames)) %>%
-      dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames,"chr"),seqnames,paste0("chr", seqnames))) %>%
-      plyranges::as_granges()
-  } else {stop("Missing start or window_start column.")}
+    } else if ("start" %in% colnames(dataTable)) {
+        outGRanges <- dataTable %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(seqnames = as.character(seqnames)) %>%
+            dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames,"chr"),seqnames,paste0("chr", seqnames))) %>%
+            plyranges::as_granges()
+    } else {stop("Missing start or window_start column.")}
 
-  return(outGRanges)
+    return(outGRanges)
 }
 
 
@@ -102,20 +102,20 @@ qseaTableToChrGRanges <- function(dataTable) {
 #' @export
 getWindowNames <- function(x) {
 
-  if(is.qseaSet(x)){
-    return(x %>%
-      qsea::getRegions() %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
-      dplyr::pull(window))
-  }
+    if(is.qseaSet(x)){
+        return(x %>%
+            qsea::getRegions() %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+            dplyr::pull(window))
+    }
 
-  return(asValidGranges(x) %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
-    dplyr::pull(window))
+    return(asValidGranges(x) %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+        dplyr::pull(window))
 
-  stop("Unknown data type!")
+    stop("Unknown data type!")
 }
 
 
@@ -148,13 +148,13 @@ getWindowNames <- function(x) {
 #'
 #' @export
 getPattern <- function(qseaSet) {
-  qseaSet %>%
-    qsea::getRegions() %>%
-    GenomicRanges::mcols() %>%
-    colnames() %>%
-    stringr::str_subset("_density$") %>%
-    stringr::str_remove("_density$") %>%
-    return()
+    qseaSet %>%
+        qsea::getRegions() %>%
+        GenomicRanges::mcols() %>%
+        colnames() %>%
+        stringr::str_subset("_density$") %>%
+        stringr::str_remove("_density$") %>%
+        return()
 }
 
 
@@ -178,9 +178,9 @@ getPattern <- function(qseaSet) {
 #'
 #' @export
 getWindows <- function(qseaSet) {
-  qseaSet %>%
-    qsea::getRegions() %>%
-    return()
+    qseaSet %>%
+        qsea::getRegions() %>%
+        return()
 }
 
 
@@ -214,9 +214,9 @@ getWindows <- function(qseaSet) {
 #'   mesa:::remove_almost_empty_cols(prop = 0.5)  # drops column b
 #'   
 remove_almost_empty_cols <- function(dat, prop)  {
-  mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
-  janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
-  return(dat[,mask_keep, drop = FALSE])
+    mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
+    janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
+    return(dat[,mask_keep, drop = FALSE])
 }
 
 
@@ -237,11 +237,11 @@ remove_almost_empty_cols <- function(dat, prop)  {
 #' @keywords internal
 #' @noRd
 skip_long_checks <- function() {
-  if (!identical(options("skip_long_checks"), TRUE)) {
-    return(invisible(TRUE))
-  }
+    if (!identical(options("skip_long_checks"), TRUE)) {
+        return(invisible(TRUE))
+    }
 
-  testthat::skip("Slow checks skipped when options(skip_long_checks = TRUE) has been set")
+    testthat::skip("Slow checks skipped when options(skip_long_checks = TRUE) has been set")
 }
 
 
@@ -278,25 +278,25 @@ skip_long_checks <- function() {
 #' @export
 asValidGranges <- function(object){
 
-  if("GRanges" %in% class(object)){
-    return(object)
-  }
-
-  if(is.data.frame(object)){
-    if(length(intersect(colnames(object),c("seqnames","start","end"))) == 3){
-      return(object %>% plyranges::as_granges())
-    } else  if(length(intersect(colnames(object),c("chr","start","end"))) == 3){
-      return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges() )
-    } else  if(length(intersect(colnames(object),c("chr","window_start","window_end"))) == 3){
-      return(object %>%
-               dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-               plyranges::as_granges() )
-    } else {
-      stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
+    if("GRanges" %in% class(object)){
+        return(object)
     }
-  }
 
-  stop("Object can not be coerced to a GRanges object")
+    if(is.data.frame(object)){
+        if(length(intersect(colnames(object),c("seqnames","start","end"))) == 3){
+            return(object %>% plyranges::as_granges())
+        } else  if(length(intersect(colnames(object),c("chr","start","end"))) == 3){
+            return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges() )
+        } else  if(length(intersect(colnames(object),c("chr","window_start","window_end"))) == 3){
+            return(object %>%
+                              dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+                              plyranges::as_granges() )
+        } else {
+            stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
+        }
+    }
+
+    stop("Object can not be coerced to a GRanges object")
 
 }
 
@@ -316,5 +316,5 @@ asValidGranges <- function(object){
 #'
 #' @keywords internal
 print_and_capture <- function(x) {
-  paste(utils::capture.output(methods::show(x)), collapse = "\n")
+    paste(utils::capture.output(methods::show(x)), collapse = "\n")
 }
