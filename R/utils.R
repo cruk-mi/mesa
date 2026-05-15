@@ -289,8 +289,8 @@ asValidGranges <- function(object){
             return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges() )
         } else  if(length(intersect(colnames(object),c("chr","window_start","window_end"))) == 3){
             return(object %>%
-                              dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-                              plyranges::as_granges() )
+                dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+                plyranges::as_granges() )
         } else {
             stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
         }
