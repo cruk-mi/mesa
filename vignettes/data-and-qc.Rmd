@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r chunk, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -27,7 +27,7 @@ library(stringr)
 QSEA has several different types of values that can be returned per window.
 You can get a table of raw counts per window with `getCountTable`:
 
-```{r}
+```{r generating-tables-of-values-fr}
 exampleTumourNormal %>%
   getCountTable()
 ```
@@ -36,14 +36,14 @@ but this is not particularly useful, as different samples generally have been se
 
 The next option is normalised reads per million (NRPM). This normalises the number of reads by the depth of sequencing, as well as copy number variation.
 
-```{r}
+```{r chunk-2}
 exampleTumourNormal %>%
   getNRPMTable()
 ```
 
 Finally, we can request beta values. Beta values are measures of methylation, scaled to lie between 0 and 1, where 0 means that the window is unmethylated and 1 is methylated. These are scaled with respect to a further number of metrics, including region CpG_density, background noise and the sample enrichment profile, and are therefore the most useful value to consider when comparing methylation between samples.
 
-```{r}
+```{r chunk-3}
 exampleTumourNormal %>%
   getBetaTable()
 ```
@@ -54,7 +54,7 @@ All three of these functions take an option `useGroupMeans` that determine wheth
 
 The example qseaSet has group as the same as sample_name, so we need to change that to see the effect:
 
-```{r}
+```{r chunk-4}
 exampleTumourNormal %>%
   getBetaTable(useGroupMeans = FALSE)
 
@@ -84,7 +84,7 @@ For the MBD-Seq data that we have studied, we apply a minimum `relH` of 2.5, wit
 
 We can use the `addLibraryInformation` function to add the information in the `libraries` table directly onto the `sampleTable`:
 
-```{r}
+```{r chunk-5}
 exampleTumourNormal %>% 
   addLibraryInformation() %>% 
   getSampleTable() %>% 
@@ -93,7 +93,7 @@ exampleTumourNormal %>%
 
 When a non-enriched ("Input") sample is used to calculate copy number variation, an equivalent calculation is also performed on these non-enriched fragments. This is also stored in the `libraries` table, in columns starting with `input`:
 
-```{r}
+```{r chunk-6}
 exampleTumourNormal %>% 
   addLibraryInformation() %>% 
   getSampleTable() %>% 
@@ -102,7 +102,7 @@ exampleTumourNormal %>%
 
 We typically see values of the `input_relH` between 1.3-1.6, suggesting that there are more CGs seen in the sequenced fragments than would be expected from the genomic sequence. This is presumably due to the evolutionary suppression of `CG` dinucleotides outside of specific contexts, meaning they are less common in those areas of the genome that are repetitive and hence less easy to map. This is likely to be dependent on the particular sequencing methods and the sample type under consideration. We therefore need to see an increase between the enriched and non-enriched data:
 
-```{r}
+```{r chunk-7}
 exampleTumourNormal %>% 
   addLibraryInformation() %>% 
   getSampleTable() %>% 
