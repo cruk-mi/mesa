@@ -57,17 +57,18 @@ were evaluated (\code{totalWindowsUsed}). Results are joined with the sample tab
 data(exampleTumourNormal, package = "mesa")
 
 #' # Count windows with NRPM >= 1 over the first 100 regions
-countWindowsAboveCutoff(exampleTumourNormal, 
-                               qsea::getRegions(exampleTumourNormal)[1:100], 
-                               cutoff = 1, 
-                               normMethod = "nrpm")
-                               
+countWindowsAboveCutoff(exampleTumourNormal,
+    qsea::getRegions(exampleTumourNormal)[1:100],
+    cutoff = 1,
+    normMethod = "nrpm"
+)
+
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
 
-Other window-summaries: 
-\code{\link{addSummaryAcrossWindows}()},
-\code{\link{summariseAcrossWindows}()}
+Other window-summaries:
+\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}},
+\code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
 }
 \concept{window-summaries}

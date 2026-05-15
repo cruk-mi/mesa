@@ -43,33 +43,33 @@ data(exampleTumourNormal, package = "mesa")
 
 # Per-sample counts (first rows/columns)
 exampleTumourNormal \%>\%
-  getCountTable() \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getCountTable() \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Group means instead of individual samples
 exampleTumourNormal \%>\%
-  getCountTable(useGroupMeans = TRUE) \%>\%
-  dplyr::select(1:6) \%>\%
-  head()
+    getCountTable(useGroupMeans = TRUE) \%>\%
+    dplyr::select(1:6) \%>\%
+    head()
 
 # Keep the method suffix in column names
 exampleTumourNormal \%>\%
-  getCountTable(addMethodSuffix = TRUE) \%>\%
-  names() \%>\%
-  head()
+    getCountTable(addMethodSuffix = TRUE) \%>\%
+    names() \%>\%
+    head()
 
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}}
 
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getDataTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{getSampleGroups2}()},
-\code{\link{makeTransposedTable}()},
-\code{\link{removeLibraryFactors}()},
-\code{\link{removeNormMethodSuffix}()}
+Other table-helpers:
+\code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=getDataTable]{getDataTable()}},
+\code{\link[=getNRPMTable]{getNRPMTable()}},
+\code{\link[=getSampleGroups2]{getSampleGroups2()}},
+\code{\link[=makeTransposedTable]{makeTransposedTable()}},
+\code{\link[=removeLibraryFactors]{removeLibraryFactors()}},
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 }
 \concept{table-helpers}

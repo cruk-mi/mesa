@@ -45,20 +45,22 @@ data(exampleTumourNormal, package = "mesa")
 
 # Summarise DMRs for a single contrast, using custom FDR threshold
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  summariseDMRsByContrast(FDRthres = 0.1)
+    calculateDMRs(
+        variable = "type",
+        contrasts = "LUAD_vs_NormalLung",
+        FDRthres = 0.1
+    ) \%>\%
+    summariseDMRsByContrast(FDRthres = 0.1)
 
 }
 \seealso{
 \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
 \code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

@@ -27,11 +27,11 @@ allowed and rendered per \strong{ComplexHeatmap} defaults.
 \examples{
 set.seed(1)
 data.frame(
-  CpG_density = runif(10),
-  annotation  = rep(c("Upstream","GeneBody"), 5)
+    CpG_density = runif(10),
+    annotation  = rep(c("Upstream", "GeneBody"), 5)
 ) \%>\%
-  mesa:::makeGeneHeatmapRowAnnotation() 
-  
+    mesa:::makeGeneHeatmapRowAnnotation()
+
 }
 \seealso{
 \code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}

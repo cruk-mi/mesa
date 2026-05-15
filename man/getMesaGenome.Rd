@@ -12,3 +12,6 @@ Character string of current genome setting (e.g., "hg38", "hg19", "mm10")
 \description{
 Get current mesa genome setting
 }
+\examples{
+getMesaGenome()
+}

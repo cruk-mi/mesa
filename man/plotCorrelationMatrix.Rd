@@ -75,9 +75,11 @@ data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\% plotCorrelationMatrix()
 
 # Using beta values and adding sample annotations
-exampleTumourNormal \%>\% 
-  plotCorrelationMatrix(normMethod = "beta",
-                        sampleAnnotation = c(tumour, patient))
+exampleTumourNormal \%>\%
+    plotCorrelationMatrix(
+        normMethod = "beta",
+        sampleAnnotation = c(tumour, patient)
+    )
 
 }
 \seealso{

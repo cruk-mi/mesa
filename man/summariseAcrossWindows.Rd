@@ -84,34 +84,34 @@ data(exampleTumourNormal, package = "mesa")
 
 # Mean NRPM and beta across all windows
 exampleTumourNormal \%>\%
-  summariseAcrossWindows(
-    fn         = mean,
-    normMethod = c("nrpm","beta")
-  )
+    summariseAcrossWindows(
+        fn         = mean,
+        normMethod = c("nrpm", "beta")
+    )
 
 # Maximum NRPM within a small genomic region
 exampleTumourNormal \%>\%
-  summariseAcrossWindows(
-    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
-    fn         = max,
-    normMethod = "nrpm",
-    suffix     = "_chr7_slice"
-  )
+    summariseAcrossWindows(
+        regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+        fn = max,
+        normMethod = "nrpm",
+        suffix = "_chr7_slice"
+    )
 
 # Median beta over all windows
 exampleTumourNormal \%>\%
-  summariseAcrossWindows(
-    fn         = median,
-    normMethod = "beta",
-    minEnrichment = 3
-  )
+    summariseAcrossWindows(
+        fn = median,
+        normMethod = "beta",
+        minEnrichment = 3
+    )
 
 }
 \seealso{
 \code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
-Other window-summaries: 
-\code{\link{addSummaryAcrossWindows}()},
-\code{\link{countWindowsAboveCutoff}()}
+Other window-summaries:
+\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}},
+\code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
 }
 \concept{window-summaries}

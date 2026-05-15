@@ -61,14 +61,14 @@ data(exampleTumourNormal, package = "mesa")
 td <- tempfile()
 dir.create(td)
 exampleTumourNormal \%>\%
-  writeBigWigs(folderName = td, normMethod = "nrpm", useGroupMeans = FALSE)
+    writeBigWigs(folderName = td, normMethod = "nrpm", useGroupMeans = FALSE)
 list.files(td, pattern = "\\\\\\\\.bw$")
 
 # Group-mean beta bigWigs (replace NA beta with 0)
 td2 <- tempfile()
 dir.create(td2)
 exampleTumourNormal \%>\%
-  writeBigWigs(folderName = td2, normMethod = "beta", useGroupMeans = TRUE, naVal = 0)
+    writeBigWigs(folderName = td2, normMethod = "beta", useGroupMeans = TRUE, naVal = 0)
 list.files(td, pattern = "\\\\\\\\.bw$")
 
 }

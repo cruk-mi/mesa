@@ -104,7 +104,7 @@ Each plot depicts the requested dimensions with aesthetics mapped as specified.
 }
 \description{
 Visualise PCA or UMAP coordinates stored in a \link{mesaDimRed} object.
-Wrappers such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
+Wrappers such as \code{\link[BiocGenerics:plotPCA]{plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
 for common use cases.
 }
 \examples{
@@ -112,25 +112,29 @@ data(exampleTumourNormal, package = "mesa")
 
 # PCA: colour by group
 exampleTumourNormal \%>\%
-  getPCA(nPC = 3) \%>\%
-  plotDimRed(colour = "group")
+    getPCA(nPC = 3) \%>\%
+    plotDimRed(colour = "group")
 
 # UMAP: colour by group, shape by tissue
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-  plotDimRed(colour = "group",
-             shape = "tissue") 
+    getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+    plotDimRed(
+        colour = "group",
+        shape = "tissue"
+    )
 
 # Show sample names
 exampleTumourNormal \%>\%
-  getPCA(nPC = 3) \%>\%
-  plotDimRed(colour = "group",
-             showSampleNames = TRUE) 
+    getPCA(nPC = 3) \%>\%
+    plotDimRed(
+        colour = "group",
+        showSampleNames = TRUE
+    )
 
 }
 \seealso{
-Other dimred-helpers: 
-\code{\link{getPCA}()},
-\code{\link{plotUMAP}()}
+Other dimred-helpers:
+\code{\link[=getPCA]{getPCA()}},
+\code{\link[=plotUMAP]{plotUMAP()}}
 }
 \concept{dimred-helpers}

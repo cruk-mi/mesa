@@ -32,14 +32,16 @@ Take the top most DMRs per contrast, based on those with the largest value of th
 }
 \examples{
 # calculate some DMRs
-DMRs <- exampleTumourNormal \%>\% 
-  calculateDMRs(variable = "type", contrasts = "all", 
-                keepContrastMeans = FALSE)
+DMRs <- exampleTumourNormal \%>\%
+    calculateDMRs(
+        variable = "type", contrasts = "all",
+        keepContrastMeans = FALSE
+    )
 # Find the DMRs with the largest deltaBeta between each comparison:
 DMRs \%>\% sliceDMRs(n = 1)
-# Or the windows with the largest log2FC: 
+# Or the windows with the largest log2FC:
 DMRs \%>\% sliceDMRs(n = 1, metric = log2FC)
-# Or the windows with the largest CpG_density: 
+# Or the windows with the largest CpG_density:
 DMRs \%>\% sliceDMRs(n = 1, metric = CpG_density)
 # If adjPval is used, then the smallest value is chosen instead:
 DMRs \%>\% sliceDMRs(n = 1, metric = CpG_density)

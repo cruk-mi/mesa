@@ -35,7 +35,7 @@ For each sample, compute the proportion of \strong{windows} with counts
 windows with counts \verb{>= numCountsNeeded} in that sample.
 }
 \details{
-Operates on the window × sample count matrix from \code{\link[qsea:qseaSet-class]{qsea::getCounts()}}.
+Operates on the window × sample count matrix from \code{\link[qsea:getCounts]{qsea::getCounts()}}.
 Counts are converted to a logical indicator (count \verb{>= numCountsNeeded})
 and summed per sample:
 \itemize{
@@ -53,32 +53,33 @@ data(exampleTumourNormal, package = "mesa")
 
 # Using the shipped ultra-stable probes (GRCh38) as the region set
 exampleTumourNormal \%>\%
-  calculateFractionReadsInGRanges(
-    regionsToOverlap = mesa::hg38CpGIslands,
-    numCountsNeeded   = 5
-  ) \%>\%
-  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
+    calculateFractionReadsInGRanges(
+        regionsToOverlap = mesa::hg38CpGIslands,
+        numCountsNeeded = 5
+    ) \%>\%
+    dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction)
 
 # Define a small GRanges subset from the object's own windows
 gr <- exampleTumourNormal \%>\%
-  qsea::getRegions() \%>\%
-  head(n = 100)
-  
+    qsea::getRegions() \%>\%
+    head(n = 100)
+
 calculateFractionReadsInGRanges(
-      qseaSet           = exampleTumourNormal,
-      regionsToOverlap  = gr,
-      numCountsNeeded   = 3) \%>\%
-  dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction) 
+    qseaSet           = exampleTumourNormal,
+    regionsToOverlap  = gr,
+    numCountsNeeded   = 3
+) \%>\%
+    dplyr::select(sample_name, initialOverBackNum, afterOverBackNum, fraction)
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getCounts()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}},
+\code{\link[qsea:getCounts]{qsea::getCounts()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}},
 \link{hg38CpGIslands}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
 
-Other window-helpers: 
-\code{\link{convertToArrayBetaTable}()},
-\code{\link{downSample}()},
-\code{\link{subsetWindowsBySignal}()},
-\code{\link{subsetWindowsOverBackground}()}
+Other window-helpers:
+\code{\link[=convertToArrayBetaTable]{convertToArrayBetaTable()}},
+\code{\link[=downSample]{downSample()}},
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}},
+\code{\link[=subsetWindowsOverBackground]{subsetWindowsOverBackground()}}
 }
 \concept{window-helpers}

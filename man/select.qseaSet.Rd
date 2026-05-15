@@ -11,7 +11,7 @@
 A qseaSet object whose \code{sampleTable} columns will be selected or renamed.}
 
 \item{...}{Additional arguments passed to \code{\link[dplyr:select]{dplyr::select()}}, supports tidyselect helpers
-(e.g., \code{\link[dplyr:reexports]{dplyr::matches()}}, \code{\link[dplyr:reexports]{dplyr::starts_with()}}).
+(e.g., \code{\link[dplyr:matches]{dplyr::matches()}}, \code{\link[dplyr:starts_with]{dplyr::starts_with()}}).
 Negative selection (\code{-col}) is supported, but \code{sample_name} and \code{group}
 cannot be removed.
 \strong{Default:} none.}
@@ -38,27 +38,27 @@ data(exampleTumourNormal, package = "mesa")
 
 # Keep only specific columns (sample_name and group always preserved)
 exampleTumourNormal \%>\%
-  dplyr::select(type, tumour) \%>\%
-  qsea::getSampleTable()
+    dplyr::select(type, tumour) \%>\%
+    qsea::getSampleTable()
 
 # Select and rename a column
 exampleTumourNormal \%>\%
-  dplyr::select(age, tumour_new = tumour) \%>\%
-  qsea::getSampleTable()
+    dplyr::select(age, tumour_new = tumour) \%>\%
+    qsea::getSampleTable()
 
 # Use tidyselect helpers
 exampleTumourNormal \%>\%
-  dplyr::select(matches("s")) \%>\%
-  qsea::getSampleTable()
+    dplyr::select(matches("s")) \%>\%
+    qsea::getSampleTable()
 
 # Negative selection (except essential columns)
 exampleTumourNormal \%>\%
-  dplyr::select(-matches("s")) \%>\%
-  qsea::getSampleTable()
+    dplyr::select(-matches("s")) \%>\%
+    qsea::getSampleTable()
 
 }
 \seealso{
 \code{\link[=selectQset]{selectQset()}} for the underlying implementation,
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to view results,
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to view results,
 \code{\link[=mutate.qseaSet]{mutate.qseaSet()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}} for related dplyr verbs.
 }

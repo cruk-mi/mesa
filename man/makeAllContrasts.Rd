@@ -25,7 +25,7 @@ combinations without repetition).
 }
 \description{
 Construct a tibble of all pairwise contrasts between levels of a categorical
-variable in the sample table of a \link[qsea:qseaSet-class]{qsea::qseaSet}.
+variable in the sample table of a \link[qsea:qseaSet]{qsea::qseaSet}.
 }
 \details{
 Levels are inferred from \code{unique(qsea::getSampleTable(qseaSet)[[variable]])}.
@@ -36,13 +36,13 @@ data(exampleTumourNormal, package = "mesa")
 
 # All pairwise contrasts among levels of 'type'
 exampleTumourNormal \%>\%
-  makeAllContrasts("type")
+    makeAllContrasts("type")
 
 }
 \seealso{
-Other DMR-detection: 
-\code{\link{calculateDMRs}()},
-\code{\link{fitQseaGLM}()},
-\code{\link{getDMRsData}()}
+Other DMR-detection:
+\code{\link[=calculateDMRs]{calculateDMRs()}},
+\code{\link[=fitQseaGLM]{fitQseaGLM()}},
+\code{\link[=getDMRsData]{getDMRsData()}}
 }
 \concept{DMR-detection}

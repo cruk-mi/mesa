@@ -29,20 +29,20 @@ data(exampleTumourNormal, package = "mesa")
 
 # Internal helper (not exported): inspect structure of the mapping
 exampleTumourNormal \%>\%
-  mesa:::getSampleGroups2() 
-  
+    mesa:::getSampleGroups2()
+
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
 
-Other table-helpers: 
-\code{\link{getBetaTable}()},
-\code{\link{getCountTable}()},
-\code{\link{getDataTable}()},
-\code{\link{getNRPMTable}()},
-\code{\link{makeTransposedTable}()},
-\code{\link{removeLibraryFactors}()},
-\code{\link{removeNormMethodSuffix}()}
+Other table-helpers:
+\code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=getCountTable]{getCountTable()}},
+\code{\link[=getDataTable]{getDataTable()}},
+\code{\link[=getNRPMTable]{getNRPMTable()}},
+\code{\link[=makeTransposedTable]{makeTransposedTable()}},
+\code{\link[=removeLibraryFactors]{removeLibraryFactors()}},
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 }
 \concept{table-helpers}
 \keyword{internal}

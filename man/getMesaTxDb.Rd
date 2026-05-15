@@ -15,3 +15,8 @@ A TxDb object for the specified genome
 \description{
 Get TxDb for current or specified genome
 }
+\examples{
+if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
+    getMesaTxDb()
+}
+}

@@ -36,20 +36,22 @@ data(exampleTumourNormal, package = "mesa")
 
 # Convert results to long format and filter at custom FDR threshold
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  pivotDMRsLonger(FDRthres = 0.1)
+    calculateDMRs(
+        variable = "type",
+        contrasts = "LUAD_vs_NormalLung",
+        FDRthres = 0.1
+    ) \%>\%
+    pivotDMRsLonger(FDRthres = 0.1)
 
 }
 \seealso{
 \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}},
 \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
-Other DMR-helpers: 
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

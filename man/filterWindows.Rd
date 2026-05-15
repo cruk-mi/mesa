@@ -33,11 +33,11 @@ exampleTumourNormal \%>\% filterWindows(CpG_density > 10)
 
 # Combine multiple conditions
 exampleTumourNormal \%>\%
-  filterWindows(seqnames == "chr7", CpG_density > 5)
+    filterWindows(seqnames == "chr7", CpG_density > 5)
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
+\code{\link[qsea:getRegions]{qsea::getRegions()}},
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} (for filtering samples instead of regions),
 \code{\link[dplyr:filter]{dplyr::filter()}}
 }

@@ -22,7 +22,7 @@ Window IDs used. \strong{Default:} none.}
 \item{object}{\code{mesaUMAP}}
 }
 \value{
-A \linkS4class{mesaUMAP} object containing UMAP coordinates and window IDs.
+A \link[=mesaUMAP-class]{mesaUMAP} object containing UMAP coordinates and window IDs.
 }
 \description{
 Stores per-sample coordinates from a UMAP embedding computed over methylation
@@ -40,13 +40,15 @@ Window IDs used to compute the embedding.}
 }}
 
 \examples{
-pts <- data.frame(UMAP1 = c(0.1, -0.2, 0.0),
-                  UMAP2 = c(0.3,  0.1, -0.1))
+pts <- data.frame(
+    UMAP1 = c(0.1, -0.2, 0.0),
+    UMAP2 = c(0.3, 0.1, -0.1)
+)
 rownames(pts) <- paste0("S", 1:3)
-mu <- mesaUMAP(points = pts, windows = c("w1","w2","w3"))
+mu <- mesaUMAP(points = pts, windows = c("w1", "w2", "w3"))
 mu
 
 }
 \seealso{
-\linkS4class{mesaDimRed}
+\link[=mesaDimRed-class]{mesaDimRed}
 }

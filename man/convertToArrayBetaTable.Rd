@@ -38,22 +38,22 @@ data(exampleTumourNormal, package = "mesa")
 
 # Use the built-in keyword for 450k probes (GRCh38)
 exampleTumourNormal \%>\%
-  convertToArrayBetaTable(arrayDetails = "Infinium450k") \%>\%
-  head()
+    convertToArrayBetaTable(arrayDetails = "Infinium450k") \%>\%
+    head()
 
 # Supply an explicit GRanges of 450k probes (must have metadata column 'ID')
 exampleTumourNormal \%>\%
-  convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
-  head()
+    convertToArrayBetaTable(arrayDetails = mesa::hg38_450kArrayGR) \%>\%
+    head()
 
 }
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, dataset \code{mesa::hg38_450kArrayGR}
 
-Other window-helpers: 
-\code{\link{calculateFractionReadsInGRanges}()},
-\code{\link{downSample}()},
-\code{\link{subsetWindowsBySignal}()},
-\code{\link{subsetWindowsOverBackground}()}
+Other window-helpers:
+\code{\link[=calculateFractionReadsInGRanges]{calculateFractionReadsInGRanges()}},
+\code{\link[=downSample]{downSample()}},
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}},
+\code{\link[=subsetWindowsOverBackground]{subsetWindowsOverBackground()}}
 }
 \concept{window-helpers}

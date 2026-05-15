@@ -47,14 +47,14 @@ exampleTumourNormal \%>\% filter(tumour != "Normal")
 
 # Combine predicates: lung tumours only
 exampleTumourNormal \%>\%
-  filter(stringr::str_detect(sample_name, "Lung"), tumour != "Normal")
+    filter(stringr::str_detect(sample_name, "Lung"), tumour != "Normal")
 
 # If no rows match, returns empty qseaSet (with a message)
 exampleTumourNormal \%>\% filter(tissue == "Liver")
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to inspect metadata,
 \code{\link[=subsetQset]{subsetQset()}} for explicit sample subsetting,
 \code{\link[=selectQset]{selectQset()}} for column selection in the \code{sampleTable}.
 }
