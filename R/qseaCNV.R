@@ -81,6 +81,7 @@
 #' @family CNV
 #'
 #' @examples
+#' # Requires BAM files; see \dontrun{} block for a full usage example.
 #' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #' exampleTumourNormal %>%
@@ -257,7 +258,6 @@ Showing first affected regions:\n%s",
 #' @family CNV
 #'
 #' @examples
-#' \dontrun{
 #' # Minimal synthetic example: build a table and pipe into runHMMCopy()
 #' set.seed(1)
 #' n <- 2000L
@@ -272,12 +272,11 @@ Showing first affected regions:\n%s",
 #'     start = rep(seq(1, by = w, length.out = n / 2), 2),
 #'     end = start + w - 1L,
 #'     width = w, strand = "*",
-#'     gc = runif(n, 0.05, 0.95), #' wide spread => stable LOESS
-#'     map = runif(n, 0.60, 0.98), #' avoid extremes / exact 1.0
+#'     gc = runif(n, 0.05, 0.95),
+#'     map = runif(n, 0.60, 0.98),
 #'     sampleA = rpois(n, 500)
 #' ) %>%
 #'     runHMMCopy(colname = "sampleA", plotDir = NULL)
-#' }
 #'
 #' @export
 runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {

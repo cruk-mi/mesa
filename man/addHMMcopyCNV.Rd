@@ -95,6 +95,7 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 (see \code{BiocParallel::register()}).
 }
 \examples{
+# Requires BAM files; see \dontrun{} block for a full usage example.
 \dontrun{
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\%

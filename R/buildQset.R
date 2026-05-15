@@ -414,6 +414,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 #'
 #' @family coverage
 #' @examples
+#' # Requires BAM files; see \dontrun{} block for a full usage example.
 #' \dontrun{
 #' sample_table <- data.frame(
 #'     sample_name = "sample1",

@@ -39,10 +39,8 @@ combined by a weighted average using \code{total_fragments} from
 weighted means for rates).
 }
 \examples{
-\dontrun{
-data(exampleTumourNormal, package = "mesa")
+data(exampleTumourNormal)
 # Pool Tumour/Normal pairs by patient into a single sample per patient:
 # e.g., "Colon1_T","Colon1_N" -> "Colon1"
 poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
-}
 }
