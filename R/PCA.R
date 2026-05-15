@@ -5,7 +5,6 @@
 #' @describeIn getDimRed Principal component analysis of a qseaSet.
 #' @family dimred-helpers
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
@@ -21,24 +20,23 @@
 #'     getPCA(topVarNum = c(10, 100, 500, NA)) %>%
 #'     slot("res") %>%
 #'     names()
-#' }
 #' @export
 getPCA <- function(qseaSet,
-                    dataTable = NULL,
-                    regionsToOverlap = NULL,
-                    normMethod = "beta",
-                    minEnrichment = 3,
-                    useGroupMeans = FALSE,
-                    minDensity = 0,
-                    topVarNum = 1000,
-                    topVarSamples = NULL,
-                    center = TRUE,
-                    scale = FALSE,
-                    nPC = 5,
-                    returnDataTable = FALSE,
-                    verbose = TRUE) {
-
-    getDimRed(qseaSet = qseaSet,
+    dataTable = NULL,
+    regionsToOverlap = NULL,
+    normMethod = "beta",
+    minEnrichment = 3,
+    useGroupMeans = FALSE,
+    minDensity = 0,
+    topVarNum = 1000,
+    topVarSamples = NULL,
+    center = TRUE,
+    scale = FALSE,
+    nPC = 5,
+    returnDataTable = FALSE,
+    verbose = TRUE) {
+    getDimRed(
+        qseaSet = qseaSet,
         dataTable = dataTable,
         method = "PCA",
         regionsToOverlap = regionsToOverlap,
@@ -52,8 +50,8 @@ getPCA <- function(qseaSet,
         scale = scale,
         nPC = nPC,
         returnDataTable = returnDataTable,
-        verbose = verbose)
-
+        verbose = verbose
+    )
 }
 
 
@@ -64,7 +62,6 @@ getPCA <- function(qseaSet,
 #' @describeIn getDimRed Uniform manifold approximation and projection of a qseaSet.
 #' @family dimred-helpers
 #' @examples
-#' \donttest{
 #' # Quick demo on a small synthetic qseaSet
 #' qsea::getExampleQseaSet(repl = 20) %>%
 #'     getUMAP()
@@ -76,7 +73,6 @@ getPCA <- function(qseaSet,
 #' # Use top 500 most variable windows only
 #' qsea::getExampleQseaSet(repl = 20) %>%
 #'     getUMAP(topVarNum = 500)
-#' }
 #' @export
 getUMAP <- function(qseaSet,
                     dataTable = NULL,
@@ -90,8 +86,8 @@ getUMAP <- function(qseaSet,
                     returnDataTable = FALSE,
                     verbose = TRUE,
                     ...) {
-
-    getDimRed(qseaSet = qseaSet,
+    getDimRed(
+        qseaSet = qseaSet,
         dataTable = dataTable,
         method = "UMAP",
         regionsToOverlap = regionsToOverlap,
@@ -102,8 +98,8 @@ getUMAP <- function(qseaSet,
         topVarNum = topVarNum,
         topVarSamples = topVarSamples,
         returnDataTable = returnDataTable,
-        ...)
-
+        ...
+    )
 }
 
 
@@ -212,7 +208,6 @@ getUMAP <- function(qseaSet,
 #' @family dimred-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # PCA on default beta-normalised matrix, keep 3 PCs
@@ -233,31 +228,33 @@ getUMAP <- function(qseaSet,
 #'     getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) %>%
 #'     slot("res") %>%
 #'     names()
-#' }
 #' @export
 getDimRed <- function(qseaSet,
-                        dataTable = NULL,
-                        method = "PCA",
-                        regionsToOverlap = NULL,
-                        normMethod = "beta",
-                        minEnrichment = 3,
-                        useGroupMeans = FALSE,
-                        minDensity = 0,
-                        topVarNum = 1000,
-                        topVarSamples = NULL,
-                        center = TRUE,
-                        scale = FALSE,
-                        nPC = 5,
-                        returnDataTable = FALSE,
-                        verbose = TRUE,
-                        ...) {
-
+    dataTable = NULL,
+    method = "PCA",
+    regionsToOverlap = NULL,
+    normMethod = "beta",
+    minEnrichment = 3,
+    useGroupMeans = FALSE,
+    minDensity = 0,
+    topVarNum = 1000,
+    topVarSamples = NULL,
+    center = TRUE,
+    scale = FALSE,
+    nPC = 5,
+    returnDataTable = FALSE,
+    verbose = TRUE,
+    ...) {
     if (!("qseaSet" %in% class(qseaSet))) {
         stop("Please provide a qseaSet in the first position.")
     }
 
     if (qseaSet %>% qsea::getSampleNames() %>% length() <= 2) {
-        stop(glue::glue("Insufficient samples {qseaSet %>% qsea::getSampleNames() %>% length()} in provided qseaSet, must be at least 3."))
+        stop(glue::glue(
+            "Insufficient samples ",
+            "{qseaSet %>% qsea::getSampleNames() %>% length()}",
+            " in provided qseaSet, must be at least 3."
+        ))
     }
 
     if (useGroupMeans) {
@@ -271,54 +268,86 @@ getDimRed <- function(qseaSet,
 
         samples <- dataTable %>%
             tidyr::as_tibble() %>%
-            dplyr::select(-tidyselect::any_of(c("seqnames", "start", "end", "width", "strand", "CpG_density"))) %>%
+            dplyr::select(
+                -tidyselect::any_of(c(
+                    "seqnames", "start", "end", "width", "strand", "CpG_density"
+                ))
+            ) %>%
             colnames()
 
-        normMethodSuffixDetected <- stringr::str_detect(samples, glue::glue("_{normMethod}$"))
+        normMethodSuffixDetected <- stringr::str_detect(
+            samples, glue::glue("_{normMethod}$")
+        )
 
         if (all(normMethodSuffixDetected)) {
-            samples <- stringr::str_remove(samples, glue::glue("_{normMethod}$"))
-            dataTable <- removeNormMethodSuffix(dataTable %>% tidyr::as_tibble(),
-                normMethod) %>%
+            samples <- stringr::str_remove(
+                samples, glue::glue("_{normMethod}$")
+            )
+            dataTable <- removeNormMethodSuffix(
+                dataTable %>% tidyr::as_tibble(),
+                normMethod
+            ) %>%
                 asValidGranges()
         } else if (any(normMethodSuffixDetected)) {
-            stop(glue::glue("normMethod suffix '_{normMethod}' is present for some but not all of the {groupString} column names in dataTable."))
+            stop(glue::glue(
+                "normMethod suffix '_{normMethod}' is present for some",
+                " but not all of the {groupString} column names in dataTable."
+            ))
         }
 
         if (useGroupMeans) {
             if (!all(samples %in% names(qsea::getSampleGroups(qseaSet)))) {
-                stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
-                (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
+                stop(glue::glue(
+                    "At least one {groupString} name in dataTable does not",
+                    " have a matching {groupString} name in qseaSet.\n",
+                    "(If there is a normMethod suffix on the {groupString}",
+                    " column names in dataTable, check it matches the input",
+                    " normMethod argument: '_{normMethod}')"
+                ))
             }
         } else {
             if (!all(samples %in% qsea::getSampleNames(qseaSet))) {
-                stop(glue::glue("At least one {groupString} name in dataTable does not have a matching {groupString} name in qseaSet.
-                (If there is a normMethod suffix on the {groupString} column names in dataTable, check it matches the input normMethod argument: '_{normMethod}')"))
+                stop(glue::glue(
+                    "At least one {groupString} name in dataTable does not",
+                    " have a matching {groupString} name in qseaSet.\n",
+                    "(If there is a normMethod suffix on the {groupString}",
+                    " column names in dataTable, check it matches the input",
+                    " normMethod argument: '_{normMethod}')"
+                ))
             }
         }
 
-        if (length(plyranges::setdiff_ranges(dataTable, getWindows(qseaSet))) > 0) {
-            stop("At least one window in dataTable does not have a matching window in qseaSet.")
+        if (length(
+            plyranges::setdiff_ranges(dataTable, getWindows(qseaSet))
+        ) > 0) {
+            stop(paste0(
+                "At least one window in dataTable does not have",
+                " a matching window in qseaSet."
+            ))
         }
 
         testSamples <- samples[seq_len(min(5, length(samples)))]
         inputValues <- dataTable[seq_len(min(50, length(dataTable))), ]
-        testValues <- getDataTable(qseaSet %>%
-            filter(sample_name %in% testSamples) %>%
-            filterByOverlaps(inputValues),
-        normMethod,
-        useGroupMeans = useGroupMeans) %>%
+        testValues <- getDataTable(
+            qseaSet %>%
+                filter(sample_name %in% testSamples) %>%
+                filterByOverlaps(inputValues),
+            normMethod,
+            useGroupMeans = useGroupMeans
+        ) %>%
             dplyr::arrange(seqnames, start, end)
 
         if (!isTRUE(all.equal(testValues, inputValues %>%
             tidyr::as_tibble() %>%
             dplyr::select(tidyselect::all_of(colnames(testValues))) %>%
             dplyr::arrange(seqnames, start, end)))) {
-            warning("Newly-generated dataTable from qseaSet on a small subset of samples/windows does not match input dataTable.")
+            warning(
+                "Newly-generated dataTable from qseaSet on a small subset",
+                " of samples/windows does not match input dataTable."
+            )
         }
         initialNumWindows <- length(dataTable)
     } else {
-
         if (useGroupMeans) {
             samples <- names(qsea::getSampleGroups(qseaSet))
         } else {
@@ -329,32 +358,44 @@ getDimRed <- function(qseaSet,
 
     if (verbose) {
         message(glue::glue("------------------------------
-                        Initial number of windows = {initialNumWindows}."))
+Initial number of windows = {initialNumWindows}."))
     }
 
     if (!is.null(regionsToOverlap)) {
         regionsToOverlap <- regionsToOverlap %>%
             tibble::as_tibble() %>%
-            dplyr::select(tidyselect::any_of(c("seqnames", "start", "end", "CpG_density"))) %>% # keep only minimum columns necessary
+            dplyr::select(
+                tidyselect::any_of(
+                    c("seqnames", "start", "end", "CpG_density")
+                )
+            ) %>% # keep only minimum columns necessary
             asValidGranges()
 
         if (is.null(dataTable)) {
             qseaSet <- qseaSet %>%
                 filterByOverlaps(regionsToOverlap = regionsToOverlap)
 
-            numWindowsRemovedRegionOverlap <- initialNumWindows - length(getWindows(qseaSet))
+            numWindowsRemovedRegionOverlap <-
+                initialNumWindows - length(getWindows(qseaSet))
             if (verbose) {
-                message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(getRegions(qseaSet))} windows remaining."))
+                message(glue::glue(
+                    "Filtered out {numWindowsRemovedRegionOverlap} windows",
+                    " using regionsToOverlap:",
+                    " {length(getRegions(qseaSet))} windows remaining."
+                ))
             }
-
-
         } else {
             dataTable <- dataTable %>%
                 plyranges::filter_by_overlaps(y = regionsToOverlap)
 
-            numWindowsRemovedRegionOverlap <- initialNumWindows - length(dataTable)
+            numWindowsRemovedRegionOverlap <-
+                initialNumWindows - length(dataTable)
             if (verbose) {
-                message(glue::glue("Filtered out {numWindowsRemovedRegionOverlap} windows using regionsToOverlap: {length(dataTable)} windows remaining."))
+                message(glue::glue(
+                    "Filtered out {numWindowsRemovedRegionOverlap} windows",
+                    " using regionsToOverlap:",
+                    " {length(dataTable)} windows remaining."
+                ))
             }
         }
     } else {
@@ -362,41 +403,54 @@ getDimRed <- function(qseaSet,
     }
 
     if (is.null(dataTable)) {
-        if (verbose) { message("-----------") }
+        if (verbose) {
+            message("-----------")
+        }
         dataTable <- qseaSet %>%
             filterWindows(CpG_density >= minDensity) %>%
             getDataTable(normMethod = normMethod, useGroupMeans = useGroupMeans)
-        if (verbose) { message("-----------") }
+        if (verbose) {
+            message("-----------")
+        }
 
         if (minDensity > 0) {
-            numWindowsRemovedMinDensity <- length(getWindows(qseaSet)) - nrow(dataTable)
+            numWindowsRemovedMinDensity <-
+                length(getWindows(qseaSet)) - nrow(dataTable)
             if (verbose) {
-                message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
+                message(glue::glue(
+                    "Filtered out {numWindowsRemovedMinDensity} windows",
+                    " with CpG_density < {minDensity}:",
+                    " {nrow(dataTable)} windows remaining."
+                ))
             }
         } else {
             numWindowsRemovedMinDensity <- NULL
         }
-
     } else {
         currentNumWindows <- length(dataTable)
         dataTable <- dataTable %>%
             tidyr::as_tibble() %>%
-            dplyr::left_join(qseaSet %>%
-                getWindows() %>%
-                tidyr::as_tibble() %>%
-                dplyr::select(seqnames, start, end, CpG_density),
-            by = dplyr::join_by(seqnames, start, end, CpG_density)) %>%
+            dplyr::left_join(
+                qseaSet %>%
+                    getWindows() %>%
+                    tidyr::as_tibble() %>%
+                    dplyr::select(seqnames, start, end, CpG_density),
+                by = dplyr::join_by(seqnames, start, end, CpG_density)
+            ) %>%
             dplyr::filter(CpG_density >= minDensity)
 
         if (minDensity > 0) {
             numWindowsRemovedMinDensity <- currentNumWindows - nrow(dataTable)
             if (verbose) {
-                message(glue::glue("Filtered out {numWindowsRemovedMinDensity} windows with CpG_density < {minDensity}: {nrow(dataTable)} windows remaining."))
+                message(glue::glue(
+                    "Filtered out {numWindowsRemovedMinDensity} windows",
+                    " with CpG_density < {minDensity}:",
+                    " {nrow(dataTable)} windows remaining."
+                ))
             }
         } else {
             numWindowsRemovedMinDensity <- NULL
         }
-
     }
 
     currentNumWindows <- nrow(dataTable)
@@ -408,23 +462,33 @@ getDimRed <- function(qseaSet,
 
     if (numWindowsRemovedMissingVals > 0) {
         if (verbose) {
-            message(glue::glue("Filtered out {numWindowsRemovedMissingVals} windows with at least one missing value: {nrow(dataTable)} windows remaining.
-                        ------------------------------"))
+            message(glue::glue(
+                "Filtered out {numWindowsRemovedMissingVals} windows with",
+                " at least one missing value:",
+                " {nrow(dataTable)} windows remaining.\n",
+                "------------------------------"
+            ))
         }
     } else {
         if (verbose) {
             message(glue::glue("No windows have missing values.
-            ------------------------------"))
+------------------------------"))
         }
     }
 
     if (nrow(dataTable) <= 2) {
-        stop(glue::glue("Insufficient windows {nrow(dataTable)} remaining after filtering! Have you filtered for poor quality samples?"))
+        stop(glue::glue(
+            "Insufficient windows {nrow(dataTable)} remaining after filtering!",
+            " Have you filtered for poor quality samples?"
+        ))
     }
 
     if (is.null(topVarNum)) {
         topVarNum <- NA
-    } else if (!(length(topVarNum) == 1 && is.na(topVarNum)) & !is.vector(topVarNum, mode = "numeric")) {
+    } else if (
+        !(length(topVarNum) == 1 && is.na(topVarNum)) &
+        !is.vector(topVarNum, mode = "numeric")
+    ) {
         stop("topVarNum should be a numeric vector (or NULL")
     }
 
@@ -432,14 +496,17 @@ getDimRed <- function(qseaSet,
         topVarSamples <- list(topVarSamples)
     }
 
-    if (length(topVarNum) > 1 && !(length(topVarSamples) %in% c(1, length(topVarNum)))) {
-        stop("If topVarSamples is a list and length(topVarNum) > 1, topVarSamples should be the same length as topVarNum.")
+    if (length(topVarNum) > 1 &&
+        !(length(topVarSamples) %in% c(1, length(topVarNum)))) {
+        stop(paste0(
+            "If topVarSamples is a list and length(topVarNum) > 1,",
+            " topVarSamples should be the same length as topVarNum."
+        ))
     }
 
 
     # replace NA with NULL
     topVarSamples <- purrr::map(topVarSamples, function(tVS) {
-
         if (length(tVS) == 1 && is.na(tVS)) {
             tVS <- NULL
         }
@@ -450,55 +517,92 @@ getDimRed <- function(qseaSet,
     topVarSamplesInput <- topVarSamples
 
     topVarSamples <- purrr::map(topVarSamples, function(tVS) {
-
         if (!is.null(tVS)) {
             if (!is.vector(tVS, mode = "character")) {
-                stop(glue::glue("topVarSamples should be NULL, a character vector of {groupString} names or a regular expression (or a list of these)."))
-
-            } else if (length(tVS) > 1) { # character vector of sample (group) names
+                stop(glue::glue(
+                    "topVarSamples should be NULL, a character vector",
+                    " of {groupString} names or a regular expression",
+                    " (or a list of these)."
+                ))
+            } else if (length(tVS) > 1) { # char vector of sample/group names
                 notInSamples <- setdiff(tVS, samples)
                 if (length(notInSamples) > 0) {
-                    stop(glue::glue("topVarSamples contains {groupString} names that are not in the qseaSet and/or dataTable:
-                        {paste0(notInSamples, collapse = ', ')}."))
+                    stop(glue::glue(
+                        "topVarSamples contains {groupString} names that are",
+                        " not in the qseaSet and/or dataTable:\n",
+                        "                        ",
+                        "{paste0(notInSamples, collapse = ', ')}."
+                    ))
                 }
-
             } else { # regular expression to match
                 tVS <- stringr::str_subset(samples, tVS)
-
             }
-
         } else {
             tVS <- samples
-
         }
 
         return(tVS)
-
     })
 
-    topVar <- tibble::tibble(topVarNum = topVarNum, topVarSamples = topVarSamples, topVarNumInput = topVarNum, topVarSamplesInput = topVarSamplesInput) %>%
-        dplyr::mutate(topVarNum = ifelse(topVarNum >= nrow(dataTable), NA, topVarNum),
+    topVar <- tibble::tibble(
+        topVarNum = topVarNum,
+        topVarSamples = topVarSamples,
+        topVarNumInput = topVarNum,
+        topVarSamplesInput = topVarSamplesInput
+    ) %>%
+        dplyr::mutate(
+            topVarNum = ifelse(topVarNum >= nrow(dataTable), NA, topVarNum),
             topVarSamples = ifelse(is.na(topVarNum), list(NULL), topVarSamples),
-            inputChanged = !purrr::map2_lgl(topVarNum, topVarNumInput, identical) |
-                !purrr::map2_lgl(topVarSamples, topVarSamplesInput, identical))
+            inputChanged = !purrr::map2_lgl(
+                topVarNum, topVarNumInput, identical
+            ) |
+                !purrr::map2_lgl(topVarSamples, topVarSamplesInput, identical)
+        )
 
     if (any(topVar$topVarNumInput > nrow(dataTable), na.rm = TRUE)) {
-        message(glue::glue("The following topVarNum values are larger than the number of remaining windows (= {nrow(dataTable)}): {paste0(dplyr::filter(topVar, topVarNumInput > nrow(dataTable)) %>% pull(topVarNumInput) %>% unique(), collapse = ', ')}"))
+        message(glue::glue(
+            "The following topVarNum values are larger than the number",
+            " of remaining windows (= {nrow(dataTable)}):",
+            " {paste0(",
+            "     dplyr::filter(topVar, topVarNumInput > nrow(dataTable))",
+            "     %>% pull(topVarNumInput) %>% unique(),",
+            "     collapse = ', '",
+            " )}"
+        ))
 
-        if (any(is.na(topVar$topVarNumInput) | topVar$topVarNumInput == nrow(dataTable))) {
-            message(glue::glue("These values are not used; {method} is already being done with all remaining windows."))
+        if (any(is.na(topVar$topVarNumInput) |
+            topVar$topVarNumInput == nrow(dataTable))) {
+            message(glue::glue(
+                "These values are not used; {method} is already being",
+                " done with all remaining windows."
+            ))
         } else {
-            message(glue::glue("These values are not used; {method} will be done with all remaining windows instead."))
+            message(glue::glue(
+                "These values are not used; {method} will be done",
+                " with all remaining windows instead."
+            ))
         }
     }
 
     topVar <- topVar %>%
         dplyr::distinct(topVarNum, topVarSamples, .keep_all = TRUE) %>%
         dplyr::group_by(topVarSamples) %>%
-        dplyr::mutate(windowSdName = ifelse(!is.na(topVarNum), glue::glue("windowSd{dplyr::cur_group_id()}"), NA), .before = 1) %>%
+        dplyr::mutate(
+            windowSdName = ifelse(
+                !is.na(topVarNum),
+                glue::glue("windowSd{dplyr::cur_group_id()}"),
+                NA
+            ),
+            .before = 1
+        ) %>%
         dplyr::ungroup() %>%
         dplyr::arrange(windowSdName, topVarNum) %>%
-        dplyr::mutate(resName = glue::glue("{method %>% stringr::str_to_lower()}{dplyr::row_number()}"), .before = 1)
+        dplyr::mutate(
+            resName = glue::glue(
+                "{method %>% stringr::str_to_lower()}{dplyr::row_number()}"
+            ),
+            .before = 1
+        )
 
     rowSds <- function(x) {
         sqrt(rowSums((x - rowMeans(x))^2) / (ncol(x) - 1))
@@ -509,50 +613,67 @@ getDimRed <- function(qseaSet,
             tidyr::drop_na(windowSdName) %>%
             dplyr::select(topVarSamples, windowSdName) %>%
             dplyr::distinct() %>%
-            dplyr::mutate(topVarSamples = purrr::set_names(topVarSamples, windowSdName)) %>%
+            dplyr::mutate(
+                topVarSamples = purrr::set_names(topVarSamples, windowSdName)
+            ) %>%
             dplyr::pull(topVarSamples) %>%
             purrr::imap(function(tVS, nm) {
-
                 if (length(setdiff(samples, tVS)) == 0) {
                     if (verbose) {
-                        message(glue::glue("Calculating standard deviation for each window across all {length(samples)} {groupString}s:
-                            {paste0(tVS, collapse = ', ')}.
-                            -> column name {nm}."))
+                        message(glue::glue(
+                            "Calculating standard deviation for each window",
+                            " across all {length(samples)} {groupString}s:\n",
+                            "{paste0(tVS, collapse = ', ')}.\n",
+                            "-> column name {nm}."
+                        ))
                     }
                 } else {
                     if (verbose) {
-                        message(glue::glue("Calculating standard deviation for each window across {length(tVS)} of {length(samples)} {groupString}s:
-                            {paste0(tVS, collapse = ', ')}.
-                            -> column name {nm}."))
+                        message(glue::glue(
+                            "Calculating standard deviation for each window",
+                            " across {length(tVS)} of",
+                            " {length(samples)} {groupString}s:\n",
+                            "{paste0(tVS, collapse = ', ')}.\n",
+                            "-> column name {nm}."
+                        ))
                     }
                 }
 
                 if (length(tVS) <= 2) {
-                    stop(glue::glue("Standard deviation calculated on less than 3 {groupString} names. Insufficent number of {groupString}s to calculate variance."))
+                    stop(glue::glue(
+                        "Standard deviation calculated on less than 3",
+                        " {groupString} names. Insufficent number of",
+                        " {groupString}s to calculate variance."
+                    ))
                 }
 
                 dataTable <- dataTable %>%
-                    dplyr::mutate({{ nm }} := dplyr::select(., tidyr::all_of(tVS)) %>%
+                    dplyr::mutate({{ nm }} := dplyr::select(
+                        ., tidyr::all_of(tVS)
+                    ) %>%
                         rowSds()) %>%
                     dplyr::select(seqnames, start, end, tidyr::all_of(nm))
-
             }) %>%
             purrr::reduce(dplyr::left_join) %>%
             dplyr::left_join(dataTable, .,
-                by = dplyr::join_by(seqnames, start, end))
+                by = dplyr::join_by(seqnames, start, end)
+            )
     }
 
     res <- topVar %>%
         dplyr::group_by(windowSdName) %>%
         dplyr::group_map(.keep = TRUE, .f = function(sdGp, sdName) {
-
             if (!is.na(sdName$windowSdName)) {
                 dataTable <- dataTable %>%
-                    dplyr::arrange(dplyr::desc(!!dplyr::sym(sdName$windowSdName)))
+                    dplyr::arrange(
+                        dplyr::desc(!!dplyr::sym(sdName$windowSdName))
+                    )
             }
 
-            purrr::pmap(sdGp, function(resName, windowSdName, topVarNum, topVarSamples, topVarNumInput, topVarSamplesInput, inputChanged) {
-
+            purrr::pmap(sdGp, function(
+                resName, windowSdName, topVarNum, topVarSamples,
+                topVarNumInput, topVarSamplesInput, inputChanged
+            ) {
                 if (!is.na(windowSdName)) {
                     th <- dataTable %>%
                         dplyr::pull({{ windowSdName }}) %>%
@@ -562,26 +683,35 @@ getDimRed <- function(qseaSet,
                         dplyr::filter(!!dplyr::sym(windowSdName) >= th)
 
                     if (length(topVarSamples) == length(samples)) {
-
                         if (verbose) {
-                            message(glue::glue("------------------------------
-                                Filtering windows based on standard deviation across all {length(topVarSamples)} {groupString}s ({windowSdName}).
-                                Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
+                            message(glue::glue(
+                            "------------------------------\n",
+                            "Filtering windows based on standard deviation\n",
+                            "across all {length(topVarSamples)}",
+                            " {groupString}s",
+                            " ({windowSdName}).\n",
+                            "Standard deviation threshold =",
+                            " {format(th, digits = 3)}",
+                            " resulting in {nrow(dataTable)} windows."
+                        ))
                         }
                     } else {
-
                         if (verbose) {
-                            message(glue::glue("------------------------------
-                                Filtering windows based on standard deviation across {length(topVarSamples)} {groupString}s ({windowSdName}).
-                                Standard deviation threshold = {format(th, digits = 3)} resulting in {nrow(dataTable)} windows."))
+                            message(glue::glue(
+                            "------------------------------\n",
+                            "Filtering windows based on standard deviation",
+                            " across {length(topVarSamples)} {groupString}s",
+                            " ({windowSdName}).\n",
+                            "Standard deviation threshold =",
+                            " {format(th, digits = 3)}",
+                            " resulting in {nrow(dataTable)} windows."
+                        ))
                         }
                     }
-
                 } else {
-
                     if (verbose) {
                         message(glue::glue("------------------------------
-                                No filtering of windows based on window standard deviation."))
+No filtering of windows based on window standard deviation."))
                     }
                     th <- NA
                 }
@@ -592,8 +722,11 @@ getDimRed <- function(qseaSet,
                     dplyr::select(tidyr::all_of(samples))
 
                 if (verbose) {
-                    message(glue::glue("Performing {method} with {ncol(dataTable)} {groupString}s and {nrow(dataTable)} windows
-                            -> {resName}."))
+                    message(glue::glue(
+                        "Performing {method} with {ncol(dataTable)}",
+                        " {groupString}s and {nrow(dataTable)} windows\n",
+                        "-> {resName}."
+                    ))
                 }
 
                 dataTable <- dataTable %>%
@@ -612,33 +745,42 @@ getDimRed <- function(qseaSet,
                 }
 
                 if (method == "UMAP") {
-
                     uwotObj <- dataTable %>%
-                        uwot::umap(n_components = 3,
-                            ...) %>%
+                        uwot::umap(
+                            n_components = 3,
+                            ...
+                        ) %>%
                         as.data.frame()
 
                     colnames(uwotObj) <- paste0("UMAP", seq_len(ncol(uwotObj)))
 
-                    return(list(resObj = list(x = uwotObj, windows = colnames(dataTable)), th = th))
-
+                    return(list(
+                        resObj = list(
+                            x = uwotObj,
+                            windows = colnames(dataTable)
+                        ),
+                        th = th
+                    ))
                 } else if (method == "PCA") {
-
                     prcompObj <- dataTable %>%
-                        stats::prcomp(center = center, scale. = scale, rank. = nPC)
+                        stats::prcomp(
+                            center = center, scale. = scale, rank. = nPC
+                        )
 
                     return(list(resObj = prcompObj, th = th))
-
                 } else {
-                    stop(glue::glue("Method {method} not known! Options are PCA or UMAP."))
+                    stop(glue::glue(
+                        "Method {method} not known! Options are PCA or UMAP."
+                    ))
                 }
-
             }) %>%
                 purrr::set_names(sdGp$resName)
         }) %>%
         purrr::list_flatten()
 
-    if (verbose) { message("------------------------------") }
+    if (verbose) {
+        message("------------------------------")
+    }
 
     th <- purrr::map(res, "th") %>%
         unlist()
@@ -651,14 +793,16 @@ getDimRed <- function(qseaSet,
         windows <- purrr::map(res, ~ rownames(.x$rotation))
     }
 
-    paramList <- list(method = method,
+    paramList <- list(
+        method = method,
         regionsToOverlap = regionsToOverlap,
         normMethod = normMethod,
         minEnrichment = minEnrichment,
         useGroupMeans = useGroupMeans,
         minDensity = minDensity,
         topVar = topVar,
-        windowSdThreshold = th)
+        windowSdThreshold = th
+    )
 
     if (method == "UMAP") {
         paramList <- c(paramList, ...)
@@ -668,36 +812,40 @@ getDimRed <- function(qseaSet,
                 points = x$x,
                 windows = y
             )
-        }
-        ) %>%
+        }) %>%
             rlang::set_names(nm = names(res))
-
     } else if (method == "PCA") {
-        paramList <- c(paramList, list(center = center,
+        paramList <- c(paramList, list(
+            center = center,
             scale = scale,
-            nPC = nPC))
+            nPC = nPC
+        ))
 
         elements <- purrr::map2(res, windows, function(x, y) {
             methods::new("mesaPCA",
                 prcomp = x,
                 windows = y
             )
-        }
-        ) %>%
+        }) %>%
             rlang::set_names(nm = names(res))
-
     }
 
-    windowFilteringList <- list(initial = initialNumWindows,
+    windowFilteringList <- list(
+        initial = initialNumWindows,
         notInRegionsToOverlap = numWindowsRemovedRegionOverlap,
         belowMinDensity = numWindowsRemovedMinDensity,
-        containMissingVals = numWindowsRemovedMissingVals)
+        containMissingVals = numWindowsRemovedMissingVals
+    )
 
     out <- methods::new("mesaDimRed",
         samples = samples,
         sampleTable = qseaSet %>% qsea::getSampleTable(),
         params = c(paramList, windowFilteringList),
-        dataTable = if (returnDataTable) { dataTable } else { data.frame() },
+        dataTable = if (returnDataTable) {
+            dataTable
+        } else {
+            data.frame()
+        },
         res = elements
     )
 
@@ -705,65 +853,114 @@ getDimRed <- function(qseaSet,
 }
 
 
-getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType = NULL, NAshape = NULL) {
-
+getShapeScale <- function(plotData, shape, shapePalette = NULL,
+    colourScaleType = NULL, NAshape = NULL) {
     if (shape == "NULLshape") {
-        return(ggplot2::scale_shape_manual(values = shapePalette, guide = "none"))
+        return(
+            ggplot2::scale_shape_manual(values = shapePalette, guide = "none")
+        )
     }
 
     shapeVals <- dplyr::pull(plotData, {{ shape }})
-    nShape <- shapeVals %>% setdiff(NA) %>% unique() %>% length()
+    nShape <- shapeVals %>%
+        setdiff(NA) %>%
+        unique() %>%
+        length()
     hasNA <- any(is.na(shapeVals))
 
     if (is.null(shapePalette)) {
         if (!is.null(colourScaleType) && colourScaleType == "diverging") {
-            shapePalette <- if (hasNA) c(21, 24, 22, 23) else c(21, 24, 22, 23, 25)
-            if (nShape > length(shapePalette)) {
-                stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; the maximum allowed by default when using a divergent colour scale is {length(shapePalette)} unique values."))
+            shapePalette <- if (hasNA) {
+                c(21, 24, 22, 23)
+            } else {
+                c(21, 24, 22, 23, 25)
             }
-
+            if (nShape > length(shapePalette)) {
+                stop(glue::glue(
+                    "`shape` variable '{shape}' has {nShape} unique values;",
+                    " the maximum allowed by default when using a divergent",
+                    " colour scale is {length(shapePalette)} unique values."
+                ))
+            }
         } else if (nShape <= 4 && hasNA) {
             shapePalette <- c(21, 24, 22, 23)
         } else if (nShape <= 5 && !hasNA) {
             shapePalette <- c(21, 24, 22, 23, 25)
         } else if (hasNA) {
-            shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12)
+            shapePalette <- c(
+                16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12
+            )
         } else {
-            shapePalette <- c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12, 7)
+            shapePalette <- c(
+                16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12, 7
+            )
         }
         if (nShape > length(shapePalette)) {
-            stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; {if (hasNA) 'with' else 'without'} NAs present, the maximum allowed by default is {length(shapePalette)}."))
+            stop(glue::glue(
+                "`shape` variable '{shape}' has {nShape} unique values;",
+                " {if (hasNA) 'with' else 'without'} NAs present,",
+                " the maximum allowed by default is {length(shapePalette)}."
+            ))
         }
     } else if (is.numeric(shapePalette)) {
         if (nShape > length(shapePalette)) {
-            stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; `shapePalette` only has {length(shapePalette)} values."))
+            stop(glue::glue(
+                "`shape` variable '{shape}' has {nShape} unique values;",
+                " `shapePalette` only has {length(shapePalette)} values."
+            ))
         }
         if (any(0:20 %in% shapePalette) & any(21:25 %in% shapePalette)) {
-            stop("'shapePalette' must contain either 0-20 (unfilled) OR 21-25 (filled), not both.")
+            stop(
+                "'shapePalette' must contain either 0-20 (unfilled) OR",
+                " 21-25 (filled), not both."
+            )
         }
-
     } else if (is.character(shapePalette)) {
         shapesInput <- shapePalette
         if (shapePalette == "filled+border") {
-            shapePalette <- if (hasNA) c(21, 24, 22, 23) else c(21, 24, 22, 23, 25)
+            shapePalette <- if (hasNA) {
+                c(21, 24, 22, 23)
+            } else {
+                c(21, 24, 22, 23, 25)
+            }
         } else {
-            shapePalette <- switch(
-                shapePalette,
-                "line-first"   = c(1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18),
-                "filled-first" = c(16, 17, 15, 18, 1, 8, 2, 0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12),
-                "mixture"      = c(16, 4, 0, 17, 8, 9, 15, 13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12),
-                stop("`shapePalette` must be 'line-first', 'filled-first', 'mixture', 'filled+border', numeric, or NULL.")
+            shapePalette <- switch(shapePalette,
+                "line-first"   = c(
+                    1, 8, 2, 0, 9, 3, 13,
+                    6, 14, 4, 5, 10, 11, 12, 16, 17, 15, 18
+                ),
+                "filled-first" = c(
+                    16, 17, 15, 18, 1, 8, 2,
+                    0, 9, 3, 13, 6, 14, 4, 5, 10, 11, 12
+                ),
+                "mixture"      = c(
+                    16, 4, 0, 17, 8, 9, 15,
+                    13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12
+                ),
+                stop(paste0(
+                    "`shapePalette` must be 'line-first', 'filled-first',",
+                    " 'mixture', 'filled+border', numeric, or NULL."
+                ))
             )
             if (colourScaleType == "diverging") {
-                warning(glue::glue("Using '{shapesInput}' palette with a divergent colour scale may reduce visibility near zero."))
+                warning(glue::glue(
+                    "Using '{shapesInput}' palette with a divergent colour",
+                    " scale may reduce visibility near zero."
+                ))
             }
         }
         if (nShape > length(shapePalette)) {
-            stop(glue::glue("`shape` variable '{shape}' has {nShape} unique values; only {length(shapePalette)} shapes available with `shapePalette` = '{shapesInput}'."))
+            stop(glue::glue(
+                "`shape` variable '{shape}' has {nShape} unique values;",
+                " only {length(shapePalette)} shapes available with",
+                " `shapePalette` = '{shapesInput}'."
+            ))
         }
-
     } else {
-        stop("`shapePalette` must be 'line-first', 'filled-first', 'mixture', 'filled+border', numeric, or NULL.")
+        stop(paste0(
+            "`shapePalette` must be 'line-first', 'filled-first',",
+            " 'mixture', 'filled+border', numeric, or NULL."
+        ))
     }
 
     if (hasNA) {
@@ -774,55 +971,69 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
         if (is.null(NAshape)) {
             if (defaultInUse) {
                 stop(glue::glue(
-                    "The default NAshape = {defaultNA} is already in use within the shapePalette. ",
-                    "Specify a different NAshape or remove the default shape from the shapePalette."
+                    "The default NAshape = {defaultNA} is already in use",
+                    " within the shapePalette. Specify a different NAshape",
+                    " or remove the default shape from the shapePalette."
                 ))
             }
             NAshape <- defaultNA
-
-        } else if ((!usingFilled && NAshape %in% 21:25) || (usingFilled && NAshape %in% 0:20)) {
+        } else if (
+            (!usingFilled && NAshape %in% 21:25) ||
+            (usingFilled && NAshape %in% 0:20)
+        ) {
             warning(glue::glue(
-                "'shapePalette' is using {if (usingFilled) 'filled' else 'unfilled'} shapes, ",
-                "but specified NAshape = {NAshape} is from the {if (!usingFilled) 'filled' else 'unfilled'} set. ",
-                "Resetting NAshape to default = {defaultNA} for {if (usingFilled) 'filled' else 'unfilled'} shapes."
+                "'shapePalette' is using",
+                " {if (usingFilled) 'filled' else 'unfilled'} shapes, ",
+                "but specified NAshape = {NAshape} is from the",
+                " {if (!usingFilled) 'filled' else 'unfilled'} set. ",
+                "Resetting NAshape to default = {defaultNA}",
+                " for {if (usingFilled) 'filled' else 'unfilled'} shapes."
             ))
             if (defaultInUse) {
-                stop(glue::glue("The default NAshape = {defaultNA} is also already in use within the shapePalette."))
+                stop(glue::glue(
+                    "The default NAshape = {defaultNA} is also already",
+                    " in use within the shapePalette."
+                ))
             }
             NAshape <- defaultNA
-
         } else if (NAshape %in% shapePalette[seq_len(nShape)]) {
             paletteName <- if (exists("shapesInput")) shapesInput else NULL
 
-            if (!is.null(paletteName) && paletteName %in% c("line-first", "filled-first")) {
+            if (!is.null(paletteName) &&
+                paletteName %in% c("line-first", "filled-first")) {
                 if (defaultInUse) {
                     stop(glue::glue(
-                        "Both the specified NAshape = {NAshape} and the default NAshape = {defaultNA} ",
-                        "are already in use within the shapePalette."
+                        "Both the specified NAshape = {NAshape} and the",
+                        " default NAshape = {defaultNA} are already in use",
+                        " within the shapePalette."
                     ))
                 }
                 warning(glue::glue(
-                    "Specified NAshape = {NAshape} is already in use in the shapePalette. ",
-                    "Because palette = '{paletteName}' has a fixed order, NAshape has been reset to default = {defaultNA}."
+                    "Specified NAshape = {NAshape} is already in use",
+                    " in the shapePalette. Because palette =",
+                    " '{paletteName}' has a fixed order, NAshape has been",
+                    " reset to default = {defaultNA}."
                 ))
                 NAshape <- defaultNA
             } else {
                 if (defaultInUse) {
                     stop(glue::glue(
-                        "Both the specified NAshape = {NAshape} and the default NAshape = {defaultNA} ",
-                        "are already in use within the shapePalette."
+                        "Both the specified NAshape = {NAshape} and the",
+                        " default NAshape = {defaultNA} are already in use",
+                        " within the shapePalette."
                     ))
                 }
                 warning(glue::glue(
-                    "Specified NAshape = {NAshape} is already in use in the shapePalette. ",
-                    "Replacing that entry in the shapePalette with the default NAshape = {defaultNA} at the end, ",
-                    "and keeping NAshape = {NAshape} for missing values."
+                    "Specified NAshape = {NAshape} is already in use",
+                    " in the shapePalette. Replacing that entry in the",
+                    " shapePalette with the default NAshape = {defaultNA}",
+                    " at the end, and keeping NAshape = {NAshape}",
+                    " for missing values."
                 ))
                 clash_idx <- match(NAshape, shapePalette)
                 shapePalette <- c(shapePalette[-clash_idx], defaultNA)
             }
         }
-
     } else {
         NAshape <- NA
     }
@@ -833,7 +1044,6 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL, colourScaleType 
 
 
 getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
-
     if (any(my_scale_shape$palette(1) %in% 21:25)) {
         filledShapes <- TRUE
     } else {
@@ -841,19 +1051,28 @@ getGeomPoint <- function(cV, shape, my_scale_shape, pointSize, alpha) {
     }
 
     if (filledShapes) {
-        my_geom_point <- ggplot2::geom_point(ggplot2::aes(fill = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
-            colour = "black", size = pointSize, alpha = alpha)
+        my_geom_point <- ggplot2::geom_point(
+            ggplot2::aes(
+                fill = !!rlang::sym(cV),
+                shape = !!rlang::sym(shape)
+            ),
+            colour = "black", size = pointSize, alpha = alpha
+        )
     } else {
-        my_geom_point <- ggplot2::geom_point(ggplot2::aes(colour = !!rlang::sym(cV), shape = !!rlang::sym(shape)),
-            size = pointSize, alpha = alpha)
+        my_geom_point <- ggplot2::geom_point(
+            ggplot2::aes(
+                colour = !!rlang::sym(cV),
+                shape = !!rlang::sym(shape)
+            ),
+            size = pointSize, alpha = alpha
+        )
     }
 
     return(my_geom_point)
-
 }
 
-getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour, symDivColourScale) {
-
+getColourScale <- function(plotData, cV, cols, colourScaleType,
+    my_scale_shape, NAcolour, symDivColourScale) {
     if (any(my_scale_shape$palette(1) %in% 21:25)) {
         filledShapes <- TRUE
     } else {
@@ -882,38 +1101,58 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
                 }
             } else if (colourScaleType == "sequential_non_pos") {
                 my_scale_colour <- if (filledShapes) {
-                    ggplot2::scale_fill_viridis_c(direction = -1, na.value = NAcolour)
+                    ggplot2::scale_fill_viridis_c(
+                        direction = -1, na.value = NAcolour
+                    )
                 } else {
-                    ggplot2::scale_colour_viridis_c(direction = -1, na.value = NAcolour)
+                    ggplot2::scale_colour_viridis_c(
+                        direction = -1, na.value = NAcolour
+                    )
                 }
             } else if (colourScaleType == "diverging") {
                 cols <- RColorBrewer::brewer.pal(9, "RdBu") %>% rev()
                 cols[5] <- "grey90"
             }
-
         } else {
             if (colourScaleType == "qualitative") {
-                nCol <- plotData %>% pull(cV) %>% setdiff(NA) %>% unique() %>% length()
+                nCol <- plotData %>%
+                    pull(cV) %>%
+                    setdiff(NA) %>%
+                    unique() %>%
+                    length()
                 if (nCol > length(cols)) {
-                    stop(glue::glue("`colour` variable '{cV}' has {nCol} unique values; the `colourPalette` argument only has {length(cols)} unique values."))
+                    stop(glue::glue(
+                        "`colour` variable '{cV}' has {nCol} unique values;",
+                        " the `colourPalette` argument only has",
+                        " {length(cols)} unique values."
+                    ))
                 }
                 my_scale_colour <- if (filledShapes) {
-                    ggplot2::scale_fill_manual(values = cols, na.value = NAcolour)
+                    ggplot2::scale_fill_manual(
+                        values = cols, na.value = NAcolour
+                    )
                 } else {
-                    ggplot2::scale_colour_manual(values = cols, na.value = NAcolour)
+                    ggplot2::scale_colour_manual(
+                        values = cols, na.value = NAcolour
+                    )
                 }
-
-            } else if (colourScaleType == "sequential_non_neg" | colourScaleType == "sequential_non_pos") {
+            } else if (
+                colourScaleType == "sequential_non_neg" |
+                colourScaleType == "sequential_non_pos"
+            ) {
                 my_scale_colour <- if (filledShapes) {
-                    ggplot2::scale_fill_gradientn(colours = cols, na.value = NAcolour)
+                    ggplot2::scale_fill_gradientn(
+                        colours = cols, na.value = NAcolour
+                    )
                 } else {
-                    ggplot2::scale_colour_gradientn(colours = cols, na.value = NAcolour)
+                    ggplot2::scale_colour_gradientn(
+                        colours = cols, na.value = NAcolour
+                    )
                 }
             }
         }
 
         if (colourScaleType == "diverging") {
-
             cVdat <- plotData[[cV]]
 
             if (symDivColourScale) {
@@ -923,35 +1162,49 @@ getColourScale <- function(plotData, cV, cols, colourScaleType, my_scale_shape, 
                 if (abs(minCV) < maxCV) {
                     # minimum (negative) value is smaller in magnitude than the largest (positive) value; colour scale needs to be extended beyond the minimum value
                     vals <- scales::rescale(c(-maxCV, 0, maxCV),
-                        to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1))
+                        to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1)
+                    )
                 } else {
                     # minimum (negative) value is larger in magnitude than the largest (positive) value; colour scale needs to be extended beyond the maximum value
                     vals <- scales::rescale(c(minCV, 0, -minCV),
-                        to = c(0, 1 + (absMinCV - maxCV) / (absMinCV + maxCV)))
+                        to = c(0, 1 + (absMinCV - maxCV) / (absMinCV + maxCV))
+                    )
                 }
 
                 my_scale_colour <- if (filledShapes) {
-                    ggplot2::scale_fill_gradientn(colours = cols, values = vals, na.value = NAcolour)
+                    ggplot2::scale_fill_gradientn(
+                        colours = cols, values = vals, na.value = NAcolour
+                    )
                 } else {
-                    ggplot2::scale_colour_gradientn(colours = cols, values = vals, na.value = NAcolour)
+                    ggplot2::scale_colour_gradientn(
+                        colours = cols, values = vals, na.value = NAcolour
+                    )
                 }
-
             } else {
                 my_scale_colour <- if (filledShapes) {
-                    ggplot2::scale_fill_gradientn(colours = cols,
-                        values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
-                        na.value = NAcolour)
+                    ggplot2::scale_fill_gradientn(
+                        colours = cols,
+                        values = scales::rescale(c(
+                            min(cVdat, na.rm = TRUE), 0,
+                            max(cVdat, na.rm = TRUE)
+                        )),
+                        na.value = NAcolour
+                    )
                 } else {
-                    ggplot2::scale_colour_gradientn(colours = cols,
-                        values = scales::rescale(c(min(cVdat, na.rm = TRUE), 0, max(cVdat, na.rm = TRUE))),
-                        na.value = NAcolour)
+                    ggplot2::scale_colour_gradientn(
+                        colours = cols,
+                        values = scales::rescale(c(
+                            min(cVdat, na.rm = TRUE), 0,
+                            max(cVdat, na.rm = TRUE)
+                        )),
+                        na.value = NAcolour
+                    )
                 }
             }
         }
     }
 
     return(my_scale_colour)
-
 }
 
 getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
@@ -960,7 +1213,11 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
     if (filledShapes &&
         !(cV %in% c("NULLcol", shape)) &&
         colourScaleType == "qualitative") {
-        my_legend_params <- ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 21, col = "black")))
+        my_legend_params <- ggplot2::guides(
+            fill = ggplot2::guide_legend(
+                override.aes = list(shape = 21, col = "black")
+            )
+        )
     } else {
         my_legend_params <- NULL
     }
@@ -1066,32 +1323,36 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #' # Colour by sample group; show names
 #' exampleTumourNormal %>%
 #'     getPCA() %>%
-#'     plotPCA(colour = "group",
-#'         showSampleNames = TRUE)
+#'     plotPCA(
+#'         colour = "group",
+#'         showSampleNames = TRUE
+#'     )
 #'
 #' # Plot PC1 vs PC3; shape by tissue
 #' exampleTumourNormal %>%
 #'     getPCA() %>%
-#'     plotPCA(components = list(c(1, 3)),
+#'     plotPCA(
+#'         components = list(c(1, 3)),
 #'         colour = "group",
-#'         shape = "tissue")
+#'         shape = "tissue"
+#'     )
 #'
 #' @export
 plotPCA.mesaDimRed <- function(object,
-                                components = list(c(1, 2), c(2, 3)),
-                                colour = NULL,
-                                colourPalette = NULL,
-                                NAcolour = "grey50",
-                                symDivColourScale = FALSE,
-                                shape = NULL,
-                                shapePalette = NULL,
-                                NAshape = NULL,
-                                showSampleNames = FALSE,
-                                pointSize = 2,
-                                alpha = 1,
-                                plotlyAnnotations = "") {
-
-    out <- plotDimRed(object = object,
+    components = list(c(1, 2), c(2, 3)),
+    colour = NULL,
+    colourPalette = NULL,
+    NAcolour = "grey50",
+    symDivColourScale = FALSE,
+    shape = NULL,
+    shapePalette = NULL,
+    NAshape = NULL,
+    showSampleNames = FALSE,
+    pointSize = 2,
+    alpha = 1,
+    plotlyAnnotations = "") {
+    out <- plotDimRed(
+        object = object,
         components = components,
         colour = {{ colour }},
         colourPalette = colourPalette,
@@ -1103,7 +1364,8 @@ plotPCA.mesaDimRed <- function(object,
         showSampleNames = showSampleNames,
         pointSize = pointSize,
         alpha = alpha,
-        plotlyAnnotations = plotlyAnnotations)
+        plotlyAnnotations = plotlyAnnotations
+    )
 
     return(out)
 }
@@ -1191,7 +1453,6 @@ plotPCA.mesaDimRed <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default UMAP (beta-normalised, top 1000 most variable windows)
@@ -1202,33 +1463,36 @@ plotPCA.mesaDimRed <- function(object,
 #' # Colour by group; show names
 #' exampleTumourNormal %>%
 #'     getUMAP(n_neighbors = 5, min_dist = 1) %>%
-#'     plotUMAP(colour = "group",
-#'         showSampleNames = TRUE)
+#'     plotUMAP(
+#'         colour = "group",
+#'         showSampleNames = TRUE
+#'     )
 #'
 #' # Custom components and shape mapping
 #' exampleTumourNormal %>%
 #'     getUMAP(n_neighbors = 5, min_dist = 1) %>%
-#'     plotUMAP(components = list(c(1, 2)),
+#'     plotUMAP(
+#'         components = list(c(1, 2)),
 #'         colour = "group",
-#'         shape = "tissue")
-#' }
+#'         shape = "tissue"
+#'     )
 #'
 #' @export
 plotUMAP <- function(object,
-                        components = list(c(1, 2)),
-                        colour = NULL,
-                        colourPalette = NULL,
-                        NAcolour = "grey50",
-                        symDivColourScale = FALSE,
-                        shape = NULL,
-                        shapePalette = NULL,
-                        NAshape = NULL,
-                        showSampleNames = FALSE,
-                        pointSize = 2,
-                        alpha = 1,
-                        plotlyAnnotations = "") {
-
-    out <- plotDimRed(object = object,
+    components = list(c(1, 2)),
+    colour = NULL,
+    colourPalette = NULL,
+    NAcolour = "grey50",
+    symDivColourScale = FALSE,
+    shape = NULL,
+    shapePalette = NULL,
+    NAshape = NULL,
+    showSampleNames = FALSE,
+    pointSize = 2,
+    alpha = 1,
+    plotlyAnnotations = "") {
+    out <- plotDimRed(
+        object = object,
         components = components,
         colour = colour,
         colourPalette = colourPalette,
@@ -1240,7 +1504,8 @@ plotUMAP <- function(object,
         showSampleNames = showSampleNames,
         pointSize = pointSize,
         alpha = alpha,
-        plotlyAnnotations = plotlyAnnotations)
+        plotlyAnnotations = plotlyAnnotations
+    )
 
     return(out)
 }
@@ -1327,7 +1592,6 @@ plotUMAP <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # PCA: colour by group
@@ -1338,34 +1602,38 @@ plotUMAP <- function(object,
 #' # UMAP: colour by group, shape by tissue
 #' exampleTumourNormal %>%
 #'     getUMAP(n_neighbors = 5, min_dist = 1) %>%
-#'     plotDimRed(colour = "group",
-#'         shape = "tissue")
+#'     plotDimRed(
+#'         colour = "group",
+#'         shape = "tissue"
+#'     )
 #'
 #' # Show sample names
 #' exampleTumourNormal %>%
 #'     getPCA(nPC = 3) %>%
-#'     plotDimRed(colour = "group",
-#'         showSampleNames = TRUE)
-#' }
+#'     plotDimRed(
+#'         colour = "group",
+#'         showSampleNames = TRUE
+#'     )
 #'
 #' @export
 plotDimRed <- function(object,
-                        components = list(c(1, 2), c(2, 3)),
-                        colour = NULL,
-                        colourPalette = NULL,
-                        NAcolour = "grey50",
-                        symDivColourScale = FALSE,
-                        shape = NULL,
-                        shapePalette = NULL,
-                        NAshape = NULL,
-                        showSampleNames = FALSE,
-                        pointSize = 2,
-                        alpha = 1,
-                        plotlyAnnotations = ""
-) {
-
+    components = list(c(1, 2), c(2, 3)),
+    colour = NULL,
+    colourPalette = NULL,
+    NAcolour = "grey50",
+    symDivColourScale = FALSE,
+    shape = NULL,
+    shapePalette = NULL,
+    NAshape = NULL,
+    showSampleNames = FALSE,
+    pointSize = 2,
+    alpha = 1,
+    plotlyAnnotations = "") {
     if (!inherits(object, "mesaDimRed")) {
-        stop("First argument should be the output from the getPCA()/getUMAP() functions in mesa.")
+        stop(
+            "First argument should be the output from the",
+            " getPCA()/getUMAP() functions in mesa."
+        )
     }
 
     sampleTable <- object@sampleTable
@@ -1373,18 +1641,20 @@ plotDimRed <- function(object,
     if (!is.null(colour)) {
         colDiff <- setdiff(colour, colnames(sampleTable))
         if (length(colDiff) > 0) {
-            stop(glue::glue("Can't colour by {colDiff}, as it is not present in the sampleTable!
-
-                        ")) # empty line is required here
+            stop(glue::glue(
+                "Can't colour by {colDiff}, as it is not present",
+                " in the sampleTable!\n\n"
+            )) # empty line is required here
         }
     }
 
     if (!is.null(shape)) {
         colDiff <- setdiff(shape, colnames(sampleTable))
         if (length(colDiff) > 0) {
-            stop(glue::glue("Can't set shapes by {colDiff}, as it is not present in the sampleTable!
-
-                        ")) # empty line is required here
+            stop(glue::glue(
+                "Can't set shapes by {colDiff}, as it is not present",
+                " in the sampleTable!\n\n"
+            )) # empty line is required here
         }
     }
 
@@ -1406,10 +1676,15 @@ plotDimRed <- function(object,
         plotlyAnnotations <- plotlyAnnotations %>% purrr::set_names(., nm = .)
     }
 
-    components <- components %>% purrr::set_names(purrr::map(components, ~ glue::glue("{columnPrefix}{.x}") %>% glue::glue_collapse("vs")))
+    components <- components %>% purrr::set_names(
+        purrr::map(
+            components,
+            ~ glue::glue("{columnPrefix}{.x}") %>%
+                glue::glue_collapse("vs")
+        )
+    )
 
     ggp <- purrr::imap(object@res, function(single, resName) {
-
         numWindows <- length(single@windows)
 
         if (columnPrefix == "PC") {
@@ -1426,7 +1701,10 @@ plotDimRed <- function(object,
             dplyr::left_join(sampleTable, by = "sample_name")
 
         if (!is.null(colourPalette) & is.null(colour)) {
-            stop("`colourPalette` argument is non-NULL, but `colour` argument is NULL.")
+            stop(paste0(
+                "`colourPalette` argument is non-NULL,",
+                " but `colour` argument is NULL."
+            ))
         }
 
         if (!is.null(shape) & length(shape) > 1) {
@@ -1451,8 +1729,11 @@ plotDimRed <- function(object,
             colour <- "NULLcol"
         }
 
-        makePlot <- function(components, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params) {
-
+        makePlot <- function(
+            components, plotData, numWindows,
+            my_geom_point, my_scale_colour,
+            my_scale_shape, my_legend_params
+        ) {
             env <- new.env(parent = globalenv())
             env$plotData <- plotData
             env$columnPrefix <- columnPrefix
@@ -1463,43 +1744,72 @@ plotDimRed <- function(object,
 
             if (is.na(topVarInfo$topVarNum)) {
                 titleString <- glue::glue("all {numWindows} windows")
-                subtitleString <- glue::glue("Using {object@params$normMethod} values.")
+                subtitleString <- glue::glue(
+                    "Using {object@params$normMethod} values."
+                )
             } else {
-                titleString <- glue::glue("top {numWindows} most variable windows")
-                if (length(topVarInfo$topVarSamples[[1]]) == length(object@samples)) {
+                titleString <- glue::glue(
+                    "top {numWindows} most variable windows"
+                )
+                if (length(topVarInfo$topVarSamples[[1]]) ==
+                    length(object@samples)) {
                     titleSubstring <- "all "
                 } else {
                     titleSubstring <- ""
                 }
-                subtitleString <- glue::glue("Using {object@params$normMethod} values and {titleSubstring}{length(topVarInfo$topVarSamples[[1]])} samples to calculate std dev.")
+                subtitleString <- glue::glue(
+                    "Using {object@params$normMethod} values and",
+                    " {titleSubstring}",
+                    "{length(topVarInfo$topVarSamples[[1]])} samples",
+                    " to calculate std dev."
+                )
             }
 
             ggp <- with(env, {
-                ggplot2::ggplot(plotData,
-                    ggplot2::aes(!!rlang::sym(glue::glue("{columnPrefix}{components[1]}")),
-                        !!rlang::sym(glue::glue("{columnPrefix}{components[2]}")),
+                ggplot2::ggplot(
+                    plotData,
+                    ggplot2::aes(
+                        !!rlang::sym(
+                            glue::glue("{columnPrefix}{components[1]}")
+                        ),
+                        !!rlang::sym(
+                            glue::glue("{columnPrefix}{components[2]}")
+                        ),
                         label = sample_name,
                         !!!rlang::syms(plotlyAnnotations)
-                ))
+                    )
+                )
             }) +
                 my_geom_point +
                 my_scale_colour +
                 my_scale_shape +
                 my_legend_params +
-                ggplot2::ggtitle(glue::glue("{object@params$method} for {length(object@samples)} samples using {titleString}."),
-                    subtitle = subtitleString) +
+                ggplot2::ggtitle(
+                    glue::glue(
+                        "{object@params$method} for {length(object@samples)}",
+                        " samples using {titleString}."
+                    ),
+                    subtitle = subtitleString
+                ) +
                 ggplot2::theme_bw() +
                 ggplot2::theme(plot.title = ggplot2::element_text(size = 12.5))
 
             if (object@params$method == "PCA") {
                 ggp <- ggp +
-                    ggplot2::xlab(glue::glue("PC{components[1]} ({propVar[components[1]]}%)")) +
-                    ggplot2::ylab(glue::glue("PC{components[2]} ({propVar[components[2]]}%)"))
+                    ggplot2::xlab(glue::glue(
+                        "PC{components[1]} ({propVar[components[1]]}%)"
+                    )) +
+                    ggplot2::ylab(glue::glue(
+                        "PC{components[2]} ({propVar[components[2]]}%)"
+                    ))
             }
 
             if (showSampleNames) {
                 if (!requireNamespace("ggrepel", quietly = TRUE)) {
-                    message("Package \"ggrepel\" is recommended to repel labels. Using default method.")
+                    message(
+                        "Package \"ggrepel\" is recommended to repel labels.",
+                        " Using default method."
+                    )
                     ggp <- ggp + ggplot2::geom_text()
                 } else {
                     ggp <- ggp + ggrepel::geom_text_repel()
@@ -1510,46 +1820,82 @@ plotDimRed <- function(object,
         }
 
         if (length(colour) == 1 && colour == "NULLcol") {
+            my_scale_shape <- getShapeScale(
+                plotData, shape, shapePalette, NAshape = NAshape
+            )
 
-            my_scale_shape <- getShapeScale(plotData, shape, shapePalette, NAshape = NAshape)
+            my_geom_point <- getGeomPoint(
+                colour, shape, my_scale_shape,
+                pointSize = pointSize, alpha = alpha
+            )
 
-            my_geom_point <- getGeomPoint(colour, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
-
-            my_scale_colour <- getColourScale(cV = colour, my_scale_shape = my_scale_shape)
+            my_scale_colour <- getColourScale(
+                cV = colour, my_scale_shape = my_scale_shape
+            )
 
             my_legend_params <- getLegendParams(colour, shape, my_scale_shape)
 
-            ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
+            ggp <- purrr::map(
+                components, makePlot, plotData, numWindows,
+                my_geom_point, my_scale_colour,
+                my_scale_shape, my_legend_params
+            )
 
             return(ggp)
-
         } else {
-
-            ggp <- purrr::map2(purrr::set_names(colour), list(colourPalette), function(cV, cols) {
-
+            ggp <- purrr::map2(
+                purrr::set_names(colour), list(colourPalette),
+                function(cV, cols) {
                 cVdat <- plotData[[cV]]
 
-                colourScaleType <- dplyr::case_when(is.factor(cVdat) || is.character(cVdat) ~ "qualitative", # qualitative variable
-                    is.numeric(cVdat) && min(cVdat, na.rm = TRUE) >= 0 ~ "sequential_non_neg", # non-negative sequential variable
-                    is.numeric(cVdat) && max(cVdat, na.rm = TRUE) <= 0 ~ "sequential_non_pos", # non-positive sequential variable
-                    is.numeric(cVdat) && (max(cVdat, na.rm = TRUE) > 0 && min(cVdat, na.rm = TRUE) < 0) ~ "diverging") # diverging variable
+                colourScaleType <- dplyr::case_when(
+                    is.factor(cVdat) || is.character(cVdat) ~
+                        "qualitative", # qualitative variable
+                    is.numeric(cVdat) && min(cVdat, na.rm = TRUE) >= 0 ~
+                        "sequential_non_neg", # non-negative sequential variable
+                    is.numeric(cVdat) && max(cVdat, na.rm = TRUE) <= 0 ~
+                        "sequential_non_pos", # non-positive sequential variable
+                    is.numeric(cVdat) &&
+                        (max(cVdat, na.rm = TRUE) > 0 &&
+                            min(cVdat, na.rm = TRUE) < 0) ~
+                        "diverging"
+                ) # diverging variable
 
                 if (is.na(colourScaleType)) {
-                    stop(glue::glue("The variable `{cV}` can not be mapped to a colour scale."))
+                    stop(glue::glue(
+                        "The variable `{cV}` can not be",
+                        " mapped to a colour scale."
+                    ))
                 }
 
-                my_scale_shape <- getShapeScale(plotData, shape, shapePalette, colourScaleType, NAshape = NAshape)
+                my_scale_shape <- getShapeScale(
+                    plotData, shape, shapePalette,
+                    colourScaleType, NAshape = NAshape
+                )
 
-                my_geom_point <- getGeomPoint(cV, shape, my_scale_shape, pointSize = pointSize, alpha = alpha)
+                my_geom_point <- getGeomPoint(
+                    cV, shape, my_scale_shape,
+                    pointSize = pointSize, alpha = alpha
+                )
 
-                my_scale_colour <- getColourScale(plotData, cV, cols, colourScaleType, my_scale_shape, NAcolour = NAcolour, symDivColourScale = symDivColourScale)
+                my_scale_colour <- getColourScale(
+                    plotData, cV, cols, colourScaleType,
+                    my_scale_shape,
+                    NAcolour = NAcolour,
+                    symDivColourScale = symDivColourScale
+                )
 
-                my_legend_params <- getLegendParams(cV, shape, my_scale_shape, colourScaleType)
+                my_legend_params <- getLegendParams(
+                    cV, shape, my_scale_shape, colourScaleType
+                )
 
-                ggp <- purrr::map(components, makePlot, plotData, numWindows, my_geom_point, my_scale_colour, my_scale_shape, my_legend_params)
+                ggp <- purrr::map(
+                    components, makePlot, plotData, numWindows,
+                    my_geom_point, my_scale_colour,
+                    my_scale_shape, my_legend_params
+                )
 
                 return(ggp)
-
             })
         }
     })
