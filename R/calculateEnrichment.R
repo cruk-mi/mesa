@@ -475,6 +475,7 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #'   [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
+#' # Requires BAM files and the MEDIPS package; see \dontrun{} block for a full usage example.
 #' \dontrun{
 #'  if (requireNamespace("MEDIPS", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {

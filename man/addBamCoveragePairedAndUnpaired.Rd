@@ -79,6 +79,7 @@ and set a multi-core/cluster backend for speed.
 }
 
 \examples{
+# Requires BAM files; see \dontrun{} block for a full usage example.
 \dontrun{
 sample_table <- data.frame(
     sample_name = "sample1",
