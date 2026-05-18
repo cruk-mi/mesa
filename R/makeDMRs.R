@@ -219,7 +219,8 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
         if ("name" %in% colnames(contrasts)) {
             conNameClean <- contrasts[i, "name"] %>% dplyr::pull()
         } else {
-            # Remove the hyphen from the name, because it messes up things later.
+            # Remove the hyphen from the name,
+            # because it messes up things later.
             # Also remove the variable name (whatever it is)
             conNameClean <- conName %>%
                 stringr::str_replace("-", "_vs_") %>%
