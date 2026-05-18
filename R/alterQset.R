@@ -83,8 +83,16 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap) {
             plyranges::as_granges()
     }
 
-    qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions, regionsToOverlap) > 0), , drop = FALSE]
-    qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(regionsToOverlap)
+    qseaSet@count_matrix <- qseaSet@count_matrix[
+        which(
+            plyranges::count_overlaps(
+                qseaSet@regions, regionsToOverlap
+            ) > 0
+        ), ,
+        drop = FALSE
+    ]
+    qseaSet@regions <- qseaSet@regions %>%
+        plyranges::filter_by_overlaps(regionsToOverlap)
 
     return(qseaSet)
 }
@@ -94,8 +102,13 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap) {
 #' @export
 filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
     if (is.data.frame(regionsToOverlap)) {
-        if (length(intersect(colnames(regionsToOverlap), c("seqnames", "start", "end"))) != 3) {
-            stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
+        if (length(intersect(
+            colnames(regionsToOverlap), c("seqnames", "start", "end")
+        )) != 3) {
+            stop(paste0(
+                "regionsToOverlap must be a GRanges object or a",
+                " dataframe with seqnames, start and end."
+            ))
         }
     }
 
@@ -228,7 +241,9 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL) {
         stop("Can only specify samples to keep or to drop, not both.")
     }
 
-    samplesNotInSet <- setdiff(c(samplesToKeep, samplesToDrop), qsea::getSampleNames(qseaSet))
+    samplesNotInSet <- setdiff(
+        c(samplesToKeep, samplesToDrop), qsea::getSampleNames(qseaSet)
+    )
     if (length(samplesNotInSet) > 0) {
         stop(glue::glue("Sample {samplesNotInSet} not present in the qseaSet!
 
@@ -249,10 +264,14 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL) {
         newSet@cnv <- qseaSet@cnv[, samplesToKeep, drop = FALSE]
     }
 
-    newSet@libraries$file_name <- qseaSet@libraries$file_name[samplesToKeep, , drop = FALSE]
-    newSet@libraries$input_file <- qseaSet@libraries$input_file[samplesToKeep, , drop = FALSE]
-    newSet@enrichment$parameters <- qseaSet@enrichment$parameters[samplesToKeep, , drop = FALSE]
-    newSet@enrichment$factors <- qseaSet@enrichment$factors[, samplesToKeep, drop = FALSE]
+    newSet@libraries$file_name <-
+        qseaSet@libraries$file_name[samplesToKeep, , drop = FALSE]
+    newSet@libraries$input_file <-
+        qseaSet@libraries$input_file[samplesToKeep, , drop = FALSE]
+    newSet@enrichment$parameters <-
+        qseaSet@enrichment$parameters[samplesToKeep, , drop = FALSE]
+    newSet@enrichment$factors <-
+        qseaSet@enrichment$factors[, samplesToKeep, drop = FALSE]
 
     return(newSet)
 }
@@ -312,7 +331,10 @@ Issues were found with:
     }
 
     if (any(duplicated(renamedNames))) {
-        stop(glue::glue("Duplicate sample_name now present: {renamedNames[duplicated(renamedNames)]}"))
+        stop(glue::glue(paste0(
+            "Duplicate sample_name now present:",
+            " {renamedNames[duplicated(renamedNames)]}"
+        )))
     }
 
     newQSet <- qseaSet
@@ -325,19 +347,33 @@ Issues were found with:
         ) %>%
         tibble::column_to_rownames("rownameCol")
 
-    rownames(newQSet@zygosity) <- stringr::str_replace_all(rownames(newQSet@zygosity), pattern, replacement)
-    rownames(newQSet@libraries$file_name) <- stringr::str_replace_all(rownames(newQSet@libraries$file_name), pattern, replacement)
+    rownames(newQSet@zygosity) <- stringr::str_replace_all(
+        rownames(newQSet@zygosity), pattern, replacement
+    )
+    rownames(newQSet@libraries$file_name) <- stringr::str_replace_all(
+        rownames(newQSet@libraries$file_name), pattern, replacement
+    )
 
     if (!is.null(newQSet@libraries$input_file)) {
-        rownames(newQSet@libraries$input_file) <- stringr::str_replace_all(rownames(newQSet@libraries$input_file), pattern, replacement)
+        rownames(newQSet@libraries$input_file) <- stringr::str_replace_all(
+            rownames(newQSet@libraries$input_file), pattern, replacement
+        )
     }
 
-    colnames(newQSet@count_matrix) <- stringr::str_replace_all(colnames(newQSet@count_matrix), pattern, replacement)
+    colnames(newQSet@count_matrix) <- stringr::str_replace_all(
+        colnames(newQSet@count_matrix), pattern, replacement
+    )
 
-    rownames(newQSet@enrichment$parameters) <- stringr::str_replace_all(rownames(newQSet@enrichment$parameters), pattern, replacement)
-    colnames(newQSet@enrichment$factors) <- stringr::str_replace_all(colnames(newQSet@enrichment$factors), pattern, replacement)
+    rownames(newQSet@enrichment$parameters) <- stringr::str_replace_all(
+        rownames(newQSet@enrichment$parameters), pattern, replacement
+    )
+    colnames(newQSet@enrichment$factors) <- stringr::str_replace_all(
+        colnames(newQSet@enrichment$factors), pattern, replacement
+    )
 
-    colnames(GenomicRanges::mcols(newQSet@cnv)) <- stringr::str_replace_all(colnames(GenomicRanges::mcols(newQSet@cnv)), pattern, replacement)
+    colnames(GenomicRanges::mcols(newQSet@cnv)) <- stringr::str_replace_all(
+        colnames(GenomicRanges::mcols(newQSet@cnv)), pattern, replacement
+    )
 
     return(newQSet)
 }
@@ -462,7 +498,9 @@ poolSamples <- function(qseaSet, mergeString) {
     newSet@zygosity <- newZygosity
 
     newSampleTable <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@sampleTable[startsWith(rownames(qseaSet@sampleTable), x), , drop = FALSE] %>%
+        qseaSet@sampleTable[
+            startsWith(rownames(qseaSet@sampleTable), x), , drop = FALSE
+        ] %>%
             dplyr::select(-tidyselect::matches("file_name|input_file")) %>%
             dplyr::mutate(
                 sample_name = x,
@@ -477,11 +515,22 @@ poolSamples <- function(qseaSet, mergeString) {
     newSet@sampleTable <- newSampleTable
 
     newLibrariesFile <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@libraries$file_name[startsWith(rownames(qseaSet@sampleTable), x), ] %>%
+        qseaSet@libraries$file_name[
+            startsWith(rownames(qseaSet@sampleTable), x), ] %>%
             tibble::as_tibble() %>%
             dplyr::summarise(
-                dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~ stats::weighted.mean(.x, total_fragments)),
-                dplyr::across(tidyselect::any_of(tidyselect::matches("reads|pairs|r1s|fragments")), ~ sum(.x))
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "mean|median|sd|relH|GoGe"
+                    )),
+                    ~ stats::weighted.mean(.x, total_fragments)
+                ),
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "reads|pairs|r1s|fragments"
+                    )),
+                    ~ sum(.x)
+                )
             ) %>%
             dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
             tibble::remove_rownames() %>%
@@ -489,12 +538,23 @@ poolSamples <- function(qseaSet, mergeString) {
     })
 
     newLibrariesInput <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@libraries$input_file[startsWith(rownames(qseaSet@sampleTable), x), ] %>%
+        qseaSet@libraries$input_file[
+            startsWith(rownames(qseaSet@sampleTable), x), ] %>%
             tibble::as_tibble() %>%
             dplyr::mutate(total_fragments2 = total_fragments) %>%
             dplyr::summarise(
-                dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~ stats::weighted.mean(.x, total_fragments)),
-                dplyr::across(tidyselect::any_of(tidyselect::matches("reads|pairs|r1s|fragments")), ~ sum(.x))
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "mean|median|sd|relH|GoGe"
+                    )),
+                    ~ stats::weighted.mean(.x, total_fragments)
+                ),
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "reads|pairs|r1s|fragments"
+                    )),
+                    ~ sum(.x)
+                )
             ) %>%
             dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
             tibble::remove_rownames() %>%
@@ -568,7 +628,10 @@ Issues were found with:
         return(qseaSet)
     }
     if (any(duplicated(renamedNames))) {
-        stop(glue::glue("Duplicate sample_name now present: {renamedNames[duplicated(renamedNames)]}"))
+        stop(glue::glue(paste0(
+            "Duplicate sample_name now present:",
+            " {renamedNames[duplicated(renamedNames)]}"
+        )))
     }
     newQSet <- qseaSet
     newQSet@sampleTable <- newQSet@sampleTable %>%
