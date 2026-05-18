@@ -47,14 +47,24 @@ qseaTableToChrGRanges <- function(dataTable) {
         outGRanges <- dataTable %>%
             tibble::as_tibble() %>%
             dplyr::mutate(chr = as.character(chr)) %>%
-            dplyr::mutate(seqnames = ifelse(stringr::str_detect(chr,"chr"),chr,paste0("chr", chr)), start = window_start, end = window_end) %>%
+            dplyr::mutate(
+                seqnames = ifelse(
+                    stringr::str_detect(chr, "chr"), chr, paste0("chr", chr)
+                ),
+                start = window_start, end = window_end
+            ) %>%
             plyranges::as_granges()
 
     } else if ("start" %in% colnames(dataTable)) {
         outGRanges <- dataTable %>%
             tibble::as_tibble() %>%
             dplyr::mutate(seqnames = as.character(seqnames)) %>%
-            dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames,"chr"),seqnames,paste0("chr", seqnames))) %>%
+            dplyr::mutate(
+                seqnames = ifelse(
+                    stringr::str_detect(seqnames, "chr"),
+                    seqnames, paste0("chr", seqnames)
+                )
+            ) %>%
             plyranges::as_granges()
     } else {stop("Missing start or window_start column.")}
 
@@ -286,13 +296,20 @@ asValidGranges <- function(object){
         if(length(intersect(colnames(object),c("seqnames","start","end"))) == 3){
             return(object %>% plyranges::as_granges())
         } else  if(length(intersect(colnames(object),c("chr","start","end"))) == 3){
-            return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges() )
+            return(
+                object %>%
+                    dplyr::rename(seqnames = chr) %>%
+                    plyranges::as_granges()
+            )
         } else  if(length(intersect(colnames(object),c("chr","window_start","window_end"))) == 3){
             return(object %>%
                 dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
                 plyranges::as_granges() )
         } else {
-            stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
+            stop(paste0(
+                "Data frame can not be coerced to a GRanges object,",
+                " requires seqnames, start, end columns."
+            ))
         }
     }
 
