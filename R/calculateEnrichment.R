@@ -36,20 +36,26 @@
 #'   }
 #'   
 #' @export
-calculateGenomicCGDistribution <- function(BSgenome){
-  dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
-  CG <- Biostrings::DNAStringSet("CG")
-  pdict0 <- Biostrings::PDict(CG)
-  params <- methods::new("BSParams", X = dataset, FUN = Biostrings::countPDict, simplify = TRUE, exclude = c("rand", "chrUn"))
-  genome.CG <- sum(BSgenome::bsapply(params, pdict = pdict0))
-  params <- methods::new("BSParams", X = dataset, FUN = Biostrings::alphabetFrequency, simplify = TRUE, exclude = c("rand", "chrUn"))
-  alphabet <- BSgenome::bsapply(params)
-  genome.l <- sum(as.numeric(alphabet))
-  genome.C <- as.numeric(sum(alphabet[2,]))
-  genome.G <- as.numeric(sum(alphabet[3,]))
-  genome.relH <- genome.CG/genome.l * 100
-  genome.GoGe <- (genome.CG * genome.l)/(genome.C * genome.G)
-  return(data.frame(genome.relH = genome.relH, genome.GoGe = genome.GoGe))
+calculateGenomicCGDistribution <- function(BSgenome) {
+    dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
+    CG <- Biostrings::DNAStringSet("CG")
+    pdict0 <- Biostrings::PDict(CG)
+    params <- methods::new(
+        "BSParams", X = dataset, FUN = Biostrings::countPDict,
+        simplify = TRUE, exclude = c("rand", "chrUn")
+    )
+    genome.CG <- sum(BSgenome::bsapply(params, pdict = pdict0))
+    params <- methods::new(
+        "BSParams", X = dataset, FUN = Biostrings::alphabetFrequency,
+        simplify = TRUE, exclude = c("rand", "chrUn")
+    )
+    alphabet <- BSgenome::bsapply(params)
+    genome.l <- sum(as.numeric(alphabet))
+    genome.C <- as.numeric(sum(alphabet[2, ]))
+    genome.G <- as.numeric(sum(alphabet[3, ]))
+    genome.relH <- genome.CG / genome.l * 100
+    genome.GoGe <- (genome.CG * genome.l) / (genome.C * genome.G)
+    return(data.frame(genome.relH = genome.relH, genome.GoGe = genome.GoGe))
 }
 
 
@@ -147,28 +153,41 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
 
   dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
 
-  ## Read region file
-  fileName <- basename(file)
-  path <- dirname(file)
-  if (path == "") {path <- getwd()}
-  if (!fileName %in% dir(path)) {
-    stop(sprintf("File %s not found in %s", shQuote(fileName), shQuote(path)),
-         call. = FALSE)
-  }
+    if (!paired) {
+        GRange.Reads <- MEDIPS::getGRange(
+            fileName, path, extend, shift, chr.select, dataset,
+            uniq, simpleCigar = FALSE
+        )
+    } else {
+        GRange.Reads <- MEDIPS::getPairedGRange(
+            fileName, path, extend, shift, chr.select, dataset,
+            uniq, simpleCigar = FALSE
+        )
+    }
 
-  if (!paired) {GRange.Reads <- MEDIPS::getGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)} else
-  {GRange.Reads <- MEDIPS::getPairedGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)}
+    ## Sort chromosomes
+    if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) > 1) {
+        chromosomes <- gtools::mixedsort(
+            unique(GenomeInfoDb::seqlevels(GRange.Reads))
+        )
+    }
+    if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) == 1) {
+        chromosomes <- unique(GenomeInfoDb::seqlevels(GRange.Reads))
+    }
 
   ## Sort chromosomes
   if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) > 1) {chromosomes <- gtools::mixedsort(unique(GenomeInfoDb::seqlevels(GRange.Reads)))}
   if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) == 1) {chromosomes <- unique(GenomeInfoDb::seqlevels(GRange.Reads))}
 
-  chr_lengths <- as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
+    IRanges::ranges(GRange.Reads) <- IRanges::restrict(
+        IRanges::ranges(GRange.Reads), +1
+    )
 
   IRanges::ranges(GRange.Reads) <- IRanges::restrict(IRanges::ranges(GRange.Reads), +1)
 
-  ##Calculate CpG density for regions
-  total <- length(chromosomes)
+    readsChars <- unlist(
+        Biostrings::getSeq(dataset, GRange.Reads, as.character = TRUE)
+    )
 
   readsChars <- unlist(Biostrings::getSeq(dataset, GRange.Reads, as.character = TRUE))
 
@@ -178,10 +197,26 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
   regions.G  <- sum(stringr::str_count(readsChars, stringr::fixed("G")))
   all.genomic <- sum(stringr::str_length(readsChars))
 
-  nReads <- length(readsChars)
+    regions.relH <- as.numeric(regions.CG) / as.numeric(all.genomic) * 100
+    regions.GoGe <- (
+        as.numeric(regions.CG) * as.numeric(all.genomic)
+    ) / (as.numeric(regions.C) * as.numeric(regions.G))
 
-  regions.relH <- as.numeric(regions.CG) / as.numeric(all.genomic) * 100
-  regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
+    if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+        utils::data(
+            "BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution",
+            package = "mesa", envir = environment()
+        )
+        genomicDistribution <- BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+    } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
+        utils::data(
+            "BSgenome.Hsapiens.UCSC.hg19.CpG.distribution",
+            package = "mesa", envir = environment()
+        )
+        genomicDistribution <- BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
+    } else {
+        genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
+    }
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
@@ -197,19 +232,19 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
   enrichment.score.relH <- regions.relH/genome.relH
   enrichment.score.GoGe <- regions.GoGe/genome.GoGe
 
-  if (!is.null(exportPath)) {
-    GRange.Reads %>%
-      BiocGenerics::width() %>%
-      dplyr::as_tibble() %>%
-      ggplot2::ggplot(ggplot2::aes(x = value)) +
-      ggplot2::geom_density(color = "black") +
-      ggplot2::theme_bw() +
-      ggplot2::labs(xlab = "Fragment Length",
-                    ylab = "Density",
-                    title = "Fragment Length Distribution",
-                    subtitle = stringr::str_remove(fileName, ".bam"))
+        ggplot2::ggsave(
+            file = stringr::str_replace(
+                file.path(exportPath, fileName), ".bam", ".pdf"
+            )
+        )
 
-    ggplot2::ggsave(file = stringr::str_replace(file.path(exportPath, fileName), ".bam", ".pdf"))
+        saveRDS(
+            GRange.Reads,
+            file = stringr::str_replace(
+                file.path(exportPath, fileName), ".bam", ".rds"
+            )
+        )
+    }
 
     saveRDS(GRange.Reads, file = stringr::str_replace(file.path(exportPath, fileName), ".bam", ".rds"))
   }
@@ -324,7 +359,15 @@ getCGPositions <- function(BSgenome, chr.select){
 #'   )
 #' }
 #' @export
-calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL){
+calculateCGEnrichmentGRanges <- function(
+    readGRanges = NULL, BSgenome = NULL, chr.select = NULL
+) {
+    if (!requireNamespace("MEDIPS", quietly = TRUE)) {
+        stop(
+            "Package \"MEDIPS\" must be installed to use this function.",
+            call. = FALSE
+        )
+    }
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -333,35 +376,52 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
     )
   }
 
-  dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
+    chromosomes <- gtools::mixedsort(
+        unique(GenomeInfoDb::seqlevels(readGRanges))
+    )
 
   chromosomes <- gtools::mixedsort(unique(GenomeInfoDb::seqlevels(readGRanges)))
 
   chr_lengths <- as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
 
-  if (all(is.na(GenomeInfoDb::seqlengths(readGRanges)))) {
-    GenomeInfoDb::seqinfo(readGRanges, pruning.mode = "coarse") <-
-      GenomeInfoDb::seqinfo(BSgenome::getBSgenome(BSgenome))[
-        GenomeInfoDb::seqnames(GenomeInfoDb::seqinfo(readGRanges))
-      ]
-    readGRanges <- IRanges::trim(readGRanges)
-  }
+    IRanges::ranges(readGRanges) <- IRanges::restrict(
+        IRanges::ranges(readGRanges), +1
+    )
 
   IRanges::ranges(readGRanges) <- IRanges::restrict(IRanges::ranges(readGRanges), +1)
 
-  ##Calculate CpG density for regions
-  total <- length(chromosomes)
+    readsChars <- unlist(
+        Biostrings::getSeq(dataset, readGRanges, as.character = TRUE)
+    )
 
   readsChars <- unlist(Biostrings::getSeq(dataset, readGRanges, as.character = TRUE))
 
-  # Faster to use stringr, as we are looking for exact matches.
-  regions.CG <- sum(stringr::str_count(readsChars, stringr::fixed("CG")))
-  regions.C  <- sum(stringr::str_count(readsChars, stringr::fixed("C")))
-  regions.G  <- sum(stringr::str_count(readsChars, stringr::fixed("G")))
-  all.genomic <- sum(stringr::str_length(readsChars))
+    regions.relH <- as.numeric(regions.CG) / as.numeric(all.genomic) * 100
+    regions.GoGe <- (
+        as.numeric(regions.CG) * as.numeric(all.genomic)
+    ) / (as.numeric(regions.C) * as.numeric(regions.G))
 
-  regions.relH <- as.numeric(regions.CG) / as.numeric(all.genomic) * 100
-  regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
+    if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+        utils::data(
+            "BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution",
+            package = "mesa", envir = environment()
+        )
+        genomicDistribution <- BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+    } else if (BSgenome == "BSgenome.Mmusculus.UCSC.mm10") {
+        utils::data(
+            "BSgenome.Mmusculus.UCSC.mm10.CpG.distribution",
+            package = "mesa", envir = environment()
+        )
+        genomicDistribution <- BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
+    } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
+        utils::data(
+            "BSgenome.Hsapiens.UCSC.hg19.CpG.distribution",
+            package = "mesa", envir = environment()
+        )
+        genomicDistribution <- BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
+    } else {
+        genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
+    }
 
   if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
     genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
@@ -516,29 +576,38 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
     )
   }
 
-  if(nonEnrich){
-    typeString <- "non-enriched"
-  } else {
-    typeString <- "enriched"
-  }
+    message(glue::glue(paste0(
+        "Adding Medips Enrichment factors to",
+        " {length(getSampleNames(qseaSet))} {typeString} samples,",
+        " using {nCores} cores."
+    )))
 
-  message(glue::glue("Adding Medips Enrichment factors to {length(getSampleNames(qseaSet))} {typeString} samples, using {nCores} cores."))
+    if (!nonEnrich) {
+        colsToCheck <- c(
+            "relH", "GoGe", "nReads",
+            "nReadsWithoutPattern", "n100bpReadsWithoutPattern"
+        )
 
-  if(!nonEnrich){
+        if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
+            stop(glue::glue(paste0(
+                "Column {colsToCheck[",
+                "colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))",
+                "]} already in sampleTable!"
+            )))
+        }
+    } else {
+        colsToCheck <- c(
+            "input_relH", "input_GoGe", "input_nReads",
+            "input_nReadsWithoutPattern", "input_n100bpReadsWithoutPattern"
+        )
 
-  colsToCheck <- c("relH","GoGe","nReads","nReadsWithoutPattern","n100bpReadsWithoutPattern")
-
-  if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
-    stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))]} already in sampleTable!
-                    "))
-     }
-  } else{
-
-    colsToCheck <- c("input_relH","input_GoGe","input_nReads","input_nReadsWithoutPattern","input_n100bpReadsWithoutPattern")
-
-    if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
-      stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))]} already in sampleTable!
-                    "))
+        if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
+            stop(glue::glue(paste0(
+                "Column {colsToCheck[",
+                "colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))",
+                "]} already in sampleTable!"
+            )))
+        }
     }
 
   }
