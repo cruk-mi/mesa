@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
-
 # mesa 0.99.2
 
 ### BUG FIXES
