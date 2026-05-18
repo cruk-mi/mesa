@@ -47,14 +47,24 @@ qseaTableToChrGRanges <- function(dataTable) {
         outGRanges <- dataTable %>%
             tibble::as_tibble() %>%
             dplyr::mutate(chr = as.character(chr)) %>%
-            dplyr::mutate(seqnames = ifelse(stringr::str_detect(chr, "chr"), chr, paste0("chr", chr)), start = window_start, end = window_end) %>%
+            dplyr::mutate(
+                seqnames = ifelse(
+                    stringr::str_detect(chr, "chr"), chr, paste0("chr", chr)
+                ),
+                start = window_start, end = window_end
+            ) %>%
             plyranges::as_granges()
 
     } else if ("start" %in% colnames(dataTable)) {
         outGRanges <- dataTable %>%
             tibble::as_tibble() %>%
             dplyr::mutate(seqnames = as.character(seqnames)) %>%
-            dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames, "chr"), seqnames, paste0("chr", seqnames))) %>%
+            dplyr::mutate(
+                seqnames = ifelse(
+                    stringr::str_detect(seqnames, "chr"),
+                    seqnames, paste0("chr", seqnames)
+                )
+            ) %>%
             plyranges::as_granges()
     } else {stop("Missing start or window_start column.")}
 
