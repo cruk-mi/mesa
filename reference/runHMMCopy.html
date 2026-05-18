@@ -19,7 +19,7 @@ selected sample/column."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@ columns (<code>gc</code>, <code>map</code>) are consistent across the table.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Minimal synthetic example: build a table and pipe into runHMMCopy()</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">2000L</span>; <span class="va">w</span> <span class="op">&lt;-</span> <span class="fl">5e4</span></span></span>
@@ -144,7 +144,24 @@ columns (<code>gc</code>, <code>map</code>) are consistent across the table.</p>
 <span class="r-in"><span>    sampleA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">500</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">runHMMCopy</span><span class="op">(</span>colname <span class="op">=</span> <span class="st">"sampleA"</span>, plotDir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>k-d tree limited by memory. ncmax= 438</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GRanges object with 2000 ranges and 1 metadata column:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          seqnames            ranges strand |   sampleA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [1]     chr1           1-50000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [2]     chr1      50001-100000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [3]     chr1     100001-150000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [4]     chr1     150001-200000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [5]     chr1     200001-250000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ...      ...               ...    ... .       ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1996]     chr2 49750001-49800000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1997]     chr2 49800001-49850000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1998]     chr2 49850001-49900000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1999]     chr2 49900001-49950000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [2000]     chr2 49950001-50000000      * |         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   seqinfo: 2 sequences from an unspecified genome; no seqlengths</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

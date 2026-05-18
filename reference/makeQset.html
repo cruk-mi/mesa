@@ -20,7 +20,7 @@ selected methods. This is typically the first step in a mesa/qsea workflow."><!-
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
       </span>
     </div>
 
@@ -318,7 +318,8 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Minimal runnable sketch if MEDIPSData is installed</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># Minimal runnable sketch if MEDIPSData is installed</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPSData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">sampleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    sample_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal1"</span>, <span class="st">"Tumour1"</span><span class="op">)</span>,</span></span>
@@ -404,6 +405,7 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 2 Samples: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Normal1, Tumour1</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 541532 Regions in 3 chromosomes of BSgenome.Hsapiens.UCSC.hg19</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

@@ -21,7 +21,7 @@ wrappers such as getPCA() and getUMAP() provide simplified access.'><!-- mathjax
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
       </span>
     </div>
 
@@ -288,7 +288,8 @@ are performed and collected in <code>res</code>.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
@@ -364,6 +365,8 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; pca4.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "pca1" "pca2" "pca3" "pca4"</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Quick demo on a small synthetic qseaSet</span></span></span>
 <span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">getUMAP</span><span class="op">(</span><span class="op">)</span></span></span>
@@ -435,6 +438,8 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 40 samples</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PCA on default beta-normalised matrix, keep 3 PCs</span></span></span>
@@ -526,6 +531,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap2.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "umap1" "umap2"</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

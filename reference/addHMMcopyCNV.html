@@ -20,7 +20,7 @@ Only GRCh38/hg38 is currently supported."><!-- mathjax --><script src="https://c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
       </span>
     </div>
 
@@ -210,7 +210,7 @@ When <code>parallel = TRUE</code>, computation uses the currently registered bac
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span></span></span>
@@ -223,8 +223,56 @@ When <code>parallel = TRUE</code>, computation uses the currently registered bac
 <span class="r-in"><span>           parallel      <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>           plotDir       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>     <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘generics’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:dplyr’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     explain</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     setequal, union</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘BiocGenerics’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:dplyr’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     combine</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     IQR, mad, sd, var, xtabs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     Filter, Find, Map, Position, Reduce, anyDuplicated, aperm, append,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     as.data.frame, basename, cbind, colnames, dirname, do.call,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     duplicated, eval, evalq, get, grep, grepl, is.unsorted, lapply,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     mapply, match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rank, rbind, rownames, sapply, saveRDS, table, tapply, unique,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     unsplit, which.max, which.min</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘S4Vectors’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:dplyr’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     first, rename</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:utils’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     findMatches</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     I, expand.grid, unname</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘IRanges’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:dplyr’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     collapse, desc, slice</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘Biostrings’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     strsplit</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (cond) .Internal(C_tryCatchHelper(addr, 1L, cond)))(structure(list(message = "",     trace = structure(list(call = list(exampleTumourNormal %&gt;%         addHMMcopyCNV(inputColumn = "input_file", windowSize = 1e+06,             hmmCopyGC = gc_hg38_1000kb, hmmCopyMap = map_hg38_1000kb,             properPairsOnly = TRUE, parallel = FALSE, plotDir = tempdir()),         addHMMcopyCNV(., inputColumn = "input_file", windowSize = 1e+06,             hmmCopyGC = gc_hg38_1000kb, hmmCopyMap = map_hg38_1000kb,             properPairsOnly = TRUE, parallel = FALSE, plotDir = tempdir()),         BiocParallel::bplapply(X = qsea::getSampleTable(qs) %&gt;%             dplyr::pull(inputColumn), FUN = getBamCoveragePairedAndUnpairedR1,             BSgenome = qsea:::getGenome(qs), regions = CNV_Regions,             fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,             minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,             minMapQual = minMapQual, properPairsOnly = properPairsOnly,             BPPARAM = BPPARAM), qsea::getSampleTable(qs) %&gt;%             dplyr::pull(inputColumn), dplyr::pull(., inputColumn),         pull.data.frame(., inputColumn), tidyselect::vars_pull(names(.data),             !!enquo(var)), pull_as_location2(loc, n, vars, error_arg = error_arg,             error_call = error_call), with_subscript_errors(type = "pull",             {                i &lt;- vctrs::vec_as_subscript2(i, logical = "error",                   arg = error_arg, call = error_call)                if (length(i) != 1) {                  cli::cli_abort("{.arg {error_arg}} must select exactly one column.",                     call = error_call)                }                if (is.numeric(i)) {                  vctrs::num_as_location2(i, n = n, negative = "ignore",                     arg = error_arg, call = error_call)                }                else {                  vctrs::vec_as_location2(i, n = n, names = names,                     arg = error_arg, call = error_call, )                }            }), withCallingHandlers(expr, vctrs_error_subscript = function(cnd) {            cnd$subscript_action &lt;- subscript_action(type)            cnd$subscript_elt &lt;- "column"            cnd_signal(cnd)        }), vctrs::vec_as_location2(i, n = n, names = names,             arg = error_arg, call = error_call, ), result_get(vec_as_location2_result(i,             n = n, names = names, negative = "error", missing = missing,             arg = arg, call = call)), vec_as_location2_result(i,             n = n, names = names, negative = "error", missing = missing,             arg = arg, call = call), tryCatch(vec_as_location(i,             n, names = names, arg = arg, call = call), vctrs_error_subscript = function(err) {            err[["subscript_scalar"]] &lt;- TRUE            err &lt;&lt;- err            i        }), tryCatchList(expr, classes, parentenv, handlers),         tryCatchOne(expr, names, parentenv, handlers[[1L]]),         doTryCatch(return(expr), name, parentenv, handler), vec_as_location(i,             n, names = names, arg = arg, call = call), `&lt;fn&gt;`(),         stop_subscript_oob(i = i, subscript_type = subscript_type,             names = names, subscript_action = subscript_action,             subscript_arg = subscript_arg, call = call), stop_subscript(class = "vctrs_error_subscript_oob",             i = i, subscript_type = subscript_type, ..., call = call),         abort(class = c(class, "vctrs_error_subscript"), i = i,             ..., call = call)), parent = c(0L, 0L, 2L, 2L, 0L,     0L, 6L, 7L, 8L, 9L, 8L, 11L, 11L, 13L, 14L, 15L, 16L, 13L,     0L, 19L, 20L, 21L), visible = c(TRUE, TRUE, TRUE, TRUE, TRUE,     TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,     FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),         namespace = c(NA, "mesa", "BiocParallel", NA, "dplyr",         "dplyr", "tidyselect", "tidyselect", "tidyselect", "base",         "vctrs", "vctrs", "vctrs", "base", "base", "base", "base",         "vctrs", "vctrs", "vctrs", "vctrs", "rlang"), scope = c(NA,         "::", "::", NA, "::", ":::", "::", ":::", ":::", "::",         "::", ":::", ":::", "::", "local", "local", "local",         "::", "local", ":::", ":::", "::"), error_frame = c(FALSE,         FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE,         FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,         FALSE, FALSE, FALSE, FALSE, FALSE)), row.names = c(NA,     -22L), version = 2L, class = c("rlang_trace", "rlib_trace",     "tbl", "data.frame")), parent = NULL, i = "input_file", subscript_type = "character",     names = c("sample_name", "group", "patient", "type", "tumour",     "tissue", "age", "gender", "stage"), subscript_action = "extract",     subscript_arg = "!!enquo(var)", rlang = list(inherit = TRUE),     call = dplyr::pull(., inputColumn), subscript_scalar = TRUE,     subscript_elt = "column"), class = c("vctrs_error_subscript_oob", "vctrs_error_subscript", "rlang_error", "error", "condition"))):</span> error in evaluating the argument 'X' in selecting a method for function 'bplapply': Can't extract columns that don't exist.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">✖</span> Column `input_file` doesn't exist.</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

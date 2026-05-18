@@ -20,7 +20,7 @@ new qseaSet with pooled samples and updated metadata."><!-- mathjax --><script s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
       </span>
     </div>
 
@@ -119,12 +119,16 @@ weighted means for rates).</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Pool Tumour/Normal pairs by patient into a single sample per patient:</span></span></span>
 <span class="r-in"><span><span class="co"># e.g., "Colon1_T","Colon1_N" -&gt; "Colon1"</span></span></span>
 <span class="r-in"><span><span class="fu">poolSamples</span><span class="op">(</span><span class="va">exampleTumourNormal</span>, mergeString <span class="op">=</span> <span class="st">"_[TN]$"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All names in common, returning second qseaSet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in estimateOffset(qs, enrichmentPattern, maxPatternDensity):</span> not enough windows with enrichment pattern density of at most 0.05 per fragment </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> found to estimate background read distribution</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

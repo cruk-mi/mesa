@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
       </span>
     </div>
 
@@ -69,6 +69,14 @@
       <small>Source: <a href="https://github.com/cruk-mi/mesa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.99.2" id="mesa-0992">mesa 0.99.2<a class="anchor" aria-label="anchor" href="#mesa-0992"></a></h2>
+<div class="section level4">
+<h4 id="bug-fixes-0-99-2">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-2"></a></h4>
+<ul><li>Wrapped slow examples (&gt;5 s) in <code>\donttest{}</code> across <code><a href="../reference/getDimRed.html">getPCA()</a></code>, <code><a href="../reference/getDimRed.html">getUMAP()</a></code>, <code><a href="../reference/getDimRed.html">getDimRed()</a></code>, <code><a href="../reference/plotUMAP.html">plotUMAP()</a></code>, <code><a href="../reference/plotDimRed.html">plotDimRed()</a></code>, <code><a href="../reference/makeQset.html">makeQset()</a></code>, <code><a href="../reference/annotateWindows.html">annotateWindows()</a></code>, <code><a href="../reference/getGenomicFeatureDistribution.html">getGenomicFeatureDistribution()</a></code>, <code><a href="../reference/plotRegionsHeatmap.html">plotRegionsHeatmap()</a></code>, <code><a href="../reference/plotGeneHeatmap.html">plotGeneHeatmap()</a></code>, <code><a href="../reference/plotGenomicFeatureDistribution.html">plotGenomicFeatureDistribution()</a></code>, <code><a href="../reference/summariseDMRsByGene.html">summariseDMRsByGene()</a></code>, <code><a href="../reference/writeDMRsToExcel.html">writeDMRsToExcel()</a></code>, <code><a href="../reference/writeDMRsToBed.html">writeDMRsToBed()</a></code>, and <code><a href="../reference/calculateCGEnrichmentGRanges.html">calculateCGEnrichmentGRanges()</a></code> — fixes R CMD check TIMEOUT on Bioconductor build machines. (<a href="https://github.com/cruk-mi/mesa/pull/74" class="external-link">#74</a>)</li>
+<li>Removed duplicate <code>@examples</code> block in <code><a href="../reference/plotRegionsHeatmap.html">plotRegionsHeatmap()</a></code> that caused identical examples to appear twice in the generated Rd file. (<a href="https://github.com/cruk-mi/mesa/pull/74" class="external-link">#74</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.1" id="mesa-0991">mesa 0.99.1<a class="anchor" aria-label="anchor" href="#mesa-0991"></a></h2>
 <ul><li>Fixed Rd cross-references to use <code>\code{\link[pkg]{function}}</code> syntax — R-devel (4.6) is stricter about package-anchored topic resolution. (<a href="https://github.com/cruk-mi/mesa/pull/73" class="external-link">#73</a>)</li>
