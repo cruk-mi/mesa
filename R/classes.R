@@ -75,8 +75,14 @@ setClass("mesaDimRed",
 #'
 #' @rdname mesaDimRed-class
 #' @export
-mesaDimRed <-  function(res, sampleTable, samples, params, dataTable = data.frame()) {
-  methods::new("mesaDimRed", res = res, sampleTable = sampleTable, samples = samples, params = params, dataTable = dataTable)
+mesaDimRed <- function(
+    res, sampleTable, samples, params, dataTable = data.frame()
+) {
+    methods::new(
+        "mesaDimRed",
+        res = res, sampleTable = sampleTable, samples = samples,
+        params = params, dataTable = dataTable
+    )
 }
 
 
@@ -280,18 +286,21 @@ setValidity("mesaUMAP", function(object) {
 #' @method mutate mesaDimRed
 #' @export
 mutate.mesaDimRed <- function(.data, ...) {
-  newTable <- .data@sampleTable  %>%
-    tibble::rownames_to_column(".rownameCol") %>%
-    dplyr::mutate(...) %>%
-    tibble::column_to_rownames(".rownameCol")
-  
-  if (!identical(.data@sampleTable$sample_name, newTable$sample_name)) {
-    stop(glue::glue("sample_names cannot be changed with dplyr::mutate()."))
-  }
-  
-  .data@sampleTable <- newTable
-  
-  return(.data)}
+    newTable <- .data@sampleTable %>%
+        tibble::rownames_to_column(".rownameCol") %>%
+        dplyr::mutate(...) %>%
+        tibble::column_to_rownames(".rownameCol")
+
+    if (!identical(.data@sampleTable$sample_name, newTable$sample_name)) {
+        stop(glue::glue(
+            "sample_names cannot be changed with dplyr::mutate()."
+        ))
+    }
+
+    .data@sampleTable <- newTable
+
+    return(.data)
+}
 
 
 #' Left-join onto the sample table of a mesaDimRed
@@ -337,10 +346,13 @@ mutate.mesaDimRed <- function(.data, ...) {
 #' @method left_join mesaDimRed
 #' @export
 left_join.mesaDimRed <- function(x, y, by = NULL, copy = FALSE,
-                                 suffix = c(".x",".y"), keep = NULL, ...) {
-  x@sampleTable <- x@sampleTable %>%
-    tibble::rownames_to_column("rownameCol") %>%
-    dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%
-    tibble::column_to_rownames("rownameCol")
-  
-  return(x)}
+    suffix = c(".x", ".y"), keep = NULL, ...) {
+    x@sampleTable <- x@sampleTable %>%
+        tibble::rownames_to_column("rownameCol") %>%
+        dplyr::left_join(
+            y, by = by, copy = copy, suffix = suffix, keep = keep, ...
+        ) %>%
+        tibble::column_to_rownames("rownameCol")
+
+    return(x)
+}
