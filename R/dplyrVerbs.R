@@ -319,7 +319,10 @@ selectQset <- function(qseaSet, ...) {
     qseaSet@sampleTable <- qseaSet %>%
         qsea::getSampleTable() %>%
         dplyr::select(sample_name, group) %>%
-        dplyr::bind_cols(newSampleTable %>% dplyr::select(-tidyselect::matches("^sample_name$|^group$")))
+        dplyr::bind_cols(
+            newSampleTable %>%
+                dplyr::select(-tidyselect::matches("^sample_name$|^group$"))
+        )
 
     return(qseaSet)
 }
@@ -558,4 +561,3 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE) {
 setMethod("colnames", "qseaSet", function(x) {
     colnames(qsea::getSampleTable(x))
 })
-
