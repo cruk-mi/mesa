@@ -504,7 +504,8 @@ makeHeatmapAnnotations <- function(qseaSet,
     sampleAnnotation_numeric <- sampleAnnotationDf %>%
         dplyr::select_if(is.numeric)
 
-    # Splitting into numeric variables with all non-negative values and those with negative values
+    # Splitting into numeric variables with all non-negative values
+    # and those with negative values
     sampleAnnotation_numeric_min_positive <- sampleAnnotation_numeric %>%
         dplyr::select_if(function(x) min(x) >= 0)
 
@@ -515,7 +516,8 @@ makeHeatmapAnnotations <- function(qseaSet,
     windowAnnotation_numeric <- windowAnnotationDf %>%
         dplyr::select_if(is.numeric)
 
-    # Splitting into numeric variables with all non-negative values and those with negative values
+    # Splitting into numeric variables with all non-negative values
+    # and those with negative values
     windowAnnotation_numeric_min_positive <- windowAnnotation_numeric %>%
         dplyr::select_if(function(x) min(x) >= 0)
 
@@ -934,8 +936,11 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     # Make row annotation object
     rowAnnot <- makeGeneHeatmapRowAnnotation(annoRow)
 
-    # Set the cell border line width depending on the number of rows or columns, as pheatmap does.
-    # Can't have gridlines for genes with too many windows, as the resulting heatmap is just grey (i.e., all you see is borders)
+    # Set the cell border line width depending on the number
+    # of rows or columns, as pheatmap does.
+    # Can't have gridlines for genes with too many windows,
+    # as the resulting heatmap is just grey
+    # (i.e., all you see is borders)
     if (nrow(numData) > 100 || ncol(numData) > 100) {
         rectGpParam <- grid::gpar(col = "grey", lwd = 0)
     } else {
@@ -1046,7 +1051,8 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
     annotationCol_numeric <- annotationColDf %>%
         dplyr::select_if(is.numeric)
 
-    # Splitting into numeric variables with all non-negative values and those with negative values
+    # Splitting into numeric variables with all non-negative values
+    # and those with negative values
     annotationCol_numeric_min_positive <- annotationCol_numeric %>%
         dplyr::select_if(function(x) min(x) >= 0)
 
