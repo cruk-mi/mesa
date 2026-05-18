@@ -70,7 +70,10 @@
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
 
     if(qsea:::getGenome(qseaSet) != "BSgenome.Hsapiens.NCBI.GRCh38") {
-        stop("This function is only currently defined for BSgenome.Hsapiens.NCBI.GRCh38.")
+        stop(
+            "This function is only currently defined for",
+            " BSgenome.Hsapiens.NCBI.GRCh38."
+        )
     }
     
     if ("hyperStableEdgar" %in% colnames(qsea::getSampleTable(qseaSet))) {
@@ -80,7 +83,10 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
 
     hyperStableBetaTable <- qseaSet %>%
         filterByOverlaps(mesa::hg38UltraStableProbes) %>%
-        qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.)) %>%
+        qsea::makeTable(
+            norm_methods = "beta",
+            samples = qsea::getSampleNames(.)
+        ) %>%
         dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
         dplyr::filter(CpG_density >= !!minDensity) %>%
         dplyr::select(tidyselect::matches("beta"))
@@ -90,12 +96,19 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
         {. >= minBeta} %>%
         apply(2,mean,na.rm = TRUE)
 
-    newData <- tibble::tibble(sample_name = names(overp8Fraction),
-                                                        hyperStableEdgar = overp8Fraction) %>%
+    newData <- tibble::tibble(
+        sample_name = names(overp8Fraction),
+        hyperStableEdgar = overp8Fraction
+    ) %>%
         dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_beta")) %>%
-        dplyr::mutate(hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3),0))
+        dplyr::mutate(
+            hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3), 0)
+        )
 
-    qseaSet@sampleTable <- cbind(qseaSet@sampleTable, dplyr::select(newData,-sample_name))
+    qseaSet@sampleTable <- cbind(
+        qseaSet@sampleTable,
+        dplyr::select(newData, -sample_name)
+    )
 
     return(qseaSet)
 
@@ -147,7 +160,10 @@ getSampleQCSummary <- function(qseaSet){
 
     qseaSet %>%
         qsea::getSampleTable() %>%
-        dplyr::select(sample_name, tidyselect::matches("valid_fragment|relH|hyperStable|ichorTumo")) %>%
+        dplyr::select(
+            sample_name,
+            tidyselect::matches("valid_fragment|relH|hyperStable|ichorTumo")
+        ) %>%
         dplyr::arrange(sample_name) %>%
         tibble::as_tibble() %>%
         return()
