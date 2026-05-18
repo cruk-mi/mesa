@@ -1,17 +1,28 @@
 utils::globalVariables(c(
-    "chr", "seqnames", "start", "end", ".", "annotation", "value", "library_factor",
-    "ROI_start", "ROI_end", "value", "window_start", "window_end", "window", "sample_name",
-    "width", "group", "relH", "CpG_density", "strand", "state", "gene_name", "map", "CNV",
-    "EMSEMBL", "SYMBOL", "GENENAME", "geneChr", "geneStart", "geneEnd", "geneLength", "n",
-    "adjPval", "group1", "group2", "sample1", "sample2", ".up", "hyperStableFractionp8", "hyperStableFractionp9", "hyperStableEdgar",
-    "isProperPair", "isUnmappedQuery", "isSupplementaryAlignment", "isDuplicate", "hasUnmappedMate",
-    "isNotPassingQualityControls", "rname", "pos", "isize", "MQ", "mapq", "isFirstMateRead", "isPaired",
-    "cigar", ".rowID", "feature", "annoShort", "type", ".comparison", ".ext", ".value", "total_fragments",
+    "chr", "seqnames", "start", "end", ".", "annotation", "value",
+    "library_factor",
+    "ROI_start", "ROI_end", "value", "window_start", "window_end",
+    "window", "sample_name",
+    "width", "group", "relH", "CpG_density", "strand", "state",
+    "gene_name", "map", "CNV",
+    "EMSEMBL", "SYMBOL", "GENENAME", "geneChr", "geneStart",
+    "geneEnd", "geneLength", "n",
+    "adjPval", "group1", "group2", "sample1", "sample2", ".up",
+    "hyperStableFractionp8", "hyperStableFractionp9", "hyperStableEdgar",
+    "isProperPair", "isUnmappedQuery", "isSupplementaryAlignment",
+    "isDuplicate", "hasUnmappedMate",
+    "isNotPassingQualityControls", "rname", "pos", "isize", "MQ",
+    "mapq", "isFirstMateRead", "isPaired",
+    "cigar", ".rowID", "feature", "annoShort", "type", ".comparison",
+    ".ext", ".value", "total_fragments",
     "isSecondaryAlignment", "ROI_ID", "ID", "ENSEMBL", "deltaBeta",
     "map_hg38_1000kb", "map_hg38_10kb", "map_hg38_50kb", "map_hg38_500kb",
-    "gc_hg38_1000kb", "gc_hg38_50kb", "gc_hg38_500kb", "gc_hg38_10kb", "score",
-    "log2FC", "group1new", "sample2new", "counts", "tumour", "rowIndex", "nUp", "nDown", "landscape", "shortAnno", "nOverCutoff",
-    "afterOverBackNum", "initialOverBackNum", "qname", "inOut", "nSign", "nStrands",
+    "gc_hg38_1000kb", "gc_hg38_50kb", "gc_hg38_500kb", "gc_hg38_10kb",
+    "score",
+    "log2FC", "group1new", "sample2new", "counts", "tumour", "rowIndex",
+    "nUp", "nDown", "landscape", "shortAnno", "nOverCutoff",
+    "afterOverBackNum", "initialOverBackNum", "qname", "inOut",
+    "nSign", "nStrands",
     "chromosome_name", "start_position", "end_position", "input_file",
     "topVarNumInput", "windowSdName", "pcaName",
     "fnValue", "group2new", "gap", "size"
@@ -70,7 +81,12 @@ liftOverHg19 <- function(grOrDf) {
 
     regions <- grOrDf %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames, "chr"), seqnames, paste0("chr", seqnames))) %>%
+        dplyr::mutate(
+            seqnames = ifelse(
+                stringr::str_detect(seqnames, "chr"),
+                seqnames, paste0("chr", seqnames)
+            )
+        ) %>%
         plyranges::as_granges()
 
     message("Performing coordinate liftover from hg19 to hg38")
@@ -187,7 +203,11 @@ setMesaTxDb <- function(TxDb) {
 
     if (!requireNamespace(TxDb, quietly = TRUE)) {
         stop(
-            glue::glue("Package {TxDb} must exist and be installed to set as default TxDb. Please install or correct and run again."),
+            glue::glue(paste0(
+                "Package {TxDb} must exist and be installed",
+                " to set as default TxDb.",
+                " Please install or correct and run again."
+            )),
             call. = FALSE
         )
     }
@@ -249,7 +269,11 @@ setMesaAnnoDb <- function(annoDb) {
 
     if (!requireNamespace(annoDb, quietly = TRUE)) {
         stop(
-            glue::glue("Package {annoDb} must exist and be installed to set as default annoDb. Please install or correct and run again."),
+            glue::glue(paste0(
+                "Package {annoDb} must exist and be installed",
+                " to set as default annoDb.",
+                " Please install or correct and run again."
+            )),
             call. = FALSE
         )
     }
@@ -341,8 +365,13 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) 
     options("mesa_parallel" = useParallel)
 
     if (useParallel & verbose) {
-        message(glue::glue("Parallelisation turned on for the functions in the mesa package, currently using {BiocParallel::bpworkers()} cores.
-Control the number of cores by calling BiocParallel::register."))
+        message(glue::glue(paste0(
+            "Parallelisation turned on for the functions in",
+            " the mesa package, currently using",
+            " {BiocParallel::bpworkers()} cores.\n",
+            "Control the number of cores by calling",
+            " BiocParallel::register."
+        )))
     } else if (verbose) {
         message("Parallelisation turned off for all functions in the mesa package.")
     }
@@ -356,9 +385,14 @@ Control the number of cores by calling BiocParallel::register."))
 getMesaParallel <- function(verbose = FALSE) {
     if (verbose) {
         if (is.null(getOption("mesa_parallel"))) {
-            message("Parallelisation not set, using serial evaluation. Call setMesaParallel to set for all mesa functions.")
+            message(paste0(
+                "Parallelisation not set, using serial evaluation.",
+                " Call setMesaParallel to set for all mesa functions."
+            ))
         } else if (getOption("mesa_parallel")) {
-            message(glue::glue("Using parallelisation, over {BiocParallel::bpworkers()} cores."))
+            message(glue::glue(
+                "Using parallelisation, over {BiocParallel::bpworkers()} cores."
+            ))
         } else {
             message("Using serial evaluation")
         }
