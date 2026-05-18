@@ -174,6 +174,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 #' @family DMR-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Summarise DMRs with explicit annotation databases
@@ -182,6 +183,7 @@ summariseDMRsByContrast <- function(DMRtable, FDRthres = 0.05, log2FCthres = 0, 
 #'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
 #'                   annoDb = "org.Hs.eg.db") %>%
 #'   summariseDMRsByGene()
+#' }
 #' @export
 summariseDMRsByGene <- function(DMRtable){
 
@@ -234,6 +236,7 @@ summariseDMRsByGene <- function(DMRtable){
 #' @family DMR-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Minimal example: write results for a single contrast
@@ -246,6 +249,7 @@ summariseDMRsByGene <- function(DMRtable){
 #'   calculateDMRs(variable = "tumour", contrasts = "all") %>%
 #'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") %>%
 #'   writeDMRsToExcel(path = file.path(tempdir(),"test.xlsx"))
+#' }
 #' @export
 writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 
@@ -308,6 +312,7 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 #' @family DMR-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Export DMRs for a single contrast to BED files in a temp directory
@@ -322,6 +327,7 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 #'   annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
 #'                   annoDb = "org.Hs.eg.db") %>%
 #'   writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
+#' }
 #' @export
 writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
 

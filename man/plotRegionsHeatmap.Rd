@@ -117,6 +117,7 @@ For \code{"beta"}, low-enrichment values are set to \code{NA} using \code{minEnr
 samples are aggregated by \code{group} before plotting.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Compute regions (DMRs) to plot
@@ -140,26 +141,7 @@ exampleTumourNormal \%>\%
                    windowAnnotation = CpG_density,
                    annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
                     )
-
-# calculate DMRs to plot
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
-# plot these windows
-exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
-# cluster the rows and add annotation
-exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs, 
-                                           clusterRows = TRUE, 
-                                           sampleAnnotation = c(tumour, tissue)
-                                           )
-# more complex example
-exampleTumourNormal \%>\% 
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                   clusterRows = TRUE, 
-                   clusterNum = 2,
-                   sampleAnnotation = tumour,
-                   windowAnnotation = CpG_density,
-                   annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
-                    )
-
+}
 }
 \seealso{
 \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap]{draw}},

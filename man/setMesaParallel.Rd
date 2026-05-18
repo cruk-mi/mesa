@@ -59,7 +59,7 @@ setMesaParallel(useParallel = FALSE, verbose = FALSE)
 getMesaParallel()  # FALSE
 
 # --- Unix/mac (MulticoreParam): enable and use 2 cores ---
-\dontrun{
+\donttest{
 if (.Platform$OS.type != "windows") {
   old <- BiocParallel::bpparam()                         # save current backend
   setMesaParallel(nCores = 2, verbose = FALSE)           # registers MulticoreParam(2)
@@ -71,7 +71,7 @@ if (.Platform$OS.type != "windows") {
 }
 
 # --- Windows: register SnowParam yourself, then enable ---
-\dontrun{
+\donttest{
 if (.Platform$OS.type == "windows") {
   old <- BiocParallel::bpparam()
   BiocParallel::register(BiocParallel::SnowParam(workers = 2))

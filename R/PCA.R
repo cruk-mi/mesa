@@ -5,6 +5,7 @@
 #' @describeIn getDimRed Principal component analysis of a qseaSet.
 #' @family dimred-helpers
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
@@ -20,6 +21,7 @@
 #'   getPCA(topVarNum = c(10, 100, 500, NA)) %>%
 #'   slot("res") %>%
 #'   names()
+#' }
 #' @export
 getPCA <- function(qseaSet,
                    dataTable = NULL,
@@ -62,6 +64,7 @@ getPCA <- function(qseaSet,
 #' @describeIn getDimRed Uniform manifold approximation and projection of a qseaSet.
 #' @family dimred-helpers
 #' @examples
+#' \donttest{
 #' # Quick demo on a small synthetic qseaSet
 #' qsea::getExampleQseaSet(repl = 20) %>%
 #'   getUMAP()
@@ -73,6 +76,7 @@ getPCA <- function(qseaSet,
 #' # Use top 500 most variable windows only
 #' qsea::getExampleQseaSet(repl = 20) %>%
 #'   getUMAP(topVarNum = 500)
+#' }
 #' @export
 getUMAP <- function(qseaSet,
                    dataTable = NULL,
@@ -208,6 +212,7 @@ getUMAP <- function(qseaSet,
 #' @family dimred-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # PCA on default beta-normalised matrix, keep 3 PCs
@@ -228,6 +233,7 @@ getUMAP <- function(qseaSet,
 #'   getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) %>%
 #'   slot("res") %>%
 #'   names()
+#' }
 #' @export
 getDimRed <- function(qseaSet,
                       dataTable = NULL,
@@ -1185,6 +1191,7 @@ plotPCA.mesaDimRed <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Default UMAP (beta-normalised, top 1000 most variable windows)
@@ -1204,6 +1211,7 @@ plotPCA.mesaDimRed <- function(object,
 #'   plotUMAP(components = list(c(1, 2)),
 #'            colour = "group",
 #'            shape  = "tissue")
+#' }
 #'
 #' @export
 plotUMAP <- function(object,
@@ -1319,6 +1327,7 @@ plotUMAP <- function(object,
 #' @family dimred-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # PCA: colour by group
@@ -1337,6 +1346,7 @@ plotUMAP <- function(object,
 #'   getPCA(nPC = 3) %>%
 #'   plotDimRed(colour = "group",
 #'              showSampleNames = TRUE) 
+#' }
 #'
 #' @export
 plotDimRed <- function(object,

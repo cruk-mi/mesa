@@ -220,6 +220,7 @@ enrichment parameters, allowing for estimation of beta values.
 }
 }
 \examples{
+\donttest{
 # Minimal runnable sketch if MEDIPSData is installed
 if (requireNamespace("MEDIPSData", quietly = TRUE)) {
   sampleTable <- data.frame(
@@ -245,6 +246,7 @@ if (requireNamespace("MEDIPSData", quietly = TRUE)) {
       properPairsOnly   = FALSE,
       minMapQual        = 10
     )
+}
 }
 }
 \seealso{

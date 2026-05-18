@@ -110,6 +110,7 @@ sample-level metadata, and can return multiple plots across UMAP component
 pairs and annotation variables.
 }
 \examples{
+\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Default UMAP (beta-normalised, top 1000 most variable windows)
@@ -129,6 +130,7 @@ exampleTumourNormal \%>\%
   plotUMAP(components = list(c(1, 2)),
            colour = "group",
            shape  = "tissue")
+}
 
 }
 \seealso{
