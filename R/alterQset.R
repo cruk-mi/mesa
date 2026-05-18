@@ -69,8 +69,16 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap){
     regionsToOverlap <- regionsToOverlap %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = stringr::str_remove(seqnames,"chr")) %>% plyranges::as_granges()
   }
 
-  qseaSet@count_matrix <- qseaSet@count_matrix[which(plyranges::count_overlaps(qseaSet@regions,regionsToOverlap) > 0), , drop = FALSE]
-  qseaSet@regions <- qseaSet@regions %>% plyranges::filter_by_overlaps(regionsToOverlap)
+    qseaSet@count_matrix <- qseaSet@count_matrix[
+        which(
+            plyranges::count_overlaps(
+                qseaSet@regions, regionsToOverlap
+            ) > 0
+        ), ,
+        drop = FALSE
+    ]
+    qseaSet@regions <- qseaSet@regions %>%
+        plyranges::filter_by_overlaps(regionsToOverlap)
 
   return(qseaSet)
 }
@@ -78,11 +86,16 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap){
 
 #' @rdname alterQsetOverlap
 #' @export
-filterByNonOverlaps <- function(qseaSet, regionsToOverlap){
-
-  if(is.data.frame(regionsToOverlap)) {
-    if(length(intersect(colnames(regionsToOverlap),c("seqnames","start","end"))) != 3){
-      stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
+filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
+    if (is.data.frame(regionsToOverlap)) {
+        if (length(intersect(
+            colnames(regionsToOverlap), c("seqnames", "start", "end")
+        )) != 3) {
+            stop(paste0(
+                "regionsToOverlap must be a GRanges object or a",
+                " dataframe with seqnames, start and end."
+            ))
+        }
     }
   }
 
@@ -197,13 +210,11 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
     message("No samples remaining, returning an empty qseaSet.")
   }
 
-  if (length(samplesToKeep) > 0 & length(samplesToDrop) > 0 ) {
-    stop("Can only specify samples to keep or to drop, not both.")
-  }
-
-  samplesNotInSet <- setdiff(c(samplesToKeep,samplesToDrop), qsea::getSampleNames(qseaSet))
-  if (length(samplesNotInSet) > 0 ) {
-    stop(glue::glue("Sample {samplesNotInSet} not present in the qseaSet!
+    samplesNotInSet <- setdiff(
+        c(samplesToKeep, samplesToDrop), qsea::getSampleNames(qseaSet)
+    )
+    if (length(samplesNotInSet) > 0) {
+        stop(glue::glue("Sample {samplesNotInSet} not present in the qseaSet!
 
                     "))
   }
@@ -222,10 +233,14 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL){
     newSet@cnv <- qseaSet@cnv[,samplesToKeep, drop = FALSE]
   }
 
-  newSet@libraries$file_name <- qseaSet@libraries$file_name[samplesToKeep,, drop = FALSE]
-  newSet@libraries$input_file <- qseaSet@libraries$input_file[samplesToKeep,, drop = FALSE]
-  newSet@enrichment$parameters <- qseaSet@enrichment$parameters[samplesToKeep,, drop = FALSE]
-  newSet@enrichment$factors <- qseaSet@enrichment$factors[,samplesToKeep, drop = FALSE]
+    newSet@libraries$file_name <-
+        qseaSet@libraries$file_name[samplesToKeep, , drop = FALSE]
+    newSet@libraries$input_file <-
+        qseaSet@libraries$input_file[samplesToKeep, , drop = FALSE]
+    newSet@enrichment$parameters <-
+        qseaSet@enrichment$parameters[samplesToKeep, , drop = FALSE]
+    newSet@enrichment$factors <-
+        qseaSet@enrichment$factors[, samplesToKeep, drop = FALSE]
 
   return(newSet)
 }
@@ -288,7 +303,12 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
     stop(glue::glue("Duplicate sample_name now present: {renamedNames[duplicated(renamedNames)]}"))
   }
 
-  newQSet <- qseaSet
+    if (any(duplicated(renamedNames))) {
+        stop(glue::glue(paste0(
+            "Duplicate sample_name now present:",
+            " {renamedNames[duplicated(renamedNames)]}"
+        )))
+    }
 
   newQSet@sampleTable <- newQSet@sampleTable %>%
     tibble::remove_rownames() %>%
@@ -299,18 +319,35 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
   rownames(newQSet@zygosity) <- stringr::str_replace_all(rownames(newQSet@zygosity), pattern, replacement)
   rownames(newQSet@libraries$file_name) <- stringr::str_replace_all(rownames(newQSet@libraries$file_name), pattern, replacement)
 
-  if(!is.null(newQSet@libraries$input_file)) {
-    rownames(newQSet@libraries$input_file) <- stringr::str_replace_all(rownames(newQSet@libraries$input_file), pattern, replacement)
-  }
+    rownames(newQSet@zygosity) <- stringr::str_replace_all(
+        rownames(newQSet@zygosity), pattern, replacement
+    )
+    rownames(newQSet@libraries$file_name) <- stringr::str_replace_all(
+        rownames(newQSet@libraries$file_name), pattern, replacement
+    )
 
-  colnames(newQSet@count_matrix) <- stringr::str_replace_all(colnames(newQSet@count_matrix), pattern, replacement)
+    if (!is.null(newQSet@libraries$input_file)) {
+        rownames(newQSet@libraries$input_file) <- stringr::str_replace_all(
+            rownames(newQSet@libraries$input_file), pattern, replacement
+        )
+    }
 
-  rownames(newQSet@enrichment$parameters) <- stringr::str_replace_all(rownames(newQSet@enrichment$parameters), pattern, replacement)
-  colnames(newQSet@enrichment$factors) <- stringr::str_replace_all(colnames(newQSet@enrichment$factors), pattern, replacement)
+    colnames(newQSet@count_matrix) <- stringr::str_replace_all(
+        colnames(newQSet@count_matrix), pattern, replacement
+    )
 
-  colnames(GenomicRanges::mcols(newQSet@cnv)) <- stringr::str_replace_all(colnames(GenomicRanges::mcols(newQSet@cnv)), pattern, replacement)
+    rownames(newQSet@enrichment$parameters) <- stringr::str_replace_all(
+        rownames(newQSet@enrichment$parameters), pattern, replacement
+    )
+    colnames(newQSet@enrichment$factors) <- stringr::str_replace_all(
+        colnames(newQSet@enrichment$factors), pattern, replacement
+    )
 
-  return(newQSet)
+    colnames(GenomicRanges::mcols(newQSet@cnv)) <- stringr::str_replace_all(
+        colnames(GenomicRanges::mcols(newQSet@cnv)), pattern, replacement
+    )
+
+    return(newQSet)
 }
 
 
@@ -464,25 +501,70 @@ poolSamples <- function(qseaSet, mergeString){
   }
   )
 
-  newLibrariesInput <- purrr::map_dfr(newNames, function(x) {
-    qseaSet@libraries$input_file[startsWith(rownames(qseaSet@sampleTable), x),] %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(total_fragments2 = total_fragments) %>%
-      dplyr::summarise(dplyr::across(tidyselect::any_of(tidyselect::matches("mean|median|sd|relH|GoGe")), ~stats::weighted.mean(.x,total_fragments)),
-                       dplyr::across(tidyselect::any_of(tidyselect::matches("reads|pairs|r1s|fragments")), ~sum(.x))
-      ) %>%
-      dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
-      tibble::remove_rownames() %>%
-      tibble::column_to_rownames("rownameCol")
+    newSampleTable <- purrr::map_dfr(newNames, function(x) {
+        qseaSet@sampleTable[
+            startsWith(rownames(qseaSet@sampleTable), x), , drop = FALSE
+        ] %>%
+            dplyr::select(-tidyselect::matches("file_name|input_file")) %>%
+            dplyr::mutate(
+                sample_name = x,
+                rownameCol = x
+            ) %>%
+            dplyr::distinct() %>%
+            dplyr::slice(1) %>%
+            tibble::remove_rownames() %>%
+            tibble::column_to_rownames("rownameCol")
+    })
 
   }
   )
 
-  newSet@libraries$file_name <- as.data.frame(newLibrariesFile)
-  newSet@libraries$input_file <- as.data.frame(newLibrariesInput)
+    newLibrariesFile <- purrr::map_dfr(newNames, function(x) {
+        qseaSet@libraries$file_name[
+            startsWith(rownames(qseaSet@sampleTable), x), ] %>%
+            tibble::as_tibble() %>%
+            dplyr::summarise(
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "mean|median|sd|relH|GoGe"
+                    )),
+                    ~ stats::weighted.mean(.x, total_fragments)
+                ),
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "reads|pairs|r1s|fragments"
+                    )),
+                    ~ sum(.x)
+                )
+            ) %>%
+            dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
+            tibble::remove_rownames() %>%
+            tibble::column_to_rownames("rownameCol")
+    })
 
-  oldSet <- qseaSet %>%
-    subsetQset(samplesToDrop = samplesToMerge)
+    newLibrariesInput <- purrr::map_dfr(newNames, function(x) {
+        qseaSet@libraries$input_file[
+            startsWith(rownames(qseaSet@sampleTable), x), ] %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(total_fragments2 = total_fragments) %>%
+            dplyr::summarise(
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "mean|median|sd|relH|GoGe"
+                    )),
+                    ~ stats::weighted.mean(.x, total_fragments)
+                ),
+                dplyr::across(
+                    tidyselect::any_of(tidyselect::matches(
+                        "reads|pairs|r1s|fragments"
+                    )),
+                    ~ sum(.x)
+                )
+            ) %>%
+            dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
+            tibble::remove_rownames() %>%
+            tibble::column_to_rownames("rownameCol")
+    })
 
   finalSet <-  combineQsets(oldSet, newSet) %>%
     addNormalisation(enrichmentMethod = "blind1-15")
@@ -553,14 +635,33 @@ renameSamples <- function(qseaSet, newNameColumn){
                   rownameCol = renamedNames) %>%
     tibble::column_to_rownames("rownameCol")
 
-  rownames(newQSet@zygosity) <- renamedNames
-  rownames(newQSet@libraries$file_name) <- renamedNames
-  if (!is.null(newQSet@libraries$input_file)) {
-    rownames(newQSet@libraries$input_file) <- renamedNames
-  }
-  colnames(newQSet@count_matrix) <- renamedNames
-  rownames(newQSet@enrichment$parameters) <- renamedNames
-  colnames(newQSet@enrichment$factors) <- renamedNames
-  colnames(GenomicRanges::mcols(newQSet@cnv)) <- renamedNames
-  return(newQSet)
+    if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
+        message("Renaming had no effect!")
+        return(qseaSet)
+    }
+    if (any(duplicated(renamedNames))) {
+        stop(glue::glue(paste0(
+            "Duplicate sample_name now present:",
+            " {renamedNames[duplicated(renamedNames)]}"
+        )))
+    }
+    newQSet <- qseaSet
+    newQSet@sampleTable <- newQSet@sampleTable %>%
+        tibble::remove_rownames() %>%
+        dplyr::mutate(
+            sample_name = renamedNames,
+            rownameCol = renamedNames
+        ) %>%
+        tibble::column_to_rownames("rownameCol")
+
+    rownames(newQSet@zygosity) <- renamedNames
+    rownames(newQSet@libraries$file_name) <- renamedNames
+    if (!is.null(newQSet@libraries$input_file)) {
+        rownames(newQSet@libraries$input_file) <- renamedNames
+    }
+    colnames(newQSet@count_matrix) <- renamedNames
+    rownames(newQSet@enrichment$parameters) <- renamedNames
+    colnames(newQSet@enrichment$factors) <- renamedNames
+    colnames(GenomicRanges::mcols(newQSet@cnv)) <- renamedNames
+    return(newQSet)
 }
