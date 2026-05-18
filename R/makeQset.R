@@ -387,7 +387,9 @@ makeQset <- function(sampleTable,
 
     } else if (coverageMethod == "PairedAndR1s") {
 
-        # load the coverage from each bam file, including using R1s from high MAPQ reads that aren't in perfect pairs.
+        # load the coverage from each bam file,
+        # including using R1s from high MAPQ reads
+        # that aren't in perfect pairs.
         qseaSet <- addBamCoveragePairedAndUnpaired(qseaSet,
             fragmentLength = fragmentLength,
             parallel = parallel,
@@ -416,7 +418,9 @@ makeQset <- function(sampleTable,
 
         # calculate the CNV, using the input files included in the sampleTable CSV.
         # uses HMMCopy behind the scenes
-        # note that apparently if you give any samples with normal or control in the name it will try and use those to normalise!
+        # note that apparently if you give any samples
+        # with normal or control in the name it will try
+        # and use those to normalise!
         qseaSet <- qsea::addCNV(qseaSet,
             file_name = "input_file",
             window_size = CNVwindowSize,
@@ -426,7 +430,8 @@ makeQset <- function(sampleTable,
             MeDIP = FALSE
         )
 
-        # this is included in the addHMMcopyCNV method more efficiently, don't need to call it there.
+        # this is included in the addHMMcopyCNV method
+        # more efficiently, don't need to call it there.
         qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
 
     } else if (CNVmethod == "HMMdefault") {
@@ -569,7 +574,9 @@ makeQset <- function(sampleTable,
     qseaSet@parameters$fragmentLength <- fragmentLength
     qseaSet@parameters$fragmentSD <- fragmentSD
 
-    # do not set library factors via TMM, just set to be 1. Makes no difference to beta values as gets normalised out anyway, only nrpms are affected.
+    # do not set library factors via TMM, just set to be 1.
+    # Makes no difference to beta values as gets normalised
+    # out anyway, only nrpms are affected.
 
     qseaSet <- addNormalisation(qseaSet, enrichmentMethod = enrichmentMethod, maxPatternDensity = maxPatternDensity)
 
