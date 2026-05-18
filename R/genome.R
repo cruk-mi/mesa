@@ -10,14 +10,23 @@ getMesaGenome <- function() {
 #' @return A TxDb object for the specified genome
 #' @export
 getMesaTxDb <- function(genome = NULL) {
-  if (is.null(genome)) genome <- getMesaGenome()
-  
-  switch(genome,
-         "hg38" = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene,
-         "hg19" = TxDb.Hsapiens.UCSC.hg19.knownGene::TxDb.Hsapiens.UCSC.hg19.knownGene,
-         "mm10" = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
-         stop("Unsupported genome: ", genome)
-  )
+    if (is.null(genome)) genome <- getMesaGenome()
+
+    switch(genome,
+        "hg38" = getExportedValue(
+            "TxDb.Hsapiens.UCSC.hg38.knownGene",
+            "TxDb.Hsapiens.UCSC.hg38.knownGene"
+        ),
+        "hg19" = getExportedValue(
+            "TxDb.Hsapiens.UCSC.hg19.knownGene",
+            "TxDb.Hsapiens.UCSC.hg19.knownGene"
+        ),
+        "mm10" = getExportedValue(
+            "TxDb.Mmusculus.UCSC.mm10.knownGene",
+            "TxDb.Mmusculus.UCSC.mm10.knownGene"
+        ),
+        stop("Unsupported genome: ", genome)
+    )
 }
 
 #' Get annotation DB for current or specified genome
