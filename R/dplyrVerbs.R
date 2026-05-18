@@ -118,21 +118,23 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE){
 #' @export
 mutate.qseaSet <- function(.data, ...){
 
-   newTable <- .data %>%
-    qsea::getSampleTable() %>%
-    tibble::rownames_to_column(".rownameCol") %>%
-    dplyr::mutate(...) %>%
-    tibble::column_to_rownames(".rownameCol")
-  
-  if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-    stop(glue::glue("sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
-  }
+    if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
+        stop(glue::glue(paste0(
+            "sample_name cannot be changed with dplyr::mutate().",
+            " Use mesa::renameQsetNames() or",
+            " mesa::renameSamples() instead."
+        )))
+    }
 
   .data@sampleTable <- newTable
 
-  if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-    stop(glue::glue("sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
-  }
+    if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
+        stop(glue::glue(paste0(
+            "sample_name cannot be changed with dplyr::mutate().",
+            " Use mesa::renameQsetNames() or",
+            " mesa::renameSamples() instead."
+        )))
+    }
 
   .data@sampleTable <- newTable
 
@@ -196,7 +198,17 @@ mutate.qseaSet <- function(.data, ...){
 #'   qsea::getSampleTable()
 #' 
 #' @export
-left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x",".y"), keep = NULL, ...){
+left_join.qseaSet <- function(
+    x, y, by = NULL, copy = FALSE,
+    suffix = c(".x", ".y"), keep = NULL, ...
+) {
+    x@sampleTable <- x %>%
+        qsea::getSampleTable() %>%
+        tibble::rownames_to_column("rownameCol") %>%
+        dplyr::left_join(
+            y, by = by, copy = copy, suffix = suffix, keep = keep, ...
+        ) %>%
+        tibble::column_to_rownames("rownameCol")
 
   x@sampleTable <- x %>%
     qsea::getSampleTable() %>%
@@ -315,11 +327,14 @@ selectQset <- function(qseaSet, ...){
     qsea::getSampleTable() %>%
     dplyr::select(...)
 
-  #ensure that the sample_name and group columns are still present at the front of the output
-  qseaSet@sampleTable <- qseaSet %>%
-    qsea::getSampleTable() %>%
-    dplyr::select(sample_name, group) %>%
-    dplyr::bind_cols(newSampleTable %>% dplyr::select(-tidyselect::matches("^sample_name$|^group$")))
+    # ensure that the sample_name and group columns are still present at the front of the output
+    qseaSet@sampleTable <- qseaSet %>%
+        qsea::getSampleTable() %>%
+        dplyr::select(sample_name, group) %>%
+        dplyr::bind_cols(
+            newSampleTable %>%
+                dplyr::select(-tidyselect::matches("^sample_name$|^group$"))
+        )
 
   return(qseaSet)
 }
