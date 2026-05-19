@@ -182,7 +182,9 @@ mixSamples <- function(
 
     newSet <- qseaSet %>%
         subsetQset(samplesToKeep = qsea::getSampleNames(qseaSet)[1]) %>%
-        renameQsetNames(paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName)
+        renameQsetNames(
+            paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName
+        )
 
     newSet@count_matrix <- as.matrix(newCounts)
     colnames(newSet@count_matrix) <- newName
@@ -456,7 +458,9 @@ mixThreeQsetSamples <- function(
 
     newSet <- qseaSet %>%
         subsetQset(samplesToKeep = qsea::getSampleNames(qseaSet)[1]) %>%
-        renameQsetNames(paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName)
+        renameQsetNames(
+            paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName
+        )
 
     newSet@count_matrix <- as.matrix(newCounts)
     colnames(newSet@count_matrix) <- newName
