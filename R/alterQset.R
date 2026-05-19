@@ -50,8 +50,13 @@
 #' @export
 filterByOverlaps <- function(qseaSet, regionsToOverlap) {
     if (is.data.frame(regionsToOverlap)) {
-        if (length(intersect(colnames(regionsToOverlap), c("seqnames", "start", "end"))) != 3) {
-            stop("regionsToOverlap must be a GRanges object or a dataframe with seqnames, start and end.")
+        if (length(intersect(
+            colnames(regionsToOverlap), c("seqnames", "start", "end")
+        )) != 3) {
+            stop(paste0(
+                "regionsToOverlap must be a GRanges object",
+                " or a dataframe with seqnames, start and end."
+            ))
         }
     }
 
@@ -141,7 +146,9 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
     }
 
     GRangesToKeep <- qsea::getRegions(qseaSet) %>%
-        plyranges::filter_by_non_overlaps(plyranges::as_granges(regionsToOverlap))
+        plyranges::filter_by_non_overlaps(
+            plyranges::as_granges(regionsToOverlap)
+        )
 
     qseaSet %>%
         filterByOverlaps(GRangesToKeep) %>%
@@ -322,12 +329,16 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
     asValidNames <- base::make.names(renamedNames)
 
     if (any(asValidNames != renamedNames)) {
-        stop(glue::glue("Sample names must be valid names for columns in R without quoting.
-See the help for base::make.names, but generally use only letters, numbers,
-underscores and dots, and names can't start with a number.
-Issues were found with:
-    {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
-"))
+        stop(glue::glue(paste0(
+            "Sample names must be valid names for columns",
+            " in R without quoting.\n",
+            "See the help for base::make.names, but generally use only",
+            " letters, numbers,\n",
+            "underscores and dots, and names can't start with a number.\n",
+            "Issues were found with:\n    ",
+            "{paste(renamedNames[renamedNames != asValidNames],",
+            " collapse = '\n    ')}"
+        )))
     }
 
     if (any(duplicated(renamedNames))) {
@@ -342,7 +353,9 @@ Issues were found with:
     newQSet@sampleTable <- newQSet@sampleTable %>%
         tibble::remove_rownames() %>%
         dplyr::mutate(
-            sample_name = stringr::str_replace_all(sample_name, pattern, replacement),
+            sample_name = stringr::str_replace_all(
+                sample_name, pattern, replacement
+            ),
             rownameCol = sample_name
         ) %>%
         tibble::column_to_rownames("rownameCol")
@@ -461,7 +474,9 @@ poolSamples <- function(qseaSet, mergeString) {
                 GenomicRanges::mcols() %>%
                 as.matrix()
 
-            weights <- qseaSet@libraries$input_file[columnsToKeep, "total_fragments"]
+            weights <- qseaSet@libraries$input_file[
+                columnsToKeep, "total_fragments"
+            ]
             weights <- weights / sum(weights)
 
             rowSums(
@@ -480,7 +495,9 @@ poolSamples <- function(qseaSet, mergeString) {
                 colnames() %>%
                 stringr::str_subset(x)
 
-            weights <- qseaSet@libraries$input_file[columnsToKeep, "total_fragments"]
+            weights <- qseaSet@libraries$input_file[
+                columnsToKeep, "total_fragments"
+            ]
             weights <- weights / sum(weights)
 
             colSums(
@@ -615,12 +632,16 @@ renameSamples <- function(qseaSet, newNameColumn) {
     asValidNames <- base::make.names(renamedNames)
 
     if (any(asValidNames != renamedNames)) {
-        stop(glue::glue("Sample names must be valid names for columns in R without quoting.
-See the help for base::make.names, but generally use only letters, numbers,
-underscores and dots, and names can't start with a number.
-Issues were found with:
-    {paste(renamedNames[renamedNames != asValidNames], collapse = '\n    ')}
-"))
+        stop(glue::glue(paste0(
+            "Sample names must be valid names for columns",
+            " in R without quoting.\n",
+            "See the help for base::make.names, but generally use only",
+            " letters, numbers,\n",
+            "underscores and dots, and names can't start with a number.\n",
+            "Issues were found with:\n    ",
+            "{paste(renamedNames[renamedNames != asValidNames],",
+            " collapse = '\n    ')}"
+        )))
     }
 
     if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
