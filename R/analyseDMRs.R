@@ -159,7 +159,9 @@ summariseDMRsByContrast <- function(
         dplyr::mutate(.up = ifelse(log2FC > 0, "nUp", "nDown")) %>%
         dplyr::group_by(group1, group2, .up) %>%
         dplyr::tally() %>%
-        tidyr::pivot_wider(names_from = .up, values_from = n, values_fill = 0) %>%
+        tidyr::pivot_wider(
+            names_from = .up, values_from = n, values_fill = 0
+        ) %>%
         dplyr::ungroup()
 
     contrastsDF %>%
