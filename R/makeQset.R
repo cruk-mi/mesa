@@ -369,160 +369,20 @@ makeQset <- function(sampleTable,
             stringr::str_detect(BSgenome, "NCBI") &&
             all(stringr::str_detect(chrSelect, "chr"))
         ) {
-            stop(glue::glue("NCBI genome does not use 'chr' prefixes. \\
-            Remove these or consider swapping to e.g. BSgenome.Hsapiens.UCSC.hg38"))
-    }
-      
-    stop(glue::glue(
-      "Chromosomes provided not found in the given BSgenome!\n",
-      "Showing first {length(unknownChr)} not found:\n",
-      "    {glue::glue_collapse(head(unknownChr), sep = '\n    ')}"
-    ))
-  }
-  
-  # chromosome lengths, and then a Seqinfo object with that
-  chrLength <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
-  seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect),chrLength, NA, BSgenome)
-
-  # number of windows of size windowSize on each chromosome
-  numWindows <- floor(chrLength/windowSize)
-
-  # starting point of each window on each chromosome, then make a GRanges object with all those windows
-  windowStart <- unlist(lapply(FUN = seq, X = chrLength - windowSize + 1,
-                            from = 1, by = windowSize), FALSE, FALSE)
-
-  windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), numWindows),
-                                           ranges = IRanges::IRanges(start = windowStart,
-                                                                     width = windowSize),
-                                           seqinfo = seqinfo)
-
-  # remove both sets of blacklisted windows from the full set of windows
-  windowsWithoutBlacklist <- windowsGRanges %>%
-    plyranges::filter_by_non_overlaps(badRegions)
-
-  message(
-    "Considering ", length(windowsWithoutBlacklist),
-    " regions with total size ",
-    sum(BiocGenerics::width(windowsWithoutBlacklist))
-  )
-
-  #make the initial Qsea object, with the reduced set of windows, using the sampleTable
-  qseaSet <- qsea::createQseaSet(sampleTable = sampleTable,
-                                 BSgenome = BSgenome,
-                                 chr.select = chrSelect,
-                                 Regions = windowsWithoutBlacklist,
-                                 window_size = windowSize)
-
-  if(any(GenomeInfoDb::genome(qsea::getRegions(qseaSet)) != BSgenome)) {
-    regions <- qseaSet %>% qsea::getRegions() 
-    GenomeInfoDb::genome(regions) <- BSgenome
-    qseaSet@regions <- regions
-  }
-
-  # store the extra blacklist file location
-  #qseaSet@parameters$badRegions2 <- blacklistBed
-
-  #TODO add a single-end coverage method.
-
-  if (coverageMethod == "qseaPaired") {
-
-    #load the coverage from each bam file, using qsea default method
-    qseaSet <- qsea::addCoverage(qseaSet,
-                                 uniquePos = FALSE,
-                                 paired = TRUE,
-                                 parallel = parallel,
-                                 minMapQual = minMapQual
-    )
-
-    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = FALSE)
-
-  } else if (coverageMethod == "PairedAndR1s") {
-
-    # load the coverage from each bam file, including using R1s from high MAPQ reads that aren't in perfect pairs.
-    qseaSet <- addBamCoveragePairedAndUnpaired(qseaSet,
-                                               fragmentLength = fragmentLength,
-                                               parallel = parallel,
-                                               minMapQual = minMapQual,
-                                               minReferenceLength = minReferenceLength,
-                                               maxInsertSize = maxInsertSize,
-                                               minInsertSize = minInsertSize,
-                                               properPairsOnly = properPairsOnly
-    )
-  } else {stop(glue::glue("Unknown coverageMethod {coverageMethod}. Use PairedAndR1s or qseaPaired."))}
-
-  qseaSet@parameters$minInsertSize <- minInsertSize
-  qseaSet@parameters$maxInsertSize <- maxInsertSize
-  qseaSet@parameters$properPairsOnly <- properPairsOnly
-  qseaSet@parameters$minReferenceLength <- minReferenceLength
-  qseaSet@parameters$minMapQual <- minMapQual
-
-  numEmpty <- qseaSet@libraries$file_name %>%
-    as.data.frame() %>%
-    dplyr::select(total_fragments) %>%
-    dplyr::filter(total_fragments == 0)
-
-  if (nrow(numEmpty) > 0) {stop(glue::glue("Empty sample: {rownames(numEmpty)}"))}
-
-  if (CNVmethod == "qseaInput") {
-
-    # calculate the CNV, using the input files included in the sampleTable CSV.
-    # uses HMMCopy behind the scenes
-    # note that apparently if you give any samples with normal or control in the name it will try and use those to normalise!
-    qseaSet <- qsea::addCNV(qseaSet,
-                            file_name = "input_file",
-                            window_size = CNVwindowSize,
-                            fragment_length = fragmentLength,
-                            paired = TRUE,
-                            parallel = TRUE,
-                            MeDIP = FALSE
-    )
-
-    #this is included in the addHMMcopyCNV method more efficiently, don't need to call it there.
-    qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
-
-  } else if (CNVmethod == "HMMdefault") {
-
-    if(is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-
-      if(CNVwindowSize == 1000000) {
-        hmmCopyGC <- gc_hg38_1000kb
-      } else if (CNVwindowSize == 500000) {
-        hmmCopyGC <- gc_hg38_500kb
-      } else if (CNVwindowSize == 50000) {
-        hmmCopyGC <- gc_hg38_50kb
-      } else {
-        stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
-      }
+            stop(glue::glue(paste0(
+                "NCBI genome does not use 'chr' prefixes. ",
+                "Remove these or consider swapping",
+                " to e.g. BSgenome.Hsapiens.UCSC.hg38"
+            )))
+        }
 
     }
 
-    if(is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.UCSC.hg38") {
-      
-      if(CNVwindowSize == 1000000) {
-        hmmCopyGC <- gc_hg38_1000kb %>%
-          dplyr::mutate(chr = paste0("chr",chr))
-      } else if (CNVwindowSize == 500000) {
-        hmmCopyGC <- gc_hg38_500kb %>%
-          dplyr::mutate(chr = paste0("chr",chr))
-      } else if (CNVwindowSize == 50000) {
-        hmmCopyGC <- gc_hg38_50kb %>%
-          dplyr::mutate(chr = paste0("chr",chr))
-      } else {
-        stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
-      }
-      
-    }    
-    
-    if(is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-      if(CNVwindowSize == 1000000) {
-        hmmCopyMap <- map_hg38_1000kb
-      } else if (CNVwindowSize == 500000) {
-        hmmCopyMap <- map_hg38_500kb
-      } else if (CNVwindowSize == 50000) {
-        hmmCopyMap <- map_hg38_50kb
-      } else {
-        stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
-      }
+    # chromosome lengths, and then a Seqinfo object with that
+    chrLength <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
+    seqinfo <- GenomeInfoDb::Seqinfo(
+        as.character(chrSelect), chrLength, NA, BSgenome
+    )
 
     }
 
@@ -671,7 +531,8 @@ makeQset <- function(sampleTable,
             }
         }
 
-        if (is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+        if (is.null(hmmCopyMap) &&
+            BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
             if (CNVwindowSize == 1000000) {
                 hmmCopyMap <- map_hg38_1000kb
             } else if (CNVwindowSize == 500000) {
@@ -805,9 +666,11 @@ makeQset <- function(sampleTable,
     #qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
 
 
-  } else if (CNVmethod == "None") {
-    message("No CNV being calculated")
-  }
+    qseaSet <- addNormalisation(
+        qseaSet,
+        enrichmentMethod = enrichmentMethod,
+        maxPatternDensity = maxPatternDensity
+    )
 
   # calculate the average CG density across the genome. Does not use the reads at all.
   qseaSet <- qsea::addPatternDensity(qseaSet,
