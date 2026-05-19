@@ -81,10 +81,12 @@ liftOverHg19 <- function(grOrDf){
         ) %>%
         plyranges::as_granges()
 
-  regions <- grOrDf %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames,"chr"), seqnames, paste0("chr", seqnames))) %>%
-    plyranges::as_granges()
+    message("Performing coordinate liftover from hg19 to hg38")
+    utils::data(
+        "hg19ToHg38.over.chain", package = "mesa", envir = environment()
+    )
+    liftover_result <- rtracklayer::liftOver(regions, hg19ToHg38.over.chain)
+    GenomeInfoDb::genome(liftover_result) <- "hg38"
 
   message("Performing coordinate liftover from hg19 to hg38")
   liftover_result <- rtracklayer::liftOver(regions, mesa::hg19ToHg38.over.chain)
@@ -376,7 +378,13 @@ setMesaAnnoDb <- function(annoDb) {
 #' }
 #'
 #' @export
-setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE){
+setMesaParallel <- function(
+    nCores = NULL, useParallel = FALSE, verbose = TRUE
+) {
+    if (!is.null(nCores) && nCores > 1) {
+        useParallel <- TRUE
+        BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
+    }
 
   if(!is.null(nCores) && nCores > 1) {
     useParallel <- TRUE
@@ -392,7 +400,10 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE){
             " BiocParallel::register."
         )))
     } else if (verbose) {
-        message("Parallelisation turned off for all functions in the mesa package.")
+        message(paste0(
+            "Parallelisation turned off for all functions",
+            " in the mesa package."
+        ))
     }
 
   if(useParallel & verbose){
