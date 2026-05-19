@@ -1,4 +1,13 @@
 test_that("Calculating DMRs", {
+  old_options <- options(
+    mesa_TxDb = getOption("mesa_TxDb"),
+    mesa_annoDb = getOption("mesa_annoDb"),
+    mesa_genome = getOption("mesa_genome")
+  )
+  on.exit(options(old_options), add = TRUE)
+  setMesaTxDb(NULL)
+  setMesaAnnoDb(NULL)
+  setMesaGenome(NULL)
 
   BiocParallel::SerialParam()
 
