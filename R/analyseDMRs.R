@@ -137,12 +137,20 @@ summariseDMRsByContrast <- function(
 
   if (!("adjPval" %in% colnames(DMRtable))) {
 
-    contrastsDF <- DMRtable %>%
-      colnames() %>%
-      stringr::str_subset(".*_vs_.*_adjPval$") %>%
-      tibble::enframe(name = NULL) %>%
-      tidyr::separate(value, into = c("group1","group2",NA), sep = "_vs_|_adjPval") %>%
-      dplyr::arrange(group1, group2)
+    DMRsummary <- DMRtable %>%
+        tibble::as_tibble() %>%
+        dplyr::filter(
+            adjPval <= FDRthres,
+            abs(log2FC) >= log2FCthres,
+            abs(deltaBeta) >= deltaBetaThres,
+        ) %>%
+        dplyr::mutate(.up = ifelse(log2FC > 0, "nUp", "nDown")) %>%
+        dplyr::group_by(group1, group2, .up) %>%
+        dplyr::tally() %>%
+        tidyr::pivot_wider(
+            names_from = .up, values_from = n, values_fill = 0
+        ) %>%
+        dplyr::ungroup()
 
     DMRtable <- DMRtable %>%
       dplyr::select(-tidyselect::matches("_nrpm$|_beta$|_means$")) %>%
