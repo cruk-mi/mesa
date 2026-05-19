@@ -432,13 +432,17 @@ pull.qseaSet <- function(.data, var = -1, name = NULL, ...){
 #' exampleTumourNormal %>% sort(decreasing = TRUE)
 #'
 #' @export
-sort.qseaSet <- function(x, decreasing = FALSE, ...){
-
-  x %>%
-    subsetQset(samplesToKeep = (x %>% qsea::getSampleNames() %>% gtools::mixedsort(decreasing = decreasing))) %>%
-    return()
-
-  }
+sort.qseaSet <- function(x, decreasing = FALSE, ...) {
+    x %>%
+        subsetQset(
+            samplesToKeep = (
+                x %>%
+                    qsea::getSampleNames() %>%
+                    gtools::mixedsort(decreasing = decreasing)
+            )
+        ) %>%
+        return()
+}
 
 
 #' Filter regions (windows) inside a qseaSet
