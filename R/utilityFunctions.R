@@ -90,7 +90,9 @@ liftOverHg19 <- function(grOrDf) {
         plyranges::as_granges()
 
     message("Performing coordinate liftover from hg19 to hg38")
-    utils::data("hg19ToHg38.over.chain", package = "mesa", envir = environment())
+    utils::data(
+        "hg19ToHg38.over.chain", package = "mesa", envir = environment()
+    )
     liftover_result <- rtracklayer::liftOver(regions, hg19ToHg38.over.chain)
     GenomeInfoDb::genome(liftover_result) <- "hg38"
 
@@ -356,7 +358,9 @@ setMesaAnnoDb <- function(annoDb) {
 #' }
 #'
 #' @export
-setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) {
+setMesaParallel <- function(
+    nCores = NULL, useParallel = FALSE, verbose = TRUE
+) {
     if (!is.null(nCores) && nCores > 1) {
         useParallel <- TRUE
         BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
@@ -373,7 +377,10 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) 
             " BiocParallel::register."
         )))
     } else if (verbose) {
-        message("Parallelisation turned off for all functions in the mesa package.")
+        message(paste0(
+            "Parallelisation turned off for all functions",
+            " in the mesa package."
+        ))
     }
 
     return(invisible(useParallel))
