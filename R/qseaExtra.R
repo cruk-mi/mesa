@@ -268,7 +268,9 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
     chipseekerData <- GRangesObject %>%
         ChIPseeker::annotatePeak(
             tssRegion = c(-2000, 500),
-            level = "transcript", # changed from gene to transcript to stop it outputting some genes as being >10Mb long
+            # changed from gene to transcript to stop it outputting
+            # some genes as being >10Mb long
+            level = "transcript",
             TxDb = TxDb,
             annoDb = annoDb,
             overlap = "all",
