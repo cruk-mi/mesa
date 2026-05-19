@@ -139,7 +139,8 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' }
 #'
 #' @export
-calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
+calculateCGEnrichment <- function(
+    file = NULL, BSgenome = NULL, exportPath = NULL,
     extend = 0, shift = 0, uniq = 0,
     chr.select = NULL, paired = TRUE) {
     if (!requireNamespace("MEDIPS", quietly = TRUE)) {
@@ -158,7 +159,11 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
         path <- getwd()
     }
     if (!fileName %in% dir(path)) {
-        stop(sprintf("File %s not found in %s", shQuote(fileName), shQuote(path)),
+        stop(
+            sprintf(
+                "File %s not found in %s",
+                shQuote(fileName), shQuote(path)
+            ),
             call. = FALSE
         )
     }
@@ -571,7 +576,8 @@ calculateCGEnrichmentGRanges <- function(
 #' }
 #' }
 #' @export
-addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
+addMedipsEnrichmentFactors <- function(
+    qseaSet, exportPath = NULL, nonEnrich = FALSE,
     extend = 0, shift = 0, uniq = 0,
     chr.select = NULL, paired = TRUE,
     file_name = "file_name",
