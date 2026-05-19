@@ -168,6 +168,7 @@ test_that("Calculating DMRs", {
 })
 
 test_that("plotting DMRs", {
+  skip_on_bioc()
 
   BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 

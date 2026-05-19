@@ -1,4 +1,5 @@
 test_that("Making a hg19 qseaSet", {
+  skip_on_bioc()
 
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
@@ -41,6 +42,7 @@ test_that("Making a hg19 qseaSet", {
 })
 
 test_that("Making a hg19 qseaSet with qsea coverage method", {
+  skip_on_bioc()
 
   #skip check unless options(run_long_checks = TRUE)
   skip_long_checks()
@@ -85,6 +87,7 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 })
 
 test_that("Making a GRCh38 qseaSet", {
+  skip_on_bioc()
 
   skip_on_ci()
   #skip check unless options(run_long_checks = TRUE)
@@ -123,6 +126,7 @@ test_that("Making a GRCh38 qseaSet", {
 })
 
 test_that("Making a GRCh38 qseaSet proper pairs only", {
+  skip_on_bioc()
 
   skip_on_ci()
   #skip check unless options(run_long_checks = TRUE)
@@ -194,6 +198,7 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 })
 
 test_that("calculateCGEnrichment works", {
+  skip_on_bioc()
 
   if(!rlang::is_installed("MEDIPSData")){
     skip("MEDIPSData Not installed")

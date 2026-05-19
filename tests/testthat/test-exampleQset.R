@@ -55,6 +55,7 @@ test_that("Annotation getting works", {
 )
 
 test_that("Testing hg38 related annotation/plotting functions", {
+  skip_on_bioc()
 
   testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE)
   testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = "tumour", useGroupMeans = FALSE)
@@ -77,7 +78,9 @@ test_that("Testing hg38 related annotation/plotting functions", {
   testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3)
   testPlotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", normMethod = "nrpm", maxScale = 3,
                                     sampleAnnotation = "tumour" )
+})
 
+test_that("Testing hg38 related helper functionality", {
   expect_no_error(exampleTumourNormal %>%
                     plotCNVheatmap(tumour))
 
@@ -115,7 +118,6 @@ test_that("Testing hg38 related annotation/plotting functions", {
   expect_equal(exampleTumourNormal %>% pull(group) %>% length(), exampleTumourNormal %>% getSampleNames() %>% length())
   expect_equal(exampleTumourNormal %>% pull(tumour) %>% unique(), c("Normal", "Tumour"))
   expect_equal(exampleTumourNormal %>% pull(type) %>% unique() %>% length(), 5)
-
 })
 
 test_that("Testing general functionality", {

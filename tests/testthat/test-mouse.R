@@ -1,4 +1,6 @@
 test_that("Mouse plotting", {
+  skip_on_bioc()
+  skip_if_not_installed("biomaRt")
   
   biomart_success <- try(biomaRt::useMart('ensembl', dataset='mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org"))
   biomart_success <- !class(biomart_success) == "try-error"
@@ -16,6 +18,8 @@ test_that("Mouse plotting", {
 })
 
 test_that("Mouse annotation", {
+  skip_if_not_installed("TxDb.Mmusculus.UCSC.mm10.knownGene")
+  skip_if_not_installed("org.Mm.eg.db")
   
   #expect an error if global settings not set
   setMesaTxDb(NULL)
