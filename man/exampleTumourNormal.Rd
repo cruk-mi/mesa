@@ -13,4 +13,9 @@ exampleTumourNormal
 \description{
 A qseaSet object containing a small region of chromosome 7 for 5 paired tumour/normal samples (commercially bought from Origene and processed within CRUK-MI CBC).
 }
+\examples{
+data("exampleTumourNormal", package = "mesa")
+exampleTumourNormal
+qsea::getSampleNames(exampleTumourNormal)
+}
 \keyword{datasets}
