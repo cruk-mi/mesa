@@ -87,7 +87,9 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
             norm_methods = "beta",
             samples = qsea::getSampleNames(.)
         ) %>%
-        dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+        dplyr::rename(
+            seqnames = chr, start = window_start, end = window_end
+        ) %>%
         dplyr::filter(CpG_density >= !!minDensity) %>%
         dplyr::select(tidyselect::matches("beta"))
 
@@ -100,7 +102,9 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8){
         sample_name = names(overp8Fraction),
         hyperStableEdgar = overp8Fraction
     ) %>%
-        dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_beta")) %>%
+        dplyr::mutate(
+            sample_name = stringr::str_remove(sample_name, "_beta")
+        ) %>%
         dplyr::mutate(
             hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3), 0)
         )
