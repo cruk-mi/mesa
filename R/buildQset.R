@@ -109,6 +109,16 @@
 #'
 #' @keywords internal
 #' @noRd
+.cigar_reference_span <- function(cigar) {
+  if (requireNamespace("cigarillo", quietly = TRUE)) {
+    return(cigarillo::cigar_extent_along_ref(cigar))
+  }
+
+  GenomicAlignments::cigarWidthAlongReferenceSpace(cigar)
+}
+
+#' @keywords internal
+#' @noRd
 getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, regions = NULL, fragmentLength = NULL,
                                               minMapQual = 30, maxInsertSize = 1000, minInsertSize = 50,
                                               minReferenceLength = 30, properPairsOnly = FALSE){
@@ -259,7 +269,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL, 
 
   R1GRanges <- R1GRanges %>%
     dplyr::filter(mapq >= minMapQual,  #require good mapq and at least minReferenceLength distance mapped onto the genome
-                  GenomicAlignments::cigarWidthAlongReferenceSpace(cigar) >= minReferenceLength)
+                  .cigar_reference_span(cigar) >= minReferenceLength)
 
   numR1sMAPQAndLength <- length(R1GRanges)
 

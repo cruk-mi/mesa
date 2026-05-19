@@ -20,6 +20,12 @@ test_that("Mouse plotting", {
 test_that("Mouse annotation", {
   skip_if_not_installed("TxDb.Mmusculus.UCSC.mm10.knownGene")
   skip_if_not_installed("org.Mm.eg.db")
+  old_options <- options(
+    mesa_TxDb = getOption("mesa_TxDb"),
+    mesa_annoDb = getOption("mesa_annoDb"),
+    mesa_genome = getOption("mesa_genome")
+  )
+  on.exit(options(old_options), add = TRUE)
   
   #expect an error if global settings not set
   setMesaTxDb(NULL)
