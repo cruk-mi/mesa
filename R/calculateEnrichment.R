@@ -140,9 +140,16 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' }
 #' 
 #' @export
-calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
-                                   extend = 0, shift = 0, uniq = 0,
-                                   chr.select = NULL, paired = TRUE){
+calculateCGEnrichment <- function(
+    file = NULL, BSgenome = NULL, exportPath = NULL,
+    extend = 0, shift = 0, uniq = 0,
+    chr.select = NULL, paired = TRUE) {
+    if (!requireNamespace("MEDIPS", quietly = TRUE)) {
+        stop(
+            "Package \"MEDIPS\" must be installed to use this function.",
+            call. = FALSE
+        )
+    }
 
   if (!requireNamespace("MEDIPS", quietly = TRUE)) {
     stop(
@@ -151,7 +158,21 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
     )
   }
 
-  dataset <- eval(parse(text=paste0(BSgenome,"::", BSgenome)))
+    ## Read region file
+    fileName <- basename(file)
+    path <- dirname(file)
+    if (path == "") {
+        path <- getwd()
+    }
+    if (!fileName %in% dir(path)) {
+        stop(
+            sprintf(
+                "File %s not found in %s",
+                shQuote(fileName), shQuote(path)
+            ),
+            call. = FALSE
+        )
+    }
 
     if (!paired) {
         GRange.Reads <- MEDIPS::getGRange(
@@ -561,11 +582,13 @@ calculateCGEnrichmentGRanges <- function(
 #'     }
 #' }
 #' @export
-addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
-                                       extend = 0, shift = 0, uniq = 0,
-                                       chr.select = NULL, paired = TRUE,
-                                       file_name = "file_name",
-                                       nCores = 1){
+addMedipsEnrichmentFactors <- function(
+    qseaSet, exportPath = NULL, nonEnrich = FALSE,
+    extend = 0, shift = 0, uniq = 0,
+    chr.select = NULL, paired = TRUE,
+    file_name = "file_name",
+    nCores = 1) {
+    BSgenome <- qseaSet %>% qsea:::getGenome()
 
   BSgenome <- qseaSet %>% qsea:::getGenome()
 
