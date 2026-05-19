@@ -270,10 +270,39 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
         ))
     }
 
-  grAnno <- chipseekerData@anno %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
-    plyranges::as_granges()
+    if (genome %in% c("hg38", "GRCh38") && is.null(CpGislandsGR)) {
+        utils::data("hg38CpGIslands", package = "mesa", envir = environment())
+        CpGislandsGR <- hg38CpGIslands
+    }
+
+    if (genome %in% c("hg38", "GRCh38") && is.null(FantomRegionsGR)) {
+        utils::data("FantomRegions", package = "mesa", envir = environment())
+        FantomRegionsGR <- FantomRegions %>% plyranges::as_granges()
+    }
+
+    if (methods::is(dataTable, "GRanges")) {
+        GRangesObject <- dataTable
+    } else {
+        GRangesObject <- dataTable %>%
+            qseaTableToChrGRanges()
+    }
+
+    chipseekerData <- GRangesObject %>%
+        ChIPseeker::annotatePeak(
+            tssRegion = c(-2000, 500),
+            # changed from gene to transcript to stop it outputting
+            # some genes as being >10Mb long
+            level = "transcript",
+            TxDb = TxDb,
+            annoDb = annoDb,
+            overlap = "all",
+            verbose = FALSE
+        )
+
+    grAnno <- chipseekerData@anno %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
+        plyranges::as_granges()
 
 
     if (!is.null(CpGislandsGR)) {
