@@ -360,8 +360,11 @@ makeQset <- function(sampleTable,
             stringr::str_detect(BSgenome, "NCBI") &&
             all(stringr::str_detect(chrSelect, "chr"))
         ) {
-            stop(glue::glue("NCBI genome does not use 'chr' prefixes. \\
-            Remove these or consider swapping to e.g. BSgenome.Hsapiens.UCSC.hg38"))
+            stop(glue::glue(paste0(
+                "NCBI genome does not use 'chr' prefixes. ",
+                "Remove these or consider swapping",
+                " to e.g. BSgenome.Hsapiens.UCSC.hg38"
+            )))
         }
 
         stop(glue::glue(
@@ -373,7 +376,9 @@ makeQset <- function(sampleTable,
 
     # chromosome lengths, and then a Seqinfo object with that
     chrLength <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
-    seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect), chrLength, NA, BSgenome)
+    seqinfo <- GenomeInfoDb::Seqinfo(
+        as.character(chrSelect), chrLength, NA, BSgenome
+    )
 
     # number of windows of size windowSize on each chromosome
     numWindows <- floor(chrLength / windowSize)
@@ -523,7 +528,8 @@ makeQset <- function(sampleTable,
             }
         }
 
-        if (is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+        if (is.null(hmmCopyMap) &&
+            BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
             if (CNVwindowSize == 1000000) {
                 hmmCopyMap <- map_hg38_1000kb
             } else if (CNVwindowSize == 500000) {
@@ -660,7 +666,11 @@ makeQset <- function(sampleTable,
 
     # do not set library factors via TMM, just set to be 1. Makes no difference to beta values as gets normalised out anyway, only nrpms are affected.
 
-    qseaSet <- addNormalisation(qseaSet, enrichmentMethod = enrichmentMethod, maxPatternDensity = maxPatternDensity)
+    qseaSet <- addNormalisation(
+        qseaSet,
+        enrichmentMethod = enrichmentMethod,
+        maxPatternDensity = maxPatternDensity
+    )
 
     qseaSet@parameters$coverageMethod <- coverageMethod
     qseaSet@parameters$cnvMethod <- CNVmethod
