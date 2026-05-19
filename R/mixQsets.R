@@ -175,12 +175,11 @@ mixSamples <- function(
         dplyr::mutate(n = tidyr::replace_na(n, 0)) %>%
         dplyr::select(n)
 
-  newCounts <- c(windows1, windows2) %>%
-    tibble::enframe(name = NULL, value = "window") %>%
-    dplyr::count(window, name = "n") %>%
-    dplyr::left_join(tibble::tibble(window = seq_len(nrow(counts))),., copy = TRUE, by = "window") %>%
-    dplyr::mutate(n = tidyr::replace_na(n,0)) %>%
-    dplyr::select(n)
+    newSet <- qseaSet %>%
+        subsetQset(samplesToKeep = qsea::getSampleNames(qseaSet)[1]) %>%
+        renameQsetNames(
+            paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName
+        )
 
   newSet <- qseaSet %>%
     subsetQset(samplesToKeep = qsea::getSampleNames(qseaSet)[1]) %>%
@@ -447,9 +446,11 @@ mixThreeQsetSamples <- function(
         dplyr::mutate(value = tidyr::replace_na(value, 0)) %>%
         dplyr::select(value)
 
-  newSet <- qseaSet %>%
-    subsetQset(samplesToKeep = qsea::getSampleNames(qseaSet)[1]) %>%
-    renameQsetNames(paste0("^",qsea::getSampleNames(qseaSet)[1],"$"), newName)
+    newSet <- qseaSet %>%
+        subsetQset(samplesToKeep = qsea::getSampleNames(qseaSet)[1]) %>%
+        renameQsetNames(
+            paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName
+        )
 
   newSet@count_matrix <- as.matrix(newCounts)
   colnames(newSet@count_matrix) <- newName
