@@ -47,7 +47,8 @@ combineQsets <- function(
     qseaSet1, qseaSet2, checkParams = FALSE,
     regionsToKeep = NULL, dropDuplicates = FALSE
 ) {
-    if (is.character(qseaSet1)) { # has to be afterwards, else errors if it is a qseaSet
+    # has to be afterwards, else errors if it is a qseaSet
+    if (is.character(qseaSet1)) {
         if (length(qseaSet1) == 1 &
             tools::file_ext(qseaSet1) == "rds") {
             message(glue::glue(
@@ -96,7 +97,8 @@ combineQsets <- function(
       commonNames <- intersect(sampleNames1,sampleNames2)
     }
 
-    if (!is.qseaSet(qseaSet2)) { # has to be afterwards, else errors if it is a qseaSet
+    # has to be afterwards, else errors if it is a qseaSet
+    if (!is.qseaSet(qseaSet2)) {
         if (length(qseaSet2) == 1 &
             tools::file_ext(qseaSet2) == "rds") {
             message(glue::glue(
@@ -148,7 +150,8 @@ combineQsets <- function(
         if (dropDuplicates) {
             message(
                 glue::glue(
-                    "Dropping {length(commonNames)} common names (use dropDuplicates=FALSE to stop this)"
+                    "Dropping {length(commonNames)} common names",
+                    " (use dropDuplicates=FALSE to stop this)"
                 )
             )
         }
@@ -187,7 +190,8 @@ combineQsets <- function(
         regions2 <- qseaSet2 %>%
             qsea::getRegions() %>%
             tibble::as_tibble() %>%
-            plyranges::as_granges() # stop complaint if genome name not identical
+            # stop complaint if genome name not identical
+            plyranges::as_granges()
 
         qseaSet1 <- qseaSet1 %>%
             filterByOverlaps(
@@ -224,13 +228,18 @@ combineQsets <- function(
         }
 
 
-        if (!identical(names(qseaSet1@enrichment), names(qseaSet2@enrichment))) {
+        if (!identical(
+            names(qseaSet1@enrichment), names(qseaSet2@enrichment)
+        )) {
             stop("Enrichment entries are not the same")
         }
-        if (qseaSet1@enrichment$pattern_name != qseaSet2@enrichment$pattern_name) {
+        if (qseaSet1@enrichment$pattern_name !=
+            qseaSet2@enrichment$pattern_name) {
             stop("Pattern names are different")
         }
-        if (!identical(qseaSet1@enrichment$density, qseaSet2@enrichment$density)) {
+        if (!identical(
+            qseaSet1@enrichment$density, qseaSet2@enrichment$density
+        )) {
             stop("Enrichment density is different.")
         }
         if (!identical(qseaSet1@enrichment$n, qseaSet2@enrichment$n)) {
@@ -246,21 +255,28 @@ combineQsets <- function(
         dplyr::select(CpG_density, tidyselect::everything()) %>%
         plyranges::as_granges()
 
-    GenomeInfoDb::seqinfo(newQSet@regions) <- GenomeInfoDb::seqinfo(qseaSet1@regions)
+    GenomeInfoDb::seqinfo(newQSet@regions) <-
+        GenomeInfoDb::seqinfo(qseaSet1@regions)
 
     newQSet@zygosity <- rbind(qseaSet1@zygosity, qseaSet2@zygosity)
-    newQSet@sampleTable <- dplyr::bind_rows(qseaSet1@sampleTable, qseaSet2@sampleTable)
+    newQSet@sampleTable <- dplyr::bind_rows(
+        qseaSet1@sampleTable, qseaSet2@sampleTable
+    )
 
     df1 <- qseaSet1@libraries$file_name
     df2 <- qseaSet2@libraries$file_name
 
-    newQSet@libraries$file_name <- dplyr::bind_rows(as.data.frame(df1), as.data.frame(df2))
+    newQSet@libraries$file_name <- dplyr::bind_rows(
+        as.data.frame(df1), as.data.frame(df2)
+    )
 
     if ("input_file" %in% names(qseaSet1@libraries)) {
         df1 <- qseaSet1@libraries$input_file
         df2 <- qseaSet2@libraries$input_file
 
-        newQSet@libraries$input_file <- dplyr::bind_rows(as.data.frame(df1), as.data.frame(df2))
+        newQSet@libraries$input_file <- dplyr::bind_rows(
+            as.data.frame(df1), as.data.frame(df2)
+        )
     }
 
     newQSet@cnv <- qseaSet1@cnv %>%
@@ -339,7 +355,8 @@ combineQsetsList <- function(
     qseaSets, firstQset = NULL, dropDuplicates = TRUE,
     checkParams = TRUE, regionsToKeep = NULL
 ) {
-    if (is.character(firstQset)) { # has to be afterwards, else errors if it is a qseaSet
+    # has to be afterwards, else errors if it is a qseaSet
+    if (is.character(firstQset)) {
         if (length(firstQset) == 1 &
             tools::file_ext(firstQset) == "rds") {
             message(glue::glue(paste0(
