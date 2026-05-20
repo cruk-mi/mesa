@@ -60,3 +60,4 @@
 #' toy_ucsc <- GenomicRanges::GRanges("chr1", IRanges::IRanges(951160, 951170))
 #' GenomicRanges::countOverlaps(toy_ucsc, gr) # after style harmonisation above
 "hg38UltraStableProbes"
+

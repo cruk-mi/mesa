@@ -65,16 +65,12 @@ setClass("mesaDimRed",
 #' * and persists parameters/data in `params` / `dataTable`.
 #'
 #' @examples
-#' st <- data.frame(
-#'     sample_name = c("S1", "S2"),
+#' st <- data.frame(sample_name = c("S1", "S2"),
 #'     group = c("A", "B"),
-#'     row.names = "sample_name"
-#' )
-#' md <- mesaDimRed(
-#'     res = list(), sampleTable = st,
+#'     row.names = "sample_name")
+#' md <- mesaDimRed(res = list(), sampleTable = st,
 #'     samples = rownames(st), params = list(),
-#'     dataTable = data.frame()
-#' )
+#'     dataTable = data.frame())
 #' md
 #'
 #' @rdname mesaDimRed-class
@@ -89,20 +85,14 @@ mesaDimRed <- function(res, sampleTable, samples, params, dataTable = data.frame
 setMethod("show", "mesaDimRed", function(object) {
     cat("Object containing ", length(object@res),
         " dimensionality reduction objects for ",
-        length(object@samples), " samples",
-        sep = ""
-    )
+        length(object@samples), " samples", sep = "")
     cat("\n")
 })
 
 # Validity check
 setValidity("mesaDimRed", function(object) {
-    if (!is.data.frame(object@sampleTable)) {
-        return("`sampleTable` must be a data.frame")
-    }
-    if (!is.character(object@samples)) {
-        return("`samples` must be character")
-    }
+    if (!is.data.frame(object@sampleTable)) return("`sampleTable` must be a data.frame")
+    if (!is.character(object@samples)) return("`samples` must be character")
     TRUE
 })
 
@@ -151,10 +141,8 @@ setClass("mesaPCA",
 #'
 #' @examples
 #' set.seed(1)
-#' x <- matrix(rnorm(20),
-#'     nrow = 5, ncol = 4,
-#'     dimnames = list(paste0("S", 1:5), paste0("W", 1:4))
-#' )
+#' x <- matrix(rnorm(20), nrow = 5, ncol = 4,
+#'     dimnames = list(paste0("S", 1:5), paste0("W", 1:4)))
 #' pc <- stats::prcomp(x, center = TRUE, scale. = FALSE)
 #' mp <- mesaPCA(prcomp = pc, windows = colnames(x))
 #' mp
@@ -172,22 +160,17 @@ setMethod("show", "mesaPCA", function(object) {
     n <- tryCatch(nrow(object@prcomp$x), error = function(e) NA_integer_)
     cat("PCA result for ", n,
         " samples calculated over ", length(object@windows),
-        " windows",
-        sep = ""
-    )
+        " windows", sep = "")
     cat("\n")
 })
 
 # Validity check
 setValidity("mesaPCA", function(object) {
-    if (!inherits(object@prcomp, "prcomp")) {
-        return("`prcomp` must be a stats::prcomp object")
-    }
-    if (!is.character(object@windows)) {
-        return("`windows` must be character")
-    }
+    if (!inherits(object@prcomp, "prcomp")) return("`prcomp` must be a stats::prcomp object")
+    if (!is.character(object@windows)) return("`windows` must be character")
     TRUE
 })
+
 
 
 # ==============================
@@ -232,10 +215,8 @@ setClass("mesaUMAP",
 #' @return A [mesaUMAP-class] object containing UMAP coordinates and window IDs.
 #'
 #' @examples
-#' pts <- data.frame(
-#'     UMAP1 = c(0.1, -0.2, 0.0),
-#'     UMAP2 = c(0.3, 0.1, -0.1)
-#' )
+#' pts <- data.frame(UMAP1 = c(0.1, -0.2, 0.0),
+#'     UMAP2 = c(0.3, 0.1, -0.1))
 #' rownames(pts) <- paste0("S", 1:3)
 #' mu <- mesaUMAP(points = pts, windows = c("w1", "w2", "w3"))
 #' mu
@@ -252,22 +233,17 @@ mesaUMAP <- function(points, windows) {
 setMethod("show", "mesaUMAP", function(object) {
     cat("UMAP result for ", nrow(object@points),
         " samples calculated over ", length(object@windows),
-        " windows",
-        sep = ""
-    )
+        " windows", sep = "")
     cat("\n")
 })
 
 # Validity check
 setValidity("mesaUMAP", function(object) {
-    if (!is.data.frame(object@points)) {
-        return("`points` must be a data.frame")
-    }
-    if (!is.character(object@windows)) {
-        return("`windows` must be character")
-    }
+    if (!is.data.frame(object@points)) return("`points` must be a data.frame")
+    if (!is.character(object@windows)) return("`windows` must be character")
     TRUE
 })
+
 
 
 # ==============================
@@ -315,8 +291,7 @@ mutate.mesaDimRed <- function(.data, ...) {
 
     .data@sampleTable <- newTable
 
-    return(.data)
-}
+    return(.data)}
 
 
 #' Left-join onto the sample table of a mesaDimRed
@@ -362,11 +337,10 @@ mutate.mesaDimRed <- function(.data, ...) {
 #' @method left_join mesaDimRed
 #' @export
 left_join.mesaDimRed <- function(x, y, by = NULL, copy = FALSE,
-    suffix = c(".x", ".y"), keep = NULL, ...) {
+                                 suffix = c(".x", ".y"), keep = NULL, ...) {
     x@sampleTable <- x@sampleTable %>%
         tibble::rownames_to_column("rownameCol") %>%
         dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%
         tibble::column_to_rownames("rownameCol")
 
-    return(x)
-}
+    return(x)}

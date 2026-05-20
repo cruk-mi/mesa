@@ -124,6 +124,7 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'     requireNamespace("MEDIPSData", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
 #'     require("GenomicRanges", quietly = TRUE)) {
+#'
 #'     calculateCGEnrichment(
 #'         file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
 #'         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
@@ -134,8 +135,9 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'
 #' @export
 calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
-    extend = 0, shift = 0, uniq = 0,
-    chr.select = NULL, paired = TRUE) {
+                                  extend = 0, shift = 0, uniq = 0,
+                                  chr.select = NULL, paired = TRUE) {
+
     if (!requireNamespace("MEDIPS", quietly = TRUE)) {
         stop(
             "Package \"MEDIPS\" must be installed to use this function.",
@@ -148,28 +150,18 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
     ## Read region file
     fileName <- basename(file)
     path <- dirname(file)
-    if (path == "") {
-        path <- getwd()
-    }
+    if (path == "") {path <- getwd()}
     if (!fileName %in% dir(path)) {
         stop(sprintf("File %s not found in %s", shQuote(fileName), shQuote(path)),
-            call. = FALSE
-        )
+            call. = FALSE)
     }
 
-    if (!paired) {
-        GRange.Reads <- MEDIPS::getGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)
-    } else {
-        GRange.Reads <- MEDIPS::getPairedGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)
-    }
+    if (!paired) {GRange.Reads <- MEDIPS::getGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)} else
+    {GRange.Reads <- MEDIPS::getPairedGRange(fileName, path, extend, shift, chr.select, dataset, uniq, simpleCigar = FALSE)}
 
     ## Sort chromosomes
-    if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) > 1) {
-        chromosomes <- gtools::mixedsort(unique(GenomeInfoDb::seqlevels(GRange.Reads)))
-    }
-    if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) == 1) {
-        chromosomes <- unique(GenomeInfoDb::seqlevels(GRange.Reads))
-    }
+    if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) > 1) {chromosomes <- gtools::mixedsort(unique(GenomeInfoDb::seqlevels(GRange.Reads)))}
+    if (length(unique(GenomeInfoDb::seqlevels(GRange.Reads))) == 1) {chromosomes <- unique(GenomeInfoDb::seqlevels(GRange.Reads))}
 
     chr_lengths <- as.numeric(GenomeInfoDb::seqlengths(dataset)[chromosomes])
 
@@ -192,11 +184,9 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
     regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
 
     if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-        utils::data("BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution", package = "mesa", envir = environment())
-        genomicDistribution <- BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+        genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
     } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
-        utils::data("BSgenome.Hsapiens.UCSC.hg19.CpG.distribution", package = "mesa", envir = environment())
-        genomicDistribution <- BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
+        genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
     } else {
         genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
     }
@@ -214,12 +204,10 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
             ggplot2::ggplot(ggplot2::aes(x = value)) +
             ggplot2::geom_density(color = "black") +
             ggplot2::theme_bw() +
-            ggplot2::labs(
-                xlab = "Fragment Length",
+            ggplot2::labs(xlab = "Fragment Length",
                 ylab = "Density",
                 title = "Fragment Length Distribution",
-                subtitle = stringr::str_remove(fileName, ".bam")
-            )
+                subtitle = stringr::str_remove(fileName, ".bam"))
 
         ggplot2::ggsave(file = stringr::str_replace(file.path(exportPath, fileName), ".bam", ".pdf"))
 
@@ -243,8 +231,7 @@ calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NUL
         length()
 
     gc()
-    return(data.frame(
-        file = file,
+    return(data.frame(file = file,
         relH = enrichment.score.relH,
         GoGe = enrichment.score.GoGe,
         nReads = nReads,
@@ -340,6 +327,7 @@ getCGPositions <- function(BSgenome, chr.select) {
 #' }
 #' @export
 calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, chr.select = NULL) {
+
     if (!requireNamespace("MEDIPS", quietly = TRUE)) {
         stop(
             "Package \"MEDIPS\" must be installed to use this function.",
@@ -378,14 +366,11 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
     regions.GoGe <- (as.numeric(regions.CG) * as.numeric(all.genomic)) / (as.numeric(regions.C) * as.numeric(regions.G))
 
     if (BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
-        utils::data("BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution", package = "mesa", envir = environment())
-        genomicDistribution <- BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
+        genomicDistribution <- mesa::BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
     } else if (BSgenome == "BSgenome.Mmusculus.UCSC.mm10") {
-        utils::data("BSgenome.Mmusculus.UCSC.mm10.CpG.distribution", package = "mesa", envir = environment())
-        genomicDistribution <- BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
+        genomicDistribution <- mesa::BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
     } else if (BSgenome == "BSgenome.Hsapiens.UCSC.hg19") {
-        utils::data("BSgenome.Hsapiens.UCSC.hg19.CpG.distribution", package = "mesa", envir = environment())
-        genomicDistribution <- BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
+        genomicDistribution <- mesa::BSgenome.Hsapiens.UCSC.hg19.CpG.distribution
     } else {
         genomicDistribution <- calculateGenomicCGDistribution(BSgenome)
     }
@@ -415,14 +400,13 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 
     gc()
 
-    return(tibble::tibble(
-        relH = enrichment.score.relH,
+    return(tibble::tibble(relH = enrichment.score.relH,
         GoGe = enrichment.score.GoGe,
         nReads = numReads,
         nReadsWithoutPattern = numWithoutPattern,
         n100bpReads = numReads100bp,
-        n100bpReadsWithoutPattern = numWithoutPatternOver100bp
-    ))
+        n100bpReadsWithoutPattern = numWithoutPatternOver100bp)
+    )
 }
 
 
@@ -496,6 +480,7 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #' \dontrun{
 #' if (requireNamespace("MEDIPS", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#'
 #'     bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
 #'
 #'     data.frame(
@@ -519,10 +504,11 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #' }
 #' @export
 addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
-    extend = 0, shift = 0, uniq = 0,
-    chr.select = NULL, paired = TRUE,
-    file_name = "file_name",
-    nCores = 1) {
+                                       extend = 0, shift = 0, uniq = 0,
+                                       chr.select = NULL, paired = TRUE,
+                                       file_name = "file_name",
+                                       nCores = 1) {
+
     BSgenome <- qseaSet %>% qsea:::getGenome()
 
     if (!requireNamespace("MEDIPS", quietly = TRUE)) {
@@ -541,6 +527,7 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
     message(glue::glue("Adding Medips Enrichment factors to {length(getSampleNames(qseaSet))} {typeString} samples, using {nCores} cores."))
 
     if (!nonEnrich) {
+
         colsToCheck <- c("relH", "GoGe", "nReads", "nReadsWithoutPattern", "n100bpReadsWithoutPattern")
 
         if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
@@ -548,12 +535,14 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
                     "))
         }
     } else {
+
         colsToCheck <- c("input_relH", "input_GoGe", "input_nReads", "input_nReadsWithoutPattern", "input_n100bpReadsWithoutPattern")
 
         if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
             stop(glue::glue("Column {colsToCheck[colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))]} already in sampleTable!
                     "))
         }
+
     }
 
     if (!nonEnrich) {
@@ -565,19 +554,16 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
 
     enrichData <- parallel::mclapply(fileNames,
         function(x) {
-            calculateCGEnrichment(x,
-                BSgenome = BSgenome, exportPath = exportPath,
+            calculateCGEnrichment(x, BSgenome = BSgenome, exportPath = exportPath,
                 extend = extend, shift = shift, uniq = uniq,
-                chr.select = chr.select, paired = paired
-            )
-        },
-        mc.cores = nCores
-    ) %>%
+                chr.select = chr.select, paired = paired)
+        }, mc.cores = nCores) %>%
         do.call(rbind, .)
 
     if (!nonEnrich) {
         qseaSet@libraries$file_name <- qseaSet@libraries$file_name %>%
             cbind(dplyr::select(enrichData, -file))
+
     } else {
         qseaSet@libraries$input_file <- qseaSet@libraries$input_file %>%
             cbind(dplyr::select(enrichData, -file))
@@ -585,3 +571,4 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
 
     return(qseaSet)
 }
+

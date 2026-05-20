@@ -84,6 +84,7 @@
 #' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #' exampleTumourNormal %>%
+#'
 #'     addHMMcopyCNV(
 #'         inputColumn = "input_file",
 #'         windowSize = 1e6,
@@ -93,19 +94,23 @@
 #'         parallel = FALSE,
 #'         plotDir = tempdir()
 #'     )
+#' 
 #' }
 #'
 #' @export
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
-    plotDir = NULL,
-    parallel = getMesaParallel(),
-    maxInsertSize = 1000,
-    minInsertSize = 50,
-    minReferenceLength = 30,
-    minMapQual = 30,
-    properPairsOnly = FALSE,
-    hmmCopyGC = NULL,
-    hmmCopyMap = NULL) {
+                          plotDir = NULL,
+                          parallel = getMesaParallel(),
+                          maxInsertSize = 1000,
+                          minInsertSize = 50,
+                          minReferenceLength = 30,
+                          minMapQual = 30,
+                          properPairsOnly = FALSE,
+                          hmmCopyGC = NULL,
+                          hmmCopyMap = NULL
+)
+{
+
     if (is.null(hmmCopyGC)) {
         stop("GC track for hmmcopy must be provided.")
     }
@@ -131,6 +136,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, 
     # leads to exponentially increasing numbers of rows
     if (any(overlappedRegions %>% duplicated()) ||
         (length(overlappedRegions) != length(CNV_Regions))) {
+
         duplicatedRegions <- utils::head(
             overlappedRegions[overlappedRegions %>% duplicated()]
         )
@@ -152,19 +158,15 @@ Showing first affected regions:\n%s",
     if (parallel) {
         BPPARAM <- BiocParallel::bpparam()
         message("Scanning up to ", BiocParallel::bpnworkers(BPPARAM), " files in parallel")
-    } else {
-        BPPARAM <- BiocParallel::SerialParam()
-    }
+    } else {BPPARAM <- BiocParallel::SerialParam()}
 
-    bamOutList <- BiocParallel::bplapply(
-        X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
+    bamOutList <- BiocParallel::bplapply(X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
         FUN = getBamCoveragePairedAndUnpairedR1,
         BSgenome = qsea:::getGenome(qs),
         regions = CNV_Regions,
         fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,
         minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,
-        minMapQual = minMapQual, properPairsOnly = properPairsOnly, BPPARAM = BPPARAM
-    )
+        minMapQual = minMapQual, properPairsOnly = properPairsOnly, BPPARAM = BPPARAM)
 
     names(bamOutList) <- qsea::getSampleTable(qs)$sample_name
 
@@ -180,9 +182,8 @@ Showing first affected regions:\n%s",
         purrr::map_dfc(function(x) {
             purrr::pluck(x, "regionsGR") %>%
                 tibble::as_tibble() %>%
-                dplyr::pull(counts)
-        }) %>%
-        as.matrix()
+                dplyr::pull(counts)  }
+        ) %>% as.matrix()
     colnames(counts) <- qsea::getSampleTable(qs)$sample_name
 
     nf <- apply(X = counts, MARGIN = 2, FUN = stats::median, na.rm = TRUE)
@@ -213,12 +214,10 @@ Showing first affected regions:\n%s",
 
     qs <- qsea:::setCNV(qs, mergedCNV)
 
-    if (length(qsea::getOffset(qs)) > 0 && !all(is.na(qsea::getOffset(qs)))) {
+    if (length(qsea::getOffset(qs)) > 0 && !all(is.na(qsea::getOffset(qs))))
         warning("Consider recalculating offset based on new CNV values")
-    }
-    if ("seqPref" %in% names(GenomicRanges::mcols(qsea::getRegions(qs)))) {
+    if ("seqPref" %in% names(GenomicRanges::mcols(qsea::getRegions(qs))))
         warning("Consider recalculating sequence ", "preference based on new CNV values")
-    }
     return(qs)
 }
 
@@ -260,15 +259,11 @@ Showing first affected regions:\n%s",
 #' \dontrun{
 #' # Minimal synthetic example: build a table and pipe into runHMMCopy()
 #' set.seed(1)
-#' n <- 2000L
-#' w <- 5e4
+#' n <- 2000L; w <- 5e4
 #' tibble::tibble(
-#'     chr = factor(
-#'         rep(c("chr1", "chr2"),
-#'             each = n / 2
-#'         ),
-#'         levels = c("chr1", "chr2")
-#'     ),
+#'     chr = factor(rep(c("chr1", "chr2"),
+#'         each = n / 2),
+#'     levels = c("chr1", "chr2")),
 #'     start = rep(seq(1, by = w, length.out = n / 2), 2),
 #'     end = start + w - 1L,
 #'     width = w, strand = "*",
@@ -281,6 +276,7 @@ Showing first affected regions:\n%s",
 #'
 #' @export
 runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
+
     if (!is.null(plotDir)) {
         dir.create(plotDir, recursive = TRUE, showWarnings = FALSE)
     }
@@ -290,15 +286,11 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         dplyr::rename(reads = tidyselect::all_of(colname)) %>%
         HMMcopy::correctReadcount(mappability = 0.9, samplesize = 50000, verbose = FALSE)
 
-    initParam <- HMMcopy::HMMsegment(correctOutput,
-        param = NULL, autosomes = NULL,
-        maxiter = 50, getparam = TRUE, verbose = FALSE
-    )
+    initParam <- HMMcopy::HMMsegment(correctOutput, param = NULL, autosomes = NULL,
+        maxiter = 50, getparam = TRUE, verbose = FALSE)
 
-    hmmseg <- HMMcopy::HMMsegment(correctOutput,
-        param = initParam, autosomes = NULL,
-        maxiter = 50, verbose = FALSE
-    )
+    hmmseg <- HMMcopy::HMMsegment(correctOutput, param = initParam, autosomes = NULL,
+        maxiter = 50, verbose = FALSE)
 
     endMusDf <- round(hmmseg$mus[, ncol(hmmseg$mus)], 2) %>%
         tibble::enframe(name = "state", value = "CNV") %>%
@@ -320,18 +312,16 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         dplyr::left_join(endMusDf, by = "state")
 
     if (!is.null(plotDir)) {
+
         grDevices::pdf(glue::glue("{plotDir}/{colname}.pdf"), width = 9, height = 9)
-        plot(correctOutput$copy,
-            col = "black",
+        plot(correctOutput$copy, col = "black",
             xlab = "Window (over chr1 to chr22)",
-            ylab = "Log 2 Ratio compared to 2 chromosomes"
-        )
+            ylab = "Log 2 Ratio compared to 2 chromosomes")
         graphics::points(tttt$CNV, col = "red", lwd = 0.5)
-        graphics::title(
-            main = glue::glue("Copy number estimated via HMMcopy."),
-            sub = "Black circles are HMMcopy mappability and gc normalised values."
-        )
+        graphics::title(main = glue::glue("Copy number estimated via HMMcopy."),
+            sub = "Black circles are HMMcopy mappability and gc normalised values.")
         grDevices::dev.off()
+
     }
 
     CNV_RegionsWithReads %>%
@@ -340,6 +330,7 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         plyranges::as_granges() %>%
         plyranges::join_overlap_inner(out) %>%
         return()
+
 }
 
 
@@ -400,14 +391,14 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
 #'
 #' @export
 plotCNVheatmap <- function(qseaSet,
-    sampleAnnotation = NULL,
-    annotationColors = NA,
-    clusterRows = TRUE) {
+                           sampleAnnotation = NULL,
+                           annotationColors = NA,
+                           clusterRows = TRUE) {
+
     rowAnnot <- makeHeatmapAnnotations(qseaSet,
         sampleOrientation = "row",
         specifiedAnnotationColors = annotationColors,
-        sampleAnnotation = {{ sampleAnnotation }}
-    ) %>%
+        sampleAnnotation = {{ sampleAnnotation }}) %>%
         purrr::pluck("sample")
 
     chr <- qseaSet %>%
@@ -438,8 +429,7 @@ plotCNVheatmap <- function(qseaSet,
         t()
 
     CNVmatrix %>%
-        ComplexHeatmap::Heatmap(
-            cluster_rows = clusterRows,
+        ComplexHeatmap::Heatmap(cluster_rows = clusterRows,
             cluster_columns = FALSE,
             show_column_names = FALSE,
             left_annotation = rowAnnot,
@@ -448,12 +438,10 @@ plotCNVheatmap <- function(qseaSet,
             row_title = "Samples",
             column_title = "Chromosome",
             column_title_side = "top",
-            heatmap_legend_param = list(legend_direction = "horizontal")
-        ) %>%
-        ComplexHeatmap::draw(
-            heatmap_legend_side = "bottom",
-            annotation_legend_side = "right"
-        )
+            heatmap_legend_param = list(legend_direction = "horizontal")) %>%
+        ComplexHeatmap::draw(heatmap_legend_side = "bottom",
+            annotation_legend_side = "right")
+
 }
 
 
@@ -488,10 +476,12 @@ plotCNVheatmap <- function(qseaSet,
 #'
 #' @export
 removeCNV <- function(qseaSet) {
+
     qseaSet@cnv <- qseaSet@cnv %>%
         tibble::as_tibble() %>%
         dplyr::mutate(dplyr::across(-c(seqnames, start, end, width, strand), ~ . * 0)) %>%
         plyranges::as_granges()
 
     return(qseaSet)
+
 }

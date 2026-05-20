@@ -75,8 +75,8 @@
 #'         "Colon1_N",
 #'         nReadsTotal = 100000,
 #'         proportion = 0.5,
-#'         renormalise = FALSE
-#'     ) %>%
+#'         renormalise = FALSE) %>%
+#'
 #'     # Only a few reads are included in this small subset of windows (82):
 #'     getCountTable() %>%
 #'     pull(Mix_Colon1_T_Colon1_N_0.5) %>%
@@ -91,8 +91,8 @@
 #'         newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
 #'         groupName   = "Synthetic",
 #'         onlyNew     = TRUE,
-#'         renormalise = FALSE
-#'     ) %>%
+#'         renormalise = FALSE) %>%
+#'
 #'     # Only a few reads are included in this small subset of windows (45):
 #'     getCountTable() %>%
 #'     dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) %>%
@@ -100,19 +100,16 @@
 #'
 #' @export
 mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newName = NULL, groupName = NULL,
-    onlyNew = FALSE,
-    renormalise = TRUE) {
+                       onlyNew = FALSE,
+                       renormalise = TRUE) {
+
     qsea:::checkSamples(qseaSet, c(sample1, sample2))
 
-    if (is.null(newName)) {
-        newName <- paste0("Mix", "_", sample1, "_", sample2, "_", proportion)
-    }
+    if (is.null(newName)) { newName <- paste0("Mix", "_", sample1, "_", sample2, "_", proportion) }
 
     message(newName)
 
-    if (is.null(groupName)) {
-        groupName <- newName
-    }
+    if (is.null(groupName)) { groupName <- newName }
 
     nReads1 <- ceiling(nReadsTotal * proportion)
     nReads2 <- nReadsTotal - nReads1
@@ -169,14 +166,12 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
     newSet@zygosity <- proportion * qseaSet@zygosity[sample1, , drop = FALSE] + (1 - proportion) * qseaSet@zygosity[sample2, , drop = FALSE]
     rownames(newSet@zygosity) <- newName
 
-    newSet@sampleTable <- tibble::tibble(
-        sample_name = newName,
+    newSet@sampleTable <- tibble::tibble(sample_name = newName,
         rownameCol = newName,
         group = groupName,
         sample1 = sample1,
         sample2 = sample2,
-        prop1 = proportion
-    ) %>%
+        prop1 = proportion) %>%
         tibble::remove_rownames() %>%
         tibble::column_to_rownames("rownameCol") %>%
         as.data.frame()
@@ -196,6 +191,7 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
     } else {
         return(combineQsets(qseaSet, newSet))
     }
+
 }
 
 
@@ -277,8 +273,7 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #'         nReadsTotal = 100000,
 #'         proportion1 = 0.5, proportion2 = 0.3,
 #'         newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
-#'         renormalise = FALSE
-#'     ) %>%
+#'         renormalise = FALSE) %>%
 #'     # Only a few reads are included in this small subset of windows (78):
 #'     getCountTable() %>%
 #'     pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) %>%
@@ -293,8 +288,7 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 #'         newName = "Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7",
 #'         groupName = "Synthetic",
 #'         onlyNew = TRUE,
-#'         renormalise = FALSE
-#'     ) %>%
+#'         renormalise = FALSE) %>%
 #'     # Only a few reads are included in this small subset of windows (29):
 #'     getCountTable() %>%
 #'     dplyr::pull(Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7) %>%
@@ -305,17 +299,14 @@ mixSamples <- function(qseaSet, sample1, sample2, nReadsTotal, proportion, newNa
 mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal, proportion1, proportion2, newName = NULL, groupName = NULL,
                                 onlyNew = FALSE,
                                 renormalise = TRUE) {
+
     qsea:::checkSamples(qseaSet, c(sample1, sample2, sample3))
 
-    if (is.null(newName)) {
-        newName <- paste0("Mix", "_", sample1, "_", sample2, "_", sample3, "_", proportion1, "_", proportion2)
-    }
+    if (is.null(newName)) { newName <- paste0("Mix", "_", sample1, "_", sample2, "_", sample3, "_", proportion1, "_", proportion2) }
 
     message(newName)
 
-    if (is.null(groupName)) {
-        groupName <- newName
-    }
+    if (is.null(groupName)) { groupName <- newName }
 
     nReads1 <- ceiling(nReadsTotal * proportion1)
     nReads2 <- ceiling(nReadsTotal * proportion2)
@@ -393,15 +384,13 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
     newSet@zygosity <- proportion1 * qseaSet@zygosity[sample1, , drop = FALSE] + proportion2 * qseaSet@zygosity[sample2, , drop = FALSE] + (1 - proportion1 - proportion2) * qseaSet@zygosity[sample3, , drop = FALSE]
     rownames(newSet@zygosity) <- newName
 
-    newSet@sampleTable <- tibble::tibble(
-        sample_name = newName,
+    newSet@sampleTable <- tibble::tibble(sample_name = newName,
         rownameCol = newName,
         group = groupName,
         sample1 = sample1,
         sample2 = sample2,
         prop1 = proportion1,
-        prop2 = proportion2
-    ) %>%
+        prop2 = proportion2) %>%
         tibble::remove_rownames() %>%
         tibble::column_to_rownames("rownameCol") %>%
         as.data.frame()
@@ -421,4 +410,5 @@ mixThreeQsetSamples <- function(qseaSet, sample1, sample2, sample3, nReadsTotal,
     } else {
         return(combineQsets(qseaSet, newSet))
     }
+
 }

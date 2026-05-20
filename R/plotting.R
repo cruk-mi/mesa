@@ -120,22 +120,23 @@
 #' }
 #' @export
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
-  normMethod = "beta",
-  sampleAnnotation = NULL,
-  windowAnnotation = NULL,
-  annotationColors = NA,
-  useGroupMeans = FALSE,
-  clusterRows = FALSE,
-  clusterCols = TRUE,
-  minEnrichment = 3,
-  maxScale = 5,
-  clusterNum = NULL,
-  clip = 1000000000,
-  minDensity = 0,
-  annotationPosition = "right",
-  title = NULL,
-  showSampleNames = NULL,
-  clusterMethod = "ward.D2", ...) {
+                               normMethod = "beta",
+                               sampleAnnotation = NULL,
+                               windowAnnotation = NULL,
+                               annotationColors = NA,
+                               useGroupMeans = FALSE,
+                               clusterRows = FALSE,
+                               clusterCols = TRUE,
+                               minEnrichment = 3,
+                               maxScale = 5,
+                               clusterNum = NULL,
+                               clip = 1000000000,
+                               minDensity = 0,
+                               annotationPosition = "right",
+                               title = NULL,
+                               showSampleNames = NULL,
+                               clusterMethod = "ward.D2", ...) {
+
     if (is.null(regionsToOverlap)) {
         regionsToOverlap <- qseaSet %>%
             qsea::getRegions()
@@ -143,23 +144,18 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 
     regionsToOverlap <- asValidGranges(regionsToOverlap)
 
-    if (length(regionsToOverlap) > 20000) {
-        stop("More than 20000 regions requested.")
-    }
+    if (length(regionsToOverlap) > 20000) {stop("More than 20000 regions requested.")}
 
-    if (length(regionsToOverlap) == 0) {
-        stop("No genomic regions given!")
-    }
+    if (length(regionsToOverlap) == 0) {stop("No genomic regions given!")}
 
-    if (normMethod == "beta") {
-        maxScale <- min(clip, 1)
-    }
+    if (normMethod == "beta") {maxScale <- min(clip, 1)}
 
     col_fun <- circlize::colorRamp2(seq(0, maxScale, length.out = 9), RColorBrewer::brewer.pal(name = "YlOrRd", n = 9))
 
     clipFn <- function(x, a, b) {a + (x - a > 0) * (x - a) - (x - b > 0) * (x - b)}
 
     if (!is.list(annotationColors)) {
+
         namesVec <- names(annotationColors)
         names(namesVec) <- namesVec
 
@@ -171,6 +167,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
             return(x = annotationColors[[x]][usedValues])
         }
         )
+
     }
 
     # define a function that removes rows that have 1 row.
@@ -456,16 +453,16 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL, clust
 #'     )
 #'
 makeHeatmapAnnotations <- function(qseaSet,
-  sampleAnnotation = NULL,
-  windowAnnotationDf = NULL,
-  useGroupMeans = FALSE,
-  specifiedAnnotationColors = NA,
-  windowOrientation = "row",
-  sampleOrientation = "column") {
+                                   sampleAnnotation = NULL,
+                                   windowAnnotationDf = NULL,
+                                   useGroupMeans = FALSE,
+                                   specifiedAnnotationColors = NA,
+                                   windowOrientation = "row",
+                                   sampleOrientation = "column") {
+
     sampleAnnotationDf <- getAnnotation(qseaSet,
         sampleAnnotation = {{ sampleAnnotation }},
-        useGroupMeans = useGroupMeans
-    ) %>%
+        useGroupMeans = useGroupMeans) %>%
         dplyr::mutate_if(is.character, as.factor)
 
     if (is.null(windowAnnotationDf)) {
@@ -1179,8 +1176,9 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'
 #' @export
 plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack",
-  normMethod = "nrpm", genome = NULL,
-  TxDb = NULL, annoDb = NULL) {
+                                           normMethod = "nrpm", genome = NULL,
+                                           TxDb = NULL, annoDb = NULL) {
+
     # Genome selection hierarchy:
     # 1. Function parameter (genome) takes precedence
     # 2. Global mesa genome setting
@@ -1208,14 +1206,12 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
     temp <- qseaSet %>%
         qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
         qseaTableToChrGRanges() %>%
-        ChIPseeker::annotatePeak(
-            tssRegion = c(-2000, 500),
+        ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
             level = "gene",
             TxDb = txdb,
             annoDb = annodb,
             overlap = "all",
-            verbose = FALSE
-        )
+            verbose = FALSE)
 
     featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet), function(x) {
         temp@anno %>%
@@ -1232,12 +1228,10 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
         ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
         ggplot2::geom_bar(position = barType, stat = "identity") +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
-        ggplot2::labs(
-            x = "Sample",
+        ggplot2::labs(x = "Sample",
             y = "Fraction",
             legend = "Feature",
-            subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}")
-        )
+            subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}"))
 }
 
 #' Sample correlation heatmap
@@ -1310,7 +1304,8 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
 #'
 #' @export
 plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
-  minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
+                                  minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
+
     ## TODO: Swap from pheatmap to ComplexHeatmap
     if (!is.null(regionsToOverlap)) {
         regionsToOverlap <- asValidGranges(regionsToOverlap)
