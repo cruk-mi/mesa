@@ -233,7 +233,7 @@ exampleMouse |>
     getRegions() |>
     annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
                     annoDb = "org.Mm.eg.db")
-  
+
 ```
 
 or they may be set at a global level by using the functions `setMesaTxDb` and `setMesaAnnoDb`:
