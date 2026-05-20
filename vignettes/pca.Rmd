@@ -2,18 +2,18 @@
 title: "Dimensionality Reduction - PCAs and UMAPs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Dimensionality Reduction - PCAs and UMAPs}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Dimensionality Reduction - PCAs and UMAPs}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r chunk, include = FALSE}
 knitr::opts_chunk$set(
-  collapse  = TRUE,
-  fig.height= 5.5,
-  fig.width = 7,
-  comment   = "#>",
-  dev       = "pdf"
+    collapse  = TRUE,
+    fig.height= 5.5,
+    fig.width = 7,
+    comment   = "#>",
+    dev       = "pdf"
 )
 ```
 
@@ -61,7 +61,7 @@ In the same way as for a `qseaSet`, the sampleTable may be updated directly, usi
 
 ```{r editing-the-sampletable}
 pca1 <- pca0 |> 
-  mutate(transformed_age = scale(age) + 0.5)
+    mutate(transformed_age = scale(age) + 0.5)
 ```
 
 ## `PlotPCA` function arguments
@@ -82,8 +82,8 @@ Here, many PCA plots have been produced and displayed (PC1 vs PC2 and PC2 vs PC2
 
 ```{r chunk-3}
 PCAplots1 <- plotPCA(pca1, 
-                     colour = c("patient", "age", "transformed_age"), 
-                     shape = "tumour") 
+                        colour = c("patient", "age", "transformed_age"), 
+                        shape = "tumour") 
 
 PCAplots1$pca1$patient$PC1vsPC2
 
@@ -195,18 +195,18 @@ Alternatively, `plotly::ggplotly()` can be used to generate an interactive versi
 
 ```{r chunk-8}
 PCAplots3 <- plotPCA(pca1, 
-                     components = c(1, 2), 
-                     colour = "patient", 
-                     shape = "tumour", 
-                     plotlyAnnotations = c("stage", "age", "gender"))
+                        components = c(1, 2), 
+                        colour = "patient", 
+                        shape = "tumour", 
+                        plotlyAnnotations = c("stage", "age", "gender"))
 
 ```
 
 ```{r pca-plot, echo=FALSE}
 if (knitr::is_html_output() && interactive()) {
-  plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
+    plotly::ggplotly(PCAplots3$pca1$patient$PC1vsPC2)
 } else {
-  PCAplots3$pca1$patient$PC1vsPC2
+    PCAplots3$pca1$patient$PC1vsPC2
 }
 ```
 
@@ -341,8 +341,8 @@ We can then use the dataTable calculated in a previous `getPCA` call, but ask `g
 
 ```{r chunk-17}
 pca4 <- getPCA(exampleTumourNormal, 
-               dataTable = methods::slot(pca3, "dataTable"), 
-               topVarNum = 250) 
+                dataTable = methods::slot(pca3, "dataTable"), 
+                topVarNum = 250) 
 ```
 
 ## Normalisation Method
@@ -365,8 +365,8 @@ This may be done by pre-filtering the qseaSet object via `filterByOverlaps`:
 
 ```{r filtering-regions}
 exampleTumourNormal |>
-  filterByOverlaps(regionsToOverlap = tibble(seqnames = 7, start = 25002001, end = 25117900)) |>
-  getPCA()
+    filterByOverlaps(regionsToOverlap = tibble(seqnames = 7, start = 25002001, end = 25117900)) |>
+    getPCA()
 ```
 
 For a full list of arguments, see the documentation (`?getPCA`).
@@ -380,7 +380,7 @@ set.seed(1)
 qseaSetRandom <- qsea::getExampleQseaSet(repl = 20)
 
 umap1 <- qseaSetRandom |>
-  getUMAP()
+    getUMAP()
 
 plotUMAP(umap1, colour = "group")
 ```
@@ -391,12 +391,12 @@ Here we show two UMAPs built off the same dataset with different values of `min_
 
 ```{r chunk-18}
 qseaSetRandom |>
-  getUMAP(min_dist = 0.01, n_neighbors = 2) |>
-  plotUMAP(colour = "group")
+    getUMAP(min_dist = 0.01, n_neighbors = 2) |>
+    plotUMAP(colour = "group")
 
 qseaSetRandom |>
-  getUMAP(min_dist = 1, n_neighbors = 40) |>
-  plotUMAP(colour = "group")
+    getUMAP(min_dist = 1, n_neighbors = 40) |>
+    plotUMAP(colour = "group")
 ```
 
 As a final note, we state that UMAPs should be used with care, as they are easy to misinterpret.

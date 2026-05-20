@@ -2,18 +2,18 @@
 title: "Differentially Methylated Regions and Annotatation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Differentially Methylated Regions and Annotatation}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Differentially Methylated Regions and Annotatation}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r chunk, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  fig.width = 7,
-  fig.height = 5,
-  comment = "#>",
-  dev = "pdf"
+    collapse = TRUE,
+    fig.width = 7,
+    fig.height = 5,
+    comment = "#>",
+    dev = "pdf"
 )
 ```
 
@@ -39,8 +39,8 @@ For instance, taking the `exampleTumourNormal` data, we can ask which windows ar
 
 ```{r chunk-2}
 exampleTumourNormal |>
-  getSampleTable() |>
-  dplyr::select(sample_name, tumour)
+    getSampleTable() |>
+    dplyr::select(sample_name, tumour)
 ```
 
 We therefore set `variable = "tumour"`, to select this column. There are several options we can pass to the `contrasts` option (i.e. the comparisons), in order to specify exactly which comparisons we want to calculate.
@@ -49,7 +49,7 @@ The `contrasts` option can be a few string settings, such as `"all"` or `"first"
 
 ```{r chunk-3}
 exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 contrasts = "first") 
 ```
 
@@ -57,7 +57,7 @@ Or a string with the two groups separated by `"_vs_"`, i.e.
 
 ```{r chunk-4}
 exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 contrasts = "Tumour_vs_Normal") 
 ```
 
@@ -65,7 +65,7 @@ Or we can provide a dataframe containing the contrasts that we wish to perform (
 
 ```{r chunk-5}
 DMRs <- exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 contrasts = tibble(group1 = "Tumour", group2 = "Normal")) 
 ```
 
@@ -73,7 +73,7 @@ One final option is that we can use a string such as "all_vs_X" or "X_vs_all" to
 
 ```{r chunk-6}
 exampleTumourNormal |>
-  calculateDMRs(variable = "type",
+    calculateDMRs(variable = "type",
                 contrasts = "all_vs_NormalLung") 
 ```
 
@@ -82,9 +82,9 @@ The output of `calculateDMRs` is a dataframe, where each row corresponds to a wi
 
 ```{r output}
 exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 contrasts = tibble(group1 = "Tumour", group2 = "Normal")) |>
-  colnames()
+    colnames()
 ```
 
 We can also get the individual data values for each differentially methylated window, by setting `keepData = TRUE` inside `calculateDMRs`, but this is often unnecessary (and makes massive objects when there are a lot of contrasts), so is switched off by default. 
@@ -92,7 +92,7 @@ Additionally, you can return the average values in the group variable of the qse
 
 ```{r chunk-7}
 exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 contrasts = tibble(group1 = "Tumour", group2 = "Normal"),
                 keepData = TRUE) 
 ```
@@ -103,10 +103,10 @@ We can incorporate a covariate into the DMR generation process, using the `covar
 
 ```{r covariates}
 DMRsCovariateTissue <- exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 covariates = "tissue",
                 contrasts = tibble(group1 = "Tumour", group2 = "Normal")) |>
-  as_tibble()
+    as_tibble()
 
 DMRsCovariateTissue
 ```
@@ -115,10 +115,10 @@ We can see that having included the tissue covariate we now have `r `DMRsCovaria
 
 ```{r chunk-8}
 DMRsCovariatePatient <- exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 covariates = "patient", 
                 contrasts = tibble(sample1 = "Tumour", sample2 = "Normal")) |>
-  as_tibble()
+    as_tibble()
 
 DMRsCovariatePatient
 ```
@@ -144,41 +144,41 @@ For finer control of the calculation, you can specify the false discovery rate (
 
 ```{r additional-options}
 allWindows <- exampleTumourNormal |>
-  calculateDMRs(variable = "tumour",
+    calculateDMRs(variable = "tumour",
                 contrasts = "Tumour_vs_Normal",
                 covariates = "patient",
                 FDRthres = 1)
 
 allWindows |>
-  mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>
-  ggplot(aes(x = Tumour_vs_Normal_log2FC, y = -log(Tumour_vs_Normal_adjPval), col = significant)) +
-  geom_point() +
-  theme_bw() +
-  labs(x = "Log2 Fold Change",
-       y = "-Log10 Adjusted P Value")
+    mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>
+    ggplot(aes(x = Tumour_vs_Normal_log2FC, y = -log(Tumour_vs_Normal_adjPval), col = significant)) +
+    geom_point() +
+    theme_bw() +
+    labs(x = "Log2 Fold Change",
+        y = "-Log10 Adjusted P Value")
 ```
 
 We can also use the $\Delta \beta$, the difference between the average beta values between the two sets of samples. This can be a more useful metric, as it characterises windows that have clearly changed in levels of methylation.
 
 ```{r chunk-10}
 allWindows |>
-  mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>
-  ggplot(aes(x = Tumour_vs_Normal_deltaBeta, y = -log(Tumour_vs_Normal_adjPval), col = significant)) +
-  geom_point() +
-  theme_bw() +
-  labs(x = "Difference in average Beta Values",
-       y = "-Log10 Adjusted P Value")
+    mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>
+    ggplot(aes(x = Tumour_vs_Normal_deltaBeta, y = -log(Tumour_vs_Normal_adjPval), col = significant)) +
+    geom_point() +
+    theme_bw() +
+    labs(x = "Difference in average Beta Values",
+        y = "-Log10 Adjusted P Value")
 ```
 
 These two metrics are correlated, but do sometimes differ, particularly in regions that have beta values close to 1 in one or both samples. This is not particularly noticeable in this small subset of the data though.
 
 ```{r chunk-11}
 allWindows |>
-  ggplot(aes(x = Tumour_vs_Normal_log2FC, y = Tumour_vs_Normal_deltaBeta)) +
-  geom_point() +
-  theme_bw() +
-  labs(x = "Log2 Fold Change",
-       y = "Difference in average Beta Values")
+    ggplot(aes(x = Tumour_vs_Normal_log2FC, y = Tumour_vs_Normal_deltaBeta)) +
+    geom_point() +
+    theme_bw() +
+    labs(x = "Log2 Fold Change",
+        y = "Difference in average Beta Values")
 ```
 
 # Annotation
@@ -187,38 +187,38 @@ We can then annotate these regions (or any other set of regions), by using the f
 
 ```{r annotation}
 annoDMRs <- DMRsCovariatePatient |>
-  annotateWindows(genome = "hg38")
+    annotateWindows(genome = "hg38")
 
 annoDMRs |> 
-  colnames()
+    colnames()
 ```
 
 The output includes which gene was assigned to that window, with an `ENSEMBL` ID column, a `SYMBOL` column for a name associated with that gene, and a (somewhat confusingly named) `GENENAME` column with a long-form expansion of that name. The `distanceToTSS` column gives how far the query window is away from the Transcriptional Start Site of the gene. It is worth noting this can be positive or negative, depending on which strand the gene is on, and that some genes are very large. 
 
 ```{r chunk-12}
 annoDMRs |> 
-  dplyr::select(seqnames, start, end, distanceToTSS, ENSEMBL, SYMBOL, GENENAME)
+    dplyr::select(seqnames, start, end, distanceToTSS, ENSEMBL, SYMBOL, GENENAME)
 ```
 
 The `annotation` column gives a long-form explanation of the annotation for that window, including which exon of which transcript is assigned, while `shortAnno` abbreviates this just e.g. Intron/Exon/Promoter.
 
 ```{r chunk-13}
 annoDMRs |> 
-  dplyr::select(start, SYMBOL, shortAnno, annotation)
+    dplyr::select(start, SYMBOL, shortAnno, annotation)
 ```
 
 Details of the full location of the gene are provided, including how long the gene is, and which transcript is being used in the annotations.
 
 ```{r chunk-14}
 annoDMRs |> 
-  dplyr::select(geneChr, geneStart, geneEnd, geneLength, geneStrand, geneId, transcriptId)
+    dplyr::select(geneChr, geneStart, geneEnd, geneLength, geneStrand, geneId, transcriptId)
 ```
 
 Finally, for hg38, the function also returns several columns regarding whether the region lies within a CpG "island" (characterised regions of the genome with high numbers of CGs), as well as the "shores" that are 2000bp each side of the "island", and "shelves" (a further 2000bp around these). It is possible for a region to be in multiple islands/shores/shelves simultaneously, so these columns give how many of these that they overlap.
 
 ```{r chunk-15}
 annoDMRs |>
-  dplyr::select(seqnames, start, end, nIslands, nShore, nShelf, inFantom, landscape)
+    dplyr::select(seqnames, start, end, nIslands, nShore, nShelf, inFantom, landscape)
 ```
 
 This function works on any data frame with the columns `seqnames`, `start` and `end`, or a GRanges object.
@@ -230,9 +230,9 @@ The underlying function being used here is `annotatePeak` from the `ChIPseeker` 
 
 ```{r other-genomes}
 exampleMouse |>
-  getRegions() |>
-  annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-                  annoDb = "org.Mm.eg.db")
+    getRegions() |>
+    annotateWindows(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+                    annoDb = "org.Mm.eg.db")
   
 ```
 
@@ -247,8 +247,8 @@ Having done this, the default databases will be set appropriately:
 
 ```{r chunk-17}
 exampleMouse |>
-  getRegions() |>
-  annotateWindows()
+    getRegions() |>
+    annotateWindows()
 ```
 
 # Analysing DMRs
@@ -256,7 +256,7 @@ There are also a set of functions to manipulate the output of the DMRs. First, w
 
 ```{r analysing-dmrs}
 allContrasts <- exampleTumourNormal |>
-  calculateDMRs(variable = "type",
+    calculateDMRs(variable = "type",
                 contrasts = "all") 
 ```
 
@@ -266,7 +266,7 @@ We therefore provide a function to pivot this wider (analogous to [dplyr::pivot_
 
 ```{r chunk-18}
 allContrasts |>
-  pivotDMRsLonger() 
+    pivotDMRsLonger() 
 ```
 
 Now there five new columns here, `group1`, `group2`, `log2FC`, `adjPval` and `deltaBeta`. This is now a tidy dataframe in long format, suitable for many downstream processing tasks [vignette("tidy-data", package = "tidyr")]. Windows which are not differentially methylated (by the adjusted P value) will be dropped; this can be controlled by setting the value of `FDRthres`. 
@@ -275,28 +275,28 @@ Now there five new columns here, `group1`, `group2`, `log2FC`, `adjPval` and `de
 
 ```{r chunk-19}
 allContrasts |>
-  pivotDMRsLonger(makePositive = TRUE) 
+    pivotDMRsLonger(makePositive = TRUE) 
 ```
 
 We can summarise by contrast, to determine how many DMRs are found within each comparison:
 
 ```{r chunk-20}
 allContrasts |>
-  summariseDMRsByContrast()
+    summariseDMRsByContrast()
 ```
 
 This can be thresholded by the fold change, adjusted p value or the delta beta:
 
 ```{r chunk-21}
 allContrasts |>
-  summariseDMRsByContrast(FDRthres = 0.001, log2FCthres = 2, deltaBetaThres = 0.2)
+    summariseDMRsByContrast(FDRthres = 0.001, log2FCthres = 2, deltaBetaThres = 0.2)
 ```
 
 We also provide a function plot an [UpSet plot)](https://upset.app/]). These are a type of plot useful for showing the intersections between a set of data, in a more generalisable form than a venn diagram.
 
 ```{r chunk-22, fig.height = 8}
 allContrasts |>
-  plotDMRUpset()
+    plotDMRUpset()
 ```
 
 ## Summarising by Gene
@@ -305,7 +305,7 @@ We can also summarise a set of windows by gene, to determine how many times each
 
 ```{r summarising-by-gene}
 annoDMRs |>
-  summariseDMRsByGene()
+    summariseDMRsByGene()
 ```
 
 # Plotting Windows
@@ -313,33 +313,33 @@ We can use the `plotRegionsHeatmap` function to plot a heatmap of selected windo
 
 ```{r plotting-windows}
 exampleTumourNormal |>
-  addLibraryInformation() |> 
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient)
+    addLibraryInformation() |> 
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient)
 ```
 
 We can add sample annotation bars to the top of the heatmap by using the sampleAnnotation option: 
 
 ```{r chunk-23}
 exampleTumourNormal |>
-  addLibraryInformation() |> 
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient,
-                     sampleAnnotation = tumour)
+    addLibraryInformation() |> 
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient,
+                        sampleAnnotation = tumour)
 ```
 Note that the annotation option allows for tidy evaluation, so we can also specify the columns unquoted:
 
 ```{r chunk-24}
 exampleTumourNormal |>
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     sampleAnnotation = c(tumour, type))
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+                        sampleAnnotation = c(tumour, type))
 ```
 
 The default is to plot beta values, but you can change that via the `normMethod` option, for instance to get normalised reads per million `nrpm`:
 
 ```{r chunk-25}
 exampleTumourNormal |>
-  addLibraryInformation() |> 
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     normMethod = "nrpm")
+    addLibraryInformation() |> 
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+                        normMethod = "nrpm")
 ```
 
 This `normMethod` option occurs in a number of functions throughout the package, with the typical choices of `counts`, `nrpm` or `beta` (other options exist within `qsea`).
@@ -349,36 +349,36 @@ We can specify colours for just one variable (with the second being chosen autom
 
 ```{r chunk-26}
 exampleTumourNormal |>
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     sampleAnnotation = c("tumour", "type"),
-                     annotationColors = list(tumour = c("Normal" = "blue", 
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+                        sampleAnnotation = c("tumour", "type"),
+                        annotationColors = list(tumour = c("Normal" = "blue", 
                                                         "Tumour" = "firebrick4"))
-                     )
+                        )
 ```
 
 Or both variables:
 
 ```{r chunk-27}
 annotColours <- list(tumour = c("Normal" = "blue", "Tumour" = "firebrick4"),
-     type = c("CRC" = "orange","LUAD" = "lightgreen", "LUSC" = "darkgreen", 
-              "NormalColon" = "tan", "NormalLung" = "grey"))
+        type = c("CRC" = "orange","LUAD" = "lightgreen", "LUSC" = "darkgreen", 
+                "NormalColon" = "tan", "NormalLung" = "grey"))
 
 exampleTumourNormal |>
-  plotRegionsHeatmap(regionsToOverlap = DMRs, 
-                     sampleAnnotation = c("tumour", "type"),
-                     annotationColors = annotColours
-                     )
+    plotRegionsHeatmap(regionsToOverlap = DMRs, 
+                        sampleAnnotation = c("tumour", "type"),
+                        annotationColors = annotColours
+                        )
 ```
 
 Rows can be clustered using the `clusterRows = TRUE` option:
 
 ```{r chunk-28}
 exampleTumourNormal |>
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     sampleAnnotation = c("tumour", "type"),
-                     annotationColors = annotColours,
-                     clusterRows = TRUE,
-                     )
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+                        sampleAnnotation = c("tumour", "type"),
+                        annotationColors = annotColours,
+                        clusterRows = TRUE,
+                        )
 ```
 
 While the columns can be controlled with `clusterCols`. By default the columns are clustered but the rows not, mostly to save computational speed.
@@ -386,11 +386,11 @@ The number of clusters to break the column dendrogram into can be controlled usi
 
 ```{r chunk-29}
 exampleTumourNormal |>
-  plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                     sampleAnnotation = c("tumour", "type"),
-                     annotationColors = annotColours,
-                     clusterNum = 3
-                     )
+    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
+                        sampleAnnotation = c("tumour", "type"),
+                        annotationColors = annotColours,
+                        clusterNum = 3
+                        )
 ```
 
 Note that the default clustering method to use for the dendrogram is set as `clusterMethod = "ward.D2"`; other options can be used.

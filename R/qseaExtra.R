@@ -2,7 +2,7 @@
 #' @keywords internal
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  assign("getCGPositions", memoise::memoise(getCGPositions), envir = parent.env(environment()))
+    assign("getCGPositions", memoise::memoise(getCGPositions), envir = parent.env(environment()))
 }
 
 #' Check whether an object is a qseaSet
@@ -28,8 +28,8 @@
 #'
 #' @export
 is.qseaSet <- function(x){
-  return(inherits(x,"qseaSet"))
-  }
+    return(inherits(x,"qseaSet"))
+    }
 
 #' Set or get an Ensembl/BioMart handle on a qseaSet
 #'
@@ -85,8 +85,8 @@ setGeneric('setMart', function(object, ...) standardGeneric('setMart'))
 #' @rdname setMart
 #' @export
 setMethod('setMart', 'qseaSet', function(object, mart){
-  object@parameters$mart <- mart
-  object
+    object@parameters$mart <- mart
+    object
 })
 
 #' @rdname setMart
@@ -192,93 +192,93 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
                             annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
                             FantomRegionsGR = NULL) {
 
-  if(!is.null(TxDb) & is.character(TxDb)){
+    if(!is.null(TxDb) & is.character(TxDb)){
     TxDb <- eval(parse(text=paste0(TxDb,"::", TxDb)))
-  }
+    }
   
-  if(is.null(TxDb) & is.null(genome)) {
+    if(is.null(TxDb) & is.null(genome)) {
     stop("Please specify a TxDb or genome, this can be set globally using setMesaTxDb and/or setMesaGenome")
-  }
+    }
   
-  if(is.null(genome)){
+    if(is.null(genome)){
     genome <- ""
-  }
+    }
   
-  if(genome %in% c("hg38","GRCh38") && is.null(TxDb)) {
+    if(genome %in% c("hg38","GRCh38") && is.null(TxDb)) {
 
     if (!requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
-      stop(
+        stop(
         "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\" must be installed to use this function. Please install and run again.",
         call. = FALSE
-      )
+        )
     }
     TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
     }
 
-  if(genome  %in% c("hg38","GRCh38") && is.null(annoDb)) {
+    if(genome  %in% c("hg38","GRCh38") && is.null(annoDb)) {
     if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-      stop(
+        stop(
         "Package \"org.Hs.eg.db\" must be installed to use this function. Please install and run again.",
         call. = FALSE
-      )
+        )
     }
     annoDb <- "org.Hs.eg.db"
     }
 
-  if(is.null(annoDb) && is.null(genome)) {
+    if(is.null(annoDb) && is.null(genome)) {
     stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
-  }
+    }
   
-  if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR <- mesa::hg38CpGIslands }
+    if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR <- mesa::hg38CpGIslands }
 
-  if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR <- mesa::FantomRegions %>% plyranges::as_granges()}
+    if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR <- mesa::FantomRegions %>% plyranges::as_granges()}
 
-  if(methods::is(dataTable,"GRanges")) {
+    if(methods::is(dataTable,"GRanges")) {
     GRangesObject <- dataTable
-  } else{
+    } else{
     GRangesObject <- dataTable %>%
-      qseaTableToChrGRanges()
-  }
+        qseaTableToChrGRanges()
+    }
 
-  chipseekerData <- GRangesObject %>%
+    chipseekerData <- GRangesObject %>%
     ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
-                             level = "transcript", # changed from gene to transcript to stop it outputting some genes as being >10Mb long
-                             TxDb = TxDb,
-                             annoDb = annoDb,
-                             overlap = "all",
-                             verbose = FALSE)
+                                level = "transcript", # changed from gene to transcript to stop it outputting some genes as being >10Mb long
+                                TxDb = TxDb,
+                                annoDb = annoDb,
+                                overlap = "all",
+                                verbose = FALSE)
 
-  grAnno <- chipseekerData@anno %>%
+    grAnno <- chipseekerData@anno %>%
     tibble::as_tibble() %>%
     dplyr::mutate(seqnames = stringr::str_remove(seqnames, "chr")) %>%
     plyranges::as_granges()
 
 
-  if(!is.null(CpGislandsGR)){
-  grAnno <- grAnno %>%
+    if(!is.null(CpGislandsGR)){
+    grAnno <- grAnno %>%
     dplyr::mutate(nIslands = plyranges::count_overlaps(., CpGislandsGR),
-           nShore = plyranges::count_overlaps(., plyranges::flank_left(CpGislandsGR, width = 2000)) +
+            nShore = plyranges::count_overlaps(., plyranges::flank_left(CpGislandsGR, width = 2000)) +
                     plyranges::count_overlaps(., plyranges::flank_right(CpGislandsGR, width = 2000)),
-           nShelf = plyranges::count_overlaps(., plyranges::shift_left(plyranges::flank_left(CpGislandsGR, width = 2000), 2000)) +
+            nShelf = plyranges::count_overlaps(., plyranges::shift_left(plyranges::flank_left(CpGislandsGR, width = 2000), 2000)) +
                     plyranges::count_overlaps(., plyranges::shift_right(plyranges::flank_right(CpGislandsGR, width = 2000), 2000))) %>%
     dplyr::mutate(landscape = dplyr::case_when(nIslands > 0 ~ "Island",
-                                               nShore > 0 ~ "Shore",
-                                               nShelf > 0 ~ "Shelf",
-                                               TRUE ~ "Open Sea"))
-  }
+                                                nShore > 0 ~ "Shore",
+                                                nShelf > 0 ~ "Shelf",
+                                                TRUE ~ "Open Sea"))
+    }
 
-  if(!is.null(FantomRegionsGR)){
-   grAnno <- grAnno %>%
+    if(!is.null(FantomRegionsGR)){
+    grAnno <- grAnno %>%
     dplyr::mutate(inFantom = plyranges::count_overlaps(., FantomRegionsGR))
-  }
+    }
 
-  dfAnno <- grAnno %>%
+    dfAnno <- grAnno %>%
     dplyr::as_tibble() %>%
     dplyr::mutate(shortAnno = stringr::str_remove(annotation," \\(.*")) %>%
     dplyr::relocate(dplyr::ends_with("means"), .after = dplyr::last_col()) %>%
     dplyr::select(-width, -strand)
 
-  return(dfAnno)
+    return(dfAnno)
 }
 
 
@@ -375,69 +375,69 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
 #' @export
 subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
 
-  fnName <- as.character(substitute(fn, env = environment()))
+    fnName <- as.character(substitute(fn, env = environment()))
 
-  if (!useGroupMeans) {
+    if (!useGroupMeans) {
     qseaSamples <- qsea::getSampleNames(qseaSet)
     groupString <- ""
-  } else {
+    } else {
     qseaSamples <- names(getSampleGroups2(qseaSet))
     groupString <- " group"
-  }
+    }
 
-  samplesNotInQset <- setdiff(samples, qseaSamples)
+    samplesNotInQset <- setdiff(samples, qseaSamples)
 
-  if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
+    if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qseaSamples, samples)
     message(glue::glue("Considering {length(samples)} sample{groupString}s containing \"{sampleNameString}\" in the name."))
-  } else if (length(samplesNotInQset) > 0 ) {
+    } else if (length(samplesNotInQset) > 0 ) {
     stop(glue::glue("Sample{groupString}(s) {paste0(samplesNotInQset, collapse = ', ')} not present in the qseaSet!"))
-  }
+    }
 
-  if (is.null(samples)) {
+    if (is.null(samples)) {
     samples <- qseaSamples
     message(glue::glue("Considering all {length(samples)} sample{groupString}s."))
-  }
-
-  if (length(samples) == 0) {
-    stop("No samples selected.")
-  }
-
-  if (!length(normMethod(normMethod)) == 1) {
-    stop(glue::glue("normMethod should be a single valid option for qsea::normMethod"))
-  }
-
-  if (!useGroupMeans) {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
-  } else {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
-  }
-
-  dataTable <- withCallingHandlers(
-    dataTable %>%
-      dplyr::mutate(
-        fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)
-      ),
-    warning = function(w) {
-      if (grepl("no non-missing arguments to .*; returning -Inf", conditionMessage(w))) {
-        invokeRestart("muffleWarning")
-      }
     }
-  )
 
-  if (aboveThreshold) {
+    if (length(samples) == 0) {
+    stop("No samples selected.")
+    }
+
+    if (!length(normMethod(normMethod)) == 1) {
+    stop(glue::glue("normMethod should be a single valid option for qsea::normMethod"))
+    }
+
+    if (!useGroupMeans) {
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
+    } else {
+    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
+    }
+
+    dataTable <- withCallingHandlers(
+    dataTable %>%
+        dplyr::mutate(
+        fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)
+        ),
+    warning = function(w) {
+        if (grepl("no non-missing arguments to .*; returning -Inf", conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+        }
+    }
+    )
+
+    if (aboveThreshold) {
     dataTable <- dataTable %>% dplyr::filter(fnValue >= !!threshold)
     keepString <- "above (or equal to)"
-  } else {
+    } else {
     dataTable <- dataTable %>% dplyr::filter(fnValue < !!threshold)
     keepString <- "below"
-  }
+    }
 
-  message(glue::glue("Keeping {nrow(dataTable)} windows with {fnName} {keepString} {threshold} over {length(samples)} sample{groupString}s."))
+    message(glue::glue("Keeping {nrow(dataTable)} windows with {fnName} {keepString} {threshold} over {length(samples)} sample{groupString}s."))
 
-  qseaSet <- filterByOverlaps(qseaSet, dataTable)
-  return(qseaSet)
+    qseaSet <- filterByOverlaps(qseaSet, dataTable)
+    return(qseaSet)
 
 }
 
@@ -512,64 +512,64 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
                                         samples = NULL, numWindows = NULL,
                                         FDRthres = 0.01, numAbove = 1){
   
-  samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
+    samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
   
-  if (length(samples) == 1 & length(samplesNotInSet) > 0 & is.character(samples)) {
+    if (length(samples) == 1 & length(samplesNotInSet) > 0 & is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
     message(glue::glue("Filtering out {length(samples)} samples containing {sampleNameString} in the name."))
-  } else if (length(samplesNotInSet) > 0 ) {
+    } else if (length(samplesNotInSet) > 0 ) {
     stop(glue::glue("Sample {samplesNotInSet} not present in the qseaSet!
 
                     "))
-  }
+    }
   
-  if (is.null(samples)) {
+    if (is.null(samples)) {
     samples <- qsea::getSampleNames(qseaSet)
-  }
+    }
   
-  message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
+    message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
   
-  countMat <- qseaSet %>%
+    countMat <- qseaSet %>%
     qsea::getCounts()
   
-  if (is.null(numWindows)) {
+    if (is.null(numWindows)) {
     numWindows <- nrow(countMat)
-  }
+    }
   
-  fdrMat <- purrr::map_dfc(samples,
-                           function(x){
-                             totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
-                             lambda <- totalNumReads/numWindows
-                             pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
-                             fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
-                               tibble::enframe(name = "window") %>%
-                               dplyr::rename(!!x := value) %>%
-                               dplyr::select(-window) 
-                           }
-  )
+    fdrMat <- purrr::map_dfc(samples,
+                            function(x){
+                                totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
+                                lambda <- totalNumReads/numWindows
+                                pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
+                                fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
+                                tibble::enframe(name = "window") %>%
+                                dplyr::rename(!!x := value) %>%
+                                dplyr::select(-window) 
+                            }
+    )
   
-  if (keepAbove) {
+    if (keepAbove) {
     indexToKeep <- fdrMat %>%
-      {. <= FDRthres} %>%
-      rowSums() %>%
-      {. >= numAbove} %>%
-      which()
-  } else {
+        {. <= FDRthres} %>%
+        rowSums() %>%
+        {. >= numAbove} %>%
+        which()
+    } else {
     indexToKeep <- fdrMat %>%
-      {. <= FDRthres} %>%
-      rowSums() %>%
-      {. < numAbove} %>%
-      which()
-  }
+        {. <= FDRthres} %>%
+        rowSums() %>%
+        {. < numAbove} %>%
+        which()
+    }
   
-  windowsToKeep <- qsea::getRegions(qseaSet)[indexToKeep]
+    windowsToKeep <- qsea::getRegions(qseaSet)[indexToKeep]
   
-  print(windowsToKeep)
+    print(windowsToKeep)
   
-  message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
+    message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
   
-  return(filterByOverlaps(qseaSet, windowsToKeep))
+    return(filterByOverlaps(qseaSet, windowsToKeep))
   
 }
 
@@ -622,35 +622,35 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 #'
 #' @export
 downSample <- function(qseaSet, nReads){
-  counts <- qseaSet@count_matrix
+    counts <- qseaSet@count_matrix
 
-  if (min(colSums(counts)) < nReads) {
+    if (min(colSums(counts)) < nReads) {
     stop(glue::glue("Number of reads requested is less than the minimum {min(colSums(counts))}."))
-  }
+    }
 
-  message(glue::glue("Downsampling all samples to {nReads} each"))
+    message(glue::glue("Downsampling all samples to {nReads} each"))
 
-  newCounts <- purrr::map_dfc(colnames(counts), function(colname){
+    newCounts <- purrr::map_dfc(colnames(counts), function(colname){
         vec <- counts[,colname]
 
         sample(rep(seq_along(vec), vec), replace = FALSE, size = nReads) %>%
-          table() %>%
-          tibble::enframe(name = "window") %>%
-          dplyr::mutate(window = as.integer(window), value = as.integer(value)) %>%
-          dplyr::left_join(tibble::tibble(window = seq_along(vec)),., copy = TRUE, by = "window") %>%
-          dplyr::mutate(value = tidyr::replace_na(value,0)) %>%
-          dplyr::select(value) %>%
-          dplyr::rename(!!colname := value)
+            table() %>%
+            tibble::enframe(name = "window") %>%
+            dplyr::mutate(window = as.integer(window), value = as.integer(value)) %>%
+            dplyr::left_join(tibble::tibble(window = seq_along(vec)),., copy = TRUE, by = "window") %>%
+            dplyr::mutate(value = tidyr::replace_na(value,0)) %>%
+            dplyr::select(value) %>%
+            dplyr::rename(!!colname := value)
 
-       }
-     )
+        }
+        )
 
-  qseaSet@count_matrix <- as.matrix(newCounts)
-  qseaSet@libraries$file_name[,"valid_fragments"] <- rep(nReads, ncol(counts))
-  qseaSet@libraries$file_name[,"offset"] <- rep(NA, ncol(counts))
-  qseaSet@libraries$file_name[,"library_factor"] <- rep(NA, ncol(counts))
+    qseaSet@count_matrix <- as.matrix(newCounts)
+    qseaSet@libraries$file_name[,"valid_fragments"] <- rep(nReads, ncol(counts))
+    qseaSet@libraries$file_name[,"offset"] <- rep(NA, ncol(counts))
+    qseaSet@libraries$file_name[,"library_factor"] <- rep(NA, ncol(counts))
 
-  return(qseaSet)
+    return(qseaSet)
 }
 
 
@@ -702,23 +702,23 @@ downSample <- function(qseaSet, nReads){
 #' @export
 convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
-  if(is.character(arrayDetails)){
+    if(is.character(arrayDetails)){
     if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38"){
-      arrayObject <- mesa::hg38_450kArrayGR
+        arrayObject <- mesa::hg38_450kArrayGR
     } else if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38"){
-      arrayObject <- mesa::hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+        arrayObject <- mesa::hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
     }
     else {stop("Only Infinium450k implemented currently as a string.")}
 
-  } else {
+    } else {
     arrayObject <- asValidGranges(arrayDetails)
-  }
+    }
 
-  if(!("ID" %in% colnames(GenomicRanges::mcols(arrayObject)))){
+    if(!("ID" %in% colnames(GenomicRanges::mcols(arrayObject)))){
     stop("No ID column found in object")
-  }
+    }
 
-  qseaSet %>%
+    qseaSet %>%
     qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = arrayObject) %>%
     dplyr::select(-tidyselect::matches("ROI_start|ROI_end|ROI_chr")) %>%
     dplyr::rename(ID = ROI_ID) %>%
@@ -796,24 +796,24 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'
 #' @export
 calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCountsNeeded) {
-  initialReadTotals <- qseaSet %>%
+    initialReadTotals <- qseaSet %>%
     qsea::getCounts() %>%
     {. >= numCountsNeeded } %>%
     colSums()
 
-  afterSubsetReadTotals <- qseaSet %>%
+    afterSubsetReadTotals <- qseaSet %>%
     filterByOverlaps(regionsToOverlap) %>%
     qsea::getCounts() %>%
     {. >= numCountsNeeded } %>%
     colSums()
 
-  out <- tibble::tibble(sample_name = names(initialReadTotals),
-         initialOverBackNum = initialReadTotals,
-         afterOverBackNum = afterSubsetReadTotals,
-         fraction = afterOverBackNum/initialOverBackNum) %>%
+    out <- tibble::tibble(sample_name = names(initialReadTotals),
+            initialOverBackNum = initialReadTotals,
+            afterOverBackNum = afterSubsetReadTotals,
+            fraction = afterOverBackNum/initialOverBackNum) %>%
     dplyr::left_join(qsea::getSampleTable(addLibraryInformation(qseaSet)))
   
-  return(out)
+    return(out)
 
 }
 
@@ -861,7 +861,7 @@ calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCounts
 #'
 #' @export
 removeNormMethodSuffix <- function(dataTable, normMethod) {
-  dplyr::rename_with(dataTable, ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$")))
+    dplyr::rename_with(dataTable, ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$")))
 }
 
 
@@ -920,20 +920,20 @@ removeNormMethodSuffix <- function(dataTable, normMethod) {
 #'                                
 #' @export
 countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
-                                   cutoff = 0, normMethod = "nrpm"){
+                                    cutoff = 0, normMethod = "nrpm"){
 
-  if (is.null(samples)) {
+    if (is.null(samples)) {
     samples <- qsea::getSampleNames(qseaSet)
-  }
+    }
 
-  reducedData <- qseaSet %>%
+    reducedData <- qseaSet %>%
     filterByOverlaps(GRanges) %>%
     qsea::makeTable(norm_methods = normMethod, samples = samples) %>%
     dplyr::select(dplyr::matches(normMethod)) %>%
     dplyr::rename_with(~ stringr::str_remove_all(.x, "_beta|_nrpm|_means")) %>%
     {. >= cutoff}
 
-  reducedData %>%
+    reducedData %>%
     colSums() %>%
     tibble::enframe(name = "sample_name", value = "numOverCutoff") %>%
     dplyr::mutate(totalWindowsUsed = nrow(reducedData)) %>%
@@ -993,9 +993,9 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
 #' @export
 makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
-  #TODO: Rewrite to use getDataTable rather than makeTable.
+    #TODO: Rewrite to use getDataTable rather than makeTable.
   
-  qseaSet %>%
+    qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
     dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", ""))  %>%
     dplyr::select(-CpG_density) %>%
@@ -1065,13 +1065,13 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 #' @rdname getCountTable
 #' @export
 getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
-  tab <- qseaSet %>% 
+    tab <- qseaSet %>% 
     getDataTable(normMethod = "counts", 
-                 useGroupMeans = useGroupMeans, 
-                 addMethodSuffix = addMethodSuffix,
-                 verbose = verbose)
+                    useGroupMeans = useGroupMeans, 
+                    addMethodSuffix = addMethodSuffix,
+                    verbose = verbose)
   
-  return(tab)
+    return(tab)
 }
 
 
@@ -1132,13 +1132,13 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 #' @rdname getNRPMTable
 #' @export
 getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
-  tab <- qseaSet %>% 
+    tab <- qseaSet %>% 
     getDataTable(normMethod = "nrpm", 
-                 useGroupMeans = useGroupMeans, 
-                 addMethodSuffix = addMethodSuffix, 
-                 verbose = verbose)
+                    useGroupMeans = useGroupMeans, 
+                    addMethodSuffix = addMethodSuffix, 
+                    verbose = verbose)
   
-  return(tab)
+    return(tab)
 }
 
 
@@ -1212,13 +1212,13 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #' @rdname getBetaTable
 #' @export
 getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
-   tab <- qseaSet %>% 
-     getDataTable(normMethod = "beta", 
-                  useGroupMeans = useGroupMeans, 
-                  minEnrichment = minEnrichment, 
-                  addMethodSuffix = addMethodSuffix,
-                  verbose = verbose)
-  return(tab)
+    tab <- qseaSet %>% 
+        getDataTable(normMethod = "beta", 
+                    useGroupMeans = useGroupMeans, 
+                    minEnrichment = minEnrichment, 
+                    addMethodSuffix = addMethodSuffix,
+                    verbose = verbose)
+    return(tab)
 }
 
 
@@ -1319,64 +1319,64 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #'
 #' @export
 summariseAcrossWindows <- function(qseaSet,
-                                   regionsToOverlap = NULL,
-                                   fn = mean,
-                                   addSampleTable = TRUE,
-                                   normMethod = c("nrpm", "beta"),
-                                   naMethod = "na.rm",
-                                   minEnrichment = 3,
-                                   suffix = "",
-                                   fnName = NULL) {
+                                    regionsToOverlap = NULL,
+                                    fn = mean,
+                                    addSampleTable = TRUE,
+                                    normMethod = c("nrpm", "beta"),
+                                    naMethod = "na.rm",
+                                    minEnrichment = 3,
+                                    suffix = "",
+                                    fnName = NULL) {
     #TODO: Can we get multiple summary statistics in one go?
 
-  if(is.null(fnName)) {
+    if(is.null(fnName)) {
     fnName <- as.character(substitute(fn, env = environment()))
-  }
+    }
 
     #if suffix doesn't start with "_" then add that to the string
     suffix <- ifelse(stringr::str_detect(suffix, "^_") | nchar(suffix) == 0 , suffix, paste0("_",suffix))
 
     if(is.null(regionsToOverlap)) {
-      regionsToOverlap <- qsea::getRegions(qseaSet)
+        regionsToOverlap <- qsea::getRegions(qseaSet)
     }
 
     dataMat <- qseaSet %>%
-      filterByOverlaps(regionsToOverlap) %>%
-      getDataTable(normMethod = normMethod,
-                   minEnrichment = minEnrichment,
-                   addMethodSuffix = TRUE)
+        filterByOverlaps(regionsToOverlap) %>%
+        getDataTable(normMethod = normMethod,
+                    minEnrichment = minEnrichment,
+                    addMethodSuffix = TRUE)
 
     if(naMethod == "drop"){
 
-      message("Dropping rows with an NA value in any sample")
+        message("Dropping rows with an NA value in any sample")
 
-      dataMat <- dataMat %>%
+        dataMat <- dataMat %>%
         tidyr::drop_na()
 
     }
 
     if(naMethod == "na.rm"){
-      message("Removing NA values on a per-sample basis")
+        message("Removing NA values on a per-sample basis")
     }
 
     map_out <- purrr::map(normMethod,
-                   function(normType){
-                     temp <- dataMat %>%
-                       dplyr::select(dplyr::matches(paste0("_", normType,"$"))) %>%
-                       dplyr::rename_with(~ stringr::str_remove_all(.x, paste0("_", normType, "$")))
+                    function(normType){
+                        temp <- dataMat %>%
+                        dplyr::select(dplyr::matches(paste0("_", normType,"$"))) %>%
+                        dplyr::rename_with(~ stringr::str_remove_all(.x, paste0("_", normType, "$")))
 
-                     out <- temp %>%
-                       apply(2, fn, na.rm = TRUE) %>%
-                       tibble::enframe(name = "sample_name", value = paste0(normType, "_", fnName, suffix)) %>%
-                       dplyr::mutate(num_windows = temp %>% apply(2,function(x) !is.na(x)) %>% colSums()) %>%
-                       dplyr::rename_with(~stringr::str_replace(.x, "num_windows", paste0(normType, "_num_windows", suffix)))
+                        out <- temp %>%
+                        apply(2, fn, na.rm = TRUE) %>%
+                        tibble::enframe(name = "sample_name", value = paste0(normType, "_", fnName, suffix)) %>%
+                        dplyr::mutate(num_windows = temp %>% apply(2,function(x) !is.na(x)) %>% colSums()) %>%
+                        dplyr::rename_with(~stringr::str_replace(.x, "num_windows", paste0(normType, "_num_windows", suffix)))
 
-                   }
+                    }
     ) %>%
-      purrr::reduce(dplyr::full_join, by = "sample_name")
+        purrr::reduce(dplyr::full_join, by = "sample_name")
 
     if(addSampleTable) {
-      map_out <- map_out %>%
+        map_out <- map_out %>%
         dplyr::left_join(qsea::getSampleTable(qseaSet), by = "sample_name")
     }
 
@@ -1486,22 +1486,22 @@ addSummaryAcrossWindows <- function(qseaSet,
                                     naMethod = "impute",
                                     minEnrichment = 3) {
 
-  #need to catch function name when called like this...
-  fnName <- as.character(substitute(fn, env = environment()))
+    #need to catch function name when called like this...
+    fnName <- as.character(substitute(fn, env = environment()))
 
-  summaryTable <- summariseAcrossWindows(qseaSet,
-                                         regionsToOverlap = regionsToOverlap,
-                                         fn = fn,
-                                         suffix = suffix, addSampleTable = FALSE,
-                         normMethod = normMethod,
-                         naMethod = naMethod,
-                         minEnrichment = minEnrichment,
-                         fnName = fnName)
+    summaryTable <- summariseAcrossWindows(qseaSet,
+                                            regionsToOverlap = regionsToOverlap,
+                                            fn = fn,
+                                            suffix = suffix, addSampleTable = FALSE,
+                            normMethod = normMethod,
+                            naMethod = naMethod,
+                            minEnrichment = minEnrichment,
+                            fnName = fnName)
 
-  qseaSet <- qseaSet %>%
+    qseaSet <- qseaSet %>%
     left_join(summaryTable, by = "sample_name")
 
-  return(qseaSet)
+    return(qseaSet)
 
 }
 
@@ -1576,57 +1576,57 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @export
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
   
-  #TODO: This requires the annotateWindows parameters to be exposed to not require setMesaTxDb and setMesaAnnoDb.
-  #TODO: Ensure this works when landscape is not present, as that is optional output from annotateWindows
+    #TODO: This requires the annotateWindows parameters to be exposed to not require setMesaTxDb and setMesaAnnoDb.
+    #TODO: Ensure this works when landscape is not present, as that is optional output from annotateWindows
   
-  temp <- qseaSet %>%
+    temp <- qseaSet %>%
     getDataTable(normMethod = normMethod,
-                 minEnrichment = minEnrichment,
-                 addMethodSuffix = TRUE) %>%
+                    minEnrichment = minEnrichment,
+                    addMethodSuffix = TRUE) %>%
     annotateWindows()
 
-  nWindows <- temp %>%
+    nWindows <- temp %>%
     dplyr::group_by(landscape) %>%
     dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(!is.na(.), na.rm = TRUE))) %>%
     tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nWindows") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  sumData <- temp %>%
+    sumData <- temp %>%
     dplyr::group_by(landscape) %>%
     dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(., na.rm = TRUE))) %>%
     tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "sum") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  overCutoffData <- temp %>%
+    overCutoffData <- temp %>%
     dplyr::group_by(landscape) %>%
     dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(.>= cutoff, na.rm = TRUE))) %>%
     tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nOverCutoff") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  nWindowsShortAnno <- temp %>%
+    nWindowsShortAnno <- temp %>%
     dplyr::group_by(shortAnno) %>%
     dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(!is.na(.), na.rm = TRUE))) %>%
     tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nWindows") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  sumDataShortAnno <- temp %>%
+    sumDataShortAnno <- temp %>%
     dplyr::group_by(shortAnno) %>%
     dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(.,na.rm = TRUE)), nWindows = dplyr::n()) %>%
     tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "sum") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  overCutoffShortAnno <- temp %>%
+    overCutoffShortAnno <- temp %>%
     dplyr::group_by(shortAnno) %>%
     dplyr::summarise(dplyr::across(tidyselect::matches("nrpm|beta"),~sum(.>= cutoff, na.rm = TRUE))) %>%
     tidyr::pivot_longer(tidyselect::matches("nrpm|beta"), names_to = "sample_name", values_to = "nOverCutoff") %>%
     dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_nrpm$|_beta$"))
 
-  sumData %>%
+    sumData %>%
     dplyr::left_join(overCutoffData) %>%
     dplyr::left_join(nWindows) %>%
     dplyr::full_join(sumDataShortAnno %>%
-                       dplyr::left_join(overCutoffShortAnno) %>%
-                       dplyr::left_join(nWindowsShortAnno)
+                        dplyr::left_join(overCutoffShortAnno) %>%
+                        dplyr::left_join(nWindowsShortAnno)
     ) %>%
     dplyr::select(sample_name, landscape, shortAnno, nWindows, sum, nOverCutoff) %>%
     dplyr:: left_join(qseaSet %>% qsea::getSampleTable()) %>%
@@ -1669,13 +1669,13 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 #'   mesa:::getSampleGroups2() 
 #'   
 getSampleGroups2 <- function(qseaSet){
-  qseaSet %>%
+    qseaSet %>%
     qsea::getSampleTable() %>%
     pull(group) %>%
     unique() %>%
     rlang::set_names(., nm = .) %>%
     purrr::map(function(x){
-      qseaSet %>%
+        qseaSet %>%
         qsea::getSampleTable() %>%
         filter(group == !!x) %>%
         pull(sample_name)
@@ -1767,51 +1767,51 @@ getSampleGroups2 <- function(qseaSet){
 #' @export
 getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
 
-  if(!is.qseaSet(qseaSet)){
+    if(!is.qseaSet(qseaSet)){
     stop("Please provide a qseaSet as the first argument.")
-  }
+    }
   
-  if(qseaSet %>% qsea::getRegions() %>% length() == 0){
+    if(qseaSet %>% qsea::getRegions() %>% length() == 0){
     stop("Attempting to get data values for a qseaSet with no remaining windows.")
-  }
+    }
   
-  if(useGroupMeans){
+    if(useGroupMeans){
     if(verbose){message(glue::glue("Generating table of {normMethod} values for {qseaSet %>% qsea::getRegions() %>% length()} regions across {qseaSet %>% getSampleGroups2() %>% length()} sample groups."))}
     tab <- qseaSet %>%
-      qsea::makeTable(groupMeans =  getSampleGroups2(.), 
-                      norm_methods = normMethod, 
-                      minEnrichment = minEnrichment,
-                      verbose = FALSE) %>% #don't use makeTable's messages as we have a different one above.
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble()
+        qsea::makeTable(groupMeans =  getSampleGroups2(.), 
+                        norm_methods = normMethod, 
+                        minEnrichment = minEnrichment,
+                        verbose = FALSE) %>% #don't use makeTable's messages as we have a different one above.
+        dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+        tibble::as_tibble()
 
     if(length(normMethod) == 1 & !addMethodSuffix) {
-      tab <- tab %>%
+        tab <- tab %>%
         dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}_means"), ""))
     } else {
-      tab <- tab %>%
+        tab <- tab %>%
         dplyr::rename_with(~ stringr::str_replace_all(.x, "_means$", ""))
     }
 
     return(tab)
 
-  } else {
+    } else {
     if(verbose){message(glue::glue("Generating table of {normMethod} values for {qseaSet %>% qsea::getRegions() %>% length()} regions across {qseaSet %>% getSampleGroups2() %>% length()} samples."))}
     tab <- qseaSet %>%
-      qsea::makeTable(samples = qsea::getSampleNames(.), 
-                      norm_methods = normMethod, 
-                      minEnrichment = minEnrichment,
-                      verbose = FALSE) %>% #don't use makeTable's messages as we have a different one above.
-      dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-      tibble::as_tibble()
+        qsea::makeTable(samples = qsea::getSampleNames(.), 
+                        norm_methods = normMethod, 
+                        minEnrichment = minEnrichment,
+                        verbose = FALSE) %>% #don't use makeTable's messages as we have a different one above.
+        dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+        tibble::as_tibble()
 
     if(length(normMethod) == 1 & !addMethodSuffix) {
-      tab <- tab %>%
+        tab <- tab %>%
         dplyr::rename_with(~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), ""))
     }
 
     return(tab)
-  }
+    }
 
 }
 
@@ -1883,35 +1883,35 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
 #' @export
 writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans = FALSE, naVal = -1){
 
-  dir.create(folderName, showWarnings = FALSE)
+    dir.create(folderName, showWarnings = FALSE)
 
-  dataTable <- qseaSet %>%
+    dataTable <- qseaSet %>%
     getDataTable(normMethod = normMethod, useGroupMeans = useGroupMeans)
 
-  if(!useGroupMeans) {
+    if(!useGroupMeans) {
     mapNames <- qseaSet %>%
-      qsea::getSampleNames()
+        qsea::getSampleNames()
 
-  } else {
+    } else {
     mapNames <- qseaSet %>%
-      getSampleGroups2()
+        getSampleGroups2()
 
-  }
+    }
 
-  mapNames %>%
+    mapNames %>%
     purrr::walk(function(x){
 
-      message(glue::glue("Writing bigWig track to {folderName}/{x}_{normMethod}.bw"))
+        message(glue::glue("Writing bigWig track to {folderName}/{x}_{normMethod}.bw"))
 
-      gr <- dataTable %>%
+        gr <- dataTable %>%
         dplyr::rename(score = !!x) %>%
         dplyr::select(seqnames, start, end, score) %>%
         dplyr::mutate(score = tidyr::replace_na(score, naVal)) %>%
         plyranges::as_granges()
 
-      GenomeInfoDb::seqinfo(gr) <- GenomeInfoDb::seqinfo(qseaSet %>% qsea::getRegions())
+        GenomeInfoDb::seqinfo(gr) <- GenomeInfoDb::seqinfo(qseaSet %>% qsea::getRegions())
 
-      gr %>%
+        gr %>%
         plyranges::write_bigwig(glue::glue("{folderName}/{x}_{normMethod}.bw"))
 
     })
@@ -1953,12 +1953,12 @@ writeBigWigs <- function(qseaSet, folderName, normMethod = "nrpm", useGroupMeans
 #'
 #' @export
 removeLibraryFactors <- function(qseaSet){
-  qseaSet <- qseaSet %>%
+    qseaSet <- qseaSet %>%
     qsea::addLibraryFactors(1)
 
-  if("library_factor" %in% colnames(qsea::getSampleTable(qseaSet))){
+    if("library_factor" %in% colnames(qsea::getSampleTable(qseaSet))){
     qseaSet <- qseaSet %>%
-      dplyr::mutate(library_factor = 1)
-  }
+        dplyr::mutate(library_factor = 1)
+    }
 return(qseaSet)
 }

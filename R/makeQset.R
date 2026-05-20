@@ -207,26 +207,26 @@
 #' }
 #' @export
 makeQset <- function(sampleTable,
-                     BSgenome,
-                     chrSelect,
-                     windowSize = 300,
-                     CNVwindowSize = 1000000,
-                     fragmentType = NULL,
-                     fragmentLength = NULL,
-                     fragmentSD = NULL,
-                     CNVmethod = "HMMdefault",
-                     coverageMethod = "PairedAndR1s",
-                     minMapQual = 10,
-                     minInsertSize = 70,
-                     maxInsertSize = 1000,
-                     minReferenceLength = 30,
-                     badRegions = NULL,
-                     properPairsOnly = FALSE,
-                     hmmCopyGC = NULL,
-                     hmmCopyMap = NULL,
-                     maxPatternDensity = 0.05,
-                     enrichmentMethod = "blind1-15",
-                     parallel = getMesaParallel()) {
+                        BSgenome,
+                        chrSelect,
+                        windowSize = 300,
+                        CNVwindowSize = 1000000,
+                        fragmentType = NULL,
+                        fragmentLength = NULL,
+                        fragmentSD = NULL,
+                        CNVmethod = "HMMdefault",
+                        coverageMethod = "PairedAndR1s",
+                        minMapQual = 10,
+                        minInsertSize = 70,
+                        maxInsertSize = 1000,
+                        minReferenceLength = 30,
+                        badRegions = NULL,
+                        properPairsOnly = FALSE,
+                        hmmCopyGC = NULL,
+                        hmmCopyMap = NULL,
+                        maxPatternDensity = 0.05,
+                        enrichmentMethod = "blind1-15",
+                        parallel = getMesaParallel()) {
 
     if (parallel) {
         if (BiocParallel::bpworkers() == 1) {
@@ -278,11 +278,11 @@ makeQset <- function(sampleTable,
 
     if (any(asValidNames != sampleTable$sample_name)) {
         stop(glue::glue("sample_name column must be valid names for columns in R without quoting.
-  See the help for base::make.names, but generally use only letters, numbers,
-  underscores and dots, and names can't start with a number.
-  Issues were found with:
+    See the help for base::make.names, but generally use only letters, numbers,
+    underscores and dots, and names can't start with a number.
+    Issues were found with:
     {paste(sampleTable$sample_name[sampleTable$sample_name != asValidNames], collapse = '\n    ')}
-   "))
+    "))
     }
 
     if (!all(file.exists(sampleTable$file_name))) {
