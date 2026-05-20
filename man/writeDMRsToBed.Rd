@@ -35,16 +35,16 @@ data(exampleTumourNormal, package = "mesa")
 
 # Export DMRs for a single contrast to BED files in a temp directory
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung") \%>\%
-  writeDMRsToBed(folder = tempdir())
+    calculateDMRs(variable = "type",
+        contrasts = "LUAD_vs_NormalLung") \%>\%
+    writeDMRsToBed(folder = tempdir())
 
 # Export DMRs with explicit annotation (requires TxDb/annotation packages)
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-                  annoDb = "org.Hs.eg.db") \%>\%
-  writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
+    calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+    annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db") \%>\%
+    writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
 }
 }
 \seealso{

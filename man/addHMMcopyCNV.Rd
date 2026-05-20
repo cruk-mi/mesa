@@ -108,7 +108,6 @@ exampleTumourNormal \%>\%
         parallel = FALSE,
         plotDir = tempdir()
     )
-
 }
 
 }

@@ -27,10 +27,10 @@ data(exampleTumourNormal, package = "mesa")
 
 # Summarise DMRs with explicit annotation databases
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-  annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-                  annoDb = "org.Hs.eg.db") \%>\%
-  summariseDMRsByGene()
+    calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
+    annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db") \%>\%
+    summariseDMRsByGene()
 }
 }
 \seealso{

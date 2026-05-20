@@ -36,10 +36,10 @@ data(exampleTumourNormal, package = "mesa")
 
 # Convert results to long format and filter at custom FDR threshold
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  pivotDMRsLonger(FDRthres = 0.1)
+    calculateDMRs(variable = "type",
+        contrasts = "LUAD_vs_NormalLung",
+        FDRthres = 0.1) \%>\%
+    pivotDMRsLonger(FDRthres = 0.1)
 
 }
 \seealso{
