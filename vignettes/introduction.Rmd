@@ -9,9 +9,9 @@ vignette: >
 
 ```{r chunk, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  dev = "pdf"
+    collapse = TRUE,
+    comment = "#>",
+    dev = "pdf"
 )
 ```
 

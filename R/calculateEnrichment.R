@@ -135,8 +135,8 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'
 #' @export
 calculateCGEnrichment <- function(file = NULL, BSgenome = NULL, exportPath = NULL,
-                                  extend = 0, shift = 0, uniq = 0,
-                                  chr.select = NULL, paired = TRUE) {
+                                    extend = 0, shift = 0, uniq = 0,
+                                    chr.select = NULL, paired = TRUE) {
 
     if (!requireNamespace("MEDIPS", quietly = TRUE)) {
         stop(
@@ -504,10 +504,10 @@ calculateCGEnrichmentGRanges <- function(readGRanges = NULL, BSgenome = NULL, ch
 #' }
 #' @export
 addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = FALSE,
-                                       extend = 0, shift = 0, uniq = 0,
-                                       chr.select = NULL, paired = TRUE,
-                                       file_name = "file_name",
-                                       nCores = 1) {
+                                        extend = 0, shift = 0, uniq = 0,
+                                        chr.select = NULL, paired = TRUE,
+                                        file_name = "file_name",
+                                        nCores = 1) {
 
     BSgenome <- qseaSet %>% qsea:::getGenome()
 
@@ -571,4 +571,3 @@ addMedipsEnrichmentFactors <- function(qseaSet, exportPath = NULL, nonEnrich = F
 
     return(qseaSet)
 }
-

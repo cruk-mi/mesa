@@ -94,20 +94,19 @@
 #'         parallel = FALSE,
 #'         plotDir = tempdir()
 #'     )
-#' 
 #' }
 #'
 #' @export
 addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000, fragmentLength = NULL,
-                          plotDir = NULL,
-                          parallel = getMesaParallel(),
-                          maxInsertSize = 1000,
-                          minInsertSize = 50,
-                          minReferenceLength = 30,
-                          minMapQual = 30,
-                          properPairsOnly = FALSE,
-                          hmmCopyGC = NULL,
-                          hmmCopyMap = NULL
+                            plotDir = NULL,
+                            parallel = getMesaParallel(),
+                            maxInsertSize = 1000,
+                            minInsertSize = 50,
+                            minReferenceLength = 30,
+                            minMapQual = 30,
+                            properPairsOnly = FALSE,
+                            hmmCopyGC = NULL,
+                            hmmCopyMap = NULL
 )
 {
 
@@ -391,9 +390,9 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
 #'
 #' @export
 plotCNVheatmap <- function(qseaSet,
-                           sampleAnnotation = NULL,
-                           annotationColors = NA,
-                           clusterRows = TRUE) {
+                            sampleAnnotation = NULL,
+                            annotationColors = NA,
+                            clusterRows = TRUE) {
 
     rowAnnot <- makeHeatmapAnnotations(qseaSet,
         sampleOrientation = "row",

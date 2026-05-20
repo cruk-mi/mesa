@@ -71,8 +71,8 @@
 #'
 #' @export
 fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
-                       contrasts = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
-                       checkPVals = TRUE, formula = NULL, calcDispersionAll = FALSE) {
+                        contrasts = NULL, keepIndex = NULL, minReadCount = 0, minNRPM = 1,
+                        checkPVals = TRUE, formula = NULL, calcDispersionAll = FALSE) {
 
     if (!is.null(contrasts)) {
         nContrasts <- nrow(contrasts)
@@ -251,7 +251,7 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
 
             if (is.null(covariates)) {
                 warning("More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
-           Set checkPVals = FALSE to ignore this.")
+            Set checkPVals = FALSE to ignore this.")
             } else {
 
                 stop(
@@ -584,20 +584,20 @@ makeAllContrasts <- function(qseaSet, variable) {
 #'
 #' @export
 calculateDMRs <- function(qseaSet,
-                          variable = NULL,
-                          covariates = NULL,
-                          contrasts = NULL,
-                          minReadCount = 0,
-                          minNRPM = 1,
-                          checkPVals = TRUE,
-                          FDRthres = 0.05,
-                          keepPvals = FALSE,
-                          formula = NULL,
-                          keepContrastMeans = TRUE,
-                          keepData = FALSE,
-                          keepGroupMeans = FALSE,
-                          direction = "both",
-                          calcDispersionAll = FALSE) {
+                            variable = NULL,
+                            covariates = NULL,
+                            contrasts = NULL,
+                            minReadCount = 0,
+                            minNRPM = 1,
+                            checkPVals = TRUE,
+                            FDRthres = 0.05,
+                            keepPvals = FALSE,
+                            formula = NULL,
+                            keepContrastMeans = TRUE,
+                            keepData = FALSE,
+                            keepGroupMeans = FALSE,
+                            direction = "both",
+                            calcDispersionAll = FALSE) {
 
     if (is.null(variable)) {stop("variable must be specified!")}
     if (is.null(contrasts)) {stop("contrasts must be specified!")}
