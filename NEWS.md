@@ -1,3 +1,17 @@
+# mesa 0.99.3
+
+## Bug Fixes
+
+- Fixed `plotly` PNG device error on headless build servers
+- Switched to `pdf` device in PCA vignette chunks to resolve
+  Cairo/X11 dependency issues in CI
+
+## Style
+
+- Standardized 4-space indentation throughout codebase per
+  Bioconductor style guide
+- Added missing chunk labels to all vignettes
+
 # mesa 0.99.2
 
 ### BUG FIXES

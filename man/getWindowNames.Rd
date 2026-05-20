@@ -26,15 +26,15 @@ constructed as \code{"seqnames:start-end"}.
 }
 \examples{
 # From a GRanges (no intermediate objects)
-GenomicRanges::GRanges(c("chr1","chr2"),
-                       IRanges::IRanges(c(10,20), c(15,30))) \%>\%
-  getWindowNames()
+GenomicRanges::GRanges(c("chr1", "chr2"),
+    IRanges::IRanges(c(10, 20), c(15, 30))) \%>\%
+    getWindowNames()
 
 # From a data.frame (no intermediate objects)
-data.frame(seqnames = c("chr1","chr2"),
-           start    = c(100,200),
-           end      = c(120,220)) \%>\%
-  getWindowNames()
+data.frame(seqnames = c("chr1", "chr2"),
+    start = c(100, 200),
+    end = c(120, 220)) \%>\%
+    getWindowNames()
 
 # From a qseaSet shipped with mesa (if available)
 data(exampleTumourNormal, package = "mesa")

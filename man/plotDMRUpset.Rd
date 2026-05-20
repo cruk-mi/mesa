@@ -47,13 +47,13 @@ data(exampleTumourNormal, package = "mesa")
 
 # Overlap of significant DMR sets across contrasts (default FDR 0.05)
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
-  plotDMRUpset()
+    calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
+    plotDMRUpset()
 
 # Clean set names by dropping the '_vs_*' suffix
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
-  plotDMRUpset(removeVS = TRUE)
+    calculateDMRs(variable = "type", contrasts = "all_vs_NormalLung") \%>\%
+    plotDMRUpset(removeVS = TRUE)
 
 }
 \seealso{

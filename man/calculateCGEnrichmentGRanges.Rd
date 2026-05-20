@@ -52,20 +52,20 @@ summarised as genomic ranges.
 \donttest{
 # Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
 if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-  n <- 200
-  gr <- GenomicRanges::GRanges(
-    seqnames = rep(1, n),
-    ranges   = IRanges::IRanges(
-      start = sample(1e6:2e6, n),
-      width = sample(80:180, n, replace = TRUE)
-    ),
-    strand = "*"
-  )
-  calculateCGEnrichmentGRanges(
-    readGRanges = gr,
-    BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
-    chr.select  = 1
-  )
+    n <- 200
+    gr <- GenomicRanges::GRanges(
+        seqnames = rep(1, n),
+        ranges = IRanges::IRanges(
+            start = sample(1e6:2e6, n),
+            width = sample(80:180, n, replace = TRUE)
+        ),
+        strand = "*"
+    )
+    calculateCGEnrichmentGRanges(
+        readGRanges = gr,
+        BSgenome    = "BSgenome.Hsapiens.NCBI.GRCh38",
+        chr.select  = 1
+    )
 }
 }
 }

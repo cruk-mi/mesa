@@ -82,30 +82,30 @@ then merges the results into the \verb{@libraries} slot (\verb{$file_name} for p
 \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
-\donttest{
- if (requireNamespace("MEDIPS", quietly = TRUE) &&
+\dontrun{
+if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
-      
-      bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
-      
-      data.frame(
+
+    bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+
+    data.frame(
         sample_name = "hESC_Input_chr22",
-        file_name   = bam,
-        group       = "Input",
-        input_file  = bam,
+        file_name = bam,
+        group = "Input",
+        input_file = bam,
         stringsAsFactors = FALSE
-      ) \%>\%
+    ) \%>\%
         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19") \%>\%
         addMedipsEnrichmentFactors(
-          exportPath = tempdir(),
-          chr.select = paste0("chr22"),
-          paired     = FALSE
-          # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
-          # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
+            exportPath = tempdir(),
+            chr.select = paste0("chr22"),
+            paired     = FALSE
+            # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
+            # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
         ) \%>\%
         qsea::getSampleTable() \%>\%
         print()
-    }
+}
 }
 }
 \seealso{

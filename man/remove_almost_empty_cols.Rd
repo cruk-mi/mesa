@@ -28,10 +28,10 @@ an internal janitor helper indicating which columns were removed.
 }
 \examples{
 data.frame(a = c(1, NA, 3),
-           b = c(NA, NA, NA),
-           c = c(1, 2, NA)) \%>\%
-  mesa:::remove_almost_empty_cols(prop = 0.5)  # drops column b
-  
+    b = c(NA, NA, NA),
+    c = c(1, 2, NA)) \%>\%
+    mesa:::remove_almost_empty_cols(prop = 0.5) # drops column b
+
 }
 \seealso{
 \code{\link[janitor:remove_empty]{janitor::remove_empty()}}

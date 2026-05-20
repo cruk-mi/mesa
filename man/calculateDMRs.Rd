@@ -133,19 +133,19 @@ data(exampleTumourNormal, package = "mesa")
 
 # A single explicit contrast
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung")
+    calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung")
 
 # All pairwise contrasts among levels of 'type'
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all")
+    calculateDMRs(variable = "type", contrasts = "all")
 
 # Tighter FDR threshold
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type", contrasts = "all", FDRthres = 1e-4)
+    calculateDMRs(variable = "type", contrasts = "all", FDRthres = 1e-4)
 
 # Return all per-sample columns for the first available contrast on 'tumour'
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "first", keepData = TRUE)
+    calculateDMRs(variable = "tumour", contrasts = "first", keepData = TRUE)
 
 }
 \seealso{

@@ -33,7 +33,7 @@ exampleTumourNormal \%>\% filterWindows(CpG_density > 10)
 
 # Combine multiple conditions
 exampleTumourNormal \%>\%
-  filterWindows(seqnames == "chr7", CpG_density > 5)
+    filterWindows(seqnames == "chr7", CpG_density > 5)
 
 }
 \seealso{

@@ -50,15 +50,15 @@ data(exampleTumourNormal, package = "mesa")
 
 # Basic CNV heatmap with sample annotations
 exampleTumourNormal \%>\%
-  plotCNVheatmap(sampleAnnotation = c(tumour, type))
+    plotCNVheatmap(sampleAnnotation = c(tumour, type))
 
 # Custom annotation colours; disable row clustering
 exampleTumourNormal \%>\%
-  plotCNVheatmap(
-    sampleAnnotation = tumour,
-    annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
-    clusterRows = FALSE
-  )
+    plotCNVheatmap(
+        sampleAnnotation = tumour,
+        annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+        clusterRows = FALSE
+    )
 
 }
 \seealso{

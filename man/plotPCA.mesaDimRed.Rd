@@ -122,22 +122,22 @@ data(exampleTumourNormal, package = "mesa")
 
 # Basic PCA plot (PC1 vs PC2) with defaults
 exampleTumourNormal \%>\%
-  getPCA() \%>\%
-  plotPCA()
+    getPCA() \%>\%
+    plotPCA()
 
 # Colour by sample group; show names
 exampleTumourNormal \%>\%
-  getPCA() \%>\%
-  plotPCA(colour = "group",
-          showSampleNames = TRUE)
+    getPCA() \%>\%
+    plotPCA(colour = "group",
+        showSampleNames = TRUE)
 
 # Plot PC1 vs PC3; shape by tissue
 exampleTumourNormal \%>\%
-  getPCA() \%>\%
-  plotPCA(components = list(c(1, 3)),
-          colour = "group",
-          shape  = "tissue") 
-          
+    getPCA() \%>\%
+    plotPCA(components = list(c(1, 3)),
+        colour = "group",
+        shape = "tissue")
+
 }
 \seealso{
 \code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}

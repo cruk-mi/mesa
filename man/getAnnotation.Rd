@@ -46,17 +46,17 @@ exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour, type
 
 # Also works with quoted column names:
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour","type"))
+exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour", "type"))
 
 # group-level annotations for tumour & tissue
 exampleTumourNormal \%>\%
-  dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
-  mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
+    dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
+    mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
 
 exampleTumourNormal \%>\%
-  dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
-  mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
-  
+    dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
+    mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
+
 }
 \seealso{
 \code{\link[=makeHeatmapAnnotations]{makeHeatmapAnnotations()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}
