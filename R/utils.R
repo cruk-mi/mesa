@@ -43,18 +43,18 @@
 #' @export
 qseaTableToChrGRanges <- function(dataTable) {
 
-    if ("window_start" %in% colnames(dataTable) ) {
+    if ("window_start" %in% colnames(dataTable)) {
         outGRanges <- dataTable %>%
             tibble::as_tibble() %>%
             dplyr::mutate(chr = as.character(chr)) %>%
-            dplyr::mutate(seqnames = ifelse(stringr::str_detect(chr,"chr"),chr,paste0("chr", chr)), start = window_start, end = window_end) %>%
+            dplyr::mutate(seqnames = ifelse(stringr::str_detect(chr, "chr"), chr, paste0("chr", chr)), start = window_start, end = window_end) %>%
             plyranges::as_granges()
 
     } else if ("start" %in% colnames(dataTable)) {
         outGRanges <- dataTable %>%
             tibble::as_tibble() %>%
             dplyr::mutate(seqnames = as.character(seqnames)) %>%
-            dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames,"chr"),seqnames,paste0("chr", seqnames))) %>%
+            dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames, "chr"), seqnames, paste0("chr", seqnames))) %>%
             plyranges::as_granges()
     } else {stop("Missing start or window_start column.")}
 
@@ -102,17 +102,17 @@ qseaTableToChrGRanges <- function(dataTable) {
 #' @export
 getWindowNames <- function(x) {
 
-    if(is.qseaSet(x)){
+    if (is.qseaSet(x)) {
         return(x %>%
             qsea::getRegions() %>%
             tibble::as_tibble() %>%
-            dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+            dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
             dplyr::pull(window))
     }
 
     return(asValidGranges(x) %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(window = paste0(seqnames,":",start,"-",end)) %>%
+        dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
         dplyr::pull(window))
 
     stop("Unknown data type!")
@@ -209,14 +209,14 @@ getWindows <- function(qseaSet) {
 #'
 #' @examples
 #' data.frame(a = c(1, NA, 3),
-#'            b = c(NA, NA, NA),
-#'            c = c(1, 2, NA)) %>%
-#'   mesa:::remove_almost_empty_cols(prop = 0.5)  # drops column b
-#'   
-remove_almost_empty_cols <- function(dat, prop)  {
-    mask_keep <- colSums(is.na(dat)) <=  prop*(nrow(dat))
+#'     b = c(NA, NA, NA),
+#'     c = c(1, 2, NA)) %>%
+#'     mesa:::remove_almost_empty_cols(prop = 0.5) # drops column b
+#'
+remove_almost_empty_cols <- function(dat, prop) {
+    mask_keep <- colSums(is.na(dat)) <= prop * (nrow(dat))
     janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
-    return(dat[,mask_keep, drop = FALSE])
+    return(dat[, mask_keep, drop = FALSE])
 }
 
 
@@ -278,19 +278,19 @@ skip_long_checks <- function() {
 #' @export
 asValidGranges <- function(object) {
 
-    if("GRanges" %in% class(object)){
+    if ("GRanges" %in% class(object)) {
         return(object)
     }
 
-    if(is.data.frame(object)){
-        if(length(intersect(colnames(object),c("seqnames","start","end"))) == 3){
+    if (is.data.frame(object)) {
+        if (length(intersect(colnames(object), c("seqnames", "start", "end"))) == 3) {
             return(object %>% plyranges::as_granges())
-        } else  if(length(intersect(colnames(object),c("chr","start","end"))) == 3){
-            return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges() )
-        } else  if(length(intersect(colnames(object),c("chr","window_start","window_end"))) == 3){
+        } else if (length(intersect(colnames(object), c("chr", "start", "end"))) == 3) {
+            return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges())
+        } else if (length(intersect(colnames(object), c("chr", "window_start", "window_end"))) == 3) {
             return(object %>%
                 dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
-                plyranges::as_granges() )
+                plyranges::as_granges())
         } else {
             stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
         }

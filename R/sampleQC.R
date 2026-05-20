@@ -69,10 +69,10 @@
 #' @export
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
 
-    if(qsea:::getGenome(qseaSet) != "BSgenome.Hsapiens.NCBI.GRCh38") {
+    if (qsea:::getGenome(qseaSet) != "BSgenome.Hsapiens.NCBI.GRCh38") {
         stop("This function is only currently defined for BSgenome.Hsapiens.NCBI.GRCh38.")
     }
-    
+
     if ("hyperStableEdgar" %in% colnames(qsea::getSampleTable(qseaSet))) {
         qseaSet <- qseaSet %>%
             selectQset(-tidyselect::matches("^hyperStableEdgar$"))
@@ -88,14 +88,14 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
     overp8Fraction <- hyperStableBetaTable %>%
         replace(., is.na(.), 0) %>%
         {. >= minBeta} %>%
-        apply(2,mean,na.rm = TRUE)
+        apply(2, mean, na.rm = TRUE)
 
     newData <- tibble::tibble(sample_name = names(overp8Fraction),
-                                                        hyperStableEdgar = overp8Fraction) %>%
-        dplyr::mutate(sample_name = stringr::str_remove(sample_name,"_beta")) %>%
-        dplyr::mutate(hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3),0))
+        hyperStableEdgar = overp8Fraction) %>%
+        dplyr::mutate(sample_name = stringr::str_remove(sample_name, "_beta")) %>%
+        dplyr::mutate(hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3), 0))
 
-    qseaSet@sampleTable <- cbind(qseaSet@sampleTable, dplyr::select(newData,-sample_name))
+    qseaSet@sampleTable <- cbind(qseaSet@sampleTable, dplyr::select(newData, -sample_name))
 
     return(qseaSet)
 

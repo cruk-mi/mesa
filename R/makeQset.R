@@ -185,11 +185,9 @@
 #'         group = c("Normal", "Tumour"),
 #'         file_name = c(
 #'             system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
-#'                 package = "MEDIPSData", mustWork = TRUE
-#'             ),
+#'                 package = "MEDIPSData", mustWork = TRUE),
 #'             system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
-#'                 package = "MEDIPSData", mustWork = TRUE
-#'             )
+#'                 package = "MEDIPSData", mustWork = TRUE)
 #'         )
 #'     )
 #'
@@ -209,26 +207,27 @@
 #' }
 #' @export
 makeQset <- function(sampleTable,
-    BSgenome,
-    chrSelect,
-    windowSize = 300,
-    CNVwindowSize = 1000000,
-    fragmentType = NULL,
-    fragmentLength = NULL,
-    fragmentSD = NULL,
-    CNVmethod = "HMMdefault",
-    coverageMethod = "PairedAndR1s",
-    minMapQual = 10,
-    minInsertSize = 70,
-    maxInsertSize = 1000,
-    minReferenceLength = 30,
-    badRegions = NULL,
-    properPairsOnly = FALSE,
-    hmmCopyGC = NULL,
-    hmmCopyMap = NULL,
-    maxPatternDensity = 0.05,
-    enrichmentMethod = "blind1-15",
-    parallel = getMesaParallel()) {
+                     BSgenome,
+                     chrSelect,
+                     windowSize = 300,
+                     CNVwindowSize = 1000000,
+                     fragmentType = NULL,
+                     fragmentLength = NULL,
+                     fragmentSD = NULL,
+                     CNVmethod = "HMMdefault",
+                     coverageMethod = "PairedAndR1s",
+                     minMapQual = 10,
+                     minInsertSize = 70,
+                     maxInsertSize = 1000,
+                     minReferenceLength = 30,
+                     badRegions = NULL,
+                     properPairsOnly = FALSE,
+                     hmmCopyGC = NULL,
+                     hmmCopyMap = NULL,
+                     maxPatternDensity = 0.05,
+                     enrichmentMethod = "blind1-15",
+                     parallel = getMesaParallel()) {
+
     if (parallel) {
         if (BiocParallel::bpworkers() == 1) {
             message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
@@ -236,10 +235,12 @@ makeQset <- function(sampleTable,
         } else {
             message(glue::glue("Detected parallel setup with {BiocParallel::bpworkers()} workers."))
         }
+
     }
 
 
     if (!is.null(fragmentType)) {
+
         if (!is.null(fragmentLength)) {
             stop("Please specify one or the other of fragmentType and fragmentLength.")
         }
@@ -251,8 +252,7 @@ makeQset <- function(sampleTable,
             fragmentLength <- 167
             fragmentSD <- 38
         } else {
-            stop("fragmentType should be either Sheared or cfDNA.")
-        }
+            stop("fragmentType should be either Sheared or cfDNA.")}
     }
 
     if (is.null(fragmentLength) | is.null(fragmentSD)) {
@@ -278,11 +278,11 @@ makeQset <- function(sampleTable,
 
     if (any(asValidNames != sampleTable$sample_name)) {
         stop(glue::glue("sample_name column must be valid names for columns in R without quoting.
-See the help for base::make.names, but generally use only letters, numbers,
-underscores and dots, and names can't start with a number.
-Issues were found with:
+  See the help for base::make.names, but generally use only letters, numbers,
+  underscores and dots, and names can't start with a number.
+  Issues were found with:
     {paste(sampleTable$sample_name[sampleTable$sample_name != asValidNames], collapse = '\n    ')}
-"))
+   "))
     }
 
     if (!all(file.exists(sampleTable$file_name))) {
@@ -310,6 +310,7 @@ Issues were found with:
     bsNames <- GenomeInfoDb::seqnames(refGenome)
     unknownChr <- setdiff(chrSelect, bsNames)
     if (length(unknownChr) > 0) {
+
         if (stringr::str_detect(BSgenome, "UCSC") && all(stringr::str_detect(chrSelect, "chr", negate = TRUE))) {
             stop(glue::glue("UCSC genome requires 'chr' prefixes which were not found. \\
             Add these or consider swapping to a BSgenome without 'chr', \\
@@ -336,19 +337,13 @@ Issues were found with:
     numWindows <- floor(chrLength / windowSize)
 
     # starting point of each window on each chromosome, then make a GRanges object with all those windows
-    windowStart <- unlist(lapply(
-        FUN = seq, X = chrLength - windowSize + 1,
-        from = 1, by = windowSize
-    ), FALSE, FALSE)
+    windowStart <- unlist(lapply(FUN = seq, X = chrLength - windowSize + 1,
+        from = 1, by = windowSize), FALSE, FALSE)
 
-    windowsGRanges <- GenomicRanges::GRanges(
-        seqnames = rep(factor(chrSelect), numWindows),
-        ranges = IRanges::IRanges(
-            start = windowStart,
-            width = windowSize
-        ),
-        seqinfo = seqinfo
-    )
+    windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), numWindows),
+        ranges = IRanges::IRanges(start = windowStart,
+            width = windowSize),
+        seqinfo = seqinfo)
 
     # remove both sets of blacklisted windows from the full set of windows
     windowsWithoutBlacklist <- windowsGRanges %>%
@@ -361,13 +356,11 @@ Issues were found with:
     )
 
     # make the initial Qsea object, with the reduced set of windows, using the sampleTable
-    qseaSet <- qsea::createQseaSet(
-        sampleTable = sampleTable,
+    qseaSet <- qsea::createQseaSet(sampleTable = sampleTable,
         BSgenome = BSgenome,
         chr.select = chrSelect,
         Regions = windowsWithoutBlacklist,
-        window_size = windowSize
-    )
+        window_size = windowSize)
 
     if (any(GenomeInfoDb::genome(qsea::getRegions(qseaSet)) != BSgenome)) {
         regions <- qseaSet %>% qsea::getRegions()
@@ -381,6 +374,7 @@ Issues were found with:
     # TODO add a single-end coverage method.
 
     if (coverageMethod == "qseaPaired") {
+
         # load the coverage from each bam file, using qsea default method
         qseaSet <- qsea::addCoverage(qseaSet,
             uniquePos = FALSE,
@@ -390,7 +384,9 @@ Issues were found with:
         )
 
         qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = FALSE)
+
     } else if (coverageMethod == "PairedAndR1s") {
+
         # load the coverage from each bam file, including using R1s from high MAPQ reads that aren't in perfect pairs.
         qseaSet <- addBamCoveragePairedAndUnpaired(qseaSet,
             fragmentLength = fragmentLength,
@@ -401,9 +397,7 @@ Issues were found with:
             minInsertSize = minInsertSize,
             properPairsOnly = properPairsOnly
         )
-    } else {
-        stop(glue::glue("Unknown coverageMethod {coverageMethod}. Use PairedAndR1s or qseaPaired."))
-    }
+    } else {stop(glue::glue("Unknown coverageMethod {coverageMethod}. Use PairedAndR1s or qseaPaired."))}
 
     qseaSet@parameters$minInsertSize <- minInsertSize
     qseaSet@parameters$maxInsertSize <- maxInsertSize
@@ -416,11 +410,10 @@ Issues were found with:
         dplyr::select(total_fragments) %>%
         dplyr::filter(total_fragments == 0)
 
-    if (nrow(numEmpty) > 0) {
-        stop(glue::glue("Empty sample: {rownames(numEmpty)}"))
-    }
+    if (nrow(numEmpty) > 0) {stop(glue::glue("Empty sample: {rownames(numEmpty)}"))}
 
     if (CNVmethod == "qseaInput") {
+
         # calculate the CNV, using the input files included in the sampleTable CSV.
         # uses HMMCopy behind the scenes
         # note that apparently if you give any samples with normal or control in the name it will try and use those to normalise!
@@ -435,8 +428,11 @@ Issues were found with:
 
         # this is included in the addHMMcopyCNV method more efficiently, don't need to call it there.
         qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
+
     } else if (CNVmethod == "HMMdefault") {
+
         if (is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+
             if (CNVwindowSize == 1000000) {
                 hmmCopyGC <- gc_hg38_1000kb
             } else if (CNVwindowSize == 500000) {
@@ -446,9 +442,11 @@ Issues were found with:
             } else {
                 stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
             }
+
         }
 
         if (is.null(hmmCopyGC) && BSgenome == "BSgenome.Hsapiens.UCSC.hg38") {
+
             if (CNVwindowSize == 1000000) {
                 hmmCopyGC <- gc_hg38_1000kb %>%
                     dplyr::mutate(chr = paste0("chr", chr))
@@ -461,6 +459,7 @@ Issues were found with:
             } else {
                 stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
             }
+
         }
 
         if (is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
@@ -473,6 +472,7 @@ Issues were found with:
             } else {
                 stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
             }
+
         }
 
         if (is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.UCSC.hg38") {
@@ -488,6 +488,7 @@ Issues were found with:
             } else {
                 stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
             }
+
         }
 
         if (is.null(hmmCopyGC)) {
@@ -498,10 +499,7 @@ Issues were found with:
             if (length(columnDiff) > 0) {
                 stop(glue::glue("hmmCopyGC object missing required columns: {paste(columnDiff, collapse = ' ')}"))
             }
-            objectWindowSize <- hmmCopyGC %>%
-                mutate(size = end - start + 1) %>%
-                pull(size) %>%
-                unique()
+            objectWindowSize <- hmmCopyGC %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
 
             if (length(objectWindowSize) != 1) {
                 stop(glue::glue("hmmCopyGC object should have constant window size for all windows."))
@@ -518,10 +516,7 @@ Issues were found with:
             if (length(columnDiff) > 0) {
                 stop(glue::glue("hmmCopyMap object missing required columns: {paste(columnDiff, collapse = ' ')}"))
             }
-            objectWindowSize <- hmmCopyMap %>%
-                mutate(size = end - start + 1) %>%
-                pull(size) %>%
-                unique()
+            objectWindowSize <- hmmCopyMap %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
 
             if (length(objectWindowSize) != 1) {
                 stop(glue::glue("hmmCopyMap object should have constant window size for all windows."))
@@ -542,8 +537,7 @@ Issues were found with:
             properPairsOnly = properPairsOnly,
             hmmCopyGC = hmmCopyGC,
             hmmCopyMap = hmmCopyMap,
-            parallel = parallel
-        )
+            parallel = parallel)
     } else if (CNVmethod == "MeCap") {
         message("Adding CNV using MeCap samples")
 
@@ -557,6 +551,8 @@ Issues were found with:
         )
 
         # qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
+
+
     } else if (CNVmethod == "None") {
         message("No CNV being calculated")
     }
@@ -567,8 +563,7 @@ Issues were found with:
         name = "CpG",
         fragment_length = fragmentLength,
         fragment_sd = fragmentSD,
-        masks = NULL
-    )
+        masks = NULL)
 
     # store the values of the fragment length and SD used into the object
     qseaSet@parameters$fragmentLength <- fragmentLength

@@ -1,5 +1,4 @@
-utils::globalVariables(c(
-    "chr", "seqnames", "start", "end", ".", "annotation", "value", "library_factor",
+utils::globalVariables(c("chr", "seqnames", "start", "end", ".", "annotation", "value", "library_factor",
     "ROI_start", "ROI_end", "value", "window_start", "window_end", "window", "sample_name",
     "width", "group", "relH", "CpG_density", "strand", "state", "gene_name", "map", "CNV",
     "EMSEMBL", "SYMBOL", "GENENAME", "geneChr", "geneStart", "geneEnd", "geneLength", "n",
@@ -14,8 +13,7 @@ utils::globalVariables(c(
     "afterOverBackNum", "initialOverBackNum", "qname", "inOut", "nSign", "nStrands",
     "chromosome_name", "start_position", "end_position", "input_file",
     "topVarNumInput", "windowSdName", "pcaName",
-    "fnValue", "group2new", "gap", "size"
-))
+    "fnValue", "group2new", "gap", "size"))
 
 #' Lift over genomic ranges from hg19 to hg38
 #'
@@ -51,9 +49,7 @@ utils::globalVariables(c(
 #'     end      = c(100100, 200100)
 #' ) %>%
 #'     liftOverHg19() %>%
-#'     {
-#'         GenomeInfoDb::genome(.)
-#'     }
+#'     { GenomeInfoDb::genome(.) }
 #'
 #' # GRanges input (some intervals may not map and can be dropped)
 #' gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))
@@ -61,6 +57,7 @@ utils::globalVariables(c(
 #'
 #' @export
 liftOverHg19 <- function(grOrDf) {
+
     if (!requireNamespace("rtracklayer", quietly = TRUE)) {
         stop(
             "Package \"rtracklayer\" must be installed to use this function.",
@@ -74,8 +71,7 @@ liftOverHg19 <- function(grOrDf) {
         plyranges::as_granges()
 
     message("Performing coordinate liftover from hg19 to hg38")
-    utils::data("hg19ToHg38.over.chain", package = "mesa", envir = environment())
-    liftover_result <- rtracklayer::liftOver(regions, hg19ToHg38.over.chain)
+    liftover_result <- rtracklayer::liftOver(regions, mesa::hg19ToHg38.over.chain)
     GenomeInfoDb::genome(liftover_result) <- "hg38"
 
     return(unlist(liftover_result))
@@ -180,6 +176,7 @@ setMesaGenome <- function(genome) {
 #'
 #' @export
 setMesaTxDb <- function(TxDb) {
+
     if (is.null(TxDb)) {
         options("mesa_TxDb" = NULL)
         return(invisible(TRUE))
@@ -242,6 +239,7 @@ setMesaTxDb <- function(TxDb) {
 #'
 #' @export
 setMesaAnnoDb <- function(annoDb) {
+
     if (is.null(annoDb)) {
         options("mesa_annoDb" = NULL)
         return(invisible(TRUE))
@@ -333,6 +331,7 @@ setMesaAnnoDb <- function(annoDb) {
 #'
 #' @export
 setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) {
+
     if (!is.null(nCores) && nCores > 1) {
         useParallel <- TRUE
         BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
@@ -342,7 +341,7 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) 
 
     if (useParallel & verbose) {
         message(glue::glue("Parallelisation turned on for the functions in the mesa package, currently using {BiocParallel::bpworkers()} cores.
-Control the number of cores by calling BiocParallel::register."))
+                       Control the number of cores by calling BiocParallel::register."))
     } else if (verbose) {
         message("Parallelisation turned off for all functions in the mesa package.")
     }
@@ -354,6 +353,7 @@ Control the number of cores by calling BiocParallel::register."))
 #' @param verbose Boolean to determine whether to print messages or not.
 #' @export
 getMesaParallel <- function(verbose = FALSE) {
+
     if (verbose) {
         if (is.null(getOption("mesa_parallel"))) {
             message("Parallelisation not set, using serial evaluation. Call setMesaParallel to set for all mesa functions.")
@@ -369,6 +369,7 @@ getMesaParallel <- function(verbose = FALSE) {
     } else {
         return(getOption("mesa_parallel"))
     }
+
 }
 
 expect_no_error <- function(object) {

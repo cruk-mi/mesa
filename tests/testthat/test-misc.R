@@ -1,5 +1,6 @@
 test_that("liftOver", {
-  region <- data.frame(seqnames = 1, start = 2000000, end = 2100000)
+
+    region <- data.frame(seqnames = 1, start = 2000000, end = 2100000)
 
     expect_false((region %>% pull(start)) == (region %>% liftOverHg19() %>% as.data.frame() %>% pull(start)))
     expect_false((region %>% pull(start)) == (region %>% plyranges::as_granges() %>% liftOverHg19() %>% as.data.frame() %>% pull(start)))
@@ -8,13 +9,14 @@ test_that("liftOver", {
 test_that("Utility functions", {
     expect_no_error(exampleTumourNormal %>% makeTable() %>% qseaTableToChrGRanges())
 
-  expect_equal(exampleTumourNormal %>% getWindowNames() %>% length(), exampleTumourNormal %>% getRegions() %>% length())
+    expect_equal(exampleTumourNormal %>% getWindowNames() %>% length(), exampleTumourNormal %>% getRegions() %>% length())
 
     expect_equal(exampleTumourNormal %>% getPattern(), exampleTumourNormal@parameters$enrichmentPattern)
 
-  expect_equal(exampleTumourNormal %>% convertToArrayBetaTable() %>% dim(), c(724, 11))
+    expect_equal(exampleTumourNormal %>% convertToArrayBetaTable %>% dim(), c(724, 11))
 
-  expect_error(data.frame(a = 1, b = 2) %>% getSampleNames(), regexp = "only on a qseaSet")
+    expect_error(data.frame(a = 1, b = 2) %>% getSampleNames(), regexp = "only on a qseaSet")
+
 })
 
 
@@ -32,14 +34,17 @@ test_that("calculateFractionReadsInGranges", {
 
 
 test_that("getTables", {
-  expect_equal(exampleTumourNormal %>% getCountTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
-  expect_equal(exampleTumourNormal %>% getNRPMTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
-  expect_equal(exampleTumourNormal %>% getDataTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
-  expect_equal(exampleTumourNormal %>% getBetaTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
+
+    expect_equal(exampleTumourNormal %>% getCountTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
+    expect_equal(exampleTumourNormal %>% getNRPMTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
+    expect_equal(exampleTumourNormal %>% getDataTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
+    expect_equal(exampleTumourNormal %>% getBetaTable() %>% nrow(), exampleTumourNormal %>% getRegions() %>% length())
+
 })
 
 test_that("Downsampling", {
-  randomSet <- qsea::getExampleQseaSet(repl = 2, expSamplingDepth = 10000)
+
+    randomSet <- qsea::getExampleQseaSet(repl = 2, expSamplingDepth = 10000)
 
     downsampleSet <- downSample(randomSet, nReads = 1000)
     expect_equal(downsampleSet %>% getCounts() %>% colSums() %>% unique(), 1000)
@@ -49,5 +54,6 @@ test_that("Downsampling", {
     expect_equal(downsampleSet %>% getCounts() %>% colSums() %>% unique(), 100)
     expect_true(all(downsampleSet@count_matrix <= randomSet@count_matrix))
 
-  expect_error(downSample(randomSet, nReads = 100000))
+    expect_error(downSample(randomSet, nReads = 100000))
+
 })
