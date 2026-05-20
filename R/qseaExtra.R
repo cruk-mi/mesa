@@ -195,15 +195,15 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
     if(!is.null(TxDb) & is.character(TxDb)){
     TxDb <- eval(parse(text=paste0(TxDb,"::", TxDb)))
     }
-  
+
     if(is.null(TxDb) & is.null(genome)) {
     stop("Please specify a TxDb or genome, this can be set globally using setMesaTxDb and/or setMesaGenome")
     }
-  
+
     if(is.null(genome)){
     genome <- ""
     }
-  
+
     if(genome %in% c("hg38","GRCh38") && is.null(TxDb)) {
 
     if (!requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE)) {
@@ -228,7 +228,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(), TxDb = .getMes
     if(is.null(annoDb) && is.null(genome)) {
     stop("Please specify a annoDb or genome, this can be set globally using setMesaannoDb and/or setMesaGenome")
     }
-  
+
     if(genome  %in% c("hg38","GRCh38") && is.null(CpGislandsGR)) { CpGislandsGR <- mesa::hg38CpGIslands }
 
     if(genome  %in% c("hg38","GRCh38") && is.null(FantomRegionsGR)) { FantomRegionsGR <- mesa::FantomRegions %>% plyranges::as_granges()}
@@ -511,9 +511,9 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE, 
                                         samples = NULL, numWindows = NULL,
                                         FDRthres = 0.01, numAbove = 1){
-  
+
     samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
-  
+
     if (length(samples) == 1 & length(samplesNotInSet) > 0 & is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
@@ -523,20 +523,20 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
                     "))
     }
-  
+
     if (is.null(samples)) {
     samples <- qsea::getSampleNames(qseaSet)
     }
-  
+
     message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
-  
+
     countMat <- qseaSet %>%
     qsea::getCounts()
-  
+
     if (is.null(numWindows)) {
     numWindows <- nrow(countMat)
     }
-  
+
     fdrMat <- purrr::map_dfc(samples,
                             function(x){
                                 totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
@@ -548,7 +548,7 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
                                 dplyr::select(-window) 
                             }
     )
-  
+
     if (keepAbove) {
     indexToKeep <- fdrMat %>%
         {. <= FDRthres} %>%
@@ -562,15 +562,15 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
         {. < numAbove} %>%
         which()
     }
-  
+
     windowsToKeep <- qsea::getRegions(qseaSet)[indexToKeep]
-  
+
     print(windowsToKeep)
-  
+
     message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
-  
+
     return(filterByOverlaps(qseaSet, windowsToKeep))
-  
+
 }
 
 
@@ -812,7 +812,7 @@ calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCounts
             afterOverBackNum = afterSubsetReadTotals,
             fraction = afterOverBackNum/initialOverBackNum) %>%
     dplyr::left_join(qsea::getSampleTable(addLibraryInformation(qseaSet)))
-  
+
     return(out)
 
 }
@@ -994,7 +994,7 @@ countWindowsAboveCutoff <- function(qseaSet, GRanges, samples = NULL,
 makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 
     #TODO: Rewrite to use getDataTable rather than makeTable.
-  
+
     qseaSet %>%
     qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
     dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", ""))  %>%
@@ -1070,7 +1070,7 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
                     useGroupMeans = useGroupMeans, 
                     addMethodSuffix = addMethodSuffix,
                     verbose = verbose)
-  
+
     return(tab)
 }
 
@@ -1137,7 +1137,7 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
                     useGroupMeans = useGroupMeans, 
                     addMethodSuffix = addMethodSuffix, 
                     verbose = verbose)
-  
+
     return(tab)
 }
 
@@ -1575,10 +1575,10 @@ addSummaryAcrossWindows <- function(qseaSet,
 #'
 #' @export
 getGenomicFeatureDistribution <- function(qseaSet, cutoff = 1 , normMethod = "nrpm", minEnrichment = 3){
-  
+
     #TODO: This requires the annotateWindows parameters to be exposed to not require setMesaTxDb and setMesaAnnoDb.
     #TODO: Ensure this works when landscape is not present, as that is optional output from annotateWindows
-  
+
     temp <- qseaSet %>%
     getDataTable(normMethod = normMethod,
                     minEnrichment = minEnrichment,
@@ -1770,11 +1770,11 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE, mi
     if(!is.qseaSet(qseaSet)){
     stop("Please provide a qseaSet as the first argument.")
     }
-  
+
     if(qseaSet %>% qsea::getRegions() %>% length() == 0){
     stop("Attempting to get data values for a qseaSet with no remaining windows.")
     }
-  
+
     if(useGroupMeans){
     if(verbose){message(glue::glue("Generating table of {normMethod} values for {qseaSet %>% qsea::getRegions() %>% length()} regions across {qseaSet %>% getSampleGroups2() %>% length()} sample groups."))}
     tab <- qseaSet %>%
