@@ -1,11 +1,10 @@
-# mesa 0.99.2.9000
+# mesa 0.99.3
 
 ## Bug Fixes
 
-- Switched vignette figure device from `png` to `ragg_png` across all
-  vignettes to fix plot rendering quality in HTML output and resolve
-  Cairo/X11 dependency issues on headless build servers without
-  requiring an X display
+- Fixed `plotly` PNG device error on headless build servers
+- Switched to `pdf` device in PCA vignette chunks to resolve
+  Cairo/X11 dependency issues in CI
 
 ## Style
 
