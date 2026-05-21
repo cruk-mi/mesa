@@ -127,7 +127,11 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
 #'     require("GenomicRanges", quietly = TRUE)) {
 #'     calculateCGEnrichment(
-#'         file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+#'         file = system.file(
+#'             "extdata",
+#'             "hESCs.Input.chr22.bam",
+#'             package = "MEDIPSData"
+#'         ),
 #'         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
 #'         exportPath = tempdir(),
 #'         paired     = FALSE
@@ -547,11 +551,16 @@ calculateCGEnrichmentGRanges <- function(
 #' [calculateCGEnrichment()], [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
-#' # Requires BAM files and the MEDIPS package; see \dontrun{} block for a full usage example.
+#' # Requires BAM files and the MEDIPS package; see \dontrun{} for a full
+#' # usage example.
 #' \dontrun{
 #' if (requireNamespace("MEDIPS", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
-#'     bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+#'     bam <- system.file(
+#'         "extdata",
+#'         "hESCs.Input.chr22.bam",
+#'         package = "MEDIPSData"
+#'     )
 #'
 #'     data.frame(
 #'         sample_name = "hESC_Input_chr22",
@@ -565,7 +574,8 @@ calculateCGEnrichmentGRanges <- function(
 #'             exportPath = tempdir(),
 #'             chr.select = paste0("chr22"),
 #'             paired     = FALSE
-#'             # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
+#'             # If your qsea returns a BSgenome object and as.character()
+#'             # doesn't help, uncomment:
 #'             # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
 #'         ) %>%
 #'         qsea::getSampleTable() %>%

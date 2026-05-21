@@ -97,7 +97,9 @@ setMethod("show", "mesaDimRed", function(object) {
 
 # Validity check
 setValidity("mesaDimRed", function(object) {
-    if (!is.data.frame(object@sampleTable)) return("`sampleTable` must be a data.frame")
+    if (!is.data.frame(object@sampleTable)) {
+        return("`sampleTable` must be a data.frame")
+    }
     if (!is.character(object@samples)) return("`samples` must be character")
     TRUE
 })
@@ -172,7 +174,9 @@ setMethod("show", "mesaPCA", function(object) {
 
 # Validity check
 setValidity("mesaPCA", function(object) {
-    if (!inherits(object@prcomp, "prcomp")) return("`prcomp` must be a stats::prcomp object")
+    if (!inherits(object@prcomp, "prcomp")) {
+        return("`prcomp` must be a stats::prcomp object")
+    }
     if (!is.character(object@windows)) return("`windows` must be character")
     TRUE
 })

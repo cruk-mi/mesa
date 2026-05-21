@@ -235,10 +235,17 @@ makeQset <- function(sampleTable,
 
     if (parallel) {
         if (BiocParallel::bpworkers() == 1) {
-            message("No configured parallelisation, use e.g. register(MulticoreParam(workers = 4)) to process multiple files at once.")
+            message(
+                "No configured parallelisation, use e.g. ",
+                "register(MulticoreParam(workers = 4)) to process multiple ",
+                "files at once."
+            )
             parallel <- FALSE
         } else {
-            message(glue::glue("Detected parallel setup with {BiocParallel::bpworkers()} workers."))
+            message(glue::glue(
+                "Detected parallel setup with ",
+                "{BiocParallel::bpworkers()} workers."
+            ))
         }
 
     }
@@ -261,7 +268,10 @@ makeQset <- function(sampleTable,
     }
 
     if (is.null(fragmentLength) | is.null(fragmentSD)) {
-        stop("fragmentLength and fragmentSD must be specified, or fragmentType can be specified for some defaults.")
+        stop(
+            "fragmentLength and fragmentSD must be specified, or ",
+            "fragmentType can be specified for some defaults."
+        )
     }
 
     # convert sampleTable to data.frame as qseaSet doesn't like tibbles.
@@ -282,7 +292,7 @@ makeQset <- function(sampleTable,
     asValidNames <- base::make.names(sampleTable$sample_name)
 
     if (any(asValidNames != sampleTable$sample_name)) {
-        stop(glue::glue("sample_name column must be valid names for columns in R without quoting.
+        stop(glue::glue("sample_name column must be valid names in R.
     See the help for base::make.names, but generally use only letters, numbers,
     underscores and dots, and names can't start with a number.
     Issues were found with:
@@ -291,16 +301,27 @@ makeQset <- function(sampleTable,
     }
 
     if (!all(file.exists(sampleTable$file_name))) {
-        stop(glue::glue(" MeCap file not found for: {dplyr::filter(sampleTable,!file.exists(file_name)) %>% dplyr::pull(sample_name)}. "))
+        stop(glue::glue(
+            " MeCap file not found for: ",
+            "{dplyr::filter(sampleTable, !file.exists(file_name)) %>%",
+            " dplyr::pull(sample_name)}. "
+        ))
     }
 
     if ((!("input_file" %in% colnames(sampleTable))) & CNVmethod == "HMMdefault") {
-        stop("Input_file column needed in the sampleTable for calculating Copy Number Variation (CNV), set CNVmethod = none to not call CNV.")
+        stop(
+            "Input_file column needed in the sampleTable for calculating ",
+            "Copy Number Variation (CNV), set CNVmethod = none to not call CNV."
+        )
     }
 
     if (("input_file" %in% colnames(sampleTable)) & CNVmethod != "none") {
         if (!all(file.exists(sampleTable$input_file))) {
-            stop(glue::glue("Input file not found for: {dplyr::filter(sampleTable,!file.exists(input_file)) %>% dplyr::pull(input_file)}. "))
+            stop(glue::glue(
+                "Input file not found for: ",
+                "{dplyr::filter(sampleTable, !file.exists(input_file)) %>%",
+                " dplyr::pull(input_file)}. "
+            ))
         }
     }
 
@@ -316,13 +337,15 @@ makeQset <- function(sampleTable,
     unknownChr <- setdiff(chrSelect, bsNames)
     if (length(unknownChr) > 0) {
 
-        if (stringr::str_detect(BSgenome, "UCSC") && all(stringr::str_detect(chrSelect, "chr", negate = TRUE))) {
+        if (stringr::str_detect(BSgenome, "UCSC") &&
+            all(stringr::str_detect(chrSelect, "chr", negate = TRUE))) {
             stop(glue::glue("UCSC genome requires 'chr' prefixes which were not found. \\
             Add these or consider swapping to a BSgenome without 'chr', \\
             e.g. BSgenome.Hsapiens.NCBI.GRCh38"))
         }
 
-        if (stringr::str_detect(BSgenome, "NCBI") && all(stringr::str_detect(chrSelect, "chr"))) {
+        if (stringr::str_detect(BSgenome, "NCBI") &&
+            all(stringr::str_detect(chrSelect, "chr"))) {
             stop(glue::glue("NCBI genome does not use 'chr' prefixes. \\
             Remove these or consider swapping to e.g. BSgenome.Hsapiens.UCSC.hg38"))
         }
@@ -336,7 +359,9 @@ makeQset <- function(sampleTable,
 
     # chromosome lengths, and then a Seqinfo object with that
     chrLength <- GenomeInfoDb::seqlengths(refGenome)[chrSelect]
-    seqinfo <- GenomeInfoDb::Seqinfo(as.character(chrSelect), chrLength, NA, BSgenome)
+    seqinfo <- GenomeInfoDb::Seqinfo(
+        as.character(chrSelect), chrLength, NA, BSgenome
+    )
 
     # number of windows of size windowSize on each chromosome
     numWindows <- floor(chrLength / windowSize)
@@ -346,10 +371,12 @@ makeQset <- function(sampleTable,
     windowStart <- unlist(lapply(FUN = seq, X = chrLength - windowSize + 1,
         from = 1, by = windowSize), FALSE, FALSE)
 
-    windowsGRanges <- GenomicRanges::GRanges(seqnames = rep(factor(chrSelect), numWindows),
+    windowsGRanges <- GenomicRanges::GRanges(
+        seqnames = rep(factor(chrSelect), numWindows),
         ranges = IRanges::IRanges(start = windowStart,
             width = windowSize),
-        seqinfo = seqinfo)
+        seqinfo = seqinfo
+    )
 
     # remove both sets of blacklisted windows from the full set of windows
     windowsWithoutBlacklist <- windowsGRanges %>%
@@ -390,7 +417,11 @@ makeQset <- function(sampleTable,
             minMapQual = minMapQual
         )
 
-        qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = FALSE)
+        qseaSet <- addMedipsEnrichmentFactors(
+            qseaSet,
+            nCores = ifelse(parallel, BiocParallel::bpworkers(), 1),
+            nonEnrich = FALSE
+        )
 
     } else if (coverageMethod == "PairedAndR1s") {
 
@@ -406,7 +437,12 @@ makeQset <- function(sampleTable,
             minInsertSize = minInsertSize,
             properPairsOnly = properPairsOnly
         )
-    } else {stop(glue::glue("Unknown coverageMethod {coverageMethod}. Use PairedAndR1s or qseaPaired."))}
+    } else {
+        stop(glue::glue(
+            "Unknown coverageMethod {coverageMethod}. Use PairedAndR1s or ",
+            "qseaPaired."
+        ))
+    }
 
     qseaSet@parameters$minInsertSize <- minInsertSize
     qseaSet@parameters$maxInsertSize <- maxInsertSize
@@ -419,7 +455,9 @@ makeQset <- function(sampleTable,
         dplyr::select(total_fragments) %>%
         dplyr::filter(total_fragments == 0)
 
-    if (nrow(numEmpty) > 0) {stop(glue::glue("Empty sample: {rownames(numEmpty)}"))}
+    if (nrow(numEmpty) > 0) {
+        stop(glue::glue("Empty sample: {rownames(numEmpty)}"))
+    }
 
     if (CNVmethod == "qseaInput") {
 
@@ -440,7 +478,11 @@ makeQset <- function(sampleTable,
 
         # this is included in the addHMMcopyCNV method
         # more efficiently, don't need to call it there.
-        qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
+        qseaSet <- addMedipsEnrichmentFactors(
+            qseaSet,
+            nCores = ifelse(parallel, BiocParallel::bpworkers(), 1),
+            nonEnrich = TRUE
+        )
 
     } else if (CNVmethod == "HMMdefault") {
 
@@ -453,7 +495,10 @@ makeQset <- function(sampleTable,
             } else if (CNVwindowSize == 50000) {
                 hmmCopyGC <- gc_hg38_50kb
             } else {
-                stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
+                stop(
+                    "Please supply gc data for this CNVwindowSize via the ",
+                    "hmmCopyGC argument"
+                )
             }
 
         }
@@ -470,7 +515,10 @@ makeQset <- function(sampleTable,
                 hmmCopyGC <- gc_hg38_50kb %>%
                     dplyr::mutate(chr = paste0("chr", chr))
             } else {
-                stop("Please supply gc data for this CNVwindowSize via the hmmCopyGC argument")
+                stop(
+                    "Please supply gc data for this CNVwindowSize via the ",
+                    "hmmCopyGC argument"
+                )
             }
 
         }
@@ -483,7 +531,10 @@ makeQset <- function(sampleTable,
             } else if (CNVwindowSize == 50000) {
                 hmmCopyMap <- map_hg38_50kb
             } else {
-                stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
+                stop(
+                    "Please supply mapability data for this CNVwindowSize via ",
+                    "the hmmCopyGC argument"
+                )
             }
 
         }
@@ -499,7 +550,10 @@ makeQset <- function(sampleTable,
                 hmmCopyMap <- map_hg38_50kb %>%
                     dplyr::mutate(chr = paste0("chr", chr))
             } else {
-                stop("Please supply mapability data for this CNVwindowSize via the hmmCopyGC argument")
+                stop(
+                    "Please supply mapability data for this CNVwindowSize via ",
+                    "the hmmCopyGC argument"
+                )
             }
 
         }
@@ -510,14 +564,26 @@ makeQset <- function(sampleTable,
             requiredColumns <- c("chr", "start", "end", "gc")
             columnDiff <- setdiff(colnames(hmmCopyGC), requiredColumns)
             if (length(columnDiff) > 0) {
-                stop(glue::glue("hmmCopyGC object missing required columns: {paste(columnDiff, collapse = ' ')}"))
+                stop(glue::glue(
+                    "hmmCopyGC object missing required columns: ",
+                    "{paste(columnDiff, collapse = ' ')}"
+                ))
             }
-            objectWindowSize <- hmmCopyGC %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
+            objectWindowSize <- hmmCopyGC %>%
+                mutate(size = end - start + 1) %>%
+                pull(size) %>%
+                unique()
 
             if (length(objectWindowSize) != 1) {
-                stop(glue::glue("hmmCopyGC object should have constant window size for all windows."))
+                stop(glue::glue(
+                    "hmmCopyGC object should have constant window size for ",
+                    "all windows."
+                ))
             } else if (objectWindowSize != CNVwindowSize) {
-                stop(glue::glue("hmmCopyGC object window size should be the same as the CNVwindowSize."))
+                stop(glue::glue(
+                    "hmmCopyGC object window size should be the same as the ",
+                    "CNVwindowSize."
+                ))
             }
         }
 
@@ -527,14 +593,26 @@ makeQset <- function(sampleTable,
             requiredColumns <- c("chr", "start", "end", "map")
             columnDiff <- setdiff(colnames(hmmCopyMap), requiredColumns)
             if (length(columnDiff) > 0) {
-                stop(glue::glue("hmmCopyMap object missing required columns: {paste(columnDiff, collapse = ' ')}"))
+                stop(glue::glue(
+                    "hmmCopyMap object missing required columns: ",
+                    "{paste(columnDiff, collapse = ' ')}"
+                ))
             }
-            objectWindowSize <- hmmCopyMap %>% mutate(size = end - start + 1) %>% pull(size) %>% unique()
+            objectWindowSize <- hmmCopyMap %>%
+                mutate(size = end - start + 1) %>%
+                pull(size) %>%
+                unique()
 
             if (length(objectWindowSize) != 1) {
-                stop(glue::glue("hmmCopyMap object should have constant window size for all windows."))
+                stop(glue::glue(
+                    "hmmCopyMap object should have constant window size for ",
+                    "all windows."
+                ))
             } else if (objectWindowSize != CNVwindowSize) {
-                stop(glue::glue("hmmCopyMap object window size should be the same as the CNVwindowSize."))
+                stop(glue::glue(
+                    "hmmCopyMap object window size should be the same as the ",
+                    "CNVwindowSize."
+                ))
             }
         }
 
@@ -588,7 +666,11 @@ makeQset <- function(sampleTable,
     # Makes no difference to beta values as gets normalised
     # out anyway, only nrpms are affected.
 
-    qseaSet <- addNormalisation(qseaSet, enrichmentMethod = enrichmentMethod, maxPatternDensity = maxPatternDensity)
+    qseaSet <- addNormalisation(
+        qseaSet,
+        enrichmentMethod = enrichmentMethod,
+        maxPatternDensity = maxPatternDensity
+    )
 
     qseaSet@parameters$coverageMethod <- coverageMethod
     qseaSet@parameters$cnvMethod <- CNVmethod

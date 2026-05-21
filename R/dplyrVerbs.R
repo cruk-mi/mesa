@@ -105,7 +105,8 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE) {
 #'     mutate(over70 = age > 70) %>%
 #'     qsea::getSampleTable()
 #'
-#' # Recode gender (better practice: use dplyr::case_when or stringr::str_replace)
+#' # Recode gender (better practice: use dplyr::case_when() or
+#' # stringr::str_replace())
 #' exampleTumourNormal %>%
 #'     mutate(gender = ifelse(gender == "F", "Female", "Male")) %>%
 #'     qsea::getSampleTable()
@@ -125,13 +126,19 @@ mutate.qseaSet <- function(.data, ...) {
         tibble::column_to_rownames(".rownameCol")
 
     if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-        stop(glue::glue("sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
+        stop(glue::glue(
+            "sample_name cannot be changed with dplyr::mutate(). Use ",
+            "mesa::renameQsetNames() or mesa::renameSamples() instead."
+        ))
     }
 
     .data@sampleTable <- newTable
 
     if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-        stop(glue::glue("sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
+        stop(glue::glue(
+            "sample_name cannot be changed with dplyr::mutate(). Use ",
+            "mesa::renameQsetNames() or mesa::renameSamples() instead."
+        ))
     }
 
     .data@sampleTable <- newTable
@@ -190,18 +197,24 @@ mutate.qseaSet <- function(.data, ...) {
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Join 'patient' (y) to 'sample_name' (x)
-#' newData <- tibble::tibble(patient = c("Colon1", "Colon2", "Lung1", "Lung3"), new = 1:4)
+#' newData <- tibble::tibble(
+#'     patient = c("Colon1", "Colon2", "Lung1", "Lung3"),
+#'     new = 1:4
+#' )
 #' exampleTumourNormal %>%
 #'     left_join(newData, by = c("sample_name" = "patient")) %>%
 #'     qsea::getSampleTable()
 #'
 #' @export
-left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), keep = NULL, ...) {
+left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE,
+                              suffix = c(".x", ".y"), keep = NULL, ...) {
 
     x@sampleTable <- x %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column("rownameCol") %>%
-        dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%
+        dplyr::left_join(
+            y, by = by, copy = copy, suffix = suffix, keep = keep, ...
+        ) %>%
         tibble::column_to_rownames("rownameCol")
 
     return(x)}

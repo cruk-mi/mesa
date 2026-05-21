@@ -194,7 +194,9 @@ setMesaGenome <- function(genome) {
 #' getOption("mesa_TxDb")
 #'
 #' # (Alternatively) you can store the object itself if already loaded:
-#' # setMesaTxDb(TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene)
+#' # setMesaTxDb(
+#' #   TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+#' # )
 #'
 #' @export
 setMesaTxDb <- function(TxDb) {
@@ -338,7 +340,8 @@ setMesaAnnoDb <- function(annoDb) {
 #' \dontrun{
 #' if (.Platform$OS.type != "windows") {
 #'     old <- BiocParallel::bpparam() # save current backend
-#'     setMesaParallel(nCores = 2, verbose = FALSE) # registers MulticoreParam(2)
+#'     setMesaParallel(nCores = 2, verbose = FALSE)
+#'     # registers MulticoreParam(2)
 #'     BiocParallel::bpworkers() # e.g. 2
 #'     getMesaParallel() # TRUE
 #'     BiocParallel::register(old) # restore previous backend
