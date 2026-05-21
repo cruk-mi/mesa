@@ -272,10 +272,10 @@ following information:
 
 - Initial number of windows
 - Messages from `makeDataTable()` (if applicable), the `mesa` function that
-  generates the table of values (beta values by default)
+    generates the table of values (beta values by default)
 - Number of windows filtered due to missing values
 - Samples used to calculate window variability (standard deviation for each
-  window)
+    window)
 - Number of top variable windows and number of samples used in PCA
 - Name assigned to each PCA result
 
