@@ -102,11 +102,11 @@ function, and is a metric to express the proportion of CG dinucleotides,
 compared to the reference genome. The relative enrichment `relH` is calculated
 in the following way:
 * For each mapped DNA fragment, retrieve the end-to-end DNA spanned on the
-  reference sequence. This is used instead of the reads themselves, as a
-  fragment will often be longer than the read(s) sequenced at its ends, and may
-  therefore contain CGs not covered by the reads.
+    reference sequence. This is used instead of the reads themselves, as a
+    fragment will often be longer than the read(s) sequenced at its ends, and
+    may therefore contain CGs not covered by the reads.
 * In these sequences, count how many CGs are present in total, and divide by the
-  total number of base pairs covered.
+    total number of base pairs covered.
 * Divide by the same ratio, calculated for the entire genome.
 
 This is therefore a measure of how many more CGs are present in the fragments

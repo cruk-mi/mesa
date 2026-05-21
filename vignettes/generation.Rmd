@@ -32,37 +32,37 @@ The first thing to prepare is the `sampleTable`; a dataframe containing metadata
 for the samples used in the package. This has three required columns:
 
 * `sample_name` : a name for each sample, which must be unique. This is the
-  primary identifier used to describe each sample, so it is good to be
-  descriptive.
+    primary identifier used to describe each sample, so it is good to be
+    descriptive.
 * `group` : a column to specify a group for each sample, for use inside certain
-  functions for averaging over samples of the same type. We suggest only using
-  this for replicates of the same (or very similar) samples, and adding extra
-  columns for other comparisons that may be of interest.
+    functions for averaging over samples of the same type. We suggest only
+    using this for replicates of the same (or very similar) samples, and
+    adding extra columns for other comparisons that may be of interest.
 * `file_name` : A path to a bam file, containing the aligned, deduplicated,
-  reads mapped to the relevant reference genome, from material which has
-  undergone the methylation enrichment/capture process (e.g. MEDIP-seq or
-  MBD-seq). Ideally `samtools fixmate` has been ran to supply mate information
-  onto the read tags, but filtering for quality is not required.
+    reads mapped to the relevant reference genome, from material which has
+    undergone the methylation enrichment/capture process (e.g. MEDIP-seq or
+    MBD-seq). Ideally `samtools fixmate` has been ran to supply mate
+    information onto the read tags, but filtering for quality is not required.
 
 There are also two more optional fields that may be used during generation:
 
 * `input_file` : This is a path to an additional bam file containing aligned,
-  deduplicated reads for material from the same sample, without performing
-  enrichment. This is whole genome sequencing, but may be sequenced at a much
-  lower depth (e.g. ultra-shallow WGS, ~1-2 million fragments is sufficient for
-  calling copy number variation at a window size of 1Mb). If present, this will
-  be used on a sample-by-sample basis to calculate copy number variation, at a
-  chromosome scale, in order to correct for this in the expected read depths.
-  This is most relevant when studying cancer, as particular cancers often show
-  recurrent patterns of copy number changes. Note that below ~0.5 million
-  fragments the calculated copy number patterns will become especially noisy
-  (for human samples).
+    deduplicated reads for material from the same sample, without performing
+    enrichment. This is whole genome sequencing, but may be sequenced at a
+    much lower depth (e.g. ultra-shallow WGS, ~1-2 million fragments is
+    sufficient for calling copy number variation at a window size of 1Mb). If
+    present, this will be used on a sample-by-sample basis to calculate copy
+    number variation, at a chromosome scale, in order to correct for this in
+    the expected read depths. This is most relevant when studying cancer, as
+    particular cancers often show recurrent patterns of copy number changes.
+    Note that below ~0.5 million fragments the calculated copy number patterns
+    will become especially noisy (for human samples).
 
 * `gender` or `sex` : If one of these columns are included, then any chromosome
-  called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for
-  samples with `M`, `m` or `male` in this column. See the [qsea code for
-  details](https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54);
-  within the National Biomarker Centre we only consider the autosomes.
+    called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for
+    samples with `M`, `m` or `male` in this column. See the [qsea code for
+    details](https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54);
+    within the National Biomarker Centre we only consider the autosomes.
 
 In addition, any further metadata columns may be included as required, and we
 recommend that anything you might want to query or compare the data on is
@@ -101,25 +101,26 @@ Before creating the `qseaSet`, you need to have:
 
 * The `sampleTable` of metadata, including the file paths to the bam files.
 * The genome to which the bam files have been mapped, and the corresponding
-  `BSgenome` package name, and the package to be installed. You can check what
-  BSgenome packages are available on BioConductor via
-  `BSgenome::available.genomes()`, or make your own if necessary
-  (`vignette("BSgenomeForge", package = "BSgenome")`).
+    `BSgenome` package name, and the package to be installed. You can check
+    what BSgenome packages are available on BioConductor via
+    `BSgenome::available.genomes()`, or make your own if necessary
+    (`vignette("BSgenomeForge", package = "BSgenome")`).
 * Whether the aligned reads are paired-end sequencing or not. If single-end
-  sequencing has been used, you need to know the expected DNA fragment length
-  from an experimental measurement, to extend all the reads to this length.
+    sequencing has been used, you need to know the expected DNA fragment
+    length from an experimental measurement, to extend all the reads to this
+    length.
 * An expected fragment length and SD of your DNA fragment size distribution.
-  There are a range of tools that can be used to visualise this on your bam
-  files, for instance [QualiMap](http://qualimap.conesalab.org/), but a rough
-  ballpark should also be experimentally known based on how the DNA material has
-  been processed for sequencing.
+    There are a range of tools that can be used to visualise this on your bam
+    files, for instance [QualiMap](http://qualimap.conesalab.org/), but a
+    rough ballpark should also be experimentally known based on how the DNA
+    material has been processed for sequencing.
 * What window size to use. In making a `qseaSet`, the genome is split into fixed
-  windows with equal size, and all analysis is performed on these windows as
-  independent units. We generally use 300bp windows, as that is a little bigger
-  than our average DNA fragment sizes, which are in the 150-250bp range. If the
-  DNA is particularly long fragments, a larger window size may make sense. This
-  should also be informed by your depth of sequencing, as a smaller window size
-  will be more prone to noise.
+    windows with equal size, and all analysis is performed on these windows as
+    independent units. We generally use 300bp windows, as that is a little
+    bigger than our average DNA fragment sizes, which are in the 150-250bp
+    range. If the DNA is particularly long fragments, a larger window size may
+    make sense. This should also be informed by your depth of sequencing, as a
+    smaller window size will be more prone to noise.
 
 For our hg19 example data, we set `BSgenome = "BSgenome.Hsapiens.UCSC.hg19"`,
 specify the three chromosomes included in the test dataset and give some
@@ -143,20 +144,20 @@ the process when multiple cores are available (but use more RAM).
 This function combines several steps:
 
 * Creating the windows to consider, controlled by the `BSgenome`, `chrSelect`,
-  `windowSize` and `badRegions` parameters.
+    `windowSize` and `badRegions` parameters.
 * Adding the coverage on the methylation enriched regions, including calculating
-  global enrichment parameters.
+    global enrichment parameters.
 * Calculating copy number variation over the non-enriched ("Input") sample, if
-  such bam files are provided, including calculating global enrichment
-  parameters.
+    such bam files are provided, including calculating global enrichment
+    parameters.
 * Calculate the average CG density of each window, using the `fragmentLength`
-  and `fragmentSD` parameters to define the expected contribution of fragments
-  to the likelihood that they overlap the window (see the Calculating CpG
-  Density section below).
+    and `fragmentSD` parameters to define the expected contribution of
+    fragments to the likelihood that they overlap the window (see the
+    Calculating CpG Density section below).
 * Calculate the background noise, by looking at how many reads lie within
-  genomic windows with very low density of CGs.
+    genomic windows with very low density of CGs.
 * Fit the curve that enables the estimation of "beta values", on a sample by
-  sample basis.
+    sample basis.
 
 ## Selecting the windows
 
@@ -180,19 +181,19 @@ accept pairs where at least one end has a MAPQ above this value.
 There are a number of options for controlling this process:
 
 * `properPairsOnly` - when set to TRUE, only the proper pairs will be included,
-  not the R1s without a mapped mate.
+    not the R1s without a mapped mate.
 * `minInsertSize` and `maxInsertSize` control the size distribution of DNA
-  fragments to be included. This enables filtering out of very short fragments,
-  which may be noisy, extremely long fragments, which are likely to be assigned
-  to the wrong bin, and also the prospect of performing in silico size
-  selection, for instance to enrich cell-free DNA for short fragments which are
-  known to be more likely to come from the tumour.
+    fragments to be included. This enables filtering out of very short
+    fragments, which may be noisy, extremely long fragments, which are likely
+    to be assigned to the wrong bin, and also the prospect of performing in
+    silico size selection, for instance to enrich cell-free DNA for short
+    fragments which are known to be more likely to come from the tumour.
 * `minReferenceLength` - this parameter controls the minimum distance along the
-  reference genome which a fragment must cover to be considered. This helps
-  filter out some R1s which have only a small portion of the read mapped
-  correctly, and may help with regions with strange artifactual binding (e.g.
-  large insertions), but I don't think it will make much difference if any if
-  `properPairs = TRUE`.
+    reference genome which a fragment must cover to be considered. This helps
+    filter out some R1s which have only a small portion of the read mapped
+    correctly, and may help with regions with strange artifactual binding
+    (e.g. large insertions), but I don't think it will make much difference if
+    any if `properPairs = TRUE`.
 
 As part of this process, a number of extra variables are added to the
 `libraries` slot in the `qseaSet`; here we will explain what these are. If
@@ -201,23 +202,25 @@ As part of this process, a number of extra variables are added to the
 The filtering that is undertaken is as follows, if `properPairs = TRUE`:
 
 * All the reads in the bam file are loaded into R using `Rsamtools`. This is
-  given by `qsea_initial_reads`.
+    given by `qsea_initial_reads`.
 * The number of "properly paired" reads, including "rescued pairs" (see note
-  below) is given by `qsea_initial_pairs`; all other reads are discarded.
+    below) is given by `qsea_initial_pairs`; all other reads are discarded.
 * For each read pair, it is retained if at least one half of the pair has a
-  mapping quality score (MAPQ) above the `minMapQual` threshold. This therefore
-  allows properly paired reads where one end is multi-mapping. This step is
-  reliant on the presence of the `MQ` tags on the bam file, which are added
-  using the tool `samtools fixmate` during bam file generation. This will be
-  stored as `qsea_mapq_filtered_pairs`.
+    mapping quality score (MAPQ) above the `minMapQual` threshold. This
+    therefore allows properly paired reads where one end is multi-mapping.
+    This step is reliant on the presence of the `MQ` tags on the bam file,
+    which are added using the tool `samtools fixmate` during bam file
+    generation. This will be stored as `qsea_mapq_filtered_pairs`.
 * For each read pair, it is retained if the insert size (the calculated
-  end-to-end fragment distance from the aligner) is within `minInsertSize` and
-  `maxInsertSize`; this number is then stored as `qsea_size_filtered_pairs`.
-  This is also stored as `total_fragments` (used in `qsea`).
+    end-to-end fragment distance from the aligner) is within `minInsertSize`
+    and `maxInsertSize`; this number is then stored as
+    `qsea_size_filtered_pairs`. This is also stored as `total_fragments`
+    (used in `qsea`).
 * These fragments are overlapped with the generated genomic windows, generated
-  using the chromosomes specified in `chrSelect` with the regions in
-  `badRegions` removed, to give the `valid_fragments`. This is the final number
-  of fragments of DNA that lie within the windows under consideration.
+    using the chromosomes specified in `chrSelect` with the regions in
+    `badRegions` removed, to give the `valid_fragments`. This is the final
+    number of fragments of DNA that lie within the windows under
+    consideration.
 
 When `properPairs = FALSE`, the first read will be retained from any read pair
 that is not considered "properly paired"; alongside any R1s whose mate did not
@@ -392,17 +395,17 @@ necessity for TMM normalisation rather unnecessary here.
 There are a couple of reasons why we therefore choose not to apply TMM:
 
 * When using beta values (including the normalisation adjustment inside the
-  `calculateDMRs` calculation), there is no effect of the `library_factor`, as
-  it is normalised out in the beta value fitting process.
+    `calculateDMRs` calculation), there is no effect of the `library_factor`,
+    as it is normalised out in the beta value fitting process.
 * The values that we get for the TMM normalisation are typically relatively
-  close to 1, so we don't find it has a big effect on the NRPM values.
+    close to 1, so we don't find it has a big effect on the NRPM values.
 * The TMM normalisation requires a sample to be set as the reference sample; the
-  other samples are normalised against this one in a combined manner (at least
-  in the current implementation in `qsea`. This therefore means that the
-  normalisation of all the samples depends on which other samples they were
-  normalised with, meaning that comparing between batches would need
-  renormalising every time. This would also mean that filtering samples pre- or
-  post-normalisation would give different results.
+    other samples are normalised against this one in a combined manner (at
+    least in the current implementation in `qsea`. This therefore means that
+    the normalisation of all the samples depends on which other samples they
+    were normalised with, meaning that comparing between batches would need
+    renormalising every time. This would also mean that filtering samples pre-
+    or post-normalisation would give different results.
 
 However, we note that these considerations might not apply for everyone; the
 `qsea::addLibraryFactors()` function may be used to apply this normalisation if

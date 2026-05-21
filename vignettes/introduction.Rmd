@@ -261,24 +261,24 @@ qseaSet |>
 These columns are detailed as so:
 
 * *total_fragments*: The total number of fragments that were remaining after the
-  above filtering steps
+    above filtering steps
 * *valid_fragments*: The total number of fragments remaining after filtering out
-  the unreliable regions. A key metric.
+    the unreliable regions. A key metric.
 * *library_factor*: A qsea calculated value related to the distribution of the
-  reads over the genome
+    reads over the genome
 * *offset*: A qsea calculated value related to the enrichment of the data, with
-  how many of the reads are in regions with low CpG density
+    how many of the reads are in regions with low CpG density
 * *fragment_median*: The median of the fragment size distribution
 * *fragment_mean*: The mean of the fragment size distribution
 * *fragment_sd*: The standard deviation of the fragment size distribution
 * *relH*: The relative enrichment of the pieces of genome covered by the
-  fragments, based on (#CGs in fragments)/(#CGs in genome)
+    fragments, based on (#CGs in fragments)/(#CGs in genome)
 * *GoGe*: Another enrichment measurement, based on (normalised) #CGs/(#Cs * #Gs)
-  inside the fragments.
+    inside the fragments.
 * *fragments_without_pattern*: Number of fragments without a CG in the reference
-  genome
+    genome
 * *prop_without_pattern*: Proportion of fragments without a CG in the reference
-  genome
+    genome
 
 When copy number variation information is added through separate WGS, there will
 also be an equivalent column which starts with `input_`, corresponding to the
