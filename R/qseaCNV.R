@@ -178,7 +178,8 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
         BPPARAM <- BiocParallel::SerialParam()
     }
 
-    bamOutList <- BiocParallel::bplapply(X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
+    bamOutList <- BiocParallel::bplapply(
+        X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
         FUN = getBamCoveragePairedAndUnpairedR1,
         BSgenome = qsea:::getGenome(qs),
         regions = CNV_Regions,
@@ -321,11 +322,22 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
             mappability = 0.9, samplesize = 50000, verbose = FALSE
         )
 
-    initParam <- HMMcopy::HMMsegment(correctOutput, param = NULL, autosomes = NULL,
-        maxiter = 50, getparam = TRUE, verbose = FALSE)
+    initParam <- HMMcopy::HMMsegment(
+        correctOutput,
+        param = NULL,
+        autosomes = NULL,
+        maxiter = 50,
+        getparam = TRUE,
+        verbose = FALSE
+    )
 
-    hmmseg <- HMMcopy::HMMsegment(correctOutput, param = initParam, autosomes = NULL,
-        maxiter = 50, verbose = FALSE)
+    hmmseg <- HMMcopy::HMMsegment(
+        correctOutput,
+        param = initParam,
+        autosomes = NULL,
+        maxiter = 50,
+        verbose = FALSE
+    )
 
     endMusDf <- round(hmmseg$mus[, ncol(hmmseg$mus)], 2) %>%
         tibble::enframe(name = "state", value = "CNV") %>%
@@ -433,7 +445,9 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
 #' exampleTumourNormal %>%
 #'     plotCNVheatmap(
 #'         sampleAnnotation = tumour,
-#'         annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+#'         annotationColors = list(
+#'             tumour = c(Tumour = "firebrick4", Normal = "blue")
+#'         ),
 #'         clusterRows = FALSE
 #'     )
 #'

@@ -114,7 +114,8 @@
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Compute regions (DMRs) to plot
-#' DMRs <- exampleTumourNormal %>% calculateDMRs(variable = "tumour", contrasts = "first")
+#' DMRs <- exampleTumourNormal %>%
+#'     calculateDMRs(variable = "tumour", contrasts = "first")
 #'
 #' # Basic heatmap of beta values over DMRs
 #' exampleTumourNormal %>% plotRegionsHeatmap(DMRs)
@@ -132,7 +133,9 @@
 #'         clusterNum = 2,
 #'         sampleAnnotation = tumour,
 #'         windowAnnotation = CpG_density,
-#'         annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+#'         annotationColors = list(
+#'             tumour = c("Tumour" = "firebrick4", "Normal" = "blue")
+#'         )
 #'     )
 #' }
 #' @export
@@ -239,9 +242,12 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     dataTab <- dataTab %>%
         filter(window %in% rownames(numData))
 
-    windowAnnotationDf <- getWindowAnnotation(dataTab, regions = regionsToOverlap,
+    windowAnnotationDf <- getWindowAnnotation(
+        dataTab,
+        regions = regionsToOverlap,
         windowAnnotation = {{ windowAnnotation }},
-        clusterRows = clusterRows)
+        clusterRows = clusterRows
+    )
 
     # Ensure regions order is maintained if not clustering.
     numData <- numData[rownames(windowAnnotationDf), ]
@@ -296,7 +302,10 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
 
     if (clusterRows) {
         if (numData %>% stats::dist() %>% is.na() %>% sum() > 0) {
-            message("Can not cluster rows due to too many missing values, setting clusterRows to be FALSE")
+            message(
+                "Can not cluster rows due to too many missing values, ",
+                "setting clusterRows to be FALSE"
+            )
             clusterRows <- FALSE
         }
     }
@@ -411,9 +420,10 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL,
         dplyr::filter(dplyr::n() > 1)
 
     if (nrow(nonUniqueWindowsDf) > 0) {
-        stop(glue::glue("Non-unique annotations found in window annotations:
-            {paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}
-                    "))
+        stop(glue::glue(
+            "Non-unique annotations found in window annotations:\n",
+            "{paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}"
+        ))
     }
     rowAnnotDfdistinct %>%
         tibble::column_to_rownames("window")
@@ -479,7 +489,8 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL,
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Build window annotations and immediately feed them into makeHeatmapAnnotations()
+#' # Build window annotations and immediately feed them into
+#' # makeHeatmapAnnotations()
 #' exampleTumourNormal %>%
 #'     filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) %>%
 #'     getDataTable(normMethod = "nrpm") %>%
@@ -602,7 +613,11 @@ makeHeatmapAnnotations <- function(qseaSet,
         }
         )
 
-    annotationColors <- c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
+    annotationColors <- c(
+        col_list_cat,
+        col_list_num_min_positive,
+        col_list_num_min_negative
+    )
 
     if (all(!is.na(specifiedAnnotationColors))) {
         if (!is.list(specifiedAnnotationColors)) {
@@ -614,10 +629,19 @@ makeHeatmapAnnotations <- function(qseaSet,
 
         if (length(commonNames)) {
             for (i in commonNames) {
-                if (!all(names(annotationColors[[i]]) %in% names(specifiedAnnotationColors[[i]]))) {
-                    missingLevels <- setdiff(names(annotationColors[[i]]), names(specifiedAnnotationColors[[i]])) %>%
+                if (!all(
+                    names(annotationColors[[i]]) %in%
+                        names(specifiedAnnotationColors[[i]])
+                )) {
+                    missingLevels <- setdiff(
+                        names(annotationColors[[i]]),
+                        names(specifiedAnnotationColors[[i]])
+                    ) %>%
                         paste(collapse = "\', \'")
-                    stop(glue::glue("Missing colors for level(s): \'{missingLevels}\' of annotation \'{i}\'."))
+                    stop(glue::glue(
+                        "Missing colors for level(s): ",
+                        "\'{missingLevels}\' of annotation \'{i}\'."
+                    ))
                 }
                 annotationColors[[i]] <- specifiedAnnotationColors[[i]]
             }
@@ -641,23 +665,27 @@ makeHeatmapAnnotations <- function(qseaSet,
         })
 
     if (ncol(sampleAnnotationDf) > 0) {
-        sampleAnnot <- ComplexHeatmap::HeatmapAnnotation(which = sampleOrientation,
+        sampleAnnot <- ComplexHeatmap::HeatmapAnnotation(
+            which = sampleOrientation,
             df = sampleAnnotationDf,
             col = annotationColors[names(sampleAnnotationDf)],
             na_col = "grey50",
             annotation_legend_param = sampleAnnotation_legend_param_ls,
-            show_annotation_name = FALSE)
+            show_annotation_name = FALSE
+        )
     } else {
         sampleAnnot <- NULL
     }
 
     if (ncol(windowAnnotationDf) > 0) {
-        windowAnnot <- ComplexHeatmap::HeatmapAnnotation(which = windowOrientation,
+        windowAnnot <- ComplexHeatmap::HeatmapAnnotation(
+            which = windowOrientation,
             df = windowAnnotationDf,
             col = annotationColors[names(windowAnnotationDf)],
             na_col = "grey50",
             annotation_legend_param = windowAnnotation_legend_param_ls,
-            show_annotation_name = FALSE)
+            show_annotation_name = FALSE
+        )
     } else {
         windowAnnot <- NULL
     }
@@ -779,7 +807,8 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 #' )
 #'
-#' # Add sample annotations (tidyselect bare names) and cluster columns into 2 groups
+#' # Add sample annotations (tidyselect bare names) and cluster columns into
+#' # 2 groups
 #' tryCatch(
 #'     exampleTumourNormal %>%
 #'         plotGeneHeatmap("HOXA9",
@@ -793,7 +822,9 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'     exampleTumourNormal %>%
 #'         plotGeneHeatmap("HOXA9",
 #'             sampleAnnotation = tumour,
-#'             annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+#'             annotationColors = list(
+#'                 tumour = c(Tumour = "firebrick4", Normal = "blue")
+#'             ),
 #'             upstreamDist = 1000,
 #'             downstreamDist = 2000),
 #'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
@@ -804,12 +835,12 @@ makeHeatmapAnnotations <- function(qseaSet,
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
                             useGroupMeans = FALSE,
                             sampleAnnotation = NULL, minDensity = 0,
-                            minEnrichment = 3, maxScale = 1, clusterNum = NULL, annotationColors = NA,
-                            upstreamDist = 3000, scaleRows = FALSE, clusterCols = TRUE, mart = NULL,
+                            minEnrichment = 3, maxScale = 1,
+                            clusterNum = NULL, annotationColors = NA,
+                            upstreamDist = 3000, scaleRows = FALSE,
+                            clusterCols = TRUE, mart = NULL,
                             showSampleNames = NULL,
-                            downstreamDist = 1000,
-                            idType = NULL,
-                            ...) {
+                            downstreamDist = 1000, idType = NULL, ...) {
 
     # Define retry rate up front so it can be reused for both useMart and getBM
     rate <- purrr::rate_backoff(pause_base = 2, pause_min = 0.1, max_times = 3)
@@ -822,11 +853,13 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     if (!is.null(getMart(qseaSet))) { mart <- getMart(qseaSet) }
 
-    if (is.null(mart) & stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
+    if (is.null(mart) &
+        stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
         stringr::str_detect(qsea:::getGenome(qseaSet), "hg38|GRCh38")) {
         mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
             host = "https://jul2022.archive.ensembl.org")
-    } else if (is.null(mart) & stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
+    } else if (is.null(mart) &
+        stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
         stringr::str_detect(qsea:::getGenome(qseaSet), "hg19|GRCh37")) {
         mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
             host = "https://feb2014.archive.ensembl.org")
@@ -849,14 +882,18 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
         } else if (stringr::str_detect(qsea:::getGenome(qseaSet), "Mmusculus")) {
             idType <- "mgi_symbol"
         } else {
-            stop("Please specify idType for genomes that are not human or mouse.
-            This must be a valid attribute for the given mart, see biomaRt::listAttributes.")
+            stop(
+                "Please specify idType for genomes that are not human or ",
+                "mouse. This must be a valid attribute for the given mart, ",
+                "see biomaRt::listAttributes."
+            )
         }
     }
 
     # Use purrr::insistently wrapped in purrr::possibly for biomart retry logic
     safeBiomartLookup <-
-        purrr::possibly(purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
+        purrr::possibly(
+            purrr::insistently(biomaRt::getBM, rate = rate, quiet = TRUE),
             otherwise = NULL)
 
     bm_result <- safeBiomartLookup(
@@ -869,12 +906,18 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     if (is.null(bm_result)) {
         stop(
-            "Could not retrieve gene information from biomart after multiple attempts. Please check your internet connection or try again later."
+            "Could not retrieve gene information from biomart after multiple ",
+            "attempts. Please check your internet connection or try again ",
+            "later."
         )
     }
 
     gene_details <- bm_result %>%
-        dplyr::rename(seqnames = chromosome_name, start = start_position, end = end_position)
+        dplyr::rename(
+            seqnames = chromosome_name,
+            start = start_position,
+            end = end_position
+        )
 
     qseaSetChr <- qseaSet %>%
         qsea::getRegions() %>%
@@ -899,10 +942,16 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     }
 
     if (nrow(gene_details) != 1) {
-        stop(glue::glue("{nrow(gene_details)} genes matching this name found in {mart@biomart}."))
+        stop(glue::glue(
+            "{nrow(gene_details)} genes matching this name found in ",
+            "{mart@biomart}."
+        ))
     }
 
-    message(glue::glue("Found {gene} on chromosome {gene_details$seqnames}, {gene_details$start} - {gene_details$end}"))
+    message(glue::glue(
+        "Found {gene} on chromosome {gene_details$seqnames}, ",
+        "{gene_details$start} - {gene_details$end}"
+    ))
 
     gene_details_gr <- gene_details %>%
         plyranges::as_granges()
@@ -960,19 +1009,39 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
             purrr::pluck("sample")
     }
 
-    geneStrand <- gene_details_gr %>% tibble::as_tibble() %>% dplyr::pull(strand)
+    geneStrand <- gene_details_gr %>%
+        tibble::as_tibble() %>%
+        dplyr::pull(strand)
 
     annoRow <- dataTable %>%
         dplyr::select(seqnames, start, end, CpG_density, window) %>%
         plyranges::as_granges() %>%
         dplyr::mutate(annotation = dplyr::case_when(
-            plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(end = start)) > 0 & geneStrand == "+" ~ "Start",
-            plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(end = start)) > 0 & geneStrand == "-" ~ "End",
-            plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(start = end)) > 0 & geneStrand == "+" ~ "End",
-            plyranges::count_overlaps(., gene_details_gr %>% dplyr::mutate(start = end)) > 0 & geneStrand == "-" ~ "Start",
+            plyranges::count_overlaps(
+                .,
+                gene_details_gr %>% dplyr::mutate(end = start)
+            ) > 0 & geneStrand == "+" ~ "Start",
+            plyranges::count_overlaps(
+                .,
+                gene_details_gr %>% dplyr::mutate(end = start)
+            ) > 0 & geneStrand == "-" ~ "End",
+            plyranges::count_overlaps(
+                .,
+                gene_details_gr %>% dplyr::mutate(start = end)
+            ) > 0 & geneStrand == "+" ~ "End",
+            plyranges::count_overlaps(
+                .,
+                gene_details_gr %>% dplyr::mutate(start = end)
+            ) > 0 & geneStrand == "-" ~ "Start",
             plyranges::count_overlaps(., gene_details_gr) > 0 ~ "GeneBody",
-            plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_upstream(upstreamDist)) > 0 ~ "Upstream",
-            plyranges::count_overlaps(., gene_details_gr %>% plyranges::shift_downstream(downstreamDist)) > 0 ~ "Downstream"
+            plyranges::count_overlaps(
+                .,
+                gene_details_gr %>% plyranges::shift_upstream(upstreamDist)
+            ) > 0 ~ "Upstream",
+            plyranges::count_overlaps(
+                .,
+                gene_details_gr %>% plyranges::shift_downstream(downstreamDist)
+            ) > 0 ~ "Downstream"
         )
         ) %>%
         as.data.frame() %>%
@@ -983,7 +1052,11 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     rowSplit <- dataTable %>%
         tibble::as_tibble() %>%
-        mutate(gap = cumsum(ifelse(start - tidyr::replace_na(dplyr::lag(start), 0) > !!windowSize, 1, 0))) %>%
+        mutate(gap = cumsum(ifelse(
+            start - tidyr::replace_na(dplyr::lag(start), 0) > !!windowSize,
+            1,
+            0
+        ))) %>%
         pull(gap)
 
     # Make row annotation object
@@ -1374,8 +1447,13 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
 #'         sampleAnnotation = c(tumour, patient))
 #'
 #' @export
-plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMeans = FALSE, sampleAnnotation = NULL, normMethod = "nrpm",
-                                    minEnrichment = 3, annotationColors = NA, minDensity = 0, ...) {
+plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL,
+                                  useGroupMeans = FALSE,
+                                  sampleAnnotation = NULL,
+                                  normMethod = "nrpm",
+                                  minEnrichment = 3,
+                                  annotationColors = NA,
+                                  minDensity = 0, ...) {
 
     ## TODO: Swap from pheatmap to ComplexHeatmap
     if (!is.null(regionsToOverlap)) {
@@ -1387,7 +1465,11 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
             filterByOverlaps(regionsToOverlap = regionsToOverlap)
     }
 
-    annotationDf <- getAnnotation(qseaSet, sampleAnnotation = {{ sampleAnnotation }}, useGroupMeans = useGroupMeans)
+    annotationDf <- getAnnotation(
+        qseaSet,
+        sampleAnnotation = {{ sampleAnnotation }},
+        useGroupMeans = useGroupMeans
+    )
 
     if (ncol(annotationDf) == 0) {
         annotationDf <- NULL
@@ -1488,7 +1570,8 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL, useGroupMean
 #'     plotDMRUpset(removeVS = TRUE)
 #'
 #' @export
-plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval = 0.05, ...) {
+plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE,
+                         minAdjPval = 0.05, ...) {
 
     if (!requireNamespace("UpSetR", quietly = TRUE)) {
         stop(
@@ -1499,14 +1582,39 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 
     temp <- DMRtable %>%
         dplyr::select(tidyselect::matches("adjPval")) %>%
-        {if (removeVS) {dplyr::rename_with(., ~ stringr::str_remove(., "_vs_.*")) } else {dplyr::rename_with(., ~ stringr::str_remove(., "_adjPval$"))}} %>%
-        {if (!is.null(string)) {dplyr::select(., tidyselect::matches(string))} else . }
+        {
+            if (removeVS) {
+                dplyr::rename_with(., ~ stringr::str_remove(., "_vs_.*"))
+            } else {
+                dplyr::rename_with(., ~ stringr::str_remove(., "_adjPval$"))
+            }
+        } %>%
+        {
+            if (!is.null(string)) {
+                dplyr::select(., tidyselect::matches(string))
+            } else {
+                .
+            }
+        }
 
-    if (ncol(temp) < 2) {stop(glue::glue("Only {ncol(temp)} column remaining, nothing to plot!"))}
+    if (ncol(temp) < 2) {
+        stop(glue::glue("Only {ncol(temp)} column remaining, nothing to plot!"))
+    }
 
-    purrr::map(stats::setNames(colnames(temp), colnames(temp)), function(x) {  which(temp[, x, drop = FALSE] <= minAdjPval)}) %>%
+    purrr::map(
+        stats::setNames(colnames(temp), colnames(temp)),
+        function(x) {
+            which(temp[, x, drop = FALSE] <= minAdjPval)
+        }
+    ) %>%
         UpSetR::fromList() %>%
-        UpSetR::upset(nsets = ncol(.), nintersects = 100, order.by = "freq", text.scale = 1.8, ...)
+        UpSetR::upset(
+            nsets = ncol(.),
+            nintersects = 100,
+            order.by = "freq",
+            text.scale = 1.8,
+            ...
+        )
 }
 
 
@@ -1554,22 +1662,28 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE, minAdjPval =
 #' # Works with none, one, or multiple columns (unquoted tidyselect):
 #' exampleTumourNormal %>% mesa:::getAnnotation()
 #' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = type)
-#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
+#' exampleTumourNormal %>%
+#'     mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
 #'
 #' # Also works with quoted column names:
 #' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = "type")
-#' exampleTumourNormal %>% mesa:::getAnnotation(sampleAnnotation = c("tumour", "type"))
+#' exampleTumourNormal %>%
+#'     mesa:::getAnnotation(sampleAnnotation = c("tumour", "type"))
 #'
 #' # group-level annotations for tumour & tissue
 #' exampleTumourNormal %>%
 #'     dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) %>%
-#'     mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
+#'     mesa:::getAnnotation(
+#'         sampleAnnotation = c(tumour, tissue),
+#'         useGroupMeans = TRUE
+#'     )
 #'
 #' exampleTumourNormal %>%
 #'     dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) %>%
 #'     mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 #'
-getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NULL) {
+getAnnotation <- function(qseaSet, useGroupMeans = FALSE,
+                          sampleAnnotation = NULL) {
 
     if (rlang::quo_is_null(rlang::enquo(sampleAnnotation))) {
         return(data.frame())
@@ -1592,13 +1706,17 @@ getAnnotation <- function(qseaSet, useGroupMeans = FALSE, sampleAnnotation = NUL
             tibble::remove_rownames() %>%
             dplyr::distinct()
 
-        if (nrow(distinctGroupTab) != (qseaSet %>% getSampleGroups2() %>% length())) {
+        if (nrow(distinctGroupTab) !=
+            (qseaSet %>% getSampleGroups2() %>% length())) {
             problemGroups <- distinctGroupTab %>%
                 dplyr::count(group) %>%
                 filter(n > 1) %>%
                 pull(group) %>%
                 paste(., collapse = "; ")
-            stop(glue::glue("Grouped annotation contains differing annotation in {problemGroups}"))
+            stop(glue::glue(
+                "Grouped annotation contains differing annotation in ",
+                "{problemGroups}"
+            ))
         }
 
         annotationColDf <- distinctGroupTab %>%
@@ -1638,7 +1756,10 @@ testPlotGeneHeatmap <- function(...) {
         plotGeneHeatmap(...)
         testthat::succeed()
     }, error = function(e) {
-        if (stringr::str_detect(e$message, "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http [45][0-9][0-9]|service unavailable|req_perform")) {
+        if (stringr::str_detect(
+            e$message,
+            "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http [45][0-9][0-9]|service unavailable|req_perform"
+        )) {
             testthat::skip("Connection to biomart failed, skipping test.")
         } else {
             stop(e)

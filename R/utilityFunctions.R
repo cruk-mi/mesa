@@ -207,11 +207,10 @@ setMesaTxDb <- function(TxDb) {
 
     if (!requireNamespace(TxDb, quietly = TRUE)) {
         stop(
-            glue::glue(paste0(
-                "Package {TxDb} must exist and be installed",
-                " to set as default TxDb.",
-                " Please install or correct and run again."
-            )),
+            glue::glue(
+                "Package {TxDb} must exist and be installed to set as ",
+                "default TxDb. Please install or correct and run again."
+            ),
             call. = FALSE
         )
     }
@@ -273,11 +272,10 @@ setMesaAnnoDb <- function(annoDb) {
 
     if (!requireNamespace(annoDb, quietly = TRUE)) {
         stop(
-            glue::glue(paste0(
-                "Package {annoDb} must exist and be installed",
-                " to set as default annoDb.",
-                " Please install or correct and run again."
-            )),
+            glue::glue(
+                "Package {annoDb} must exist and be installed to set as ",
+                "default annoDb. Please install or correct and run again."
+            ),
             call. = FALSE
         )
     }
@@ -374,18 +372,14 @@ setMesaParallel <- function(
     options("mesa_parallel" = useParallel)
 
     if (useParallel & verbose) {
-        message(glue::glue(paste0(
-            "Parallelisation turned on for the functions in",
-            " the mesa package, currently using",
-            " {BiocParallel::bpworkers()} cores.\n",
-            "Control the number of cores by calling",
-            " BiocParallel::register."
-        )))
-    } else if (verbose) {
-        message(paste0(
-            "Parallelisation turned off for all functions",
-            " in the mesa package."
+        message(glue::glue(
+            "Parallelisation turned on for the functions in the mesa ",
+            "package, currently using {BiocParallel::bpworkers()} cores.\n",
+            "Control the number of cores by calling ",
+            "BiocParallel::register."
         ))
+    } else if (verbose) {
+        message("Parallelisation turned off for all functions in the mesa package.")
     }
 
     return(invisible(useParallel))
@@ -397,10 +391,10 @@ setMesaParallel <- function(
 getMesaParallel <- function(verbose = FALSE) {
     if (verbose) {
         if (is.null(getOption("mesa_parallel"))) {
-            message(paste0(
-                "Parallelisation not set, using serial evaluation.",
-                " Call setMesaParallel to set for all mesa functions."
-            ))
+            message(
+                "Parallelisation not set, using serial evaluation. Call ",
+                "setMesaParallel to set for all mesa functions."
+            )
         } else if (getOption("mesa_parallel")) {
             message(glue::glue(
                 "Using parallelisation, over {BiocParallel::bpworkers()} cores."
