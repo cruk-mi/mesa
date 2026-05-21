@@ -30,8 +30,10 @@ plotRegionsHeatmap(
 \item{qseaSet}{\code{qseaSet}.
 Input object containing windows and counts/betas.}
 
-\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
-If provided, only windows overlapping these regions are plotted; otherwise all windows are considered.
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or
+\code{NULL}.
+If provided, only windows overlapping these regions are plotted; otherwise
+all windows are considered.
 \strong{Default:} \code{NULL}.}
 
 \item{normMethod}{\code{character(1)}.
@@ -39,11 +41,13 @@ Which measure to plot, \code{"beta"} or \code{"nrpm"}.
 \strong{Default:} \code{"beta"}.}
 
 \item{sampleAnnotation}{\code{character()} or \code{NULL}.
-Names of columns from the sample table to display as column annotations (e.g., \code{c("tumour","tissue")}).
+Names of columns from the sample table to display as column annotations
+(e.g., \code{c("tumour","tissue")}).
 \strong{Default:} \code{NULL}.}
 
 \item{windowAnnotation}{\code{character()} or \code{NULL}.
-Names of columns from region metadata (from the \code{qseaSet} regions or \code{regionsToOverlap}) to display as row annotations (e.g., \code{c("CpG_density")}).
+Names of columns from region metadata (from the \code{qseaSet} regions or
+\code{regionsToOverlap}) to display as row annotations (e.g., \code{c("CpG_density")}).
 \strong{Default:} \code{NULL}.}
 
 \item{annotationColors}{\code{list} or \code{NA}.
@@ -51,7 +55,8 @@ Optional named colour maps for annotations, e.g. \code{list(tumour = c(Tumour = 
 \strong{Default:} \code{NA}.}
 
 \item{useGroupMeans}{\code{logical(1)}.
-If \code{TRUE}, average samples by the \code{group} column in the sample table (combine replicates).
+If \code{TRUE}, average samples by the \code{group} column in the sample table (combine
+replicates).
 \strong{Default:} \code{FALSE}.}
 
 \item{clusterRows}{\code{logical(1)}.
@@ -71,11 +76,13 @@ Upper limit of the colour scale (used for \code{"nrpm"}; not applied to \code{"b
 \strong{Default:} \code{5}.}
 
 \item{clusterNum}{\code{integer(1)} or \code{NULL}.
-If set, cut the \strong{column} dendrogram into this many clusters and display cluster labels.
+If set, cut the \strong{column} dendrogram into this many clusters and display
+cluster labels.
 \strong{Default:} \code{NULL}.}
 
 \item{clip}{\code{numeric(1)}.
-Cap values above this threshold before plotting (applies to \code{"nrpm"}, ignored for \code{"beta"}).
+Cap values above this threshold before plotting (applies to \code{"nrpm"}, ignored
+for \code{"beta"}).
 \strong{Default:} \code{1e9}.}
 
 \item{minDensity}{\code{numeric(1)}.
@@ -91,7 +98,8 @@ Optional plot title.
 \strong{Default:} \code{NULL}.}
 
 \item{showSampleNames}{\code{logical(1)} or \code{NULL}.
-If \code{NULL}, names are shown when there are fewer than 50 samples; set \code{TRUE}/\code{FALSE} to force.
+If \code{NULL}, names are shown when there are fewer than 50 samples; set
+\code{TRUE}/\code{FALSE} to force.
 \strong{Default:} \code{NULL}.}
 
 \item{clusterMethod}{\code{character(1)}.
@@ -102,18 +110,25 @@ Clustering method for dendrograms (e.g., \code{"ward.D2"}).
 }
 \value{
 Draws a heatmap on the active device and (invisibly) returns the underlying
-\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition with
+\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further
+composition with
 \code{\link[ComplexHeatmap]{draw}}.
 }
 \description{
-Plot sample signal over a set of regions as a heatmap using \strong{ComplexHeatmap}.
-Regions are selected by overlap with \code{regionsToOverlap}, values are taken from
-the \code{qseaSet}, and optional annotations from the sample/region metadata can be added.
+Plot sample signal over a set of regions as a heatmap using
+\strong{ComplexHeatmap}.
+Regions are selected by overlap with \code{regionsToOverlap}, values are taken
+from
+the \code{qseaSet}, and optional annotations from the sample/region metadata can
+be added.
 }
 \details{
-Windows are filtered by overlap (if \code{regionsToOverlap} is given) and by \code{minDensity}.
-For \code{"beta"}, low-enrichment values are set to \code{NA} using \code{minEnrichment}. For \code{"nrpm"},
-\code{clip} and \code{maxScale} help stabilise colour scaling for outliers. If \code{useGroupMeans = TRUE},
+Windows are filtered by overlap (if \code{regionsToOverlap} is given) and by
+\code{minDensity}.
+For \code{"beta"}, low-enrichment values are set to \code{NA} using \code{minEnrichment}.
+For \code{"nrpm"},
+\code{clip} and \code{maxScale} help stabilise colour scaling for outliers. If
+\code{useGroupMeans = TRUE},
 samples are aggregated by \code{group} before plotting.
 }
 \examples{
@@ -144,6 +159,7 @@ exampleTumourNormal \%>\%
 }
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}, \code{\link[ComplexHeatmap]{draw}},
-\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
+\code{\link[ComplexHeatmap]{draw}},
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:getSampleTable]{getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }

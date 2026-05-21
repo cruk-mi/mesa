@@ -8,8 +8,8 @@ liftOverHg19(grOrDf)
 }
 \arguments{
 \item{grOrDf}{\code{GRanges} or \code{data.frame}.
-Input intervals. Data frames must contain at least \code{seqnames}, \code{start},
-and \code{end}. \code{seqnames} may include or omit the \code{"chr"} prefix; it is added
+Input intervals. Data frames must contain at least \code{seqnames}, \code{start}, and
+\code{end}. \code{seqnames} may include or omit the \code{"chr"} prefix; it is added
 automatically if missing.
 \strong{Default:} none (must be supplied).}
 }
@@ -19,8 +19,8 @@ A \link[GenomicRanges]{GRanges-class} in hg38 coordinates (with
 chain are dropped (i.e., may return fewer ranges than provided).
 }
 \description{
-Convert genomic intervals from UCSC \strong{hg19} to \strong{hg38/GRCh38} using
-a preloaded chain object.
+Convert genomic intervals from UCSC \strong{hg19} to \strong{hg38/GRCh38} using a
+preloaded chain object.
 }
 \details{
 Internally, the input is coerced to a \code{GRanges} (adding \code{"chr"} if needed),
@@ -37,7 +37,9 @@ data.frame(
     end      = c(100100, 200100)
 ) \%>\%
     liftOverHg19() \%>\%
-    { GenomeInfoDb::genome(.) }
+    {
+        GenomeInfoDb::genome(.)
+    }
 
 # GRanges input (some intervals may not map and can be dropped)
 gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))

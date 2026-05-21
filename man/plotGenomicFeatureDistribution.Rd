@@ -40,7 +40,8 @@ Transcript database for gene annotation. Ignored if \code{genome} is provided.
 \strong{Default:} \code{TxDb.Hsapiens.UCSC.hg38.knownGene} for backward compatibility.}
 
 \item{annoDb}{\code{character(1)} or \code{NULL}.
-Annotation database name (e.g., \code{"org.Hs.eg.db"}). Ignored if \code{genome} is provided.
+Annotation database name (e.g., \code{"org.Hs.eg.db"}). Ignored if \code{genome} is
+provided.
 \strong{Default:} \code{"org.Hs.eg.db"}.}
 }
 \value{
@@ -53,8 +54,10 @@ per sample as stacked/dodged/filled bars.
 }
 \details{
 Feature classes are taken from region annotations available on the windows
-(e.g., columns produced by \code{\link[=annotateWindows]{annotateWindows()}} such as \code{shortAnno}/\code{annotation},
-if present). Bars are positioned according to \code{barType} (\code{stack}/\code{dodge}/\code{fill}).
+(e.g., columns produced by \code{\link[=annotateWindows]{annotateWindows()}} such as
+\code{shortAnno}/\code{annotation},
+if present). Bars are positioned according to \code{barType}
+(\code{stack}/\code{dodge}/\code{fill}).
 }
 \examples{
 \donttest{
@@ -82,7 +85,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}
 
-Other annotation-summaries: 
-\code{\link{getGenomicFeatureDistribution}()}
+Other annotation-summaries:
+\code{\link[=getGenomicFeatureDistribution]{getGenomicFeatureDistribution()}}
 }
 \concept{annotation-summaries}

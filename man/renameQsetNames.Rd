@@ -20,8 +20,8 @@ String to replace matches of \code{pattern}. Defaults to \code{""} (empty string
 A \code{qseaSet} object:
 \itemize{
 \item \strong{renameQsetNames()}: returns the input \code{qseaSet} with sample names
-updated according to \code{pattern} and \code{replacement}. All dependent slots
-are updated consistently.
+updated according to \code{pattern} and \code{replacement}. All dependent slots are
+updated consistently.
 }
 }
 \description{
@@ -35,6 +35,7 @@ data(exampleTumourNormal, package = "mesa")
 # Replace "T" with "Tumour" in sample names
 renameQsetNames(exampleTumourNormal,
     pattern = "T",
-    replacement = "Tumour")
+    replacement = "Tumour"
+)
 
 }

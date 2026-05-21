@@ -27,12 +27,11 @@ First sample name, contributing \code{proportion * nReadsTotal} reads.}
 Second sample name, contributing the remainder of reads.}
 
 \item{nReadsTotal}{\code{integer(1)}.
-Total number of reads to simulate in the new mixed sample.
-Must be \verb{>= 0}.}
+Total number of reads to simulate in the new mixed sample. Must be \verb{>= 0}.}
 
 \item{proportion}{\code{numeric(1)}.
-Proportion of reads taken from \code{sample1}. Must be in \verb{[0, 1]}.
-The remaining \code{1 - proportion} reads are taken from \code{sample2}.}
+Proportion of reads taken from \code{sample1}. Must be in \verb{[0, 1]}. The remaining
+\code{1 - proportion} reads are taken from \code{sample2}.}
 
 \item{newName}{\code{character(1)} or \code{NULL}.
 Name for the new synthetic sample.
@@ -44,14 +43,14 @@ Group name for the new sample recorded in the \code{sampleTable}.
 \strong{Default:} \code{NULL} (uses \code{newName}).}
 
 \item{onlyNew}{\code{logical(1)}.
-If \code{TRUE}, return only the synthetic sample. If \code{FALSE}, return the
-original \code{qseaSet} with the new sample appended.
+If \code{TRUE}, return only the synthetic sample. If \code{FALSE}, return the original
+\code{qseaSet} with the new sample appended.
 \strong{Default:} \code{FALSE}.}
 
 \item{renormalise}{\code{logical(1)}.
-Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. For efficiency, set
-to \code{FALSE} when creating multiple mixtures and run normalisation once at
-the end.
+Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. For efficiency, set to
+\code{FALSE} when creating multiple mixtures and run normalisation once at the
+end.
 \strong{Default:} \code{TRUE}.}
 }
 \value{
@@ -68,11 +67,11 @@ existing samples in user-specified proportions. Useful for benchmarking,
 downsampling experiments, or simulating tumour–normal mixtures.
 }
 \details{
-Note that if the qseaSet windows have been filtered prior to using this,
-the fraction of fragments present in the current qseaSet is calculated,
-such that the total number of reads would have been approximately \code{nReadsTotal}.
-E.g. if there are 50\% of the total fragments in the windows present in the current samples,
-0.5*\code{nReadsTotal} fragments will be sampled.
+Note that if the qseaSet windows have been filtered prior to using this, the
+fraction of fragments present in the current qseaSet is calculated, such that
+the total number of reads would have been approximately \code{nReadsTotal}. E.g.
+if there are 50\% of the total fragments in the windows present in the current
+samples, 0.5*\code{nReadsTotal} fragments will be sampled.
 \itemize{
 \item Input validation ensures \code{sample1}/\code{sample2} exist, \verb{proportion ∈ [0,1]},
 and \code{nReadsTotal} is non-negative.
@@ -91,8 +90,8 @@ exampleTumourNormal \%>\%
         "Colon1_N",
         nReadsTotal = 100000,
         proportion = 0.5,
-        renormalise = FALSE) \%>\%
-
+        renormalise = FALSE
+    ) \%>\%
     # Only a few reads are included in this small subset of windows (82):
     getCountTable() \%>\%
     pull(Mix_Colon1_T_Colon1_N_0.5) \%>\%
@@ -107,8 +106,8 @@ exampleTumourNormal \%>\%
         newName     = "Mix_Colon1_T_0.8_Colon1_N_0.2",
         groupName   = "Synthetic",
         onlyNew     = TRUE,
-        renormalise = FALSE) \%>\%
-
+        renormalise = FALSE
+    ) \%>\%
     # Only a few reads are included in this small subset of windows (45):
     getCountTable() \%>\%
     dplyr::pull(Mix_Colon1_T_0.8_Colon1_N_0.2) \%>\%
@@ -118,7 +117,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}, \code{\link[=addNormalisation]{addNormalisation()}}
 
-Other sample-simulation: 
-\code{\link{mixThreeQsetSamples}()}
+Other sample-simulation:
+\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}
 }
 \concept{sample-simulation}

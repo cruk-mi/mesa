@@ -7,7 +7,7 @@
 #'
 #' @details
 #' - **Genome restriction.** Only supported for
-#'   `"BSgenome.Hsapiens.NCBI.GRCh38"`; the function stops otherwise (checked via
+#' `"BSgenome.Hsapiens.NCBI.GRCh38"`; the function stops otherwise (checked via
 #'   `qsea:::getGenome()`).
 #' - **Regions used.** Uses `mesa::hg38UltraStableProbes`, a GRCh38 set derived
 #'   from array data (*Edgar et al.*, 2014).
@@ -31,7 +31,8 @@
 #'
 #' @return
 #' The input `qseaSet` with its `sampleTable` augmented by a numeric column
-#' `hyperStableEdgar` (range 0–1) giving, per sample, the fraction of ultra-stable
+#' `hyperStableEdgar` (range 0–1) giving, per sample, the fraction of
+#' ultra-stable
 #' windows called methylated.
 #'
 #' @seealso
@@ -141,7 +142,8 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
 #' Columns not present in the `sampleTable` are silently omitted.
 #'
 #' @seealso
-#' [qsea::getSampleTable()], [addLibraryInformation()], [addHyperStableFraction()]
+#' [qsea::getSampleTable()], [addLibraryInformation()],
+#' [addHyperStableFraction()]
 #'
 #' @examples
 #' data("exampleTumourNormal", package = "mesa")

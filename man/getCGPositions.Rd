@@ -9,14 +9,16 @@ getCGPositions(BSgenome, chr.select)
 \arguments{
 \item{BSgenome}{Character(1). BSgenome package name.}
 
-\item{chr.select}{Character vector of chromosome names to include (e.g., \code{paste0("chr", 1:22)}).}
+\item{chr.select}{Character vector of chromosome names to include (e.g.,
+\code{paste0("chr", 1:22)}).}
 }
 \value{
 A \link[GenomicRanges]{GRanges-class} of motif positions.
 }
 \description{
 Convenience wrapper that returns genomic positions of the \code{"CG"} motif
-for the specified BSgenome and chromosomes, via \code{MEDIPS::MEDIPS.getPositions()}.
+for the specified BSgenome and chromosomes, via
+\code{MEDIPS::MEDIPS.getPositions()}.
 }
 \examples{
 # Requires MEDIPS and a BSgenome package
@@ -25,5 +27,6 @@ for the specified BSgenome and chromosomes, via \code{MEDIPS::MEDIPS.getPosition
 # }
 }
 \seealso{
-\code{\link{calculateCGEnrichment}}, \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
+\code{\link{calculateCGEnrichment}},
+\code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
 }

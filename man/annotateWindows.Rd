@@ -20,7 +20,8 @@ Windows to annotate. Data frames must include \code{seqnames}, \code{start}, and
 
 \item{genome}{\code{character(1)} or \code{NULL}.
 Guides annotation defaults. Currently supports \code{"hg38"}/\code{"GRCh38"}.
-\strong{Default:} value set by \code{\link[=setMesaGenome]{setMesaGenome()}} (via internal \code{.getMesaGenome()}), or \code{NULL}.}
+\strong{Default:} value set by \code{\link[=setMesaGenome]{setMesaGenome()}} (via internal
+\code{.getMesaGenome()}), or \code{NULL}.}
 
 \item{TxDb}{TxDb object or \code{character(1)}.
 Either an unquoted TxDb object or a string like
@@ -45,7 +46,8 @@ FANTOM enhancer regions for overlap counts.
 \strong{Default:} \code{NULL} (for GRCh38/hg38, uses \code{mesa::FantomRegions}).}
 }
 \value{
-A tibble with the input windows augmented by ChIPseeker annotations and,
+A tibble with the input windows augmented by ChIPseeker annotations
+and,
 when available, CpG island landscape and Fantom overlap.
 }
 \description{
@@ -58,14 +60,17 @@ left \code{NULL} to use mesa defaults for GRCh38).
 }
 \details{
 \itemize{
-\item \strong{Conversion:} Non-\code{GRanges} inputs are converted via \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}.
-\item \strong{Genome-aware defaults (GRCh38/hg38):} Missing \code{TxDb}/\code{annoDb}/contexts are
+\item \strong{Conversion:} Non-\code{GRanges} inputs are converted via
+\code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}.
+\item \strong{Genome-aware defaults (GRCh38/hg38):} Missing \code{TxDb}/\code{annoDb}/contexts
+are
 filled using the packages noted above when installed.
 \item \strong{Seqlevels style:} Output \code{seqnames} have the \code{"chr"} prefix removed
 (e.g., \code{"chr1"} → \code{"1"}).
 \item \strong{ChIPseeker call:} Uses \code{tssRegion = c(-2000, 500)}, \code{level = "transcript"},
 \code{overlap = "all"}, \code{verbose = FALSE}.
-\item \strong{Output columns:} Includes \code{annotation} (full label), \code{shortAnno} (without the
+\item \strong{Output columns:} Includes \code{annotation} (full label), \code{shortAnno}
+(without the
 trailing parenthetical), and—when contexts are provided—\code{landscape}
 (Island/Shore/Shelf/Open Sea) and \code{inFantom} (overlap count with FANTOM).
 }
@@ -104,6 +109,7 @@ exampleMouse \%>\%
 
 }
 \seealso{
-\code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}}, \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
+\code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}},
+\code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}},
 \code{\link[=qseaTableToChrGRanges]{qseaTableToChrGRanges()}}, \code{\link[=liftOverHg19]{liftOverHg19()}}
 }

@@ -14,8 +14,8 @@ combineQsetsList(
 }
 \arguments{
 \item{qseaSets}{\code{list}
-List of \code{qseaSet} objects, or \code{character()} paths to \code{.rds} files
-containing \code{qseaSet} objects. \strong{Default:} none (must be supplied).}
+List of \code{qseaSet} objects, or \code{character()} paths to \code{.rds} files containing
+\code{qseaSet} objects. \strong{Default:} none (must be supplied).}
 
 \item{firstQset}{\code{qseaSet} or \code{character(1)}
 Optional initial \code{qseaSet} to merge into. If a \code{character(1)} ending in
@@ -33,8 +33,8 @@ Verify that global parameters are identical across inputs.
 
 \item{regionsToKeep}{\code{GRanges} or coercible
 If supplied, restrict each \code{qseaSet} to these genomic regions \emph{before}
-combining (saves memory). Accepts \code{GRanges} or a data frame with
-\code{seqnames}, \code{start}, \code{end}.
+combining (saves memory). Accepts \code{GRanges} or a data frame with \code{seqnames},
+\code{start}, \code{end}.
 \strong{Default:} \code{NULL} (keep all regions).}
 }
 \value{

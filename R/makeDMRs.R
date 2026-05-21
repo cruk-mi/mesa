@@ -44,7 +44,7 @@
 #'
 #' @param calcDispersionAll `logical(1)`
 #'   If `TRUE`, samples not present in any specified contrast are still used to
-#'   fit the initial GLM and dispersion estimates. Note this means adding samples
+#' fit the initial GLM and dispersion estimates. Note this means adding samples
 #'   to `qseaSet` can change DMRs even when they are not directly contrasted.
 #'   **Default:** `FALSE`.
 #'
@@ -203,7 +203,8 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
 
     pb$tick()
 
-    # Yes, a for loop. The issue is that it adds repeatedly to the qseaGLM object, so can't be vectorised easily.
+    # Yes, a for loop. The issue is that it adds repeatedly to the qseaGLM
+    # object, so can't be vectorised easily.
     for (i in seq_len(nrow(contrasts))) {
 
         conName <- paste0(variable, contrasts[i, "group1"], "-", variable, contrasts[i, "group2"])
@@ -360,13 +361,15 @@ getDMRsData <- function(qseaSet, qseaGLM, sampleNames = NULL, variable = NULL, k
         unique()
 
     hack <- FALSE
-    # workaround to ensure that qsea doesn't drop the data frame to a vector when it subsets, copied row removed at the end
+    # workaround to ensure that qsea doesn't drop the data frame to a vector
+    # when it subsets, copied row removed at the end
     if (length(sigIndex) == 1) {
         sigIndex <- c(sigIndex, sigIndex)
         hack <- TRUE
     }
 
-    # Use the same workaround to ensure that the same columns and types are returned as would be expected if any DMRs were found.
+    # Use the same workaround to ensure that the same columns and types are
+    # returned as would be expected if any DMRs were found.
     if (length(sigIndex) == 0) {
         sigIndex <- 1
         hack <- TRUE
@@ -467,7 +470,8 @@ makeAllContrasts <- function(qseaSet, variable) {
 
 #' Fit GLM and return DMR data in one step
 #'
-#' Calculate one or more contrasts to find Differentially Methylated Regions (DMRs).
+#' Calculate one or more contrasts to find Differentially Methylated Regions
+#' (DMRs).
 #'
 #' @param qseaSet `qseaSet`.
 #'   Input object containing counts and sample metadata.
@@ -547,7 +551,8 @@ makeAllContrasts <- function(qseaSet, variable) {
 #' @details
 #' Contrast strings are parsed as follows:
 #' * `"A_vs_B"` creates a single contrast *A vs B*;
-#' * `"All"`/`"all"` expands to all pairwise contrasts among levels of `variable`
+#' * `"All"`/`"all"` expands to all pairwise contrasts among levels of
+#' `variable`
 #'   (via [makeAllContrasts()]);
 #' * `"All_vs_X"` creates *each level vs X*;
 #' * `"X_vs_All"` creates *X vs each other level*;

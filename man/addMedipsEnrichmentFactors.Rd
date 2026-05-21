@@ -22,8 +22,8 @@ addMedipsEnrichmentFactors(
 Input object whose sample table contains BAM paths.}
 
 \item{exportPath}{\code{character(1)} or \code{NULL}
-Directory to export per-sample fragment-length PDFs and read-\code{GRanges} RDS files.
-If \code{NULL}, no files are written.
+Directory to export per-sample fragment-length PDFs and read-\code{GRanges} RDS
+files. If \code{NULL}, no files are written.
 \strong{Default:} \code{NULL}.}
 
 \item{nonEnrich}{\code{logical(1)}
@@ -33,15 +33,15 @@ under \verb{@libraries$file_name}).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Shift applied to read positions.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
@@ -49,7 +49,7 @@ Passed to MEDIPS range extraction; subset of chromosomes to analyse.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
-Whether BAMs are paired-end (uses \code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
+Whether BAMs are paired-end (uses \code{\link[MEDIPS:getPairedGRange]{MEDIPS::getPairedGRange()}}).
 \strong{Default:} \code{TRUE}.}
 
 \item{file_name}{\code{character(1)}
@@ -67,25 +67,27 @@ A \code{qseaSet} with new MEDIPS-style metrics appended:
 \item \strong{Sample/library metrics} (added under the appropriate library frame):
 \code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern}, \code{n100bpReads},
 \code{n100bpReadsWithoutPattern}.
-\item \strong{Provenance}: any export artefacts (PDF/RDS) written to \code{exportPath} if provided.
+\item \strong{Provenance}: any export artefacts (PDF/RDS) written to \code{exportPath} if
+provided.
 }
 }
 \description{
-For each sample, compute MEDIPS-style CpG enrichment metrics (\strong{relH}, \strong{GoGe},
-and read counts) from its BAM and append the results to the \code{qseaSet} sample
-metadata. Supports both pulldown (default) and input libraries.
+For each sample, compute MEDIPS-style CpG enrichment metrics (\strong{relH},
+\strong{GoGe}, and read counts) from its BAM and append the results to the
+\code{qseaSet} sample metadata. Supports both pulldown (default) and input
+libraries.
 }
 \details{
-Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and counts,
-then merges the results into the \verb{@libraries} slot (\verb{$file_name} for pulldown,
-\verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelisation uses
-\code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
+Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and
+counts, then merges the results into the \verb{@libraries} slot (\verb{$file_name} for
+pulldown, \verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelisation
+uses \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
+# Requires BAM files and the MEDIPS package; see \dontrun{} block for a full usage example.
 \dontrun{
 if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
-
     bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
 
     data.frame(
@@ -109,6 +111,5 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
 }
 }
 \seealso{
-\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
-\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, \code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}
 }

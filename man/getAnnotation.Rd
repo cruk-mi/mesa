@@ -17,7 +17,8 @@ if \code{FALSE}, return per-sample annotations.
 
 \item{sampleAnnotation}{tidyselect specification, \code{character()}, or \code{NULL}.
 Columns from the sample table to include as annotations. Accepts unquoted
-tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g., \code{c("tumour","type")}).
+tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g.,
+\code{c("tumour","type")}).
 \strong{Default:} \code{NULL} (no extra columns beyond the identifier).}
 }
 \value{
@@ -25,7 +26,8 @@ tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g., \code{c("tum
 (or to \code{group} when \code{useGroupMeans = TRUE}).
 }
 \description{
-Note that sampleAnnotation must be enclosed within double curly brackets when used.
+Note that sampleAnnotation must be enclosed within double curly brackets when
+used.
 }
 \details{
 Select sample-table columns to use as annotations, either per-sample or

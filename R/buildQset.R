@@ -168,7 +168,8 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
     readBamData <- Rsamtools::scanBam(file = fileName, param = myParam)
 
     if (is.null(readBamData[[1]]$tag$MQ)) {
-        # MQ is the mate quality tag, coming from samtools fixmate. If not present, then add as NA.
+        # MQ is the mate quality tag, coming from samtools fixmate. If not
+        # present, then add as NA.
         message(glue::glue(
             "No samtools fixmate MQ (mate quality) tags on the bam file, ",
             "using R1 MAPQ only."
@@ -360,7 +361,8 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
     #   dplyr::group_by(id) #%>%
     # dplyr::summarise(avgFragmentLength = median(width))
 
-    # Count the number of reads within each region. Use the midpoints to be consistent with qsea.
+    # Count the number of reads within each region. Use the midpoints to be
+    # consistent with qsea.
     midPointCounts <- readGRanges %>%
         dplyr::mutate(start = (start + end) / 2, end = start) %>%
         plyranges::count_overlaps(regions, .)
@@ -458,8 +460,10 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
 #' @return A `qseaSet` with updated slots:
 #'
 #' * **Counts**: updated count matrix via `qsea:::setCounts()`.
-#' * **Library**: updated library table via `qsea:::setLibrary()`, with summary metrics.
-#' * **Parameters**: appended record of MAPQ/size thresholds via `qsea:::addParameters()`.
+#' * **Library**: updated library table via `qsea:::setLibrary()`, with summary
+#' metrics.
+#' * **Parameters**: appended record of MAPQ/size thresholds via
+#' `qsea:::addParameters()`.
 #'
 #' @details
 #' Per-region counts are computed from fragment midpoints to align with qsea’s
@@ -546,7 +550,8 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     #     }
     #   ) %>% as.matrix()
     #
-    # colnames(regionAvgs) <- paste0(rep(sampleTable$sample_name,rep(2,nrow(sampleTable))), "_",
+    # colnames(regionAvgs) <-
+    # paste0(rep(sampleTable$sample_name,rep(2,nrow(sampleTable))), "_",
     #                                c("avgFragmentLength", "avgFragmentMAPQ"))
     #
     #   message("Calculated read coverage")
@@ -561,7 +566,8 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     qs <- qsea:::setCounts(qs, count_matrix = coverage)
     qs <- qsea:::setLibrary(qs, "file_name", libraries)
 
-    # GenomicRanges::mcols(qs@regions) <- cbind(GenomicRanges::mcols(qs@regions), regionAvgs)
+    # GenomicRanges::mcols(qs@regions) <-
+    # cbind(GenomicRanges::mcols(qs@regions), regionAvgs)
 
 
     return(qs)
@@ -608,7 +614,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #' \itemize{
 #'   \item **"blind1-15"**: the blind calibration method detailed in the qsea
 #'     paper, fitting a straight line of decreasing expected average
-#'     methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.
+#' methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.
 #'   \item **"none"**: no enrichment normalisation is performed.
 #' }
 #'

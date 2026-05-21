@@ -19,7 +19,8 @@ makeHeatmapAnnotations(
 The input object from which sample metadata are taken.}
 
 \item{sampleAnnotation}{tidyselect specification or \code{character()} or \code{NULL}.
-Columns from the sample table to annotate (unquoted helpers like \code{group}, \code{tumour},
+Columns from the sample table to annotate (unquoted helpers like \code{group},
+\code{tumour},
 or a character vector of names).
 \strong{Default:} \code{NULL}.}
 
@@ -51,12 +52,16 @@ ready to pass to \code{ComplexHeatmap::Heatmap(...)}.
 }
 \description{
 Helper to generate \code{ComplexHeatmap::HeatmapAnnotation()} objects for samples
-and windows with automatic colour handling for categorical and numeric variables.
+and windows with automatic colour handling for categorical and numeric
+variables.
 }
 \details{
-When \code{specifiedAnnotationColors} is not supplied, discrete variables receive a
-qualitative palette and numeric variables are mapped to a continuous gradient.
-The function respects \code{useGroupMeans} to annotate either per-sample or per-group.
+When \code{specifiedAnnotationColors} is not supplied, discrete variables receive
+a
+qualitative palette and numeric variables are mapped to a continuous
+gradient.
+The function respects \code{useGroupMeans} to annotate either per-sample or
+per-group.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
@@ -79,7 +84,8 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}},
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}},
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}},
 \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
 }
 \keyword{internal}

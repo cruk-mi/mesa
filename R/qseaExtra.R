@@ -12,7 +12,8 @@
 #' @param x `ANY`.  
 #'   Object to test.
 #'
-#' @return `logical(1)`: `TRUE` if `x` inherits from class `"qseaSet"`, otherwise `FALSE`.
+#' @return `logical(1)`: `TRUE` if `x` inherits from class `"qseaSet"`,
+#' otherwise `FALSE`.
 #'
 #' @seealso
 #' [qsea::createQseaSet()], [qsea::getSampleTable()], [base::inherits()]
@@ -52,7 +53,8 @@ is.qseaSet <- function(x){
 #'
 #' @return
 #' - `setMart()` returns the updated `qseaSet` (with `@parameters$mart` set).  
-#' - `getMart()` returns the stored value (whatever was set), or `NULL` if absent.
+#' - `getMart()` returns the stored value (whatever was set), or `NULL` if
+#' absent.
 #'
 #' @details
 #' These are S4 generics with methods for class `"qseaSet"`. The value is not
@@ -106,13 +108,14 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' enhancer overlaps can be added if the corresponding ranges are provided (or
 #' left `NULL` to use mesa defaults for GRCh38).
 #'
-#' @param dataTable `data.frame`/`tibble` (coercible to `GRanges`) or `GRanges`.  
-#'   Windows to annotate. Data frames must include `seqnames`, `start`, and `end`
+#' @param dataTable `data.frame`/`tibble` (coercible to `GRanges`) or `GRanges`.
+#' Windows to annotate. Data frames must include `seqnames`, `start`, and `end`
 #'   (or columns convertible by [qseaTableToChrGRanges()]).
 #'
 #' @param genome `character(1)` or `NULL`.  
 #'   Guides annotation defaults. Currently supports `"hg38"`/`"GRCh38"`.  
-#'   **Default:** value set by [setMesaGenome()] (via internal `.getMesaGenome()`), or `NULL`.
+#' **Default:** value set by [setMesaGenome()] (via internal
+#' `.getMesaGenome()`), or `NULL`.
 #'
 #' @param TxDb TxDb object or `character(1)`.  
 #'   Either an unquoted TxDb object or a string like
@@ -125,7 +128,7 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'
 #' @param annoDb `character(1)` or `NULL`.  
 #'   OrgDb package name (e.g., `"org.Hs.eg.db"`).  
-#'   **Default:** value set by [setMesaAnnoDb()] (via `.getMesaAnnoDb()`), or for
+#' **Default:** value set by [setMesaAnnoDb()] (via `.getMesaAnnoDb()`), or for
 #'   GRCh38/hg38 when `NULL`, use `"org.Hs.eg.db"` if installed.
 #'
 #' @param CpGislandsGR `GRanges` or `NULL`.  
@@ -137,22 +140,28 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'   **Default:** `NULL` (for GRCh38/hg38, uses `mesa::FantomRegions`).
 #'
 #' @details
-#' * **Conversion:** Non-`GRanges` inputs are converted via [qseaTableToChrGRanges()].  
-#' * **Genome-aware defaults (GRCh38/hg38):** Missing `TxDb`/`annoDb`/contexts are
+#' * **Conversion:** Non-`GRanges` inputs are converted via
+#' [qseaTableToChrGRanges()].
+#' * **Genome-aware defaults (GRCh38/hg38):** Missing `TxDb`/`annoDb`/contexts
+#' are
 #'   filled using the packages noted above when installed.  
 #' * **Seqlevels style:** Output `seqnames` have the `"chr"` prefix removed
 #'   (e.g., `"chr1"` → `"1"`).  
-#' * **ChIPseeker call:** Uses `tssRegion = c(-2000, 500)`, `level = "transcript"`,
+#' * **ChIPseeker call:** Uses `tssRegion = c(-2000, 500)`, `level =
+#' "transcript"`,
 #'   `overlap = "all"`, `verbose = FALSE`.  
-#' * **Output columns:** Includes `annotation` (full label), `shortAnno` (without the
+#' * **Output columns:** Includes `annotation` (full label), `shortAnno`
+#' (without the
 #'   trailing parenthetical), and—when contexts are provided—`landscape`
 #'   (Island/Shore/Shelf/Open Sea) and `inFantom` (overlap count with FANTOM).
 #'
-#' @return A tibble with the input windows augmented by ChIPseeker annotations and,
+#' @return A tibble with the input windows augmented by ChIPseeker annotations
+#' and,
 #'   when available, CpG island landscape and Fantom overlap.
 #'
 #' @seealso
-#' [ChIPseeker::annotatePeak()], [setMesaGenome()], [setMesaTxDb()], [setMesaAnnoDb()],
+#' [ChIPseeker::annotatePeak()], [setMesaGenome()], [setMesaTxDb()],
+#' [setMesaAnnoDb()],
 #' [qseaTableToChrGRanges()], [liftOverHg19()]
 #'
 #' @examples
@@ -347,7 +356,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
 #'   **Default:** none (must be supplied).
 #'
 #' @param aboveThreshold `logical(1)`.  
-#'   Keep windows with values `>= threshold` when `TRUE`; keep windows with values
+#' Keep windows with values `>= threshold` when `TRUE`; keep windows with values
 #'   `< threshold` when `FALSE`.  
 #'   **Default:** none (must be supplied).
 #'
@@ -357,7 +366,7 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
 #'   **Default:** `NULL`.
 #'
 #' @param normMethod `character(1)`.  
-#'   Normalisation/measure to evaluate. One of `"nrpm"`, `"beta"`, or `"counts"`.  
+#' Normalisation/measure to evaluate. One of `"nrpm"`, `"beta"`, or `"counts"`.
 #'   **Default:** `"nrpm"`.
 #'
 #' @param useGroupMeans `logical(1)`.  
@@ -418,7 +427,9 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
 #'   )
 #'
 #' @export
-subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, samples = NULL, normMethod = "nrpm", useGroupMeans = FALSE){
+subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold,
+                                  samples = NULL, normMethod = "nrpm",
+                                  useGroupMeans = FALSE) {
 
     fnName <- as.character(substitute(fn, env = environment()))
 
@@ -432,12 +443,19 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 
     samplesNotInQset <- setdiff(samples, qseaSamples)
 
-    if (length(samples) == 1 & length(samplesNotInQset) > 0 & is.character(samples)) {
+    if (length(samples) == 1 & length(samplesNotInQset) > 0 &
+        is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qseaSamples, samples)
-    message(glue::glue("Considering {length(samples)} sample{groupString}s containing \"{sampleNameString}\" in the name."))
-    } else if (length(samplesNotInQset) > 0 ) {
-    stop(glue::glue("Sample{groupString}(s) {paste0(samplesNotInQset, collapse = ', ')} not present in the qseaSet!"))
+    message(glue::glue(
+        "Considering {length(samples)} sample{groupString}s containing ",
+        "\"{sampleNameString}\" in the name."
+    ))
+    } else if (length(samplesNotInQset) > 0) {
+    stop(glue::glue(
+        "Sample{groupString}(s) ",
+        "{paste0(samplesNotInQset, collapse = ', ')} not present in the qseaSet!"
+    ))
     }
 
     if (is.null(samples)) {
@@ -450,13 +468,23 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     }
 
     if (!length(normMethod(normMethod)) == 1) {
-    stop(glue::glue("normMethod should be a single valid option for qsea::normMethod"))
+    stop(glue::glue(
+        "normMethod should be a single valid option for qsea::normMethod"
+    ))
     }
 
     if (!useGroupMeans) {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(sample_name %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
+    dataTable <- getDataTable(
+        qseaSet %>% dplyr::filter(sample_name %in% !!samples),
+        normMethod = normMethod,
+        useGroupMeans = useGroupMeans
+    )
     } else {
-    dataTable <- getDataTable(qseaSet %>% dplyr::filter(group %in% !!samples), normMethod = normMethod, useGroupMeans = useGroupMeans)
+    dataTable <- getDataTable(
+        qseaSet %>% dplyr::filter(group %in% !!samples),
+        normMethod = normMethod,
+        useGroupMeans = useGroupMeans
+    )
     }
 
     dataTable <- withCallingHandlers(
@@ -465,7 +493,10 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
         fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)
         ),
     warning = function(w) {
-        if (grepl("no non-missing arguments to .*; returning -Inf", conditionMessage(w))) {
+        if (grepl(
+            "no non-missing arguments to .*; returning -Inf",
+            conditionMessage(w)
+        )) {
         invokeRestart("muffleWarning")
         }
     }
@@ -479,7 +510,10 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
     keepString <- "below"
     }
 
-    message(glue::glue("Keeping {nrow(dataTable)} windows with {fnName} {keepString} {threshold} over {length(samples)} sample{groupString}s."))
+    message(glue::glue(
+        "Keeping {nrow(dataTable)} windows with {fnName} {keepString} ",
+        "{threshold} over {length(samples)} sample{groupString}s."
+    ))
 
     qseaSet <- filterByOverlaps(qseaSet, dataTable)
     return(qseaSet)
@@ -500,16 +534,17 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #'   Input object containing per-window read counts.
 #'
 #' @param keepAbove `logical(1)`.  
-#'   If `TRUE`, **keep** windows above background; if `FALSE`, **remove** them.  
+#' If `TRUE`, **keep** windows above background; if `FALSE`, **remove** them.
 #'   **Default:** `FALSE`.
 #'
 #' @param samples `character()` or `NULL`.  
-#'   Vector of sample names to test, or a single string used as a pattern matched
+#' Vector of sample names to test, or a single string used as a pattern matched
 #'   against sample names. If `NULL`, all samples are tested.  
 #'   **Default:** `NULL`.
 #'
 #' @param numWindows `integer(1)` or `NULL`.  
-#'   Total number of windows in the genome used to compute the expected background.
+#' Total number of windows in the genome used to compute the expected
+#' background.
 #'   If `NULL`, it will use all the windows currently in the qseaSet.
 #'   **Default:** `NULL`.
 #'
@@ -523,7 +558,8 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold, sample
 #'   **Default:** `1`.
 #'
 #' @details
-#' For each tested sample, an expected count per window is derived from its total
+#' For each tested sample, an expected count per window is derived from its
+#' total
 #' reads and the supplied/estimated `numWindows`, and a Poisson test is used to
 #' flag windows above background. This uses the `valid_fragments` column in the 
 #' library information attached to the qseaSet, which is the number of fragments
@@ -559,11 +595,15 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
     samplesNotInSet <- setdiff(samples, qsea::getSampleNames(qseaSet))
 
-    if (length(samples) == 1 & length(samplesNotInSet) > 0 & is.character(samples)) {
+    if (length(samples) == 1 & length(samplesNotInSet) > 0 &
+        is.character(samples)) {
     sampleNameString <- samples
     samples <- stringr::str_subset(qsea::getSampleNames(qseaSet), samples)
-    message(glue::glue("Filtering out {length(samples)} samples containing {sampleNameString} in the name."))
-    } else if (length(samplesNotInSet) > 0 ) {
+    message(glue::glue(
+        "Filtering out {length(samples)} samples containing ",
+        "{sampleNameString} in the name."
+    ))
+    } else if (length(samplesNotInSet) > 0) {
     stop(glue::glue("Sample {samplesNotInSet} not present in the qseaSet!
 
                     "))
@@ -573,7 +613,10 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
     samples <- qsea::getSampleNames(qseaSet)
     }
 
-    message(glue::glue("Removing windows with reads above background levels in {length(samples)} samples."))
+    message(glue::glue(
+        "Removing windows with reads above background levels in ",
+        "{length(samples)} samples."
+    ))
 
     countMat <- qseaSet %>%
     qsea::getCounts()
@@ -584,9 +627,15 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
     fdrMat <- purrr::map_dfc(samples,
                             function(x){
-                                totalNumReads <- qseaSet@libraries$file_name[x, "valid_fragments"]
+                                totalNumReads <- qseaSet@libraries$file_name[
+                                    x, "valid_fragments"
+                                ]
                                 lambda <- totalNumReads/numWindows
-                                pvals <- stats::ppois(countMat[,x] - 1, lambda, lower.tail = FALSE)
+                                pvals <- stats::ppois(
+                                    countMat[, x] - 1,
+                                    lambda,
+                                    lower.tail = FALSE
+                                )
                                 fdrvals <- stats::p.adjust(pvals, method = "fdr") %>%
                                 tibble::enframe(name = "window") %>%
                                 dplyr::rename(!!x := value) %>%
@@ -612,7 +661,10 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
     print(windowsToKeep)
 
-    message(glue::glue("Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on {length(samples)} samples, {length(windowsToKeep)} remaining"))
+    message(glue::glue(
+        "Removing {nrow(fdrMat) - length(windowsToKeep)} windows based on ",
+        "{length(samples)} samples, {length(windowsToKeep)} remaining"
+    ))
 
     return(filterByOverlaps(qseaSet, windowsToKeep))
 
@@ -711,7 +763,7 @@ downSample <- function(qseaSet, nReads){
 #'
 #' @param arrayDetails `character(1)` or `GRanges`.  
 #'   Either a recognised keyword (currently `"Infinium450k"`) or a `GRanges`
-#'   of probe loci with an `ID` metadata column of probe identifiers. Coordinates
+#' of probe loci with an `ID` metadata column of probe identifiers. Coordinates
 #'   must match the `qseaSet` genome (e.g., GRCh38).  
 #'   **Default:** `"Infinium450k"`.
 #'
@@ -788,7 +840,8 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'   `regionsToOverlap` (via [filterByOverlaps()]).
 #' The reported `fraction` is `afterOverBackNum / initialOverBackNum`.
 #'
-#' **Note:** despite the function name, this computes a **window-based** fraction
+#' **Note:** despite the function name, this computes a **window-based**
+#' fraction
 #' using a count threshold, not a direct fraction of raw reads.
 #'
 #' @param qseaSet `qseaSet`.  
@@ -796,7 +849,7 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 #'
 #' @param regionsToOverlap `GRanges` or `data.frame`.  
 #'   Regions to consider for overlap. Data frames must be coercible to `GRanges`
-#'   (e.g., have `seqnames`/`start`/`end` or `chr`/`window_start`/`window_end`).  
+#' (e.g., have `seqnames`/`start`/`end` or `chr`/`window_start`/`window_end`).
 #'   **Default:** none (must be supplied).
 #'
 #' @param numCountsNeeded `integer(1)`.  
@@ -885,7 +938,8 @@ calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCounts
 #'
 #' @details
 #' Intended for post-processing tables where column names encode the measure,
-#' e.g., `"sample_beta"`, `"group_beta_means"`. The function drops those suffixes
+#' e.g., `"sample_beta"`, `"group_beta_means"`. The function drops those
+#' suffixes
 #' to yield bare sample/group names, facilitating downstream joins and plotting.
 #'
 #' @seealso
@@ -940,7 +994,8 @@ removeNormMethodSuffix <- function(dataTable, normMethod) {
 #' The function builds a window × sample matrix over `GRanges` for the chosen
 #' `normMethod`, optionally restricts to `samples`, and counts, per sample, the
 #' number of windows with value `>= cutoff`. It also reports how many windows
-#' were evaluated (`totalWindowsUsed`). Results are joined with the sample table.
+#' were evaluated (`totalWindowsUsed`). Results are joined with the sample
+#' table.
 #'
 #' @return
 #' A tibble with one row per sample containing:
@@ -1203,7 +1258,7 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #'   **Default:** `FALSE`.
 #'
 #' @param minEnrichment `integer(1)`.  
-#'   Minimum reads per window required for a non-`NA` beta (below this threshold,
+#' Minimum reads per window required for a non-`NA` beta (below this threshold,
 #'   qsea sets beta to `NA`).  
 #'   **Default:** `3`.
 #'
@@ -1278,13 +1333,13 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #'   **Default:** none (must be supplied).
 #'
 #' @param regionsToOverlap `GRanges`, `data.frame`, or `NULL`.  
-#'   Regions used to restrict the windows before summarising. Data frames must be
+#' Regions used to restrict the windows before summarising. Data frames must be
 #'   coercible to `GRanges` (e.g., have `seqnames`/`start`/`end` or
-#'   `chr`/`window_start`/`window_end`). If `NULL`, use all windows in `qseaSet`.  
+#' `chr`/`window_start`/`window_end`). If `NULL`, use all windows in `qseaSet`.
 #'   **Default:** `NULL`.
 #'
 #' @param fn `function`.  
-#'   Summary function applied **column-wise per sample** over the selected windows
+#' Summary function applied **column-wise per sample** over the selected windows
 #'   (e.g., `mean`, `median`, `sd`). Provide NA handling inside `fn` if needed,
 #'   e.g., `function(x) mean(x, na.rm = TRUE)`.  
 #'   **Default:** `mean`.
@@ -1298,11 +1353,11 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #'   **Default:** `TRUE`.
 #'
 #' @param normMethod `character()`.  
-#'   One or more measures to summarise. Typically a subset of `c("nrpm","beta")`.  
+#' One or more measures to summarise. Typically a subset of `c("nrpm","beta")`.
 #'   **Default:** `c("nrpm","beta")`.
 #'
 #' @param naMethod `character(1)`.  
-#'   How to treat missing values prior to/within summarisation. Common choices:  
+#' How to treat missing values prior to/within summarisation. Common choices:
 #'   `"na.rm"` — call `fn` with `na.rm = TRUE` when supported;  
 #'   `"drop"`  — drop windows with any `NA` across the selected methods before
 #'   summarising.  
@@ -1319,16 +1374,19 @@ getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addM
 #'   **Default:** `NULL`.
 #'
 #' @details
-#' The function builds a window × sample matrix for each `normMethod`, optionally
+#' The function builds a window × sample matrix for each `normMethod`,
+#' optionally
 #' restricts to `regionsToOverlap`, then applies `fn` over windows for each
-#' sample to produce a single summary value per sample (per method). Missing-value
+#' sample to produce a single summary value per sample (per method).
+#' Missing-value
 #' handling follows `naMethod`. When summarising betas, windows below
 #' `minEnrichment` reads are `NA` prior to summarisation.
 #'
 #' @return
 #' A tibble with one row per sample. For each requested `normMethod`, a summary
 #' column is added (column naming typically reflects `<method>` and `fn` and may
-#' include `suffix`). If `addSampleTable = TRUE`, sample-table columns are joined.
+#' include `suffix`). If `addSampleTable = TRUE`, sample-table columns are
+#' joined.
 #'
 #' @seealso
 #' [addSummaryAcrossWindows()], [getDataTable()]
@@ -1440,9 +1498,9 @@ summariseAcrossWindows <- function(qseaSet,
 #'   **Default:** none (must be supplied).
 #'
 #' @param regionsToOverlap `GRanges`, `data.frame`, or `NULL`.  
-#'   Regions used to restrict the windows before summarising. Data frames must be
+#' Regions used to restrict the windows before summarising. Data frames must be
 #'   coercible to `GRanges` (e.g., have `seqnames`/`start`/`end` or
-#'   `chr`/`window_start`/`window_end`). If `NULL`, use all windows in `qseaSet`.  
+#' `chr`/`window_start`/`window_end`). If `NULL`, use all windows in `qseaSet`.
 #'   **Default:** `NULL`.
 #'
 #' @param fn `function`.  
@@ -1457,11 +1515,11 @@ summariseAcrossWindows <- function(qseaSet,
 #'   **Default:** `""`.
 #'
 #' @param normMethod `character()`.  
-#'   One or more measures to summarise. Typically a subset of `c("nrpm","beta")`.  
+#' One or more measures to summarise. Typically a subset of `c("nrpm","beta")`.
 #'   **Default:** `c("nrpm","beta")`.
 #'
 #' @param naMethod `character(1)`.  
-#'   How to treat missing values prior to/within summarisation. Supported values:
+#' How to treat missing values prior to/within summarisation. Supported values:
 #'   `"na.rm"` — call `fn` with `na.rm = TRUE` (when supported);  
 #'   `"drop"`  — drop windows with any `NA` across selected methods;  
 #'   `"impute"` — replace missing values via the package’s internal strategy
@@ -1584,7 +1642,8 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' When using beta, windows failing `minEnrichment` are treated as `NA` before
 #' summarisation.
 #' 
-#' This function requires a transcript database and OrgDb to annotate windows (via
+#' This function requires a transcript database and OrgDb to annotate windows
+#' (via
 #' [annotateWindows()]). Either:
 #' - set them globally with [setMesaGenome()] (recommended for GRCh38/hg38), or
 #' - provide compatible `TxDb`/`annoDb` packages yourself.
@@ -1690,7 +1749,7 @@ setMethod('getSampleNames', 'data.frame',function(object){stop("getSampleNames i
 #' in that group, preserving the current sample order.
 #'
 #' @param qseaSet `qseaSet`.  
-#'   Object providing the sample table (must contain `sample_name` and `group`).  
+#' Object providing the sample table (must contain `sample_name` and `group`).
 #'   **Default:** none (must be supplied).
 #'
 #' @return
@@ -1780,7 +1839,8 @@ getSampleGroups2 <- function(qseaSet){
 #' sample (or group), plus window metadata columns.
 #'
 #' @seealso
-#' [getCountTable()], [getNRPMTable()], [getBetaTable()], [removeNormMethodSuffix()]
+#' [getCountTable()], [getNRPMTable()], [getBetaTable()],
+#' [removeNormMethodSuffix()]
 #'
 #' @family table-helpers
 #'

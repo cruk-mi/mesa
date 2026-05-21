@@ -7,7 +7,8 @@
 \format{
 A \code{GRanges} object with 974 ranges and 1 metadata column:
 \describe{
-\item{Probe_ID}{Character cg identifier for the probe/locus (e.g., \code{"cg11733071"}).}
+\item{Probe_ID}{Character cg identifier for the probe/locus (e.g.,
+\code{"cg11733071"}).}
 }
 }
 \source{
@@ -17,22 +18,28 @@ Processed from public array resources following Edgar et al. (2014).
 hg38UltraStableProbes
 }
 \description{
-Genomic loci that are consistently methylated (“ultra-stable”) across many human tissues
-and diseases, mapped to GRCh38. Regions correspond to Illumina array probe loci
-(cg identifiers) derived as in Edgar et al. (2014), and are intended for QC and summary
+Genomic loci that are consistently methylated (“ultra-stable”) across many
+human tissues
+and diseases, mapped to GRCh38. Regions correspond to Illumina array probe
+loci
+(cg identifiers) derived as in Edgar et al. (2014), and are intended for QC
+and summary
 metrics (e.g., \code{\link[=addHyperStableFraction]{addHyperStableFraction()}}).
 }
 \details{
 \itemize{
-\item \strong{Seqnames:} numeric chromosomes \code{"1"}–\code{"22"} (no \code{"chr"} prefix; UCSC style
+\item \strong{Seqnames:} numeric chromosomes \code{"1"}–\code{"22"} (no \code{"chr"} prefix; UCSC
+style
 can be set if needed).
 \item \strong{Strand:} \code{"*"} for all ranges.
 \item \strong{Widths:} 3 bp windows (probe CpG ±1 bp).
-\item \strong{Genome metadata:} currently unset; set to \code{"hg38"} if you need an explicit
+\item \strong{Genome metadata:} currently unset; set to \code{"hg38"} if you need an
+explicit
 tag.
 }
 
-When combining with other \code{GRanges}, harmonise styles/metadata as needed, e.g.
+When combining with other \code{GRanges}, harmonise styles/metadata as needed,
+e.g.
 use \code{GenomeInfoDb::seqlevelsStyle()} to convert to \code{"UCSC"} (\code{"chr1"}, …) and
 \code{GenomeInfoDb::genome()} to set \code{"hg38"}.
 }
@@ -64,7 +71,8 @@ GenomicRanges::countOverlaps(toy_ucsc, gr) # after style harmonisation above
 }
 \references{
 Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
-\emph{Meta-analysis of human methylomes reveals stably methylated sequences surrounding CpG islands associated with high gene expression}.
+\emph{Meta-analysis of human methylomes reveals stably methylated sequences
+surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{

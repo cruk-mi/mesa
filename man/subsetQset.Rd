@@ -26,9 +26,9 @@ selected samples.
 }
 }
 \description{
-Restrict a \code{qseaSet} to a specified set of samples. All internal
-matrices and slots are subset consistently.
-Use exactly one of \code{samplesToKeep} or \code{samplesToDrop}.
+Restrict a \code{qseaSet} to a specified set of samples. All internal matrices and
+slots are subset consistently. Use exactly one of \code{samplesToKeep} or
+\code{samplesToDrop}.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

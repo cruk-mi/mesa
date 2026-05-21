@@ -1,6 +1,7 @@
 #' Convert a makeTable-like data frame to GRanges (UCSC style)
 #'
-#' Coerce a table of windows to a \link[GenomicRanges]{GRanges-class}. Two input layouts are
+#' Coerce a table of windows to a \link[GenomicRanges]{GRanges-class}. Two input
+#' layouts are
 #' supported:
 #' - `chr`, `window_start`, `window_end` (as in `qsea::makeTable()` output), or
 #' - `seqnames`, `start`, `end`.
@@ -78,12 +79,13 @@ qseaTableToChrGRanges <- function(dataTable) {
 #' window/region.
 #'
 #' @param x `qseaSet` **or** `GRanges` **or** `data.frame`.
-#'   If a data frame, it must be coercible to `GRanges` (accepted columns include
-#'   `seqnames/start/end`, or `chr/start/end`, or `chr/window_start/window_end`).
+#' If a data frame, it must be coercible to `GRanges` (accepted columns include
+#' `seqnames/start/end`, or `chr/start/end`, or `chr/window_start/window_end`).
 #'   **Default:** none (must be supplied).
 #'
 #' @details
-#' If `x` is a `qseaSet`, regions are taken from `qsea::getRegions(x)`. Otherwise
+#' If `x` is a `qseaSet`, regions are taken from `qsea::getRegions(x)`.
+#' Otherwise
 #' the input is coerced to `GRanges` (see [asValidGranges()]) and labels are
 #' constructed as `"seqnames:start-end"`.
 #'

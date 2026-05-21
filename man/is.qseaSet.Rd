@@ -11,7 +11,8 @@ is.qseaSet(x)
 Object to test.}
 }
 \value{
-\code{logical(1)}: \code{TRUE} if \code{x} inherits from class \code{"qseaSet"}, otherwise \code{FALSE}.
+\code{logical(1)}: \code{TRUE} if \code{x} inherits from class \code{"qseaSet"},
+otherwise \code{FALSE}.
 }
 \description{
 Predicate helper used in input validation and branching logic.
@@ -27,5 +28,5 @@ iris \%>\% is.qseaSet()
 
 }
 \seealso{
-\code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[base:class]{base::inherits()}}
+\code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[base:inherits]{base::inherits()}}
 }

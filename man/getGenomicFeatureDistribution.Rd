@@ -51,7 +51,8 @@ When using beta, windows failing \code{minEnrichment} are treated as \code{NA} b
 summarisation.
 }
 
-This function requires a transcript database and OrgDb to annotate windows (via
+This function requires a transcript database and OrgDb to annotate windows
+(via
 \code{\link[=annotateWindows]{annotateWindows()}}). Either:
 \itemize{
 \item set them globally with \code{\link[=setMesaGenome]{setMesaGenome()}} (recommended for GRCh38/hg38), or
@@ -80,7 +81,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
-Other annotation-summaries: 
-\code{\link{plotGenomicFeatureDistribution}()}
+Other annotation-summaries:
+\code{\link[=plotGenomicFeatureDistribution]{plotGenomicFeatureDistribution()}}
 }
 \concept{annotation-summaries}
