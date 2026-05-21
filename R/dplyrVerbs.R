@@ -206,8 +206,10 @@ mutate.qseaSet <- function(.data, ...) {
 #'     qsea::getSampleTable()
 #'
 #' @export
-left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE,
-                              suffix = c(".x", ".y"), keep = NULL, ...) {
+left_join.qseaSet <- function(
+    x, y, by = NULL, copy = FALSE,
+    suffix = c(".x", ".y"), keep = NULL, ...
+) {
 
     x@sampleTable <- x %>%
         qsea::getSampleTable() %>%

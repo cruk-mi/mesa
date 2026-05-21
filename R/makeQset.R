@@ -254,7 +254,10 @@ makeQset <- function(sampleTable,
     if (!is.null(fragmentType)) {
 
         if (!is.null(fragmentLength)) {
-            stop("Please specify one or the other of fragmentType and fragmentLength.")
+            stop(
+                "Please specify one or the other of fragmentType and ",
+                "fragmentLength."
+            )
         }
 
         if (fragmentType %in% c("Sheared", "sheared")) {
@@ -308,7 +311,8 @@ makeQset <- function(sampleTable,
         ))
     }
 
-    if ((!("input_file" %in% colnames(sampleTable))) & CNVmethod == "HMMdefault") {
+    if ((!("input_file" %in% colnames(sampleTable))) &
+        CNVmethod == "HMMdefault") {
         stop(
             "Input_file column needed in the sampleTable for calculating ",
             "Copy Number Variation (CNV), set CNVmethod = none to not call CNV."
@@ -339,15 +343,20 @@ makeQset <- function(sampleTable,
 
         if (stringr::str_detect(BSgenome, "UCSC") &&
             all(stringr::str_detect(chrSelect, "chr", negate = TRUE))) {
-            stop(glue::glue("UCSC genome requires 'chr' prefixes which were not found. \\
-            Add these or consider swapping to a BSgenome without 'chr', \\
-            e.g. BSgenome.Hsapiens.NCBI.GRCh38"))
+            stop(glue::glue(
+                "UCSC genome requires 'chr' prefixes which were not found.\n",
+                "Add these or consider swapping to a BSgenome without 'chr',\n",
+                "e.g. BSgenome.Hsapiens.NCBI.GRCh38"
+            ))
         }
 
         if (stringr::str_detect(BSgenome, "NCBI") &&
             all(stringr::str_detect(chrSelect, "chr"))) {
-            stop(glue::glue("NCBI genome does not use 'chr' prefixes. \\
-            Remove these or consider swapping to e.g. BSgenome.Hsapiens.UCSC.hg38"))
+            stop(glue::glue(
+                "NCBI genome does not use 'chr' prefixes.\n",
+                "Remove these or consider swapping to e.g. ",
+                "BSgenome.Hsapiens.UCSC.hg38"
+            ))
         }
 
         stop(glue::glue(
@@ -523,7 +532,8 @@ makeQset <- function(sampleTable,
 
         }
 
-        if (is.null(hmmCopyMap) && BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
+        if (is.null(hmmCopyMap) &&
+            BSgenome == "BSgenome.Hsapiens.NCBI.GRCh38") {
             if (CNVwindowSize == 1000000) {
                 hmmCopyMap <- map_hg38_1000kb
             } else if (CNVwindowSize == 500000) {

@@ -325,10 +325,10 @@ getDimRed <- function(qseaSet,
         if (length(
             plyranges::setdiff_ranges(dataTable, getWindows(qseaSet))
         ) > 0) {
-            stop(paste0(
+            stop(
                 "At least one window in dataTable does not have",
                 " a matching window in qseaSet."
-            ))
+            )
         }
 
         testSamples <- samples[seq_len(min(5, length(samples)))]
@@ -503,10 +503,10 @@ Initial number of windows = {initialNumWindows}."))
 
     if (length(topVarNum) > 1 &&
         !(length(topVarSamples) %in% c(1, length(topVarNum)))) {
-        stop(paste0(
+        stop(
             "If topVarSamples is a list and length(topVarNum) > 1,",
             " topVarSamples should be the same length as topVarNum."
-        ))
+        )
     }
 
 
@@ -944,10 +944,10 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL,
                     16, 4, 0, 17, 8, 9, 15,
                     13, 2, 18, 14, 3, 1, 5, 6, 10, 11, 12
                 ),
-                stop(paste0(
+                stop(
                     "`shapePalette` must be 'line-first', 'filled-first',",
                     " 'mixture', 'filled+border', numeric, or NULL."
-                ))
+                )
             )
             if (colourScaleType == "diverging") {
                 warning(glue::glue(
@@ -964,10 +964,10 @@ getShapeScale <- function(plotData, shape, shapePalette = NULL,
             ))
         }
     } else {
-        stop(paste0(
+        stop(
             "`shapePalette` must be 'line-first', 'filled-first',",
             " 'mixture', 'filled+border', numeric, or NULL."
-        ))
+        )
     }
 
     if (hasNA) {
@@ -1725,10 +1725,10 @@ plotDimRed <- function(object,
             dplyr::left_join(sampleTable, by = "sample_name")
 
         if (!is.null(colourPalette) & is.null(colour)) {
-            stop(paste0(
+            stop(
                 "`colourPalette` argument is non-NULL,",
                 " but `colour` argument is NULL."
-            ))
+            )
         }
 
         if (!is.null(shape) & length(shape) > 1) {

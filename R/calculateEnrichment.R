@@ -604,11 +604,11 @@ addMedipsEnrichmentFactors <- function(
         typeString <- "enriched"
     }
 
-    message(glue::glue(paste0(
-        "Adding Medips Enrichment factors to",
-        " {length(getSampleNames(qseaSet))} {typeString} samples,",
-        " using {nCores} cores."
-    )))
+    message(glue::glue(
+        "Adding Medips Enrichment factors to ",
+        "{length(getSampleNames(qseaSet))} {typeString} samples, ",
+        "using {nCores} cores."
+    ))
 
     if (!nonEnrich) {
         colsToCheck <- c(
@@ -617,11 +617,11 @@ addMedipsEnrichmentFactors <- function(
         )
 
         if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
-            stop(glue::glue(paste0(
+            stop(glue::glue(
                 "Column {colsToCheck[",
                 "colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))",
                 "]} already in sampleTable!"
-            )))
+            ))
         }
     } else {
         colsToCheck <- c(
@@ -630,11 +630,11 @@ addMedipsEnrichmentFactors <- function(
         )
 
         if (any(colsToCheck %in% colnames(qsea::getSampleTable(qseaSet)))) {
-            stop(glue::glue(paste0(
+            stop(glue::glue(
                 "Column {colsToCheck[",
                 "colsToCheck %in% colnames(qsea::getSampleTable(qseaSet))",
                 "]} already in sampleTable!"
-            )))
+            ))
         }
     }
 

@@ -238,17 +238,23 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
     for (i in seq_len(nrow(contrasts))) {
 
         conName <- paste0(
-            variable, contrasts[i, "group1"], "-", variable, contrasts[i, "group2"]
+            variable,
+            contrasts[i, "group1"],
+            "-",
+            variable,
+            contrasts[i, "group2"]
         )
 
-        if (!(contrasts[i, "group1"] %in% qsea::getSampleTable(qseaSet)[, variable])) {
+        if (!(contrasts[i, "group1"] %in%
+            qsea::getSampleTable(qseaSet)[, variable])) {
             stop(glue::glue(
                 "value {contrasts[i,]$group1} not found in column ",
                 "{variable} of the sampleTable!"
             ))
         }
 
-        if (!(contrasts[i, "group2"] %in% qsea::getSampleTable(qseaSet)[, variable])) {
+        if (!(contrasts[i, "group2"] %in%
+            qsea::getSampleTable(qseaSet)[, variable])) {
             stop(glue::glue(
                 "value {contrasts[i,]$group2} not found in column ",
                 "{variable} of the sampleTable!"
@@ -283,7 +289,10 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
                 verbose = FALSE
             ),
             message = function(m) {
-                if (stringr::str_detect(conditionMessage(m), quiet_substrings)) {
+                if (stringr::str_detect(
+                    conditionMessage(m),
+                    quiet_substrings
+                )) {
                     invokeRestart("muffleMessage")
                 }
             }
@@ -294,8 +303,11 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
             checkPVals) {
 
             if (is.null(covariates)) {
-                warning("More than 20% of windows have p-values of exactly 0, possibly something has gone wrong! \n
-            Set checkPVals = FALSE to ignore this.")
+                warning(
+                    "More than 20% of windows have p-values of exactly 0; ",
+                    "possibly something has gone wrong!\n",
+                    "Set checkPVals = FALSE to ignore this."
+                )
             } else {
 
                 stop(
@@ -674,14 +686,19 @@ calculateDMRs <- function(qseaSet,
         } else if (contrasts %in% c("First", "first")) {
             contrasts <- makeAllContrasts(qseaSet, variable)[1, ]
             message(glue::glue(
-                "Calculating the first possible contrast on the {variable} column."
+                "Calculating the first possible contrast on the ",
+                "{variable} column."
             ))
         } else if (stringr::str_detect(contrasts, "All_vs_|all_vs_")) {
 
             value2 <- contrasts %>% stringr::str_remove("All_vs_|all_vs_")
             contrasts <- tibble::tibble(
-                group1 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value2),
-                group2 = value2)
+                group1 = qseaSet %>%
+                    pull(variable) %>%
+                    unique() %>%
+                    setdiff(value2),
+                group2 = value2
+            )
             message(glue::glue(
                 "Calculating all ({nrow(contrasts)}) possible contrasts ",
                 "against {value2} on the {variable} column."
@@ -689,8 +706,13 @@ calculateDMRs <- function(qseaSet,
         } else if (stringr::str_detect(contrasts, "_vs_All")) {
 
             value1 <- contrasts %>% stringr::str_remove("_vs_All|_vs_all")
-            contrasts <- tibble::tibble(group1 = value1,
-                group2 = qseaSet %>% pull(variable) %>% unique() %>% setdiff(value1))
+            contrasts <- tibble::tibble(
+                group1 = value1,
+                group2 = qseaSet %>%
+                    pull(variable) %>%
+                    unique() %>%
+                    setdiff(value1)
+            )
             message(glue::glue(
                 "Calculating all ({nrow(contrasts)}) possible contrasts ",
                 "between {value1} and the rest of {variable} column."
