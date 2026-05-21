@@ -61,7 +61,9 @@ There are also two more optional fields that may be used during generation:
 * `gender` or `sex` : If one of these columns are included, then any chromosome
     called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for
     samples with `M`, `m` or `male` in this column. See the [qsea code for
-    details](https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54);
+    details](
+        https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54
+    );
     within the National Biomarker Centre we only consider the autosomes.
 
 In addition, any further metadata columns may be included as required, and we
@@ -84,10 +86,22 @@ recommend using the hg38/GRCh38 reference genome rather than hg19 as used here!
 
 ```{r chunk-2, eval = requireNamespace("MEDIPSData")}
 sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
-    "Normal1", "Normal1", "Normal", "Patient1", system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-    "Normal2", "Normal1", "Normal", "Patient2", system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-    "Tumour1", "Tumour1", "Tumour", "Patient1", system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-    "Tumour2", "Tumour2", "Tumour", "Patient2", system.file("extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)
+    "Normal1", "Normal1", "Normal", "Patient1", system.file(
+        "extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE
+    ),
+    "Normal2", "Normal1", "Normal", "Patient2", system.file(
+        "extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE
+    ),
+    "Tumour1", "Tumour1", "Tumour", "Patient1", system.file(
+        "extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE
+    ),
+    "Tumour2", "Tumour2", "Tumour", "Patient2", system.file(
+        "extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE
+    )
     )
 ```
 

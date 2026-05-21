@@ -210,7 +210,13 @@ allWindows <- exampleTumourNormal |>
 
 allWindows |>
     mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>
-    ggplot(aes(x = Tumour_vs_Normal_log2FC, y = -log(Tumour_vs_Normal_adjPval), col = significant)) +
+    ggplot(
+        aes(
+            x = Tumour_vs_Normal_log2FC,
+            y = -log(Tumour_vs_Normal_adjPval),
+            col = significant
+        )
+    ) +
     geom_point() +
     theme_bw() +
     labs(x = "Log2 Fold Change",
@@ -224,7 +230,13 @@ characterises windows that have clearly changed in levels of methylation.
 ```{r chunk-10}
 allWindows |>
     mutate(significant = (Tumour_vs_Normal_adjPval <= 0.05)) |>
-    ggplot(aes(x = Tumour_vs_Normal_deltaBeta, y = -log(Tumour_vs_Normal_adjPval), col = significant)) +
+    ggplot(
+        aes(
+            x = Tumour_vs_Normal_deltaBeta,
+            y = -log(Tumour_vs_Normal_adjPval),
+            col = significant
+        )
+    ) +
     geom_point() +
     theme_bw() +
     labs(x = "Difference in average Beta Values",
@@ -272,7 +284,9 @@ very large.
 
 ```{r chunk-12}
 annoDMRs |> 
-    dplyr::select(seqnames, start, end, distanceToTSS, ENSEMBL, SYMBOL, GENENAME)
+    dplyr::select(
+        seqnames, start, end, distanceToTSS, ENSEMBL, SYMBOL, GENENAME
+    )
 ```
 
 The `annotation` column gives a long-form explanation of the annotation for that
@@ -289,7 +303,9 @@ gene is, and which transcript is being used in the annotations.
 
 ```{r chunk-14}
 annoDMRs |> 
-    dplyr::select(geneChr, geneStart, geneEnd, geneLength, geneStrand, geneId, transcriptId)
+    dplyr::select(
+        geneChr, geneStart, geneEnd, geneLength, geneStrand, geneId, transcriptId
+    )
 ```
 
 Finally, for hg38, the function also returns several columns regarding whether
@@ -301,7 +317,9 @@ give how many of these that they overlap.
 
 ```{r chunk-15}
 annoDMRs |>
-    dplyr::select(seqnames, start, end, nIslands, nShore, nShelf, inFantom, landscape)
+    dplyr::select(
+        seqnames, start, end, nIslands, nShore, nShelf, inFantom, landscape
+    )
 ```
 
 This function works on any data frame with the columns `seqnames`, `start` and
@@ -390,7 +408,11 @@ This can be thresholded by the fold change, adjusted p value or the delta beta:
 
 ```{r chunk-21}
 allContrasts |>
-    summariseDMRsByContrast(FDRthres = 0.001, log2FCthres = 2, deltaBetaThres = 0.2)
+    summariseDMRsByContrast(
+        FDRthres = 0.001,
+        log2FCthres = 2,
+        deltaBetaThres = 0.2
+    )
 ```
 
 We also provide a function plot an [UpSet plot)](https://upset.app/]). These are
