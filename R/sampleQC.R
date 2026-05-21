@@ -166,7 +166,10 @@ getSampleQCSummary <- function(qseaSet) {
 
     qseaSet %>%
         qsea::getSampleTable() %>%
-        dplyr::select(sample_name, tidyselect::matches("valid_fragment|relH|hyperStable|ichorTumo")) %>%
+        dplyr::select(
+            sample_name,
+            tidyselect::matches("valid_fragment|relH|hyperStable|ichorTumo")
+        ) %>%
         dplyr::arrange(sample_name) %>%
         tibble::as_tibble() %>%
         return()

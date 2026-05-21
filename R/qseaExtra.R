@@ -2,7 +2,11 @@
 #' @keywords internal
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-    assign("getCGPositions", memoise::memoise(getCGPositions), envir = parent.env(environment()))
+    assign(
+        "getCGPositions",
+        memoise::memoise(getCGPositions),
+        envir = parent.env(environment())
+    )
 }
 
 #' Check whether an object is a qseaSet
@@ -323,7 +327,9 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
 
     if (!is.null(FantomRegionsGR)) {
         grAnno <- grAnno %>%
-            dplyr::mutate(inFantom = plyranges::count_overlaps(., FantomRegionsGR))
+            dplyr::mutate(
+                inFantom = plyranges::count_overlaps(., FantomRegionsGR)
+            )
     }
 
     dfAnno <- grAnno %>%
@@ -454,13 +460,16 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold,
     } else if (length(samplesNotInQset) > 0) {
     stop(glue::glue(
         "Sample{groupString}(s) ",
-        "{paste0(samplesNotInQset, collapse = ', ')} not present in the qseaSet!"
+        "{glue::glue_collapse(samplesNotInQset, sep = ', ')} not present in ",
+        "the qseaSet!"
     ))
     }
 
     if (is.null(samples)) {
     samples <- qseaSamples
-    message(glue::glue("Considering all {length(samples)} sample{groupString}s."))
+    message(glue::glue(
+        "Considering all {length(samples)} sample{groupString}s."
+    ))
     }
 
     if (length(samples) == 0) {
@@ -490,7 +499,12 @@ subsetWindowsBySignal <- function(qseaSet, fn, threshold, aboveThreshold,
     dataTable <- withCallingHandlers(
     dataTable %>%
         dplyr::mutate(
-        fnValue = apply(dplyr::pick(tidyselect::all_of(samples)), 1, fn, na.rm = TRUE)
+        fnValue = apply(
+            dplyr::pick(tidyselect::all_of(samples)),
+            1,
+            fn,
+            na.rm = TRUE
+        )
         ),
     warning = function(w) {
         if (grepl(
@@ -722,7 +736,10 @@ downSample <- function(qseaSet, nReads){
     counts <- qseaSet@count_matrix
 
     if (min(colSums(counts)) < nReads) {
-    stop(glue::glue("Number of reads requested is less than the minimum {min(colSums(counts))}."))
+    stop(glue::glue(
+        "Number of reads requested is less than the minimum ",
+        "{min(colSums(counts))}."
+    ))
     }
 
     message(glue::glue("Downsampling all samples to {nReads} each"))
@@ -733,8 +750,16 @@ downSample <- function(qseaSet, nReads){
         sample(rep(seq_along(vec), vec), replace = FALSE, size = nReads) %>%
             table() %>%
             tibble::enframe(name = "window") %>%
-            dplyr::mutate(window = as.integer(window), value = as.integer(value)) %>%
-            dplyr::left_join(tibble::tibble(window = seq_along(vec)),., copy = TRUE, by = "window") %>%
+            dplyr::mutate(
+                window = as.integer(window),
+                value = as.integer(value)
+            ) %>%
+            dplyr::left_join(
+                tibble::tibble(window = seq_along(vec)),
+                .,
+                copy = TRUE,
+                by = "window"
+            ) %>%
             dplyr::mutate(value = tidyr::replace_na(value,0)) %>%
             dplyr::select(value) %>%
             dplyr::rename(!!colname := value)
@@ -799,11 +824,16 @@ downSample <- function(qseaSet, nReads){
 #' @export
 convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
-    if(is.character(arrayDetails)){
-    if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38"){
+    if (is.character(arrayDetails)) {
+    if (arrayDetails == "Infinium450k" &
+        qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38") {
         arrayObject <- mesa::hg38_450kArrayGR
-    } else if(arrayDetails == "Infinium450k" & qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38"){
-        arrayObject <- mesa::hg38_450kArrayGR %>% tibble::as_tibble() %>% dplyr::mutate(seqnames = paste0("chr",seqnames)) %>% plyranges::as_granges()
+    } else if (arrayDetails == "Infinium450k" &
+        qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38") {
+        arrayObject <- mesa::hg38_450kArrayGR %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
+            plyranges::as_granges()
     }
     else {stop("Only Infinium450k implemented currently as a string.")}
 
@@ -816,7 +846,11 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
     }
 
     qseaSet %>%
-    qsea::makeTable(norm_methods = "beta", samples = qsea::getSampleNames(.), ROIs = arrayObject) %>%
+    qsea::makeTable(
+        norm_methods = "beta",
+        samples = qsea::getSampleNames(.),
+        ROIs = arrayObject
+    ) %>%
     dplyr::select(-tidyselect::matches("ROI_start|ROI_end|ROI_chr")) %>%
     dplyr::rename(ID = ROI_ID) %>%
     dplyr::select(ID, tidyselect::matches("beta")) %>%
@@ -960,7 +994,10 @@ calculateFractionReadsInGRanges <- function(qseaSet, regionsToOverlap, numCounts
 #'
 #' @export
 removeNormMethodSuffix <- function(dataTable, normMethod) {
-    dplyr::rename_with(dataTable, ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$")))
+    dplyr::rename_with(
+        dataTable,
+        ~ stringr::str_remove(.x, glue::glue("_{normMethod}(_means)?$"))
+    )
 }
 
 
@@ -1096,14 +1133,27 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
     #TODO: Rewrite to use getDataTable rather than makeTable.
 
     qseaSet %>%
-    qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
-    dplyr::rename_with(~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", ""))  %>%
+    qsea::makeTable(
+        samples = qsea::getSampleNames(.),
+        norm_methods = normMethod
+    ) %>%
+    dplyr::rename_with(
+        ~ stringr::str_replace_all(.x, "_nrpm$|_beta$|_counts$", "")
+    ) %>%
     dplyr::select(-CpG_density) %>%
-    tidyr::pivot_longer(-c(chr, window_start,window_end), names_to = "sample_name", values_to = "value") %>%
-    dplyr::mutate(chr = ifelse(stringr::str_detect(chr,"chr"), chr, paste0("chr",chr))) %>%
+    tidyr::pivot_longer(
+        -c(chr, window_start, window_end),
+        names_to = "sample_name",
+        values_to = "value"
+    ) %>%
+    dplyr::mutate(
+        chr = ifelse(stringr::str_detect(chr, "chr"), chr, paste0("chr", chr))
+    ) %>%
     tidyr::unite(col = "window", chr, window_start, window_end) %>%
     tidyr::pivot_wider(names_from = window, values_from = value) %>%
-    dplyr::left_join(qsea::getSampleTable(qseaSet) %>% dplyr::select(sample_name, ...)) %>%
+    dplyr::left_join(
+        qsea::getSampleTable(qseaSet) %>% dplyr::select(sample_name, ...)
+    ) %>%
     dplyr::relocate(tidyselect::matches("^chr"), .after = tidyselect::last_col())
 
 }
@@ -1164,7 +1214,8 @@ makeTransposedTable <- function(qseaSet, normMethod = "nrpm", ...){
 #'
 #' @rdname getCountTable
 #' @export
-getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
+getCountTable <- function(qseaSet, useGroupMeans = FALSE,
+                          addMethodSuffix = FALSE, verbose = TRUE) {
     tab <- qseaSet %>% 
     getDataTable(normMethod = "counts", 
                     useGroupMeans = useGroupMeans, 
@@ -1231,7 +1282,8 @@ getCountTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALS
 #'
 #' @rdname getNRPMTable
 #' @export
-getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE, verbose = TRUE){
+getNRPMTable <- function(qseaSet, useGroupMeans = FALSE,
+                         addMethodSuffix = FALSE, verbose = TRUE) {
     tab <- qseaSet %>% 
     getDataTable(normMethod = "nrpm", 
                     useGroupMeans = useGroupMeans, 
@@ -1311,7 +1363,8 @@ getNRPMTable <- function(qseaSet, useGroupMeans = FALSE, addMethodSuffix = FALSE
 #'
 #' @rdname getBetaTable
 #' @export
-getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE){
+getBetaTable <- function(qseaSet, useGroupMeans = FALSE, minEnrichment = 3,
+                         addMethodSuffix = FALSE, verbose = TRUE) {
     tab <- qseaSet %>% 
         getDataTable(normMethod = "beta", 
                     useGroupMeans = useGroupMeans, 

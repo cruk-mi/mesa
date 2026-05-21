@@ -318,7 +318,11 @@ asValidGranges <- function(object) {
             colnames(object), c("chr", "window_start", "window_end")
         )) == 3) {
             return(object %>%
-                dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
+                dplyr::rename(
+                    seqnames = chr,
+                    start = window_start,
+                    end = window_end
+                ) %>%
                 plyranges::as_granges())
         } else {
             stop(
