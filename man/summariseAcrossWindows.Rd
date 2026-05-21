@@ -65,7 +65,8 @@ from \code{fn}.
 \value{
 A tibble with one row per sample. For each requested \code{normMethod}, a summary
 column is added (column naming typically reflects \verb{<method>} and \code{fn} and may
-include \code{suffix}). If \code{addSampleTable = TRUE}, sample-table columns are joined.
+include \code{suffix}). If \code{addSampleTable = TRUE}, sample-table columns are
+joined.
 }
 \description{
 Apply a summary function (e.g., mean, median, sd) over genomic windows
@@ -73,9 +74,11 @@ per sample, optionally restricted to a set of regions and for one or more
 normalisation methods.
 }
 \details{
-The function builds a window × sample matrix for each \code{normMethod}, optionally
+The function builds a window × sample matrix for each \code{normMethod},
+optionally
 restricts to \code{regionsToOverlap}, then applies \code{fn} over windows for each
-sample to produce a single summary value per sample (per method). Missing-value
+sample to produce a single summary value per sample (per method).
+Missing-value
 handling follows \code{naMethod}. When summarising betas, windows below
 \code{minEnrichment} reads are \code{NA} prior to summarisation.
 }
@@ -110,8 +113,8 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
-Other window-summaries: 
-\code{\link{addSummaryAcrossWindows}()},
-\code{\link{countWindowsAboveCutoff}()}
+Other window-summaries:
+\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}},
+\code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
 }
 \concept{window-summaries}

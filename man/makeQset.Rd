@@ -182,7 +182,8 @@ sequences for tiling windows.
 \strong{Windows & blacklist}
 \itemize{
 \item Chromosomes in \code{chrSelect} are tiled into non-overlapping windows of size
-\code{windowSize} (bp). Windows overlapping \code{badRegions} (if provided) are removed.
+\code{windowSize} (bp). Windows overlapping \code{badRegions} (if provided) are
+removed.
 }
 
 \strong{Coverage loading}
@@ -192,14 +193,16 @@ high-MAPQ R1 singletons; governed by \code{minMapQual}, \code{minInsertSize},
 \code{maxInsertSize}, \code{properPairsOnly}, \code{minReferenceLength}.
 \item \code{coverageMethod = "qseaPaired"} delegates to \code{\link[qsea:addCoverage]{qsea::addCoverage()}} with
 paired settings.
-\item \code{fragmentType} can set defaults for \code{fragmentLength}/\code{fragmentSD} (\code{"Sheared"}
+\item \code{fragmentType} can set defaults for \code{fragmentLength}/\code{fragmentSD}
+(\code{"Sheared"}
 or \code{"cfDNA"}); otherwise supply both explicitly.
 }
 
 \strong{CNV options}
 \itemize{
 \item \code{"qseaInput"}: run \code{\link[qsea:addCNV]{qsea::addCNV()}} using \code{input_file} BAMs.
-\item \code{"HMMdefault"}: use mesa's \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} with supplied defaults for GRCh38
+\item \code{"HMMdefault"}: use mesa's \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} with supplied defaults for
+GRCh38
 GC/mappability tracks (objects like \code{gc_hg38_1000kb}, \code{map_hg38_1000kb},
 chosen by \code{CNVwindowSize}).
 \item \code{"MeCap"}: estimate CNV from MeCap BAMs (\code{file_name}).
@@ -209,7 +212,8 @@ chosen by \code{CNVwindowSize}).
 \strong{Parallelisation}
 \itemize{
 \item If \code{parallel = TRUE}, computation uses the currently registered
-BiocParallel backend (see \code{\link[BiocParallel:register]{BiocParallel::register()}}); otherwise runs serially.
+BiocParallel backend (see \code{\link[BiocParallel:register]{BiocParallel::register()}}); otherwise runs
+serially.
 Use \code{setMesaParallel()} to toggle package-wide.
 }
 

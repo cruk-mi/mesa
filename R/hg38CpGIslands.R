@@ -1,6 +1,7 @@
 #' CpG islands for hg38.
 #'
-#' A GRanges object containing CpG islands in hg38 coordinates. Generated from http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cpgIslandExt.txt.gz
+#' A GRanges object containing CpG islands in hg38 coordinates. Generated from
+#' http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cpgIslandExt.txt.gz
 #'
 #' @format A GRanges object with 31144 ranges and 7 metadata columns:
 #' \describe{

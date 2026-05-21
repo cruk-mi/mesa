@@ -35,7 +35,7 @@ For each sample, compute the proportion of \strong{windows} with counts
 windows with counts \verb{>= numCountsNeeded} in that sample.
 }
 \details{
-Operates on the window × sample count matrix from \code{\link[qsea:qseaSet-class]{qsea::getCounts()}}.
+Operates on the window × sample count matrix from \code{\link[qsea:getCounts]{qsea::getCounts()}}.
 Counts are converted to a logical indicator (count \verb{>= numCountsNeeded})
 and summed per sample:
 \itemize{
@@ -45,7 +45,8 @@ and summed per sample:
 The reported \code{fraction} is \code{afterOverBackNum / initialOverBackNum}.
 }
 
-\strong{Note:} despite the function name, this computes a \strong{window-based} fraction
+\strong{Note:} despite the function name, this computes a \strong{window-based}
+fraction
 using a count threshold, not a direct fraction of raw reads.
 }
 \examples{
@@ -72,13 +73,13 @@ calculateFractionReadsInGRanges(
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getCounts()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}},
+\code{\link[qsea:getCounts]{qsea::getCounts()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}},
 \link{hg38CpGIslands}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
 
-Other window-helpers: 
-\code{\link{convertToArrayBetaTable}()},
-\code{\link{downSample}()},
-\code{\link{subsetWindowsBySignal}()},
-\code{\link{subsetWindowsOverBackground}()}
+Other window-helpers:
+\code{\link[=convertToArrayBetaTable]{convertToArrayBetaTable()}},
+\code{\link[=downSample]{downSample()}},
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}},
+\code{\link[=subsetWindowsOverBackground]{subsetWindowsOverBackground()}}
 }
 \concept{window-helpers}

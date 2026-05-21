@@ -24,14 +24,14 @@ If \code{TRUE}, enforce identical global parameters across inputs.
 \strong{Default:} \code{FALSE}.}
 
 \item{regionsToKeep}{\code{GRanges} or coercible
-If supplied, restrict both \code{qseaSet1} and \code{qseaSet2} to these genomic
-regions before combining. Accepts a \code{GRanges} or a data frame with
-\code{seqnames}, \code{start}, \code{end}.
+If supplied, restrict both \code{qseaSet1} and \code{qseaSet2} to these genomic regions
+before combining. Accepts a \code{GRanges} or a data frame with \code{seqnames},
+\code{start}, \code{end}.
 \strong{Default:} \code{NULL}.}
 
 \item{dropDuplicates}{\code{logical(1)}
-If \code{TRUE}, drop duplicate sample names. If \code{FALSE}, duplicates are
-retained but renamed with suffix \code{"_Dup"}.
+If \code{TRUE}, drop duplicate sample names. If \code{FALSE}, duplicates are retained
+but renamed with suffix \code{"_Dup"}.
 \strong{Default:} \code{FALSE}.}
 }
 \value{

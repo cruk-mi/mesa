@@ -19,9 +19,9 @@ A \code{qseaSet} object:
 }
 \description{
 Append library information to the \code{sampleTable} of a \code{qseaSet}. Columns are
-taken from \code{qseaSet@libraries$file_name}, and when available,
-from \code{qseaSet@libraries$input_file} (prefixed with \code{"input_"}). Existing
-columns are not duplicated.
+taken from \code{qseaSet@libraries$file_name}, and when available, from
+\code{qseaSet@libraries$input_file} (prefixed with \code{"input_"}). Existing columns
+are not duplicated.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

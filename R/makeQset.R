@@ -13,7 +13,8 @@
 #'   - `group` (string label).
 #'   If the selected `CNVmethod` uses inputs (`"HMMdefault"`, `"qseaInput"`),
 #'   also include `input_file` (path to matched Input BAM).
-#' - BAMs should be coordinate-sorted. For paired data, running `samtools fixmate`
+#' - BAMs should be coordinate-sorted. For paired data, running `samtools
+#' fixmate`
 #'   is recommended so MAPQ tags are available (see `minMapQual` note below).
 #' - `BSgenome` must be an installed genome package string (e.g.
 #'   `"BSgenome.Hsapiens.NCBI.GRCh38"`), which provides chromosome lengths and
@@ -21,7 +22,8 @@
 #'
 #' **Windows & blacklist**
 #' - Chromosomes in `chrSelect` are tiled into non-overlapping windows of size
-#'   `windowSize` (bp). Windows overlapping `badRegions` (if provided) are removed.
+#' `windowSize` (bp). Windows overlapping `badRegions` (if provided) are
+#' removed.
 #'
 #' **Coverage loading**
 #' - `coverageMethod = "PairedAndR1s"` loads proper pairs and, optionally,
@@ -29,12 +31,14 @@
 #'   `maxInsertSize`, `properPairsOnly`, `minReferenceLength`.
 #' - `coverageMethod = "qseaPaired"` delegates to [qsea::addCoverage()] with
 #'   paired settings.
-#' - `fragmentType` can set defaults for `fragmentLength`/`fragmentSD` (`"Sheared"`
+#' - `fragmentType` can set defaults for `fragmentLength`/`fragmentSD`
+#' (`"Sheared"`
 #'   or `"cfDNA"`); otherwise supply both explicitly.
 #'
 #' **CNV options**
 #' - `"qseaInput"`: run [qsea::addCNV()] using `input_file` BAMs.
-#' - `"HMMdefault"`: use mesa's [addHMMcopyCNV()] with supplied defaults for GRCh38
+#' - `"HMMdefault"`: use mesa's [addHMMcopyCNV()] with supplied defaults for
+#' GRCh38
 #'   GC/mappability tracks (objects like `gc_hg38_1000kb`, `map_hg38_1000kb`,
 #'   chosen by `CNVwindowSize`).
 #' - `"MeCap"`: estimate CNV from MeCap BAMs (`file_name`).
@@ -42,7 +46,8 @@
 #'
 #' **Parallelisation**
 #' - If `parallel = TRUE`, computation uses the currently registered
-#'   BiocParallel backend (see [BiocParallel::register()]); otherwise runs serially.
+#' BiocParallel backend (see [BiocParallel::register()]); otherwise runs
+#' serially.
 #'   Use `setMesaParallel()` to toggle package-wide.
 #'
 #' **Additional processing**
@@ -73,7 +78,7 @@
 #'   **Default:** `1e6`.
 #'
 #' @param fragmentType `character(1)` or `NULL`.
-#'   If `"Sheared"` or `"cfDNA"`, sets defaults for `fragmentLength`/`fragmentSD`;
+#' If `"Sheared"` or `"cfDNA"`, sets defaults for `fragmentLength`/`fragmentSD`;
 #'   otherwise both must be supplied explicitly.
 #'   **Default:** `NULL`.
 #'
@@ -336,7 +341,8 @@ makeQset <- function(sampleTable,
     # number of windows of size windowSize on each chromosome
     numWindows <- floor(chrLength / windowSize)
 
-    # starting point of each window on each chromosome, then make a GRanges object with all those windows
+    # starting point of each window on each chromosome, then make a GRanges
+    # object with all those windows
     windowStart <- unlist(lapply(FUN = seq, X = chrLength - windowSize + 1,
         from = 1, by = windowSize), FALSE, FALSE)
 
@@ -355,7 +361,8 @@ makeQset <- function(sampleTable,
         sum(BiocGenerics::width(windowsWithoutBlacklist))
     )
 
-    # make the initial Qsea object, with the reduced set of windows, using the sampleTable
+    # make the initial Qsea object, with the reduced set of windows, using the
+    # sampleTable
     qseaSet <- qsea::createQseaSet(sampleTable = sampleTable,
         BSgenome = BSgenome,
         chr.select = chrSelect,
@@ -416,7 +423,8 @@ makeQset <- function(sampleTable,
 
     if (CNVmethod == "qseaInput") {
 
-        # calculate the CNV, using the input files included in the sampleTable CSV.
+        # calculate the CNV, using the input files included in the sampleTable
+        # CSV.
         # uses HMMCopy behind the scenes
         # note that apparently if you give any samples
         # with normal or control in the name it will try
@@ -555,14 +563,16 @@ makeQset <- function(sampleTable,
             MeDIP = TRUE
         )
 
-        # qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores = ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
+        # qseaSet <- addMedipsEnrichmentFactors(qseaSet, nCores =
+        # ifelse(parallel, BiocParallel::bpworkers(), 1), nonEnrich = TRUE)
 
 
     } else if (CNVmethod == "None") {
         message("No CNV being calculated")
     }
 
-    # calculate the average CG density across the genome. Does not use the reads at all.
+    # calculate the average CG density across the genome. Does not use the reads
+    # at all.
     qseaSet <- qsea::addPatternDensity(qseaSet,
         pattern = "CG",
         name = "CpG",

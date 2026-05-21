@@ -7,20 +7,20 @@
 #' computation.
 #'
 #' @param qseaSet `qseaSet`
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' A qseaSet object containing methylation-enriched sequencing data.
 #'
 #' @param regionsToOverlap `GRanges` or `data.frame`
-#'   Genomic regions used for filtering. If a `data.frame`, it must contain
-#'   columns `seqnames` (`character()`), `start` (`integer()`), and `end`
-#'   (`integer()`); the object is coerced internally to a `GRanges`.
+#' Genomic regions used for filtering. If a `data.frame`, it must contain
+#' columns `seqnames` (`character()`), `start` (`integer()`), and `end`
+#' (`integer()`); the object is coerced internally to a `GRanges`.
 #'
 #' @return A `qseaSet` object:
 #'
 #' * **filterByOverlaps()**: returns the input `qseaSet` restricted to
-#'   windows that **overlap** `regionsToOverlap`.
+#' windows that **overlap** `regionsToOverlap`.
 #'
 #' * **filterByNonOverlaps()**: returns the input `qseaSet` restricted to
-#'   windows that **do not overlap** `regionsToOverlap`.
+#' windows that **do not overlap** `regionsToOverlap`.
 #'
 #' @details
 #' Chromosome naming is aligned using [`GenomeInfoDb::seqlevelsStyle()`] so that
@@ -159,17 +159,17 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
 #' Add library metrics to the qseaSet sample table
 #'
 #' Append library information to the `sampleTable` of a `qseaSet`. Columns are
-#' taken from `qseaSet@libraries$file_name`, and when available,
-#' from `qseaSet@libraries$input_file` (prefixed with `"input_"`). Existing
-#' columns are not duplicated.
+#' taken from `qseaSet@libraries$file_name`, and when available, from
+#' `qseaSet@libraries$input_file` (prefixed with `"input_"`). Existing columns
+#' are not duplicated.
 #'
 #' @param qseaSet `qseaSet`
-#'   A qseaSet object containing sequencing data.
+#' A qseaSet object containing sequencing data.
 #'
 #' @return A `qseaSet` object:
 #'
 #' * **addLibraryInformation()**: returns the same `qseaSet` with its
-#'   `sampleTable` augmented by library-level columns.
+#' `sampleTable` augmented by library-level columns.
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
@@ -209,25 +209,25 @@ addLibraryInformation <- function(qseaSet) {
 
 #' Subset a qseaSet by samples
 #'
-#' Restrict a `qseaSet` to a specified set of samples. All internal
-#' matrices and slots are subset consistently.
-#' Use exactly one of `samplesToKeep` or `samplesToDrop`.
+#' Restrict a `qseaSet` to a specified set of samples. All internal matrices and
+#' slots are subset consistently. Use exactly one of `samplesToKeep` or
+#' `samplesToDrop`.
 #'
 #' @param qseaSet `qseaSet`
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' A qseaSet object containing methylation-enriched sequencing data.
 #'
 #' @param samplesToKeep `character()`
-#'   Names of samples to retain. Cannot be used together with `samplesToDrop`.
+#' Names of samples to retain. Cannot be used together with `samplesToDrop`.
 #'   **Default:** `NULL`.
 #'
 #' @param samplesToDrop `character()`
-#'   Names of samples to remove. Cannot be used together with `samplesToKeep`.
+#' Names of samples to remove. Cannot be used together with `samplesToKeep`.
 #'   **Default:** `NULL`.
 #'
 #' @return A `qseaSet` object:
 #'
 #' * **subsetQset()**: returns the input `qseaSet` restricted to the
-#'   selected samples.
+#' selected samples.
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
@@ -291,19 +291,19 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL) {
 #' and the `sampleTable`).
 #'
 #' @param qseaSet `qseaSet`
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' A qseaSet object containing methylation-enriched sequencing data.
 #'
 #' @param pattern `character(1)`
-#'   Regular expression used to match substrings in sample names.
+#' Regular expression used to match substrings in sample names.
 #'
 #' @param replacement `character(1)`
-#'   String to replace matches of `pattern`. Defaults to `""` (empty string).
+#' String to replace matches of `pattern`. Defaults to `""` (empty string).
 #'
 #' @return A `qseaSet` object:
 #'
 #' * **renameQsetNames()**: returns the input `qseaSet` with sample names
-#'   updated according to `pattern` and `replacement`. All dependent slots
-#'   are updated consistently.
+#' updated according to `pattern` and `replacement`. All dependent slots are
+#' updated consistently.
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
@@ -400,21 +400,21 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' new `qseaSet` with pooled samples and updated metadata.
 #'
 #' @param qseaSet `qseaSet`
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' A qseaSet object containing methylation-enriched sequencing data.
 #'
 #' @param mergeString `character(1)`
-#'   Regular expression used to remove the **suffix** that distinguishes samples
-#'   to be merged. The remaining prefix becomes the pooled sample name. After
-#'   removal, pooled names are matched using `startsWith()`.
-#'   For example, with names like `"Patient1_T"` and `"Patient1_N"`, use
-#'   `mergeString = "_[TN]$"` to pool them into `"Patient1"`.
+#' Regular expression used to remove the **suffix** that distinguishes samples
+#' to be merged. The remaining prefix becomes the pooled sample name. After
+#' removal, pooled names are matched using `startsWith()`. For example, with
+#' names like `"Patient1_T"` and `"Patient1_N"`, use `mergeString = "_[TN]$"` to
+#' pool them into `"Patient1"`.
 #'
 #' @return A `qseaSet` object:
 #'
 #' * **poolSamples()**: returns a new `qseaSet` where samples with names sharing
-#'   a common prefix (after applying `mergeString`) are merged. Counts are summed,
-#'   CNV and zygosity values are combined using weighted averages, and library
-#'   statistics are aggregated.
+#' a common prefix (after applying `mergeString`) are merged. Counts are summed,
+#' CNV and zygosity values are combined using weighted averages, and library
+#' statistics are aggregated.
 #'
 #' @details
 #' Internally, pooled counts are simple sums. CNV values and zygosity are
@@ -597,18 +597,18 @@ poolSamples <- function(qseaSet, mergeString) {
 #' `sampleTable` of a `qseaSet`, updating all dependent slots consistently.
 #'
 #' @param qseaSet `qseaSet`
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' A qseaSet object containing methylation-enriched sequencing data.
 #'
 #' @param newNameColumn `character(1)`
-#'   The name of a column in the `sampleTable` containing new sample names.
-#'   Values must be unique and contain no `NA`s.
-#'   (Unquoted column names are supported via tidy evaluation.)
+#' The name of a column in the `sampleTable` containing new sample names. Values
+#' must be unique and contain no `NA`s. (Unquoted column names are supported via
+#' tidy evaluation.)
 #'
 #' @return A `qseaSet` object:
 #'
 #' * **renameSamples()**: returns the input `qseaSet` with sample names replaced
-#'   by values from `newNameColumn`. All associated slots are updated to reflect
-#'   the new naming.
+#' by values from `newNameColumn`. All associated slots are updated to reflect
+#' the new naming.
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")

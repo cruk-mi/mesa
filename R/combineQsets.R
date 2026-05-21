@@ -5,24 +5,24 @@
 #' [combineQsetsList()].
 #'
 #' @param qseaSet1 `qseaSet` or `character(1)`
-#'   Either a `qseaSet` object, or path to an `.rds` file containing one.
+#' Either a `qseaSet` object, or path to an `.rds` file containing one.
 #'
 #' @param qseaSet2 `qseaSet` or `character(1)`
-#'   Either a `qseaSet` object, or path to an `.rds` file containing one.
+#' Either a `qseaSet` object, or path to an `.rds` file containing one.
 #'
 #' @param checkParams `logical(1)`
-#'   If `TRUE`, enforce identical global parameters across inputs.
+#' If `TRUE`, enforce identical global parameters across inputs.
 #'   **Default:** `FALSE`.
 #'
 #' @param regionsToKeep `GRanges` or coercible
-#'   If supplied, restrict both `qseaSet1` and `qseaSet2` to these genomic
-#'   regions before combining. Accepts a `GRanges` or a data frame with
-#'   `seqnames`, `start`, `end`.
+#' If supplied, restrict both `qseaSet1` and `qseaSet2` to these genomic regions
+#' before combining. Accepts a `GRanges` or a data frame with `seqnames`,
+#' `start`, `end`.
 #'   **Default:** `NULL`.
 #'
 #' @param dropDuplicates `logical(1)`
-#'   If `TRUE`, drop duplicate sample names. If `FALSE`, duplicates are
-#'   retained but renamed with suffix `"_Dup"`.
+#' If `TRUE`, drop duplicate sample names. If `FALSE`, duplicates are retained
+#' but renamed with suffix `"_Dup"`.
 #'   **Default:** `FALSE`.
 #'
 #' @return A `qseaSet` object containing:
@@ -135,7 +135,9 @@ combineQsets <- function(
     if (!identical(slots1, slots2)) {
         stop("Objects have different slots!")
     }
-    # if (!identical(qseaSet1@parameters, qseaSet2@parameters)) {stop("Parameters are not the same, use checkParams = FALSE to combine anyway.")}
+    # if (!identical(qseaSet1@parameters, qseaSet2@parameters))
+    # {stop("Parameters are not the same, use checkParams = FALSE to combine
+    # anyway.")}
 
     parameters1 <- tibble::as_tibble(qseaSet1@parameters) %>%
         dplyr::select(order(colnames(.)))
@@ -171,7 +173,8 @@ combineQsets <- function(
                 regions1 %>% plyranges::filter_by_overlaps(regions2)
             )
 
-        ## TODO Check intersection properly to make sure they are exactly start/end together
+        ## TODO Check intersection properly to make sure they are exactly
+        #start/end together
         message(glue::glue(paste0(
             "Regions are not identical:",
             " {length(regions1)} and {length(regions2)} regions.\n",
@@ -278,27 +281,27 @@ combineQsets <- function(
 #' tumour/normal, multiple runs) and need to be combined into one container.
 #'
 #' @param qseaSets `list`
-#'   List of `qseaSet` objects, or `character()` paths to `.rds` files
-#'   containing `qseaSet` objects. **Default:** none (must be supplied).
+#' List of `qseaSet` objects, or `character()` paths to `.rds` files containing
+#' `qseaSet` objects. **Default:** none (must be supplied).
 #'
 #' @param firstQset `qseaSet` or `character(1)`
-#'   Optional initial `qseaSet` to merge into. If a `character(1)` ending in
-#'   `.rds`, it is loaded via [readr::read_rds()].
+#' Optional initial `qseaSet` to merge into. If a `character(1)` ending in
+#' `.rds`, it is loaded via [readr::read_rds()].
 #'   **Default:** `NULL`.
 #'
 #' @param dropDuplicates `logical(1)`
-#'   If `TRUE`, drop samples with duplicated names across inputs. If `FALSE`,
-#'   duplicates are renamed by appending `"_Dup"`.
+#' If `TRUE`, drop samples with duplicated names across inputs. If `FALSE`,
+#' duplicates are renamed by appending `"_Dup"`.
 #'   **Default:** `TRUE`.
 #'
 #' @param checkParams `logical(1)`
-#'   Verify that global parameters are identical across inputs.
+#' Verify that global parameters are identical across inputs.
 #'   **Default:** `TRUE`.
 #'
 #' @param regionsToKeep `GRanges` or coercible
-#'   If supplied, restrict each `qseaSet` to these genomic regions *before*
-#'   combining (saves memory). Accepts `GRanges` or a data frame with
-#'   `seqnames`, `start`, `end`.
+#' If supplied, restrict each `qseaSet` to these genomic regions *before*
+#' combining (saves memory). Accepts `GRanges` or a data frame with `seqnames`,
+#' `start`, `end`.
 #'   **Default:** `NULL` (keep all regions).
 #'
 #' @return A `qseaSet` object:
@@ -308,7 +311,7 @@ combineQsets <- function(
 #' * **Regions** optionally prefiltered by `regionsToKeep` prior to merge.
 #'
 #' @seealso
-#'   [combineQsets()] for pairwise merging.
+#' [combineQsets()] for pairwise merging.
 #'
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")

@@ -8,8 +8,8 @@ setMesaGenome(genome)
 }
 \arguments{
 \item{genome}{\code{character(1)} or \code{NULL}.
-Genome identifier to store (typically \code{"hg38"} or \code{"GRCh38"}).
-Use \code{NULL} to clear the setting.
+Genome identifier to store (typically \code{"hg38"} or \code{"GRCh38"}). Use \code{NULL} to
+clear the setting.
 \strong{Default:} none (must be supplied).}
 }
 \value{
@@ -21,8 +21,8 @@ options so that functions like \code{\link[=annotateWindows]{annotateWindows()}}
 is not explicitly supplied.
 }
 \details{
-This function sets the session option \verb{options(mesa_genome = <genome>)}.
-It \strong{does not} modify TxDb or OrgDb options directly; set those via
+This function sets the session option \verb{options(mesa_genome = <genome>)}. It
+\strong{does not} modify TxDb or OrgDb options directly; set those via
 \code{\link[=setMesaTxDb]{setMesaTxDb()}} and \code{\link[=setMesaAnnoDb]{setMesaAnnoDb()}} if you want global defaults for
 transcript and gene annotation packages. Helpers such as \code{\link[=annotateWindows]{annotateWindows()}}
 consult \code{getOption("mesa_genome")} when \code{genome} is missing.

@@ -13,8 +13,8 @@ summariseDMRsByContrast(
 }
 \arguments{
 \item{DMRtable}{\code{data.frame} or \code{GRanges}
-DMR results, typically returned by \code{\link[=calculateDMRs]{calculateDMRs()}}. If in wide format,
-it will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
+DMR results, typically returned by \code{\link[=calculateDMRs]{calculateDMRs()}}. If in wide format, it
+will be converted with \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}.}
 
 \item{FDRthres}{\code{numeric(1)}
 False discovery rate threshold for significance.
@@ -32,8 +32,8 @@ Absolute delta-beta threshold for calling up/down regulation.
 A \code{tibble}:
 \itemize{
 \item \strong{summariseDMRsByContrast()}: returns one row per contrast, with
-counts of up-regulated (\code{nUp}) and down-regulated (\code{nDown}) DMRs that
-pass the specified thresholds.
+counts of up-regulated (\code{nUp}) and down-regulated (\code{nDown}) DMRs that pass
+the specified thresholds.
 }
 }
 \description{
@@ -45,20 +45,21 @@ data(exampleTumourNormal, package = "mesa")
 
 # Summarise DMRs for a single contrast, using custom FDR threshold
 exampleTumourNormal \%>\%
-  calculateDMRs(variable = "type",
-                contrasts = "LUAD_vs_NormalLung",
-                FDRthres = 0.1) \%>\%
-  summariseDMRsByContrast(FDRthres = 0.1)
+    calculateDMRs(
+        variable = "type",
+        contrasts = "LUAD_vs_NormalLung",
+        FDRthres = 0.1
+    ) \%>\%
+    summariseDMRsByContrast(FDRthres = 0.1)
 
 }
 \seealso{
-\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
-\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}}, \code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

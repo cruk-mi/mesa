@@ -4,48 +4,47 @@
 #' existing samples in user-specified proportions. Useful for benchmarking,
 #' downsampling experiments, or simulating tumour–normal mixtures.
 #'
-#' Note that if the qseaSet windows have been filtered prior to using this,
-#' the fraction of fragments present in the current qseaSet is calculated,
-#' such that the total number of reads would have been approximately `nReadsTotal`.
-#' E.g. if there are 50% of the total fragments in the windows present in the current samples,
-#' 0.5*`nReadsTotal` fragments will be sampled.
+#' Note that if the qseaSet windows have been filtered prior to using this, the
+#' fraction of fragments present in the current qseaSet is calculated, such that
+#' the total number of reads would have been approximately `nReadsTotal`. E.g.
+#' if there are 50% of the total fragments in the windows present in the current
+#' samples, 0.5*`nReadsTotal` fragments will be sampled.
 #'
 #'
 #' @param qseaSet `qseaSet`.
-#'   The input object containing the two source samples.
+#' The input object containing the two source samples.
 #'
 #' @param sample1 `character(1)`.
-#'   First sample name, contributing `proportion * nReadsTotal` reads.
+#' First sample name, contributing `proportion * nReadsTotal` reads.
 #'
 #' @param sample2 `character(1)`.
-#'   Second sample name, contributing the remainder of reads.
+#' Second sample name, contributing the remainder of reads.
 #'
 #' @param nReadsTotal `integer(1)`.
-#'   Total number of reads to simulate in the new mixed sample.
-#'   Must be `>= 0`.
+#' Total number of reads to simulate in the new mixed sample. Must be `>= 0`.
 #'
 #' @param proportion `numeric(1)`.
-#'   Proportion of reads taken from `sample1`. Must be in `[0, 1]`.
-#'   The remaining `1 - proportion` reads are taken from `sample2`.
+#' Proportion of reads taken from `sample1`. Must be in `[0, 1]`. The remaining
+#' `1 - proportion` reads are taken from `sample2`.
 #'
 #' @param newName `character(1)` or `NULL`.
-#'   Name for the new synthetic sample.
+#' Name for the new synthetic sample.
 #'   **Default:** `NULL` (a name is generated automatically, e.g.,
-#'   `"Mix_<sample1>_<sample2>_<proportion>"`).
+#' `"Mix_<sample1>_<sample2>_<proportion>"`).
 #'
 #' @param groupName `character(1)` or `NULL`.
-#'   Group name for the new sample recorded in the `sampleTable`.
+#' Group name for the new sample recorded in the `sampleTable`.
 #'   **Default:** `NULL` (uses `newName`).
 #'
 #' @param onlyNew `logical(1)`.
-#'   If `TRUE`, return only the synthetic sample. If `FALSE`, return the
-#'   original `qseaSet` with the new sample appended.
+#' If `TRUE`, return only the synthetic sample. If `FALSE`, return the original
+#' `qseaSet` with the new sample appended.
 #'   **Default:** `FALSE`.
 #'
 #' @param renormalise `logical(1)`.
-#'   Whether to run [addNormalisation()] on the result. For efficiency, set
-#'   to `FALSE` when creating multiple mixtures and run normalisation once at
-#'   the end.
+#' Whether to run [addNormalisation()] on the result. For efficiency, set to
+#' `FALSE` when creating multiple mixtures and run normalisation once at the
+#' end.
 #'   **Default:** `TRUE`.
 #'
 #' @return A `qseaSet` containing the new synthetic sample:
@@ -55,10 +54,10 @@
 #'
 #' @details
 #' * Input validation ensures `sample1`/`sample2` exist, `proportion ∈ [0,1]`,
-#'   and `nReadsTotal` is non-negative.
+#' and `nReadsTotal` is non-negative.
 #' * The mixing strategy (e.g., proportional allocation vs sampling) follows
-#'   the package’s implementation; set `renormalise = TRUE` to recompute
-#'   offsets/enrichment after adding the new sample if required by your workflow.
+#' the package’s implementation; set `renormalise = TRUE` to recompute
+#' offsets/enrichment after adding the new sample if required by your workflow.
 #'
 #' @seealso
 #' [mixThreeQsetSamples()], [downSample()], [addNormalisation()]
@@ -240,27 +239,27 @@ mixSamples <- function(
 #' existing samples according to user-specified proportions. Useful for simple
 #' mixture simulations; currently intended for internal use.
 #'
-#' Note that if the qseaSet windows have been filtered prior to using this,
-#' the fraction of fragments present in the current qseaSet is calculated,
-#' such that the total number of reads would have been approximately `nReadsTotal`.
-#' E.g. if there are 50% of the total fragments in the windows present in the current samples,
-#' 0.5*`nReadsTotal` fragments will be sampled.
+#' Note that if the qseaSet windows have been filtered prior to using this, the
+#' fraction of fragments present in the current qseaSet is calculated, such that
+#' the total number of reads would have been approximately `nReadsTotal`. E.g.
+#' if there are 50% of the total fragments in the windows present in the current
+#' samples, 0.5*`nReadsTotal` fragments will be sampled.
 #'
 #' @param qseaSet `qseaSet`.
-#'   The input object containing the three source samples.
+#' The input object containing the three source samples.
 #'
 #' @param sample1, sample2, sample3 `character(1)`.
-#'   Sample names to mix (must exist in `qseaSet`).
+#' Sample names to mix (must exist in `qseaSet`).
 #'
 #' @param nReadsTotal `integer(1)`.
-#'   Total number of reads to simulate in the mixed sample. Must be `>= 0`.
+#' Total number of reads to simulate in the mixed sample. Must be `>= 0`.
 #'
 #' @param proportion1 `numeric(1)`.
-#'   Proportion taken from `sample1`. Must be in `[0, 1]`.
+#' Proportion taken from `sample1`. Must be in `[0, 1]`.
 #'   **Default:** none (must be supplied).
 #'
 #' @param proportion2 `numeric(1)`.
-#'   Proportion taken from `sample2`. Must be in `[0, 1]`.
+#' Proportion taken from `sample2`. Must be in `[0, 1]`.
 #'   **Default:** none (must be supplied).
 #'
 #' The proportion from `sample3` is computed as `1 - proportion1 - proportion2`.
@@ -268,21 +267,22 @@ mixSamples <- function(
 #' `sample3` gets a non-negative share).
 #'
 #' @param newName `character(1)` or `NULL`.
-#'   Name for the new synthetic sample.
-#'   **Default:** `NULL` (auto-generated, e.g., `"Mix3_<s1>_<s2>_<s3>_<p1>_<p2>"`).
+#' Name for the new synthetic sample.
+#' **Default:** `NULL` (auto-generated, e.g.,
+#' `"Mix3_<s1>_<s2>_<s3>_<p1>_<p2>"`).
 #'
 #' @param groupName `character(1)` or `NULL`.
-#'   Group name recorded in the `sampleTable` for the new sample.
+#' Group name recorded in the `sampleTable` for the new sample.
 #'   **Default:** `NULL` (uses `newName`).
 #'
 #' @param onlyNew `logical(1)`.
-#'   If `TRUE`, return only the synthetic mixture. If `FALSE`, append it to the
-#'   original `qseaSet`.
+#' If `TRUE`, return only the synthetic mixture. If `FALSE`, append it to the
+#' original `qseaSet`.
 #'   **Default:** `FALSE`.
 #'
 #' @param renormalise `logical(1)`.
-#'   Whether to run [addNormalisation()] on the result. For batching multiple
-#'   mixtures, consider `FALSE` and normalise once at the end.
+#' Whether to run [addNormalisation()] on the result. For batching multiple
+#' mixtures, consider `FALSE` and normalise once at the end.
 #'   **Default:** `TRUE`.
 #'
 #' @return A `qseaSet` containing the new synthetic sample:
@@ -292,10 +292,10 @@ mixSamples <- function(
 #'
 #' @details
 #' * Validates that `sample1`, `sample2`, `sample3` exist; `nReadsTotal >= 0`;
-#'   `proportion1, proportion2 ∈ [0, 1]`; and `proportion1 + proportion2 ≤ 1`.
+#' `proportion1, proportion2 ∈ [0, 1]`; and `proportion1 + proportion2 ≤ 1`.
 #' * The mixing strategy follows the package implementation (proportional
-#'   allocation / sampling); use `renormalise = TRUE` if downstream steps rely
-#'   on offsets/enrichment being recomputed.
+#' allocation / sampling); use `renormalise = TRUE` if downstream steps rely on
+#' offsets/enrichment being recomputed.
 #'
 #' @seealso
 #' [mixSamples()] (two-sample mixture), [addNormalisation()]

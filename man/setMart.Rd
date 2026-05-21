@@ -31,7 +31,8 @@ you interpret elsewhere (e.g., \code{"ENSEMBL_110"}). Stored verbatim in
 \value{
 \itemize{
 \item \code{setMart()} returns the updated \code{qseaSet} (with \verb{@parameters$mart} set).
-\item \code{getMart()} returns the stored value (whatever was set), or \code{NULL} if absent.
+\item \code{getMart()} returns the stored value (whatever was set), or \code{NULL} if
+absent.
 }
 }
 \description{

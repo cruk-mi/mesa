@@ -16,8 +16,8 @@ Genomic ranges representing fragments (each range = one fragment).
 \strong{Default:} \code{NULL} (must be supplied).}
 
 \item{BSgenome}{\code{character(1)}
-Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
-The package must be installed and loadable.
+Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}. The
+package must be installed and loadable.
 \strong{Default:} \code{NULL}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
@@ -44,12 +44,10 @@ extracted directly from a BAM file.
 \details{
 relH and GoGe are computed by counting \code{"CG"} dinucleotides in the provided
 fragments and normalising by genome-wide expectations (from
-\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}}).
-Unlike \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, this function assumes reads are already
-summarised as genomic ranges.
+\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}}). Unlike \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, this
+function assumes reads are already summarised as genomic ranges.
 }
 \examples{
-\donttest{
 # Runnable toy example with synthetic reads over chr1 (requires a BSgenome)
 if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
     n <- 200
@@ -68,10 +66,7 @@ if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
     )
 }
 }
-}
 \seealso{
-\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
-\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
-\pkg{GenomicRanges},
-\pkg{BSgenome}
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
+\pkg{GenomicRanges}, \pkg{BSgenome}
 }

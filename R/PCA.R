@@ -59,7 +59,8 @@ getPCA <- function(qseaSet,
 #'
 #' Convenience wrapper around [getDimRed()] with `method = "UMAP"`.
 #'
-#' @describeIn getDimRed Uniform manifold approximation and projection of a qseaSet.
+#' @describeIn getDimRed Uniform manifold approximation and projection of a
+#' qseaSet.
 #' @family dimred-helpers
 #' @examples
 #' # Quick demo on a small synthetic qseaSet
@@ -110,100 +111,103 @@ getUMAP <- function(qseaSet,
 #' wrappers such as [getPCA()] and [getUMAP()] provide simplified access.
 #'
 #' @param qseaSet `qseaSet`.
-#'   Input object providing windows, counts and `sampleTable`.
+#' Input object providing windows, counts and `sampleTable`.
 #'
 #' @param dataTable `data.frame` or `GRanges` or `NULL`.
-#'   Normalised values with windows in rows and samples in columns. Must contain
-#'   `seqnames`, `start`, `end` (if `data.frame`), or metadata columns with
-#'   values (if `GRanges`). If `NULL`, the matrix is derived internally (see
-#'   `normMethod`, `minEnrichment`).
+#' Normalised values with windows in rows and samples in columns. Must contain
+#' `seqnames`, `start`, `end` (if `data.frame`), or metadata columns with values
+#' (if `GRanges`). If `NULL`, the matrix is derived internally (see
+#' `normMethod`, `minEnrichment`).
 #'   **Default:** `NULL`.
 #'
 #' @param method `character(1)`. One of `"PCA"` or `"UMAP"`.
 #'   **Default:** `"PCA"`.
 #'
 #' @param regionsToOverlap `GRanges`, coercible `data.frame`, or `NULL`.
-#'   If supplied, only windows overlapping these regions are used.
+#' If supplied, only windows overlapping these regions are used.
 #'   **Default:** `NULL`.
 #'
 #' @param normMethod `character(1)`.
-#'   Name of predefined normalisation (e.g., `"beta"`, `"nrpm"`); passed to
-#'   [qsea::normMethod()] when `dataTable = NULL`.
+#' Name of predefined normalisation (e.g., `"beta"`, `"nrpm"`); passed to
+#' [qsea::normMethod()] when `dataTable = NULL`.
 #'   **Default:** `"beta"`.
 #'
 #' @param minEnrichment `numeric(1)`.
-#'   Minimum reads required for beta values to be non-`NA`; forwarded to
-#'   [getDataTable()] when building data internally.
+#' Minimum reads required for beta values to be non-`NA`; forwarded to
+#' [getDataTable()] when building data internally.
 #'   **Default:** `3`.
 #'
 #' @param useGroupMeans `logical(1)`.
-#'   If `TRUE`, average samples within the `group` column (combine replicates)
-#'   before DR.
+#' If `TRUE`, average samples within the `group` column (combine replicates)
+#' before DR.
 #'   **Default:** `FALSE`.
 #'
 #' @param minDensity `numeric(1)`.
-#'   Minimum CpG density; windows below this are removed.
+#' Minimum CpG density; windows below this are removed.
 #'   **Default:** `0`.
 #'
-#' @param topVarNum `numeric(1)` or `integer(1)` or `Inf` or `NULL` **or** a vector.
-#'   Keep the `topVarNum` most variable windows (by SD). If `NA`, `NULL`, `Inf`,
-#'   or `>=` available windows, use all. If a vector, DR is run once per value
-#'   and results are returned in a list.
+#' @param topVarNum `numeric(1)` or `integer(1)` or `Inf` or `NULL` **or** a
+#' vector.
+#' Keep the `topVarNum` most variable windows (by SD). If `NA`, `NULL`, `Inf`,
+#' or `>=` available windows, use all. If a vector, DR is run once per value and
+#' results are returned in a list.
 #'   **Default:** `1000`.
 #'
 #' @param topVarSamples `NULL`, `character()`, `list`, or `regex` string.
-#'   Samples used to compute variability. If `NULL`/`NA`, use all samples. If a
-#'   vector/regex, select matching samples. If a `list`, perform DR per list
-#'   element (should match `length(topVarNum)` when vectorised).
+#' Samples used to compute variability. If `NULL`/`NA`, use all samples. If a
+#' vector/regex, select matching samples. If a `list`, perform DR per list
+#' element (should match `length(topVarNum)` when vectorised).
 #'   **Default:** `NULL`.
 #'
 #' @param center `logical(1)`.
-#'   Centre features to mean zero (PCA only).
+#' Centre features to mean zero (PCA only).
 #'   **Default:** `TRUE`.
 #'
 #' @param scale `logical(1)`.
-#'   Scale features to unit variance (PCA only).
+#' Scale features to unit variance (PCA only).
 #'   **Default:** `FALSE`.
 #'
 #' @param nPC `integer(1)`.
-#'   Number of principal components to compute (PCA only).
+#' Number of principal components to compute (PCA only).
 #'   **Default:** `5`.
 #'
 #' @param returnDataTable `logical(1)`.
-#'   If `TRUE`, include the matrix used for DR in the return object.
+#' If `TRUE`, include the matrix used for DR in the return object.
 #'   **Default:** `FALSE`.
 #'
 #' @param verbose `logical(1)`.
-#'   If `TRUE`, print messages regarding the function execution.
+#' If `TRUE`, print messages regarding the function execution.
 #'   **Default:** `TRUE`.
 #'
-#' @param ... Additional arguments passed to [uwot::umap()] (when `method="UMAP"`),
-#'   e.g. `n_neighbors`, `min_dist`, `metric`.
+#' @param ... Additional arguments passed to [uwot::umap()] (when
+#' `method="UMAP"`),
+#' e.g. `n_neighbors`, `min_dist`, `metric`.
 #'
 #' @return A [`mesaDimRed`] object with:
 #' * **res**: Named list of DR results; each element is a [`mesaPCA`] (for PCA)
-#'   or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
+#' or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
 #' * **samples**: Character vector of sample IDs used.
 #' * **dataTable** (optional): The numeric matrix used for DR when
-#'   `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
-#'   `minDensity`, removal of rows with missing values, and may include columns
-#'   of window SDs when applicable (named per `params$topVar`).
-#' * **params**: List of parameters used (method, selection/filter settings, etc.).
+#' `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
+#' `minDensity`, removal of rows with missing values, and may include columns of
+#' window SDs when applicable (named per `params$topVar`).
+#' * **params**: List of parameters used (method, selection/filter settings,
+#' etc.).
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
 #' @details:
 #' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
-#'   and `scale` controls.
+#' and `scale` controls.
 #' - For `method = "UMAP"`, DR is performed via [uwot::umap()].
 #' - Prior to DR, optional filtering is applied: enrichment cut-off
-#'   (`minEnrichment`), CpG density (`minDensity`), region restriction
-#'   (`regionsToOverlap`), and most-variable windows (`topVarNum`).
+#' (`minEnrichment`), CpG density (`minDensity`), region restriction
+#' (`regionsToOverlap`), and most-variable windows (`topVarNum`).
 #' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple DR runs
-#'   are performed and collected in `res`.
+#' are performed and collected in `res`.
 #'
 #' @seealso
-#' [getPCA()], [getUMAP()], [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class],
-#' [qsea::normMethod()], [uwot::umap()], [stats::prcomp()]
+#' [getPCA()], [getUMAP()], [mesaDimRed-class], [mesaPCA-class],
+#' [mesaUMAP-class], [qsea::normMethod()], [uwot::umap()], [stats::prcomp()]
 #'
 #' @family dimred-helpers
 #'
@@ -1160,12 +1164,16 @@ getColourScale <- function(plotData, cV, cols, colourScaleType,
                 minCV <- min(cVdat, na.rm = TRUE)
                 absMinCV <- abs(minCV)
                 if (abs(minCV) < maxCV) {
-                    # minimum (negative) value is smaller in magnitude than the largest (positive) value; colour scale needs to be extended beyond the minimum value
+                    # minimum (negative) value is smaller in magnitude than the
+                    # largest (positive) value; colour scale needs to be
+                    # extended beyond the minimum value
                     vals <- scales::rescale(c(-maxCV, 0, maxCV),
                         to = c(-(maxCV - absMinCV) / (absMinCV + maxCV), 1)
                     )
                 } else {
-                    # minimum (negative) value is larger in magnitude than the largest (positive) value; colour scale needs to be extended beyond the maximum value
+                    # minimum (negative) value is larger in magnitude than the
+                    # largest (positive) value; colour scale needs to be
+                    # extended beyond the maximum value
                     vals <- scales::rescale(c(minCV, 0, -minCV),
                         to = c(0, 1 + (absMinCV - maxCV) / (absMinCV + maxCV))
                     )
@@ -1232,80 +1240,85 @@ getLegendParams <- function(cV, shape, my_scale_shape, colourScaleType) {
 #' annotation variables.
 #'
 #' @param object `mesaDimRed`.
-#'   A dimensionality-reduction container returned by [getPCA()].
+#' A dimensionality-reduction container returned by [getPCA()].
 #' @param components `integer(2)` **or** `list` of `integer(2)`.
-#'   PC indices to plot (e.g. `c(1, 2)` for PC1 vs PC2), or a list of such pairs
-#'   to produce multiple plots.
+#' PC indices to plot (e.g. `c(1, 2)` for PC1 vs PC2), or a list of such pairs
+#' to produce multiple plots.
 #'   **Default:** `list(c(1, 2), c(2, 3))`.
 #'
 #' @param colour `NULL` or `character()` .
-#'   Name(s) of sample-table variable(s) mapped to point colour; one plot per
-#'   variable.
+#' Name(s) of sample-table variable(s) mapped to point colour; one plot per
+#' variable.
 #'   **Default:** `NULL` (no colour mapping).
 #'
 #' @param colourPalette `NULL` or `character()`.
-#'   Palette used for colouring points. If `NULL`, a suitable default is chosen.
+#' Palette used for colouring points. If `NULL`, a suitable default is chosen.
 #'   **Default:** `NULL`.
 #'
 #' @param NAcolour `character(1)`.
-#'   Colour for missing values in `colour`.
+#' Colour for missing values in `colour`.
 #'   **Default:** `"grey50"`.
 #'
 #' @param symDivColourScale `logical(1)`.
-#'   If `TRUE`, diverging colour scales are centred symmetrically around zero.
-#'   Ignored for non-diverging scales.
+#' If `TRUE`, diverging colour scales are centred symmetrically around zero.
+#' Ignored for non-diverging scales.
 #'   **Default:** `FALSE`.
 #'
 #' @param shape `NULL` or `character(1)`.
-#'   Sample-table variable mapped to point shape (single variable only).
+#' Sample-table variable mapped to point shape (single variable only).
 #'   **Default:** `NULL`.
 #'
 #' @param shapePalette `NULL`, `character(1)`, or `numeric()`.
-#'   Shapes used for categories of the `shape` variable. Options:
+#' Shapes used for categories of the `shape` variable. Options:
 #'   * A numeric vector of base‐R shape codes.
 #'     - 0–20: line/filled shapes.
 #'     - 21–25: filled shapes with a border (border colour = black).
 #'   * A keyword, with internally defined sets:
-#'     - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19 categories**).
-#'     - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19 categories**).
+#' - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19
+#' categories**).
+#' - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19
+#' categories**).
 #'     - `"mixture"`: mixture of line and filled shapes (**max 19 categories**).
-#'     - `"filled+border"`: filled+border shapes (**max 5 categories, or 4 if NAs in `shape`**).
-#'   * `NULL`: choose automatically (`"mixture"` for non-diverging/none; `"filled+border"`
+#' - `"filled+border"`: filled+border shapes (**max 5 categories, or 4 if NAs in
+#' `shape`**).
+#' * `NULL`: choose automatically (`"mixture"` for non-diverging/none;
+#' `"filled+border"`
 #'     for diverging colour scales).
 #'   **Default:** `NULL`.
 #'
 #' @param NAshape `NULL` or `numeric(1)`.
-#'   Shape for missing values in `shape`. If `NULL`, uses `7`, or `25` when
-#'   `"filled+border"` is active.
+#' Shape for missing values in `shape`. If `NULL`, uses `7`, or `25` when
+#' `"filled+border"` is active.
 #'   **Default:** `NULL`.
 #'
 #' @param showSampleNames `logical(1)`.
-#'   Overlay sample names on points.
+#' Overlay sample names on points.
 #'   **Default:** `FALSE`.
 #'
 #' @param pointSize `numeric(1)`.
-#'   Point size.
+#' Point size.
 #'   **Default:** `2`.
 #'
 #' @param alpha `numeric(1)`.
-#'   Point transparency in `[0, 1]`.
+#' Point transparency in `[0, 1]`.
 #'   **Default:** `1`.
 #'
 #' @param plotlyAnnotations `character()` .
-#'   Column names from the sample table to add as tooltips when converting to
-#'   interactive `plotly`.
+#' Column names from the sample table to add as tooltips when converting to
+#' interactive `plotly`.
 #'   **Default:** `""` (empty string).
 #'
 #' @return A `list` of `ggplot` objects—one per combination of `components`
-#'   pairs and `colour` variables—each depicting the chosen PCs with requested
-#'   aesthetics. Specifically:
+#' pairs and `colour` variables—each depicting the chosen PCs with requested
+#' aesthetics. Specifically:
 #'   * one plot per `components` pair × per `colour` variable;
 #'   * shapes/labels applied per `shape`/`showSampleNames`;
 #'   * consistent axis labelling (PC variance if available).
 #'
 #' @details
 #' **Shape defaults**
-#' * `"mixture"` is used for non-diverging or discrete colour scales (or no colour).
+#' * `"mixture"` is used for non-diverging or discrete colour scales (or no
+#' colour).
 #' * `"filled+border"` is used for diverging colour scales.
 #' These defaults aim to keep categories visually separable for larger cohorts.
 #'
@@ -1378,74 +1391,78 @@ plotPCA.mesaDimRed <- function(object,
 #' pairs and annotation variables.
 #'
 #' @param object `mesaDimRed`.
-#'   A dimensionality-reduction container returned by [getUMAP()].
+#' A dimensionality-reduction container returned by [getUMAP()].
 #'
 #' @param components `integer(2)` **or** `list` of `integer(2)`.
-#'   UMAP indices to plot (e.g. `c(1, 2)` for UMAP1 vs UMAP2), or a list of such
-#'   pairs to produce multiple plots.
+#' UMAP indices to plot (e.g. `c(1, 2)` for UMAP1 vs UMAP2), or a list of such
+#' pairs to produce multiple plots.
 #'   **Default:** `list(c(1, 2))`.
 #'
 #' @param colour `NULL` or `character()`.
-#'   Name(s) of sample-table variable(s) mapped to point colour; one plot per
-#'   variable.
+#' Name(s) of sample-table variable(s) mapped to point colour; one plot per
+#' variable.
 #'   **Default:** `NULL` (no colour mapping).
 #'
 #' @param colourPalette `NULL` or `character()`.
-#'   Palette used for colouring points. If `NULL`, a suitable default is chosen.
+#' Palette used for colouring points. If `NULL`, a suitable default is chosen.
 #'   **Default:** `NULL`.
 #'
 #' @param NAcolour `character(1)`.
-#'   Colour for missing values in `colour`.
+#' Colour for missing values in `colour`.
 #'   **Default:** `"grey50"`.
 #'
 #' @param symDivColourScale `logical(1)`.
-#'   If `TRUE`, diverging colour scales are centred symmetrically around zero.
-#'   Ignored for non-diverging scales.
+#' If `TRUE`, diverging colour scales are centred symmetrically around zero.
+#' Ignored for non-diverging scales.
 #'   **Default:** `FALSE`.
 #'
 #' @param shape `NULL` or `character(1)`.
-#'   Sample-table variable mapped to point shape (single variable only).
+#' Sample-table variable mapped to point shape (single variable only).
 #'   **Default:** `NULL`.
 #'
 #' @param shapePalette `NULL`, `character(1)`, or `numeric()`.
-#'   Shapes used for categories of the `shape` variable. Options:
+#' Shapes used for categories of the `shape` variable. Options:
 #'   * A numeric vector of base-R shape codes.
 #'     - 0–20: line/filled shapes.
 #'     - 21–25: filled shapes with a border (border colour = black).
 #'   * A keyword, with internally defined sets:
-#'     - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19 categories**).
-#'     - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19 categories**).
+#' - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19
+#' categories**).
+#' - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19
+#' categories**).
 #'     - `"mixture"`: mixture of line and filled shapes (**max 19 categories**).
-#'     - `"filled+border"`: filled+border shapes (**max 5 categories, or 4 if NAs in `shape`**).
-#'   * `NULL`: choose automatically (`"mixture"` for non-diverging/none; `"filled+border"`
+#' - `"filled+border"`: filled+border shapes (**max 5 categories, or 4 if NAs in
+#' `shape`**).
+#' * `NULL`: choose automatically (`"mixture"` for non-diverging/none;
+#' `"filled+border"`
 #'     for diverging colour scales).
 #'   **Default:** `NULL`.
 #'
 #' @param NAshape `NULL` or `numeric(1)`.
-#'   Shape for missing values in `shape`. If `NULL`, uses `7`, or `25` when
-#'   `"filled+border"` is active.
+#' Shape for missing values in `shape`. If `NULL`, uses `7`, or `25` when
+#' `"filled+border"` is active.
 #'   **Default:** `NULL`.
 #'
 #' @param showSampleNames `logical(1)`.
-#'   Overlay sample names on points.
+#' Overlay sample names on points.
 #'   **Default:** `FALSE`.
 #'
 #' @param pointSize `numeric(1)`.
-#'   Point size.
+#' Point size.
 #'   **Default:** `2`.
 #'
 #' @param alpha `numeric(1)`.
-#'   Point transparency in `[0, 1]`.
+#' Point transparency in `[0, 1]`.
 #'   **Default:** `1`.
 #'
 #' @param plotlyAnnotations `character()`.
-#'   Column names from the sample table to add as tooltips when converting to
-#'   interactive `plotly`.
+#' Column names from the sample table to add as tooltips when converting to
+#' interactive `plotly`.
 #'   **Default:** `""` (empty string).
 #'
 #' @return A `list` of `ggplot` objects—one per combination of `components`
-#'   pairs and `colour` variables—each depicting the chosen UMAP dimensions with
-#'   requested aesthetics. Specifically:
+#' pairs and `colour` variables—each depicting the chosen UMAP dimensions with
+#' requested aesthetics. Specifically:
 #'   * one plot per `components` pair × per `colour` variable;
 #'   * shapes/labels applied per `shape`/`showSampleNames`;
 #'   * consistent axis labelling (UMAP1/UMAP2 etc.).
@@ -1513,81 +1530,85 @@ plotUMAP <- function(object,
 
 #' Plot dimensionality reduction results
 #'
-#' Visualise PCA or UMAP coordinates stored in a [mesaDimRed] object.
-#' Wrappers such as [plotPCA()] and [plotUMAP()] provide convenient shortcuts
-#' for common use cases.
+#' Visualise PCA or UMAP coordinates stored in a [mesaDimRed] object. Wrappers
+#' such as [plotPCA()] and [plotUMAP()] provide convenient shortcuts for common
+#' use cases.
 #'
 #' @param object `mesaDimRed`.
-#'   A dimensionality reduction container returned by [getPCA()] or [getUMAP()].
+#' A dimensionality reduction container returned by [getPCA()] or [getUMAP()].
 #'
 #' @param components `integer(2)` **or** `list` of `integer(2)`.
-#'   Component indices to plot (e.g. `c(1, 2)` for PC1 vs PC2). A list of pairs
-#'   generates multiple plots.
+#' Component indices to plot (e.g. `c(1, 2)` for PC1 vs PC2). A list of pairs
+#' generates multiple plots.
 #'   **Default:** `list(c(1, 2), c(2, 3))` for PCA, `list(c(1, 2))` for UMAP.
 #'
 #' @param colour `NULL` or `character()`.
-#'   Name(s) of sample-table variable(s) mapped to point colour. One plot is
-#'   produced per variable.
+#' Name(s) of sample-table variable(s) mapped to point colour. One plot is
+#' produced per variable.
 #'   **Default:** `NULL` (no colouring).
 #'
 #' @param colourPalette `NULL` or `character()`.
-#'   Palette for point colours. If `NULL`, defaults are selected automatically.
+#' Palette for point colours. If `NULL`, defaults are selected automatically.
 #'   **Default:** `NULL`.
 #'
 #' @param NAcolour `character(1)`.
-#'   Colour for missing values in `colour`.
+#' Colour for missing values in `colour`.
 #'   **Default:** `"grey50"`.
 #'
 #' @param symDivColourScale `logical(1)`.
-#'   If `TRUE`, diverging colour scales are centred symmetrically around zero.
-#'   Ignored for non-diverging scales.
+#' If `TRUE`, diverging colour scales are centred symmetrically around zero.
+#' Ignored for non-diverging scales.
 #'   **Default:** `FALSE`.
 #'
 #' @param shape `NULL` or `character(1)`.
-#'   Sample-table variable mapped to point shape. Only one variable supported.
+#' Sample-table variable mapped to point shape. Only one variable supported.
 #'   **Default:** `NULL`.
 #'
 #' @param shapePalette `NULL`, `character(1)`, or `numeric()`.
-#'   Shapes used for categories of the `shape` variable. Options:
+#' Shapes used for categories of the `shape` variable. Options:
 #'   * A numeric vector of base-R shape codes:
 #'     - 0–20: line/filled shapes.
 #'     - 21–25: filled shapes with borders (border colour = black).
 #'   * A keyword:
-#'     - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19 categories**).
-#'     - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19 categories**).
+#' - `"line-first"`: 15 line shapes, then 4 filled shapes (**max 19
+#' categories**).
+#' - `"filled-first"`: 4 filled shapes, then 15 line shapes (**max 19
+#' categories**).
 #'     - `"mixture"`: mixture of line and filled shapes (**max 19 categories**).
-#'     - `"filled+border"`: filled+border shapes (**max 5 categories; 4 if NAs in `shape`**).
+#' - `"filled+border"`: filled+border shapes (**max 5 categories; 4 if NAs in
+#' `shape`**).
 #'   * `NULL`: automatic choice—`"mixture"` unless a diverging colour scale is
-#'     used, in which case `"filled+border"`.
+#' used, in which case `"filled+border"`.
 #'   **Default:** `NULL`.
 #'
 #' @param NAshape `NULL` or `numeric(1)`.
-#'   Shape used for missing values in `shape`. If `NULL`, defaults to `7`, or `25`
-#'   when `"filled+border"` is active.
+#' Shape used for missing values in `shape`. If `NULL`, defaults to `7`, or `25`
+#' when `"filled+border"` is active.
 #'   **Default:** `NULL`.
 #'
 #' @param showSampleNames `logical(1)`.
-#'   If `TRUE`, overlay sample names on points.
+#' If `TRUE`, overlay sample names on points.
 #'   **Default:** `FALSE`.
 #'
 #' @param pointSize `numeric(1)`.
-#'   Size of plotted points.
+#' Size of plotted points.
 #'   **Default:** `2`.
 #'
 #' @param alpha `numeric(1)`.
-#'   Transparency of points in `[0, 1]`.
+#' Transparency of points in `[0, 1]`.
 #'   **Default:** `1`.
 #'
 #' @param plotlyAnnotations `character()`.
-#'   Column names from the sample table used as tooltips when converting plots
-#'   to interactive `plotly`.
+#' Column names from the sample table used as tooltips when converting plots to
+#' interactive `plotly`.
 #'   **Default:** `""` (empty string).
 #'
 #' @return A `list` of `ggplot2` objects, one for each combination of:
 #'   * component pairs in `components`, and
 #'   * variables specified in `colour`.
 #'
-#' Each plot depicts the requested dimensions with aesthetics mapped as specified.
+#' Each plot depicts the requested dimensions with aesthetics mapped as
+#' specified.
 #'
 #' @family dimred-helpers
 #'

@@ -60,13 +60,21 @@ Shapes used for categories of the \code{shape} variable. Options:
 \item 21–25: filled shapes with a border (border colour = black).
 }
 \item A keyword, with internally defined sets:
-\itemize{
-\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19 categories}).
-\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19 categories}).
-\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
-\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories, or 4 if NAs in \code{shape}}).
 }
-\item \code{NULL}: choose automatically (\code{"mixture"} for non-diverging/none; \code{"filled+border"}
+\itemize{
+\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19
+categories}).
+\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19
+categories}).
+\itemize{
+\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
+}
+\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories, or 4 if NAs in
+\code{shape}}).
+}
+\itemize{
+\item \code{NULL}: choose automatically (\code{"mixture"} for non-diverging/none;
+\code{"filled+border"}
 for diverging colour scales).
 \strong{Default:} \code{NULL}.
 }}
@@ -112,7 +120,8 @@ annotation variables.
 \details{
 \strong{Shape defaults}
 \itemize{
-\item \code{"mixture"} is used for non-diverging or discrete colour scales (or no colour).
+\item \code{"mixture"} is used for non-diverging or discrete colour scales (or no
+colour).
 \item \code{"filled+border"} is used for diverging colour scales.
 These defaults aim to keep categories visually separable for larger cohorts.
 }
@@ -128,18 +137,22 @@ exampleTumourNormal \%>\%
 # Colour by sample group; show names
 exampleTumourNormal \%>\%
     getPCA() \%>\%
-    plotPCA(colour = "group",
-        showSampleNames = TRUE)
+    plotPCA(
+        colour = "group",
+        showSampleNames = TRUE
+    )
 
 # Plot PC1 vs PC3; shape by tissue
 exampleTumourNormal \%>\%
     getPCA() \%>\%
-    plotPCA(components = list(c(1, 3)),
+    plotPCA(
+        components = list(c(1, 3)),
         colour = "group",
-        shape = "tissue")
+        shape = "tissue"
+    )
 
 }
 \seealso{
-\code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=plotUMAP]{plotUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}
 }
 \concept{dimred-plotting}

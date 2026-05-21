@@ -4,26 +4,25 @@
 #' columns for contrasts, effect sizes, and significance values.
 #'
 #' @param DMRtable `data.frame`
-#'   DMR results in wide format, typically produced by [calculateDMRs()].
+#' DMR results in wide format, typically produced by [calculateDMRs()].
 #'
 #' @param FDRthres `numeric(1)`
-#'   False discovery rate threshold for filtering significant windows.
+#' False discovery rate threshold for filtering significant windows.
 #'   **Default:** `0.05`.
 #'
 #' @param makePositive `logical(1)`
-#'   If `TRUE`, reverse the direction of contrasts so that all retained windows
-#'   are positively associated with `group1`.
+#' If `TRUE`, reverse the direction of contrasts so that all retained windows
+#' are positively associated with `group1`.
 #'   **Default:** `FALSE`.
 #'
 #' @return A `tibble`:
 #'
 #' * **pivotDMRsLonger()**: returns a long-format table with one row per
-#'   DMR–contrast combination, including columns `group1`, `group2`,
-#'   `deltaBeta`, `log2FC`, and `adjPval`.
+#' DMR–contrast combination, including columns `group1`, `group2`, `deltaBeta`,
+#' `log2FC`, and `adjPval`.
 #'
 #' @seealso
-#'   [tidyr::pivot_longer()],
-#'   [summariseDMRsByContrast()]
+#' [tidyr::pivot_longer()], [summariseDMRsByContrast()]
 #'
 #' @family DMR-helpers
 #'
@@ -86,30 +85,29 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE) {
 #' Internally, results are reshaped to long format before summarisation.
 #'
 #' @param DMRtable `data.frame` or `GRanges`
-#'   DMR results, typically returned by [calculateDMRs()]. If in wide format,
-#'   it will be converted with [pivotDMRsLonger()].
+#' DMR results, typically returned by [calculateDMRs()]. If in wide format, it
+#' will be converted with [pivotDMRsLonger()].
 #'
 #' @param FDRthres `numeric(1)`
-#'   False discovery rate threshold for significance.
+#' False discovery rate threshold for significance.
 #'   **Default:** `0.05`.
 #'
 #' @param log2FCthres `numeric(1)`
-#'   Absolute log2 fold-change threshold for calling up/down regulation.
+#' Absolute log2 fold-change threshold for calling up/down regulation.
 #'   **Default:** `0`.
 #'
 #' @param deltaBetaThres `numeric(1)`
-#'   Absolute delta-beta threshold for calling up/down regulation.
+#' Absolute delta-beta threshold for calling up/down regulation.
 #'   **Default:** `0`.
 #'
 #' @return A `tibble`:
 #'
 #' * **summariseDMRsByContrast()**: returns one row per contrast, with
-#'   counts of up-regulated (`nUp`) and down-regulated (`nDown`) DMRs that
-#'   pass the specified thresholds.
+#' counts of up-regulated (`nUp`) and down-regulated (`nDown`) DMRs that pass
+#' the specified thresholds.
 #'
 #' @seealso
-#'   [pivotDMRsLonger()],
-#'   [summariseDMRsByGene()]
+#' [pivotDMRsLonger()], [summariseDMRsByGene()]
 #'
 #' @family DMR-helpers
 #'
@@ -180,17 +178,16 @@ summariseDMRsByContrast <- function(
 #' Aggregate differentially methylated region (DMR) windows by gene annotation.
 #'
 #' @param DMRtable `data.frame` or `GRanges`
-#'   Annotated DMRs. Must include the columns `ENSEMBL`, `SYMBOL`, and `GENENAME`
-#'   (typically added with [annotateWindows()]).
+#' Annotated DMRs. Must include the columns `ENSEMBL`, `SYMBOL`, and `GENENAME`
+#' (typically added with [annotateWindows()]).
 #'
 #' @return A `tibble`:
 #'
 #' * **summariseDMRsByGene()**: returns one row per gene, with counts of
-#'   associated DMRs and any aggregated metadata.
+#' associated DMRs and any aggregated metadata.
 #'
 #' @seealso
-#'   [annotateWindows()],
-#'   [summariseDMRsByContrast()]
+#' [annotateWindows()], [summariseDMRsByContrast()]
 #'
 #' @family DMR-helpers
 #'
@@ -231,20 +228,20 @@ summariseDMRsByGene <- function(DMRtable) {
 #' creating one worksheet per contrast.
 #'
 #' @param dataTable `data.frame` or `GRanges`
-#'   DMR results, typically produced by [calculateDMRs()]. If a `GRanges`, it
-#'   will be coerced to a data frame internally.
+#' DMR results, typically produced by [calculateDMRs()]. If a `GRanges`, it will
+#' be coerced to a data frame internally.
 #'
 #' @param path `character(1)`
-#'   File path of the Excel workbook to write (e.g., `"dmr_results.xlsx"`).
+#' File path of the Excel workbook to write (e.g., `"dmr_results.xlsx"`).
 #'
 #' @param FDRthres `numeric(1)`
-#'   False discovery rate threshold used to filter DMRs before writing.
+#' False discovery rate threshold used to filter DMRs before writing.
 #'   **Default:** `0.05`.
 #'
 #' @return (Invisibly) returns the input object:
 #'
 #' * **writeDMRsToExcel()**: returns `dataTable` (invisibly), enabling use in
-#'   a pipeline.
+#' a pipeline.
 #'
 #' @details
 #' One worksheet is created per contrast found in `dataTable`. If no contrast
@@ -253,7 +250,7 @@ summariseDMRsByGene <- function(DMRtable) {
 #' writing to `tempfile(fileext = ".xlsx")` in examples or tests.
 #'
 #' @seealso
-#'   [writeDMRsToBed()]
+#' [writeDMRsToBed()]
 #'
 #' @family DMR-helpers
 #'
@@ -286,7 +283,8 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
         stringr::str_subset("adjPval$")
 
     purrr::walk(contrasts, function(x) {
-        ## TODO Make this cleaner, particularly for multiple tabs to stop them being the same name
+        ## TODO Make this cleaner, particularly for multiple tabs to stop them
+        #being the same name
         ## Probably by using walk2 and the name.
         sheetName <- stringr::str_trunc(x, 31, "right", ellipsis = "")
 
@@ -312,23 +310,23 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 #' with one file generated per contrast.
 #'
 #' @param dataTable `data.frame`
-#'   DMR results, typically returned by [calculateDMRs()]. If a `GRanges`, it
-#'   will be coerced to a data frame internally.
+#' DMR results, typically returned by [calculateDMRs()]. If a `GRanges`, it will
+#' be coerced to a data frame internally.
 #'
 #' @param folder `character(1)`
-#'   Directory in which to write BED files. Must exist and be writable.
+#' Directory in which to write BED files. Must exist and be writable.
 #'
 #' @param FDRthres `numeric(1)`
-#'   False discovery rate threshold used to filter DMRs before writing.
+#' False discovery rate threshold used to filter DMRs before writing.
 #'   **Default:** `0.05`.
 #'
 #' @return (Invisibly) returns the input object:
 #'
 #' * **writeDMRsToBed()**: returns `dataTable` (invisibly), enabling use in a
-#'   pipeline.
+#' pipeline.
 #'
 #' @seealso
-#'   [writeDMRsToExcel()]
+#' [writeDMRsToExcel()]
 #'
 #' @family DMR-helpers
 #'
@@ -380,15 +378,22 @@ writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
     invisible(dataTable)
 }
 
-#' Take the top most DMRs per contrast, based on those with the largest value of the selected metric
+#' Take the top most DMRs per contrast, based on those with the largest value of
+#' the selected metric
 #'
-#' @param DMRs  A data frame containing the output of calculateDMRs, potentially with multiple contrasts
+#' @param DMRs  A data frame containing the output of calculateDMRs, potentially
+#' with multiple contrasts
 #' @param n How many DMRs to take of each contrast (if that many exists)
 #' @param FDRthres Threshold on the adjusted p values
-#' @param metric Which metric to use to select the top DMRs. Options are deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start columns) or any other column in the data frame.
-#' If `adjPval` or `position` are used, then the window with the smallest value will be chosen, otherwise the largest value will be used.
-#' @param makePositive Whether to reverse the contrast when the window is hypomethylated in the contrast.
-#' @return A data frame with the DMRs with the largest value of the selected metrics
+#' @param metric Which metric to use to select the top DMRs. Options are
+#' deltaBeta, log2FC, adjPval, CpG_density, position (using seqnames and start
+#' columns) or any other column in the data frame.
+#' If `adjPval` or `position` are used, then the window with the smallest value
+#' will be chosen, otherwise the largest value will be used.
+#' @param makePositive Whether to reverse the contrast when the window is
+#' hypomethylated in the contrast.
+#' @return A data frame with the DMRs with the largest value of the selected
+#' metrics
 #' @examples
 #' # calculate some DMRs
 #' DMRs <- exampleTumourNormal %>%

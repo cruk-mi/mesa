@@ -30,13 +30,13 @@ utils::globalVariables(c(
 
 #' Lift over genomic ranges from hg19 to hg38
 #'
-#' Convert genomic intervals from UCSC **hg19** to **hg38/GRCh38** using
-#' a preloaded chain object.
+#' Convert genomic intervals from UCSC **hg19** to **hg38/GRCh38** using a
+#' preloaded chain object.
 #'
 #' @param grOrDf `GRanges` or `data.frame`.
-#'   Input intervals. Data frames must contain at least `seqnames`, `start`,
-#'   and `end`. `seqnames` may include or omit the `"chr"` prefix; it is added
-#'   automatically if missing.
+#' Input intervals. Data frames must contain at least `seqnames`, `start`, and
+#' `end`. `seqnames` may include or omit the `"chr"` prefix; it is added
+#' automatically if missing.
 #'   **Default:** none (must be supplied).
 #'
 #' @return
@@ -123,13 +123,13 @@ liftOverHg19 <- function(grOrDf) {
 #' is not explicitly supplied.
 #'
 #' @param genome `character(1)` or `NULL`.
-#'   Genome identifier to store (typically `"hg38"` or `"GRCh38"`).
-#'   Use `NULL` to clear the setting.
+#' Genome identifier to store (typically `"hg38"` or `"GRCh38"`). Use `NULL` to
+#' clear the setting.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
-#' This function sets the session option `options(mesa_genome = <genome>)`.
-#' It **does not** modify TxDb or OrgDb options directly; set those via
+#' This function sets the session option `options(mesa_genome = <genome>)`. It
+#' **does not** modify TxDb or OrgDb options directly; set those via
 #' [setMesaTxDb()] and [setMesaAnnoDb()] if you want global defaults for
 #' transcript and gene annotation packages. Helpers such as [annotateWindows()]
 #' consult `getOption("mesa_genome")` when `genome` is missing.
@@ -162,13 +162,13 @@ setMesaGenome <- function(genome) {
 
 #' Set default TxDb for downstream annotation helpers
 #'
-#' Record a preferred TxDb to use when functions such as [annotateWindows()]
-#' are called without an explicit `TxDb`.
+#' Record a preferred TxDb to use when functions such as [annotateWindows()] are
+#' called without an explicit `TxDb`.
 #'
 #' @param TxDb `character(1)`, TxDb **object**, or `NULL`.
-#'   Either the name of an installed TxDb package (e.g.,
-#'   `"TxDb.Hsapiens.UCSC.hg38.knownGene"`), the TxDb object itself, or `NULL`
-#'   to clear the setting. If a string is supplied, the package must be installed.
+#' Either the name of an installed TxDb package (e.g.,
+#' `"TxDb.Hsapiens.UCSC.hg38.knownGene"`), the TxDb object itself, or `NULL` to
+#' clear the setting. If a string is supplied, the package must be installed.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
@@ -226,9 +226,9 @@ setMesaTxDb <- function(TxDb) {
 #' [annotateWindows()] are called without an explicit `annoDb`.
 #'
 #' @param annoDb `character(1)` or `NULL`.
-#'   Name of an installed OrgDb package (e.g., `"org.Hs.eg.db"` or
-#'   `"org.Mm.eg.db"`), or `NULL` to clear the setting. The package must be
-#'   installed if a string is supplied.
+#' Name of an installed OrgDb package (e.g., `"org.Hs.eg.db"` or
+#' `"org.Mm.eg.db"`), or `NULL` to clear the setting. The package must be
+#' installed if a string is supplied.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
@@ -292,36 +292,38 @@ setMesaAnnoDb <- function(annoDb) {
 #' backend); `getMesaParallel()` returns the current setting.
 #'
 #' @param nCores `integer(1)` or `NULL`.
-#'   If `> 1` on Unix/macOS, registers `BiocParallel::MulticoreParam(workers = nCores)`
-#'   and enables parallel mode. Ignored on Windows (see **Details**).
+#' If `> 1` on Unix/macOS, registers `BiocParallel::MulticoreParam(workers =
+#' nCores)` and enables parallel mode. Ignored on Windows (see **Details**).
 #'   **Default:** `NULL`.
 #'
 #' @param useParallel `logical(1)`.
-#'   Explicitly turn mesa parallelisation on/off (sets the `"mesa_parallel"`
-#'   option). If `nCores > 1`, this is treated as `TRUE`.
+#' Explicitly turn mesa parallelisation on/off (sets the `"mesa_parallel"`
+#' option). If `nCores > 1`, this is treated as `TRUE`.
 #'   **Default:** `FALSE`.
 #'
 #' @param verbose `logical(1)`.
-#'   Print status messages.
+#' Print status messages.
 #'   **Default:** `TRUE`.
 #'
 #' @details
 #' - This function stores the flag in `options(mesa_parallel = <TRUE/FALSE>)`.
 #' - On Unix/macOS, supplying `nCores > 1` will **register** a
-#'   `MulticoreParam` backend via `BiocParallel::register()` and enable
-#'   parallelisation.
+#' `MulticoreParam` backend via `BiocParallel::register()` and enable
+#' parallelisation.
 #' - On **Windows**, forked backends are unavailable; you should manually
-#'   register a compatible backend (e.g., `SnowParam`) and then call
-#'   `setMesaParallel(useParallel = TRUE)`.
+#' register a compatible backend (e.g., `SnowParam`) and then call
+#' `setMesaParallel(useParallel = TRUE)`.
 #' - You can always inspect the active backend with `BiocParallel::bpparam()`
-#'   and the worker count with `BiocParallel::bpworkers()`.
+#' and the worker count with `BiocParallel::bpworkers()`.
 #'
 #' @return
-#' - `setMesaParallel()` — logical scalar (`TRUE`/`FALSE`), returned **invisibly**;
-#'   primarily used for its side effects (setting the option and possibly
-#'   registering a backend).
-#' - `getMesaParallel()` — logical scalar indicating whether mesa parallelisation
-#'   is currently enabled; with `verbose = TRUE`, also prints a status message.
+#' - `setMesaParallel()` — logical scalar (`TRUE`/`FALSE`), returned
+#' **invisibly**;
+#' primarily used for its side effects (setting the option and possibly
+#' registering a backend).
+#' - `getMesaParallel()` — logical scalar indicating whether mesa
+#' parallelisation
+#' is currently enabled; with `verbose = TRUE`, also prints a status message.
 #'
 #' @seealso
 #' [BiocParallel::register()], [BiocParallel::MulticoreParam()],

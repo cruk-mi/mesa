@@ -11,7 +11,8 @@ filterWindows(qseaSet, ...)
 The qseaSet object whose regions (windows) will be filtered.}
 
 \item{...}{Expressions.
-Predicates passed to \code{\link[dplyr:filter]{dplyr::filter()}} and evaluated on the regions data frame.
+Predicates passed to \code{\link[dplyr:filter]{dplyr::filter()}} and evaluated on the regions data
+frame.
 \strong{Default:} none (no filtering).}
 }
 \value{
@@ -20,7 +21,8 @@ Both the \code{count_matrix} and \verb{@regions} slot are updated consistently.
 }
 \description{
 Filters the \strong{regions} of a \code{qseaSet} using \code{\link[dplyr:filter]{dplyr::filter()}} predicates
-applied to its regions (as a data frame), then subsets the object accordingly.
+applied to its regions (as a data frame), then subsets the object
+accordingly.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
@@ -37,7 +39,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
+\code{\link[qsea:getRegions]{qsea::getRegions()}},
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} (for filtering samples instead of regions),
 \code{\link[dplyr:filter]{dplyr::filter()}}
 }

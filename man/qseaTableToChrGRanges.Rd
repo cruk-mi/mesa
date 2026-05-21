@@ -16,7 +16,8 @@ Table of windows to convert. Must contain either the trio
 A \code{GRanges} with \code{seqnames} in UCSC style. The genome is unset.
 }
 \description{
-Coerce a table of windows to a \link[GenomicRanges]{GRanges-class}. Two input layouts are
+Coerce a table of windows to a \link[GenomicRanges]{GRanges-class}. Two input
+layouts are
 supported:
 \itemize{
 \item \code{chr}, \code{window_start}, \code{window_end} (as in \code{qsea::makeTable()} output), or

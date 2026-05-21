@@ -1,5 +1,6 @@
 #' Get current mesa genome setting
-#' @return Character string of current genome setting (e.g., "hg38", "hg19", "mm10")
+#' @return Character string of current genome setting (e.g., "hg38", "hg19",
+#' "mm10")
 #' @export
 getMesaGenome <- function() {
     getOption("mesa_genome", "hg38")
@@ -31,7 +32,8 @@ getMesaTxDb <- function(genome = NULL) {
 
 #' Get annotation DB for current or specified genome
 #' @param genome Genome build, defaults to current setting
-#' @return Character string of annotation database name (e.g., "org.Hs.eg.db", "org.Mm.eg.db")
+#' @return Character string of annotation database name (e.g., "org.Hs.eg.db",
+#' "org.Mm.eg.db")
 #' @export
 getMesaAnnoDb <- function(genome = NULL) {
     if (is.null(genome)) genome <- getMesaGenome()

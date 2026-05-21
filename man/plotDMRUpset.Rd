@@ -32,14 +32,18 @@ Draws an UpSet plot on the active device and \strong{invisibly} returns the resu
 from \code{\link[UpSetR:upset]{UpSetR::upset()}} (for further customization if needed).
 }
 \description{
-Visualise the overlap of significant DMR sets across contrasts (columns ending
+Visualise the overlap of significant DMR sets across contrasts (columns
+ending
 with \verb{*_adjPval}) using an UpSet plot.
 }
 \details{
-The function discovers DMR sets by locating columns that end with \code{"_adjPval"}.
+The function discovers DMR sets by locating columns that end with
+\code{"_adjPval"}.
 For each such column, a logical membership is formed at the chosen FDR cutoff
-(\code{minAdjPval}). Optionally, set names are simplified with \code{removeVS}, and then
-subset with \code{string} if provided. The resulting membership matrix is visualised
+(\code{minAdjPval}). Optionally, set names are simplified with \code{removeVS}, and
+then
+subset with \code{string} if provided. The resulting membership matrix is
+visualised
 with \strong{UpSetR}.
 }
 \examples{

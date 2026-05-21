@@ -60,13 +60,21 @@ Shapes used for categories of the \code{shape} variable. Options:
 \item 21–25: filled shapes with a border (border colour = black).
 }
 \item A keyword, with internally defined sets:
-\itemize{
-\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19 categories}).
-\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19 categories}).
-\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
-\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories, or 4 if NAs in \code{shape}}).
 }
-\item \code{NULL}: choose automatically (\code{"mixture"} for non-diverging/none; \code{"filled+border"}
+\itemize{
+\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19
+categories}).
+\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19
+categories}).
+\itemize{
+\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
+}
+\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories, or 4 if NAs in
+\code{shape}}).
+}
+\itemize{
+\item \code{NULL}: choose automatically (\code{"mixture"} for non-diverging/none;
+\code{"filled+border"}
 for diverging colour scales).
 \strong{Default:} \code{NULL}.
 }}
@@ -110,7 +118,6 @@ sample-level metadata, and can return multiple plots across UMAP component
 pairs and annotation variables.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Default UMAP (beta-normalised, top 1000 most variable windows)
@@ -121,21 +128,24 @@ exampleTumourNormal \%>\%
 # Colour by group; show names
 exampleTumourNormal \%>\%
     getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-    plotUMAP(colour = "group",
-        showSampleNames = TRUE)
+    plotUMAP(
+        colour = "group",
+        showSampleNames = TRUE
+    )
 
 # Custom components and shape mapping
 exampleTumourNormal \%>\%
     getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-    plotUMAP(components = list(c(1, 2)),
+    plotUMAP(
+        components = list(c(1, 2)),
         colour = "group",
-        shape = "tissue")
-}
+        shape = "tissue"
+    )
 
 }
 \seealso{
-Other dimred-helpers: 
-\code{\link{getPCA}()},
-\code{\link{plotDimRed}()}
+Other dimred-helpers:
+\code{\link[=getPCA]{getPCA()}},
+\code{\link[=plotDimRed]{plotDimRed()}}
 }
 \concept{dimred-helpers}

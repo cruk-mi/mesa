@@ -21,9 +21,9 @@ Path to the BAM file.
 \strong{Default:} \code{NULL} (must be supplied).}
 
 \item{BSgenome}{\code{character(1)}
-Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
-For GRCh38 and hg19, precomputed distributions are cached within \pkg{mesa}
-for speed; otherwise, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}} is used.
+Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}. For
+GRCh38 and hg19, precomputed distributions are cached within \pkg{mesa} for
+speed; otherwise, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}} is used.
 \strong{Default:} \code{NULL}.}
 
 \item{exportPath}{\code{character(1)} or \code{NULL}
@@ -32,24 +32,24 @@ containing the read GRanges. If \code{NULL}, no files are written.
 \strong{Default:} \code{NULL}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Shift applied to read positions.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Subset of chromosomes to use.
+Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Subset of chromosomes to use.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
 Whether BAM contains paired-end reads (passed to
-\code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
+\code{\link[MEDIPS:getPairedGRange]{MEDIPS::getPairedGRange()}}).
 \strong{Default:} \code{TRUE}.}
 }
 \value{
@@ -84,7 +84,6 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("MEDIPSData", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
     require("GenomicRanges", quietly = TRUE)) {
-
     calculateCGEnrichment(
         file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
@@ -95,8 +94,6 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
 
 }
 \seealso{
-\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},
-\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
-\pkg{MEDIPS},
-\pkg{BSgenome}
+\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
+\pkg{MEDIPS}, \pkg{BSgenome}
 }

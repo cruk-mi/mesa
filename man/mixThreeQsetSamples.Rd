@@ -42,7 +42,8 @@ The sum \code{proportion1 + proportion2} must be \strong{strictly less than 1} (
 
 \item{newName}{\code{character(1)} or \code{NULL}.
 Name for the new synthetic sample.
-\strong{Default:} \code{NULL} (auto-generated, e.g., \code{"Mix3_<s1>_<s2>_<s3>_<p1>_<p2>"}).}
+\strong{Default:} \code{NULL} (auto-generated, e.g.,
+\code{"Mix3_<s1>_<s2>_<s3>_<p1>_<p2>"}).}
 
 \item{groupName}{\code{character(1)} or \code{NULL}.
 Group name recorded in the \code{sampleTable} for the new sample.
@@ -72,17 +73,17 @@ existing samples according to user-specified proportions. Useful for simple
 mixture simulations; currently intended for internal use.
 }
 \details{
-Note that if the qseaSet windows have been filtered prior to using this,
-the fraction of fragments present in the current qseaSet is calculated,
-such that the total number of reads would have been approximately \code{nReadsTotal}.
-E.g. if there are 50\% of the total fragments in the windows present in the current samples,
-0.5*\code{nReadsTotal} fragments will be sampled.
+Note that if the qseaSet windows have been filtered prior to using this, the
+fraction of fragments present in the current qseaSet is calculated, such that
+the total number of reads would have been approximately \code{nReadsTotal}. E.g.
+if there are 50\% of the total fragments in the windows present in the current
+samples, 0.5*\code{nReadsTotal} fragments will be sampled.
 \itemize{
 \item Validates that \code{sample1}, \code{sample2}, \code{sample3} exist; \code{nReadsTotal >= 0};
 \verb{proportion1, proportion2 ∈ [0, 1]}; and \verb{proportion1 + proportion2 ≤ 1}.
 \item The mixing strategy follows the package implementation (proportional
-allocation / sampling); use \code{renormalise = TRUE} if downstream steps rely
-on offsets/enrichment being recomputed.
+allocation / sampling); use \code{renormalise = TRUE} if downstream steps rely on
+offsets/enrichment being recomputed.
 }
 }
 \examples{
@@ -95,7 +96,8 @@ exampleTumourNormal \%>\%
         nReadsTotal = 100000,
         proportion1 = 0.5, proportion2 = 0.3,
         newName = "Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2",
-        renormalise = FALSE) \%>\%
+        renormalise = FALSE
+    ) \%>\%
     # Only a few reads are included in this small subset of windows (78):
     getCountTable() \%>\%
     pull(Mix_Colon1_T_0.5_Colon1_N_0.3_Lung1_T_0.2) \%>\%
@@ -110,7 +112,8 @@ exampleTumourNormal \%>\%
         newName = "Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7",
         groupName = "Synthetic",
         onlyNew = TRUE,
-        renormalise = FALSE) \%>\%
+        renormalise = FALSE
+    ) \%>\%
     # Only a few reads are included in this small subset of windows (29):
     getCountTable() \%>\%
     dplyr::pull(Mix_Colon1_T_0.1_Colon1_N_0.2_Lung1_T_0.7) \%>\%
@@ -121,8 +124,8 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=mixSamples]{mixSamples()}} (two-sample mixture), \code{\link[=addNormalisation]{addNormalisation()}}
 
-Other sample-simulation: 
-\code{\link{mixSamples}()}
+Other sample-simulation:
+\code{\link[=mixSamples]{mixSamples()}}
 }
 \concept{sample-simulation}
 \keyword{internal}

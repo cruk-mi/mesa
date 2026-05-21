@@ -21,11 +21,12 @@
 #'   **Default:** `NULL`.
 #'
 #' @param plotDir `character(1)` or `NULL`.
-#'   Directory to write per-sample PDF diagnostics; if `NULL`, no plots are saved.
+#' Directory to write per-sample PDF diagnostics; if `NULL`, no plots are saved.
 #'   **Default:** `NULL`.
 #'
 #' @param parallel `logical(1)`.
-#'   Use the registered **BiocParallel** backend when `TRUE`; otherwise run serially.
+#' Use the registered **BiocParallel** backend when `TRUE`; otherwise run
+#' serially.
 #'   **Default:** `getMesaParallel()`.
 #'
 #' @param maxInsertSize `integer(1)`.
@@ -45,7 +46,8 @@
 #'   **Default:** `30`.
 #'
 #' @param properPairsOnly `logical(1)`.
-#'   If `TRUE`, ignore unpaired R1; if `FALSE`, combine proper pairs with high-quality R1.
+#' If `TRUE`, ignore unpaired R1; if `FALSE`, combine proper pairs with
+#' high-quality R1.
 #'   **Default:** `FALSE`.
 #'
 #' @param hmmCopyGC `GRanges` or `NULL`.
@@ -58,8 +60,10 @@
 #'
 #' @details
 #' Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
-#' HMMcopy (`HMMcopy::correctReadcount()` followed by `HMMcopy::HMMsegment()`), and
-#' merged back into the `qseaSet`. You must supply GC/mappability tracks binned at
+#' HMMcopy (`HMMcopy::correctReadcount()` followed by `HMMcopy::HMMsegment()`),
+#' and
+#' merged back into the `qseaSet`. You must supply GC/mappability tracks binned
+#' at
 #' the same `windowSize` (or use package-provided defaults where applicable).
 #' When `parallel = TRUE`, computation uses the currently registered backend
 #' (see `BiocParallel::register()`).
@@ -127,13 +131,15 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
         windowSize
     )
 
-    # check that the hmmcopy objects are appropriate; each CNV_Region window should
+    # check that the hmmcopy objects are appropriate; each CNV_Region window
+    # should
     # overlap exactly one GC/Map window.
     overlappedRegions <- CNV_Regions %>%
         plyranges::join_overlap_left(hmmCopyGC) %>%
         plyranges::join_overlap_left(hmmCopyMap)
 
-    # two conditions should be the same, but really don't want this to happen as it
+    # two conditions should be the same, but really don't want this to happen as
+    # it
     # leads to exponentially increasing numbers of rows
     if (any(overlappedRegions %>% duplicated()) ||
         (length(overlappedRegions) != length(CNV_Regions))) {
@@ -157,7 +163,8 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
         )
     }
 
-    # this object is only used for this sanity check, not used directly again, so clean up
+    # this object is only used for this sanity check, not used directly again,
+    # so clean up
     rm(overlappedRegions)
 
     if (parallel) {
@@ -222,7 +229,8 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
 
 
     # try saving the raw CNV data in the qseaSet.
-    # TODO would be better as a slot of its own, but can't seem to manage that into the S4 class
+    # TODO would be better as a slot of its own, but can't seem to manage that
+    # into the S4 class
     qs@libraries$input_counts <- CNV_RegionsWithReads
 
     mergedCNV <- purrr::map(
@@ -382,7 +390,8 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
 #'   [addHMMcopyCNV()] or `qsea::addCNV()`).
 #'
 #' @param sampleAnnotation tidyselect specification, `character()`, or `NULL`.
-#'   Sample-table columns to display as column annotations (e.g., `c("tumour","type")`
+#' Sample-table columns to display as column annotations (e.g.,
+#' `c("tumour","type")`
 #'   or bare helpers `tumour, type`).
 #'   **Default:** `NULL`.
 #'
@@ -407,7 +416,8 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
 #' \code{\link[ComplexHeatmap]{draw}}.
 #'
 #' @seealso
-#' [addHMMcopyCNV()], \code{runHMMcopy()}, \code{\link[ComplexHeatmap]{Heatmap}},
+#' [addHMMcopyCNV()], \code{runHMMcopy()},
+#' \code{\link[ComplexHeatmap]{Heatmap}},
 #' [qsea::addCNV()]
 #'
 #' @family CNV
