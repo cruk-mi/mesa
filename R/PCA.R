@@ -15,7 +15,8 @@
 #' exampleTumourNormal %>%
 #'     getPCA(nPC = 3)
 #'
-#' # Use multiple cutoffs for most-variable windows (returns list of PCA results)
+#' # Use multiple cutoffs for most-variable windows
+#' # (returns list of PCA results)
 #' exampleTumourNormal %>%
 #'     getPCA(topVarNum = c(10, 100, 500, NA)) %>%
 #'     slot("res") %>%
@@ -695,7 +696,8 @@ Initial number of windows = {initialNumWindows}."))
                             " {groupString}s",
                             " ({windowSdName}).\n",
                             "Standard deviation threshold =",
-                            " {format(th, digits = 3)}",
+                            " ",
+                            format(th, digits = 3),
                             " resulting in {nrow(dataTable)} windows."
                         ))
                         }
@@ -707,7 +709,8 @@ Initial number of windows = {initialNumWindows}."))
                             " across {length(topVarSamples)} {groupString}s",
                             " ({windowSdName}).\n",
                             "Standard deviation threshold =",
-                            " {format(th, digits = 3)}",
+                            " ",
+                            format(th, digits = 3),
                             " resulting in {nrow(dataTable)} windows."
                         ))
                         }

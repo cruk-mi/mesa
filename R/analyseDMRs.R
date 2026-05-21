@@ -265,7 +265,10 @@ summariseDMRsByGene <- function(DMRtable) {
 #' # With multiple contrasts and annotation
 #' exampleTumourNormal %>%
 #'     calculateDMRs(variable = "tumour", contrasts = "all") %>%
-#'     annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") %>%
+#'     annotateWindows(
+#'         TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+#'         annoDb = "org.Hs.eg.db"
+#'     ) %>%
 #'     writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
 #' @export
 writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {

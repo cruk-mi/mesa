@@ -227,7 +227,12 @@ getWindows <- function(qseaSet) {
 #'
 remove_almost_empty_cols <- function(dat, prop) {
     mask_keep <- colSums(is.na(dat)) <= prop * (nrow(dat))
-    janitor:::remove_message(dat = dat, mask_keep = mask_keep, which = "cols", reason = "almost empty")
+    janitor:::remove_message(
+        dat = dat,
+        mask_keep = mask_keep,
+        which = "cols",
+        reason = "almost empty"
+    )
     return(dat[, mask_keep, drop = FALSE])
 }
 
@@ -253,7 +258,9 @@ skip_long_checks <- function() {
         return(invisible(TRUE))
     }
 
-    testthat::skip("Slow checks skipped when options(skip_long_checks = TRUE) has been set")
+    testthat::skip(
+        "Slow checks skipped when options(skip_long_checks = TRUE) has been set"
+    )
 }
 
 
@@ -295,16 +302,29 @@ asValidGranges <- function(object) {
     }
 
     if (is.data.frame(object)) {
-        if (length(intersect(colnames(object), c("seqnames", "start", "end"))) == 3) {
+        if (length(intersect(
+            colnames(object), c("seqnames", "start", "end")
+        )) == 3) {
             return(object %>% plyranges::as_granges())
-        } else if (length(intersect(colnames(object), c("chr", "start", "end"))) == 3) {
-            return(object %>% dplyr::rename(seqnames = chr) %>% plyranges::as_granges())
-        } else if (length(intersect(colnames(object), c("chr", "window_start", "window_end"))) == 3) {
+        } else if (length(intersect(
+            colnames(object), c("chr", "start", "end")
+        )) == 3) {
+            return(
+                object %>%
+                    dplyr::rename(seqnames = chr) %>%
+                    plyranges::as_granges()
+            )
+        } else if (length(intersect(
+            colnames(object), c("chr", "window_start", "window_end")
+        )) == 3) {
             return(object %>%
                 dplyr::rename(seqnames = chr, start = window_start, end = window_end) %>%
                 plyranges::as_granges())
         } else {
-            stop("Data frame can not be coerced to a GRanges object, requires seqnames, start, end columns.")
+            stop(
+                "Data frame can not be coerced to a GRanges object, requires ",
+                "seqnames, start, end columns."
+            )
         }
     }
 

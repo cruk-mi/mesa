@@ -74,7 +74,10 @@
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
 
     if (qsea:::getGenome(qseaSet) != "BSgenome.Hsapiens.NCBI.GRCh38") {
-        stop("This function is only currently defined for BSgenome.Hsapiens.NCBI.GRCh38.")
+        stop(
+            "This function is only currently defined for ",
+            "BSgenome.Hsapiens.NCBI.GRCh38."
+        )
     }
 
     if ("hyperStableEdgar" %in% colnames(qsea::getSampleTable(qseaSet))) {

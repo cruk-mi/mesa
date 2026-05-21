@@ -614,7 +614,12 @@ poolSamples <- function(qseaSet, mergeString) {
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' exampleTumourNormal %>%
-#'     dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(.))))) %>%
+#'     dplyr::mutate(
+#'         newName = paste0(
+#'             "Sample",
+#'             seq_len(nrow(qsea::getSampleTable(.)))
+#'         )
+#'     ) %>%
 #'     renameSamples(newNameColumn = "newName")
 #'
 #' @export

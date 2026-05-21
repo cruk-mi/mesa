@@ -80,17 +80,28 @@
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
 #'     requireNamespace("Rsamtools", quietly = TRUE)) {
 #'
-#'     bam_src <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+#'     bam_src <- system.file(
+#'         "extdata",
+#'         "hESCs.Input.chr22.bam",
+#'         package = "MEDIPSData"
+#'     )
 #'     tmpdir <- tempfile("bam_demo_"); dir.create(tmpdir)
 #'     bam <- file.path(tmpdir, basename(bam_src))
 #'     file.copy(bam_src, bam, overwrite = TRUE)
 #'     if (!file.exists(paste0(bam_src, ".bai"))) {
 #'         Rsamtools::indexBam(bam)
 #'     } else {
-#'         file.copy(paste0(bam_src, ".bai"), paste0(bam, ".bai"), overwrite = TRUE)
+#'         file.copy(
+#'             paste0(bam_src, ".bai"),
+#'             paste0(bam, ".bai"),
+#'             overwrite = TRUE
+#'         )
 #'     }
 #'
-#'     regs <- GenomicRanges::GRanges("chr22", IRanges::IRanges(20000000, 20001000))
+#'     regs <- GenomicRanges::GRanges(
+#'         "chr22",
+#'         IRanges::IRanges(20000000, 20001000)
+#'     )
 #'
 #'     res <- mesa:::getBamCoveragePairedAndUnpairedR1(
 #'         fileName            = bam,
@@ -556,12 +567,17 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     #
     #   message("Calculated read coverage")
 
-    libraries <- bamOutList %>% purrr::map_dfr(~ purrr::pluck(., "library")) %>% as.data.frame()
+    libraries <- bamOutList %>%
+        purrr::map_dfr(~ purrr::pluck(., "library")) %>%
+        as.data.frame()
     rownames(libraries) <- sampleTable$sample_name
 
-    param <- list(minMapQual = minMapQual, minReferenceLength = minReferenceLength,
+    param <- list(
+        minMapQual = minMapQual,
+        minReferenceLength = minReferenceLength,
         maxInsertSize = maxInsertSize, minInsertSize = minInsertSize,
-        properPairsOnly = properPairsOnly)
+        properPairsOnly = properPairsOnly
+    )
     qs <- qsea:::addParameters(qs, param)
     qs <- qsea:::setCounts(qs, count_matrix = coverage)
     qs <- qsea:::setLibrary(qs, "file_name", libraries)

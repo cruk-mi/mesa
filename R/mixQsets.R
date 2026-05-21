@@ -82,7 +82,8 @@
 #'     sum()
 #'
 #'
-#' # Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group
+#' # Mix two samples 80/20 and return only the synthetic sample, with an
+#' # explicit name and group
 #' exampleTumourNormal %>%
 #'     mixSamples("Colon1_T", "Colon1_N",
 #'         nReadsTotal = 50000,
@@ -306,7 +307,8 @@ mixSamples <- function(
 #' \dontrun{
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
+#' # Mix three samples 50/30/20 into ~100k total fragments; append to the
+#' # qseaSet
 #' exampleTumourNormal %>%
 #'     mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
 #'         nReadsTotal = 100000,
@@ -320,7 +322,8 @@ mixSamples <- function(
 #'     sum()
 #'
 #'
-#' # Mix three samples and return only the synthetic sample, with an explicit name and group.
+#' # Mix three samples and return only the synthetic sample, with an explicit
+#' # name and group.
 #' exampleTumourNormal %>%
 #'     mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
 #'         nReadsTotal = 50000,
