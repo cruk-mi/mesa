@@ -175,23 +175,23 @@ combineQsets <- function(
 
         ## TODO Check intersection properly to make sure they are exactly
         #start/end together
-        message(glue::glue(paste0(
-            "Regions are not identical:",
-            " {length(regions1)} and {length(regions2)} regions.\n",
+        message(glue::glue(
+            "Regions are not identical: {length(regions1)} and ",
+            "{length(regions2)} regions.\n",
             "Taking intersection of ",
             "{length(regions1 %>% plyranges::filter_by_overlaps(regions2))}",
             " regions."
-        )))
+        ))
     }
 
     if (is.character(all.equal(
         qsea::getRegions(qseaSet1)$CpG_density,
         qsea::getRegions(qseaSet2)$CpG_density
     ))) {
-        warning(glue::glue(paste0(
-            "CpG densities differ between the two objects.",
-            " Keeping the density values from the first qseaSet"
-        )))
+        warning(glue::glue(
+            "CpG densities differ between the two objects. ",
+            "Keeping the density values from the first qseaSet"
+        ))
     }
 
     if (checkParams) {
@@ -331,20 +331,18 @@ combineQsetsList <- function(
     if (is.character(firstQset)) {
         if (length(firstQset) == 1 &
             tools::file_ext(firstQset) == "rds") {
-            message(glue::glue(paste0(
-                "Character string given as firstQset,",
-                " loading {firstQset}"
-            )))
+            message(glue::glue(
+                "Character string given as firstQset, loading {firstQset}"
+            ))
             firstQset <- readr::read_rds(firstQset)
         }
     }
 
     # TODO catch errors better
     if (is.null(firstQset) & length(qseaSets) >= 2) {
-        message(glue::glue(paste0(
-            "No initial qseaSet given,",
-            " using first element as initial qseaSet"
-        )))
+        message(glue::glue(
+            "No initial qseaSet given, using first element as initial qseaSet"
+        ))
         firstQset <- qseaSets[[1]]
         qseaSets <- utils::tail(qseaSets, n = -1)
     }

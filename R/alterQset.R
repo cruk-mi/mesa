@@ -53,10 +53,10 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap) {
         if (length(intersect(
             colnames(regionsToOverlap), c("seqnames", "start", "end")
         )) != 3) {
-            stop(paste0(
+            stop(
                 "regionsToOverlap must be a GRanges object",
                 " or a dataframe with seqnames, start and end."
-            ))
+            )
         }
     }
 
@@ -110,10 +110,10 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
         if (length(intersect(
             colnames(regionsToOverlap), c("seqnames", "start", "end")
         )) != 3) {
-            stop(paste0(
+            stop(
                 "regionsToOverlap must be a GRanges object or a",
                 " dataframe with seqnames, start and end."
-            ))
+            )
         }
     }
 
