@@ -1,4 +1,6 @@
---- title: "Data Tables and Quality Control" output: rmarkdown::html_vignette
+---
+title: "Data Tables and Quality Control"
+output: rmarkdown::html_vignette
 vignette: >
     %\VignetteIndexEntry{Data Tables and Quality Control}
     %\VignetteEngine{knitr::rmarkdown}

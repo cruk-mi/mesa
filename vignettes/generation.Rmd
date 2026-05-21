@@ -1,4 +1,7 @@
---- title: "Generating qseaSets" output: rmarkdown::html_vignette vignette: >
+---
+title: "Generating qseaSets"
+output: rmarkdown::html_vignette
+vignette: >
     %\VignetteIndexEntry{Generating qseaSets}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
