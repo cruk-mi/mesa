@@ -56,7 +56,9 @@ qseaSet <- exampleTumourNormal
 
 As the underlying structure to hold our methylation data we use the `qsea`
 package. The tutorial vignette for [`qsea` is available
-here](https://bioconductor.org/packages/release/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html),
+[here](
+    https://bioconductor.org/packages/release/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html
+),
 but we will cover some of these concepts here.
 
 The qseaSet object contains a number of different pieces of information
