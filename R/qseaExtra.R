@@ -225,11 +225,9 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
             "TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE
         )) {
             stop(
-                paste0(
-                    "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\"",
-                    " must be installed to use this function.",
-                    " Please install and run again."
-                ),
+                "Package \"TxDb.Hsapiens.UCSC.hg38.knownGene\"",
+                " must be installed to use this function.",
+                " Please install and run again.",
                 call. = FALSE
             )
         }
@@ -242,10 +240,8 @@ annotateWindows <- function(dataTable, genome = .getMesaGenome(),
     if (genome %in% c("hg38", "GRCh38") && is.null(annoDb)) {
         if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
             stop(
-                paste0(
-                    "Package \"org.Hs.eg.db\" must be installed to use",
-                    " this function. Please install and run again."
-                ),
+                "Package \"org.Hs.eg.db\" must be installed to use",
+                " this function. Please install and run again.",
                 call. = FALSE
             )
         }
