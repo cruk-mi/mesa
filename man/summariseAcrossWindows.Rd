@@ -95,7 +95,11 @@ exampleTumourNormal \%>\%
 # Maximum NRPM within a small genomic region
 exampleTumourNormal \%>\%
   summariseAcrossWindows(
-    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    regionsToOverlap = data.frame(
+        seqnames = 7,
+        start = 25002001,
+        end = 25017900
+    ),
     fn         = max,
     normMethod = "nrpm",
     suffix     = "_chr7_slice"
@@ -113,8 +117,8 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
-Other window-summaries:
-\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}},
-\code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
+Other window-summaries: 
+\code{\link{addSummaryAcrossWindows}()},
+\code{\link{countWindowsAboveCutoff}()}
 }
 \concept{window-summaries}

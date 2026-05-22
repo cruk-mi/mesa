@@ -33,16 +33,16 @@ exampleTumourNormal \%>\%
   
 }
 \seealso{
-\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=pull.qseaSet]{pull.qseaSet()}}, \code{\link[=select.qseaSet]{select.qseaSet()}}
 
-Other table-helpers:
-\code{\link[=getBetaTable]{getBetaTable()}},
-\code{\link[=getCountTable]{getCountTable()}},
-\code{\link[=getDataTable]{getDataTable()}},
-\code{\link[=getNRPMTable]{getNRPMTable()}},
-\code{\link[=makeTransposedTable]{makeTransposedTable()}},
-\code{\link[=removeLibraryFactors]{removeLibraryFactors()}},
-\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeLibraryFactors}()},
+\code{\link{removeNormMethodSuffix}()}
 }
 \concept{table-helpers}
 \keyword{internal}

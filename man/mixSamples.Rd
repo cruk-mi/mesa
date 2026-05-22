@@ -98,7 +98,8 @@ exampleTumourNormal \%>\%
     sum()
 
 
-# Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group
+# Mix two samples 80/20 and return only the synthetic sample, with an
+# explicit name and group
 exampleTumourNormal \%>\%
     mixSamples("Colon1_T", "Colon1_N",
         nReadsTotal = 50000,
@@ -117,7 +118,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}, \code{\link[=downSample]{downSample()}}, \code{\link[=addNormalisation]{addNormalisation()}}
 
-Other sample-simulation:
-\code{\link[=mixThreeQsetSamples]{mixThreeQsetSamples()}}
+Other sample-simulation: 
+\code{\link{mixThreeQsetSamples}()}
 }
 \concept{sample-simulation}

@@ -66,7 +66,8 @@ per-group.
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
-# Build window annotations and immediately feed them into makeHeatmapAnnotations()
+# Build window annotations and immediately feed them into
+# makeHeatmapAnnotations()
 exampleTumourNormal \%>\%
     filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
     getDataTable(normMethod = "nrpm") \%>\%

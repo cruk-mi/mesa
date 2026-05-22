@@ -21,7 +21,7 @@ Window IDs used. \strong{Default:} none.}
 \item{object}{\code{mesaPCA}}
 }
 \value{
-A \link[=mesaPCA-class]{mesaPCA} object containing the PCA fit and window IDs.
+A \linkS4class{mesaPCA} object containing the PCA fit and window IDs.
 }
 \description{
 Stores a PCA fit (from \code{\link[stats:prcomp]{stats::prcomp()}}) computed over methylation windows.
@@ -46,5 +46,5 @@ mp
 
 }
 \seealso{
-\link[=mesaDimRed-class]{mesaDimRed}
+\linkS4class{mesaDimRed}
 }

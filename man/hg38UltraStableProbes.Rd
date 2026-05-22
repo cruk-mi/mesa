@@ -18,13 +18,12 @@ Processed from public array resources following Edgar et al. (2014).
 hg38UltraStableProbes
 }
 \description{
-Genomic loci that are consistently methylated (“ultra-stable”) across many
-human tissues
-and diseases, mapped to GRCh38. Regions correspond to Illumina array probe
-loci
-(cg identifiers) derived as in Edgar et al. (2014), and are intended for QC
-and summary
-metrics (e.g., \code{\link[=addHyperStableFraction]{addHyperStableFraction()}}).
+Genomic loci that are consistently methylated (“ultra-stable”)
+across many human tissues and diseases, mapped to GRCh38.
+Regions correspond to Illumina array probe loci (cg identifiers)
+derived as in Edgar et al.
+(2014), and are intended for QC and summary metrics (e.g.,
+\code{\link[=addHyperStableFraction]{addHyperStableFraction()}}).
 }
 \details{
 \itemize{
@@ -40,8 +39,8 @@ tag.
 
 When combining with other \code{GRanges}, harmonise styles/metadata as needed,
 e.g.
-use \code{GenomeInfoDb::seqlevelsStyle()} to convert to \code{"UCSC"} (\code{"chr1"}, …) and
-\code{GenomeInfoDb::genome()} to set \code{"hg38"}.
+use \code{GenomeInfoDb::seqlevelsStyle()} to convert to \code{"UCSC"} (\code{"chr1"}, …)
+and \code{GenomeInfoDb::genome()} to set \code{"hg38"}.
 }
 \examples{
 data(hg38UltraStableProbes)

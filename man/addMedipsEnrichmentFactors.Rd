@@ -33,15 +33,15 @@ under \verb{@libraries$file_name}).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
@@ -49,7 +49,7 @@ Passed to MEDIPS range extraction; subset of chromosomes to analyse.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
-Whether BAMs are paired-end (uses \code{\link[MEDIPS:getPairedGRange]{MEDIPS::getPairedGRange()}}).
+Whether BAMs are paired-end (uses \code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
 \strong{Default:} \code{TRUE}.}
 
 \item{file_name}{\code{character(1)}
@@ -84,11 +84,16 @@ pulldown, \verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelis
 uses \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
-# Requires BAM files and the MEDIPS package; see \dontrun{} block for a full usage example.
+# Requires BAM files and the MEDIPS package; see \dontrun{} for a full
+# usage example.
 \dontrun{
 if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
-    bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+    bam <- system.file(
+        "extdata",
+        "hESCs.Input.chr22.bam",
+        package = "MEDIPSData"
+    )
 
     data.frame(
         sample_name = "hESC_Input_chr22",
@@ -102,7 +107,8 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
             exportPath = tempdir(),
             chr.select = paste0("chr22"),
             paired     = FALSE
-            # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
+            # If your qsea returns a BSgenome object and as.character()
+            # doesn't help, uncomment:
             # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
         ) \%>\%
         qsea::getSampleTable() \%>\%

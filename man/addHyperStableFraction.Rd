@@ -2,7 +2,8 @@
 % Please edit documentation in R/sampleQC.R
 \name{addHyperStableFraction}
 \alias{addHyperStableFraction}
-\title{Summarise the fraction of hyper-stable methylated regions (GRCh38 only)}
+\title{Summarise the fraction of hyper-stable methylated regions
+(GRCh38 only)}
 \usage{
 addHyperStableFraction(qseaSet, minDensity = 5, minBeta = 0.8)
 }
@@ -40,9 +41,9 @@ CpG density (≥ \code{minDensity}). The result is added to the sample table as
 from array data (\emph{Edgar et al.}, 2014).
 \item \strong{Computation.} Windows overlapping the ultra-stable set are extracted,
 beta values are computed via \code{qsea::makeTable(norm_methods = "beta")},
-windows with \code{CpG_density < minDensity} are dropped, \code{NA} beta are treated
-as \code{0} for thresholding, and the per-sample fraction with beta ≥ \code{minBeta}
-is returned.
+windows with \code{CpG_density < minDensity} are dropped, \code{NA} beta
+are treated as \code{0} for thresholding, and the per-sample
+fraction with beta ≥ \code{minBeta} is returned.
 }
 }
 \examples{
@@ -78,6 +79,6 @@ surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[qsea:getSampleNames]{qsea::getSampleNames()}},
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
 \link{hg38UltraStableProbes}, \code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }

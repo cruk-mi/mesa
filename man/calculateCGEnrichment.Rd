@@ -32,24 +32,24 @@ containing the read GRanges. If \code{NULL}, no files are written.
 \strong{Default:} \code{NULL}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Subset of chromosomes to use.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Subset of chromosomes to use.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
 Whether BAM contains paired-end reads (passed to
-\code{\link[MEDIPS:getPairedGRange]{MEDIPS::getPairedGRange()}}).
+\code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
 \strong{Default:} \code{TRUE}.}
 }
 \value{
@@ -85,7 +85,11 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
     require("GenomicRanges", quietly = TRUE)) {
     calculateCGEnrichment(
-        file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+        file = system.file(
+            "extdata",
+            "hESCs.Input.chr22.bam",
+            package = "MEDIPSData"
+        ),
         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = tempdir(),
         paired     = FALSE

@@ -136,7 +136,8 @@ samples are aggregated by \code{group} before plotting.
 data(exampleTumourNormal, package = "mesa")
 
 # Compute regions (DMRs) to plot
-DMRs <- exampleTumourNormal \%>\% calculateDMRs(variable = "tumour", contrasts = "first")
+DMRs <- exampleTumourNormal \%>\%
+    calculateDMRs(variable = "tumour", contrasts = "first")
 
 # Basic heatmap of beta values over DMRs
 exampleTumourNormal \%>\% plotRegionsHeatmap(DMRs)
@@ -154,12 +155,14 @@ exampleTumourNormal \%>\%
         clusterNum = 2,
         sampleAnnotation = tumour,
         windowAnnotation = CpG_density,
-        annotationColors = list(tumour = c("Tumour" = "firebrick4", "Normal" = "blue"))
+        annotationColors = list(
+            tumour = c("Tumour" = "firebrick4", "Normal" = "blue")
+        )
     )
 }
 }
 \seealso{
 \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
 \code{\link[ComplexHeatmap]{draw}},
-\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:getSampleTable]{getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }

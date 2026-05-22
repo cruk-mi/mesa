@@ -94,13 +94,13 @@ exampleTumourNormal \%>\%
 \code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}},
 \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 
-Other table-helpers:
-\code{\link[=getBetaTable]{getBetaTable()}},
-\code{\link[=getCountTable]{getCountTable()}},
-\code{\link[=getNRPMTable]{getNRPMTable()}},
-\code{\link[=getSampleGroups2]{getSampleGroups2()}},
-\code{\link[=makeTransposedTable]{makeTransposedTable()}},
-\code{\link[=removeLibraryFactors]{removeLibraryFactors()}},
-\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeLibraryFactors}()},
+\code{\link{removeNormMethodSuffix}()}
 }
 \concept{table-helpers}

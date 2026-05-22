@@ -112,7 +112,7 @@ specified.
 }
 \description{
 Visualise PCA or UMAP coordinates stored in a \link{mesaDimRed} object. Wrappers
-such as \code{\link[BiocGenerics:plotPCA]{plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts for common
+such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts for common
 use cases.
 }
 \examples{
@@ -141,8 +141,8 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-Other dimred-helpers:
-\code{\link[=getPCA]{getPCA()}},
-\code{\link[=plotUMAP]{plotUMAP()}}
+Other dimred-helpers: 
+\code{\link{getPCA}()},
+\code{\link{plotUMAP}()}
 }
 \concept{dimred-helpers}
