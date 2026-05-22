@@ -90,7 +90,8 @@ offsets/enrichment being recomputed.
 \dontrun{
 data(exampleTumourNormal, package = "mesa")
 
-# Mix three samples 50/30/20 into ~100k total fragments; append to the qseaSet
+# Mix three samples 50/30/20 into ~100k total fragments; append to the
+# qseaSet
 exampleTumourNormal \%>\%
     mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
         nReadsTotal = 100000,
@@ -104,7 +105,8 @@ exampleTumourNormal \%>\%
     sum()
 
 
-# Mix three samples and return only the synthetic sample, with an explicit name and group.
+# Mix three samples and return only the synthetic sample, with an explicit
+# name and group.
 exampleTumourNormal \%>\%
     mesa:::mixThreeQsetSamples("Colon1_T", "Colon1_N", "Lung1_T",
         nReadsTotal = 50000,
@@ -124,8 +126,8 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=mixSamples]{mixSamples()}} (two-sample mixture), \code{\link[=addNormalisation]{addNormalisation()}}
 
-Other sample-simulation:
-\code{\link[=mixSamples]{mixSamples()}}
+Other sample-simulation: 
+\code{\link{mixSamples}()}
 }
 \concept{sample-simulation}
 \keyword{internal}

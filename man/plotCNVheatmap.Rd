@@ -57,7 +57,9 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
     plotCNVheatmap(
         sampleAnnotation = tumour,
-        annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+        annotationColors = list(
+            tumour = c(Tumour = "firebrick4", Normal = "blue")
+        ),
         clusterRows = FALSE
     )
 
@@ -67,9 +69,9 @@ exampleTumourNormal \%>\%
 \code{\link[ComplexHeatmap]{Heatmap}},
 \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
-Other CNV:
-\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}},
-\code{\link[=removeCNV]{removeCNV()}},
-\code{\link[=runHMMCopy]{runHMMCopy()}}
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{removeCNV}()},
+\code{\link{runHMMCopy}()}
 }
 \concept{CNV}

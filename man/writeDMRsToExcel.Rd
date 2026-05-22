@@ -46,16 +46,19 @@ exampleTumourNormal \%>\%
 # With multiple contrasts and annotation
 exampleTumourNormal \%>\%
     calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-    annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+    annotateWindows(
+        TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db"
+    ) \%>\%
     writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
 }
 \seealso{
 \code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
 
-Other DMR-helpers:
-\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
-\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
-\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
-\code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
+Other DMR-helpers: 
+\code{\link{pivotDMRsLonger}()},
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{summariseDMRsByGene}()},
+\code{\link{writeDMRsToBed}()}
 }
 \concept{DMR-helpers}

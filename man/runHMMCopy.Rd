@@ -58,9 +58,9 @@ tibble::tibble(
 \seealso{
 \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[HMMcopy:correctReadcount]{HMMcopy::correctReadcount()}}, \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}}
 
-Other CNV:
-\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}},
-\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
-\code{\link[=removeCNV]{removeCNV()}}
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{plotCNVheatmap}()},
+\code{\link{removeCNV}()}
 }
 \concept{CNV}

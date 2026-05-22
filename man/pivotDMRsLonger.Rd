@@ -23,8 +23,8 @@ are positively associated with \code{group1}.
 A \code{tibble}:
 \itemize{
 \item \strong{pivotDMRsLonger()}: returns a long-format table with one row per
-DMR–contrast combination, including columns \code{group1}, \code{group2}, \code{deltaBeta},
-\code{log2FC}, and \code{adjPval}.
+DMR–contrast combination, including columns \code{group1}, \code{group2},
+\code{deltaBeta}, \code{log2FC}, and \code{adjPval}.
 }
 }
 \description{
@@ -47,10 +47,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
-Other DMR-helpers:
-\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
-\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
-\code{\link[=writeDMRsToBed]{writeDMRsToBed()}},
-\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
+Other DMR-helpers: 
+\code{\link{summariseDMRsByContrast}()},
+\code{\link{summariseDMRsByGene}()},
+\code{\link{writeDMRsToBed}()},
+\code{\link{writeDMRsToExcel}()}
 }
 \concept{DMR-helpers}

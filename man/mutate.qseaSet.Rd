@@ -39,7 +39,8 @@ exampleTumourNormal \%>\%
     mutate(over70 = age > 70) \%>\%
     qsea::getSampleTable()
 
-# Recode gender (better practice: use dplyr::case_when or stringr::str_replace)
+# Recode gender (better practice: use dplyr::case_when() or
+# stringr::str_replace())
 exampleTumourNormal \%>\%
     mutate(gender = ifelse(gender == "F", "Female", "Male")) \%>\%
     qsea::getSampleTable()
@@ -51,7 +52,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to inspect metadata,
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
 \code{\link[=renameSamples]{renameSamples()}} and \code{\link[=renameQsetNames]{renameQsetNames()}} for renaming,
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} and \code{\link[=selectQset]{selectQset()}} for other dplyr verbs.
 }

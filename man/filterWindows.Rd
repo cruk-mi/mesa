@@ -39,7 +39,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:getRegions]{qsea::getRegions()}},
+\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} (for filtering samples instead of regions),
 \code{\link[dplyr:filter]{dplyr::filter()}}
 }

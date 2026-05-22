@@ -2,8 +2,9 @@
 % Please edit documentation in R/plotting.R
 \name{plotGeneHeatmap}
 \alias{plotGeneHeatmap}
-\title{Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
-\strong{ComplexHeatmap}. The gene can be given as a HGNC symbol or Ensembl ID.}
+\title{Plot sample signal over windows spanning a gene (± flanks) as a
+heatmap using \strong{ComplexHeatmap}. The gene can be given as a HGNC
+symbol or Ensembl ID.}
 \usage{
 plotGeneHeatmap(
   qseaSet,
@@ -113,8 +114,9 @@ composition
 with \code{\link[ComplexHeatmap]{draw}}.
 }
 \description{
-Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
-\strong{ComplexHeatmap}. The gene can be given as a HGNC symbol or Ensembl ID.
+Plot sample signal over windows spanning a gene (± flanks) as a
+heatmap using \strong{ComplexHeatmap}. The gene can be given as a HGNC
+symbol or Ensembl ID.
 }
 \details{
 The function resolves the gene to genomic coordinates (using \code{mart}, or a
@@ -137,7 +139,8 @@ tryCatch(
     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 )
 
-# Add sample annotations (tidyselect bare names) and cluster columns into 2 groups
+# Add sample annotations (tidyselect bare names) and cluster columns into
+# 2 groups
 tryCatch(
     exampleTumourNormal \%>\%
         plotGeneHeatmap("HOXA9",
@@ -151,7 +154,9 @@ tryCatch(
     exampleTumourNormal \%>\%
         plotGeneHeatmap("HOXA9",
             sampleAnnotation = tumour,
-            annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+            annotationColors = list(
+                tumour = c(Tumour = "firebrick4", Normal = "blue")
+            ),
             upstreamDist = 1000,
             downstreamDist = 2000),
     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
@@ -160,6 +165,6 @@ tryCatch(
 
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[qsea:getSampleTable]{getSampleTable()}}, \code{\link[=setMart]{setMart()}},
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=setMart]{setMart()}},
 \code{\link[biomaRt:useMart]{biomaRt::useMart()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
 }

@@ -104,10 +104,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=filterByOverlaps]{filterByOverlaps()}}
 
-Other window-helpers:
-\code{\link[=calculateFractionReadsInGRanges]{calculateFractionReadsInGRanges()}},
-\code{\link[=convertToArrayBetaTable]{convertToArrayBetaTable()}},
-\code{\link[=downSample]{downSample()}},
-\code{\link[=subsetWindowsOverBackground]{subsetWindowsOverBackground()}}
+Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{downSample}()},
+\code{\link{subsetWindowsOverBackground}()}
 }
 \concept{window-helpers}

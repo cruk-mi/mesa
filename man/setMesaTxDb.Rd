@@ -36,7 +36,9 @@ setMesaTxDb(NULL)
 getOption("mesa_TxDb")
 
 # (Alternatively) you can store the object itself if already loaded:
-# setMesaTxDb(TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene)
+# setMesaTxDb(
+#   TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+# )
 
 }
 \seealso{

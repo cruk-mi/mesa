@@ -71,7 +71,7 @@ A tibble with one row per DMR (window) containing:
 }
 }
 \description{
-Given a \code{\link[qsea:qseaGLM]{qseaGLM}} object with one or more contrasts, extract a \emph{wide}
+Given a \code{\link[qsea:qseaGLM-class]{qsea::qseaGLM}} object with one or more contrasts, extract a \emph{wide}
 results table of statistics, adjusted p-values, and (optionally) group means
 and per-sample values.
 }
@@ -91,9 +91,9 @@ getDMRsData(qs, glmfit, variable = "type", FDRthres = 0.1)
 
 }
 \seealso{
-Other DMR-detection:
-\code{\link[=calculateDMRs]{calculateDMRs()}},
-\code{\link[=fitQseaGLM]{fitQseaGLM()}},
-\code{\link[=makeAllContrasts]{makeAllContrasts()}}
+Other DMR-detection: 
+\code{\link{calculateDMRs}()},
+\code{\link{fitQseaGLM}()},
+\code{\link{makeAllContrasts}()}
 }
 \concept{DMR-detection}

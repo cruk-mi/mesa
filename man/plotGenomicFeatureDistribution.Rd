@@ -71,12 +71,17 @@ exampleTumourNormal \%>\%
 
 # Override for specific analysis
 exampleTumourNormal \%>\%
-    plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+    plotGenomicFeatureDistribution(
+        genome = "mm10",
+        normMethod = "nrpm",
+        cutoff = 2
+    )
 
 # Advanced: manual control (bypasses mesa genome system)
 exampleTumourNormal \%>\%
     plotGenomicFeatureDistribution(
-        TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+        TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
+            TxDb.Mmusculus.UCSC.mm10.knownGene,
         annoDb = "org.Mm.eg.db"
     )
 }
@@ -85,7 +90,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}
 
-Other annotation-summaries:
-\code{\link[=getGenomicFeatureDistribution]{getGenomicFeatureDistribution()}}
+Other annotation-summaries: 
+\code{\link{getGenomicFeatureDistribution}()}
 }
 \concept{annotation-summaries}

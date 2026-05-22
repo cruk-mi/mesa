@@ -19,8 +19,9 @@ and sample metadata intact. Useful for resetting CNV prior to recomputation.
 }
 \details{
 This operation preserves regions (windows) and sample metadata; only the
-per-window CNV values are replaced with zeros. Use this to “clear” existing
-CNV calls before running \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or other CNV routines again.
+per-window CNV values are replaced with zeros. Use this to “clear”
+existing CNV calls before running \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or other CNV
+routines again.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
@@ -35,9 +36,9 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{\link[=plotCNVheatmap]{plotCNVheatmap()}}, \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
-Other CNV:
-\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}},
-\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
-\code{\link[=runHMMCopy]{runHMMCopy()}}
+Other CNV: 
+\code{\link{addHMMcopyCNV}()},
+\code{\link{plotCNVheatmap}()},
+\code{\link{runHMMCopy}()}
 }
 \concept{CNV}

@@ -123,9 +123,9 @@ exampleTumourNormal \%>\%
 \code{\link[HMMcopy:HMMsegment]{HMMcopy::HMMsegment()}},
 \code{\link[BiocParallel:register]{BiocParallel::register()}}
 
-Other CNV:
-\code{\link[=plotCNVheatmap]{plotCNVheatmap()}},
-\code{\link[=removeCNV]{removeCNV()}},
-\code{\link[=runHMMCopy]{runHMMCopy()}}
+Other CNV: 
+\code{\link{plotCNVheatmap}()},
+\code{\link{removeCNV}()},
+\code{\link{runHMMCopy}()}
 }
 \concept{CNV}
