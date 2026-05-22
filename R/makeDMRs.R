@@ -71,10 +71,10 @@
 #'
 #' @export
 fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
-                       contrasts = NULL, keepIndex = NULL,
-                       minReadCount = 0, minNRPM = 1,
-                       checkPVals = TRUE, formula = NULL,
-                       calcDispersionAll = FALSE) {
+    contrasts = NULL, keepIndex = NULL,
+    minReadCount = 0, minNRPM = 1,
+    checkPVals = TRUE, formula = NULL,
+    calcDispersionAll = FALSE) {
 
     if (!is.null(contrasts)) {
         nContrasts <- nrow(contrasts)
@@ -311,7 +311,8 @@ fitQseaGLM <- function(qseaSet, variable = NULL, covariates = NULL,
             } else {
 
                 stop(
-                    "More than 20% of windows have p-values of exactly 0; this likely ",
+                    "More than 20% of windows have p-values of exactly 0; ",
+                    "this likely ",
                     "indicates a model issue.\n",
                     "Try removing covariates from the model (if any), or set ",
                     "checkPVals = FALSE to ignore this if you're sure."

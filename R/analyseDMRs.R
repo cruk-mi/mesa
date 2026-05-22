@@ -18,8 +18,8 @@
 #' @return A `tibble`:
 #'
 #' * **pivotDMRsLonger()**: returns a long-format table with one row per
-#' DMR–contrast combination, including columns `group1`, `group2`, `deltaBeta`,
-#' `log2FC`, and `adjPval`.
+#'   DMR–contrast combination, including columns `group1`, `group2`,
+#'   `deltaBeta`, `log2FC`, and `adjPval`.
 #'
 #' @seealso
 #' [tidyr::pivot_longer()], [summariseDMRsByContrast()]

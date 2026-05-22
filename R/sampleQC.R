@@ -1,4 +1,5 @@
-#' Summarise the fraction of hyper-stable methylated regions (GRCh38 only)
+#' Summarise the fraction of hyper-stable methylated regions
+#' (GRCh38 only)
 #'
 #' For each sample, compute the proportion of *Edgar et al.* “ultra-stable”
 #' windows that are clearly methylated (beta ≥ `minBeta`) after filtering by
@@ -13,9 +14,9 @@
 #'   from array data (*Edgar et al.*, 2014).
 #' - **Computation.** Windows overlapping the ultra-stable set are extracted,
 #'   beta values are computed via `qsea::makeTable(norm_methods = "beta")`,
-#'   windows with `CpG_density < minDensity` are dropped, `NA` beta are treated
-#'   as `0` for thresholding, and the per-sample fraction with beta ≥ `minBeta`
-#'   is returned.
+#'   windows with `CpG_density < minDensity` are dropped, `NA` beta
+#'   are treated as `0` for thresholding, and the per-sample
+#'   fraction with beta ≥ `minBeta` is returned.
 #'
 #' @param qseaSet `qseaSet`.
 #'   Input object (must be GRCh38).
@@ -113,7 +114,10 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
             hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3), 0)
         )
 
-    qseaSet@sampleTable <- cbind(qseaSet@sampleTable, dplyr::select(newData, -sample_name))
+    qseaSet@sampleTable <- cbind(
+        qseaSet@sampleTable,
+        dplyr::select(newData, -sample_name)
+    )
 
     return(qseaSet)
 
