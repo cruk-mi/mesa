@@ -1,16 +1,23 @@
 # mesa 0.99.3
 
 ## Bug Fixes
-
 - Fixed `plotly` PNG device error on headless build servers
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Switched to `pdf` device in PCA vignette chunks to resolve
   Cairo/X11 dependency issues in CI
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+- Restored vignette YAML front matter dropped during line-wrap reflow
+  ([#76](https://github.com/cruk-mi/mesa/pull/76))
 
 ## Style
-
 - Standardized 4-space indentation throughout codebase per
   Bioconductor style guide
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Added missing chunk labels to all vignettes
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+- Wrapped all lines > 80 characters across R sources, vignettes, and helpers
+  to satisfy BiocCheck `LINE_LENGTH` notes
+  ([#76](https://github.com/cruk-mi/mesa/pull/76))
 
 # mesa 0.99.2
 
