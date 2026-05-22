@@ -422,7 +422,10 @@ getWindowAnnotation <- function(dataTab, regions, windowAnnotation = NULL,
     if (nrow(nonUniqueWindowsDf) > 0) {
         stop(glue::glue(
             "Non-unique annotations found in window annotations:\n",
-            "{paste(capture.output(print(head(nonUniqueWindowsDf))), collapse = '\n')}"
+            "{paste(
+                capture.output(print(head(nonUniqueWindowsDf))),
+                collapse = '\n'
+            )}"
         ))
     }
     rowAnnotDfdistinct %>%
@@ -589,29 +592,36 @@ makeHeatmapAnnotations <- function(qseaSet,
     colvecs_zerocenter <- c("BrBG", "PiYG", "PuOr", "PRGn", "RdGy") %>%
         purrr::set_names(., nm = .) %>%
         purrr::map(function(pal) {
-            RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+            RColorBrewer::brewer.pal(
+                RColorBrewer::brewer.pal.info[pal, "maxcolors"],
+                pal
+            ) %>%
                 {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
-        }
-        )
+        })
 
 
 
-    col_list_num_min_positive <- c(sampleAnnotation_numeric_min_positive, windowAnnotation_numeric_min_positive) %>%
+    col_list_num_min_positive <- c(
+        sampleAnnotation_numeric_min_positive,
+        windowAnnotation_numeric_min_positive
+    ) %>%
         purrr::map2(colvecs_binary[seq_along(.)], function(val, cols) {
-            circlize::colorRamp2(c(min(val, na.rm = TRUE),
-                max(val, na.rm = TRUE)),
-            cols)
-        }
-        )
+            circlize::colorRamp2(
+                c(min(val, na.rm = TRUE), max(val, na.rm = TRUE)),
+                cols
+            )
+        })
 
-    col_list_num_min_negative <- c(sampleAnnotation_numeric_min_negative, windowAnnotation_numeric_min_negative) %>%
+    col_list_num_min_negative <- c(
+        sampleAnnotation_numeric_min_negative,
+        windowAnnotation_numeric_min_negative
+    ) %>%
         purrr::map2(colvecs_zerocenter[seq_along(.)], function(val, cols) {
-            circlize::colorRamp2(c(min(val, na.rm = TRUE),
-                0,
-                max(val, na.rm = TRUE)),
-            cols)
-        }
-        )
+            circlize::colorRamp2(
+                c(min(val, na.rm = TRUE), 0, max(val, na.rm = TRUE)),
+                cols
+            )
+        })
 
     annotationColors <- c(
         col_list_cat,
@@ -694,8 +704,9 @@ makeHeatmapAnnotations <- function(qseaSet,
     return(list(sample = sampleAnnot, window = windowAnnot))
 }
 
-#' Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
-#' **ComplexHeatmap**. The gene can be given as a HGNC symbol or Ensembl ID.
+#' Plot sample signal over windows spanning a gene (± flanks) as a
+#' heatmap using **ComplexHeatmap**. The gene can be given as a HGNC
+#' symbol or Ensembl ID.
 #'
 #' @param qseaSet `qseaSet`.
 #'   Input object containing windows and counts/betas.
@@ -869,8 +880,11 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     # If all useMart retries failed, stop with an informative message
     if (is.null(mart)) {
-        stop("Could not connect to Ensembl via biomaRt after multiple attempts. ",
-            "Please check your internet connection or supply a mart object directly via the `mart` argument.")
+        stop(
+            "Could not connect to Ensembl via biomaRt after multiple ",
+            "attempts. Please check your internet connection or supply a ",
+            "mart object directly via the `mart` argument."
+        )
     }
 
     if (is.null(idType)) {
@@ -879,7 +893,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
             idType <- "ensembl_gene_id"
         } else if (stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens")) {
             idType <- "hgnc_symbol"
-        } else if (stringr::str_detect(qsea:::getGenome(qseaSet), "Mmusculus")) {
+        } else if (
+            stringr::str_detect(qsea:::getGenome(qseaSet), "Mmusculus")
+        ) {
             idType <- "mgi_symbol"
         } else {
             stop(
@@ -976,7 +992,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
             minEnrichment = minEnrichment
         ) %>%
         dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-        dplyr::mutate_all(~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
+        dplyr::mutate_all(
+            ~ dplyr::case_when(!is.nan(.x) ~ .x)
+        ) # do something with NaN values?
 
     if (useGroupMeans) {
         colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
@@ -1190,40 +1208,52 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
     annotationCol_numeric_min_negative <- annotationCol_numeric %>%
         dplyr::select_if(function(x) min(x) < 0)
 
-    colvecs_binary <- c("Reds", "YlGnBu", "YlOrBr", "PuRd", "Blues", "Purples") %>%
+    colvecs_binary <- c(
+        "Reds", "YlGnBu", "YlOrBr", "PuRd", "Blues", "Purples"
+    ) %>%
         purrr::set_names(., nm = .) %>%
         purrr::map(function(pal) {
-            RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+            RColorBrewer::brewer.pal(
+                RColorBrewer::brewer.pal.info[pal, "maxcolors"],
+                pal
+            ) %>%
                 {c(dplyr::first(.), dplyr::last(.))}
-        }
-        )
+        })
 
     colvecs_zerocenter <- c("BrBG", "PiYG", "PuOr", "PRGn", "RdGy") %>%
         purrr::set_names(., nm = .) %>%
         purrr::map(function(pal) {
-            RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal, "maxcolors"], pal) %>%
+            RColorBrewer::brewer.pal(
+                RColorBrewer::brewer.pal.info[pal, "maxcolors"],
+                pal
+            ) %>%
                 {c(dplyr::first(.), dplyr::nth(., 6), dplyr::last(.))}
-        }
-        )
+        })
 
     col_list_num_min_positive <- annotationCol_numeric_min_positive %>%
         purrr::map2(colvecs_binary[seq_along(ncol(.))], function(val, cols) {
-            circlize::colorRamp2(c(min(val, na.rm = TRUE),
-                max(val, na.rm = TRUE)),
-            cols)
-        }
-        )
+            circlize::colorRamp2(
+                c(min(val, na.rm = TRUE), max(val, na.rm = TRUE)),
+                cols
+            )
+        })
 
     col_list_num_min_negative <- annotationCol_numeric_min_negative %>%
-        purrr::map2(colvecs_zerocenter[seq_along(ncol(.))], function(val, cols) {
-            circlize::colorRamp2(c(min(val, na.rm = TRUE),
-                0,
-                max(val, na.rm = TRUE)),
-            cols)
-        }
+        purrr::map2(
+            colvecs_zerocenter[seq_along(ncol(.))],
+            function(val, cols) {
+                circlize::colorRamp2(
+                    c(min(val, na.rm = TRUE), 0, max(val, na.rm = TRUE)),
+                    cols
+                )
+            }
         )
 
-    annotationColors <- c(col_list_cat, col_list_num_min_positive, col_list_num_min_negative)
+    annotationColors <- c(
+        col_list_cat,
+        col_list_num_min_positive,
+        col_list_num_min_negative
+    )
 
     annotation_legend_param_ls <- annotationColDf %>%
         colnames() %>%
@@ -1304,20 +1334,31 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'
 #' # Override for specific analysis
 #' exampleTumourNormal %>%
-#'     plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+#'     plotGenomicFeatureDistribution(
+#'         genome = "mm10",
+#'         normMethod = "nrpm",
+#'         cutoff = 2
+#'     )
 #'
 #' # Advanced: manual control (bypasses mesa genome system)
 #' exampleTumourNormal %>%
 #'     plotGenomicFeatureDistribution(
-#'         TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+#'         TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
+#'             TxDb.Mmusculus.UCSC.mm10.knownGene,
 #'         annoDb = "org.Mm.eg.db"
 #'     )
 #' }
 #'
 #' @export
-plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack",
-                                            normMethod = "nrpm", genome = NULL,
-                                            TxDb = NULL, annoDb = NULL) {
+plotGenomicFeatureDistribution <- function(
+    qseaSet,
+    cutoff = 1,
+    barType = "stack",
+    normMethod = "nrpm",
+    genome = NULL,
+    TxDb = NULL,
+    annoDb = NULL
+) {
 
     # Genome selection hierarchy:
     # 1. Function parameter (genome) takes precedence
@@ -1335,29 +1376,44 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
         annodb <- getMesaAnnoDb()
     } else if (!is.null(TxDb) || !is.null(annoDb)) {
         # Manual parameters
-        txdb <- if (is.null(TxDb)) TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene else TxDb
+        txdb <- if (is.null(TxDb)) {
+            TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+        } else {
+            TxDb
+        }
         annodb <- if (is.null(annoDb)) "org.Hs.eg.db" else annoDb
     } else {
         # Default fallback
-        txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+        txdb <- getExportedValue(
+            "TxDb.Hsapiens.UCSC.hg38.knownGene",
+            "TxDb.Hsapiens.UCSC.hg38.knownGene"
+        )
         annodb <- "org.Hs.eg.db"
     }
 
     temp <- qseaSet %>%
-        qsea::makeTable(samples = qsea::getSampleNames(.), norm_methods = normMethod) %>%
+        qsea::makeTable(
+            samples = qsea::getSampleNames(.),
+            norm_methods = normMethod
+        ) %>%
         qseaTableToChrGRanges() %>%
-        ChIPseeker::annotatePeak(tssRegion = c(-2000, 500),
+        ChIPseeker::annotatePeak(
+            tssRegion = c(-2000, 500),
             level = "gene",
             TxDb = txdb,
             annoDb = annodb,
             overlap = "all",
-            verbose = FALSE)
+            verbose = FALSE
+        )
 
     featureTable <- purrr::map_dfr(qsea::getSampleNames(qseaSet), function(x) {
         temp@anno %>%
-            tibble::as_tibble() %>% # Convert before filter to avoid GRanges conversion
+            tibble::as_tibble() %>% # Convert before filter to avoid GRanges
+            # conversion
             dplyr::filter(!!dplyr::sym(paste0(x, "_", normMethod)) > cutoff) %>%
-            dplyr::mutate(annoShort = stringr::str_replace(annotation, "on \\(.*", "on")) %>%
+            dplyr::mutate(
+                annoShort = stringr::str_replace(annotation, "on \\(.*", "on")
+            ) %>%
             dplyr::pull(annoShort) %>%
             table() %>%
             tibble::enframe(name = "feature") %>%
@@ -1367,11 +1423,22 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
     featureTable %>%
         ggplot2::ggplot(ggplot2::aes(y = value, x = sample, fill = feature)) +
         ggplot2::geom_bar(position = barType, stat = "identity") +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, vjust = 0.5)) +
-        ggplot2::labs(x = "Sample",
+        ggplot2::theme(
+            axis.text.x = ggplot2::element_text(
+                angle = 90,
+                hjust = 0,
+                vjust = 0.5
+            )
+        ) +
+        ggplot2::labs(
+            x = "Sample",
             y = "Fraction",
             legend = "Feature",
-            subtitle = glue::glue("{getWindowSize(qseaSet)}bp windows with at least {cutoff} {normMethod}"))
+            subtitle = glue::glue(
+                "{getWindowSize(qseaSet)}bp windows with at least ",
+                "{cutoff} {normMethod}"
+            )
+        )
 }
 
 #' Sample correlation heatmap
@@ -1447,13 +1514,17 @@ plotGenomicFeatureDistribution <- function(qseaSet, cutoff = 1, barType = "stack
 #'         sampleAnnotation = c(tumour, patient))
 #'
 #' @export
-plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL,
-                                  useGroupMeans = FALSE,
-                                  sampleAnnotation = NULL,
-                                  normMethod = "nrpm",
-                                  minEnrichment = 3,
-                                  annotationColors = NA,
-                                  minDensity = 0, ...) {
+plotCorrelationMatrix <- function(
+    qseaSet,
+    regionsToOverlap = NULL,
+    useGroupMeans = FALSE,
+    sampleAnnotation = NULL,
+    normMethod = "nrpm",
+    minEnrichment = 3,
+    annotationColors = NA,
+    minDensity = 0,
+    ...
+) {
 
     ## TODO: Swap from pheatmap to ComplexHeatmap
     if (!is.null(regionsToOverlap)) {
@@ -1482,7 +1553,9 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL,
             minEnrichment = minEnrichment
         ) %>%
         dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-        dplyr::mutate_all(~ dplyr::case_when(!is.nan(.x) ~ .x)) # do something with NaN values?
+        dplyr::mutate_all(
+            ~ dplyr::case_when(!is.nan(.x) ~ .x)
+        ) # do something with NaN values?
 
     if (useGroupMeans) {
         colsToFind <- qseaSet %>% getSampleGroups2() %>% names()
@@ -1570,8 +1643,13 @@ plotCorrelationMatrix <- function(qseaSet, regionsToOverlap = NULL,
 #'     plotDMRUpset(removeVS = TRUE)
 #'
 #' @export
-plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE,
-                         minAdjPval = 0.05, ...) {
+plotDMRUpset <- function(
+    DMRtable,
+    string = NULL,
+    removeVS = FALSE,
+    minAdjPval = 0.05,
+    ...
+) {
 
     if (!requireNamespace("UpSetR", quietly = TRUE)) {
         stop(
@@ -1682,8 +1760,11 @@ plotDMRUpset <- function(DMRtable, string = NULL, removeVS = FALSE,
 #'     dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) %>%
 #'     mesa:::getAnnotation(sampleAnnotation = tumour, useGroupMeans = TRUE)
 #'
-getAnnotation <- function(qseaSet, useGroupMeans = FALSE,
-                          sampleAnnotation = NULL) {
+getAnnotation <- function(
+    qseaSet,
+    useGroupMeans = FALSE,
+    sampleAnnotation = NULL
+) {
 
     if (rlang::quo_is_null(rlang::enquo(sampleAnnotation))) {
         return(data.frame())
@@ -1758,7 +1839,11 @@ testPlotGeneHeatmap <- function(...) {
     }, error = function(e) {
         if (stringr::str_detect(
             e$message,
-            "(?i)biomart|SSL|connection|timeout|could not resolve|unexpected eof|http [45][0-9][0-9]|service unavailable|req_perform"
+            paste0(
+                "(?i)biomart|SSL|connection|timeout|could not resolve|",
+                "unexpected eof|http [45][0-9][0-9]|service unavailable|",
+                "req_perform"
+            )
         )) {
             testthat::skip("Connection to biomart failed, skipping test.")
         } else {
