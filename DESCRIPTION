@@ -42,6 +42,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
 Imports:
     plyranges,
     magrittr,
@@ -118,4 +119,3 @@ biocViews: Sequencing, DNAMethylation, CpGIsland,
 Config/testthat/edition: 3
 URL: https://github.com/cruk-mi/mesa
 BugReports: https://github.com/cruk-mi/mesa
-RoxygenNote: 7.3.3
