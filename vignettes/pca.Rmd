@@ -481,7 +481,11 @@ This may be done by pre-filtering the qseaSet object via `filterByOverlaps`:
 ```{r filtering-regions}
 exampleTumourNormal |>
     filterByOverlaps(
-        regionsToOverlap = tibble(seqnames = 7, start = 25002001, end = 25117900)
+        regionsToOverlap = tibble(
+            seqnames = 7,
+            start = 25002001,
+            end = 25117900
+        )
     ) |>
     getPCA()
 ```

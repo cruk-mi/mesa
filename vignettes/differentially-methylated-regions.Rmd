@@ -304,7 +304,8 @@ gene is, and which transcript is being used in the annotations.
 ```{r chunk-14}
 annoDMRs |> 
     dplyr::select(
-        geneChr, geneStart, geneEnd, geneLength, geneStrand, geneId, transcriptId
+        geneChr, geneStart, geneEnd, geneLength, geneStrand,
+        geneId, transcriptId
     )
 ```
 
@@ -488,11 +489,13 @@ variable (with the second being chosen automatically):
 
 ```{r chunk-26}
 exampleTumourNormal |>
-    plotRegionsHeatmap(regionsToOverlap = DMRsCovariatePatient, 
-                        sampleAnnotation = c("tumour", "type"),
-                        annotationColors = list(tumour = c("Normal" = "blue", 
-                                                        "Tumour" = "firebrick4"))
-                        )
+    plotRegionsHeatmap(
+        regionsToOverlap = DMRsCovariatePatient,
+        sampleAnnotation = c("tumour", "type"),
+        annotationColors = list(
+            tumour = c("Normal" = "blue", "Tumour" = "firebrick4")
+        )
+    )
 ```
 
 Or both variables:

@@ -23,9 +23,9 @@ library(tibble)
 
 # Introduction
 In this vignette we cover the generation of a qseaSet using the functions
-provided in `mesa`, rather than those in `qsea`. Please see the [`qsea`
-tutorial](https://bioconductor.org/packages/devel/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html)
-for more detail, but we will cover much of that here.
+provided in `mesa`, rather than those in `qsea`. Please see the `qsea`
+package vignette `vignette("qsea_tutorial", package = "qsea")` for more
+detail, but we will cover much of that here.
 
 ## Sample Metadata 
 The first thing to prepare is the `sampleTable`; a dataframe containing metadata
@@ -60,10 +60,8 @@ There are also two more optional fields that may be used during generation:
 
 * `gender` or `sex` : If one of these columns are included, then any chromosome
     called `X`,`Y`, `chrX` or `chrY` will be set with appropriate zygosity for
-    samples with `M`, `m` or `male` in this column. See the [qsea code for
-    details](
-        https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54
-    );
+    samples with `M`, `m` or `male` in this column. See
+    `qsea.createSet.R` in the `qsea` source for details;
     within the National Biomarker Centre we only consider the autosomes.
 
 In addition, any further metadata columns may be included as required, and we
