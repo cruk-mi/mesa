@@ -1,12 +1,11 @@
 #' Ultra-stable methylated regions (GRCh38)
 #'
-#' Genomic loci that are consistently methylated (“ultra-stable”) across many
-#' human tissues
-#' and diseases, mapped to GRCh38. Regions correspond to Illumina array probe
-#' loci
-#' (cg identifiers) derived as in Edgar et al. (2014), and are intended for QC
-#' and summary
-#' metrics (e.g., [addHyperStableFraction()]).
+#' Genomic loci that are consistently methylated (“ultra-stable”)
+#' across many human tissues and diseases, mapped to GRCh38.
+#' Regions correspond to Illumina array probe loci (cg identifiers)
+#' derived as in Edgar et al.
+#' (2014), and are intended for QC and summary metrics (e.g.,
+#' [addHyperStableFraction()]).
 #'
 #' @format
 #' A `GRanges` object with 974 ranges and 1 metadata column:
@@ -27,8 +26,8 @@
 #'
 #' When combining with other `GRanges`, harmonise styles/metadata as needed,
 #' e.g.
-#' use `GenomeInfoDb::seqlevelsStyle()` to convert to `"UCSC"` (`"chr1"`, …) and
-#' `GenomeInfoDb::genome()` to set `"hg38"`.
+#' use `GenomeInfoDb::seqlevelsStyle()` to convert to `"UCSC"` (`"chr1"`, …)
+#' and `GenomeInfoDb::genome()` to set `"hg38"`.
 #'
 #' @source
 #' Processed from public array resources following Edgar et al. (2014).
@@ -68,4 +67,3 @@
 #' toy_ucsc <- GenomicRanges::GRanges("chr1", IRanges::IRanges(951160, 951170))
 #' GenomicRanges::countOverlaps(toy_ucsc, gr) # after style harmonisation above
 "hg38UltraStableProbes"
-

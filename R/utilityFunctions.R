@@ -379,7 +379,9 @@ setMesaParallel <- function(
             "BiocParallel::register."
         ))
     } else if (verbose) {
-        message("Parallelisation turned off for all functions in the mesa package.")
+        message(
+            "Parallelisation turned off for all functions in the mesa package."
+        )
     }
 
     return(invisible(useParallel))
