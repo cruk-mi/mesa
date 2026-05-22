@@ -149,15 +149,12 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
         )
 
         stop(
-            sprintf(
-                paste0(
-                    "CNV regions overlap with multiple windows from the ",
-                    "hmmCopyGC and/or hmmCopyMap objects!\n",
-                    "This probably means that your window ",
-                    "sizes do not match.\n",
-                    "Showing first affected regions:\n%s"
-                ),
-                print_and_capture(duplicatedRegions)
+            glue::glue(
+                "CNV regions overlap with multiple windows from the ",
+                "hmmCopyGC and/or hmmCopyMap objects!\n",
+                "This probably means that your window sizes do not match.\n",
+                "Showing first affected regions:\n",
+                "{print_and_capture(duplicatedRegions)}"
             ),
             call. = FALSE
         )

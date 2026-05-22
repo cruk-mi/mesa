@@ -329,23 +329,25 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
     asValidNames <- base::make.names(renamedNames)
 
     if (any(asValidNames != renamedNames)) {
-        stop(glue::glue(paste0(
-            "Sample names must be valid names for columns",
-            " in R without quoting.\n",
-            "See the help for base::make.names, but generally use only",
-            " letters, numbers,\n",
+        invalidNames <- glue::glue_collapse(
+            renamedNames[renamedNames != asValidNames],
+            sep = "\n    "
+        )
+        stop(glue::glue(
+            "Sample names must be valid names for columns in R without ",
+            "quoting.\n",
+            "See the help for base::make.names, but generally use only ",
+            "letters, numbers,\n",
             "underscores and dots, and names can't start with a number.\n",
-            "Issues were found with:\n    ",
-            "{paste(renamedNames[renamedNames != asValidNames],",
-            " collapse = '\n    ')}"
-        )))
+            "Issues were found with:\n    {invalidNames}"
+        ))
     }
 
     if (any(duplicated(renamedNames))) {
-        stop(glue::glue(paste0(
-            "Duplicate sample_name now present:",
-            " {renamedNames[duplicated(renamedNames)]}"
-        )))
+        stop(glue::glue(
+            "Duplicate sample_name now present: ",
+            "{renamedNames[duplicated(renamedNames)]}"
+        ))
     }
 
     newQSet <- qseaSet
@@ -637,16 +639,18 @@ renameSamples <- function(qseaSet, newNameColumn) {
     asValidNames <- base::make.names(renamedNames)
 
     if (any(asValidNames != renamedNames)) {
-        stop(glue::glue(paste0(
-            "Sample names must be valid names for columns",
-            " in R without quoting.\n",
-            "See the help for base::make.names, but generally use only",
-            " letters, numbers,\n",
+        invalidNames <- glue::glue_collapse(
+            renamedNames[renamedNames != asValidNames],
+            sep = "\n    "
+        )
+        stop(glue::glue(
+            "Sample names must be valid names for columns in R without ",
+            "quoting.\n",
+            "See the help for base::make.names, but generally use only ",
+            "letters, numbers,\n",
             "underscores and dots, and names can't start with a number.\n",
-            "Issues were found with:\n    ",
-            "{paste(renamedNames[renamedNames != asValidNames],",
-            " collapse = '\n    ')}"
-        )))
+            "Issues were found with:\n    {invalidNames}"
+        ))
     }
 
     if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
@@ -654,10 +658,10 @@ renameSamples <- function(qseaSet, newNameColumn) {
         return(qseaSet)
     }
     if (any(duplicated(renamedNames))) {
-        stop(glue::glue(paste0(
-            "Duplicate sample_name now present:",
-            " {renamedNames[duplicated(renamedNames)]}"
-        )))
+        stop(glue::glue(
+            "Duplicate sample_name now present: ",
+            "{renamedNames[duplicated(renamedNames)]}"
+        ))
     }
     newQSet <- qseaSet
     newQSet@sampleTable <- newQSet@sampleTable %>%
