@@ -55,10 +55,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToBed}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToBed]{writeDMRsToBed()}}
 }
 \concept{DMR-helpers}

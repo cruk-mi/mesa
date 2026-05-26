@@ -28,5 +28,5 @@ iris \%>\% is.qseaSet()
 
 }
 \seealso{
-\code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[base:class]{base::inherits()}}
+\code{\link[qsea:createQseaSet]{qsea::createQseaSet()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[base:inherits]{base::inherits()}}
 }

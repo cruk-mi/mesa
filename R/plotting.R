@@ -200,12 +200,7 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     # define a function that removes rows that have 1 row.
     remove_almost_empty_rows <- function(dat) {
         mask_keep <- rowSums(is.na(dat)) != (ncol(dat) - 1)
-        janitor:::remove_message(
-            dat = dat,
-            mask_keep = mask_keep,
-            which = "rows",
-            reason = "almost empty"
-        )
+        if (!all(mask_keep)) message("Removing ", sum(!mask_keep), " almost empty rows.")
         return(dat[mask_keep, , drop = FALSE])
     }
 
@@ -864,14 +859,15 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     if (!is.null(getMart(qseaSet))) { mart <- getMart(qseaSet) }
 
+    .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
     if (is.null(mart) &
-        stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
-        stringr::str_detect(qsea:::getGenome(qseaSet), "hg38|GRCh38")) {
+        stringr::str_detect(.genome, "Hsapiens") &
+        stringr::str_detect(.genome, "hg38|GRCh38")) {
         mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
             host = "https://jul2022.archive.ensembl.org")
     } else if (is.null(mart) &
-        stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens") &
-        stringr::str_detect(qsea:::getGenome(qseaSet), "hg19|GRCh37")) {
+        stringr::str_detect(.genome, "Hsapiens") &
+        stringr::str_detect(.genome, "hg19|GRCh37")) {
         mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
             host = "https://feb2014.archive.ensembl.org")
     } else if (is.null(mart)) {
@@ -891,11 +887,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
         if (stringr::str_detect(gene, "^ENS.*G")) {
             idType <- "ensembl_gene_id"
-        } else if (stringr::str_detect(qsea:::getGenome(qseaSet), "Hsapiens")) {
+        } else if (stringr::str_detect(.genome, "Hsapiens")) {
             idType <- "hgnc_symbol"
-        } else if (
-            stringr::str_detect(qsea:::getGenome(qseaSet), "Mmusculus")
-        ) {
+        } else if (stringr::str_detect(.genome, "Mmusculus")) {
             idType <- "mgi_symbol"
         } else {
             stop(

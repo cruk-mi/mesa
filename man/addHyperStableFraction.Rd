@@ -36,7 +36,7 @@ CpG density (≥ \code{minDensity}). The result is added to the sample table as
 \itemize{
 \item \strong{Genome restriction.} Only supported for
 \code{"BSgenome.Hsapiens.NCBI.GRCh38"}; the function stops otherwise (checked via
-\code{qsea:::getGenome()}).
+\code{qsea::getParameters()}).
 \item \strong{Regions used.} Uses \code{mesa::hg38UltraStableProbes}, a GRCh38 set derived
 from array data (\emph{Edgar et al.}, 2014).
 \item \strong{Computation.} Windows overlapping the ultra-stable set are extracted,
@@ -79,6 +79,6 @@ surrounding CpG islands associated with high gene expression}.
 \url{https://pubmed.ncbi.nlm.nih.gov/25493099/}
 }
 \seealso{
-\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleNames()}},
+\code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[qsea:getSampleNames]{qsea::getSampleNames()}},
 \link{hg38UltraStableProbes}, \code{\link[=getSampleQCSummary]{getSampleQCSummary()}}
 }

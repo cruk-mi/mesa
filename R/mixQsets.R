@@ -106,7 +106,7 @@ mixSamples <- function(
     onlyNew = FALSE,
     renormalise = TRUE
 ) {
-    qsea:::checkSamples(qseaSet, c(sample1, sample2))
+    stopifnot(all(c(sample1, sample2) %in% qsea::getSampleNames(qseaSet)))
 
     if (is.null(newName)) {
         newName <- paste0("Mix", "_", sample1, "_", sample2, "_", proportion)
@@ -347,7 +347,7 @@ mixThreeQsetSamples <- function(
     onlyNew = FALSE,
     renormalise = TRUE
 ) {
-    qsea:::checkSamples(qseaSet, c(sample1, sample2, sample3))
+    stopifnot(all(c(sample1, sample2, sample3) %in% qsea::getSampleNames(qseaSet)))
 
     if (is.null(newName)) {
         newName <- paste0(

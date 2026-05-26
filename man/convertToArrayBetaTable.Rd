@@ -50,10 +50,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, dataset \code{mesa::hg38_450kArrayGR}
 
-Other window-helpers: 
-\code{\link{calculateFractionReadsInGRanges}()},
-\code{\link{downSample}()},
-\code{\link{subsetWindowsBySignal}()},
-\code{\link{subsetWindowsOverBackground}()}
+Other window-helpers:
+\code{\link[=calculateFractionReadsInGRanges]{calculateFractionReadsInGRanges()}},
+\code{\link[=downSample]{downSample()}},
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}},
+\code{\link[=subsetWindowsOverBackground]{subsetWindowsOverBackground()}}
 }
 \concept{window-helpers}

@@ -87,6 +87,6 @@ if (.Platform$OS.type == "windows") {
 
 }
 \seealso{
-\code{\link[BiocParallel:register]{BiocParallel::register()}}, \code{\link[BiocParallel:MulticoreParam-class]{BiocParallel::MulticoreParam()}},
-\code{\link[BiocParallel:SnowParam-class]{BiocParallel::SnowParam()}}, \code{\link[BiocParallel:BiocParallelParam-class]{BiocParallel::bpworkers()}}
+\code{\link[BiocParallel:register]{BiocParallel::register()}}, \code{\link[BiocParallel:MulticoreParam]{BiocParallel::MulticoreParam()}},
+\code{\link[BiocParallel:SnowParam]{BiocParallel::SnowParam()}}, \code{\link[BiocParallel:bpworkers]{BiocParallel::bpworkers()}}
 }

@@ -50,6 +50,12 @@
 
 # mesa 0.99.0
 
+### FIXED
+* Resolved `R CMD check` TIMEOUT: `skip_long_checks()` was using `options()` (returns a list) instead of `getOption()`, so slow tests were never skipped. Also set `options(skip_long_checks = TRUE)` in `tests/testthat.R` so BAM-processing tests are skipped during `R CMD check`.
+* Resolved NOTE "Package in Depends field not imported from: 'qsea'": added `@import qsea` via `R/mesa-package.R`.
+* Resolved NOTE "Unexported objects imported by ':::' calls": replaced all `qsea:::` and `janitor:::` calls with public-API equivalents or inline slot assignments.
+* Resolved NOTE "no visible binding for global variable": added `BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution`, `BSgenome.Hsapiens.UCSC.hg19.CpG.distribution`, `BSgenome.Mmusculus.UCSC.mm10.CpG.distribution`, `FantomRegions`, and `hg19ToHg38.over.chain` to `utils::globalVariables()`.
+
 ### ADDED
 * Many more examples for individual functions on their help pages, as well as a set of vignettes. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Added validity checks for mesa classes (mesaDimRed, mesaPCA, mesaUMAP). [!43](https://github.com/cruk-mi/mesa/pull/43)

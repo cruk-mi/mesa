@@ -227,12 +227,7 @@ getWindows <- function(qseaSet) {
 #'
 remove_almost_empty_cols <- function(dat, prop) {
     mask_keep <- colSums(is.na(dat)) <= prop * (nrow(dat))
-    janitor:::remove_message(
-        dat = dat,
-        mask_keep = mask_keep,
-        which = "cols",
-        reason = "almost empty"
-    )
+    if (!all(mask_keep)) message("Removing ", sum(!mask_keep), " almost empty cols.")
     return(dat[, mask_keep, drop = FALSE])
 }
 
@@ -254,7 +249,7 @@ remove_almost_empty_cols <- function(dat, prop) {
 #' @keywords internal
 #' @noRd
 skip_long_checks <- function() {
-    if (!identical(options("skip_long_checks"), TRUE)) {
+    if (!isTRUE(getOption("skip_long_checks"))) {
         return(invisible(TRUE))
     }
 

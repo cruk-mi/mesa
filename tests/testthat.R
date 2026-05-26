@@ -8,5 +8,6 @@
 
 library(testthat)
 library(mesa)
+options(skip_long_checks = TRUE)
 BiocParallel::register(BiocParallel::MulticoreParam(workers = 1))
 test_check("mesa")

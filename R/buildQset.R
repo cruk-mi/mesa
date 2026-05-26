@@ -470,11 +470,9 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
 #'
 #' @return A `qseaSet` with updated slots:
 #'
-#' * **Counts**: updated count matrix via `qsea:::setCounts()`.
-#' * **Library**: updated library table via `qsea:::setLibrary()`, with summary
-#' metrics.
-#' * **Parameters**: appended record of MAPQ/size thresholds via
-#' `qsea:::addParameters()`.
+#' * **Counts**: updated count matrix.
+#' * **Library**: updated library table with summary metrics.
+#' * **Parameters**: appended record of MAPQ/size thresholds.
 #'
 #' @details
 #' Per-region counts are computed from fragment midpoints to align with qsea’s
@@ -522,7 +520,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
     }
 
     getCGPositions(
-        qsea:::getGenome(qs),
+        qsea::getParameters(qs)[["BSgenome"]],
         qs %>% qsea::getRegions() %>%
             GenomeInfoDb::seqnames() %>%
             levels()
@@ -530,7 +528,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 
     bamOutList <- BiocParallel::bplapply(X = sampleTable[, "file_name"],
         FUN = getBamCoveragePairedAndUnpairedR1,
-        BSgenome = qsea:::getGenome(qs),
+        BSgenome = qsea::getParameters(qs)[["BSgenome"]],
         regions = Regions,
         fragmentLength = fragmentLength, maxInsertSize = maxInsertSize,
         minInsertSize = minInsertSize, minReferenceLength = minReferenceLength,
@@ -578,9 +576,9 @@ addBamCoveragePairedAndUnpaired <- function(qs,
         maxInsertSize = maxInsertSize, minInsertSize = minInsertSize,
         properPairsOnly = properPairsOnly
     )
-    qs <- qsea:::addParameters(qs, param)
-    qs <- qsea:::setCounts(qs, count_matrix = coverage)
-    qs <- qsea:::setLibrary(qs, "file_name", libraries)
+    qs@parameters <- c(qsea::getParameters(qs), param)
+    qs@count_matrix <- coverage
+    qs@libraries[["file_name"]] <- libraries
 
     # GenomicRanges::mcols(qs@regions) <-
     # cbind(GenomicRanges::mcols(qs@regions), regionAvgs)

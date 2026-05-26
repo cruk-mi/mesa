@@ -25,7 +25,12 @@ utils::globalVariables(c(
     "nSign", "nStrands",
     "chromosome_name", "start_position", "end_position", "input_file",
     "topVarNumInput", "windowSdName", "pcaName",
-    "fnValue", "group2new", "gap", "size"
+    "fnValue", "group2new", "gap", "size",
+    "BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution",
+    "BSgenome.Hsapiens.UCSC.hg19.CpG.distribution",
+    "BSgenome.Mmusculus.UCSC.mm10.CpG.distribution",
+    "FantomRegions",
+    "hg19ToHg38.over.chain"
 ))
 
 #' Lift over genomic ranges from hg19 to hg38
