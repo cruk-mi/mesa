@@ -8,6 +8,16 @@
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Restored vignette YAML front matter dropped during line-wrap reflow
   ([#76](https://github.com/cruk-mi/mesa/pull/76))
+- Resolved `R CMD check` TIMEOUT: `skip_long_checks()` used `options()`
+  (returns a list) instead of `getOption()`, so slow tests never skipped.
+  Added `options(skip_long_checks = TRUE)` to `tests/testthat.R`.
+- Resolved NOTE "Package in Depends field not imported from 'qsea'":
+  added `@import qsea` via `R/mesa-package.R`.
+- Resolved NOTE "Unexported objects imported by ':::' calls": replaced
+  all `qsea:::` and `janitor:::` calls with public-API equivalents or
+  inline S4 slot assignments.
+- Resolved NOTE "no visible binding for global variable": declared five
+  data-object names in `utils::globalVariables()`.
 
 ## Style
 - Standardized 4-space indentation throughout codebase per

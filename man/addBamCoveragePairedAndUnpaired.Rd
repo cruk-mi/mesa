@@ -18,7 +18,7 @@ addBamCoveragePairedAndUnpaired(
 \arguments{
 \item{qs}{\code{qseaSet}
 Input object with valid \code{file_name} in its sample table and regions
-accessible via \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}.}
+accessible via \code{\link[qsea:getRegions]{qsea::getRegions()}}.}
 
 \item{fragmentLength}{\code{integer(1)} or \code{NULL}
 Length to extend unpaired R1 reads. If \code{NULL}, estimated as the median
@@ -54,11 +54,9 @@ If \code{FALSE}, combine proper pairs with high-quality unpaired R1 reads.
 \value{
 A \code{qseaSet} with updated slots:
 \itemize{
-\item \strong{Counts}: updated count matrix via \code{qsea:::setCounts()}.
-\item \strong{Library}: updated library table via \code{qsea:::setLibrary()}, with summary
-metrics.
-\item \strong{Parameters}: appended record of MAPQ/size thresholds via
-\code{qsea:::addParameters()}.
+\item \strong{Counts}: updated count matrix.
+\item \strong{Library}: updated library table with summary metrics.
+\item \strong{Parameters}: appended record of MAPQ/size thresholds.
 }
 }
 \description{
@@ -82,8 +80,8 @@ and set a multi-core/cluster backend for speed.
 
 \seealso{
 \code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}},
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
+\code{\link[qsea:getRegions]{qsea::getRegions()}},
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}},
 \code{\link[BiocParallel:register]{BiocParallel::register()}}
 }
 \concept{coverage}

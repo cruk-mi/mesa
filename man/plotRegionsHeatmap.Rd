@@ -164,5 +164,5 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
 \code{\link[ComplexHeatmap]{draw}},
-\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
+\code{\link[=calculateDMRs]{calculateDMRs()}}, \code{\link[qsea:getSampleTable]{getSampleTable()}}, \code{\link[=getWindows]{getWindows()}}
 }
