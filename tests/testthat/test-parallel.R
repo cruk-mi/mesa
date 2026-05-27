@@ -1,5 +1,5 @@
 test_that("Parallelisation works with useParallel", {
-  
+  setMesaParallel(useParallel = FALSE, verbose = FALSE)
   expect_false(getMesaParallel())
   
   expect_true(setMesaParallel(useParallel = TRUE))
