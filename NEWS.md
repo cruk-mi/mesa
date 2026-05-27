@@ -11,6 +11,13 @@
 - Resolved `R CMD check` TIMEOUT: `skip_long_checks()` used `options()`
   (returns a list) instead of `getOption()`, so slow tests never skipped.
   Added `options(skip_long_checks = TRUE)` to `tests/testthat.R`.
+- Further cut `R CMD check` test runtime: added `helper-fixtures.R`
+  with a memoised `cachedExampleQset()` so repeated
+  `qsea::getExampleQseaSet()` builds are reused across `test_that`
+  blocks, and gated the heaviest blocks
+  (`test-DMRs.R` "Calculating DMRs", `test-exampleQset.R`
+  "Testing general functionality", `test-pca.R` "UMAPs") behind
+  `skip_long_checks()`.
 - Resolved NOTE "Package in Depends field not imported from 'qsea'":
   added `@import qsea` via `R/mesa-package.R`.
 - Resolved NOTE "Unexported objects imported by ':::' calls": replaced
