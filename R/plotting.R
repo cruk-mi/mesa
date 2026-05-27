@@ -200,7 +200,9 @@ plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
     # define a function that removes rows that have 1 row.
     remove_almost_empty_rows <- function(dat) {
         mask_keep <- rowSums(is.na(dat)) != (ncol(dat) - 1)
-        if (!all(mask_keep)) message("Removing ", sum(!mask_keep), " almost empty rows.")
+        if (!all(mask_keep)) {
+            message("Removing ", sum(!mask_keep), " almost empty rows.")
+        }
         return(dat[mask_keep, , drop = FALSE])
     }
 

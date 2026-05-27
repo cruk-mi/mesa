@@ -74,7 +74,8 @@
 #' @export
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
 
-    if (qsea::getParameters(qseaSet)[["BSgenome"]] != "BSgenome.Hsapiens.NCBI.GRCh38") {
+    bsgenome <- qsea::getParameters(qseaSet)[["BSgenome"]]
+    if (bsgenome != "BSgenome.Hsapiens.NCBI.GRCh38") {
         stop(
             "This function is only currently defined for ",
             "BSgenome.Hsapiens.NCBI.GRCh38."

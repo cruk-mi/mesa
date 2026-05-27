@@ -227,7 +227,9 @@ getWindows <- function(qseaSet) {
 #'
 remove_almost_empty_cols <- function(dat, prop) {
     mask_keep <- colSums(is.na(dat)) <= prop * (nrow(dat))
-    if (!all(mask_keep)) message("Removing ", sum(!mask_keep), " almost empty cols.")
+    if (!all(mask_keep)) {
+        message("Removing ", sum(!mask_keep), " almost empty cols.")
+    }
     return(dat[, mask_keep, drop = FALSE])
 }
 

@@ -347,7 +347,9 @@ mixThreeQsetSamples <- function(
     onlyNew = FALSE,
     renormalise = TRUE
 ) {
-    stopifnot(all(c(sample1, sample2, sample3) %in% qsea::getSampleNames(qseaSet)))
+    stopifnot(all(
+        c(sample1, sample2, sample3) %in% qsea::getSampleNames(qseaSet)
+    ))
 
     if (is.null(newName)) {
         newName <- paste0(
