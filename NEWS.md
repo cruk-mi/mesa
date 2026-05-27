@@ -20,6 +20,11 @@
   "Testing general functionality", `test-pca.R` "UMAPs") behind
   `skip_long_checks()`.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- Fixed `addHMMcopyCNV()`: `qsea:::makeGenomeWindows()` was replaced
+  with a fixed-width `GRanges` reimplementation, correcting wrong window
+  widths and boundaries that broke the hmmCopy GC/mappability overlap
+  check.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved NOTE "Package in Depends field not imported from 'qsea'":
   added `@import qsea` via `R/mesa-package.R`.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
