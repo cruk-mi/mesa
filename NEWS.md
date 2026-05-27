@@ -11,6 +11,7 @@
 - Resolved `R CMD check` TIMEOUT: `skip_long_checks()` used `options()`
   (returns a list) instead of `getOption()`, so slow tests never skipped.
   Added `options(skip_long_checks = TRUE)` to `tests/testthat.R`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Further cut `R CMD check` test runtime: added `helper-fixtures.R`
   with a memoised `cachedExampleQset()` so repeated
   `qsea::getExampleQseaSet()` builds are reused across `test_that`
@@ -18,13 +19,17 @@
   (`test-DMRs.R` "Calculating DMRs", `test-exampleQset.R`
   "Testing general functionality", `test-pca.R` "UMAPs") behind
   `skip_long_checks()`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved NOTE "Package in Depends field not imported from 'qsea'":
   added `@import qsea` via `R/mesa-package.R`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved NOTE "Unexported objects imported by ':::' calls": replaced
   all `qsea:::` and `janitor:::` calls with public-API equivalents or
   inline S4 slot assignments.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved NOTE "no visible binding for global variable": declared five
   data-object names in `utils::globalVariables()`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 
 ## Style
 - Standardized 4-space indentation throughout codebase per
