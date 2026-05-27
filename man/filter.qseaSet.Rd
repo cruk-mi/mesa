@@ -54,7 +54,7 @@ exampleTumourNormal \%>\% filter(tissue == "Liver")
 
 }
 \seealso{
-\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to inspect metadata,
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
 \code{\link[=subsetQset]{subsetQset()}} for explicit sample subsetting,
 \code{\link[=selectQset]{selectQset()}} for column selection in the \code{sampleTable}.
 }

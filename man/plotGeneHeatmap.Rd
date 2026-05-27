@@ -165,6 +165,6 @@ tryCatch(
 
 }
 \seealso{
-\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[qsea:getSampleTable]{getSampleTable()}}, \code{\link[=setMart]{setMart()}},
+\code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=setMart]{setMart()}},
 \code{\link[biomaRt:useMart]{biomaRt::useMart()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
 }

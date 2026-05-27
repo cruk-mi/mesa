@@ -117,8 +117,8 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
-Other window-summaries:
-\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}},
-\code{\link[=countWindowsAboveCutoff]{countWindowsAboveCutoff()}}
+Other window-summaries: 
+\code{\link{addSummaryAcrossWindows}()},
+\code{\link{countWindowsAboveCutoff}()}
 }
 \concept{window-summaries}

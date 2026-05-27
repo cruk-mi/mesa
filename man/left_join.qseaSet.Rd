@@ -22,7 +22,7 @@ A qseaSet object whose \code{sampleTable} will receive additional columns.}
 A data frame or tibble to join onto the \code{sampleTable}.}
 
 \item{by}{\code{character()} or \verb{named character()}.
-Join keys, as in \code{\link[dplyr:left_join]{dplyr::left_join()}}.
+Join keys, as in \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}.
 For qseaSets, the safest choice is \code{by = "sample_name"}.
 \strong{Default:} \code{NULL} (all common variables between \code{x@sampleTable} and \code{y}).}
 
@@ -38,9 +38,9 @@ Suffixes appended to overlapping non-join column names from \code{x} and \code{y
 \item{keep}{\code{logical(1)} or \code{NULL}.
 If \code{TRUE}, keeps join keys from both \code{x} and \code{y}.
 If \code{FALSE}, only keys from \code{x} are kept.
-\strong{Default:} \code{NULL} (deferred to \code{\link[dplyr:left_join]{dplyr::left_join()}} behaviour).}
+\strong{Default:} \code{NULL} (deferred to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} behaviour).}
 
-\item{...}{Additional arguments passed to \code{\link[dplyr:left_join]{dplyr::left_join()}},
+\item{...}{Additional arguments passed to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}},
 e.g. \code{relationship = "one-to-one"} (dplyr ≥ 1.1).
 \strong{Default:} none.}
 }
@@ -53,7 +53,7 @@ A \code{qseaSet} object with its \code{sampleTable} updated:
 }
 }
 \description{
-Extends \code{\link[dplyr:left_join]{dplyr::left_join()}} to merge a data frame into a \code{qseaSet}'s
+Extends \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to merge a data frame into a \code{qseaSet}'s
 \code{sampleTable}. Useful for adding annotations or metadata to samples.
 }
 \examples{
@@ -70,7 +70,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to view metadata,
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to view metadata,
 \code{\link[=mutate.qseaSet]{mutate.qseaSet()}}, \code{\link[=filter.qseaSet]{filter.qseaSet()}} for other dplyr verbs,
-\code{\link[dplyr:left_join]{dplyr::left_join()}} for join semantics.
+\code{\link[dplyr:mutate-joins]{dplyr::left_join()}} for join semantics.
 }

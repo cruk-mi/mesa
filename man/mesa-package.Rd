@@ -21,7 +21,6 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Steven Hill \email{stevenhill.work@gmail.com} (\href{https://orcid.org/0000-0002-5909-692X}{ORCID})
   \item Simon Pearce (\href{https://orcid.org/0000-0002-1680-5538}{ORCID})
 }
 

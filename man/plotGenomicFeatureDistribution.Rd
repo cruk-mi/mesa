@@ -90,7 +90,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}
 
-Other annotation-summaries:
-\code{\link[=getGenomicFeatureDistribution]{getGenomicFeatureDistribution()}}
+Other annotation-summaries: 
+\code{\link{getGenomicFeatureDistribution}()}
 }
 \concept{annotation-summaries}

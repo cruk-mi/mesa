@@ -38,13 +38,13 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=addLibraryInformation]{addLibraryInformation()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[qsea:addLibraryFactors]{qsea::addLibraryFactors()}}
 
-Other table-helpers:
-\code{\link[=getBetaTable]{getBetaTable()}},
-\code{\link[=getCountTable]{getCountTable()}},
-\code{\link[=getDataTable]{getDataTable()}},
-\code{\link[=getNRPMTable]{getNRPMTable()}},
-\code{\link[=getSampleGroups2]{getSampleGroups2()}},
-\code{\link[=makeTransposedTable]{makeTransposedTable()}},
-\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
+Other table-helpers: 
+\code{\link{getBetaTable}()},
+\code{\link{getCountTable}()},
+\code{\link{getDataTable}()},
+\code{\link{getNRPMTable}()},
+\code{\link{getSampleGroups2}()},
+\code{\link{makeTransposedTable}()},
+\code{\link{removeNormMethodSuffix}()}
 }
 \concept{table-helpers}

@@ -85,7 +85,7 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}, \code{\link[=getDataTable]{getDataTable()}}
 
-Other annotation-summaries:
-\code{\link[=plotGenomicFeatureDistribution]{plotGenomicFeatureDistribution()}}
+Other annotation-summaries: 
+\code{\link{plotGenomicFeatureDistribution}()}
 }
 \concept{annotation-summaries}

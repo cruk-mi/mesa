@@ -51,10 +51,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}, \code{\link[=mixSamples]{mixSamples()}}
 
-Other window-helpers:
-\code{\link[=calculateFractionReadsInGRanges]{calculateFractionReadsInGRanges()}},
-\code{\link[=convertToArrayBetaTable]{convertToArrayBetaTable()}},
-\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}},
-\code{\link[=subsetWindowsOverBackground]{subsetWindowsOverBackground()}}
+Other window-helpers: 
+\code{\link{calculateFractionReadsInGRanges}()},
+\code{\link{convertToArrayBetaTable}()},
+\code{\link{subsetWindowsBySignal}()},
+\code{\link{subsetWindowsOverBackground}()}
 }
 \concept{window-helpers}

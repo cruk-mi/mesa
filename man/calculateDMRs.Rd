@@ -151,9 +151,9 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-Other DMR-detection:
-\code{\link[=fitQseaGLM]{fitQseaGLM()}},
-\code{\link[=getDMRsData]{getDMRsData()}},
-\code{\link[=makeAllContrasts]{makeAllContrasts()}}
+Other DMR-detection: 
+\code{\link{fitQseaGLM}()},
+\code{\link{getDMRsData}()},
+\code{\link{makeAllContrasts}()}
 }
 \concept{DMR-detection}

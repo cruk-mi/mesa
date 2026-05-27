@@ -152,7 +152,7 @@ Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{meth
 Convenience wrapper around \code{\link[=getDimRed]{getDimRed()}} with \code{method = "UMAP"}.
 
 Run PCA or UMAP on methylation signal matrices extracted from a
-\link[qsea:qseaSet]{qsea::qseaSet}. This is the core workhorse for dimensionality reduction;
+\link[qsea:qseaSet-class]{qsea::qseaSet}. This is the core workhorse for dimensionality reduction;
 wrappers such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUMAP()}} provide simplified access.
 }
 \details{
@@ -226,11 +226,19 @@ exampleTumourNormal \%>\%
     names()
 }
 \seealso{
-\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \link[=mesaDimRed-class]{mesaDimRed}, \link[=mesaPCA-class]{mesaPCA},
-\link[=mesaUMAP-class]{mesaUMAP}, \code{\link[qsea:normMethod]{qsea::normMethod()}}, \code{\link[uwot:umap]{uwot::umap()}}, \code{\link[stats:prcomp]{stats::prcomp()}}
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA},
+\linkS4class{mesaUMAP}, \code{\link[qsea:normMethod]{qsea::normMethod()}}, \code{\link[uwot:umap]{uwot::umap()}}, \code{\link[stats:prcomp]{stats::prcomp()}}
 
-Other dimred-helpers:
-\code{\link[=plotDimRed]{plotDimRed()}},
-\code{\link[=plotUMAP]{plotUMAP()}}
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
+
+Other dimred-helpers: 
+\code{\link{plotDimRed}()},
+\code{\link{plotUMAP}()}
 }
 \concept{dimred-helpers}

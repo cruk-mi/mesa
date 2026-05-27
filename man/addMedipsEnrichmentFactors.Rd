@@ -33,15 +33,15 @@ under \verb{@libraries$file_name}).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
@@ -49,7 +49,7 @@ Passed to MEDIPS range extraction; subset of chromosomes to analyse.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
-Whether BAMs are paired-end (uses \code{\link[MEDIPS:getPairedGRange]{MEDIPS::getPairedGRange()}}).
+Whether BAMs are paired-end (uses \code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
 \strong{Default:} \code{TRUE}.}
 
 \item{file_name}{\code{character(1)}

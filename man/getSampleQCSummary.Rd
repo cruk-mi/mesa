@@ -42,6 +42,6 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}}, \code{\link[=addLibraryInformation]{addLibraryInformation()}},
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}}, \code{\link[=addLibraryInformation]{addLibraryInformation()}},
 \code{\link[=addHyperStableFraction]{addHyperStableFraction()}}
 }

@@ -52,7 +52,7 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to inspect metadata,
+\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect metadata,
 \code{\link[=renameSamples]{renameSamples()}} and \code{\link[=renameQsetNames]{renameQsetNames()}} for renaming,
 \code{\link[=filter.qseaSet]{filter.qseaSet()}} and \code{\link[=selectQset]{selectQset()}} for other dplyr verbs.
 }
