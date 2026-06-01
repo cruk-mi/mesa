@@ -2,9 +2,10 @@
 
 ## Bug Fixes
 
-- Fixed `plotly` PNG device error on headless build servers
-- Switched to `pdf` device in PCA vignette chunks to resolve
-  Cairo/X11 dependency issues in CI
+- Switched vignette figure device from `pdf` to `ragg_png` across all
+  vignettes to fix plot rendering quality in HTML output and resolve
+  Cairo/X11 dependency issues on headless build servers without
+  requiring an X display
 
 ## Style
 
