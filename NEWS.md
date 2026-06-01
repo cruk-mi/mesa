@@ -1,5 +1,11 @@
 # mesa 0.99.3
 
+## Documentation
+- Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` and
+  `addNormalisation()` examples with the package's own
+  `exampleTumourNormal` dataset, removing synthetic data generation
+  from `R CMD check` example runs.
+
 ## Bug Fixes
 - Fixed `plotly` PNG device error on headless build servers
   ([#75](https://github.com/cruk-mi/mesa/pull/75))

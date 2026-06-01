@@ -639,16 +639,16 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'   [getPattern()]
 #'
 #' @examples
-#' # Run normalisation on a toy qseaSet with ~100k reads
-#' getExampleQseaSet(expSamplingDepth = 100000) %>%
+#' # Run normalisation on the example qseaSet
+#' exampleTumourNormal %>%
 #'     addNormalisation(maxPatternDensity = 0.5)
 #'
 #' # Run with no enrichment normalisation
-#' getExampleQseaSet(expSamplingDepth = 1e5) %>%
+#' exampleTumourNormal %>%
 #'     addNormalisation(enrichmentMethod = "none", maxPatternDensity = 0.5)
 #'
 #' # Access the recorded enrichment method
-#' getExampleQseaSet(expSamplingDepth = 1e5) %>%
+#' exampleTumourNormal %>%
 #'     addNormalisation(maxPatternDensity = 0.5) %>%
 #'     getParameters() %>%
 #'     purrr::pluck("enrichmentMethod")
