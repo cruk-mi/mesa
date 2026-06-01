@@ -16,7 +16,12 @@
 - Added missing chunk labels to all vignettes
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Wrapped all lines > 80 characters across R sources, vignettes, and helpers
-  to satisfy BiocCheck `LINE_LENGTH` notes
+  to satisfy BiocCheck `LINE_LENGTH` notes; where `::` cannot be broken across
+  lines, replaced long namespace-qualified names with `getExportedValue()`
+  (for annotation-package objects in `R/genome.R`, `R/qseaExtra.R`) and
+  `utils::data()` (for package datasets in `R/calculateEnrichment.R`,
+  `R/qseaExtra.R`) — both are semantically equivalent to `pkg::name` but
+  can be formatted across multiple lines
   ([#76](https://github.com/cruk-mi/mesa/pull/76))
 
 # mesa 0.99.2
