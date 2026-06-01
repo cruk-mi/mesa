@@ -1,10 +1,12 @@
 # mesa 0.99.3
 
 ## Documentation
-- Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` and
-  `addNormalisation()` examples with the package's own
-  `exampleTumourNormal` dataset, removing synthetic data generation
+- Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples
+  with `exampleTumourNormal`, removing slow synthetic data generation
   from `R CMD check` example runs.
+- Wrapped `addNormalisation()` examples in `\donttest{}`: the function
+  requires windows across a range of CpG densities for background
+  estimation, which the pre-filtered example datasets do not provide.
 
 ## Bug Fixes
 - Fixed `plotly` PNG device error on headless build servers

@@ -639,19 +639,24 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'   [getPattern()]
 #'
 #' @examples
-#' # Run normalisation on the example qseaSet
-#' exampleTumourNormal %>%
+#' # addNormalisation requires windows spanning a range of CpG densities for
+#' # background estimation; the pre-filtered example datasets lack these, so
+#' # a synthetic qseaSet is used here.
+#' \donttest{
+#' # Run normalisation on a toy qseaSet with ~100k reads
+#' qsea::getExampleQseaSet(expSamplingDepth = 100000) %>%
 #'     addNormalisation(maxPatternDensity = 0.5)
 #'
 #' # Run with no enrichment normalisation
-#' exampleTumourNormal %>%
+#' qsea::getExampleQseaSet(expSamplingDepth = 1e5) %>%
 #'     addNormalisation(enrichmentMethod = "none", maxPatternDensity = 0.5)
 #'
 #' # Access the recorded enrichment method
-#' exampleTumourNormal %>%
+#' qsea::getExampleQseaSet(expSamplingDepth = 1e5) %>%
 #'     addNormalisation(maxPatternDensity = 0.5) %>%
 #'     getParameters() %>%
 #'     purrr::pluck("enrichmentMethod")
+#' }
 #'
 #' @export
 addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15",
