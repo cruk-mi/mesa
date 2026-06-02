@@ -1,4 +1,4 @@
-# mesa 0.99.3
+# mesa 0.99.2.9000
 
 ## Documentation
 - Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples
