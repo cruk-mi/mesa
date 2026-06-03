@@ -3,7 +3,7 @@
 ## Bug Fixes
 - Fixed `plotly` PNG device error on headless build servers
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
-- Switched to `pdf` device in PCA vignette chunks to resolve
+- Switched to `ragg_png` device in PCA vignette chunks to resolve
   Cairo/X11 dependency issues in CI
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Restored vignette YAML front matter dropped during line-wrap reflow
