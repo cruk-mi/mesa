@@ -20,7 +20,7 @@ pairs and annotation variables."><!-- mathjax --><script src="https://cdnjs.clou
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -216,8 +216,8 @@ requested aesthetics. Specifically:</p><ul><li><p>one plot per <code>components<
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Default UMAP (beta-normalised, top 1000 most variable windows)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">plotUMAP</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">plotUMAP</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -240,9 +240,9 @@ requested aesthetics. Specifically:</p><ul><li><p>one plot per <code>components<
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Colour by group; show names</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">plotUMAP</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>           showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">plotUMAP</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -267,10 +267,10 @@ requested aesthetics. Specifically:</p><ul><li><p>one plot per <code>components<
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom components and shape mapping</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">plotUMAP</span><span class="op">(</span>components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>           colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>           shape  <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">plotUMAP</span><span class="op">(</span>components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        shape <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>

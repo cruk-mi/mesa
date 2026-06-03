@@ -19,7 +19,7 @@ downsampling experiments, or simulating tumour–normal mixtures."><!-- mathjax 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -182,17 +182,17 @@ offsets/enrichment after adding the new sample if required by your workflow.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Mix two samples 50/50 into ~100k total fragments; append to the qseaSet</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">mixSamples</span><span class="op">(</span><span class="st">"Colon1_T"</span>, </span></span>
-<span class="r-in"><span>             <span class="st">"Colon1_N"</span>, </span></span>
-<span class="r-in"><span>             nReadsTotal <span class="op">=</span> <span class="fl">100000</span>, </span></span>
-<span class="r-in"><span>             proportion <span class="op">=</span> <span class="fl">0.5</span>, </span></span>
-<span class="r-in"><span>             renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>                           </span></span>
-<span class="r-in"><span><span class="co"># Only a few reads are included in this small subset of windows (82):</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="getCountTable.html">getCountTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span></span>
-<span class="r-in"><span> <span class="fu">pull</span><span class="op">(</span><span class="va">Mix_Colon1_T_Colon1_N_0.5</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">mixSamples</span><span class="op">(</span><span class="st">"Colon1_T"</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"Colon1_N"</span>,</span></span>
+<span class="r-in"><span>        nReadsTotal <span class="op">=</span> <span class="fl">100000</span>,</span></span>
+<span class="r-in"><span>        proportion <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
+<span class="r-in"><span>        renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Only a few reads are included in this small subset of windows (82):</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getCountTable.html">getCountTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">pull</span><span class="op">(</span><span class="va">Mix_Colon1_T_Colon1_N_0.5</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mix_Colon1_T_Colon1_N_0.5</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mixing 50000 reads from Colon1_T with 50000 reads from Colon1_N.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(seqnames, start, end, width, strand, CpG_density)`</span>
@@ -202,18 +202,18 @@ offsets/enrichment after adding the new sample if required by your workflow.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mixSamples</span><span class="op">(</span><span class="st">"Colon1_T"</span>, <span class="st">"Colon1_N"</span>,</span></span>
-<span class="r-in"><span>             nReadsTotal <span class="op">=</span> <span class="fl">50000</span>,</span></span>
-<span class="r-in"><span>             proportion  <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
-<span class="r-in"><span>             newName     <span class="op">=</span> <span class="st">"Mix_Colon1_T_0.8_Colon1_N_0.2"</span>,</span></span>
-<span class="r-in"><span>             groupName   <span class="op">=</span> <span class="st">"Synthetic"</span>,</span></span>
-<span class="r-in"><span>             onlyNew     <span class="op">=</span> <span class="cn">TRUE</span> ,</span></span>
-<span class="r-in"><span>             renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>             </span></span>
-<span class="r-in"><span>  <span class="co"># Only a few reads are included in this small subset of windows (45):</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getCountTable.html">getCountTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">Mix_Colon1_T_0.8_Colon1_N_0.2</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">mixSamples</span><span class="op">(</span><span class="st">"Colon1_T"</span>, <span class="st">"Colon1_N"</span>,</span></span>
+<span class="r-in"><span>        nReadsTotal <span class="op">=</span> <span class="fl">50000</span>,</span></span>
+<span class="r-in"><span>        proportion  <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>        newName     <span class="op">=</span> <span class="st">"Mix_Colon1_T_0.8_Colon1_N_0.2"</span>,</span></span>
+<span class="r-in"><span>        groupName   <span class="op">=</span> <span class="st">"Synthetic"</span>,</span></span>
+<span class="r-in"><span>        onlyNew     <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>        renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Only a few reads are included in this small subset of windows (45):</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getCountTable.html">getCountTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">Mix_Colon1_T_0.8_Colon1_N_0.2</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mix_Colon1_T_0.8_Colon1_N_0.2</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mixing 40000 reads from Colon1_T with 10000 reads from Colon1_N.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of counts values for 819 regions across 1 samples.</span>

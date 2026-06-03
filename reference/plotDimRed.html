@@ -19,7 +19,7 @@ for common use cases."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -212,8 +212,8 @@ to interactive <code>plotly</code>.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PCA: colour by group</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">plotDimRed</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">plotDimRed</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -241,9 +241,9 @@ to interactive <code>plotly</code>.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># UMAP: colour by group, shape by tissue</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">plotDimRed</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>             shape <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getUMAP</a></span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">plotDimRed</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        shape <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -271,9 +271,9 @@ to interactive <code>plotly</code>.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Show sample names</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">plotDimRed</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>             showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">plotDimRed</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>

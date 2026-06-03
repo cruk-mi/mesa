@@ -20,7 +20,7 @@ annotation variables."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -219,8 +219,8 @@ These defaults aim to keep categories visually separable for larger cohorts.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Basic PCA plot (PC1 vs PC2) with defaults</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -246,9 +246,9 @@ These defaults aim to keep categories visually separable for larger cohorts.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Colour by sample group; show names</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>          showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -276,10 +276,10 @@ These defaults aim to keep categories visually separable for larger cohorts.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot PC1 vs PC3; shape by tissue</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>          colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>          shape  <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        shape <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -301,7 +301,7 @@ These defaults aim to keep categories visually separable for larger cohorts.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span>          </span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

@@ -19,7 +19,7 @@ at the front of the table if present)."><!-- mathjax --><script src="https://cdn
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -116,8 +116,8 @@ and <code>group</code> cannot be removed.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Keep only sample_name and group</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">selectQset</span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">group</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">selectQset</span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">group</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_T    Colon1_T Colon1_T</span>
@@ -132,8 +132,8 @@ and <code>group</code> cannot be removed.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Select and rename a column</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">selectQset</span><span class="op">(</span><span class="va">age</span>, tumour_type <span class="op">=</span> <span class="va">tumour</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">selectQset</span><span class="op">(</span><span class="va">age</span>, tumour_type <span class="op">=</span> <span class="va">tumour</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group age tumour_type</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  80      Normal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_T    Colon1_T Colon1_T  80      Tumour</span>
@@ -148,8 +148,8 @@ and <code>group</code> cannot be removed.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use tidyselect helpers</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">selectQset</span><span class="op">(</span><span class="fu">matches</span><span class="op">(</span><span class="st">"s"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">selectQset</span><span class="op">(</span><span class="fu">matches</span><span class="op">(</span><span class="st">"s"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group tissue stage</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  Colon  &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_T    Colon1_T Colon1_T  Colon   III</span>

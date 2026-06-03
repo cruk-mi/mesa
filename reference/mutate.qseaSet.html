@@ -18,7 +18,7 @@ sampleTable."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/lib
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -121,8 +121,8 @@ The <code>sample_name</code> column <strong>cannot</strong> be changed with this
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Add a new logical column based on age</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mutate</span><span class="op">(</span>over70 <span class="op">=</span> <span class="va">age</span> <span class="op">&gt;</span> <span class="fl">70</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">mutate</span><span class="op">(</span>over70 <span class="op">=</span> <span class="va">age</span> <span class="op">&gt;</span> <span class="fl">70</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group patient        type tumour tissue age gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon Normal  Colon  80      F</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_T    Colon1_T Colon1_T  Colon1         CRC Tumour  Colon  80      F</span>
@@ -148,8 +148,8 @@ The <code>sample_name</code> column <strong>cannot</strong> be changed with this
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Recode gender (better practice: use dplyr::case_when or stringr::str_replace)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mutate</span><span class="op">(</span>gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">mutate</span><span class="op">(</span>gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group patient        type tumour tissue age gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon Normal  Colon  80 Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_T    Colon1_T Colon1_T  Colon1         CRC Tumour  Colon  80 Female</span>
@@ -175,8 +175,8 @@ The <code>sample_name</code> column <strong>cannot</strong> be changed with this
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Change group by removing digits from sample_name</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mutate</span><span class="op">(</span>group <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="st">"[0-9]"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">mutate</span><span class="op">(</span>group <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="st">"[0-9]"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name   group patient        type tumour tissue age gender stage</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon_N  Colon1 NormalColon Normal  Colon  80      F  &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_T    Colon1_T Colon_T  Colon1         CRC Tumour  Colon  80      F   III</span>

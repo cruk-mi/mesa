@@ -18,7 +18,7 @@ creating one worksheet per contrast."><!-- mathjax --><script src="https://cdnjs
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -130,8 +130,8 @@ writing to <code>tempfile(fileext = ".xlsx")</code> in examples or tests.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Minimal example: write results for a single contrast</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"type"</span>, contrasts <span class="op">=</span> <span class="st">"LUAD_vs_NormalLung"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">writeDMRsToExcel</span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"test.xlsx"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"type"</span>, contrasts <span class="op">=</span> <span class="st">"LUAD_vs_NormalLung"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">writeDMRsToExcel</span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"test.xlsx"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 5 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 255 windows, without using parallelisation.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing contrast LUAD_vs_NormalLung</span>
@@ -139,12 +139,12 @@ writing to <code>tempfile(fileext = ".xlsx")</code> in examples or tests.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selecting regions from contrast LUAD_vs_NormalLung</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selected 46/255 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> adding test results from LUAD_vs_NormalLung</span>
-<span class="r-in"><span>  </span></span>
-<span class="r-in"><span><span class="co"># With multiple contrasts and annotation </span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># With multiple contrasts and annotation</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>, contrasts <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="annotateWindows.html">annotateWindows</a></span><span class="op">(</span>TxDb <span class="op">=</span> <span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>, annoDb <span class="op">=</span> <span class="st">"org.Hs.eg.db"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">writeDMRsToExcel</span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"test.xlsx"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>, contrasts <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="annotateWindows.html">annotateWindows</a></span><span class="op">(</span>TxDb <span class="op">=</span> <span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>, annoDb <span class="op">=</span> <span class="st">"org.Hs.eg.db"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">writeDMRsToExcel</span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"test.xlsx"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating 1 possible contrasts on the tumour column.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 10 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 309 windows, without using parallelisation.</span>

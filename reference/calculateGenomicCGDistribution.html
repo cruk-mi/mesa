@@ -21,7 +21,7 @@ GoGe: enrichment statistic \((nCG * genome_length) / (nC * nG)\).
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -116,15 +116,15 @@ occurrences across the genome.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example: compute genome-wide CpG metrics for a S. cerevisae genome. </span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example: compute genome-wide CpG metrics for a S. cerevisae genome.</span></span></span>
 <span class="r-in"><span><span class="co"># It could be done for GRCh38 genome instead, but it will take more time to</span></span></span>
 <span class="r-in"><span><span class="co"># run (package must be installed)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BSgenome.Scerevisiae.UCSC.sacCer3"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu">calculateGenomicCGDistribution</span><span class="op">(</span><span class="st">"BSgenome.Scerevisiae.UCSC.sacCer3"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="fu">calculateGenomicCGDistribution</span><span class="op">(</span><span class="st">"BSgenome.Scerevisiae.UCSC.sacCer3"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   genome.relH genome.GoGe</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    2.922563   0.8033108</span>
-<span class="r-in"><span>  </span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

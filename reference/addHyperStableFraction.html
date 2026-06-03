@@ -20,7 +20,7 @@ hyperStableEdgar (overwriting any existing column of that name)."><!-- mathjax -
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -145,22 +145,22 @@ surrounding CpG islands associated with high gene expression</em>.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run only if the example windows overlap the ultra-stable probes</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">has_ov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu">GenomicRanges</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/IRanges/man/findOverlaps-methods.html" class="external-link">countOverlaps</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      <span class="fu">mesa</span><span class="fu">::</span><span class="va"><a href="hg38UltraStableProbes.html">hg38UltraStableProbes</a></span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span>    <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="va">has_ov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>            <span class="fu">GenomicRanges</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/IRanges/man/findOverlaps-methods.html" class="external-link">countOverlaps</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>                <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                <span class="fu">mesa</span><span class="fu">::</span><span class="va"><a href="hg38UltraStableProbes.html">hg38UltraStableProbes</a></span></span></span>
+<span class="r-in"><span>            <span class="op">)</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="va">has_ov</span><span class="op">)</span> <span class="fu">addHyperStableFraction</span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="kw">else</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No overlap with hg38UltraStableProbes in this toy dataset; skipping."</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="va">.</span></span></span>
-<span class="r-in"><span>  <span class="op">}</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="st">"hyperStableEdgar"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>        <span class="kw">if</span> <span class="op">(</span><span class="va">has_ov</span><span class="op">)</span> <span class="fu">addHyperStableFraction</span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="kw">else</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>            <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No overlap with hg38UltraStableProbes in this toy dataset; skipping."</span><span class="op">)</span></span></span>
+<span class="r-in"><span>            <span class="va">.</span></span></span>
+<span class="r-in"><span>        <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="st">"hyperStableEdgar"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: GenomeInfoDb</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No overlap with hg38UltraStableProbes in this toy dataset; skipping.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name</span>

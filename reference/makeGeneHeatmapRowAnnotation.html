@@ -18,7 +18,7 @@ categorical tracks (e.g., region labels) and numeric tracks (e.g., CpG density).
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -110,10 +110,10 @@ allowed and rendered per <strong>ComplexHeatmap</strong> defaults.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  CpG_density <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  annotation  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Upstream"</span>,<span class="st">"GeneBody"</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    CpG_density <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    annotation  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Upstream"</span>, <span class="st">"GeneBody"</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mesa</span><span class="fu">:::</span><span class="fu">makeGeneHeatmapRowAnnotation</span><span class="op">(</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>    <span class="fu">mesa</span><span class="fu">:::</span><span class="fu">makeGeneHeatmapRowAnnotation</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A HeatmapAnnotation object with 2 annotations</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   name: heatmap_annotation_0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   position: row </span>
@@ -125,7 +125,7 @@ allowed and rendered per <strong>ComplexHeatmap</strong> defaults.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         name   annotation_type color_mapping width</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  CpG_density continuous vector  user-defined   5mm</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   annotation   discrete vector  user-defined   5mm</span>
-<span class="r-in"><span>  </span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

@@ -18,7 +18,7 @@ and windows with automatic colour handling for categorical and numeric variables
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -159,19 +159,19 @@ The function respects <code>useGroupMeans</code> to annotate either per-sample o
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Build window annotations and immediately feed them into makeHeatmapAnnotations()</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="alterQsetOverlap.html">filterByOverlaps</a></span><span class="op">(</span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="getDataTable.html">getDataTable</a></span><span class="op">(</span>normMethod <span class="op">=</span> <span class="st">"nrpm"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">seqnames</span>, <span class="st">":"</span>, <span class="va">start</span>, <span class="st">"-"</span>, <span class="va">end</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mesa</span><span class="fu">:::</span><span class="fu"><a href="getWindowAnnotation.html">getWindowAnnotation</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    regions <span class="op">=</span> <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>    windowAnnotation <span class="op">=</span> <span class="va">CpG_density</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mesa</span><span class="fu">:::</span><span class="fu">makeHeatmapAnnotations</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    qseaSet <span class="op">=</span> <span class="va">exampleTumourNormal</span>,</span></span>
-<span class="r-in"><span>    sampleAnnotation <span class="op">=</span> <span class="va">group</span>,</span></span>
-<span class="r-in"><span>    windowAnnotationDf <span class="op">=</span> <span class="va">.</span>,</span></span>
-<span class="r-in"><span>    useGroupMeans <span class="op">=</span> <span class="cn">FALSE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="alterQsetOverlap.html">filterByOverlaps</a></span><span class="op">(</span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDataTable.html">getDataTable</a></span><span class="op">(</span>normMethod <span class="op">=</span> <span class="st">"nrpm"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">seqnames</span>, <span class="st">":"</span>, <span class="va">start</span>, <span class="st">"-"</span>, <span class="va">end</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">mesa</span><span class="fu">:::</span><span class="fu"><a href="getWindowAnnotation.html">getWindowAnnotation</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        regions <span class="op">=</span> <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>        windowAnnotation <span class="op">=</span> <span class="va">CpG_density</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">mesa</span><span class="fu">:::</span><span class="fu">makeHeatmapAnnotations</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        qseaSet <span class="op">=</span> <span class="va">exampleTumourNormal</span>,</span></span>
+<span class="r-in"><span>        sampleAnnotation <span class="op">=</span> <span class="va">group</span>,</span></span>
+<span class="r-in"><span>        windowAnnotationDf <span class="op">=</span> <span class="va">.</span>,</span></span>
+<span class="r-in"><span>        useGroupMeans <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 50 regions across 10 samples.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $sample</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A HeatmapAnnotation object with 1 annotation</span>
@@ -197,7 +197,7 @@ The function respects <code>useGroupMeans</code> to annotate either per-sample o
 <span class="r-out co"><span class="r-pr">#&gt;</span>         name   annotation_type color_mapping width</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  CpG_density continuous vector  user-defined   5mm</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span>  </span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

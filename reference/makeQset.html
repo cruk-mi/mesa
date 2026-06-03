@@ -20,7 +20,7 @@ selected methods. This is typically the first step in a mesa/qsea workflow."><!-
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -321,29 +321,29 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Minimal runnable sketch if MEDIPSData is installed</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPSData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">sampleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    sample_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal1"</span>, <span class="st">"Tumour1"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    group       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span>,  <span class="st">"Tumour"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    file_name   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1N_fst_chr_20_21_22.bam"</span>,</span></span>
-<span class="r-in"><span>                  package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1T_fst_chr_20_21_22.bam"</span>,</span></span>
-<span class="r-in"><span>                  package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">sampleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        sample_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal1"</span>, <span class="st">"Tumour1"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span>, <span class="st">"Tumour"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>            <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1N_fst_chr_20_21_22.bam"</span>,</span></span>
+<span class="r-in"><span>                package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1T_fst_chr_20_21_22.bam"</span>,</span></span>
+<span class="r-in"><span>                package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">sampleTable</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">makeQset</span><span class="op">(</span></span></span>
-<span class="r-in"><span>      BSgenome          <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span></span>
-<span class="r-in"><span>      chrSelect         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"chr"</span>, <span class="fl">20</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      windowSize        <span class="op">=</span> <span class="fl">300</span>,</span></span>
-<span class="r-in"><span>      fragmentLength    <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>      fragmentSD        <span class="op">=</span> <span class="fl">50</span>,</span></span>
-<span class="r-in"><span>      CNVmethod         <span class="op">=</span> <span class="st">"None"</span>,</span></span>
-<span class="r-in"><span>      coverageMethod    <span class="op">=</span> <span class="st">"PairedAndR1s"</span>,</span></span>
-<span class="r-in"><span>      properPairsOnly   <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>      minMapQual        <span class="op">=</span> <span class="fl">10</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">sampleTable</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        <span class="fu">makeQset</span><span class="op">(</span></span></span>
+<span class="r-in"><span>            BSgenome          <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span></span>
+<span class="r-in"><span>            chrSelect         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"chr"</span>, <span class="fl">20</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            windowSize        <span class="op">=</span> <span class="fl">300</span>,</span></span>
+<span class="r-in"><span>            fragmentLength    <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>            fragmentSD        <span class="op">=</span> <span class="fl">50</span>,</span></span>
+<span class="r-in"><span>            CNVmethod         <span class="op">=</span> <span class="st">"None"</span>,</span></span>
+<span class="r-in"><span>            coverageMethod    <span class="op">=</span> <span class="st">"PairedAndR1s"</span>,</span></span>
+<span class="r-in"><span>            properPairsOnly   <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>            minMapQual        <span class="op">=</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Considering 541532 regions with total size 162459600</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ==== Creating qsea set ====</span>

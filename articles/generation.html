@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -241,12 +241,12 @@ chromosomes included in the test dataset and give some approximate
 fragment length and SD values.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/makeQset.html">makeQset</a></span><span class="op">(</span><span class="va">sampleTable</span>,</span>
-<span>   BSgenome <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span>
-<span>   chrSelect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"chr"</span>,<span class="fl">20</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,</span>
-<span>   windowSize <span class="op">=</span> <span class="fl">300</span>,</span>
-<span>   fragmentLength <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>   fragmentSD <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>   CNVmethod <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
+<span>    BSgenome <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span>
+<span>    chrSelect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"chr"</span>,<span class="fl">20</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,</span>
+<span>    windowSize <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>    fragmentLength <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>    fragmentSD <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>    CNVmethod <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'generics'</span></span>
 <span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
@@ -727,7 +727,7 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt;  [9] IRanges_2.44.0                    S4Vectors_0.48.1                 </span></span>
 <span><span class="co">#&gt; [11] BiocGenerics_0.56.0               generics_0.1.4                   </span></span>
 <span><span class="co">#&gt; [13] tibble_3.3.1                      stringr_1.6.0                    </span></span>
-<span><span class="co">#&gt; [15] mesa_0.99.2                       dplyr_1.2.1                      </span></span>
+<span><span class="co">#&gt; [15] mesa_0.99.2.9000                  dplyr_1.2.1                      </span></span>
 <span><span class="co">#&gt; [17] qsea_1.36.0                      </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
@@ -736,7 +736,7 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt;  [5] HMMcopy_1.52.0              rlang_1.2.0                </span></span>
 <span><span class="co">#&gt;  [7] magrittr_2.0.5              MEDIPS_1.62.0              </span></span>
 <span><span class="co">#&gt;  [9] otel_0.2.0                  matrixStats_1.5.0          </span></span>
-<span><span class="co">#&gt; [11] compiler_4.5.2              RSQLite_3.52.0             </span></span>
+<span><span class="co">#&gt; [11] compiler_4.5.2              RSQLite_3.53.1             </span></span>
 <span><span class="co">#&gt; [13] png_0.1-9                   systemfonts_1.3.2          </span></span>
 <span><span class="co">#&gt; [15] vctrs_0.7.3                 pkgconfig_2.0.3            </span></span>
 <span><span class="co">#&gt; [17] crayon_1.5.3                fastmap_1.2.0              </span></span>
@@ -744,7 +744,7 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt; [21] rmarkdown_2.31              preprocessCore_1.72.0      </span></span>
 <span><span class="co">#&gt; [23] UCSC.utils_1.6.1            ragg_1.5.2                 </span></span>
 <span><span class="co">#&gt; [25] purrr_1.2.2                 bit_4.6.0                  </span></span>
-<span><span class="co">#&gt; [27] xfun_0.57                   cachem_1.1.0               </span></span>
+<span><span class="co">#&gt; [27] xfun_0.58                   cachem_1.1.0               </span></span>
 <span><span class="co">#&gt; [29] cigarillo_1.0.0             GenomeInfoDb_1.46.2        </span></span>
 <span><span class="co">#&gt; [31] jsonlite_2.0.0              progress_1.2.3             </span></span>
 <span><span class="co">#&gt; [33] blob_1.3.0                  DelayedArray_0.36.1        </span></span>
@@ -776,7 +776,7 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt; [85] htmlwidgets_1.6.4           memoise_2.0.1              </span></span>
 <span><span class="co">#&gt; [87] htmltools_0.5.9             pkgdown_2.2.0              </span></span>
 <span><span class="co">#&gt; [89] lifecycle_1.0.5             httr_1.4.8                 </span></span>
-<span><span class="co">#&gt; [91] statmod_1.5.2               bit64_4.8.0</span></span></code></pre>
+<span><span class="co">#&gt; [91] statmod_1.5.2               bit64_4.8.2</span></span></code></pre>
 </div>
 </div>
   </div>

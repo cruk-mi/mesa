@@ -18,7 +18,7 @@ ComplexHeatmap. The gene can be given as a HGNC symbol or Ensembl ID."><!-- math
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -240,8 +240,8 @@ aggregated by <code>group</code> prior to plotting. Column annotations can be ad
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Basic gene heatmap (beta) with defaults</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found HOXA9 on chromosome 7, 27162438 - 27175180</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 38 regions across 10 samples.</span>
@@ -250,11 +250,11 @@ aggregated by <code>group</code> prior to plotting. Column annotations can be ad
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Add sample annotations (tidyselect bare names) and cluster columns into 2 groups</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span>,</span></span>
-<span class="r-in"><span>                    sampleAnnotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tumour</span>, <span class="va">tissue</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    clusterNum <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span>,</span></span>
+<span class="r-in"><span>            sampleAnnotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tumour</span>, <span class="va">tissue</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            clusterNum <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found HOXA9 on chromosome 7, 27162438 - 27175180</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 38 regions across 10 samples.</span>
@@ -263,13 +263,13 @@ aggregated by <code>group</code> prior to plotting. Column annotations can be ad
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom colours and wider flanks</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span>,</span></span>
-<span class="r-in"><span>                    sampleAnnotation  <span class="op">=</span> <span class="va">tumour</span>,</span></span>
-<span class="r-in"><span>                    annotationColors  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Tumour <span class="op">=</span> <span class="st">"firebrick4"</span>, Normal <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    upstreamDist <span class="op">=</span> <span class="fl">1000</span>,</span></span>
-<span class="r-in"><span>                    downstreamDist <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span>,</span></span>
+<span class="r-in"><span>            sampleAnnotation <span class="op">=</span> <span class="va">tumour</span>,</span></span>
+<span class="r-in"><span>            annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Tumour <span class="op">=</span> <span class="st">"firebrick4"</span>, Normal <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            upstreamDist <span class="op">=</span> <span class="fl">1000</span>,</span></span>
+<span class="r-in"><span>            downstreamDist <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Found HOXA9 on chromosome 7, 27162438 - 27175180</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 41 regions across 10 samples.</span>

@@ -21,7 +21,7 @@ wrappers such as getPCA() and getUMAP() provide simplified access.'><!-- mathjax
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
       </span>
     </div>
 
@@ -293,7 +293,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getPCA</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getPCA</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -312,7 +312,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Request only the top 3 PCs</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getPCA</span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getPCA</span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -331,9 +331,9 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use multiple cutoffs for most-variable windows (returns list of PCA results)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getPCA</span><span class="op">(</span>topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">500</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="st">"res"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getPCA</span><span class="op">(</span>topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">500</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="st">"res"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -369,7 +369,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Quick demo on a small synthetic qseaSet</span></span></span>
 <span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getUMAP</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
@@ -393,7 +393,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Alter UMAP hyperparameters</span></span></span>
 <span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getUMAP</span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
@@ -417,7 +417,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use top 500 most variable windows only</span></span></span>
 <span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getUMAP</span><span class="op">(</span>topVarNum <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span>topVarNum <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
@@ -444,7 +444,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PCA on default beta-normalised matrix, keep 3 PCs</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"PCA"</span>, nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"PCA"</span>, nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -463,7 +463,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># UMAP on the top 500 most variable windows</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"UMAP"</span>, topVarNum <span class="op">=</span> <span class="fl">500</span>, n_neighbors <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"UMAP"</span>, topVarNum <span class="op">=</span> <span class="fl">500</span>, n_neighbors <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -485,7 +485,7 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span><span class="co"># Restrict DR to a set of regions (coerced from data.frame)</span></span></span>
 <span class="r-in"><span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>seqnames <span class="op">=</span> <span class="st">"chr7"</span>, start <span class="op">=</span> <span class="fl">25002001</span>, end <span class="op">=</span> <span class="fl">25027900</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"PCA"</span>, regionsToOverlap <span class="op">=</span> <span class="va">regs</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"PCA"</span>, regionsToOverlap <span class="op">=</span> <span class="va">regs</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 807 windows using regionsToOverlap: 12 windows remaining.</span>
@@ -505,9 +505,9 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Vectorised topVarNum runs (returns a list of results)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"UMAP"</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">2000</span><span class="op">)</span>, n_neighbors <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="st">"res"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"UMAP"</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">2000</span><span class="op">)</span>, n_neighbors <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="st">"res"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
