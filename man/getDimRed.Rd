@@ -178,52 +178,52 @@ data(exampleTumourNormal, package = "mesa")
 
 # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
 exampleTumourNormal \%>\%
-  getPCA()
+    getPCA()
 
 # Request only the top 3 PCs
 exampleTumourNormal \%>\%
-  getPCA(nPC = 3)
+    getPCA(nPC = 3)
 
 # Use multiple cutoffs for most-variable windows (returns list of PCA results)
 exampleTumourNormal \%>\%
-  getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
-  slot("res") \%>\%
-  names()
+    getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
+    slot("res") \%>\%
+    names()
 }
 \donttest{
 # Quick demo on a small synthetic qseaSet
 qsea::getExampleQseaSet(repl = 20) \%>\%
-  getUMAP()
+    getUMAP()
 
 # Alter UMAP hyperparameters
 qsea::getExampleQseaSet(repl = 20) \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1)
+    getUMAP(n_neighbors = 5, min_dist = 1)
 
 # Use top 500 most variable windows only
 qsea::getExampleQseaSet(repl = 20) \%>\%
-  getUMAP(topVarNum = 500)
+    getUMAP(topVarNum = 500)
 }
 \donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # PCA on default beta-normalised matrix, keep 3 PCs
 exampleTumourNormal \%>\%
-  getDimRed(method = "PCA", nPC = 3)
+    getDimRed(method = "PCA", nPC = 3)
 
 # UMAP on the top 500 most variable windows
 exampleTumourNormal \%>\%
-  getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
+    getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
 
 # Restrict DR to a set of regions (coerced from data.frame)
 regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 exampleTumourNormal \%>\%
-  getDimRed(method = "PCA", regionsToOverlap = regs)
+    getDimRed(method = "PCA", regionsToOverlap = regs)
 
 # Vectorised topVarNum runs (returns a list of results)
 exampleTumourNormal \%>\%
-  getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
-  slot("res") \%>\%
-  names()
+    getDimRed(method = "UMAP", topVarNum = c(500, 2000), n_neighbors = 5) \%>\%
+    slot("res") \%>\%
+    names()
 }
 }
 \seealso{

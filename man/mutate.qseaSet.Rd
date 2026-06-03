@@ -36,18 +36,18 @@ data(exampleTumourNormal, package = "mesa")
 
 # Add a new logical column based on age
 exampleTumourNormal \%>\%
-  mutate(over70 = age > 70) \%>\%
-  qsea::getSampleTable()
+    mutate(over70 = age > 70) \%>\%
+    qsea::getSampleTable()
 
 # Recode gender (better practice: use dplyr::case_when or stringr::str_replace)
 exampleTumourNormal \%>\%
-  mutate(gender = ifelse(gender == "F", "Female", "Male")) \%>\%
-  qsea::getSampleTable()
+    mutate(gender = ifelse(gender == "F", "Female", "Male")) \%>\%
+    qsea::getSampleTable()
 
 # Change group by removing digits from sample_name
 exampleTumourNormal \%>\%
-  mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
-  qsea::getSampleTable()
+    mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
+    qsea::getSampleTable()
 
 }
 \seealso{

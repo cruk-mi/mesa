@@ -95,20 +95,19 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 (see \code{BiocParallel::register()}).
 }
 \examples{
-\donttest{
+\dontrun{
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\%
 
     addHMMcopyCNV(
-           inputColumn = "input_file",
-           windowSize    = 1e6,
-           hmmCopyGC     = gc_hg38_1000kb,   # GRanges with 'gc' column
-           hmmCopyMap    = map_hg38_1000kb,  # GRanges with 'map' column
-           properPairsOnly = TRUE,
-           parallel      = FALSE,
-           plotDir       = tempdir()
-     )
-
+        inputColumn = "input_file",
+        windowSize = 1e6,
+        hmmCopyGC = gc_hg38_1000kb, # GRanges with 'gc' column
+        hmmCopyMap = map_hg38_1000kb, # GRanges with 'map' column
+        properPairsOnly = TRUE,
+        parallel = FALSE,
+        plotDir = tempdir()
+    )
 }
 
 }

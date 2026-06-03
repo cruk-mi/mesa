@@ -36,7 +36,7 @@ data(exampleTumourNormal, package = "mesa")
 
 # All pairwise contrasts among levels of 'type'
 exampleTumourNormal \%>\%
-  makeAllContrasts("type")
+    makeAllContrasts("type")
 
 }
 \seealso{

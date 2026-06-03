@@ -63,20 +63,20 @@ data(exampleTumourNormal, package = "mesa")
 
 # Build window annotations and immediately feed them into makeHeatmapAnnotations()
 exampleTumourNormal \%>\%
-  filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
-  getDataTable(normMethod = "nrpm") \%>\%
-  dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
-  mesa:::getWindowAnnotation(
-    regions = qsea::getRegions(exampleTumourNormal)[1:50],
-    windowAnnotation = CpG_density
-  ) \%>\%
-  mesa:::makeHeatmapAnnotations(
-    qseaSet = exampleTumourNormal,
-    sampleAnnotation = group,
-    windowAnnotationDf = .,
-    useGroupMeans = FALSE
-  ) 
-  
+    filterByOverlaps(qsea::getRegions(exampleTumourNormal)[1:50]) \%>\%
+    getDataTable(normMethod = "nrpm") \%>\%
+    dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) \%>\%
+    mesa:::getWindowAnnotation(
+        regions = qsea::getRegions(exampleTumourNormal)[1:50],
+        windowAnnotation = CpG_density
+    ) \%>\%
+    mesa:::makeHeatmapAnnotations(
+        qseaSet = exampleTumourNormal,
+        sampleAnnotation = group,
+        windowAnnotationDf = .,
+        useGroupMeans = FALSE
+    )
+
 }
 \seealso{
 \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[=getWindowAnnotation]{getWindowAnnotation()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}},

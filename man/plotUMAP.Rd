@@ -115,21 +115,21 @@ data(exampleTumourNormal, package = "mesa")
 
 # Default UMAP (beta-normalised, top 1000 most variable windows)
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-  plotUMAP()
+    getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+    plotUMAP()
 
 # Colour by group; show names
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-  plotUMAP(colour = "group",
-           showSampleNames = TRUE)
+    getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+    plotUMAP(colour = "group",
+        showSampleNames = TRUE)
 
 # Custom components and shape mapping
 exampleTumourNormal \%>\%
-  getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-  plotUMAP(components = list(c(1, 2)),
-           colour = "group",
-           shape  = "tissue")
+    getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
+    plotUMAP(components = list(c(1, 2)),
+        colour = "group",
+        shape = "tissue")
 }
 
 }

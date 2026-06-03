@@ -26,15 +26,15 @@ return a valid \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}. Suppo
 \examples{
 # From GRanges (passes through)
 GenomicRanges::GRanges("chr1", IRanges::IRanges(100, 200)) \%>\%
-  asValidGranges()
+    asValidGranges()
 
 # From data.frame (seqnames/start/end)
 data.frame(seqnames = "chr2", start = 10, end = 20) \%>\%
-  asValidGranges()
+    asValidGranges()
 
 # From data.frame (chr/window_start/window_end)
 data.frame(chr = "1", window_start = 1000, window_end = 1100) \%>\%
-  asValidGranges()
+    asValidGranges()
 }
 \seealso{
 \code{\link[plyranges]{as_granges}}, \code{\link{qseaTableToChrGRanges}}

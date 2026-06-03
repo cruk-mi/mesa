@@ -2,15 +2,16 @@
 title: "Data Tables and Quality Control"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Data Tables and Quality Control}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Data Tables and Quality Control}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r chunk, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>",
+    dev = "ragg_png"
 )
 ```
 
@@ -26,25 +27,25 @@ library(stringr)
 QSEA has several different types of values that can be returned per window.
 You can get a table of raw counts per window with `getCountTable`:
 
-```{r}
+```{r generating-tables-of-values-fr}
 exampleTumourNormal %>%
-  getCountTable()
+    getCountTable()
 ```
 
 but this is not particularly useful, as different samples generally have been sequenced to different read depths. We note that the annotation of the `qseaSet` regions are included in this output, especially the `CpG_density` that is described in `vignette("Generation of qseaSets")`.
 
 The next option is normalised reads per million (NRPM). This normalises the number of reads by the depth of sequencing, as well as copy number variation.
 
-```{r}
+```{r chunk-2}
 exampleTumourNormal %>%
-  getNRPMTable()
+    getNRPMTable()
 ```
 
 Finally, we can request beta values. Beta values are measures of methylation, scaled to lie between 0 and 1, where 0 means that the window is unmethylated and 1 is methylated. These are scaled with respect to a further number of metrics, including region CpG_density, background noise and the sample enrichment profile, and are therefore the most useful value to consider when comparing methylation between samples.
 
-```{r}
+```{r chunk-3}
 exampleTumourNormal %>%
-  getBetaTable()
+    getBetaTable()
 ```
 
 Note that for some windows an NA value will be returned. This occurs when less than three reads would be required for the window to be fully methylated, at the read depth and enrichment profile calculated per sample. These occur particularly at windows with low CpG_density.
@@ -53,13 +54,13 @@ All three of these functions take an option `useGroupMeans` that determine wheth
 
 The example qseaSet has group as the same as sample_name, so we need to change that to see the effect:
 
-```{r}
+```{r chunk-4}
 exampleTumourNormal %>%
-  getBetaTable(useGroupMeans = FALSE)
+    getBetaTable(useGroupMeans = FALSE)
 
 exampleTumourNormal %>%
-  mutate(group = str_remove(sample_name,"\\d")) %>%
-  getBetaTable(useGroupMeans = TRUE) 
+    mutate(group = str_remove(sample_name,"\\d")) %>%
+    getBetaTable(useGroupMeans = TRUE) 
 ```
 
 Now this table only has two columns (and note that there are no NA values any more due to the increased coverage).
@@ -83,36 +84,36 @@ For the MBD-Seq data that we have studied, we apply a minimum `relH` of 2.5, wit
 
 We can use the `addLibraryInformation` function to add the information in the `libraries` table directly onto the `sampleTable`:
 
-```{r}
+```{r chunk-5}
 exampleTumourNormal %>% 
-  addLibraryInformation() %>% 
-  getSampleTable() %>% 
-  dplyr::select(sample_name, relH)
+    addLibraryInformation() %>% 
+    getSampleTable() %>% 
+    dplyr::select(sample_name, relH)
 ```
 
 When a non-enriched ("Input") sample is used to calculate copy number variation, an equivalent calculation is also performed on these non-enriched fragments. This is also stored in the `libraries` table, in columns starting with `input`:
 
-```{r}
+```{r chunk-6}
 exampleTumourNormal %>% 
-  addLibraryInformation() %>% 
-  getSampleTable() %>% 
-  dplyr::select(sample_name, input_relH)
+    addLibraryInformation() %>% 
+    getSampleTable() %>% 
+    dplyr::select(sample_name, input_relH)
 ```
 
 We typically see values of the `input_relH` between 1.3-1.6, suggesting that there are more CGs seen in the sequenced fragments than would be expected from the genomic sequence. This is presumably due to the evolutionary suppression of `CG` dinucleotides outside of specific contexts, meaning they are less common in those areas of the genome that are repetitive and hence less easy to map. This is likely to be dependent on the particular sequencing methods and the sample type under consideration. We therefore need to see an increase between the enriched and non-enriched data:
 
-```{r}
+```{r chunk-7}
 exampleTumourNormal %>% 
-  addLibraryInformation() %>% 
-  getSampleTable() %>% 
-  dplyr::select(sample_name, relH_MeCap = relH, relH_Input = input_relH) %>% 
-  pivot_longer(matches("relH"), 
-               names_prefix = "relH", 
-               names_to = "enrichment", 
-               values_to = "relH") %>%
-  ggplot(aes(x = sample_name, y = relH, col = enrichment)) +
-  geom_point() +
-  theme_bw()
+    addLibraryInformation() %>% 
+    getSampleTable() %>% 
+    dplyr::select(sample_name, relH_MeCap = relH, relH_Input = input_relH) %>% 
+    pivot_longer(matches("relH"), 
+                names_prefix = "relH", 
+                names_to = "enrichment", 
+                values_to = "relH") %>%
+    ggplot(aes(x = sample_name, y = relH, col = enrichment)) +
+    geom_point() +
+    theme_bw()
 ```
 
 There is a second relative enrichment metric defined by the `MEDIPs` package, known as `GoGe`, that is also calculated globally in a similar way but considers the ratio between the number of `CG`s present in the fragments compared to the number of `C`s and `G`s independently. This is calculated and stored in the `libraries` information alongside the `relH` metric.

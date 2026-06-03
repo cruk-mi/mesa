@@ -1,3 +1,18 @@
+# mesa 0.99.2.9000
+
+## Bug Fixes
+
+- Switched vignette figure device from `png` to `ragg_png` across all
+  vignettes to fix plot rendering quality in HTML output and resolve
+  Cairo/X11 dependency issues on headless build servers without
+  requiring an X display
+
+## Style
+
+- Standardized 4-space indentation throughout codebase per
+  Bioconductor style guide
+- Added missing chunk labels to all vignettes
+
 # mesa 0.99.2
 
 ### BUG FIXES

@@ -32,12 +32,12 @@ result is unlisted. The returned object is tagged as \code{"hg38"}.
 \examples{
 # Data.frame input; mix of 'chr' and no 'chr' is fine
 data.frame(
-  seqnames = c("1", "chr2"),
-  start    = c(100000, 200000),
-  end      = c(100100, 200100)
-) \%>\% 
-  liftOverHg19() \%>\% 
-  { GenomeInfoDb::genome(.) }
+    seqnames = c("1", "chr2"),
+    start    = c(100000, 200000),
+    end      = c(100100, 200100)
+) \%>\%
+    liftOverHg19() \%>\%
+    { GenomeInfoDb::genome(.) }
 
 # GRanges input (some intervals may not map and can be dropped)
 gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))

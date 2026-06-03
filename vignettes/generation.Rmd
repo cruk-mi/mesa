@@ -2,15 +2,16 @@
 title: "Generating qseaSets"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Generating qseaSets}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Generating qseaSets}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r chunk, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>",
+    dev = "ragg_png"
 )
 ```
 
@@ -43,7 +44,7 @@ One thing to note is that we highly recommend the use of the tool such as [NGSCh
 For the example here, we use the example data in the `MEDIPSData` package. This contains pairs of tumour and normal tissue from the same patients, with MEDIP-seq performed as the enrichment step. These bam files are downsampled to only contain chromosomes 20-22, and are aligned to hg19. 
 Note, we highly recommend using the hg38/GRCh38 reference genome rather than hg19 as used here!
 
-```{r, eval = requireNamespace("MEDIPSData")}
+```{r chunk-2, eval = requireNamespace("MEDIPSData")}
 sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
     "Normal1", "Normal1", "Normal", "Patient1", system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
     "Normal2", "Normal1", "Normal", "Patient2", system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
@@ -66,14 +67,14 @@ Before creating the `qseaSet`, you need to have:
 
 For our hg19 example data, we set `BSgenome = "BSgenome.Hsapiens.UCSC.hg19"`, specify the three chromosomes included in the test dataset and give some approximate fragment length and SD values.
 
-```{r, eval = requireNamespace("BSgenome.Hsapiens.UCSC.hg19")}
+```{r chunk-3, eval = requireNamespace("BSgenome.Hsapiens.UCSC.hg19")}
 makeQset(sampleTable,
-   BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-   chrSelect = paste0("chr",20:22),
-   windowSize = 300,
-   fragmentLength = 200,
-   fragmentSD = 50,
-   CNVmethod = "none")
+    BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+    chrSelect = paste0("chr",20:22),
+    windowSize = 300,
+    fragmentLength = 200,
+    fragmentSD = 50,
+    CNVmethod = "none")
 ```
 
 A range of messages are produced as output during this process. One thing to note is that by default the process is performed without parallelisation, this can be controlled via the `setMesaParallel` function and will vastly speed up the process when multiple cores are available (but use more RAM). 

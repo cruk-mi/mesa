@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.99.2
+Version: 0.99.2.9000
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -109,7 +109,8 @@ Suggests:
     TxDb.Hsapiens.UCSC.hg38.knownGene,
     TxDb.Hsapiens.UCSC.hg19.knownGene,
     TxDb.Mmusculus.UCSC.mm10.knownGene,
-    plotly
+    plotly,
+    ragg
 VignetteBuilder: knitr
 biocViews: Sequencing, DNAMethylation, CpGIsland, 
         Preprocessing, Normalization, QualityControl, Visualization,

@@ -223,29 +223,29 @@ enrichment parameters, allowing for estimation of beta values.
 \donttest{
 # Minimal runnable sketch if MEDIPSData is installed
 if (requireNamespace("MEDIPSData", quietly = TRUE)) {
-  sampleTable <- data.frame(
-    sample_name = c("Normal1", "Tumour1"),
-    group       = c("Normal",  "Tumour"),
-    file_name   = c(
-      system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
-                  package = "MEDIPSData", mustWork = TRUE),
-      system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
-                  package = "MEDIPSData", mustWork = TRUE)
+    sampleTable <- data.frame(
+        sample_name = c("Normal1", "Tumour1"),
+        group = c("Normal", "Tumour"),
+        file_name = c(
+            system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+                package = "MEDIPSData", mustWork = TRUE),
+            system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
+                package = "MEDIPSData", mustWork = TRUE)
+        )
     )
-  )
 
-  sampleTable \%>\%
-    makeQset(
-      BSgenome          = "BSgenome.Hsapiens.UCSC.hg19",
-      chrSelect         = paste0("chr", 20:22),
-      windowSize        = 300,
-      fragmentLength    = 200,
-      fragmentSD        = 50,
-      CNVmethod         = "None",
-      coverageMethod    = "PairedAndR1s",
-      properPairsOnly   = FALSE,
-      minMapQual        = 10
-    )
+    sampleTable \%>\%
+        makeQset(
+            BSgenome          = "BSgenome.Hsapiens.UCSC.hg19",
+            chrSelect         = paste0("chr", 20:22),
+            windowSize        = 300,
+            fragmentLength    = 200,
+            fragmentSD        = 50,
+            CNVmethod         = "None",
+            coverageMethod    = "PairedAndR1s",
+            properPairsOnly   = FALSE,
+            minMapQual        = 10
+        )
 }
 }
 }

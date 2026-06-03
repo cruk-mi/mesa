@@ -56,30 +56,30 @@ and the worker count with \code{BiocParallel::bpworkers()}.
 \examples{
 # Turn parallelisation OFF (serial evaluation)
 setMesaParallel(useParallel = FALSE, verbose = FALSE)
-getMesaParallel()  # FALSE
+getMesaParallel() # FALSE
 
 # --- Unix/mac (MulticoreParam): enable and use 2 cores ---
-\donttest{
+\dontrun{
 if (.Platform$OS.type != "windows") {
-  old <- BiocParallel::bpparam()                         # save current backend
-  setMesaParallel(nCores = 2, verbose = FALSE)           # registers MulticoreParam(2)
-  BiocParallel::bpworkers()                               # e.g. 2
-  getMesaParallel()                                       # TRUE
-  BiocParallel::register(old)                             # restore previous backend
-  setMesaParallel(useParallel = FALSE, verbose = FALSE)   # back to serial
+    old <- BiocParallel::bpparam() # save current backend
+    setMesaParallel(nCores = 2, verbose = FALSE) # registers MulticoreParam(2)
+    BiocParallel::bpworkers() # e.g. 2
+    getMesaParallel() # TRUE
+    BiocParallel::register(old) # restore previous backend
+    setMesaParallel(useParallel = FALSE, verbose = FALSE) # back to serial
 }
 }
 
 # --- Windows: register SnowParam yourself, then enable ---
-\donttest{
+\dontrun{
 if (.Platform$OS.type == "windows") {
-  old <- BiocParallel::bpparam()
-  BiocParallel::register(BiocParallel::SnowParam(workers = 2))
-  setMesaParallel(useParallel = TRUE, verbose = FALSE)
-  BiocParallel::bpworkers()                               # e.g. 2
-  getMesaParallel()                                       # TRUE
-  BiocParallel::register(old)
-  setMesaParallel(useParallel = FALSE, verbose = FALSE)
+    old <- BiocParallel::bpparam()
+    BiocParallel::register(BiocParallel::SnowParam(workers = 2))
+    setMesaParallel(useParallel = TRUE, verbose = FALSE)
+    BiocParallel::bpworkers() # e.g. 2
+    getMesaParallel() # TRUE
+    BiocParallel::register(old)
+    setMesaParallel(useParallel = FALSE, verbose = FALSE)
 }
 }
 
