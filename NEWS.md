@@ -2,7 +2,7 @@
 
 ## Bug Fixes
 
-- Switched vignette figure device from `pdf` to `ragg_png` across all
+- Switched vignette figure device from `png` to `ragg_png` across all
   vignettes to fix plot rendering quality in HTML output and resolve
   Cairo/X11 dependency issues on headless build servers without
   requiring an X display
