@@ -11,7 +11,8 @@ is.qseaSet(x)
 Object to test.}
 }
 \value{
-\code{logical(1)}: \code{TRUE} if \code{x} inherits from class \code{"qseaSet"}, otherwise \code{FALSE}.
+\code{logical(1)}: \code{TRUE} if \code{x} inherits from class \code{"qseaSet"},
+otherwise \code{FALSE}.
 }
 \description{
 Predicate helper used in input validation and branching logic.

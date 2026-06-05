@@ -8,8 +8,8 @@ writeDMRsToExcel(dataTable, path, FDRthres = 0.05)
 }
 \arguments{
 \item{dataTable}{\code{data.frame} or \code{GRanges}
-DMR results, typically produced by \code{\link[=calculateDMRs]{calculateDMRs()}}. If a \code{GRanges}, it
-will be coerced to a data frame internally.}
+DMR results, typically produced by \code{\link[=calculateDMRs]{calculateDMRs()}}. If a \code{GRanges}, it will
+be coerced to a data frame internally.}
 
 \item{path}{\code{character(1)}
 File path of the Excel workbook to write (e.g., \code{"dmr_results.xlsx"}).}
@@ -36,7 +36,6 @@ restricted on the system (e.g., some HPC build environments), consider
 writing to \code{tempfile(fileext = ".xlsx")} in examples or tests.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Minimal example: write results for a single contrast
@@ -47,9 +46,11 @@ exampleTumourNormal \%>\%
 # With multiple contrasts and annotation
 exampleTumourNormal \%>\%
     calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-    annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene", annoDb = "org.Hs.eg.db") \%>\%
+    annotateWindows(
+        TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db"
+    ) \%>\%
     writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
-}
 }
 \seealso{
 \code{\link[=writeDMRsToBed]{writeDMRsToBed()}}

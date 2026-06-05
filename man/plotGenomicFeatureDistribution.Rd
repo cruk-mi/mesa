@@ -40,7 +40,8 @@ Transcript database for gene annotation. Ignored if \code{genome} is provided.
 \strong{Default:} \code{TxDb.Hsapiens.UCSC.hg38.knownGene} for backward compatibility.}
 
 \item{annoDb}{\code{character(1)} or \code{NULL}.
-Annotation database name (e.g., \code{"org.Hs.eg.db"}). Ignored if \code{genome} is provided.
+Annotation database name (e.g., \code{"org.Hs.eg.db"}). Ignored if \code{genome} is
+provided.
 \strong{Default:} \code{"org.Hs.eg.db"}.}
 }
 \value{
@@ -53,8 +54,10 @@ per sample as stacked/dodged/filled bars.
 }
 \details{
 Feature classes are taken from region annotations available on the windows
-(e.g., columns produced by \code{\link[=annotateWindows]{annotateWindows()}} such as \code{shortAnno}/\code{annotation},
-if present). Bars are positioned according to \code{barType} (\code{stack}/\code{dodge}/\code{fill}).
+(e.g., columns produced by \code{\link[=annotateWindows]{annotateWindows()}} such as
+\code{shortAnno}/\code{annotation},
+if present). Bars are positioned according to \code{barType}
+(\code{stack}/\code{dodge}/\code{fill}).
 }
 \examples{
 \donttest{
@@ -68,12 +71,17 @@ exampleTumourNormal \%>\%
 
 # Override for specific analysis
 exampleTumourNormal \%>\%
-    plotGenomicFeatureDistribution(genome = "mm10", normMethod = "nrpm", cutoff = 2)
+    plotGenomicFeatureDistribution(
+        genome = "mm10",
+        normMethod = "nrpm",
+        cutoff = 2
+    )
 
 # Advanced: manual control (bypasses mesa genome system)
 exampleTumourNormal \%>\%
     plotGenomicFeatureDistribution(
-        TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
+        TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
+            TxDb.Mmusculus.UCSC.mm10.knownGene,
         annoDb = "org.Mm.eg.db"
     )
 }

@@ -51,7 +51,8 @@ exceed a chosen threshold using the selected normalisation/measure.
 The function builds a window × sample matrix over \code{GRanges} for the chosen
 \code{normMethod}, optionally restricts to \code{samples}, and counts, per sample, the
 number of windows with value \verb{>= cutoff}. It also reports how many windows
-were evaluated (\code{totalWindowsUsed}). Results are joined with the sample table.
+were evaluated (\code{totalWindowsUsed}). Results are joined with the sample
+table.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

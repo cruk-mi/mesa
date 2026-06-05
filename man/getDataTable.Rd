@@ -91,7 +91,8 @@ exampleTumourNormal \%>\%
 
 }
 \seealso{
-\code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}}, \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
+\code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}},
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
 
 Other table-helpers: 
 \code{\link{getBetaTable}()},

@@ -20,8 +20,10 @@ plotCorrelationMatrix(
 \item{qseaSet}{\code{qseaSet}.
 Input object containing windows and signal (beta or nrpm).}
 
-\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or \code{NULL}.
-If provided, restrict computation to windows overlapping these regions; otherwise
+\item{regionsToOverlap}{\code{GRanges}, \code{data.frame} (coercible to \code{GRanges}), or
+\code{NULL}.
+If provided, restrict computation to windows overlapping these regions;
+otherwise
 use all windows.
 \strong{Default:} \code{NULL}.}
 
@@ -63,8 +65,10 @@ Compute and plot the correlation matrix across samples (or group means)
 using the selected normalisation measure and optional region filters.
 }
 \details{
-Windows are optionally restricted by \code{regionsToOverlap} and filtered by \code{minDensity}.
-Correlations are computed on the chosen \code{normMethod} after any group averaging.
+Windows are optionally restricted by \code{regionsToOverlap} and filtered by
+\code{minDensity}.
+Correlations are computed on the chosen \code{normMethod} after any group
+averaging.
 For \code{"beta"}, entries below \code{minEnrichment} are set to \code{NA} to down-weight
 low-enrichment windows.
 }

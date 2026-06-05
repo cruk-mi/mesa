@@ -8,8 +8,10 @@ makeGeneHeatmapRowAnnotation(rowAnnotationDF)
 }
 \arguments{
 \item{rowAnnotationDF}{\code{data.frame}/\code{tibble}.
-One row per window with columns to annotate (e.g., \code{annotation}, \code{CpG_density}).
-Categorical variables (factor/character) receive discrete colour maps; numeric
+One row per window with columns to annotate (e.g., \code{annotation},
+\code{CpG_density}).
+Categorical variables (factor/character) receive discrete colour maps;
+numeric
 variables are mapped to a continuous gradient.}
 }
 \value{
@@ -17,11 +19,13 @@ variables are mapped to a continuous gradient.}
 }
 \description{
 Helper to create a \code{ComplexHeatmap::HeatmapAnnotation} for \strong{rows} showing
-categorical tracks (e.g., region labels) and numeric tracks (e.g., CpG density).
+categorical tracks (e.g., region labels) and numeric tracks (e.g., CpG
+density).
 }
 \details{
 Column types determine colour mapping automatically: factors/characters get a
-qualitative palette; numeric columns use a continuous scale. Missing values are
+qualitative palette; numeric columns use a continuous scale. Missing values
+are
 allowed and rendered per \strong{ComplexHeatmap} defaults.
 }
 \examples{
@@ -34,6 +38,7 @@ data.frame(
 
 }
 \seealso{
-\code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}, \code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}
+\code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}, \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}},
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}
 }
 \keyword{internal}

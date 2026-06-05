@@ -41,7 +41,8 @@ Directory to write per-sample PDF diagnostics; if \code{NULL}, no plots are save
 \strong{Default:} \code{NULL}.}
 
 \item{parallel}{\code{logical(1)}.
-Use the registered \strong{BiocParallel} backend when \code{TRUE}; otherwise run serially.
+Use the registered \strong{BiocParallel} backend when \code{TRUE}; otherwise run
+serially.
 \strong{Default:} \code{getMesaParallel()}.}
 
 \item{maxInsertSize}{\code{integer(1)}.
@@ -61,7 +62,8 @@ Minimum MAPQ; for pairs, either end meeting the cutoff is accepted.
 \strong{Default:} \code{30}.}
 
 \item{properPairsOnly}{\code{logical(1)}.
-If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine proper pairs with high-quality R1.
+If \code{TRUE}, ignore unpaired R1; if \code{FALSE}, combine proper pairs with
+high-quality R1.
 \strong{Default:} \code{FALSE}.}
 
 \item{hmmCopyGC}{\code{GRanges} or \code{NULL}.
@@ -88,8 +90,10 @@ Only GRCh38/hg38 is currently supported.
 }
 \details{
 Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
-HMMcopy (\code{HMMcopy::correctReadcount()} followed by \code{HMMcopy::HMMsegment()}), and
-merged back into the \code{qseaSet}. You must supply GC/mappability tracks binned at
+HMMcopy (\code{HMMcopy::correctReadcount()} followed by \code{HMMcopy::HMMsegment()}),
+and
+merged back into the \code{qseaSet}. You must supply GC/mappability tracks binned
+at
 the same \code{windowSize} (or use package-provided defaults where applicable).
 When \code{parallel = TRUE}, computation uses the currently registered backend
 (see \code{BiocParallel::register()}).

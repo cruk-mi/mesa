@@ -16,7 +16,8 @@ ordering.
 \strong{Default:} none (no reordering).}
 
 \item{.by_group}{\code{logical(1)}.
-Grouped arrangement is not implemented for \code{qseaSet}; this argument is ignored.
+Grouped arrangement is not implemented for \code{qseaSet}; this argument is
+ignored.
 \strong{Default:} \code{FALSE}.}
 }
 \value{
@@ -24,7 +25,8 @@ A \code{qseaSet} object with samples reordered.
 Both the \code{count_matrix} and the \code{sampleTable} are updated consistently.
 }
 \description{
-Extends \code{\link[dplyr:arrange]{dplyr::arrange()}} to reorder \strong{samples} of a \code{qseaSet} based on columns
+Extends \code{\link[dplyr:arrange]{dplyr::arrange()}} to reorder \strong{samples} of a \code{qseaSet} based on
+columns
 in its \code{sampleTable}.
 }
 \examples{

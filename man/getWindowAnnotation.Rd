@@ -36,7 +36,8 @@ order produced by clustering in the heatmap.
 requested annotation columns.
 }
 \description{
-Note that windowAnnotation must be enclosed within double curly brackets when used.
+Note that windowAnnotation must be enclosed within double curly brackets when
+used.
 }
 \details{
 Build a data frame of row annotations aligned to the windows shown in the
@@ -44,9 +45,12 @@ heatmap created by \code{\link[=plotRegionsHeatmap]{plotRegionsHeatmap()}}. Anno
 the table used to plot (e.g. \code{getDataTable()} output) and/or from metadata
 columns on a \code{GRanges} of regions.
 
-Rows are aligned by the \code{window} label (\code{"chr:start-end"}). When both \code{dataTab}
-and \code{regions} provide overlapping information, columns from either source may be
-selected via \code{windowAnnotation}. Use tidyselect to pick or pattern-match columns.
+Rows are aligned by the \code{window} label (\code{"chr:start-end"}). When both
+\code{dataTab}
+and \code{regions} provide overlapping information, columns from either source may
+be
+selected via \code{windowAnnotation}. Use tidyselect to pick or pattern-match
+columns.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

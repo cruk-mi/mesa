@@ -1,17 +1,28 @@
 # mesa 0.99.2.9000
 
 ## Bug Fixes
-
-- Switched vignette figure device from `png` to `ragg_png` across all
-  vignettes to fix plot rendering quality in HTML output and resolve
-  Cairo/X11 dependency issues on headless build servers without
-  requiring an X display
+- Fixed `plotly` PNG device error on headless build servers
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+- Switched to `ragg_png` device in PCA vignette chunks to resolve
+  Cairo/X11 dependency issues in CI
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+- Restored vignette YAML front matter dropped during line-wrap reflow
+  ([#76](https://github.com/cruk-mi/mesa/pull/76))
 
 ## Style
-
 - Standardized 4-space indentation throughout codebase per
   Bioconductor style guide
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Added missing chunk labels to all vignettes
+  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+- Wrapped all lines > 80 characters across R sources, vignettes, and helpers
+  to satisfy BiocCheck `LINE_LENGTH` notes; where `::` cannot be broken across
+  lines, replaced long namespace-qualified names with `getExportedValue()`
+  (for annotation-package objects in `R/genome.R`, `R/qseaExtra.R`) and
+  `utils::data()` (for package datasets in `R/calculateEnrichment.R`,
+  `R/qseaExtra.R`) — both are semantically equivalent to `pkg::name` but
+  can be formatted across multiple lines
+  ([#76](https://github.com/cruk-mi/mesa/pull/76))
 
 # mesa 0.99.2
 

@@ -2,8 +2,9 @@
 % Please edit documentation in R/plotting.R
 \name{plotGeneHeatmap}
 \alias{plotGeneHeatmap}
-\title{Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
-\strong{ComplexHeatmap}. The gene can be given as a HGNC symbol or Ensembl ID.}
+\title{Plot sample signal over windows spanning a gene (± flanks) as a
+heatmap using \strong{ComplexHeatmap}. The gene can be given as a HGNC
+symbol or Ensembl ID.}
 \usage{
 plotGeneHeatmap(
   qseaSet,
@@ -31,14 +32,16 @@ plotGeneHeatmap(
 Input object containing windows and counts/betas.}
 
 \item{gene}{\code{character(1)}.
-Gene identifier to plot (HGNC symbol like \code{"HOXA9"} or Ensembl ID like \code{"ENSG000..."}).}
+Gene identifier to plot (HGNC symbol like \code{"HOXA9"} or Ensembl ID like
+\code{"ENSG000..."}).}
 
 \item{normMethod}{\code{character(1)}.
 Which measure to plot. One of \code{"beta"} or \code{"nrpm"}.
 \strong{Default:} \code{"beta"}.}
 
 \item{useGroupMeans}{\code{logical(1)}.
-If \code{TRUE}, average samples by the \code{group} column in the sample table (combine replicates).
+If \code{TRUE}, average samples by the \code{group} column in the sample table (combine
+replicates).
 \strong{Default:} \code{FALSE}.}
 
 \item{sampleAnnotation}{tidyselect specification or \code{character()} or \code{NULL}.
@@ -59,7 +62,8 @@ Upper limit of the colour scale (used for \code{"nrpm"}; not applied to \code{"b
 \strong{Default:} \code{1}.}
 
 \item{clusterNum}{\code{integer(1)} or \code{NULL}.
-If set, cut the \strong{column} dendrogram into this many clusters and display cluster labels.
+If set, cut the \strong{column} dendrogram into this many clusters and display
+cluster labels.
 \strong{Default:} \code{NULL}.}
 
 \item{annotationColors}{\code{list} or \code{NA}.
@@ -80,13 +84,16 @@ Whether to cluster columns (samples).
 \strong{Default:} \code{TRUE}.}
 
 \item{mart}{\code{biomaRt::Mart} or \code{NULL}.
-Ensembl mart used to resolve gene coordinates. If \code{NULL}, attempts to use a mart
-stored on the \code{qseaSet} (see \code{\link[=setMart]{setMart()}}); otherwise falls back to a default for
+Ensembl mart used to resolve gene coordinates. If \code{NULL}, attempts to use a
+mart
+stored on the \code{qseaSet} (see \code{\link[=setMart]{setMart()}}); otherwise falls back to a default
+for
 GRCh38/hg38 or hg19.
 \strong{Default:} \code{NULL}.}
 
 \item{showSampleNames}{\code{logical(1)} or \code{NULL}.
-If \code{NULL}, names are shown when there are fewer than 50 samples; set \code{TRUE}/\code{FALSE} to force.
+If \code{NULL}, names are shown when there are fewer than 50 samples; set
+\code{TRUE}/\code{FALSE} to force.
 \strong{Default:} \code{NULL}.}
 
 \item{downstreamDist}{\code{integer(1)}.
@@ -94,25 +101,30 @@ Number of base pairs downstream of the gene to include.
 \strong{Default:} \code{1000}.}
 
 \item{idType}{\code{character(1)} or \code{NULL}.
-Column in the mart to match \code{gene} against (needed for non-human/mouse setups).
+Column in the mart to match \code{gene} against (needed for non-human/mouse
+setups).
 \strong{Default:} \code{NULL}.}
 
 \item{...}{Additional arguments forwarded to \strong{ComplexHeatmap} constructors.}
 }
 \value{
 Draws a heatmap on the active device and (invisibly) returns the underlying
-\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further composition
+\strong{ComplexHeatmap} object (e.g., a \code{Heatmap}/\code{HeatmapList}) for further
+composition
 with \code{\link[ComplexHeatmap]{draw}}.
 }
 \description{
-Plot sample signal over windows spanning a gene (± flanks) as a heatmap using
-\strong{ComplexHeatmap}. The gene can be given as a HGNC symbol or Ensembl ID.
+Plot sample signal over windows spanning a gene (± flanks) as a
+heatmap using \strong{ComplexHeatmap}. The gene can be given as a HGNC
+symbol or Ensembl ID.
 }
 \details{
-The function resolves the gene to genomic coordinates (using \code{mart}, or a mart
+The function resolves the gene to genomic coordinates (using \code{mart}, or a
+mart
 stored on the object, or a built-in default for human builds), expands the
 interval by \code{upstreamDist}/\code{downstreamDist}, filters windows by overlap and
-\code{minDensity}, then draws a heatmap of \code{"beta"} or \code{"nrpm"}. For \code{"beta"}, values
+\code{minDensity}, then draws a heatmap of \code{"beta"} or \code{"nrpm"}. For \code{"beta"},
+values
 below \code{minEnrichment} are set to \code{NA}. If \code{useGroupMeans = TRUE}, samples are
 aggregated by \code{group} prior to plotting. Column annotations can be added via
 \code{sampleAnnotation}; colours can be customized via \code{annotationColors}.
@@ -127,7 +139,8 @@ tryCatch(
     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 )
 
-# Add sample annotations (tidyselect bare names) and cluster columns into 2 groups
+# Add sample annotations (tidyselect bare names) and cluster columns into
+# 2 groups
 tryCatch(
     exampleTumourNormal \%>\%
         plotGeneHeatmap("HOXA9",
@@ -141,7 +154,9 @@ tryCatch(
     exampleTumourNormal \%>\%
         plotGeneHeatmap("HOXA9",
             sampleAnnotation = tumour,
-            annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+            annotationColors = list(
+                tumour = c(Tumour = "firebrick4", Normal = "blue")
+            ),
             upstreamDist = 1000,
             downstreamDist = 2000),
     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))

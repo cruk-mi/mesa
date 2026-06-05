@@ -9,16 +9,16 @@ setMesaTxDb(TxDb)
 \arguments{
 \item{TxDb}{\code{character(1)}, TxDb \strong{object}, or \code{NULL}.
 Either the name of an installed TxDb package (e.g.,
-\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}), the TxDb object itself, or \code{NULL}
-to clear the setting. If a string is supplied, the package must be installed.
+\code{"TxDb.Hsapiens.UCSC.hg38.knownGene"}), the TxDb object itself, or \code{NULL} to
+clear the setting. If a string is supplied, the package must be installed.
 \strong{Default:} none (must be supplied).}
 }
 \value{
 Invisibly returns \code{TRUE} on success.
 }
 \description{
-Record a preferred TxDb to use when functions such as \code{\link[=annotateWindows]{annotateWindows()}}
-are called without an explicit \code{TxDb}.
+Record a preferred TxDb to use when functions such as \code{\link[=annotateWindows]{annotateWindows()}} are
+called without an explicit \code{TxDb}.
 }
 \details{
 This sets the session option \code{options(mesa_TxDb = TxDb)}. When a string is
@@ -36,7 +36,9 @@ setMesaTxDb(NULL)
 getOption("mesa_TxDb")
 
 # (Alternatively) you can store the object itself if already loaded:
-# setMesaTxDb(TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene)
+# setMesaTxDb(
+#   TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+# )
 
 }
 \seealso{

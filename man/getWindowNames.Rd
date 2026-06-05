@@ -20,7 +20,8 @@ Return character labels of the form \code{"seqnames:start-end"} for each genomic
 window/region.
 }
 \details{
-If \code{x} is a \code{qseaSet}, regions are taken from \code{qsea::getRegions(x)}. Otherwise
+If \code{x} is a \code{qseaSet}, regions are taken from \code{qsea::getRegions(x)}.
+Otherwise
 the input is coerced to \code{GRanges} (see \code{\link[=asValidGranges]{asValidGranges()}}) and labels are
 constructed as \code{"seqnames:start-end"}.
 }

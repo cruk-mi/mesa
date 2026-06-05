@@ -55,8 +55,10 @@ If \code{FALSE}, combine proper pairs with high-quality unpaired R1 reads.
 A \code{qseaSet} with updated slots:
 \itemize{
 \item \strong{Counts}: updated count matrix via \code{qsea:::setCounts()}.
-\item \strong{Library}: updated library table via \code{qsea:::setLibrary()}, with summary metrics.
-\item \strong{Parameters}: appended record of MAPQ/size thresholds via \code{qsea:::addParameters()}.
+\item \strong{Library}: updated library table via \code{qsea:::setLibrary()}, with summary
+metrics.
+\item \strong{Parameters}: appended record of MAPQ/size thresholds via
+\code{qsea:::addParameters()}.
 }
 }
 \description{

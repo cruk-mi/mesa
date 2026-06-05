@@ -104,13 +104,15 @@ A tibble with one row per \strong{significant} region/window containing:
 }
 }
 \description{
-Calculate one or more contrasts to find Differentially Methylated Regions (DMRs).
+Calculate one or more contrasts to find Differentially Methylated Regions
+(DMRs).
 }
 \details{
 Contrast strings are parsed as follows:
 \itemize{
 \item \code{"A_vs_B"} creates a single contrast \emph{A vs B};
-\item \code{"All"}/\code{"all"} expands to all pairwise contrasts among levels of \code{variable}
+\item \code{"All"}/\code{"all"} expands to all pairwise contrasts among levels of
+\code{variable}
 (via \code{\link[=makeAllContrasts]{makeAllContrasts()}});
 \item \code{"All_vs_X"} creates \emph{each level vs X};
 \item \code{"X_vs_All"} creates \emph{X vs each other level};

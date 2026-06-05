@@ -28,7 +28,8 @@ group-mean columns.
 }
 \details{
 Intended for post-processing tables where column names encode the measure,
-e.g., \code{"sample_beta"}, \code{"group_beta_means"}. The function drops those suffixes
+e.g., \code{"sample_beta"}, \code{"group_beta_means"}. The function drops those
+suffixes
 to yield bare sample/group names, facilitating downstream joins and plotting.
 }
 \examples{

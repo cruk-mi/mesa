@@ -22,8 +22,8 @@ addMedipsEnrichmentFactors(
 Input object whose sample table contains BAM paths.}
 
 \item{exportPath}{\code{character(1)} or \code{NULL}
-Directory to export per-sample fragment-length PDFs and read-\code{GRanges} RDS files.
-If \code{NULL}, no files are written.
+Directory to export per-sample fragment-length PDFs and read-\code{GRanges} RDS
+files. If \code{NULL}, no files are written.
 \strong{Default:} \code{NULL}.}
 
 \item{nonEnrich}{\code{logical(1)}
@@ -67,26 +67,33 @@ A \code{qseaSet} with new MEDIPS-style metrics appended:
 \item \strong{Sample/library metrics} (added under the appropriate library frame):
 \code{relH}, \code{GoGe}, \code{nReads}, \code{nReadsWithoutPattern}, \code{n100bpReads},
 \code{n100bpReadsWithoutPattern}.
-\item \strong{Provenance}: any export artefacts (PDF/RDS) written to \code{exportPath} if provided.
+\item \strong{Provenance}: any export artefacts (PDF/RDS) written to \code{exportPath} if
+provided.
 }
 }
 \description{
-For each sample, compute MEDIPS-style CpG enrichment metrics (\strong{relH}, \strong{GoGe},
-and read counts) from its BAM and append the results to the \code{qseaSet} sample
-metadata. Supports both pulldown (default) and input libraries.
+For each sample, compute MEDIPS-style CpG enrichment metrics (\strong{relH},
+\strong{GoGe}, and read counts) from its BAM and append the results to the
+\code{qseaSet} sample metadata. Supports both pulldown (default) and input
+libraries.
 }
 \details{
-Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and counts,
-then merges the results into the \verb{@libraries} slot (\verb{$file_name} for pulldown,
-\verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelisation uses
-\code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
+Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and
+counts, then merges the results into the \verb{@libraries} slot (\verb{$file_name} for
+pulldown, \verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelisation
+uses \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
+# Requires BAM files and the MEDIPS package; see \dontrun{} for a full
+# usage example.
 \dontrun{
 if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
-
-    bam <- system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData")
+    bam <- system.file(
+        "extdata",
+        "hESCs.Input.chr22.bam",
+        package = "MEDIPSData"
+    )
 
     data.frame(
         sample_name = "hESC_Input_chr22",
@@ -100,7 +107,8 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
             exportPath = tempdir(),
             chr.select = paste0("chr22"),
             paired     = FALSE
-            # If your qsea returns a BSgenome object and as.character() doesn't help, uncomment:
+            # If your qsea returns a BSgenome object and as.character()
+            # doesn't help, uncomment:
             # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
         ) \%>\%
         qsea::getSampleTable() \%>\%
@@ -109,6 +117,5 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
 }
 }
 \seealso{
-\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
-\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, \code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}
 }

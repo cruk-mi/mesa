@@ -63,8 +63,8 @@ Input object providing windows, counts and \code{sampleTable}.}
 
 \item{dataTable}{\code{data.frame} or \code{GRanges} or \code{NULL}.
 Normalised values with windows in rows and samples in columns. Must contain
-\code{seqnames}, \code{start}, \code{end} (if \code{data.frame}), or metadata columns with
-values (if \code{GRanges}). If \code{NULL}, the matrix is derived internally (see
+\code{seqnames}, \code{start}, \code{end} (if \code{data.frame}), or metadata columns with values
+(if \code{GRanges}). If \code{NULL}, the matrix is derived internally (see
 \code{normMethod}, \code{minEnrichment}).
 \strong{Default:} \code{NULL}.}
 
@@ -91,10 +91,11 @@ before DR.
 Minimum CpG density; windows below this are removed.
 \strong{Default:} \code{0}.}
 
-\item{topVarNum}{\code{numeric(1)} or \code{integer(1)} or \code{Inf} or \code{NULL} \strong{or} a vector.
+\item{topVarNum}{\code{numeric(1)} or \code{integer(1)} or \code{Inf} or \code{NULL} \strong{or} a
+vector.
 Keep the \code{topVarNum} most variable windows (by SD). If \code{NA}, \code{NULL}, \code{Inf},
-or \code{>=} available windows, use all. If a vector, DR is run once per value
-and results are returned in a list.
+or \code{>=} available windows, use all. If a vector, DR is run once per value and
+results are returned in a list.
 \strong{Default:} \code{1000}.}
 
 \item{topVarSamples}{\code{NULL}, \code{character()}, \code{list}, or \code{regex} string.
@@ -123,7 +124,8 @@ If \code{TRUE}, include the matrix used for DR in the return object.
 If \code{TRUE}, print messages regarding the function execution.
 \strong{Default:} \code{TRUE}.}
 
-\item{...}{Additional arguments passed to \code{\link[uwot:umap]{uwot::umap()}} (when \code{method="UMAP"}),
+\item{...}{Additional arguments passed to \code{\link[uwot:umap]{uwot::umap()}} (when
+\code{method="UMAP"}),
 e.g. \code{n_neighbors}, \code{min_dist}, \code{metric}.}
 
 \item{method}{\code{character(1)}. One of \code{"PCA"} or \code{"UMAP"}.
@@ -137,9 +139,10 @@ or \code{\link{mesaUMAP}} (for UMAP). Names correspond to entries in \code{param
 \item \strong{samples}: Character vector of sample IDs used.
 \item \strong{dataTable} (optional): The numeric matrix used for DR when
 \code{returnDataTable = TRUE}. It reflects filtering by \code{regionsToOverlap} and
-\code{minDensity}, removal of rows with missing values, and may include columns
-of window SDs when applicable (named per \code{params$topVar}).
-\item \strong{params}: List of parameters used (method, selection/filter settings, etc.).
+\code{minDensity}, removal of rows with missing values, and may include columns of
+window SDs when applicable (named per \code{params$topVar}).
+\item \strong{params}: List of parameters used (method, selection/filter settings,
+etc.).
 \item \strong{sampleTable}: Copy of \code{qsea::getSampleTable(qseaSet)}.
 }
 }
@@ -169,11 +172,11 @@ are performed and collected in \code{res}.
 \itemize{
 \item \code{getPCA()}: Principal component analysis of a qseaSet.
 
-\item \code{getUMAP()}: Uniform manifold approximation and projection of a qseaSet.
+\item \code{getUMAP()}: Uniform manifold approximation and projection of a
+qseaSet.
 
 }}
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)
@@ -184,13 +187,12 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
     getPCA(nPC = 3)
 
-# Use multiple cutoffs for most-variable windows (returns list of PCA results)
+# Use multiple cutoffs for most-variable windows
+# (returns list of PCA results)
 exampleTumourNormal \%>\%
     getPCA(topVarNum = c(10, 100, 500, NA)) \%>\%
     slot("res") \%>\%
     names()
-}
-\donttest{
 # Quick demo on a small synthetic qseaSet
 qsea::getExampleQseaSet(repl = 20) \%>\%
     getUMAP()
@@ -202,8 +204,6 @@ qsea::getExampleQseaSet(repl = 20) \%>\%
 # Use top 500 most variable windows only
 qsea::getExampleQseaSet(repl = 20) \%>\%
     getUMAP(topVarNum = 500)
-}
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # PCA on default beta-normalised matrix, keep 3 PCs
@@ -225,10 +225,9 @@ exampleTumourNormal \%>\%
     slot("res") \%>\%
     names()
 }
-}
 \seealso{
-\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA}, \linkS4class{mesaUMAP},
-\code{\link[qsea:normMethod]{qsea::normMethod()}}, \code{\link[uwot:umap]{uwot::umap()}}, \code{\link[stats:prcomp]{stats::prcomp()}}
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}, \linkS4class{mesaDimRed}, \linkS4class{mesaPCA},
+\linkS4class{mesaUMAP}, \code{\link[qsea:normMethod]{qsea::normMethod()}}, \code{\link[uwot:umap]{uwot::umap()}}, \code{\link[stats:prcomp]{stats::prcomp()}}
 
 Other dimred-helpers: 
 \code{\link{plotDimRed}()},

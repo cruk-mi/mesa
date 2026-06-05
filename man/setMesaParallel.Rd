@@ -11,8 +11,7 @@ getMesaParallel(verbose = FALSE)
 }
 \arguments{
 \item{nCores}{\code{integer(1)} or \code{NULL}.
-If \verb{> 1} on Unix/macOS, registers \code{BiocParallel::MulticoreParam(workers = nCores)}
-and enables parallel mode. Ignored on Windows (see \strong{Details}).
+If \verb{> 1} on Unix/macOS, registers \code{BiocParallel::MulticoreParam(workers = nCores)} and enables parallel mode. Ignored on Windows (see \strong{Details}).
 \strong{Default:} \code{NULL}.}
 
 \item{useParallel}{\code{logical(1)}.
@@ -24,10 +23,12 @@ option). If \code{nCores > 1}, this is treated as \code{TRUE}.
 }
 \value{
 \itemize{
-\item \code{setMesaParallel()} — logical scalar (\code{TRUE}/\code{FALSE}), returned \strong{invisibly};
+\item \code{setMesaParallel()} — logical scalar (\code{TRUE}/\code{FALSE}), returned
+\strong{invisibly};
 primarily used for its side effects (setting the option and possibly
 registering a backend).
-\item \code{getMesaParallel()} — logical scalar indicating whether mesa parallelisation
+\item \code{getMesaParallel()} — logical scalar indicating whether mesa
+parallelisation
 is currently enabled; with \code{verbose = TRUE}, also prints a status message.
 }
 }
@@ -62,7 +63,8 @@ getMesaParallel() # FALSE
 \dontrun{
 if (.Platform$OS.type != "windows") {
     old <- BiocParallel::bpparam() # save current backend
-    setMesaParallel(nCores = 2, verbose = FALSE) # registers MulticoreParam(2)
+    setMesaParallel(nCores = 2, verbose = FALSE)
+    # registers MulticoreParam(2)
     BiocParallel::bpworkers() # e.g. 2
     getMesaParallel() # TRUE
     BiocParallel::register(old) # restore previous backend

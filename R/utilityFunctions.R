@@ -1,29 +1,42 @@
-utils::globalVariables(c("chr", "seqnames", "start", "end", ".", "annotation", "value", "library_factor",
-    "ROI_start", "ROI_end", "value", "window_start", "window_end", "window", "sample_name",
-    "width", "group", "relH", "CpG_density", "strand", "state", "gene_name", "map", "CNV",
-    "EMSEMBL", "SYMBOL", "GENENAME", "geneChr", "geneStart", "geneEnd", "geneLength", "n",
-    "adjPval", "group1", "group2", "sample1", "sample2", ".up", "hyperStableFractionp8", "hyperStableFractionp9", "hyperStableEdgar",
-    "isProperPair", "isUnmappedQuery", "isSupplementaryAlignment", "isDuplicate", "hasUnmappedMate",
-    "isNotPassingQualityControls", "rname", "pos", "isize", "MQ", "mapq", "isFirstMateRead", "isPaired",
-    "cigar", ".rowID", "feature", "annoShort", "type", ".comparison", ".ext", ".value", "total_fragments",
+utils::globalVariables(c(
+    "chr", "seqnames", "start", "end", ".", "annotation", "value",
+    "library_factor",
+    "ROI_start", "ROI_end", "value", "window_start", "window_end",
+    "window", "sample_name",
+    "width", "group", "relH", "CpG_density", "strand", "state",
+    "gene_name", "map", "CNV",
+    "EMSEMBL", "SYMBOL", "GENENAME", "geneChr", "geneStart",
+    "geneEnd", "geneLength", "n",
+    "adjPval", "group1", "group2", "sample1", "sample2", ".up",
+    "hyperStableFractionp8", "hyperStableFractionp9", "hyperStableEdgar",
+    "isProperPair", "isUnmappedQuery", "isSupplementaryAlignment",
+    "isDuplicate", "hasUnmappedMate",
+    "isNotPassingQualityControls", "rname", "pos", "isize", "MQ",
+    "mapq", "isFirstMateRead", "isPaired",
+    "cigar", ".rowID", "feature", "annoShort", "type", ".comparison",
+    ".ext", ".value", "total_fragments",
     "isSecondaryAlignment", "ROI_ID", "ID", "ENSEMBL", "deltaBeta",
     "map_hg38_1000kb", "map_hg38_10kb", "map_hg38_50kb", "map_hg38_500kb",
-    "gc_hg38_1000kb", "gc_hg38_50kb", "gc_hg38_500kb", "gc_hg38_10kb", "score",
-    "log2FC", "group1new", "sample2new", "counts", "tumour", "rowIndex", "nUp", "nDown", "landscape", "shortAnno", "nOverCutoff",
-    "afterOverBackNum", "initialOverBackNum", "qname", "inOut", "nSign", "nStrands",
+    "gc_hg38_1000kb", "gc_hg38_50kb", "gc_hg38_500kb", "gc_hg38_10kb",
+    "score",
+    "log2FC", "group1new", "sample2new", "counts", "tumour", "rowIndex",
+    "nUp", "nDown", "landscape", "shortAnno", "nOverCutoff",
+    "afterOverBackNum", "initialOverBackNum", "qname", "inOut",
+    "nSign", "nStrands",
     "chromosome_name", "start_position", "end_position", "input_file",
     "topVarNumInput", "windowSdName", "pcaName",
-    "fnValue", "group2new", "gap", "size"))
+    "fnValue", "group2new", "gap", "size"
+))
 
 #' Lift over genomic ranges from hg19 to hg38
 #'
-#' Convert genomic intervals from UCSC **hg19** to **hg38/GRCh38** using
-#' a preloaded chain object.
+#' Convert genomic intervals from UCSC **hg19** to **hg38/GRCh38** using a
+#' preloaded chain object.
 #'
 #' @param grOrDf `GRanges` or `data.frame`.
-#'   Input intervals. Data frames must contain at least `seqnames`, `start`,
-#'   and `end`. `seqnames` may include or omit the `"chr"` prefix; it is added
-#'   automatically if missing.
+#' Input intervals. Data frames must contain at least `seqnames`, `start`, and
+#' `end`. `seqnames` may include or omit the `"chr"` prefix; it is added
+#' automatically if missing.
 #'   **Default:** none (must be supplied).
 #'
 #' @return
@@ -49,7 +62,9 @@ utils::globalVariables(c("chr", "seqnames", "start", "end", ".", "annotation", "
 #'     end      = c(100100, 200100)
 #' ) %>%
 #'     liftOverHg19() %>%
-#'     { GenomeInfoDb::genome(.) }
+#'     {
+#'         GenomeInfoDb::genome(.)
+#'     }
 #'
 #' # GRanges input (some intervals may not map and can be dropped)
 #' gr <- GenomicRanges::GRanges("chr1", IRanges::IRanges(100000, 100300))
@@ -57,7 +72,6 @@ utils::globalVariables(c("chr", "seqnames", "start", "end", ".", "annotation", "
 #'
 #' @export
 liftOverHg19 <- function(grOrDf) {
-
     if (!requireNamespace("rtracklayer", quietly = TRUE)) {
         stop(
             "Package \"rtracklayer\" must be installed to use this function.",
@@ -67,11 +81,19 @@ liftOverHg19 <- function(grOrDf) {
 
     regions <- grOrDf %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames, "chr"), seqnames, paste0("chr", seqnames))) %>%
+        dplyr::mutate(
+            seqnames = ifelse(
+                stringr::str_detect(seqnames, "chr"),
+                seqnames, paste0("chr", seqnames)
+            )
+        ) %>%
         plyranges::as_granges()
 
     message("Performing coordinate liftover from hg19 to hg38")
-    liftover_result <- rtracklayer::liftOver(regions, mesa::hg19ToHg38.over.chain)
+    utils::data(
+        "hg19ToHg38.over.chain", package = "mesa", envir = environment()
+    )
+    liftover_result <- rtracklayer::liftOver(regions, hg19ToHg38.over.chain)
     GenomeInfoDb::genome(liftover_result) <- "hg38"
 
     return(unlist(liftover_result))
@@ -101,13 +123,13 @@ liftOverHg19 <- function(grOrDf) {
 #' is not explicitly supplied.
 #'
 #' @param genome `character(1)` or `NULL`.
-#'   Genome identifier to store (typically `"hg38"` or `"GRCh38"`).
-#'   Use `NULL` to clear the setting.
+#' Genome identifier to store (typically `"hg38"` or `"GRCh38"`). Use `NULL` to
+#' clear the setting.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
-#' This function sets the session option `options(mesa_genome = <genome>)`.
-#' It **does not** modify TxDb or OrgDb options directly; set those via
+#' This function sets the session option `options(mesa_genome = <genome>)`. It
+#' **does not** modify TxDb or OrgDb options directly; set those via
 #' [setMesaTxDb()] and [setMesaAnnoDb()] if you want global defaults for
 #' transcript and gene annotation packages. Helpers such as [annotateWindows()]
 #' consult `getOption("mesa_genome")` when `genome` is missing.
@@ -140,13 +162,13 @@ setMesaGenome <- function(genome) {
 
 #' Set default TxDb for downstream annotation helpers
 #'
-#' Record a preferred TxDb to use when functions such as [annotateWindows()]
-#' are called without an explicit `TxDb`.
+#' Record a preferred TxDb to use when functions such as [annotateWindows()] are
+#' called without an explicit `TxDb`.
 #'
 #' @param TxDb `character(1)`, TxDb **object**, or `NULL`.
-#'   Either the name of an installed TxDb package (e.g.,
-#'   `"TxDb.Hsapiens.UCSC.hg38.knownGene"`), the TxDb object itself, or `NULL`
-#'   to clear the setting. If a string is supplied, the package must be installed.
+#' Either the name of an installed TxDb package (e.g.,
+#' `"TxDb.Hsapiens.UCSC.hg38.knownGene"`), the TxDb object itself, or `NULL` to
+#' clear the setting. If a string is supplied, the package must be installed.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
@@ -172,11 +194,12 @@ setMesaGenome <- function(genome) {
 #' getOption("mesa_TxDb")
 #'
 #' # (Alternatively) you can store the object itself if already loaded:
-#' # setMesaTxDb(TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene)
+#' # setMesaTxDb(
+#' #   TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+#' # )
 #'
 #' @export
 setMesaTxDb <- function(TxDb) {
-
     if (is.null(TxDb)) {
         options("mesa_TxDb" = NULL)
         return(invisible(TRUE))
@@ -184,7 +207,10 @@ setMesaTxDb <- function(TxDb) {
 
     if (!requireNamespace(TxDb, quietly = TRUE)) {
         stop(
-            glue::glue("Package {TxDb} must exist and be installed to set as default TxDb. Please install or correct and run again."),
+            glue::glue(
+                "Package {TxDb} must exist and be installed to set as ",
+                "default TxDb. Please install or correct and run again."
+            ),
             call. = FALSE
         )
     }
@@ -201,9 +227,9 @@ setMesaTxDb <- function(TxDb) {
 #' [annotateWindows()] are called without an explicit `annoDb`.
 #'
 #' @param annoDb `character(1)` or `NULL`.
-#'   Name of an installed OrgDb package (e.g., `"org.Hs.eg.db"` or
-#'   `"org.Mm.eg.db"`), or `NULL` to clear the setting. The package must be
-#'   installed if a string is supplied.
+#' Name of an installed OrgDb package (e.g., `"org.Hs.eg.db"` or
+#' `"org.Mm.eg.db"`), or `NULL` to clear the setting. The package must be
+#' installed if a string is supplied.
 #'   **Default:** none (must be supplied).
 #'
 #' @details
@@ -239,7 +265,6 @@ setMesaTxDb <- function(TxDb) {
 #'
 #' @export
 setMesaAnnoDb <- function(annoDb) {
-
     if (is.null(annoDb)) {
         options("mesa_annoDb" = NULL)
         return(invisible(TRUE))
@@ -247,7 +272,10 @@ setMesaAnnoDb <- function(annoDb) {
 
     if (!requireNamespace(annoDb, quietly = TRUE)) {
         stop(
-            glue::glue("Package {annoDb} must exist and be installed to set as default annoDb. Please install or correct and run again."),
+            glue::glue(
+                "Package {annoDb} must exist and be installed to set as ",
+                "default annoDb. Please install or correct and run again."
+            ),
             call. = FALSE
         )
     }
@@ -264,36 +292,38 @@ setMesaAnnoDb <- function(annoDb) {
 #' backend); `getMesaParallel()` returns the current setting.
 #'
 #' @param nCores `integer(1)` or `NULL`.
-#'   If `> 1` on Unix/macOS, registers `BiocParallel::MulticoreParam(workers = nCores)`
-#'   and enables parallel mode. Ignored on Windows (see **Details**).
+#' If `> 1` on Unix/macOS, registers `BiocParallel::MulticoreParam(workers =
+#' nCores)` and enables parallel mode. Ignored on Windows (see **Details**).
 #'   **Default:** `NULL`.
 #'
 #' @param useParallel `logical(1)`.
-#'   Explicitly turn mesa parallelisation on/off (sets the `"mesa_parallel"`
-#'   option). If `nCores > 1`, this is treated as `TRUE`.
+#' Explicitly turn mesa parallelisation on/off (sets the `"mesa_parallel"`
+#' option). If `nCores > 1`, this is treated as `TRUE`.
 #'   **Default:** `FALSE`.
 #'
 #' @param verbose `logical(1)`.
-#'   Print status messages.
+#' Print status messages.
 #'   **Default:** `TRUE`.
 #'
 #' @details
 #' - This function stores the flag in `options(mesa_parallel = <TRUE/FALSE>)`.
 #' - On Unix/macOS, supplying `nCores > 1` will **register** a
-#'   `MulticoreParam` backend via `BiocParallel::register()` and enable
-#'   parallelisation.
+#' `MulticoreParam` backend via `BiocParallel::register()` and enable
+#' parallelisation.
 #' - On **Windows**, forked backends are unavailable; you should manually
-#'   register a compatible backend (e.g., `SnowParam`) and then call
-#'   `setMesaParallel(useParallel = TRUE)`.
+#' register a compatible backend (e.g., `SnowParam`) and then call
+#' `setMesaParallel(useParallel = TRUE)`.
 #' - You can always inspect the active backend with `BiocParallel::bpparam()`
-#'   and the worker count with `BiocParallel::bpworkers()`.
+#' and the worker count with `BiocParallel::bpworkers()`.
 #'
 #' @return
-#' - `setMesaParallel()` — logical scalar (`TRUE`/`FALSE`), returned **invisibly**;
-#'   primarily used for its side effects (setting the option and possibly
-#'   registering a backend).
-#' - `getMesaParallel()` — logical scalar indicating whether mesa parallelisation
-#'   is currently enabled; with `verbose = TRUE`, also prints a status message.
+#' - `setMesaParallel()` — logical scalar (`TRUE`/`FALSE`), returned
+#' **invisibly**;
+#' primarily used for its side effects (setting the option and possibly
+#' registering a backend).
+#' - `getMesaParallel()` — logical scalar indicating whether mesa
+#' parallelisation
+#' is currently enabled; with `verbose = TRUE`, also prints a status message.
 #'
 #' @seealso
 #' [BiocParallel::register()], [BiocParallel::MulticoreParam()],
@@ -308,7 +338,8 @@ setMesaAnnoDb <- function(annoDb) {
 #' \dontrun{
 #' if (.Platform$OS.type != "windows") {
 #'     old <- BiocParallel::bpparam() # save current backend
-#'     setMesaParallel(nCores = 2, verbose = FALSE) # registers MulticoreParam(2)
+#'     setMesaParallel(nCores = 2, verbose = FALSE)
+#'     # registers MulticoreParam(2)
 #'     BiocParallel::bpworkers() # e.g. 2
 #'     getMesaParallel() # TRUE
 #'     BiocParallel::register(old) # restore previous backend
@@ -330,8 +361,9 @@ setMesaAnnoDb <- function(annoDb) {
 #' }
 #'
 #' @export
-setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) {
-
+setMesaParallel <- function(
+    nCores = NULL, useParallel = FALSE, verbose = TRUE
+) {
     if (!is.null(nCores) && nCores > 1) {
         useParallel <- TRUE
         BiocParallel::register(BiocParallel::MulticoreParam(workers = nCores))
@@ -340,10 +372,16 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) 
     options("mesa_parallel" = useParallel)
 
     if (useParallel & verbose) {
-        message(glue::glue("Parallelisation turned on for the functions in the mesa package, currently using {BiocParallel::bpworkers()} cores.
-                        Control the number of cores by calling BiocParallel::register."))
+        message(glue::glue(
+            "Parallelisation turned on for the functions in the mesa ",
+            "package, currently using {BiocParallel::bpworkers()} cores.\n",
+            "Control the number of cores by calling ",
+            "BiocParallel::register."
+        ))
     } else if (verbose) {
-        message("Parallelisation turned off for all functions in the mesa package.")
+        message(
+            "Parallelisation turned off for all functions in the mesa package."
+        )
     }
 
     return(invisible(useParallel))
@@ -353,12 +391,16 @@ setMesaParallel <- function(nCores = NULL, useParallel = FALSE, verbose = TRUE) 
 #' @param verbose Boolean to determine whether to print messages or not.
 #' @export
 getMesaParallel <- function(verbose = FALSE) {
-
     if (verbose) {
         if (is.null(getOption("mesa_parallel"))) {
-            message("Parallelisation not set, using serial evaluation. Call setMesaParallel to set for all mesa functions.")
+            message(
+                "Parallelisation not set, using serial evaluation. Call ",
+                "setMesaParallel to set for all mesa functions."
+            )
         } else if (getOption("mesa_parallel")) {
-            message(glue::glue("Using parallelisation, over {BiocParallel::bpworkers()} cores."))
+            message(glue::glue(
+                "Using parallelisation, over {BiocParallel::bpworkers()} cores."
+            ))
         } else {
             message("Using serial evaluation")
         }
@@ -369,7 +411,6 @@ getMesaParallel <- function(verbose = FALSE) {
     } else {
         return(getOption("mesa_parallel"))
     }
-
 }
 
 expect_no_error <- function(object) {

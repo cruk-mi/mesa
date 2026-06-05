@@ -22,20 +22,19 @@ associated DMRs and any aggregated metadata.
 Aggregate differentially methylated region (DMR) windows by gene annotation.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Summarise DMRs with explicit annotation databases
 exampleTumourNormal \%>\%
     calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-    annotateWindows(TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-        annoDb = "org.Hs.eg.db") \%>\%
+    annotateWindows(
+        TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+        annoDb = "org.Hs.eg.db"
+    ) \%>\%
     summariseDMRsByGene()
 }
-}
 \seealso{
-\code{\link[=annotateWindows]{annotateWindows()}},
-\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
+\code{\link[=annotateWindows]{annotateWindows()}}, \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}
 
 Other DMR-helpers: 
 \code{\link{pivotDMRsLonger}()},

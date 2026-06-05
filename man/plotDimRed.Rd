@@ -60,15 +60,22 @@ Shapes used for categories of the \code{shape} variable. Options:
 \item 21–25: filled shapes with borders (border colour = black).
 }
 \item A keyword:
-\itemize{
-\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19 categories}).
-\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19 categories}).
-\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
-\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories; 4 if NAs in \code{shape}}).
 }
+\itemize{
+\item \code{"line-first"}: 15 line shapes, then 4 filled shapes (\strong{max 19
+categories}).
+\item \code{"filled-first"}: 4 filled shapes, then 15 line shapes (\strong{max 19
+categories}).
+\itemize{
+\item \code{"mixture"}: mixture of line and filled shapes (\strong{max 19 categories}).
+}
+\item \code{"filled+border"}: filled+border shapes (\strong{max 5 categories; 4 if NAs in
+\code{shape}}).
+\itemize{
 \item \code{NULL}: automatic choice—\code{"mixture"} unless a diverging colour scale is
 used, in which case \code{"filled+border"}.
 \strong{Default:} \code{NULL}.
+}
 }}
 
 \item{NAshape}{\code{NULL} or \code{numeric(1)}.
@@ -89,8 +96,8 @@ Transparency of points in \verb{[0, 1]}.
 \strong{Default:} \code{1}.}
 
 \item{plotlyAnnotations}{\code{character()}.
-Column names from the sample table used as tooltips when converting plots
-to interactive \code{plotly}.
+Column names from the sample table used as tooltips when converting plots to
+interactive \code{plotly}.
 \strong{Default:} \code{""} (empty string).}
 }
 \value{
@@ -100,15 +107,15 @@ A \code{list} of \code{ggplot2} objects, one for each combination of:
 \item variables specified in \code{colour}.
 }
 
-Each plot depicts the requested dimensions with aesthetics mapped as specified.
+Each plot depicts the requested dimensions with aesthetics mapped as
+specified.
 }
 \description{
-Visualise PCA or UMAP coordinates stored in a \link{mesaDimRed} object.
-Wrappers such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts
-for common use cases.
+Visualise PCA or UMAP coordinates stored in a \link{mesaDimRed} object. Wrappers
+such as \code{\link[BiocGenerics:plotPCA]{BiocGenerics::plotPCA()}} and \code{\link[=plotUMAP]{plotUMAP()}} provide convenient shortcuts for common
+use cases.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # PCA: colour by group
@@ -119,15 +126,18 @@ exampleTumourNormal \%>\%
 # UMAP: colour by group, shape by tissue
 exampleTumourNormal \%>\%
     getUMAP(n_neighbors = 5, min_dist = 1) \%>\%
-    plotDimRed(colour = "group",
-        shape = "tissue")
+    plotDimRed(
+        colour = "group",
+        shape = "tissue"
+    )
 
 # Show sample names
 exampleTumourNormal \%>\%
     getPCA(nPC = 3) \%>\%
-    plotDimRed(colour = "group",
-        showSampleNames = TRUE)
-}
+    plotDimRed(
+        colour = "group",
+        showSampleNames = TRUE
+    )
 
 }
 \seealso{

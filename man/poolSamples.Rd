@@ -13,9 +13,9 @@ A qseaSet object containing methylation-enriched sequencing data.}
 \item{mergeString}{\code{character(1)}
 Regular expression used to remove the \strong{suffix} that distinguishes samples
 to be merged. The remaining prefix becomes the pooled sample name. After
-removal, pooled names are matched using \code{startsWith()}.
-For example, with names like \code{"Patient1_T"} and \code{"Patient1_N"}, use
-\code{mergeString = "_[TN]$"} to pool them into \code{"Patient1"}.}
+removal, pooled names are matched using \code{startsWith()}. For example, with
+names like \code{"Patient1_T"} and \code{"Patient1_N"}, use \code{mergeString = "_[TN]$"} to
+pool them into \code{"Patient1"}.}
 }
 \value{
 A \code{qseaSet} object:
@@ -40,7 +40,7 @@ weighted means for rates).
 }
 \examples{
 \dontrun{
-data(exampleTumourNormal, package = "mesa")
+data(exampleTumourNormal)
 # Pool Tumour/Normal pairs by patient into a single sample per patient:
 # e.g., "Colon1_T","Colon1_N" -> "Colon1"
 poolSamples(exampleTumourNormal, mergeString = "_[TN]$")

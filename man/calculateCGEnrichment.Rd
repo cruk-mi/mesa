@@ -21,9 +21,9 @@ Path to the BAM file.
 \strong{Default:} \code{NULL} (must be supplied).}
 
 \item{BSgenome}{\code{character(1)}
-Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}.
-For GRCh38 and hg19, precomputed distributions are cached within \pkg{mesa}
-for speed; otherwise, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}} is used.
+Name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}. For
+GRCh38 and hg19, precomputed distributions are cached within \pkg{mesa} for
+speed; otherwise, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}} is used.
 \strong{Default:} \code{NULL}.}
 
 \item{exportPath}{\code{character(1)} or \code{NULL}
@@ -84,9 +84,12 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
     requireNamespace("MEDIPSData", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
     require("GenomicRanges", quietly = TRUE)) {
-
     calculateCGEnrichment(
-        file       = system.file("extdata", "hESCs.Input.chr22.bam", package = "MEDIPSData"),
+        file = system.file(
+            "extdata",
+            "hESCs.Input.chr22.bam",
+            package = "MEDIPSData"
+        ),
         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = tempdir(),
         paired     = FALSE
@@ -95,8 +98,6 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
 
 }
 \seealso{
-\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},
-\code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
-\pkg{MEDIPS},
-\pkg{BSgenome}
+\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
+\pkg{MEDIPS}, \pkg{BSgenome}
 }

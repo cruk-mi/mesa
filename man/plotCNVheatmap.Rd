@@ -17,7 +17,8 @@ Input object containing per-window CNV tracks (e.g., created by
 \code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}} or \code{qsea::addCNV()}).}
 
 \item{sampleAnnotation}{tidyselect specification, \code{character()}, or \code{NULL}.
-Sample-table columns to display as column annotations (e.g., \code{c("tumour","type")}
+Sample-table columns to display as column annotations (e.g.,
+\code{c("tumour","type")}
 or bare helpers \verb{tumour, type}).
 \strong{Default:} \code{NULL}.}
 
@@ -56,13 +57,16 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
     plotCNVheatmap(
         sampleAnnotation = tumour,
-        annotationColors = list(tumour = c(Tumour = "firebrick4", Normal = "blue")),
+        annotationColors = list(
+            tumour = c(Tumour = "firebrick4", Normal = "blue")
+        ),
         clusterRows = FALSE
     )
 
 }
 \seealso{
-\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()}, \code{\link[ComplexHeatmap]{Heatmap}},
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}, \code{runHMMcopy()},
+\code{\link[ComplexHeatmap]{Heatmap}},
 \code{\link[qsea:addCNV]{qsea::addCNV()}}
 
 Other CNV: 

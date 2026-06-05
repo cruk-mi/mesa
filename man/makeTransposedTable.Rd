@@ -30,10 +30,10 @@ Create a wide table for ML/visualisation where \strong{rows are samples} and
 }
 \details{
 Internally obtains a window × sample matrix for \code{normMethod}, transposes it
-to sample × window, and (if requested) appends selected sample-table columns.
-Window columns are typically named \code{"chr:start-end"}. If measure suffixes
-are present in column names, they may be cleaned to bare sample/window names
-(see \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}).
+to sample × window, and (if requested) appends selected sample-table
+columns. Window columns are typically named \code{"chr:start-end"}. If
+measure suffixes are present in column names, they may be cleaned to
+bare sample/window names (see \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}).
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

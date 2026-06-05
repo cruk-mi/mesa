@@ -68,7 +68,12 @@ list.files(td, pattern = "\\\\\\\\.bw$")
 td2 <- tempfile()
 dir.create(td2)
 exampleTumourNormal \%>\%
-  writeBigWigs(folderName = td2, normMethod = "beta", useGroupMeans = TRUE, naVal = 0)
+  writeBigWigs(
+      folderName = td2,
+      normMethod = "beta",
+      useGroupMeans = TRUE,
+      naVal = 0
+  )
 list.files(td, pattern = "\\\\\\\\.bw$")
 
 }

@@ -11,9 +11,9 @@ renameSamples(qseaSet, newNameColumn)
 A qseaSet object containing methylation-enriched sequencing data.}
 
 \item{newNameColumn}{\code{character(1)}
-The name of a column in the \code{sampleTable} containing new sample names.
-Values must be unique and contain no \code{NA}s.
-(Unquoted column names are supported via tidy evaluation.)}
+The name of a column in the \code{sampleTable} containing new sample names. Values
+must be unique and contain no \code{NA}s. (Unquoted column names are supported via
+tidy evaluation.)}
 }
 \value{
 A \code{qseaSet} object:
@@ -31,7 +31,12 @@ Replace sample names with values from a user-supplied column in the
 data(exampleTumourNormal, package = "mesa")
 
 exampleTumourNormal \%>\%
-    dplyr::mutate(newName = paste0("Sample", seq_len(nrow(qsea::getSampleTable(.))))) \%>\%
+    dplyr::mutate(
+        newName = paste0(
+            "Sample",
+            seq_len(nrow(qsea::getSampleTable(.)))
+        )
+    ) \%>\%
     renameSamples(newNameColumn = "newName")
 
 }

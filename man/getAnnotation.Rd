@@ -17,7 +17,8 @@ if \code{FALSE}, return per-sample annotations.
 
 \item{sampleAnnotation}{tidyselect specification, \code{character()}, or \code{NULL}.
 Columns from the sample table to include as annotations. Accepts unquoted
-tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g., \code{c("tumour","type")}).
+tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g.,
+\code{c("tumour","type")}).
 \strong{Default:} \code{NULL} (no extra columns beyond the identifier).}
 }
 \value{
@@ -25,7 +26,8 @@ tidyselect (e.g., \verb{tumour, type}) or a character vector (e.g., \code{c("tum
 (or to \code{group} when \code{useGroupMeans = TRUE}).
 }
 \description{
-Note that sampleAnnotation must be enclosed within double curly brackets when used.
+Note that sampleAnnotation must be enclosed within double curly brackets when
+used.
 }
 \details{
 Select sample-table columns to use as annotations, either per-sample or
@@ -42,16 +44,21 @@ data(exampleTumourNormal, package = "mesa")
 # Works with none, one, or multiple columns (unquoted tidyselect):
 exampleTumourNormal \%>\% mesa:::getAnnotation()
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = type)
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
+exampleTumourNormal \%>\%
+    mesa:::getAnnotation(sampleAnnotation = c(tumour, type))
 
 # Also works with quoted column names:
 exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = "type")
-exampleTumourNormal \%>\% mesa:::getAnnotation(sampleAnnotation = c("tumour", "type"))
+exampleTumourNormal \%>\%
+    mesa:::getAnnotation(sampleAnnotation = c("tumour", "type"))
 
 # group-level annotations for tumour & tissue
 exampleTumourNormal \%>\%
     dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%
-    mesa:::getAnnotation(sampleAnnotation = c(tumour, tissue), useGroupMeans = TRUE)
+    mesa:::getAnnotation(
+        sampleAnnotation = c(tumour, tissue),
+        useGroupMeans = TRUE
+    )
 
 exampleTumourNormal \%>\%
     dplyr::mutate(group = stringr::str_remove(sample_name, "[0-9]")) \%>\%

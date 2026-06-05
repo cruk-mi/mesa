@@ -80,7 +80,11 @@ exampleTumourNormal \%>\%
 # Maximum NRPM across a small genomic slice
 exampleTumourNormal \%>\%
   addSummaryAcrossWindows(
-    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    regionsToOverlap = data.frame(
+        seqnames = 7,
+        start = 25002001,
+        end = 25017900
+    ),
     fn         = max,
     normMethod = "nrpm"
   ) \%>\%
@@ -89,7 +93,11 @@ exampleTumourNormal \%>\%
 # Add summaries repeatedly with different regions using a suffix
 exampleTumourNormal \%>\%
   addSummaryAcrossWindows(
-    regionsToOverlap = data.frame(seqnames = 7, start = 25002001, end = 25017900),
+    regionsToOverlap = data.frame(
+        seqnames = 7,
+        start = 25002001,
+        end = 25017900
+    ),
     fn         = median,
     normMethod = "nrpm",
     suffix     = "subset"

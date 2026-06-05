@@ -60,7 +60,10 @@ Extends \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} to merge a data fra
 data(exampleTumourNormal, package = "mesa")
 
 # Join 'patient' (y) to 'sample_name' (x)
-newData <- tibble::tibble(patient = c("Colon1", "Colon2", "Lung1", "Lung3"), new = 1:4)
+newData <- tibble::tibble(
+    patient = c("Colon1", "Colon2", "Lung1", "Lung3"),
+    new = 1:4
+)
 exampleTumourNormal \%>\%
     left_join(newData, by = c("sample_name" = "patient")) \%>\%
     qsea::getSampleTable()

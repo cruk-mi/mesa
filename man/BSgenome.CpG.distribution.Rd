@@ -21,6 +21,7 @@ BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution
 BSgenome.Mmusculus.UCSC.mm10.CpG.distribution
 }
 \description{
-A data frame containing cached relH and GoGe values for different BSgenomes, generated with calculateGenomicCGDistribution
+A data frame containing cached relH and GoGe values for different BSgenomes,
+generated with calculateGenomicCGDistribution
 }
 \keyword{datasets}

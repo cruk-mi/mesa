@@ -27,7 +27,8 @@ against sample names. If \code{NULL}, all samples are tested.
 \strong{Default:} \code{NULL}.}
 
 \item{numWindows}{\code{integer(1)} or \code{NULL}.
-Total number of windows in the genome used to compute the expected background.
+Total number of windows in the genome used to compute the expected
+background.
 If \code{NULL}, it will use all the windows currently in the qseaSet.
 \strong{Default:} \code{NULL}.}
 
@@ -52,7 +53,8 @@ discovery rate, otherwise it will use the number of windows currently in the
 qseaSet.
 }
 \details{
-For each tested sample, an expected count per window is derived from its total
+For each tested sample, an expected count per window is derived from its
+total
 reads and the supplied/estimated \code{numWindows}, and a Poisson test is used to
 flag windows above background. This uses the \code{valid_fragments} column in the
 library information attached to the qseaSet, which is the number of fragments

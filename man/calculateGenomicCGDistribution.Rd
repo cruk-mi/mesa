@@ -8,9 +8,8 @@ calculateGenomicCGDistribution(BSgenome)
 }
 \arguments{
 \item{BSgenome}{\code{character(1)}
-The name of a BSgenome package, e.g.
-\code{"BSgenome.Hsapiens.NCBI.GRCh38"}. The package must be installed
-and loadable in the current session.}
+The name of a BSgenome package, e.g. \code{"BSgenome.Hsapiens.NCBI.GRCh38"}. The
+package must be installed and loadable in the current session.}
 }
 \value{
 A \code{data.frame} with two numeric columns:
@@ -27,7 +26,8 @@ Compute genome-wide CpG metrics for a given BSgenome:
 }
 }
 \details{
-These values are used as denominators to normalise sample-level CpG enrichment.
+These values are used as denominators to normalise sample-level CpG
+enrichment.
 \itemize{
 \item Chromosomes with names containing \code{"rand"} or \code{"chrUn"} are excluded.
 \item The BSgenome indicated by \code{BSgenome} is loaded dynamically.
@@ -45,8 +45,6 @@ if (requireNamespace("BSgenome.Scerevisiae.UCSC.sacCer3", quietly = TRUE)) {
 
 }
 \seealso{
-\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}},
-\code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}},
-\pkg{BSgenome},
+\code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}, \code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}, \pkg{BSgenome},
 \pkg{Biostrings}
 }

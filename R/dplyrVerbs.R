@@ -105,7 +105,8 @@ filter.qseaSet <- function(.data, ..., .preserve = FALSE) {
 #'     mutate(over70 = age > 70) %>%
 #'     qsea::getSampleTable()
 #'
-#' # Recode gender (better practice: use dplyr::case_when or stringr::str_replace)
+#' # Recode gender (better practice: use dplyr::case_when() or
+#' # stringr::str_replace())
 #' exampleTumourNormal %>%
 #'     mutate(gender = ifelse(gender == "F", "Female", "Male")) %>%
 #'     qsea::getSampleTable()
@@ -125,13 +126,19 @@ mutate.qseaSet <- function(.data, ...) {
         tibble::column_to_rownames(".rownameCol")
 
     if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-        stop(glue::glue("sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
+        stop(glue::glue(
+            "sample_name cannot be changed with dplyr::mutate(). Use ",
+            "mesa::renameQsetNames() or mesa::renameSamples() instead."
+        ))
     }
 
     .data@sampleTable <- newTable
 
     if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-        stop(glue::glue("sample_name cannot be changed with dplyr::mutate(). Use mesa::renameQsetNames() or mesa::renameSamples() instead."))
+        stop(glue::glue(
+            "sample_name cannot be changed with dplyr::mutate(). Use ",
+            "mesa::renameQsetNames() or mesa::renameSamples() instead."
+        ))
     }
 
     .data@sampleTable <- newTable
@@ -190,18 +197,26 @@ mutate.qseaSet <- function(.data, ...) {
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Join 'patient' (y) to 'sample_name' (x)
-#' newData <- tibble::tibble(patient = c("Colon1", "Colon2", "Lung1", "Lung3"), new = 1:4)
+#' newData <- tibble::tibble(
+#'     patient = c("Colon1", "Colon2", "Lung1", "Lung3"),
+#'     new = 1:4
+#' )
 #' exampleTumourNormal %>%
 #'     left_join(newData, by = c("sample_name" = "patient")) %>%
 #'     qsea::getSampleTable()
 #'
 #' @export
-left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), keep = NULL, ...) {
+left_join.qseaSet <- function(
+    x, y, by = NULL, copy = FALSE,
+    suffix = c(".x", ".y"), keep = NULL, ...
+) {
 
     x@sampleTable <- x %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column("rownameCol") %>%
-        dplyr::left_join(y, by = by, copy = copy, suffix = suffix, keep = keep, ...) %>%
+        dplyr::left_join(
+            y, by = by, copy = copy, suffix = suffix, keep = keep, ...
+        ) %>%
         tibble::column_to_rownames("rownameCol")
 
     return(x)}
@@ -225,7 +240,7 @@ left_join.qseaSet <- function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".
 #'   A qseaSet object whose `sampleTable` columns will be selected or renamed.
 #'
 #' @param ...
-#'   Additional arguments passed to [dplyr::select()], supports tidyselect helpers
+#' Additional arguments passed to [dplyr::select()], supports tidyselect helpers
 #'   (e.g., [dplyr::matches()], [dplyr::starts_with()]).
 #'   Negative selection (`-col`) is supported, but `sample_name` and `group`
 #'   cannot be removed.
@@ -277,7 +292,7 @@ select.qseaSet <- function(.data, ...) {selectQset(.data, ...)}
 #'   A qseaSet object whose `sampleTable` columns will be selected or renamed.
 #'
 #' @param ...
-#'   Additional arguments passed to [dplyr::select()]. Supports tidyselect helpers
+#' Additional arguments passed to [dplyr::select()]. Supports tidyselect helpers
 #'   (e.g., [dplyr::matches()], [dplyr::starts_with()]) and renaming
 #'   (`newName = oldName`). Negative selection is supported, but `sample_name`
 #'   and `group` cannot be removed.
@@ -315,11 +330,15 @@ selectQset <- function(qseaSet, ...) {
         qsea::getSampleTable() %>%
         dplyr::select(...)
 
-    # ensure that the sample_name and group columns are still present at the front of the output
+    # ensure that the sample_name and group columns are still present at the
+    # front of the output
     qseaSet@sampleTable <- qseaSet %>%
         qsea::getSampleTable() %>%
         dplyr::select(sample_name, group) %>%
-        dplyr::bind_cols(newSampleTable %>% dplyr::select(-tidyselect::matches("^sample_name$|^group$")))
+        dplyr::bind_cols(
+            newSampleTable %>%
+                dplyr::select(-tidyselect::matches("^sample_name$|^group$"))
+        )
 
     return(qseaSet)
 }
@@ -420,7 +439,13 @@ pull.qseaSet <- function(.data, var = -1, name = NULL, ...) {
 sort.qseaSet <- function(x, decreasing = FALSE, ...) {
 
     x %>%
-        subsetQset(samplesToKeep = (x %>% qsea::getSampleNames() %>% gtools::mixedsort(decreasing = decreasing))) %>%
+        subsetQset(
+            samplesToKeep = (
+                x %>%
+                    qsea::getSampleNames() %>%
+                    gtools::mixedsort(decreasing = decreasing)
+            )
+        ) %>%
         return()
 
 }
@@ -429,13 +454,15 @@ sort.qseaSet <- function(x, decreasing = FALSE, ...) {
 #' Filter regions (windows) inside a qseaSet
 #'
 #' Filters the **regions** of a `qseaSet` using [dplyr::filter()] predicates
-#' applied to its regions (as a data frame), then subsets the object accordingly.
+#' applied to its regions (as a data frame), then subsets the object
+#' accordingly.
 #'
 #' @param qseaSet `qseaSet`.
 #'   The qseaSet object whose regions (windows) will be filtered.
 #'
 #' @param ... Expressions.
-#'   Predicates passed to [dplyr::filter()] and evaluated on the regions data frame.
+#' Predicates passed to [dplyr::filter()] and evaluated on the regions data
+#' frame.
 #'   **Default:** none (no filtering).
 #'
 #' @return A `qseaSet` object with only regions matching the filter conditions.
@@ -477,7 +504,8 @@ filterWindows <- function(qseaSet, ...) {
 
 #' Arrange (reorder) samples in a qseaSet via dplyr syntax
 #'
-#' Extends [dplyr::arrange()] to reorder **samples** of a `qseaSet` based on columns
+#' Extends [dplyr::arrange()] to reorder **samples** of a `qseaSet` based on
+#' columns
 #' in its `sampleTable`.
 #'
 #' @method arrange qseaSet
@@ -492,7 +520,8 @@ filterWindows <- function(qseaSet, ...) {
 #'   **Default:** none (no reordering).
 #'
 #' @param .by_group `logical(1)`.
-#'   Grouped arrangement is not implemented for `qseaSet`; this argument is ignored.
+#' Grouped arrangement is not implemented for `qseaSet`; this argument is
+#' ignored.
 #'   **Default:** `FALSE`.
 #'
 #' @return A `qseaSet` object with samples reordered.
@@ -532,7 +561,8 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE) {
 
 #' Column names of a qseaSet sample table
 #'
-#' S4 method for \code{\link[BiocGenerics]{colnames}} that returns the column names of a
+#' S4 method for \code{\link[BiocGenerics]{colnames}} that returns the column
+#' names of a
 #' `qseaSet`'s sample metadata table (i.e., [qsea::getSampleTable()]).
 #'
 #' @param x `qseaSet`.
@@ -558,4 +588,3 @@ arrange.qseaSet <- function(.data, ..., .by_group = FALSE) {
 setMethod("colnames", "qseaSet", function(x) {
     colnames(qsea::getSampleTable(x))
 })
-

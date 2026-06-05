@@ -45,7 +45,8 @@ and summed per sample:
 The reported \code{fraction} is \code{afterOverBackNum / initialOverBackNum}.
 }
 
-\strong{Note:} despite the function name, this computes a \strong{window-based} fraction
+\strong{Note:} despite the function name, this computes a \strong{window-based}
+fraction
 using a count threshold, not a direct fraction of raw reads.
 }
 \examples{

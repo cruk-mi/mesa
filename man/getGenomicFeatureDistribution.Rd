@@ -51,7 +51,8 @@ When using beta, windows failing \code{minEnrichment} are treated as \code{NA} b
 summarisation.
 }
 
-This function requires a transcript database and OrgDb to annotate windows (via
+This function requires a transcript database and OrgDb to annotate windows
+(via
 \code{\link[=annotateWindows]{annotateWindows()}}). Either:
 \itemize{
 \item set them globally with \code{\link[=setMesaGenome]{setMesaGenome()}} (recommended for GRCh38/hg38), or
@@ -72,7 +73,11 @@ exampleTumourNormal \%>\%
 
 # Beta-based summary (apply a minimum enrichment for non-NA betas)
 exampleTumourNormal \%>\%
-  getGenomicFeatureDistribution(cutoff = 0.7, normMethod = "beta", minEnrichment = 3) \%>\%
+  getGenomicFeatureDistribution(
+      cutoff = 0.7,
+      normMethod = "beta",
+      minEnrichment = 3
+  ) \%>\%
   head()
 }
 
