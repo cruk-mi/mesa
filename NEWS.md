@@ -33,6 +33,10 @@
   `from = 1L`, raising "formal argument 'from' matched by multiple actual
   arguments".
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- `addHyperStableFraction()` now uses `identical()` for the `BSgenome`
+  check, avoiding an "argument is of length zero" error when the
+  `BSgenome` parameter is missing (`NULL`).
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved BiocCheck NOTEs: imported `qsea` via `@import`
   (`R/mesa-package.R`), replaced all `qsea:::`/`janitor:::` calls with
   public-API equivalents or inline slot assignments, and declared five
