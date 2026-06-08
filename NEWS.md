@@ -4,43 +4,35 @@
 - Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples
   with `exampleTumourNormal`, removing slow synthetic data generation
   from `R CMD check` example runs.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Wrapped `addNormalisation()` examples in `\donttest{}`: the function
   requires windows across a range of CpG densities for background
   estimation, which the pre-filtered example datasets do not provide.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 
 ## Bug Fixes
 - Fixed `plotly` PNG device error on headless build servers
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
-- Switched to `pdf` device in PCA vignette chunks to resolve
+- Switched to `ragg_png` device in PCA vignette chunks to resolve
   Cairo/X11 dependency issues in CI
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Restored vignette YAML front matter dropped during line-wrap reflow
   ([#76](https://github.com/cruk-mi/mesa/pull/76))
-- Resolved `R CMD check` TIMEOUT: `skip_long_checks()` used `options()`
-  (returns a list) instead of `getOption()`, so slow tests never skipped.
-  Added `options(skip_long_checks = TRUE)` to `tests/testthat.R`.
+- Fixed `R CMD check` TIMEOUT: `skip_long_checks()` read `options()`
+  instead of `getOption()`, so slow tests never skipped. Also set
+  `options(skip_long_checks = TRUE)` in `tests/testthat.R`.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
-- Further cut `R CMD check` test runtime: added `helper-fixtures.R`
-  with a memoised `cachedExampleQset()` so repeated
-  `qsea::getExampleQseaSet()` builds are reused across `test_that`
-  blocks, and gated the heaviest blocks
-  (`test-DMRs.R` "Calculating DMRs", `test-exampleQset.R`
-  "Testing general functionality", `test-pca.R` "UMAPs") behind
-  `skip_long_checks()`.
+- Cut test runtime: memoised `qsea::getExampleQseaSet()` builds via
+  `cachedExampleQset()` (`helper-fixtures.R`) and gated the slowest
+  `test_that()` blocks behind `skip_long_checks()`.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
-- Fixed `addHMMcopyCNV()`: `qsea:::makeGenomeWindows()` was replaced
-  with a fixed-width `GRanges` reimplementation, correcting wrong window
-  widths and boundaries that broke the hmmCopy GC/mappability overlap
-  check.
+- Fixed `addHMMcopyCNV()`: replaced `qsea:::makeGenomeWindows()` with a
+  fixed-width `GRanges` reimplementation, correcting window widths and
+  boundaries.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
-- Resolved NOTE "Package in Depends field not imported from 'qsea'":
-  added `@import qsea` via `R/mesa-package.R`.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
-- Resolved NOTE "Unexported objects imported by ':::' calls": replaced
-  all `qsea:::` and `janitor:::` calls with public-API equivalents or
-  inline S4 slot assignments.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
-- Resolved NOTE "no visible binding for global variable": declared five
+- Resolved BiocCheck NOTEs: imported `qsea` via `@import`
+  (`R/mesa-package.R`), replaced all `qsea:::`/`janitor:::` calls with
+  public-API equivalents or inline slot assignments, and declared five
   data-object names in `utils::globalVariables()`.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
 
@@ -89,12 +81,6 @@
   ([#73](https://github.com/cruk-mi/mesa/pull/73))
 
 # mesa 0.99.0
-
-### FIXED
-* Resolved `R CMD check` TIMEOUT: `skip_long_checks()` was using `options()` (returns a list) instead of `getOption()`, so slow tests were never skipped. Also set `options(skip_long_checks = TRUE)` in `tests/testthat.R` so BAM-processing tests are skipped during `R CMD check`.
-* Resolved NOTE "Package in Depends field not imported from: 'qsea'": added `@import qsea` via `R/mesa-package.R`.
-* Resolved NOTE "Unexported objects imported by ':::' calls": replaced all `qsea:::` and `janitor:::` calls with public-API equivalents or inline slot assignments.
-* Resolved NOTE "no visible binding for global variable": added `BSgenome.Hsapiens.NCBI.GRCh38.CpG.distribution`, `BSgenome.Hsapiens.UCSC.hg19.CpG.distribution`, `BSgenome.Mmusculus.UCSC.mm10.CpG.distribution`, `FantomRegions`, and `hg19ToHg38.over.chain` to `utils::globalVariables()`.
 
 ### ADDED
 * Many more examples for individual functions on their help pages, as well as a set of vignettes. [!14](https://github.com/cruk-mi/mesa/pull/14)
