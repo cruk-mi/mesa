@@ -355,9 +355,15 @@ mixThreeQsetSamples <- function(
     onlyNew = FALSE,
     renormalise = TRUE
 ) {
-    stopifnot(all(
-        c(sample1, sample2, sample3) %in% qsea::getSampleNames(qseaSet)
-    ))
+    missingSamples <- setdiff(
+        c(sample1, sample2, sample3), qsea::getSampleNames(qseaSet)
+    )
+    if (length(missingSamples) > 0) {
+        stop(
+            "Sample(s) not found in qseaSet: ",
+            paste(missingSamples, collapse = ", ")
+        )
+    }
 
     if (is.null(newName)) {
         newName <- paste0(

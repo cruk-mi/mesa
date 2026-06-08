@@ -41,6 +41,9 @@
   `qseaSet` instead of a generic `stopifnot()` failure, restoring the
   diagnostics lost when `qsea:::checkSamples()` was dropped.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- `mixThreeQsetSamples()` likewise now names the absent sample(s) rather
+  than failing with a generic `stopifnot()` message.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved BiocCheck NOTEs: imported `qsea` via `@import`
   (`R/mesa-package.R`), replaced all `qsea:::`/`janitor:::` calls with
   public-API equivalents or inline slot assignments, and declared five
