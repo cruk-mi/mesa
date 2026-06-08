@@ -132,7 +132,8 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
         seqnames = rep(factor(names(.chr_len)), floor(.chr_len / windowSize)),
         ranges = IRanges::IRanges(
             start = unlist(lapply(
-                .chr_len - windowSize + 1L, seq, from = 1L, by = windowSize
+                .chr_len - windowSize + 1L,
+                function(end) seq(1L, end, by = windowSize)
             )),
             width = windowSize
         ),

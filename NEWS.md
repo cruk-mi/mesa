@@ -1,9 +1,9 @@
 # mesa 0.99.2.9000
 
 ## Documentation
-- Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples
-  with `exampleTumourNormal`, removing slow synthetic data generation
-  from `R CMD check` example runs.
+- Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples with 
+  `exampleTumourNormal`, removing slow synthetic data generation from 
+  `R CMD check` example runs.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Wrapped `addNormalisation()` examples in `\donttest{}`: the function
   requires windows across a range of CpG densities for background
@@ -28,7 +28,10 @@
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Fixed `addHMMcopyCNV()`: replaced `qsea:::makeGenomeWindows()` with a
   fixed-width `GRanges` reimplementation, correcting window widths and
-  boundaries.
+  boundaries. Also corrected the window-start `seq()` call, which passed
+  the chromosome length positionally to `from` while also naming
+  `from = 1L`, raising "formal argument 'from' matched by multiple actual
+  arguments".
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Resolved BiocCheck NOTEs: imported `qsea` via `@import`
   (`R/mesa-package.R`), replaced all `qsea:::`/`janitor:::` calls with
