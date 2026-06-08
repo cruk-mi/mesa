@@ -12,10 +12,8 @@ A Granges object with 636 ranges:
 }
 }
 \source{
-\url{
 https://github.com/Boyle-Lab/Blacklist/blob/master/lists/
 hg38-blacklist.v2.bed.gz
-}
 }
 \usage{
 ENCODEbadRegions
