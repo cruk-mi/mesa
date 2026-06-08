@@ -210,8 +210,8 @@ getWindows <- function(qseaSet) {
 #'   **Default:** none (must be supplied).
 #'
 #' @details
-#' Column order and the number of rows are preserved. A message is emitted via
-#' an internal janitor helper indicating which columns were removed.
+#' Column order and the number of rows are preserved. A message is emitted
+#' indicating how many columns were removed.
 #'
 #' @return
 #' A `data.frame` with columns failing the threshold removed.
@@ -225,6 +225,7 @@ getWindows <- function(qseaSet) {
 #'     c = c(1, 2, NA)) %>%
 #'     mesa:::remove_almost_empty_cols(prop = 0.5) # drops column b
 #'
+#' @noRd
 remove_almost_empty_cols <- function(dat, prop) {
     mask_keep <- colSums(is.na(dat)) <= prop * (nrow(dat))
     if (!all(mask_keep)) {
