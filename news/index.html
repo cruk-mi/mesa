@@ -72,13 +72,31 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.2.9000" id="mesa-09929000">mesa 0.99.2.9000<a class="anchor" aria-label="anchor" href="#mesa-09929000"></a></h2>
 <div class="section level3">
+<h3 id="documentation-0-99-2-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-2-9000"></a></h3>
+<ul><li>Replaced <code><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">qsea::getExampleQseaSet()</a></code> calls in <code><a href="../reference/getDimRed.html">getUMAP()</a></code> examples with <code>exampleTumourNormal</code>, removing slow synthetic data generation from <code>R CMD check</code> example runs. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>Wrapped <code><a href="../reference/addNormalisation.html">addNormalisation()</a></code> examples in <code>\donttest{}</code>: the function requires windows across a range of CpG densities for background estimation, which the pre-filtered example datasets do not provide. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-0-99-2-9000">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-2-9000"></a></h3>
-<ul><li>Switched vignette figure device from <code>png</code> to <code>ragg_png</code> across all vignettes to fix plot rendering quality in HTML output and resolve Cairo/X11 dependency issues on headless build servers without requiring an X display</li>
+<ul><li>Fixed <code>plotly</code> PNG device error on headless build servers (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
+<li>Switched to <code>ragg_png</code> device in PCA vignette chunks to resolve Cairo/X11 dependency issues in CI (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
+<li>Restored vignette YAML front matter dropped during line-wrap reflow (<a href="https://github.com/cruk-mi/mesa/pull/76" class="external-link">#76</a>)</li>
+<li>Fixed <code>R CMD check</code> TIMEOUT: <code>skip_long_checks()</code> read <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options()</a></code> instead of <code><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption()</a></code>, so slow tests never skipped. Also set <code>options(skip_long_checks = TRUE)</code> in <code>tests/testthat.R</code>. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>Cut test runtime: memoised <code><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">qsea::getExampleQseaSet()</a></code> builds via <code>cachedExampleQset()</code> (<code>helper-fixtures.R</code>) and gated the slowest <code>test_that()</code> blocks behind <code>skip_long_checks()</code>. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>Fixed <code><a href="../reference/addHMMcopyCNV.html">addHMMcopyCNV()</a></code>: replaced <code>qsea:::makeGenomeWindows()</code> with a fixed-width <code>GRanges</code> reimplementation, correcting window widths and boundaries. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>
+<code><a href="../reference/addHyperStableFraction.html">addHyperStableFraction()</a></code> now uses <code><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical()</a></code> for the <code>BSgenome</code> check, avoiding an “argument is of length zero” error when the <code>BSgenome</code> parameter is missing (<code>NULL</code>). (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>
+<code><a href="../reference/mixSamples.html">mixSamples()</a></code> now reports which sample name(s) are absent from the <code>qseaSet</code> instead of a generic <code><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot()</a></code> failure, restoring the diagnostics lost when <code>qsea:::checkSamples()</code> was dropped. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>
+<code><a href="../reference/mixThreeQsetSamples.html">mixThreeQsetSamples()</a></code> likewise now names the absent sample(s) rather than failing with a generic <code><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot()</a></code> message. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
+<li>Resolved BiocCheck NOTEs: imported <code>qsea</code> via <code>@import</code> (<code>R/mesa-package.R</code>), replaced all <code>qsea:::</code>/<code>janitor:::</code> calls with public-API equivalents or inline slot assignments, and declared five data-object names in <code><a href="https://rdrr.io/r/utils/globalVariables.html" class="external-link">utils::globalVariables()</a></code>. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="style-0-99-2-9000">Style<a class="anchor" aria-label="anchor" href="#style-0-99-2-9000"></a></h3>
-<ul><li>Standardized 4-space indentation throughout codebase per Bioconductor style guide</li>
-<li>Added missing chunk labels to all vignettes</li>
+<ul><li>Standardized 4-space indentation throughout codebase per Bioconductor style guide (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
+<li>Added missing chunk labels to all vignettes (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
+<li>Wrapped all lines &gt; 80 characters across R sources, vignettes, and helpers to satisfy BiocCheck <code>LINE_LENGTH</code> notes; where <code>::</code> cannot be broken across lines, replaced long namespace-qualified names with <code><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getExportedValue()</a></code> (for annotation-package objects in <code>R/genome.R</code>, <code>R/qseaExtra.R</code>) and <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">utils::data()</a></code> (for package datasets in <code>R/calculateEnrichment.R</code>, <code>R/qseaExtra.R</code>) — both are semantically equivalent to <code>pkg::name</code> but can be formatted across multiple lines (<a href="https://github.com/cruk-mi/mesa/pull/76" class="external-link">#76</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">

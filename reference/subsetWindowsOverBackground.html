@@ -119,7 +119,8 @@ against sample names. If <code>NULL</code>, all samples are tested.
 
 <dt id="arg-numwindows">numWindows<a class="anchor" aria-label="anchor" href="#arg-numwindows"></a></dt>
 <dd><p><code>integer(1)</code> or <code>NULL</code>.
-Total number of windows in the genome used to compute the expected background.
+Total number of windows in the genome used to compute the expected
+background.
 If <code>NULL</code>, it will use all the windows currently in the qseaSet.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
@@ -143,7 +144,8 @@ to keep/drop it (depending on <code>keepAbove</code>).
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>For each tested sample, an expected count per window is derived from its total
+    <p>For each tested sample, an expected count per window is derived from its
+total
 reads and the supplied/estimated <code>numWindows</code>, and a Poisson test is used to
 flag windows above background. This uses the <code>valid_fragments</code> column in the
 library information attached to the qseaSet, which is the number of fragments

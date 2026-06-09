@@ -97,7 +97,8 @@ Input object containing per-window CNV tracks (e.g., created by
 
 <dt id="arg-sampleannotation">sampleAnnotation<a class="anchor" aria-label="anchor" href="#arg-sampleannotation"></a></dt>
 <dd><p>tidyselect specification, <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>, or <code>NULL</code>.
-Sample-table columns to display as column annotations (e.g., <code>c("tumour","type")</code>
+Sample-table columns to display as column annotations (e.g.,
+<code>c("tumour","type")</code>
 or bare helpers <code>tumour, type</code>).
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
@@ -130,7 +131,8 @@ and <code>annotationColors</code> are provided.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="addHMMcopyCNV.html">addHMMcopyCNV()</a></code>, <code>runHMMcopy()</code>, <code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/Heatmap.html" class="external-link">Heatmap</a></code>,
+    <div class="dont-index"><p><code><a href="addHMMcopyCNV.html">addHMMcopyCNV()</a></code>, <code>runHMMcopy()</code>,
+<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/Heatmap.html" class="external-link">Heatmap</a></code>,
 <code><a href="https://rdrr.io/pkg/qsea/man/addCNV.html" class="external-link">qsea::addCNV()</a></code></p>
 <p>Other CNV:
 <code><a href="addHMMcopyCNV.html">addHMMcopyCNV()</a></code>,
@@ -151,7 +153,9 @@ and <code>annotationColors</code> are provided.</p>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">plotCNVheatmap</span><span class="op">(</span></span></span>
 <span class="r-in"><span>        sampleAnnotation <span class="op">=</span> <span class="va">tumour</span>,</span></span>
-<span class="r-in"><span>        annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Tumour <span class="op">=</span> <span class="st">"firebrick4"</span>, Normal <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>            tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Tumour <span class="op">=</span> <span class="st">"firebrick4"</span>, Normal <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span>,</span></span>
 <span class="r-in"><span>        clusterRows <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotCNVheatmap-2.png" alt="" width="700" height="433"></span>

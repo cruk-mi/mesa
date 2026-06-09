@@ -290,22 +290,26 @@ is recommended so MAPQ tags are available (see <code>minMapQual</code> note belo
 <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>), which provides chromosome lengths and
 sequences for tiling windows.</p></li>
 </ul><p><strong>Windows &amp; blacklist</strong></p><ul><li><p>Chromosomes in <code>chrSelect</code> are tiled into non-overlapping windows of size
-<code>windowSize</code> (bp). Windows overlapping <code>badRegions</code> (if provided) are removed.</p></li>
+<code>windowSize</code> (bp). Windows overlapping <code>badRegions</code> (if provided) are
+removed.</p></li>
 </ul><p><strong>Coverage loading</strong></p><ul><li><p><code>coverageMethod = "PairedAndR1s"</code> loads proper pairs and, optionally,
 high-MAPQ R1 singletons; governed by <code>minMapQual</code>, <code>minInsertSize</code>,
 <code>maxInsertSize</code>, <code>properPairsOnly</code>, <code>minReferenceLength</code>.</p></li>
 <li><p><code>coverageMethod = "qseaPaired"</code> delegates to <code><a href="https://rdrr.io/pkg/qsea/man/addCoverage.html" class="external-link">qsea::addCoverage()</a></code> with
 paired settings.</p></li>
-<li><p><code>fragmentType</code> can set defaults for <code>fragmentLength</code>/<code>fragmentSD</code> (<code>"Sheared"</code>
+<li><p><code>fragmentType</code> can set defaults for <code>fragmentLength</code>/<code>fragmentSD</code>
+(<code>"Sheared"</code>
 or <code>"cfDNA"</code>); otherwise supply both explicitly.</p></li>
 </ul><p><strong>CNV options</strong></p><ul><li><p><code>"qseaInput"</code>: run <code><a href="https://rdrr.io/pkg/qsea/man/addCNV.html" class="external-link">qsea::addCNV()</a></code> using <code>input_file</code> BAMs.</p></li>
-<li><p><code>"HMMdefault"</code>: use mesa's <code><a href="addHMMcopyCNV.html">addHMMcopyCNV()</a></code> with supplied defaults for GRCh38
+<li><p><code>"HMMdefault"</code>: use mesa's <code><a href="addHMMcopyCNV.html">addHMMcopyCNV()</a></code> with supplied defaults for
+GRCh38
 GC/mappability tracks (objects like <code>gc_hg38_1000kb</code>, <code>map_hg38_1000kb</code>,
 chosen by <code>CNVwindowSize</code>).</p></li>
 <li><p><code>"MeCap"</code>: estimate CNV from MeCap BAMs (<code>file_name</code>).</p></li>
 <li><p><code>"None"</code>: do not compute CNV.</p></li>
 </ul><p><strong>Parallelisation</strong></p><ul><li><p>If <code>parallel = TRUE</code>, computation uses the currently registered
-BiocParallel backend (see <code><a href="https://rdrr.io/pkg/BiocParallel/man/register.html" class="external-link">BiocParallel::register()</a></code>); otherwise runs serially.
+BiocParallel backend (see <code><a href="https://rdrr.io/pkg/BiocParallel/man/register.html" class="external-link">BiocParallel::register()</a></code>); otherwise runs
+serially.
 Use <code><a href="setMesaParallel.html">setMesaParallel()</a></code> to toggle package-wide.</p></li>
 </ul><p><strong>Additional processing</strong></p><ul><li><p>Adds CpG density via <code>qsea::addPatternDensity(pattern = "CG")</code>, and
 enrichment parameters, allowing for estimation of beta values.</p></li>

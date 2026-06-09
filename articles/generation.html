@@ -123,8 +123,9 @@
 </h2>
 <p>In this vignette we cover the generation of a qseaSet using the
 functions provided in <code>mesa</code>, rather than those in
-<code>qsea</code>. Please see the <a href="https://bioconductor.org/packages/devel/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html" class="external-link"><code>qsea</code>
-tutorial</a> for more detail, but we will cover much of that here.</p>
+<code>qsea</code>. Please see the <code>qsea</code> package vignette
+<code><a href="https://bioconductor.org/packages/release/bioc/vignettes/qsea/inst/doc/qsea_tutorial.html" class="external-link">vignette("qsea_tutorial", package = "qsea")</a></code> for more
+detail, but we will cover much of that here.</p>
 <div class="section level3">
 <h3 id="sample-metadata">Sample Metadata<a class="anchor" aria-label="anchor" href="#sample-metadata"></a>
 </h3>
@@ -169,9 +170,9 @@ noisy (for human samples).</p></li>
 are included, then any chromosome called <code>X</code>,<code>Y</code>,
 <code>chrX</code> or <code>chrY</code> will be set with appropriate
 zygosity for samples with <code>M</code>, <code>m</code> or
-<code>male</code> in this column. See the <a href="https://github.com/MatthiasLienhard/qsea/blob/3cdd22d3738857066fa7ab786e456fa0b6c92951/R/qsea.createSet.R#L35-L54" class="external-link">qsea
-code for details</a>; within the National Biomarker Centre we only
-consider the autosomes.</p></li>
+<code>male</code> in this column. See <code>qsea.createSet.R</code> in
+the <code>qsea</code> source for details; within the National Biomarker
+Centre we only consider the autosomes.</p></li>
 </ul>
 <p>In addition, any further metadata columns may be included as
 required, and we recommend that anything you might want to query or
@@ -193,10 +194,22 @@ using the hg38/GRCh38 reference genome rather than hg19 as used
 here!</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sampleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span><span class="op">~</span><span class="va">sample_name</span>, <span class="op">~</span><span class="va">group</span>, <span class="op">~</span><span class="va">tumour</span>, <span class="op">~</span><span class="va">patient</span>, <span class="op">~</span><span class="va">file_name</span>,</span>
-<span>    <span class="st">"Normal1"</span>, <span class="st">"Normal1"</span>, <span class="st">"Normal"</span>, <span class="st">"Patient1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1N_fst_chr_20_21_22.bam"</span>, package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    <span class="st">"Normal2"</span>, <span class="st">"Normal1"</span>, <span class="st">"Normal"</span>, <span class="st">"Patient2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_2N_fst_chr_20_21_22.bam"</span>, package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    <span class="st">"Tumour1"</span>, <span class="st">"Tumour1"</span>, <span class="st">"Tumour"</span>, <span class="st">"Patient1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1T_fst_chr_20_21_22.bam"</span>, package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    <span class="st">"Tumour2"</span>, <span class="st">"Tumour2"</span>, <span class="st">"Tumour"</span>, <span class="st">"Patient2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_2T_fst_chr_20_21_22.bam"</span>, package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="st">"Normal1"</span>, <span class="st">"Normal1"</span>, <span class="st">"Normal"</span>, <span class="st">"Patient1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1N_fst_chr_20_21_22.bam"</span>,</span>
+<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"Normal2"</span>, <span class="st">"Normal1"</span>, <span class="st">"Normal"</span>, <span class="st">"Patient2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_2N_fst_chr_20_21_22.bam"</span>,</span>
+<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"Tumour1"</span>, <span class="st">"Tumour1"</span>, <span class="st">"Tumour"</span>, <span class="st">"Patient1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1T_fst_chr_20_21_22.bam"</span>,</span>
+<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"Tumour2"</span>, <span class="st">"Tumour2"</span>, <span class="st">"Tumour"</span>, <span class="st">"Patient2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_2T_fst_chr_20_21_22.bam"</span>,</span>
+<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -523,7 +536,7 @@ detailed in <code><a href="https://bioconductor.org/packages/release/bioc/vignet
 is an exception if you are using the human genome <code>hg38</code> (or
 <code>GRCh38</code>), in which case files are provided for window sizes
 of <code>50kb</code>, <code>500kb</code> or <code>1000kb</code>. These
-are stored in objects called e.g. <code>gc_hg38_1000kb</code> and
+are stored in objects called e.g. <code>gc_hg38_1000kb</code> and
 <code>map_hg38_1000kb</code>; similar objects need to be generated for
 other genomes or window sizes using the tools <code>gcCounter</code> or
 <code>mapCounter</code> from the <a href="https://github.com/shahcompbio/hmmcopy_utils" class="external-link"><code>hmmCopy</code>
@@ -762,7 +775,7 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt; [57] KEGGREST_1.50.0             evaluate_1.0.5             </span></span>
 <span><span class="co">#&gt; [59] desc_1.4.3                  BiocFileCache_3.0.0        </span></span>
 <span><span class="co">#&gt; [61] pillar_1.11.1               filelock_1.0.3             </span></span>
-<span><span class="co">#&gt; [63] MatrixGenerics_1.22.0       RCurl_1.98-1.18            </span></span>
+<span><span class="co">#&gt; [63] MatrixGenerics_1.22.0       RCurl_1.98-1.19            </span></span>
 <span><span class="co">#&gt; [65] hms_1.1.4                   gtools_3.9.5               </span></span>
 <span><span class="co">#&gt; [67] glue_1.8.1                  tools_4.5.2                </span></span>
 <span><span class="co">#&gt; [69] data.table_1.18.4           GenomicAlignments_1.46.0   </span></span>

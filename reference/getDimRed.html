@@ -147,8 +147,8 @@ Input object providing windows, counts and <code>sampleTable</code>.</p></dd>
 <dt id="arg-datatable">dataTable<a class="anchor" aria-label="anchor" href="#arg-datatable"></a></dt>
 <dd><p><code>data.frame</code> or <code>GRanges</code> or <code>NULL</code>.
 Normalised values with windows in rows and samples in columns. Must contain
-<code>seqnames</code>, <code>start</code>, <code>end</code> (if <code>data.frame</code>), or metadata columns with
-values (if <code>GRanges</code>). If <code>NULL</code>, the matrix is derived internally (see
+<code>seqnames</code>, <code>start</code>, <code>end</code> (if <code>data.frame</code>), or metadata columns with values
+(if <code>GRanges</code>). If <code>NULL</code>, the matrix is derived internally (see
 <code>normMethod</code>, <code>minEnrichment</code>).
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
@@ -187,10 +187,11 @@ Minimum CpG density; windows below this are removed.
 
 
 <dt id="arg-topvarnum">topVarNum<a class="anchor" aria-label="anchor" href="#arg-topvarnum"></a></dt>
-<dd><p><code>numeric(1)</code> or <code>integer(1)</code> or <code>Inf</code> or <code>NULL</code> <strong>or</strong> a vector.
+<dd><p><code>numeric(1)</code> or <code>integer(1)</code> or <code>Inf</code> or <code>NULL</code> <strong>or</strong> a
+vector.
 Keep the <code>topVarNum</code> most variable windows (by SD). If <code>NA</code>, <code>NULL</code>, <code>Inf</code>,
-or <code>&gt;=</code> available windows, use all. If a vector, DR is run once per value
-and results are returned in a list.
+or <code>&gt;=</code> available windows, use all. If a vector, DR is run once per value and
+results are returned in a list.
 <strong>Default:</strong> <code>1000</code>.</p></dd>
 
 
@@ -233,7 +234,8 @@ If <code>TRUE</code>, print messages regarding the function execution.
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments passed to <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code> (when <code>method="UMAP"</code>),
+<dd><p>Additional arguments passed to <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code> (when
+<code>method="UMAP"</code>),
 e.g. <code>n_neighbors</code>, <code>min_dist</code>, <code>metric</code>.</p></dd>
 
 
@@ -249,9 +251,10 @@ or <code><a href="mesaUMAP-class.html">mesaUMAP</a></code> (for UMAP). Names cor
 <li><p><strong>samples</strong>: Character vector of sample IDs used.</p></li>
 <li><p><strong>dataTable</strong> (optional): The numeric matrix used for DR when
 <code>returnDataTable = TRUE</code>. It reflects filtering by <code>regionsToOverlap</code> and
-<code>minDensity</code>, removal of rows with missing values, and may include columns
-of window SDs when applicable (named per <code>params$topVar</code>).</p></li>
-<li><p><strong>params</strong>: List of parameters used (method, selection/filter settings, etc.).</p></li>
+<code>minDensity</code>, removal of rows with missing values, and may include columns of
+window SDs when applicable (named per <code>params$topVar</code>).</p></li>
+<li><p><strong>params</strong>: List of parameters used (method, selection/filter settings,
+etc.).</p></li>
 <li><p><strong>sampleTable</strong>: Copy of <code>qsea::getSampleTable(qseaSet)</code>.</p></li>
 </ul></div>
     <div id="details">
@@ -269,12 +272,13 @@ are performed and collected in <code>res</code>.</p></li>
     <h2>Functions</h2>
 
 <ul><li><p><code>getPCA()</code>: Principal component analysis of a qseaSet.</p></li>
-<li><p><code>getUMAP()</code>: Uniform manifold approximation and projection of a qseaSet.</p></li>
+<li><p><code>getUMAP()</code>: Uniform manifold approximation and projection of a
+qseaSet.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code>getPCA()</code>, <code>getUMAP()</code>, <a href="mesaDimRed-class.html">mesaDimRed</a>, <a href="mesaPCA-class.html">mesaPCA</a>, <a href="mesaUMAP-class.html">mesaUMAP</a>,
-<code><a href="https://rdrr.io/pkg/qsea/man/normMethod.html" class="external-link">qsea::normMethod()</a></code>, <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code>, <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code></p>
+    <div class="dont-index"><p><code>getPCA()</code>, <code>getUMAP()</code>, <a href="mesaDimRed-class.html">mesaDimRed</a>, <a href="mesaPCA-class.html">mesaPCA</a>,
+<a href="mesaUMAP-class.html">mesaUMAP</a>, <code><a href="https://rdrr.io/pkg/qsea/man/normMethod.html" class="external-link">qsea::normMethod()</a></code>, <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code>, <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code></p>
 <p>Other dimred-helpers:
 <code><a href="plotDimRed.html">plotDimRed()</a></code>,
 <code><a href="plotUMAP.html">plotUMAP()</a></code></p>
@@ -288,8 +292,7 @@ are performed and collected in <code>res</code>.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Default PCA (beta-normalised, top 1000 most variable windows, 5 PCs)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
@@ -329,7 +332,8 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 10 samples</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Use multiple cutoffs for most-variable windows (returns list of PCA results)</span></span></span>
+<span class="r-in"><span><span class="co"># Use multiple cutoffs for most-variable windows</span></span></span>
+<span class="r-in"><span><span class="co"># (returns list of PCA results)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">getPCA</span><span class="op">(</span>topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">500</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="st">"res"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
@@ -345,17 +349,20 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; column name windowSd1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 10 samples (windowSd1).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> across all 10 samples (windowSd1).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.308 resulting in 10 windows.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing PCA with 10 samples and 10 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; pca1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 10 samples (windowSd1).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> across all 10 samples (windowSd1).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.19 resulting in 100 windows.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing PCA with 10 samples and 100 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; pca2.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 10 samples (windowSd1).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> across all 10 samples (windowSd1).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.0485 resulting in 500 windows.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing PCA with 10 samples and 500 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; pca3.</span>
@@ -365,81 +372,65 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; pca4.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "pca1" "pca2" "pca3" "pca4"</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Quick demo on a small synthetic qseaSet</span></span></span>
-<span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
+<span class="r-in"><span><span class="co"># Default UMAP</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 10000.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 9800 regions across 2 samples.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 819 regions across 10 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 3297 windows with at least one missing value: 6503 windows remaining.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 220 windows with at least one missing value: 599 windows remaining.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating standard deviation for each window across all 40 samples:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sim1T, Sim2T, Sim3T, Sim4T, Sim5T, Sim6T, Sim7T, Sim8T, Sim9T, Sim10T, Sim11T, Sim12T, Sim13T, Sim14T, Sim15T, Sim16T, Sim17T, Sim18T, Sim19T, Sim20T, Sim1N, Sim2N, Sim3N, Sim4N, Sim5N, Sim6N, Sim7N, Sim8N, Sim9N, Sim10N, Sim11N, Sim12N, Sim13N, Sim14N, Sim15N, Sim16N, Sim17N, Sim18N, Sim19N, Sim20N.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; column name windowSd1.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following topVarNum values are larger than the number of remaining windows (= 599): 1000</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> These values are not used; UMAP will be done with all remaining windows instead.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 40 samples (windowSd1).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.203 resulting in 1000 windows.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 40 samples and 1000 windows</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No filtering of windows based on window standard deviation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 10 samples and 599 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 40 samples</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 10 samples</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Alter UMAP hyperparameters</span></span></span>
-<span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, min_dist <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 10000.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 9800 regions across 2 samples.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 819 regions across 10 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 3212 windows with at least one missing value: 6588 windows remaining.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 220 windows with at least one missing value: 599 windows remaining.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating standard deviation for each window across all 40 samples:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sim1T, Sim2T, Sim3T, Sim4T, Sim5T, Sim6T, Sim7T, Sim8T, Sim9T, Sim10T, Sim11T, Sim12T, Sim13T, Sim14T, Sim15T, Sim16T, Sim17T, Sim18T, Sim19T, Sim20T, Sim1N, Sim2N, Sim3N, Sim4N, Sim5N, Sim6N, Sim7N, Sim8N, Sim9N, Sim10N, Sim11N, Sim12N, Sim13N, Sim14N, Sim15N, Sim16N, Sim17N, Sim18N, Sim19N, Sim20N.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; column name windowSd1.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following topVarNum values are larger than the number of remaining windows (= 599): 1000</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> These values are not used; UMAP will be done with all remaining windows instead.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 40 samples (windowSd1).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.203 resulting in 1000 windows.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 40 samples and 1000 windows</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No filtering of windows based on window standard deviation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 10 samples and 599 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 40 samples</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 10 samples</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use top 500 most variable windows only</span></span></span>
-<span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span>topVarNum <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">getUMAP</span><span class="op">(</span>n_neighbors <span class="op">=</span> <span class="fl">5</span>, topVarNum <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 10000.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 9800 regions across 2 samples.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of beta values for 819 regions across 10 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 3203 windows with at least one missing value: 6597 windows remaining.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtered out 220 windows with at least one missing value: 599 windows remaining.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating standard deviation for each window across all 40 samples:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sim1T, Sim2T, Sim3T, Sim4T, Sim5T, Sim6T, Sim7T, Sim8T, Sim9T, Sim10T, Sim11T, Sim12T, Sim13T, Sim14T, Sim15T, Sim16T, Sim17T, Sim18T, Sim19T, Sim20T, Sim1N, Sim2N, Sim3N, Sim4N, Sim5N, Sim6N, Sim7N, Sim8N, Sim9N, Sim10N, Sim11N, Sim12N, Sim13N, Sim14N, Sim15N, Sim16N, Sim17N, Sim18N, Sim19N, Sim20N.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating standard deviation for each window across all 10 samples:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; column name windowSd1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 40 samples (windowSd1).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.214 resulting in 500 windows.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 40 samples and 500 windows</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> across all 10 samples (windowSd1).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.0485 resulting in 500 windows.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 10 samples and 500 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 40 samples</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 10 samples</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PCA on default beta-normalised matrix, keep 3 PCs</span></span></span>
@@ -475,7 +466,8 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; column name windowSd1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 10 samples (windowSd1).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> across all 10 samples (windowSd1).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.0485 resulting in 500 windows.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 10 samples and 500 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap1.</span>
@@ -521,7 +513,8 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; column name windowSd1.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation across all 10 samples (windowSd1).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering windows based on standard deviation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> across all 10 samples (windowSd1).</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Standard deviation threshold = 0.0485 resulting in 500 windows.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing UMAP with 10 samples and 500 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap1.</span>
@@ -531,7 +524,6 @@ are performed and collected in <code>res</code>.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -&gt; umap2.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "umap1" "umap2"</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

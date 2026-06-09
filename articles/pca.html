@@ -199,10 +199,9 @@ updated directly, using <code>mutate</code> or
 <p>The <code>colour</code> and <code>shape</code> arguments to
 <code><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA()</a></code> specify variables to use to set the colour and/or
 shape of the points (samples) on the PCA plot. These variables need to
-be in the qseaSet sample table.<br>
-Multiple variables can be specified for <code>colour</code> and a PCA
-plot will be produced for each variable.<br>
-Only one variable can be specified for <code>shape</code>.</p>
+be in the qseaSet sample table. Multiple variables can be specified for
+<code>colour</code> and a PCA plot will be produced for each
+variable. Only one variable can be specified for <code>shape</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>,</span>
 <span>        colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient"</span>, <span class="st">"age"</span>, <span class="st">"transformed_age"</span><span class="op">)</span>, </span>
@@ -258,13 +257,18 @@ on the properties of the variable being used.</p>
 <p>For the <code>transformed_age</code> variable (that was generated in
 the <code>mutate</code> example above), a diverging colour palette is
 used, but it is not symmetric around zero. That is, the darkest blue
-maps to approx -0.5 whereas the darkest red maps to approx 2.<br>
-Depending on the variable, it may be appropriate that the darkest blue
-maps to -2 (i.e. equivalent to the darkest red mapping to 2), and for
-this the <code>symDivColourScale</code> argument can be set to TRUE, as
-seen below (and we also replot the above version for comparison).</p>
+maps to approx -0.5 whereas the darkest red maps to approx 2. Depending
+on the variable, it may be appropriate that the darkest blue maps to -2
+(i.e. equivalent to the darkest red mapping to 2), and for this the
+<code>symDivColourScale</code> argument can be set to TRUE, as seen
+below (and we also replot the above version for comparison).</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">PCAplots2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, colour <span class="op">=</span> <span class="st">"transformed_age"</span>, shape <span class="op">=</span> <span class="st">"tumour"</span>, symDivColourScale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<code class="sourceCode R"><span><span class="va">PCAplots2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span></span>
+<span>    <span class="va">pca1</span>,</span>
+<span>    colour <span class="op">=</span> <span class="st">"transformed_age"</span>,</span>
+<span>    shape <span class="op">=</span> <span class="st">"tumour"</span>,</span>
+<span>    symDivColourScale <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/colour-and-shape-palettes-1.png" class="r-plt" alt="" width="672"></p>
@@ -366,11 +370,10 @@ be changed using the <code>NAshape</code> argument).</p>
 </h3>
 <p>As can be seen in the last example above, the <code>components</code>
 argument to <code><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA()</a></code> can be used to specify which
-components to plot. Above we only ask for PC1 vs PC2.<br>
-If you would like more than one plot, then use a list. For example, the
-default behaviour is to set
-<code>components = list(c(1, 2), c(2, 3))</code> which plots both PC1 vs
-PC2 and PC2 vs PC3.</p>
+components to plot. Above we only ask for PC1 vs PC2. If you would like
+more than one plot, then use a list. For example, the default behaviour
+is to set <code>components = list(c(1, 2), c(2, 3))</code> which plots
+both PC1 vs PC2 and PC2 vs PC3.</p>
 </div>
 <div class="section level3">
 <h3 id="point-size">Point size<a class="anchor" aria-label="anchor" href="#point-size"></a>
@@ -427,8 +430,8 @@ annotations.</p>
 <span>                        shape <span class="op">=</span> <span class="st">"tumour"</span>, </span>
 <span>                        plotlyAnnotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stage"</span>, <span class="st">"age"</span>, <span class="st">"gender"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/pca-plot-1.png" class="r-plt" alt="" width="672"></p>
-<p>Plotly plots are great for interactive use in html reports.<br>
-The downside of using them is that the legend often gets displayed in a
+<p>Plotly plots are great for interactive use in html reports. The
+downside of using them is that the legend often gets displayed in a
 complicated, unhelpful way and the formatting of the plot is often not
 as good and hard to control.<br>
 Sometimes it makes sense to plot a non-plotly and plotly version of the
@@ -469,13 +472,24 @@ PCA</li>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 599 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
-<!-- The output of `getPCA()` is a `mesaDimRed` object with the following components: -->
-<!-- -   **pcas** A named list of objects of class prcomp. List names correspond to entries in the `params$topVar` component of the output. -->
+<!-- The output of `getPCA()` is a `mesaDimRed` object with the following
+components: -->
+<!-- -   **pcas** A named list of objects of class prcomp. List names
+correspond to entries in the `params$topVar` component of the output. -->
 <!-- -   **samples** Names of the samples analysed. -->
-<!-- -   **windows** A list of names of the windows analysed. List names correspond to entries in the `params$topVar` component of the output. -->
-<!-- -   **dataTable** If `returnDataTable = TRUE`, the table of normalised values. The table will contain windows after filtering based on `regionsToOverlap` and `minDensity`, but _prior_ to filtering based on `topVarNum`. Windows with missing values will also have been removed. The table will also include column(s) of window standard deviations, where applicable, with column name(s) corresponding to entries in the `params$topVar` component of the output. -->
+<!-- -   **windows** A list of names of the windows analysed. List names
+correspond to entries in the `params$topVar` component of the output. -->
+<!-- -   **dataTable** If `returnDataTable = TRUE`, the table of normalised
+values. The table will contain windows after filtering based on
+`regionsToOverlap` and `minDensity`, but _prior_ to filtering based on
+`topVarNum`. Windows with missing values will also have been removed. The table
+will also include column(s) of window standard deviations, where applicable,
+with column name(s) corresponding to entries in the `params$topVar` component
+of the output. -->
 <!-- -   **params** A list of the parameters used. -->
-<!-- -   **windowFiltering** A list of the initial number of windows and the number filtered out at each filtering step (not including filtering based on `topVarNum`). -->
+<!-- -   **windowFiltering** A list of the initial number of windows and the
+number filtered out at each filtering step (not including filtering based on
+`topVarNum`). -->
 </div>
 <div class="section level2">
 <h2 id="getpca-function-arguments">
@@ -517,17 +531,20 @@ being used (i.e. no filtering based on most variable windows).</p>
 <span><span class="co">#&gt; Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span></span>
 <span><span class="co">#&gt; -&gt; column name windowSd1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 10 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 10 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.19 resulting in 100 windows.</span></span>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 100 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 10 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 10 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.13 resulting in 250 windows.</span></span>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 250 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca2.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 10 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 10 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.0485 resulting in 500 windows.</span></span>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 500 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca3.</span></span>
@@ -576,12 +593,14 @@ values will be ignored:</p>
 <span><span class="co">#&gt; Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span></span>
 <span><span class="co">#&gt; -&gt; column name windowSd1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 10 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 10 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.13 resulting in 250 windows.</span></span>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 250 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 10 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 10 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.0485 resulting in 500 windows.</span></span>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 500 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca2.</span></span>
@@ -598,7 +617,9 @@ values will be ignored:</p>
 standard deviation for each window using the <code>topVarSamples</code>
 argument. This may be either an explicit vector of sample names,</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tumourNames</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">tumourNames</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>, topVarSamples <span class="op">=</span> <span class="va">tumourNames</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -673,7 +694,10 @@ table to use:</p>
 <code class="sourceCode R"><span><span class="va">dataTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getBetaTable.html">getBetaTable</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of beta values for 819 regions across 10 samples.</span></span>
 <span></span>
-<span><span class="va">pca2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, dataTable <span class="op">=</span> <span class="va">dataTable</span><span class="op">)</span> <span class="co"># dataTable generated externally and passed into getPCA</span></span>
+<span><span class="va">pca2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span></span>
+<span>    <span class="va">exampleTumourNormal</span>,</span>
+<span>    dataTable <span class="op">=</span> <span class="va">dataTable</span></span>
+<span><span class="op">)</span> <span class="co"># dataTable generated externally and passed into getPCA</span></span>
 <span><span class="co">#&gt; Generating table of beta values for 50 regions across 5 samples.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -699,7 +723,10 @@ default since the <code>dataTable</code> can often be large and storing
 it every time <code><a href="../reference/getDimRed.html">getPCA()</a></code> is run would be
 memory-inefficient.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pca3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, returnDataTable <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># dataTable generated within getPCA and returned as part of output</span></span>
+<code class="sourceCode R"><span><span class="va">pca3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span></span>
+<span>    <span class="va">exampleTumourNormal</span>,</span>
+<span>    returnDataTable <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span> <span class="co"># dataTable generated within getPCA and returned as part of output</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
 <span><span class="co">#&gt; -----------</span></span>
@@ -751,7 +778,8 @@ different number of top windows:</p>
 <span><span class="co">#&gt; Colon1_N, Colon1_T, Colon2_N, Colon2_T, Lung1_N, Lung1_T, Lung2_N, Lung2_T, Lung3_N, Lung3_T.</span></span>
 <span><span class="co">#&gt; -&gt; column name windowSd1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 10 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 10 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.13 resulting in 250 windows.</span></span>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 250 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
@@ -825,7 +853,13 @@ wish to see how these same windows split the samples.</p>
 <code>filterByOverlaps</code>:</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/alterQsetOverlap.html">filterByOverlaps</a></span><span class="op">(</span>regionsToOverlap <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>seqnames <span class="op">=</span> <span class="fl">7</span>, start <span class="op">=</span> <span class="fl">25002001</span>, end <span class="op">=</span> <span class="fl">25117900</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/alterQsetOverlap.html">filterByOverlaps</a></span><span class="op">(</span></span>
+<span>        regionsToOverlap <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>            seqnames <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>            start <span class="op">=</span> <span class="fl">25002001</span>,</span>
+<span>            end <span class="op">=</span> <span class="fl">25117900</span></span>
+<span>        <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 38.</span></span>
@@ -877,7 +911,8 @@ functions:</p>
 <span><span class="co">#&gt; Sim1T, Sim2T, Sim3T, Sim4T, Sim5T, Sim6T, Sim7T, Sim8T, Sim9T, Sim10T, Sim11T, Sim12T, Sim13T, Sim14T, Sim15T, Sim16T, Sim17T, Sim18T, Sim19T, Sim20T, Sim1N, Sim2N, Sim3N, Sim4N, Sim5N, Sim6N, Sim7N, Sim8N, Sim9N, Sim10N, Sim11N, Sim12N, Sim13N, Sim14N, Sim15N, Sim16N, Sim17N, Sim18N, Sim19N, Sim20N.</span></span>
 <span><span class="co">#&gt; -&gt; column name windowSd1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 40 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 40 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.203 resulting in 1000 windows.</span></span>
 <span><span class="co">#&gt; Performing UMAP with 40 samples and 1000 windows</span></span>
 <span><span class="co">#&gt; -&gt; umap1.</span></span>
@@ -918,7 +953,8 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; Sim1T, Sim2T, Sim3T, Sim4T, Sim5T, Sim6T, Sim7T, Sim8T, Sim9T, Sim10T, Sim11T, Sim12T, Sim13T, Sim14T, Sim15T, Sim16T, Sim17T, Sim18T, Sim19T, Sim20T, Sim1N, Sim2N, Sim3N, Sim4N, Sim5N, Sim6N, Sim7N, Sim8N, Sim9N, Sim10N, Sim11N, Sim12N, Sim13N, Sim14N, Sim15N, Sim16N, Sim17N, Sim18N, Sim19N, Sim20N.</span></span>
 <span><span class="co">#&gt; -&gt; column name windowSd1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 40 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 40 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.203 resulting in 1000 windows.</span></span>
 <span><span class="co">#&gt; Performing UMAP with 40 samples and 1000 windows</span></span>
 <span><span class="co">#&gt; -&gt; umap1.</span></span>
@@ -943,7 +979,8 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; Sim1T, Sim2T, Sim3T, Sim4T, Sim5T, Sim6T, Sim7T, Sim8T, Sim9T, Sim10T, Sim11T, Sim12T, Sim13T, Sim14T, Sim15T, Sim16T, Sim17T, Sim18T, Sim19T, Sim20T, Sim1N, Sim2N, Sim3N, Sim4N, Sim5N, Sim6N, Sim7N, Sim8N, Sim9N, Sim10N, Sim11N, Sim12N, Sim13N, Sim14N, Sim15N, Sim16N, Sim17N, Sim18N, Sim19N, Sim20N.</span></span>
 <span><span class="co">#&gt; -&gt; column name windowSd1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
-<span><span class="co">#&gt; Filtering windows based on standard deviation across all 40 samples (windowSd1).</span></span>
+<span><span class="co">#&gt; Filtering windows based on standard deviation</span></span>
+<span><span class="co">#&gt; across all 40 samples (windowSd1).</span></span>
 <span><span class="co">#&gt; Standard deviation threshold = 0.203 resulting in 1000 windows.</span></span>
 <span><span class="co">#&gt; Performing UMAP with 40 samples and 1000 windows</span></span>
 <span><span class="co">#&gt; -&gt; umap1.</span></span>
@@ -987,7 +1024,7 @@ they are easy to misinterpret.</p>
 <span><span class="co">#&gt;   [1] tidyselect_1.2.1            viridisLite_0.4.3          </span></span>
 <span><span class="co">#&gt;   [3] farver_2.1.2                Biostrings_2.78.0          </span></span>
 <span><span class="co">#&gt;   [5] S7_0.2.2                    bitops_1.0-9               </span></span>
-<span><span class="co">#&gt;   [7] fastmap_1.2.0               RCurl_1.98-1.18            </span></span>
+<span><span class="co">#&gt;   [7] fastmap_1.2.0               RCurl_1.98-1.19            </span></span>
 <span><span class="co">#&gt;   [9] GenomicAlignments_1.46.0    XML_3.99-0.23              </span></span>
 <span><span class="co">#&gt;  [11] digest_0.6.39               lifecycle_1.0.5            </span></span>
 <span><span class="co">#&gt;  [13] plyranges_1.30.1            statmod_1.5.2              </span></span>

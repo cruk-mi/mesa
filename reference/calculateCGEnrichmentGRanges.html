@@ -100,8 +100,8 @@ Genomic ranges representing fragments (each range = one fragment).
 
 <dt id="arg-bsgenome">BSgenome<a class="anchor" aria-label="anchor" href="#arg-bsgenome"></a></dt>
 <dd><p><code>character(1)</code>
-Name of a BSgenome package, e.g. <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>.
-The package must be installed and loadable.
+Name of a BSgenome package, e.g. <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>. The
+package must be installed and loadable.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
@@ -124,22 +124,18 @@ Vector of chromosomes to restrict motif calculation.
     <h2>Details</h2>
     <p>relH and GoGe are computed by counting <code>"CG"</code> dinucleotides in the provided
 fragments and normalising by genome-wide expectations (from
-<code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code>).
-Unlike <code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>, this function assumes reads are already
-summarised as genomic ranges.</p>
+<code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code>). Unlike <code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>, this
+function assumes reads are already summarised as genomic ranges.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>,
-<code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code>,
-<span class="pkg">GenomicRanges</span>,
-<span class="pkg">BSgenome</span></p></div>
+    <div class="dont-index"><p><code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>, <code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code>,
+<span class="pkg">GenomicRanges</span>, <span class="pkg">BSgenome</span></p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Runnable toy example with synthetic reads over chr1 (requires a BSgenome)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Runnable toy example with synthetic reads over chr1 (requires a BSgenome)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BSgenome.Hsapiens.NCBI.GRCh38"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200</span></span></span>
 <span class="r-in"><span>    <span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu">GenomicRanges</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></span><span class="op">(</span></span></span>
@@ -167,7 +163,6 @@ summarised as genomic ranges.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    relH  GoGe nReads nReadsWithoutPattern n100bpReads n100bpReadsWithoutPattern</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  3.94  1.88    200                   12         161                         9</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

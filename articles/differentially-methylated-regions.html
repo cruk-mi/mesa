@@ -309,8 +309,8 @@ beta values for the samples with each different type,
 repeated if multiple contrasts are calculated in one call to
 <code>calculateDMRs</code>. Following these contrast specific columns
 there is a block of columns that includes the average beta and nrpm
-values for the values of the variable under consideration,
-e.g. <code>Tumour_nrpm_means</code>.</p>
+values for the values of the variable under consideration, e.g.
+<code>Tumour_nrpm_means</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>,</span>
@@ -496,7 +496,13 @@ plotting a volcano plot:</p>
 <span></span>
 <span><span class="va">allWindows</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Tumour_vs_Normal_log2FC</span>, y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>, col <span class="op">=</span> <span class="va">significant</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>            x <span class="op">=</span> <span class="va">Tumour_vs_Normal_log2FC</span>,</span>
+<span>            y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>,</span>
+<span>            col <span class="op">=</span> <span class="va">significant</span></span>
+<span>        <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Log2 Fold Change"</span>,</span>
@@ -510,7 +516,13 @@ that have clearly changed in levels of methylation.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allWindows</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Tumour_vs_Normal_deltaBeta</span>, y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>, col <span class="op">=</span> <span class="va">significant</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>            x <span class="op">=</span> <span class="va">Tumour_vs_Normal_deltaBeta</span>,</span>
+<span>            y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>,</span>
+<span>            col <span class="op">=</span> <span class="va">significant</span></span>
+<span>        <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Difference in average Beta Values"</span>,</span>
@@ -637,7 +649,9 @@ this can be positive or negative, depending on which strand the gene is
 on, and that some genes are very large.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">seqnames</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">distanceToTSS</span>, <span class="va">ENSEMBL</span>, <span class="va">SYMBOL</span>, <span class="va">GENENAME</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>        <span class="va">seqnames</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">distanceToTSS</span>, <span class="va">ENSEMBL</span>, <span class="va">SYMBOL</span>, <span class="va">GENENAME</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 7</span></span></span>
 <span><span class="co">#&gt;    seqnames    start      end distanceToTSS ENSEMBL         SYMBOL   GENENAME   </span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
@@ -678,7 +692,10 @@ long the gene is, and which transcript is being used in the
 annotations.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">geneChr</span>, <span class="va">geneStart</span>, <span class="va">geneEnd</span>, <span class="va">geneLength</span>, <span class="va">geneStrand</span>, <span class="va">geneId</span>, <span class="va">transcriptId</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>        <span class="va">geneChr</span>, <span class="va">geneStart</span>, <span class="va">geneEnd</span>, <span class="va">geneLength</span>, <span class="va">geneStrand</span>,</span>
+<span>        <span class="va">geneId</span>, <span class="va">transcriptId</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 7</span></span></span>
 <span><span class="co">#&gt;    geneChr geneStart  geneEnd geneLength geneStrand geneId    transcriptId     </span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            </span></span>
@@ -702,7 +719,9 @@ islands/shores/shelves simultaneously, so these columns give how many of
 these that they overlap.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">seqnames</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">nIslands</span>, <span class="va">nShore</span>, <span class="va">nShelf</span>, <span class="va">inFantom</span>, <span class="va">landscape</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>        <span class="va">seqnames</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">nIslands</span>, <span class="va">nShore</span>, <span class="va">nShelf</span>, <span class="va">inFantom</span>, <span class="va">landscape</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 8</span></span></span>
 <span><span class="co">#&gt;    seqnames    start      end nIslands nShore nShelf inFantom landscape</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
@@ -928,7 +947,11 @@ within each comparison:</p>
 delta beta:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/summariseDMRsByContrast.html">summariseDMRsByContrast</a></span><span class="op">(</span>FDRthres <span class="op">=</span> <span class="fl">0.001</span>, log2FCthres <span class="op">=</span> <span class="fl">2</span>, deltaBetaThres <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/summariseDMRsByContrast.html">summariseDMRsByContrast</a></span><span class="op">(</span></span>
+<span>        FDRthres <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>        log2FCthres <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>        deltaBetaThres <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
 <span><span class="co">#&gt;    group1      group2        nUp nDown</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -1058,11 +1081,13 @@ colours. We can specify colours for just one variable (with the second
 being chosen automatically):</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/plotRegionsHeatmap.html">plotRegionsHeatmap</a></span><span class="op">(</span>regionsToOverlap <span class="op">=</span> <span class="va">DMRsCovariatePatient</span>, </span>
-<span>                        sampleAnnotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tumour"</span>, <span class="st">"type"</span><span class="op">)</span>,</span>
-<span>                        annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span> <span class="op">=</span> <span class="st">"blue"</span>, </span>
-<span>                                                        <span class="st">"Tumour"</span> <span class="op">=</span> <span class="st">"firebrick4"</span><span class="op">)</span><span class="op">)</span></span>
-<span>                        <span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/plotRegionsHeatmap.html">plotRegionsHeatmap</a></span><span class="op">(</span></span>
+<span>        regionsToOverlap <span class="op">=</span> <span class="va">DMRsCovariatePatient</span>,</span>
+<span>        sampleAnnotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tumour"</span>, <span class="st">"type"</span><span class="op">)</span>,</span>
+<span>        annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>            tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"Tumour"</span> <span class="op">=</span> <span class="st">"firebrick4"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
@@ -1093,9 +1118,7 @@ option:</p>
 <span>                        <span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
-<span><span class="co">#&gt; No empty rows to remove.</span></span>
-<span><span class="co">#&gt; No almost empty rows to remove.</span></span>
-<span><span class="co">#&gt; No almost empty rows to remove.</span></span></code></pre></div>
+<span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
 <p><img src="differentially-methylated-regions_files/figure-html/chunk-28-1.png" class="r-plt" alt="" width="672"></p>
 <p>While the columns can be controlled with <code>clusterCols</code>. By
 default the columns are clustered but the rows not, mostly to save
@@ -1179,7 +1202,7 @@ used.</p>
 <span><span class="co">#&gt;  [28] GenomicRanges_1.62.1                     </span></span>
 <span><span class="co">#&gt;  [29] purrr_1.2.2                              </span></span>
 <span><span class="co">#&gt;  [30] R.utils_2.13.0                           </span></span>
-<span><span class="co">#&gt;  [31] RCurl_1.98-1.18                          </span></span>
+<span><span class="co">#&gt;  [31] RCurl_1.98-1.19                          </span></span>
 <span><span class="co">#&gt;  [32] yulab.utils_0.2.4                        </span></span>
 <span><span class="co">#&gt;  [33] tweenr_2.0.3                             </span></span>
 <span><span class="co">#&gt;  [34] rappdirs_0.3.4                           </span></span>

@@ -113,14 +113,13 @@ Second sample name, contributing the remainder of reads.</p></dd>
 
 <dt id="arg-nreadstotal">nReadsTotal<a class="anchor" aria-label="anchor" href="#arg-nreadstotal"></a></dt>
 <dd><p><code>integer(1)</code>.
-Total number of reads to simulate in the new mixed sample.
-Must be <code>&gt;= 0</code>.</p></dd>
+Total number of reads to simulate in the new mixed sample. Must be <code>&gt;= 0</code>.</p></dd>
 
 
 <dt id="arg-proportion">proportion<a class="anchor" aria-label="anchor" href="#arg-proportion"></a></dt>
 <dd><p><code>numeric(1)</code>.
-Proportion of reads taken from <code>sample1</code>. Must be in <code>[0, 1]</code>.
-The remaining <code>1 - proportion</code> reads are taken from <code>sample2</code>.</p></dd>
+Proportion of reads taken from <code>sample1</code>. Must be in <code>[0, 1]</code>. The remaining
+<code>1 - proportion</code> reads are taken from <code>sample2</code>.</p></dd>
 
 
 <dt id="arg-newname">newName<a class="anchor" aria-label="anchor" href="#arg-newname"></a></dt>
@@ -138,16 +137,16 @@ Group name for the new sample recorded in the <code>sampleTable</code>.
 
 <dt id="arg-onlynew">onlyNew<a class="anchor" aria-label="anchor" href="#arg-onlynew"></a></dt>
 <dd><p><code>logical(1)</code>.
-If <code>TRUE</code>, return only the synthetic sample. If <code>FALSE</code>, return the
-original <code>qseaSet</code> with the new sample appended.
+If <code>TRUE</code>, return only the synthetic sample. If <code>FALSE</code>, return the original
+<code>qseaSet</code> with the new sample appended.
 <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-renormalise">renormalise<a class="anchor" aria-label="anchor" href="#arg-renormalise"></a></dt>
 <dd><p><code>logical(1)</code>.
-Whether to run <code><a href="addNormalisation.html">addNormalisation()</a></code> on the result. For efficiency, set
-to <code>FALSE</code> when creating multiple mixtures and run normalisation once at
-the end.
+Whether to run <code><a href="addNormalisation.html">addNormalisation()</a></code> on the result. For efficiency, set to
+<code>FALSE</code> when creating multiple mixtures and run normalisation once at the
+end.
 <strong>Default:</strong> <code>TRUE</code>.</p></dd>
 
 </dl></div>
@@ -159,11 +158,11 @@ The <code>sampleTable</code>, counts, and relevant slots are updated consistentl
 </ul></div>
     <div id="details">
     <h2>Details</h2>
-    <p>Note that if the qseaSet windows have been filtered prior to using this,
-the fraction of fragments present in the current qseaSet is calculated,
-such that the total number of reads would have been approximately <code>nReadsTotal</code>.
-E.g. if there are 50% of the total fragments in the windows present in the current samples,
-0.5*<code>nReadsTotal</code> fragments will be sampled.</p><ul><li><p>Input validation ensures <code>sample1</code>/<code>sample2</code> exist, <code>proportion ∈ [0,1]</code>,
+    <p>Note that if the qseaSet windows have been filtered prior to using this, the
+fraction of fragments present in the current qseaSet is calculated, such that
+the total number of reads would have been approximately <code>nReadsTotal</code>. E.g.
+if there are 50% of the total fragments in the windows present in the current
+samples, 0.5*<code>nReadsTotal</code> fragments will be sampled.</p><ul><li><p>Input validation ensures <code>sample1</code>/<code>sample2</code> exist, <code>proportion ∈ [0,1]</code>,
 and <code>nReadsTotal</code> is non-negative.</p></li>
 <li><p>The mixing strategy (e.g., proportional allocation vs sampling) follows
 the package’s implementation; set <code>renormalise = TRUE</code> to recompute
@@ -187,8 +186,8 @@ offsets/enrichment after adding the new sample if required by your workflow.</p>
 <span class="r-in"><span>        <span class="st">"Colon1_N"</span>,</span></span>
 <span class="r-in"><span>        nReadsTotal <span class="op">=</span> <span class="fl">100000</span>,</span></span>
 <span class="r-in"><span>        proportion <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
-<span class="r-in"><span>        renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span>        renormalise <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="co"># Only a few reads are included in this small subset of windows (82):</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="getCountTable.html">getCountTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">pull</span><span class="op">(</span><span class="va">Mix_Colon1_T_Colon1_N_0.5</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
@@ -200,7 +199,8 @@ offsets/enrichment after adding the new sample if required by your workflow.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 82</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Mix two samples 80/20 and return only the synthetic sample, with an explicit name and group</span></span></span>
+<span class="r-in"><span><span class="co"># Mix two samples 80/20 and return only the synthetic sample, with an</span></span></span>
+<span class="r-in"><span><span class="co"># explicit name and group</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">mixSamples</span><span class="op">(</span><span class="st">"Colon1_T"</span>, <span class="st">"Colon1_N"</span>,</span></span>
 <span class="r-in"><span>        nReadsTotal <span class="op">=</span> <span class="fl">50000</span>,</span></span>
@@ -208,8 +208,8 @@ offsets/enrichment after adding the new sample if required by your workflow.</p>
 <span class="r-in"><span>        newName     <span class="op">=</span> <span class="st">"Mix_Colon1_T_0.8_Colon1_N_0.2"</span>,</span></span>
 <span class="r-in"><span>        groupName   <span class="op">=</span> <span class="st">"Synthetic"</span>,</span></span>
 <span class="r-in"><span>        onlyNew     <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>        renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span>        renormalise <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="co"># Only a few reads are included in this small subset of windows (45):</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="getCountTable.html">getCountTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">Mix_Colon1_T_0.8_Colon1_N_0.2</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>

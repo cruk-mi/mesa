@@ -94,8 +94,8 @@ tumour/normal, multiple runs) and need to be combined into one container.</p>
 
 <dl><dt id="arg-qseasets">qseaSets<a class="anchor" aria-label="anchor" href="#arg-qseasets"></a></dt>
 <dd><p><code>list</code>
-List of <code>qseaSet</code> objects, or <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> paths to <code>.rds</code> files
-containing <code>qseaSet</code> objects. <strong>Default:</strong> none (must be supplied).</p></dd>
+List of <code>qseaSet</code> objects, or <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> paths to <code>.rds</code> files containing
+<code>qseaSet</code> objects. <strong>Default:</strong> none (must be supplied).</p></dd>
 
 
 <dt id="arg-firstqset">firstQset<a class="anchor" aria-label="anchor" href="#arg-firstqset"></a></dt>
@@ -121,8 +121,8 @@ Verify that global parameters are identical across inputs.
 <dt id="arg-regionstokeep">regionsToKeep<a class="anchor" aria-label="anchor" href="#arg-regionstokeep"></a></dt>
 <dd><p><code>GRanges</code> or coercible
 If supplied, restrict each <code>qseaSet</code> to these genomic regions <em>before</em>
-combining (saves memory). Accepts <code>GRanges</code> or a data frame with
-<code>seqnames</code>, <code>start</code>, <code>end</code>.
+combining (saves memory). Accepts <code>GRanges</code> or a data frame with <code>seqnames</code>,
+<code>start</code>, <code>end</code>.
 <strong>Default:</strong> <code>NULL</code> (keep all regions).</p></dd>
 
 </dl></div>
@@ -141,7 +141,7 @@ combining (saves memory). Accepts <code>GRanges</code> or a data frame with
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Split a cohort into Tumour and Normal, create a list with them, then combine back</span></span></span>
+<span class="r-in"><span><span class="co"># Split a cohort into Tumour and Normal, create a list, then combine back</span></span></span>
 <span class="r-in"><span><span class="va">tumours</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">normals</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Normal"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">qsetList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">tumours</span>, <span class="va">normals</span><span class="op">)</span></span></span>

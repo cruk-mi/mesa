@@ -91,8 +91,8 @@ Internally, results are reshaped to long format before summarisation.</p>
 
 <dl><dt id="arg-dmrtable">DMRtable<a class="anchor" aria-label="anchor" href="#arg-dmrtable"></a></dt>
 <dd><p><code>data.frame</code> or <code>GRanges</code>
-DMR results, typically returned by <code><a href="calculateDMRs.html">calculateDMRs()</a></code>. If in wide format,
-it will be converted with <code><a href="pivotDMRsLonger.html">pivotDMRsLonger()</a></code>.</p></dd>
+DMR results, typically returned by <code><a href="calculateDMRs.html">calculateDMRs()</a></code>. If in wide format, it
+will be converted with <code><a href="pivotDMRsLonger.html">pivotDMRsLonger()</a></code>.</p></dd>
 
 
 <dt id="arg-fdrthres">FDRthres<a class="anchor" aria-label="anchor" href="#arg-fdrthres"></a></dt>
@@ -116,13 +116,12 @@ Absolute delta-beta threshold for calling up/down regulation.
     <div id="value">
     <h2>Value</h2>
     <p>A <code>tibble</code>:</p><ul><li><p><strong>summariseDMRsByContrast()</strong>: returns one row per contrast, with
-counts of up-regulated (<code>nUp</code>) and down-regulated (<code>nDown</code>) DMRs that
-pass the specified thresholds.</p></li>
+counts of up-regulated (<code>nUp</code>) and down-regulated (<code>nDown</code>) DMRs that pass
+the specified thresholds.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="pivotDMRsLonger.html">pivotDMRsLonger()</a></code>,
-<code><a href="summariseDMRsByGene.html">summariseDMRsByGene()</a></code></p>
+    <div class="dont-index"><p><code><a href="pivotDMRsLonger.html">pivotDMRsLonger()</a></code>, <code><a href="summariseDMRsByGene.html">summariseDMRsByGene()</a></code></p>
 <p>Other DMR-helpers:
 <code><a href="pivotDMRsLonger.html">pivotDMRsLonger()</a></code>,
 <code><a href="summariseDMRsByGene.html">summariseDMRsByGene()</a></code>,
@@ -136,9 +135,11 @@ pass the specified thresholds.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Summarise DMRs for a single contrast, using custom FDR threshold</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"type"</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        variable <span class="op">=</span> <span class="st">"type"</span>,</span></span>
 <span class="r-in"><span>        contrasts <span class="op">=</span> <span class="st">"LUAD_vs_NormalLung"</span>,</span></span>
-<span class="r-in"><span>        FDRthres <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        FDRthres <span class="op">=</span> <span class="fl">0.1</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">summariseDMRsByContrast</span><span class="op">(</span>FDRthres <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 5 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 255 windows, without using parallelisation.</span>

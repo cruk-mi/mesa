@@ -89,9 +89,8 @@ GoGe: enrichment statistic \((nCG * genome_length) / (nC * nG)\).
 
 <dl><dt id="arg-bsgenome">BSgenome<a class="anchor" aria-label="anchor" href="#arg-bsgenome"></a></dt>
 <dd><p><code>character(1)</code>
-The name of a BSgenome package, e.g.
-<code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>. The package must be installed
-and loadable in the current session.</p></dd>
+The name of a BSgenome package, e.g. <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>. The
+package must be installed and loadable in the current session.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -101,16 +100,15 @@ and loadable in the current session.</p></dd>
 </ul></div>
     <div id="details">
     <h2>Details</h2>
-    <p>These values are used as denominators to normalise sample-level CpG enrichment.</p><ul><li><p>Chromosomes with names containing <code>"rand"</code> or <code>"chrUn"</code> are excluded.</p></li>
+    <p>These values are used as denominators to normalise sample-level CpG
+enrichment.</p><ul><li><p>Chromosomes with names containing <code>"rand"</code> or <code>"chrUn"</code> are excluded.</p></li>
 <li><p>The BSgenome indicated by <code>BSgenome</code> is loaded dynamically.</p></li>
 <li><p>Uses <span class="pkg">Biostrings</span> and <span class="pkg">BSgenome</span> utilities to count CpG, C, and G
 occurrences across the genome.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>,
-<code><a href="calculateCGEnrichmentGRanges.html">calculateCGEnrichmentGRanges()</a></code>,
-<span class="pkg">BSgenome</span>,
+    <div class="dont-index"><p><code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>, <code><a href="calculateCGEnrichmentGRanges.html">calculateCGEnrichmentGRanges()</a></code>, <span class="pkg">BSgenome</span>,
 <span class="pkg">Biostrings</span></p></div>
     </div>
 

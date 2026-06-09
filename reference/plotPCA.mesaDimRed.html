@@ -151,12 +151,16 @@ Sample-table variable mapped to point shape (single variable only).
 Shapes used for categories of the <code>shape</code> variable. Options:</p><ul><li><p>A numeric vector of base‐R shape codes.</p><ul><li><p>0–20: line/filled shapes.</p></li>
 <li><p>21–25: filled shapes with a border (border colour = black).</p></li>
 </ul></li>
-<li><p>A keyword, with internally defined sets:</p><ul><li><p><code>"line-first"</code>: 15 line shapes, then 4 filled shapes (<strong>max 19 categories</strong>).</p></li>
-<li><p><code>"filled-first"</code>: 4 filled shapes, then 15 line shapes (<strong>max 19 categories</strong>).</p></li>
-<li><p><code>"mixture"</code>: mixture of line and filled shapes (<strong>max 19 categories</strong>).</p></li>
-<li><p><code>"filled+border"</code>: filled+border shapes (<strong>max 5 categories, or 4 if NAs in <code>shape</code></strong>).</p></li>
+<li><p>A keyword, with internally defined sets:</p></li>
+</ul><ul><li><p><code>"line-first"</code>: 15 line shapes, then 4 filled shapes (<strong>max 19
+categories</strong>).</p></li>
+<li><p><code>"filled-first"</code>: 4 filled shapes, then 15 line shapes (<strong>max 19
+categories</strong>).</p><ul><li><p><code>"mixture"</code>: mixture of line and filled shapes (<strong>max 19 categories</strong>).</p></li>
 </ul></li>
-<li><p><code>NULL</code>: choose automatically (<code>"mixture"</code> for non-diverging/none; <code>"filled+border"</code>
+<li><p><code>"filled+border"</code>: filled+border shapes (<strong>max 5 categories, or 4 if NAs in
+<code>shape</code></strong>).</p></li>
+</ul><ul><li><p><code>NULL</code>: choose automatically (<code>"mixture"</code> for non-diverging/none;
+<code>"filled+border"</code>
 for diverging colour scales).
 <strong>Default:</strong> <code>NULL</code>.</p></li>
 </ul></dd>
@@ -204,7 +208,8 @@ aesthetics. Specifically:</p><ul><li><p>one plot per <code>components</code> pai
 </ul></div>
     <div id="details">
     <h2>Details</h2>
-    <p><strong>Shape defaults</strong></p><ul><li><p><code>"mixture"</code> is used for non-diverging or discrete colour scales (or no colour).</p></li>
+    <p><strong>Shape defaults</strong></p><ul><li><p><code>"mixture"</code> is used for non-diverging or discrete colour scales (or no
+colour).</p></li>
 <li><p><code>"filled+border"</code> is used for diverging colour scales.
 These defaults aim to keep categories visually separable for larger cohorts.</p></li>
 </ul></div>
@@ -247,8 +252,10 @@ These defaults aim to keep categories visually separable for larger cohorts.</p>
 <span class="r-in"><span><span class="co"># Colour by sample group; show names</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>        showSampleNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
+<span class="r-in"><span>        showSampleNames <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>
@@ -277,9 +284,11 @@ These defaults aim to keep categories visually separable for larger cohorts.</p>
 <span class="r-in"><span><span class="co"># Plot PC1 vs PC3; shape by tissue</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        colour <span class="op">=</span> <span class="st">"group"</span>,</span></span>
-<span class="r-in"><span>        shape <span class="op">=</span> <span class="st">"tissue"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>        shape <span class="op">=</span> <span class="st">"tissue"</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -----------</span>

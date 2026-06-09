@@ -74,6 +74,7 @@
 <url><loc>/reference/makeQset.html</loc></url>
 <url><loc>/reference/makeTransposedTable.html</loc></url>
 <url><loc>/reference/map_hg38_1000kb.html</loc></url>
+<url><loc>/reference/mesa-package.html</loc></url>
 <url><loc>/reference/mesaDimRed-class.html</loc></url>
 <url><loc>/reference/mesaPCA-class.html</loc></url>
 <url><loc>/reference/mesaUMAP-class.html</loc></url>
@@ -99,7 +100,6 @@
 <url><loc>/reference/removeCNV.html</loc></url>
 <url><loc>/reference/removeLibraryFactors.html</loc></url>
 <url><loc>/reference/removeNormMethodSuffix.html</loc></url>
-<url><loc>/reference/remove_almost_empty_cols.html</loc></url>
 <url><loc>/reference/renameQsetNames.html</loc></url>
 <url><loc>/reference/renameSamples.html</loc></url>
 <url><loc>/reference/runHMMCopy.html</loc></url>

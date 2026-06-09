@@ -133,7 +133,8 @@ Directory to write per-sample PDF diagnostics; if <code>NULL</code>, no plots ar
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p><code>logical(1)</code>.
-Use the registered <strong>BiocParallel</strong> backend when <code>TRUE</code>; otherwise run serially.
+Use the registered <strong>BiocParallel</strong> backend when <code>TRUE</code>; otherwise run
+serially.
 <strong>Default:</strong> <code><a href="setMesaParallel.html">getMesaParallel()</a></code>.</p></dd>
 
 
@@ -163,7 +164,8 @@ Minimum MAPQ; for pairs, either end meeting the cutoff is accepted.
 
 <dt id="arg-properpairsonly">properPairsOnly<a class="anchor" aria-label="anchor" href="#arg-properpairsonly"></a></dt>
 <dd><p><code>logical(1)</code>.
-If <code>TRUE</code>, ignore unpaired R1; if <code>FALSE</code>, combine proper pairs with high-quality R1.
+If <code>TRUE</code>, ignore unpaired R1; if <code>FALSE</code>, combine proper pairs with
+high-quality R1.
 <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
@@ -188,8 +190,10 @@ Precomputed mappability track binned at <code>windowSize</code>.
     <div id="details">
     <h2>Details</h2>
     <p>Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
-HMMcopy (<code><a href="https://rdrr.io/pkg/HMMcopy/man/correctReadcount.html" class="external-link">HMMcopy::correctReadcount()</a></code> followed by <code><a href="https://rdrr.io/pkg/HMMcopy/man/HMMsegment.html" class="external-link">HMMcopy::HMMsegment()</a></code>), and
-merged back into the <code>qseaSet</code>. You must supply GC/mappability tracks binned at
+HMMcopy (<code><a href="https://rdrr.io/pkg/HMMcopy/man/correctReadcount.html" class="external-link">HMMcopy::correctReadcount()</a></code> followed by <code><a href="https://rdrr.io/pkg/HMMcopy/man/HMMsegment.html" class="external-link">HMMcopy::HMMsegment()</a></code>),
+and
+merged back into the <code>qseaSet</code>. You must supply GC/mappability tracks binned
+at
 the same <code>windowSize</code> (or use package-provided defaults where applicable).
 When <code>parallel = TRUE</code>, computation uses the currently registered backend
 (see <code><a href="https://rdrr.io/pkg/BiocParallel/man/register.html" class="external-link">BiocParallel::register()</a></code>).</p>

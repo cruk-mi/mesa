@@ -105,9 +105,9 @@ Path to the BAM file.
 
 <dt id="arg-bsgenome">BSgenome<a class="anchor" aria-label="anchor" href="#arg-bsgenome"></a></dt>
 <dd><p><code>character(1)</code>
-Name of a BSgenome package, e.g. <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>.
-For GRCh38 and hg19, precomputed distributions are cached within <span class="pkg">mesa</span>
-for speed; otherwise, <code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code> is used.
+Name of a BSgenome package, e.g. <code>"BSgenome.Hsapiens.NCBI.GRCh38"</code>. For
+GRCh38 and hg19, precomputed distributions are cached within <span class="pkg">mesa</span> for
+speed; otherwise, <code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code> is used.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
@@ -168,10 +168,8 @@ with <span class="pkg">mesa</span> for efficiency.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="calculateCGEnrichmentGRanges.html">calculateCGEnrichmentGRanges()</a></code>,
-<code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code>,
-<span class="pkg">MEDIPS</span>,
-<span class="pkg">BSgenome</span></p></div>
+    <div class="dont-index"><p><code><a href="calculateCGEnrichmentGRanges.html">calculateCGEnrichmentGRanges()</a></code>, <code><a href="calculateGenomicCGDistribution.html">calculateGenomicCGDistribution()</a></code>,
+<span class="pkg">MEDIPS</span>, <span class="pkg">BSgenome</span></p></div>
     </div>
 
     <div id="ref-examples">
@@ -180,9 +178,12 @@ with <span class="pkg">mesa</span> for efficiency.</p></li>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPSData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
 <span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://bioconductor.org/packages/GenomicRanges" class="external-link">"GenomicRanges"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="fu">calculateCGEnrichment</span><span class="op">(</span></span></span>
-<span class="r-in"><span>        file       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hESCs.Input.chr22.bam"</span>, package <span class="op">=</span> <span class="st">"MEDIPSData"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>            <span class="st">"extdata"</span>,</span></span>
+<span class="r-in"><span>            <span class="st">"hESCs.Input.chr22.bam"</span>,</span></span>
+<span class="r-in"><span>            package <span class="op">=</span> <span class="st">"MEDIPSData"</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span>,</span></span>
 <span class="r-in"><span>        BSgenome   <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span></span>
 <span class="r-in"><span>        exportPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        paired     <span class="op">=</span> <span class="cn">FALSE</span></span></span>

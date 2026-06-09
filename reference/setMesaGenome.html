@@ -88,8 +88,8 @@ is not explicitly supplied.</p>
 
 <dl><dt id="arg-genome">genome<a class="anchor" aria-label="anchor" href="#arg-genome"></a></dt>
 <dd><p><code>character(1)</code> or <code>NULL</code>.
-Genome identifier to store (typically <code>"hg38"</code> or <code>"GRCh38"</code>).
-Use <code>NULL</code> to clear the setting.
+Genome identifier to store (typically <code>"hg38"</code> or <code>"GRCh38"</code>). Use <code>NULL</code> to
+clear the setting.
 <strong>Default:</strong> none (must be supplied).</p></dd>
 
 </dl></div>
@@ -99,8 +99,8 @@ Use <code>NULL</code> to clear the setting.
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>This function sets the session option <code>options(mesa_genome = &lt;genome&gt;)</code>.
-It <strong>does not</strong> modify TxDb or OrgDb options directly; set those via
+    <p>This function sets the session option <code>options(mesa_genome = &lt;genome&gt;)</code>. It
+<strong>does not</strong> modify TxDb or OrgDb options directly; set those via
 <code><a href="setMesaTxDb.html">setMesaTxDb()</a></code> and <code><a href="setMesaAnnoDb.html">setMesaAnnoDb()</a></code> if you want global defaults for
 transcript and gene annotation packages. Helpers such as <code><a href="annotateWindows.html">annotateWindows()</a></code>
 consult <code>getOption("mesa_genome")</code> when <code>genome</code> is missing.</p>

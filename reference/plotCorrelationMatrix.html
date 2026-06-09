@@ -100,8 +100,10 @@ Input object containing windows and signal (beta or nrpm).</p></dd>
 
 
 <dt id="arg-regionstooverlap">regionsToOverlap<a class="anchor" aria-label="anchor" href="#arg-regionstooverlap"></a></dt>
-<dd><p><code>GRanges</code>, <code>data.frame</code> (coercible to <code>GRanges</code>), or <code>NULL</code>.
-If provided, restrict computation to windows overlapping these regions; otherwise
+<dd><p><code>GRanges</code>, <code>data.frame</code> (coercible to <code>GRanges</code>), or
+<code>NULL</code>.
+If provided, restrict computation to windows overlapping these regions;
+otherwise
 use all windows.
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
@@ -156,8 +158,10 @@ Minimum <code>CpG_density</code> required to keep a window.
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Windows are optionally restricted by <code>regionsToOverlap</code> and filtered by <code>minDensity</code>.
-Correlations are computed on the chosen <code>normMethod</code> after any group averaging.
+    <p>Windows are optionally restricted by <code>regionsToOverlap</code> and filtered by
+<code>minDensity</code>.
+Correlations are computed on the chosen <code>normMethod</code> after any group
+averaging.
 For <code>"beta"</code>, entries below <code>minEnrichment</code> are set to <code>NA</code> to down-weight
 low-enrichment windows.</p>
     </div>

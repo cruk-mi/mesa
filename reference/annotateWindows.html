@@ -108,7 +108,8 @@ Windows to annotate. Data frames must include <code>seqnames</code>, <code>start
 <dt id="arg-genome">genome<a class="anchor" aria-label="anchor" href="#arg-genome"></a></dt>
 <dd><p><code>character(1)</code> or <code>NULL</code>.
 Guides annotation defaults. Currently supports <code>"hg38"</code>/<code>"GRCh38"</code>.
-<strong>Default:</strong> value set by <code><a href="setMesaGenome.html">setMesaGenome()</a></code> (via internal <code>.getMesaGenome()</code>), or <code>NULL</code>.</p></dd>
+<strong>Default:</strong> value set by <code><a href="setMesaGenome.html">setMesaGenome()</a></code> (via internal
+<code>.getMesaGenome()</code>), or <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-txdb">TxDb<a class="anchor" aria-label="anchor" href="#arg-txdb"></a></dt>
@@ -143,26 +144,31 @@ FANTOM enhancer regions for overlap counts.
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with the input windows augmented by ChIPseeker annotations and,
+    <p>A tibble with the input windows augmented by ChIPseeker annotations
+and,
 when available, CpG island landscape and Fantom overlap.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
 
-<ul><li><p><strong>Conversion:</strong> Non-<code>GRanges</code> inputs are converted via <code><a href="qseaTableToChrGRanges.html">qseaTableToChrGRanges()</a></code>.</p></li>
-<li><p><strong>Genome-aware defaults (GRCh38/hg38):</strong> Missing <code>TxDb</code>/<code>annoDb</code>/contexts are
+<ul><li><p><strong>Conversion:</strong> Non-<code>GRanges</code> inputs are converted via
+<code><a href="qseaTableToChrGRanges.html">qseaTableToChrGRanges()</a></code>.</p></li>
+<li><p><strong>Genome-aware defaults (GRCh38/hg38):</strong> Missing <code>TxDb</code>/<code>annoDb</code>/contexts
+are
 filled using the packages noted above when installed.</p></li>
 <li><p><strong>Seqlevels style:</strong> Output <code>seqnames</code> have the <code>"chr"</code> prefix removed
 (e.g., <code>"chr1"</code> → <code>"1"</code>).</p></li>
 <li><p><strong>ChIPseeker call:</strong> Uses <code>tssRegion = c(-2000, 500)</code>, <code>level = "transcript"</code>,
 <code>overlap = "all"</code>, <code>verbose = FALSE</code>.</p></li>
-<li><p><strong>Output columns:</strong> Includes <code>annotation</code> (full label), <code>shortAnno</code> (without the
+<li><p><strong>Output columns:</strong> Includes <code>annotation</code> (full label), <code>shortAnno</code>
+(without the
 trailing parenthetical), and—when contexts are provided—<code>landscape</code>
 (Island/Shore/Shelf/Open Sea) and <code>inFantom</code> (overlap count with FANTOM).</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/ChIPseeker/man/annotatePeak.html" class="external-link">ChIPseeker::annotatePeak()</a></code>, <code><a href="setMesaGenome.html">setMesaGenome()</a></code>, <code><a href="setMesaTxDb.html">setMesaTxDb()</a></code>, <code><a href="setMesaAnnoDb.html">setMesaAnnoDb()</a></code>,
+    <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/ChIPseeker/man/annotatePeak.html" class="external-link">ChIPseeker::annotatePeak()</a></code>, <code><a href="setMesaGenome.html">setMesaGenome()</a></code>, <code><a href="setMesaTxDb.html">setMesaTxDb()</a></code>,
+<code><a href="setMesaAnnoDb.html">setMesaAnnoDb()</a></code>,
 <code><a href="qseaTableToChrGRanges.html">qseaTableToChrGRanges()</a></code>, <code><a href="liftOverHg19.html">liftOverHg19()</a></code></p></div>
     </div>
 
