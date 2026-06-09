@@ -1,5 +1,7 @@
 test_that("Calculating DMRs", {
 
+    skip_long_checks()
+
     BiocParallel::SerialParam()
 
     randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
@@ -14,6 +16,9 @@ test_that("Calculating DMRs", {
             contrasts = tibble::tibble(sample1 = "Tumor", sample2 = "Normal")))
 
     expect_true(DMRdata %>% tibble::has_name(c("Tumor_vs_Normal_log2FC", "Tumor_vs_Normal_adjPval", "Tumor_vs_Normal_deltaBeta")) %>% all())
+    setMesaGenome(NULL)
+    setMesaTxDb(NULL)
+    setMesaAnnoDb(NULL)
     skip_if_not_installed("org.Hs.eg.db") # skip if org.Hs.eg.db not installed
     expect_error(annotatedData <- DMRdata %>% annotateWindows()) # expect error if no local or global genome specified
     expect_no_error(annotatedData <- DMRdata %>% annotateWindows(genome = "hg38")) # expect no error if genome set
@@ -171,7 +176,7 @@ test_that("plotting DMRs", {
 
     BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),

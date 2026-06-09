@@ -64,17 +64,17 @@ getPCA <- function(qseaSet,
 #' qseaSet.
 #' @family dimred-helpers
 #' @examples
-#' # Quick demo on a small synthetic qseaSet
-#' qsea::getExampleQseaSet(repl = 20) %>%
-#'     getUMAP()
+#' # Default UMAP
+#' exampleTumourNormal %>%
+#'     getUMAP(n_neighbors = 5)
 #'
 #' # Alter UMAP hyperparameters
-#' qsea::getExampleQseaSet(repl = 20) %>%
+#' exampleTumourNormal %>%
 #'     getUMAP(n_neighbors = 5, min_dist = 1)
 #'
 #' # Use top 500 most variable windows only
-#' qsea::getExampleQseaSet(repl = 20) %>%
-#'     getUMAP(topVarNum = 500)
+#' exampleTumourNormal %>%
+#'     getUMAP(n_neighbors = 5, topVarNum = 500)
 #' @export
 getUMAP <- function(qseaSet,
                     dataTable = NULL,

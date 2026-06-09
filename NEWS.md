@@ -1,5 +1,15 @@
 # mesa 0.99.2.9000
 
+## Documentation
+- Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples with 
+  `exampleTumourNormal`, removing slow synthetic data generation from 
+  `R CMD check` example runs.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- Wrapped `addNormalisation()` examples in `\donttest{}`: the function
+  requires windows across a range of CpG densities for background
+  estimation, which the pre-filtered example datasets do not provide.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+
 ## Bug Fixes
 - Fixed `plotly` PNG device error on headless build servers
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
@@ -8,6 +18,34 @@
   ([#75](https://github.com/cruk-mi/mesa/pull/75))
 - Restored vignette YAML front matter dropped during line-wrap reflow
   ([#76](https://github.com/cruk-mi/mesa/pull/76))
+- Fixed `R CMD check` TIMEOUT: `skip_long_checks()` read `options()`
+  instead of `getOption()`, so slow tests never skipped. Also set
+  `options(skip_long_checks = TRUE)` in `tests/testthat.R`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- Cut test runtime: memoised `qsea::getExampleQseaSet()` builds via
+  `cachedExampleQset()` (`helper-fixtures.R`) and gated the slowest
+  `test_that()` blocks behind `skip_long_checks()`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- Fixed `addHMMcopyCNV()`: replaced `qsea:::makeGenomeWindows()` with a
+  fixed-width `GRanges` reimplementation, correcting window widths and
+  boundaries.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- `addHyperStableFraction()` now uses `identical()` for the `BSgenome`
+  check, avoiding an "argument is of length zero" error when the
+  `BSgenome` parameter is missing (`NULL`).
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- `mixSamples()` now reports which sample name(s) are absent from the
+  `qseaSet` instead of a generic `stopifnot()` failure, restoring the
+  diagnostics lost when `qsea:::checkSamples()` was dropped.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- `mixThreeQsetSamples()` likewise now names the absent sample(s) rather
+  than failing with a generic `stopifnot()` message.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+- Resolved BiocCheck NOTEs: imported `qsea` via `@import`
+  (`R/mesa-package.R`), replaced all `qsea:::`/`janitor:::` calls with
+  public-API equivalents or inline slot assignments, and declared five
+  data-object names in `utils::globalVariables()`.
+  ([#77](https://github.com/cruk-mi/mesa/pull/77))
 
 ## Style
 - Standardized 4-space indentation throughout codebase per

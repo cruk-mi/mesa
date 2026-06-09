@@ -13,8 +13,6 @@
 #'   \item{ranges}{position on the chromosome}
 #' }
 #' @source
-#' \url{
 #' https://github.com/Boyle-Lab/Blacklist/blob/master/lists/
 #' hg38-blacklist.v2.bed.gz
-#' }
 "ENCODEbadRegions"

@@ -9,7 +9,7 @@
 #' @details
 #' - **Genome restriction.** Only supported for
 #' `"BSgenome.Hsapiens.NCBI.GRCh38"`; the function stops otherwise (checked via
-#'   `qsea:::getGenome()`).
+#'   `qsea::getParameters()`).
 #' - **Regions used.** Uses `mesa::hg38UltraStableProbes`, a GRCh38 set derived
 #'   from array data (*Edgar et al.*, 2014).
 #' - **Computation.** Windows overlapping the ultra-stable set are extracted,
@@ -74,7 +74,8 @@
 #' @export
 addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
 
-    if (qsea:::getGenome(qseaSet) != "BSgenome.Hsapiens.NCBI.GRCh38") {
+    bsgenome <- qsea::getParameters(qseaSet)[["BSgenome"]]
+    if (!identical(bsgenome, "BSgenome.Hsapiens.NCBI.GRCh38")) {
         stop(
             "This function is only currently defined for ",
             "BSgenome.Hsapiens.NCBI.GRCh38."

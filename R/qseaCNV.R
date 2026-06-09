@@ -125,10 +125,22 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
 
     # TODO something with zygosity
 
-    CNV_Regions <- qsea:::makeGenomeWindows(
-        qsea:::getGenome(qs),
-        as.character(qsea::getChrNames(qs)),
-        windowSize
+    .chr_len <- GenomeInfoDb::seqlengths(
+        BSgenome::getBSgenome(qsea::getParameters(qs)[["BSgenome"]])
+    )[as.character(qsea::getChrNames(qs))]
+    CNV_Regions <- GenomicRanges::GRanges(
+        seqnames = rep(factor(names(.chr_len)), floor(.chr_len / windowSize)),
+        ranges = IRanges::IRanges(
+            start = unlist(lapply(
+                .chr_len - windowSize + 1L,
+                function(end) seq(1L, end, by = windowSize)
+            )),
+            width = windowSize
+        ),
+        seqinfo = GenomeInfoDb::Seqinfo(
+            names(.chr_len), .chr_len, NA,
+            qsea::getParameters(qs)[["BSgenome"]]
+        )
     )
 
     # check that the hmmcopy objects are appropriate; each CNV_Region window
@@ -178,7 +190,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
     bamOutList <- BiocParallel::bplapply(
         X = qsea::getSampleTable(qs) %>% dplyr::pull(inputColumn),
         FUN = getBamCoveragePairedAndUnpairedR1,
-        BSgenome = qsea:::getGenome(qs),
+        BSgenome = qsea::getParameters(qs)[["BSgenome"]],
         regions = CNV_Regions,
         fragmentLength = fragmentLength,
         maxInsertSize = maxInsertSize,
@@ -197,7 +209,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
 
     rownames(libraries) <- qsea::getSampleTable(qs)$sample_name
 
-    qs <- qsea:::setLibrary(qs, "input_file", libraries)
+    qs@libraries[["input_file"]] <- libraries
 
     counts <- bamOutList %>%
         purrr::map_dfc(function(x) {
@@ -237,7 +249,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
     ) %>%
         purrr::reduce(plyranges::join_overlap_inner)
 
-    qs <- qsea:::setCNV(qs, mergedCNV)
+    qs@cnv <- mergedCNV
 
     if (length(qsea::getOffset(qs)) > 0 && !all(is.na(qsea::getOffset(qs))))
         warning("Consider recalculating offset based on new CNV values")

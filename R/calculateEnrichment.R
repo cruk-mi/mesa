@@ -589,7 +589,7 @@ addMedipsEnrichmentFactors <- function(
     chr.select = NULL, paired = TRUE,
     file_name = "file_name",
     nCores = 1) {
-    BSgenome <- qseaSet %>% qsea:::getGenome()
+    BSgenome <- qsea::getParameters(qseaSet)[["BSgenome"]]
 
     if (!requireNamespace("MEDIPS", quietly = TRUE)) {
         stop(

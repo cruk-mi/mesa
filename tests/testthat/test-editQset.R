@@ -1,6 +1,6 @@
 test_that("Filtering Qset works", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1000)
 
     expect_equal(randomSet %>%
         filter(stringr::str_detect(sample_name, "Sim7")) %>%
@@ -14,7 +14,7 @@ test_that("Filtering Qset works", {
 
 test_that("Changing Qset Windows", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
 
     regions <- qsea::getRegions(randomSet)[1:1000]
 
@@ -30,7 +30,7 @@ test_that("Changing Qset Windows", {
 
 test_that("Mutating Qset works", {
 
-    qseaSet <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000)
+    qseaSet <- cachedExampleQset(repl = 3, expSamplingDepth = 1000)
 
     sampTab <- qseaSet %>%
         mutate(newCol = ifelse(stringr::str_detect(sample_name, "Sim1"), "fish", "duck")) %>%
@@ -58,7 +58,7 @@ test_that("Mutating Qset works", {
 
 test_that("Join works", {
 
-    qseaSet <- qsea::getExampleQseaSet(repl = 3, expSamplingDepth = 1000)
+    qseaSet <- cachedExampleQset(repl = 3, expSamplingDepth = 1000)
 
     expect_true(
         "new" %in% (colnames(qseaSet %>% left_join(tibble(group = c("Tumor", "Normal"), new = 1:2)) %>% getSampleTable()))
@@ -75,7 +75,7 @@ test_that("Join works", {
 
 test_that("Sorting Qsets", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
 
     sortedSet <- randomSet %>%
         sort()
@@ -86,7 +86,7 @@ test_that("Sorting Qsets", {
 
 test_that("Combining Qsets", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1000)
 
     splitSet <- filter(randomSet, group == "Tumor") %>%
         combineQsets(filter(randomSet, group != "Tumor"))
@@ -103,7 +103,7 @@ test_that("Combining Qsets", {
 
 test_that("filterByOverlaps", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
 
     reducedGRanges <- randomSet %>% qsea::getRegions() %>% filter(start <= 1000000)
 
@@ -121,7 +121,7 @@ test_that("filterByOverlaps", {
 
 test_that("addLibraryInformation", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
 
     colNames <- randomSet %>%
         addLibraryInformation() %>%
@@ -136,7 +136,7 @@ test_that("addLibraryInformation", {
 
 test_that("renameSamples", {
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1000) %>%
         mutate(new_column = LETTERS[1:16])
 
     renamedSet <- randomSet %>%

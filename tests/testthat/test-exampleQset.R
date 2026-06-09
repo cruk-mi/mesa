@@ -119,6 +119,9 @@ test_that("Testing hg38 related annotation/plotting functions", {
 })
 
 test_that("Testing general functionality", {
+
+    skip_long_checks()
+
     randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",

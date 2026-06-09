@@ -91,6 +91,8 @@ test_that("PCAs", {
 
 test_that("UMAPs", {
 
+  skip_long_checks()
+
   set.seed(1)
   expect_no_error(obj1 <- exampleTumourNormal %>% getUMAP(n_neighbors = 5) )
   set.seed(1)

@@ -835,10 +835,12 @@ convertToArrayBetaTable <- function(qseaSet, arrayDetails = "Infinium450k") {
 
     if (is.character(arrayDetails)) {
     if (arrayDetails == "Infinium450k" &
-        qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.NCBI.GRCh38") {
+        qsea::getParameters(qseaSet)[["BSgenome"]] ==
+            "BSgenome.Hsapiens.NCBI.GRCh38") {
         arrayObject <- mesa::hg38_450kArrayGR
     } else if (arrayDetails == "Infinium450k" &
-        qsea:::getGenome(qseaSet) == "BSgenome.Hsapiens.UCSC.hg38") {
+        qsea::getParameters(qseaSet)[["BSgenome"]] ==
+            "BSgenome.Hsapiens.UCSC.hg38") {
         arrayObject <- mesa::hg38_450kArrayGR %>%
             tibble::as_tibble() %>%
             dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
