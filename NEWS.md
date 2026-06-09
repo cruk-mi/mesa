@@ -28,10 +28,7 @@
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - Fixed `addHMMcopyCNV()`: replaced `qsea:::makeGenomeWindows()` with a
   fixed-width `GRanges` reimplementation, correcting window widths and
-  boundaries. Also corrected the window-start `seq()` call, which passed
-  the chromosome length positionally to `from` while also naming
-  `from = 1L`, raising "formal argument 'from' matched by multiple actual
-  arguments".
+  boundaries.
   ([#77](https://github.com/cruk-mi/mesa/pull/77))
 - `addHyperStableFraction()` now uses `identical()` for the `BSgenome`
   check, avoiding an "argument is of length zero" error when the
