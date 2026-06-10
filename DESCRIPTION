@@ -37,7 +37,7 @@ Description: A package for the analysis of methylation enrichment sequencing
     functions for determining differentially methylated regions. Many functions 
     are provided for tidyverse style modification of the qseaSet objects 
     originally defined in 'qsea'. 
-License: GPL-3
+License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
