@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.3</span>
       </span>
     </div>
 
@@ -70,15 +70,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.99.2.9000" id="mesa-09929000">mesa 0.99.2.9000<a class="anchor" aria-label="anchor" href="#mesa-09929000"></a></h2>
+<h2 class="page-header" data-toc-text="0.99.3" id="mesa-0993">mesa 0.99.3<a class="anchor" aria-label="anchor" href="#mesa-0993"></a></h2>
 <div class="section level3">
-<h3 id="documentation-0-99-2-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-2-9000"></a></h3>
+<h3 id="documentation-0-99-3">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-3"></a></h3>
 <ul><li>Broadened licence from <code>GPL-3</code> to <code>GPL (&gt;=2)</code>. (<a href="https://github.com/cruk-mi/mesa/pull/80" class="external-link">#80</a>)</li>
 <li>Replaced <code><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">qsea::getExampleQseaSet()</a></code> calls in <code><a href="../reference/getDimRed.html">getUMAP()</a></code> examples with <code>exampleTumourNormal</code>, removing slow synthetic data generation from <code>R CMD check</code> example runs. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
 <li>Wrapped <code><a href="../reference/addNormalisation.html">addNormalisation()</a></code> examples in <code>\donttest{}</code>: the function requires windows across a range of CpG densities for background estimation, which the pre-filtered example datasets do not provide. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-99-2-9000">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-2-9000"></a></h3>
+<h3 id="bug-fixes-0-99-3">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-3"></a></h3>
 <ul><li>Fixed <code>plotly</code> PNG device error on headless build servers (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
 <li>Switched to <code>ragg_png</code> device in PCA vignette chunks to resolve Cairo/X11 dependency issues in CI (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
 <li>Restored vignette YAML front matter dropped during line-wrap reflow (<a href="https://github.com/cruk-mi/mesa/pull/76" class="external-link">#76</a>)</li>
@@ -94,7 +94,7 @@
 <li>Resolved BiocCheck NOTEs: imported <code>qsea</code> via <code>@import</code> (<code>R/mesa-package.R</code>), replaced all <code>qsea:::</code>/<code>janitor:::</code> calls with public-API equivalents or inline slot assignments, and declared five data-object names in <code><a href="https://rdrr.io/r/utils/globalVariables.html" class="external-link">utils::globalVariables()</a></code>. (<a href="https://github.com/cruk-mi/mesa/pull/77" class="external-link">#77</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="style-0-99-2-9000">Style<a class="anchor" aria-label="anchor" href="#style-0-99-2-9000"></a></h3>
+<h3 id="style-0-99-3">Style<a class="anchor" aria-label="anchor" href="#style-0-99-3"></a></h3>
 <ul><li>Standardized 4-space indentation throughout codebase per Bioconductor style guide (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
 <li>Added missing chunk labels to all vignettes (<a href="https://github.com/cruk-mi/mesa/pull/75" class="external-link">#75</a>)</li>
 <li>Wrapped all lines &gt; 80 characters across R sources, vignettes, and helpers to satisfy BiocCheck <code>LINE_LENGTH</code> notes; where <code>::</code> cannot be broken across lines, replaced long namespace-qualified names with <code><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getExportedValue()</a></code> (for annotation-package objects in <code>R/genome.R</code>, <code>R/qseaExtra.R</code>) and <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">utils::data()</a></code> (for package datasets in <code>R/calculateEnrichment.R</code>, <code>R/qseaExtra.R</code>) — both are semantically equivalent to <code>pkg::name</code> but can be formatted across multiple lines (<a href="https://github.com/cruk-mi/mesa/pull/76" class="external-link">#76</a>)</li>
