@@ -1,4 +1,4 @@
-# mesa 0.99.2.9000
+# mesa 0.99.3
 
 ## Documentation
 - Broadened licence from `GPL-3` to `GPL (>=2)`.
