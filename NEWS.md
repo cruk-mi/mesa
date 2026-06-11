@@ -1,10 +1,8 @@
 # mesa 0.99.2.9000
 
-## Miscellaneous
+## Documentation
 - Broadened licence from `GPL-3` to `GPL (>=2)`.
   ([#80](https://github.com/cruk-mi/mesa/pull/80))
-
-## Documentation
 - Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples with 
   `exampleTumourNormal`, removing slow synthetic data generation from 
   `R CMD check` example runs.
