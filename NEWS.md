@@ -1,5 +1,16 @@
 # mesa 0.99.3.9000
 
+## Bug Fixes
+- `calculateCGEnrichment()` (both `paired = TRUE` and `paired = FALSE`) and
+  `calculateCGEnrichmentGRanges()` now work in a fresh session. Previously they
+  called `MEDIPS::getPairedGRange()` / `MEDIPS::getGRange()` /
+  `MEDIPS::MEDIPS.getPositions()` via `::`, which relies on `GenomicRanges`
+  being attached to the search path and failed with
+  `could not find function "strand<-"` otherwise. Reads are now imported
+  directly with `Rsamtools` / `GenomicAlignments`, and CpG motif positions are
+  located with `Biostrings`; `calculateCGEnrichment()` no longer depends on
+  `MEDIPS`.
+
 ## Testing
 - Guarded the slowest still-running `testthat` blocks (annotation/heatmap and
   DMR-pipeline tests in `test-exampleQset.R`, the DMR plotting block in

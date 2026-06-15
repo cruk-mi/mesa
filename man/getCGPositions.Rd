@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateEnrichment.R
 \name{getCGPositions}
 \alias{getCGPositions}
-\title{Genomic positions of a motif (CG) from MEDIPS}
+\title{Genomic positions of a motif (CG)}
 \usage{
 getCGPositions(BSgenome, chr.select)
 }
@@ -10,23 +10,22 @@ getCGPositions(BSgenome, chr.select)
 \item{BSgenome}{Character(1). BSgenome package name.}
 
 \item{chr.select}{Character vector of chromosome names to include (e.g.,
-\code{paste0("chr", 1:22)}).}
+\code{paste0("chr", 1:22)}). If \code{NULL}, all chromosomes are used.}
 }
 \value{
 A \link[GenomicRanges]{GRanges-class} of motif positions.
 }
 \description{
-Convenience wrapper that returns genomic positions of the \code{"CG"} motif
-for the specified BSgenome and chromosomes, via
-\code{MEDIPS::MEDIPS.getPositions()}.
+Return the genomic positions of the \code{"CG"} dinucleotide for the
+specified BSgenome and chromosomes, located directly with \pkg{Biostrings}.
 }
 \examples{
-# Requires MEDIPS and a BSgenome package
+# Requires a BSgenome package
 # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
+#   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "chr22")
 # }
 }
 \seealso{
 \code{\link{calculateCGEnrichment}},
-\code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
+\code{\link{calculateCGEnrichmentGRanges}}, \pkg{Biostrings}
 }

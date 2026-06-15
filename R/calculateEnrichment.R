@@ -60,9 +60,10 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' CpG enrichment from a BAM file (MEDIPS-style)
 #'
 #' Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM
-#' file. Uses \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
-#' interrogate the reference genome. Optionally exports a fragment-length
-#' density plot (PDF) and a serialized RDS with the GRanges of reads.
+#' file. Reads are imported directly with \pkg{Rsamtools} /
+#' \pkg{GenomicAlignments}, and \pkg{Biostrings} is used to interrogate the
+#' reference genome. Optionally exports a fragment-length density plot (PDF) and
+#' a serialized RDS with the GRanges of reads.
 #'
 #' @param file `character(1)`
 #' Path to the BAM file.
@@ -80,24 +81,27 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'   **Default:** `NULL`.
 #'
 #' @param extend `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Extension length for unpaired reads.
+#' Extension length for single-end reads (used only when `paired = FALSE`):
+#' reads are resized to this length in the 5'->3' direction. Unused for paired
+#' reads.
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Shift applied to read positions.
+#' Offset applied to fragment/read positions.
 #'   **Default:** `0`.
 #'
 #' @param uniq `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Minimum mapping uniqueness.
+#' If non-zero, duplicate fragments are collapsed.
 #'   **Default:** `0`.
 #'
 #' @param chr.select `character()` or `NULL`
-#' Passed to [MEDIPS::getGRange()]. Subset of chromosomes to use.
+#' Subset of chromosomes to use.
 #'   **Default:** `NULL` (all chromosomes).
 #'
 #' @param paired `logical(1)`
-#' Whether BAM contains paired-end reads (passed to
-#' [MEDIPS::getPairedGRange()]).
+#' Whether the BAM contains paired-end reads. When `TRUE`, properly paired
+#' fragments are reconstructed from the template length; when `FALSE`, single
+#' reads are used (optionally extended via `extend`).
 #'   **Default:** `TRUE`.
 #'
 #' @return A `data.frame` with columns:
@@ -118,14 +122,12 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'
 #' @seealso
 #' [calculateCGEnrichmentGRanges()], [calculateGenomicCGDistribution()],
-#' \pkg{MEDIPS}, \pkg{BSgenome}
+#' \pkg{BSgenome}
 #'
 #'
 #' @examples
-#' if (requireNamespace("MEDIPS", quietly = TRUE) &&
-#'     requireNamespace("MEDIPSData", quietly = TRUE) &&
-#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
-#'     require("GenomicRanges", quietly = TRUE)) {
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
 #'     calculateCGEnrichment(
 #'         file = system.file(
 #'             "extdata",
@@ -143,12 +145,6 @@ calculateCGEnrichment <- function(
     file = NULL, BSgenome = NULL, exportPath = NULL,
     extend = 0, shift = 0, uniq = 0,
     chr.select = NULL, paired = TRUE) {
-    if (!requireNamespace("MEDIPS", quietly = TRUE)) {
-        stop(
-            "Package \"MEDIPS\" must be installed to use this function.",
-            call. = FALSE
-        )
-    }
 
     dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
 
@@ -169,14 +165,14 @@ calculateCGEnrichment <- function(
     }
 
     if (!paired) {
-        GRange.Reads <- MEDIPS::getGRange(
-            fileName, path, extend, shift, chr.select, dataset,
-            uniq, simpleCigar = FALSE
+        GRange.Reads <- readSingleEndFragments(
+            file = file, dataset = dataset, chr.select = chr.select,
+            extend = extend, shift = shift, uniq = uniq
         )
     } else {
-        GRange.Reads <- MEDIPS::getPairedGRange(
-            fileName, path, extend, shift, chr.select, dataset,
-            uniq, simpleCigar = FALSE
+        GRange.Reads <- readPairedFragments(
+            file = file, dataset = dataset, chr.select = chr.select,
+            shift = shift, uniq = uniq
         )
     }
 
@@ -295,28 +291,178 @@ calculateCGEnrichment <- function(
 }
 
 
-#' Genomic positions of a motif (CG) from MEDIPS
+#' Genomic positions of a motif (CG)
 #'
-#' Convenience wrapper that returns genomic positions of the \code{"CG"} motif
-#' for the specified BSgenome and chromosomes, via
-#' \code{MEDIPS::MEDIPS.getPositions()}.
+#' Return the genomic positions of the \code{"CG"} dinucleotide for the
+#' specified BSgenome and chromosomes, located directly with \pkg{Biostrings}.
 #'
 #' @param BSgenome Character(1). BSgenome package name.
 #' @param chr.select Character vector of chromosome names to include (e.g.,
-#' \code{paste0("chr", 1:22)}).
+#' \code{paste0("chr", 1:22)}). If \code{NULL}, all chromosomes are used.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of motif positions.
 #'
 #' @seealso \code{\link{calculateCGEnrichment}},
-#' \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
+#' \code{\link{calculateCGEnrichmentGRanges}}, \pkg{Biostrings}
 #'
 #' @examples
-#' # Requires MEDIPS and a BSgenome package
+#' # Requires a BSgenome package
 #' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
+#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "chr22")
 #' # }
 getCGPositions <- function(BSgenome, chr.select) {
-    MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
+    dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
+
+    chrs <- if (is.null(chr.select)) {
+        GenomeInfoDb::seqnames(dataset)
+    } else {
+        as.character(chr.select)
+    }
+
+    perChr <- lapply(chrs, function(chr) {
+        hits <- Biostrings::matchPattern("CG", dataset[[chr]])
+        GenomicRanges::GRanges(
+            chr,
+            IRanges::IRanges(start = BiocGenerics::start(hits), width = 2L)
+        )
+    })
+
+    do.call(c, perChr)
+}
+
+
+#' Import paired-end fragments from a BAM file
+#'
+#' Read the properly paired fragments from a BAM file and return them as a
+#' \link[GenomicRanges]{GRanges-class}, one range per fragment. Replaces the
+#' previous reliance on \code{MEDIPS::getPairedGRange()}, which is only usable
+#' when \pkg{GenomicRanges} happens to be attached to the search path.
+#'
+#' The forward read of each properly mapped pair is selected and the fragment
+#' span is reconstructed from its position and template length (\code{isize}),
+#' equivalent to \code{MEDIPS::getPairedGRange(uniq = 0)}.
+#'
+#' @param file Character(1). Path to the BAM file (must be indexed when
+#' \code{chr.select} is supplied).
+#' @param dataset A BSgenome object, used for chromosome lengths.
+#' @param chr.select Character vector of chromosomes to import, or \code{NULL}
+#' for all chromosomes.
+#' @param shift Integer(1). Optional offset applied to fragment coordinates.
+#' @param uniq Integer(1). If non-zero, duplicate fragments are collapsed.
+#'
+#' @return A \link[GenomicRanges]{GRanges-class} of fragment ranges.
+#'
+#' @keywords internal
+#' @noRd
+readPairedFragments <- function(file, dataset, chr.select = NULL,
+    shift = 0, uniq = 0) {
+
+    flag <- Rsamtools::scanBamFlag(
+        isPaired = TRUE, isProperPair = TRUE,
+        hasUnmappedMate = FALSE, isUnmappedQuery = FALSE
+    )
+    what <- c("strand", "rname", "pos", "isize")
+
+    if (is.null(chr.select)) {
+        param <- Rsamtools::ScanBamParam(what = what, flag = flag)
+    } else {
+        seqLengths <- GenomeInfoDb::seqlengths(dataset)
+        which <- GenomicRanges::GRanges(
+            as.character(chr.select),
+            IRanges::IRanges(
+                start = 1, end = seqLengths[as.character(chr.select)]
+            )
+        )
+        param <- Rsamtools::ScanBamParam(
+            what = what, flag = flag, which = which
+        )
+    }
+
+    readDF <- Rsamtools::scanBam(file = file, param = param) %>%
+        purrr::map_df(~ tibble::as_tibble(as.data.frame(.)))
+
+    fragments <- readDF %>%
+        dplyr::filter(strand == "+") %>%
+        dplyr::mutate(
+            seqnames = as.character(rname),
+            start = pos + shift,
+            end = pos + isize - 1 + shift,
+            strand = "*"
+        ) %>%
+        plyranges::as_granges()
+
+    if (uniq != 0) {
+        fragments <- BiocGenerics::unique(fragments)
+    }
+
+    fragments
+}
+
+
+#' Import single-end reads from a BAM file
+#'
+#' Read mapped single-end reads from a BAM file and return them as a
+#' \link[GenomicRanges]{GRanges-class}, one range per read. Replaces the
+#' previous reliance on \code{MEDIPS::getGRange()}, which is only usable when
+#' \pkg{GenomicRanges} happens to be attached to the search path.
+#'
+#' Read spans come from the alignment CIGAR. When \code{extend > 0}, reads are
+#' resized to that fragment length in the 5'->3' (strand-aware) direction,
+#' equivalent to \code{MEDIPS::getGRange()}.
+#'
+#' @param file Character(1). Path to the BAM file (must be indexed when
+#' \code{chr.select} is supplied).
+#' @param dataset A BSgenome object, used for chromosome lengths.
+#' @param chr.select Character vector of chromosomes to import, or \code{NULL}
+#' for all chromosomes.
+#' @param extend Integer(1). If non-zero, reads are extended to this length.
+#' @param shift Integer(1). Optional strand-aware offset applied to reads.
+#' @param uniq Integer(1). If non-zero, duplicate reads are collapsed.
+#'
+#' @return A \link[GenomicRanges]{GRanges-class} of read ranges.
+#'
+#' @keywords internal
+#' @noRd
+readSingleEndFragments <- function(file, dataset, chr.select = NULL,
+    extend = 0, shift = 0, uniq = 0) {
+
+    flag <- Rsamtools::scanBamFlag(isUnmappedQuery = FALSE)
+
+    if (is.null(chr.select)) {
+        param <- Rsamtools::ScanBamParam(flag = flag)
+    } else {
+        seqLengths <- GenomeInfoDb::seqlengths(dataset)
+        which <- GenomicRanges::GRanges(
+            as.character(chr.select),
+            IRanges::IRanges(
+                start = 1, end = seqLengths[as.character(chr.select)]
+            )
+        )
+        param <- Rsamtools::ScanBamParam(flag = flag, which = which)
+    }
+
+    reads <- GenomicRanges::granges(
+        GenomicAlignments::readGAlignments(file, param = param)
+    )
+
+    if (shift != 0) {
+        offsets <- ifelse(
+            BiocGenerics::strand(reads) == "-", -shift, shift
+        )
+        reads <- GenomicRanges::shift(reads, offsets)
+    }
+
+    if (extend > 0) {
+        reads <- GenomicRanges::resize(reads, width = extend, fix = "start")
+    }
+
+    BiocGenerics::strand(reads) <- "*"
+
+    if (uniq != 0) {
+        reads <- BiocGenerics::unique(reads)
+    }
+
+    reads
 }
 
 
