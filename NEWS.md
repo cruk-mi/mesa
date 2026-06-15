@@ -1,3 +1,14 @@
+# mesa 0.99.3.9000
+
+## Testing
+- Guarded the slowest still-running `testthat` blocks (annotation/heatmap and
+  DMR-pipeline tests in `test-exampleQset.R`, the DMR plotting block in
+  `test-DMRs.R`, and the PCA block in `test-pca.R`) with `skip_long_checks()`,
+  so they are skipped during `R CMD check`. This keeps the tests phase within
+  the Bioconductor 15-minute check limit; the blocks still run locally with
+  `options(skip_long_checks = FALSE)` and the same functions remain exercised
+  by the package's runnable examples.
+
 # mesa 0.99.3
 
 ## Documentation
