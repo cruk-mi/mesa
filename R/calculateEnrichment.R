@@ -171,8 +171,7 @@ calculateCGEnrichment <- function(
         )
     } else {
         GRange.Reads <- readPairedFragments(
-            file = file, dataset = dataset, chr.select = chr.select,
-            shift = shift, uniq = uniq
+            file = file, chr.select = chr.select, uniq = uniq
         )
     }
 
@@ -338,40 +337,37 @@ getCGPositions <- function(BSgenome, chr.select) {
 #' previous reliance on \code{MEDIPS::getPairedGRange()}, which is only usable
 #' when \pkg{GenomicRanges} happens to be attached to the search path.
 #'
-#' The forward read of each properly mapped pair is selected and the fragment
-#' span is reconstructed from its position and template length (\code{isize}),
-#' equivalent to \code{MEDIPS::getPairedGRange(uniq = 0)}.
+#' Mirrors \code{MEDIPS::getPairedGRange(uniq = 0)}: the first mate of each
+#' properly mapped pair is taken, and the fragment span is reconstructed from
+#' the leftmost of the read and its mate position plus the template length
+#' (\code{isize}). \code{shift} / \code{extend} are intentionally ignored for
+#' paired data (the true fragment span is known).
 #'
 #' @param file Character(1). Path to the BAM file (must be indexed when
 #' \code{chr.select} is supplied).
-#' @param dataset A BSgenome object, used for chromosome lengths.
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
-#' @param shift Integer(1). Optional offset applied to fragment coordinates.
 #' @param uniq Integer(1). If non-zero, duplicate fragments are collapsed.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of fragment ranges.
 #'
 #' @keywords internal
 #' @noRd
-readPairedFragments <- function(file, dataset, chr.select = NULL,
-    shift = 0, uniq = 0) {
+readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
 
     flag <- Rsamtools::scanBamFlag(
         isPaired = TRUE, isProperPair = TRUE,
-        hasUnmappedMate = FALSE, isUnmappedQuery = FALSE
+        hasUnmappedMate = FALSE, isUnmappedQuery = FALSE,
+        isFirstMateRead = TRUE, isSecondMateRead = FALSE
     )
-    what <- c("strand", "rname", "pos", "isize")
+    what <- c("rname", "pos", "strand", "isize", "mpos")
 
     if (is.null(chr.select)) {
         param <- Rsamtools::ScanBamParam(what = what, flag = flag)
     } else {
-        seqLengths <- GenomeInfoDb::seqlengths(dataset)
         which <- GenomicRanges::GRanges(
             as.character(chr.select),
-            IRanges::IRanges(
-                start = 1, end = seqLengths[as.character(chr.select)]
-            )
+            IRanges::IRanges(start = 1, end = 536870912)
         )
         param <- Rsamtools::ScanBamParam(
             what = what, flag = flag, which = which
@@ -382,11 +378,10 @@ readPairedFragments <- function(file, dataset, chr.select = NULL,
         purrr::map_df(~ tibble::as_tibble(as.data.frame(.)))
 
     fragments <- readDF %>%
-        dplyr::filter(strand == "+") %>%
         dplyr::mutate(
             seqnames = as.character(rname),
-            start = pos + shift,
-            end = pos + isize - 1 + shift,
+            start = pmin(pos, mpos),
+            end = pmin(pos, mpos) + abs(isize) - 1,
             strand = "*"
         ) %>%
         plyranges::as_granges()

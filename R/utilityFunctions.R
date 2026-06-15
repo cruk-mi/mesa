@@ -11,7 +11,7 @@ utils::globalVariables(c(
     "hyperStableFractionp8", "hyperStableFractionp9", "hyperStableEdgar",
     "isProperPair", "isUnmappedQuery", "isSupplementaryAlignment",
     "isDuplicate", "hasUnmappedMate",
-    "isNotPassingQualityControls", "rname", "pos", "isize", "MQ",
+    "isNotPassingQualityControls", "rname", "pos", "isize", "mpos", "MQ",
     "mapq", "isFirstMateRead", "isPaired",
     "cigar", ".rowID", "feature", "annoShort", "type", ".comparison",
     ".ext", ".value", "total_fragments",
