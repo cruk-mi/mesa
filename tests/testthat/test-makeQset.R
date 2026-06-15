@@ -199,6 +199,11 @@ test_that("calculateCGEnrichment works", {
         skip("MEDIPSData Not installed")
     }
 
+    # MEDIPS::getPairedGRange() uses strand<- without importing it, relying on
+    # GenomicRanges being attached (it is in MEDIPS's Depends). Calling MEDIPS
+    # via :: does not attach that dependency, so make it explicit here.
+    library(GenomicRanges)
+
     enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = NULL,
