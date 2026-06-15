@@ -12,7 +12,7 @@ utils::globalVariables(c(
     "isProperPair", "isUnmappedQuery", "isSupplementaryAlignment",
     "isDuplicate", "hasUnmappedMate",
     "isNotPassingQualityControls", "rname", "pos", "isize", "mpos", "MQ",
-    "mapq", "isFirstMateRead", "isPaired",
+    "qwidth", "mapq", "isFirstMateRead", "isPaired",
     "cigar", ".rowID", "feature", "annoShort", "type", ".comparison",
     ".ext", ".value", "total_fragments",
     "isSecondaryAlignment", "ROI_ID", "ID", "ENSEMBL", "deltaBeta",

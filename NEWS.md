@@ -7,11 +7,13 @@
   `MEDIPS::MEDIPS.getPositions()` via `::`, which relies on `GenomicRanges`
   being attached to the search path and failed with
   `could not find function "strand<-"` otherwise. Reads are now imported
-  directly with `Rsamtools` / `GenomicAlignments`, and CpG motif positions are
-  located with `Biostrings`; `calculateCGEnrichment()` no longer depends on
-  `MEDIPS`.
+  directly with `Rsamtools::scanBam` (paired and single-end), and CpG motif
+  positions are located with `Biostrings`; `calculateCGEnrichment()` no longer
+  depends on `MEDIPS`.
 
 ## Testing
+- Added a regression test for the single-end (`paired = FALSE`)
+  `calculateCGEnrichment()` path.
 - Guarded the slowest still-running `testthat` blocks (annotation/heatmap and
   DMR-pipeline tests in `test-exampleQset.R`, the DMR plotting block in
   `test-DMRs.R`, and the PCA block in `test-pca.R`) with `skip_long_checks()`,

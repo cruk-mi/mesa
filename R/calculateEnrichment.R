@@ -166,7 +166,7 @@ calculateCGEnrichment <- function(
 
     if (!paired) {
         GRange.Reads <- readSingleEndFragments(
-            file = file, dataset = dataset, chr.select = chr.select,
+            file = file, chr.select = chr.select,
             extend = extend, shift = shift, uniq = uniq
         )
     } else {
@@ -401,13 +401,12 @@ readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
 #' previous reliance on \code{MEDIPS::getGRange()}, which is only usable when
 #' \pkg{GenomicRanges} happens to be attached to the search path.
 #'
-#' Read spans come from the alignment CIGAR. When \code{extend > 0}, reads are
-#' resized to that fragment length in the 5'->3' (strand-aware) direction,
-#' equivalent to \code{MEDIPS::getGRange()}.
+#' Read spans are \code{[pos, pos + qwidth - 1]} (mirroring
+#' \code{MEDIPS::getGRange()}). When \code{extend > 0}, reads are resized to that
+#' length in the 5'->3' (strand-aware) direction.
 #'
 #' @param file Character(1). Path to the BAM file (must be indexed when
 #' \code{chr.select} is supplied).
-#' @param dataset A BSgenome object, used for chromosome lengths.
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
 #' @param extend Integer(1). If non-zero, reads are extended to this length.
@@ -418,27 +417,32 @@ readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
 #'
 #' @keywords internal
 #' @noRd
-readSingleEndFragments <- function(file, dataset, chr.select = NULL,
+readSingleEndFragments <- function(file, chr.select = NULL,
     extend = 0, shift = 0, uniq = 0) {
 
     flag <- Rsamtools::scanBamFlag(isUnmappedQuery = FALSE)
+    what <- c("rname", "pos", "strand", "qwidth")
 
     if (is.null(chr.select)) {
-        param <- Rsamtools::ScanBamParam(flag = flag)
+        param <- Rsamtools::ScanBamParam(what = what, flag = flag)
     } else {
-        seqLengths <- GenomeInfoDb::seqlengths(dataset)
         which <- GenomicRanges::GRanges(
             as.character(chr.select),
-            IRanges::IRanges(
-                start = 1, end = seqLengths[as.character(chr.select)]
-            )
+            IRanges::IRanges(start = 1, end = 536870912)
         )
-        param <- Rsamtools::ScanBamParam(flag = flag, which = which)
+        param <- Rsamtools::ScanBamParam(
+            what = what, flag = flag, which = which
+        )
     }
 
-    reads <- GenomicRanges::granges(
-        GenomicAlignments::readGAlignments(file, param = param)
-    )
+    reads <- Rsamtools::scanBam(file = file, param = param) %>%
+        purrr::map_df(~ tibble::as_tibble(as.data.frame(.))) %>%
+        dplyr::mutate(
+            seqnames = as.character(rname),
+            start = pos,
+            end = pos + qwidth - 1
+        ) %>%
+        plyranges::as_granges()
 
     if (shift != 0) {
         offsets <- ifelse(
