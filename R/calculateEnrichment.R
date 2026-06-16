@@ -60,10 +60,10 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' CpG enrichment from a BAM file (MEDIPS-style)
 #'
 #' Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM
-#' file. Reads are imported directly with \pkg{Rsamtools} /
-#' \pkg{GenomicAlignments}, and \pkg{Biostrings} is used to interrogate the
-#' reference genome. Optionally exports a fragment-length density plot (PDF) and
-#' a serialized RDS with the GRanges of reads.
+#' file. Reads are imported directly with \pkg{Rsamtools}, and
+#' \pkg{Biostrings} is used to interrogate the reference genome. Optionally
+#' exports a fragment-length density plot (PDF) and a serialized RDS with the
+#' GRanges of reads.
 #'
 #' @param file `character(1)`
 #' Path to the BAM file.
