@@ -217,6 +217,11 @@ test_that("calculateCGEnrichment works (single-end)", {
         skip("MEDIPSData Not installed")
     }
 
+    # The fresh-session failure (#81) only manifested when GenomicRanges was
+    # not attached to the search path. Assert that here so this regression
+    # test keeps exercising that failure mode regardless of test order.
+    expect_false("package:GenomicRanges" %in% search())
+
     enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = NULL,
