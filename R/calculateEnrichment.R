@@ -167,12 +167,16 @@ calculateCGEnrichment <- function(
     if (!paired) {
         GRange.Reads <- readSingleEndFragments(
             file = file, chr.select = chr.select,
-            extend = extend, shift = shift, uniq = uniq
+            extend = extend, shift = shift
         )
     } else {
         GRange.Reads <- readPairedFragments(
-            file = file, chr.select = chr.select, uniq = uniq
+            file = file, chr.select = chr.select
         )
+    }
+
+    if (uniq != 0) {
+        GRange.Reads <- BiocGenerics::unique(GRange.Reads)
     }
 
     ## Sort chromosomes
@@ -326,7 +330,7 @@ getCGPositions <- function(BSgenome, chr.select) {
         )
     })
 
-    do.call(c, perChr)
+    unlist(GenomicRanges::GRangesList(perChr), use.names = FALSE)
 }
 
 
@@ -347,13 +351,12 @@ getCGPositions <- function(BSgenome, chr.select) {
 #' \code{chr.select} is supplied).
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
-#' @param uniq Integer(1). If non-zero, duplicate fragments are collapsed.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of fragment ranges.
 #'
 #' @keywords internal
 #' @noRd
-readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
+readPairedFragments <- function(file, chr.select = NULL) {
 
     flag <- Rsamtools::scanBamFlag(
         isPaired = TRUE, isProperPair = TRUE,
@@ -375,9 +378,9 @@ readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
     }
 
     readDF <- Rsamtools::scanBam(file = file, param = param) %>%
-        purrr::map_df(~ tibble::as_tibble(as.data.frame(.)))
+        purrr::map_df(as.data.frame)
 
-    fragments <- readDF %>%
+    readDF %>%
         dplyr::mutate(
             seqnames = as.character(rname),
             start = pmin(pos, mpos),
@@ -385,12 +388,6 @@ readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
             strand = "*"
         ) %>%
         plyranges::as_granges()
-
-    if (uniq != 0) {
-        fragments <- BiocGenerics::unique(fragments)
-    }
-
-    fragments
 }
 
 
@@ -411,14 +408,13 @@ readPairedFragments <- function(file, chr.select = NULL, uniq = 0) {
 #' for all chromosomes.
 #' @param extend Integer(1). If non-zero, reads are extended to this length.
 #' @param shift Integer(1). Optional strand-aware offset applied to reads.
-#' @param uniq Integer(1). If non-zero, duplicate reads are collapsed.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of read ranges.
 #'
 #' @keywords internal
 #' @noRd
 readSingleEndFragments <- function(file, chr.select = NULL,
-    extend = 0, shift = 0, uniq = 0) {
+    extend = 0, shift = 0) {
 
     flag <- Rsamtools::scanBamFlag(isUnmappedQuery = FALSE)
     what <- c("rname", "pos", "strand", "qwidth")
@@ -436,7 +432,7 @@ readSingleEndFragments <- function(file, chr.select = NULL,
     }
 
     reads <- Rsamtools::scanBam(file = file, param = param) %>%
-        purrr::map_df(~ tibble::as_tibble(as.data.frame(.))) %>%
+        purrr::map_df(as.data.frame) %>%
         dplyr::mutate(
             seqnames = as.character(rname),
             start = pos,
@@ -452,14 +448,14 @@ readSingleEndFragments <- function(file, chr.select = NULL,
     }
 
     if (extend > 0) {
+        # resize() on a GRanges is strand-aware: fix = "start" extends from
+        # the 5' end regardless of strand (not the lower genomic
+        # coordinate), so this already matches the 5'->3' extension
+        # described above.
         reads <- GenomicRanges::resize(reads, width = extend, fix = "start")
     }
 
     BiocGenerics::strand(reads) <- "*"
-
-    if (uniq != 0) {
-        reads <- BiocGenerics::unique(reads)
-    }
 
     reads
 }

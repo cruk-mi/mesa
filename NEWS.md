@@ -1,26 +1,13 @@
 # mesa 0.99.3.9000
 
 ## Bug Fixes
-- `calculateCGEnrichment()` (both `paired = TRUE` and `paired = FALSE`) and
-  `calculateCGEnrichmentGRanges()` now work in a fresh session. Previously they
-  called `MEDIPS::getPairedGRange()` / `MEDIPS::getGRange()` /
-  `MEDIPS::MEDIPS.getPositions()` via `::`, which relies on `GenomicRanges`
-  being attached to the search path and failed with
-  `could not find function "strand<-"` otherwise. Reads are now imported
-  directly with `Rsamtools::scanBam` (paired and single-end), and CpG motif
-  positions are located with `Biostrings`; `calculateCGEnrichment()` no longer
-  depends on `MEDIPS`.
+- `calculateCGEnrichment()` and `calculateCGEnrichmentGRanges()` no longer
+  depend on `MEDIPS` and work correctly in a fresh session.
 
 ## Testing
-- Added a regression test for the single-end (`paired = FALSE`)
-  `calculateCGEnrichment()` path.
-- Guarded the slowest still-running `testthat` blocks (annotation/heatmap and
-  DMR-pipeline tests in `test-exampleQset.R`, the DMR plotting block in
-  `test-DMRs.R`, and the PCA block in `test-pca.R`) with `skip_long_checks()`,
-  so they are skipped during `R CMD check`. This keeps the tests phase within
-  the Bioconductor 15-minute check limit; the blocks still run locally with
-  `options(skip_long_checks = FALSE)` and the same functions remain exercised
-  by the package's runnable examples.
+- Added a regression test for the single-end `calculateCGEnrichment()` path.
+- Guarded the slowest `testthat` blocks with `skip_long_checks()` to keep
+  `R CMD check` within the Bioconductor 15-minute limit.
 
 # mesa 0.99.3
 
