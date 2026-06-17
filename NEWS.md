@@ -1,5 +1,8 @@
 # mesa 0.99.3.9000
 
+## Testing
+- Guarded the slowest `testthat` blocks with `skip_long_checks()` to keep
+  `R CMD check` within the Bioconductor 15-minute limit.
 
 # mesa 0.99.3
 
