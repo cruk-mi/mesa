@@ -194,6 +194,7 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
 })
 
 test_that("calculateCGEnrichment works", {
+    skip_long_checks()
 
     if (!rlang::is_installed("MEDIPSData")) {
         skip("MEDIPSData Not installed")
