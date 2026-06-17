@@ -2,8 +2,8 @@
 #' (GRCh38 only)
 #'
 #' For each sample, compute the proportion of *Edgar et al.* “ultra-stable”
-#' windows that are clearly methylated (beta ≥ `minBeta`) after filtering by
-#' CpG density (≥ `minDensity`). The result is added to the sample table as
+#' windows that are clearly methylated (beta >= `minBeta`) after filtering by
+#' CpG density (>= `minDensity`). The result is added to the sample table as
 #' `hyperStableEdgar` (overwriting any existing column of that name).
 #'
 #' @details
@@ -16,7 +16,7 @@
 #'   beta values are computed via `qsea::makeTable(norm_methods = "beta")`,
 #'   windows with `CpG_density < minDensity` are dropped, `NA` beta
 #'   are treated as `0` for thresholding, and the per-sample
-#'   fraction with beta ≥ `minBeta` is returned.
+#'   fraction with beta >= `minBeta` is returned.
 #'
 #' @param qseaSet `qseaSet`.
 #'   Input object (must be GRCh38).

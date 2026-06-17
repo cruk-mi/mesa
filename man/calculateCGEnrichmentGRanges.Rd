@@ -31,8 +31,8 @@ A \code{tibble} with one row and the following columns:
 \item \strong{GoGe} — sample GoGe normalised by genome GoGe.
 \item \strong{nReads} — total reads (fragments).
 \item \strong{nReadsWithoutPattern} — reads lacking \code{"CG"} motif.
-\item \strong{n100bpReads} — reads with length ≥ 100 bp.
-\item \strong{n100bpReadsWithoutPattern} — reads ≥ 100 bp lacking \code{"CG"}.
+\item \strong{n100bpReads} — reads with length >= 100 bp.
+\item \strong{n100bpReadsWithoutPattern} — reads >= 100 bp lacking \code{"CG"}.
 }
 }
 \description{
