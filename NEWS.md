@@ -3,6 +3,9 @@
 ## Testing
 - Guarded the slowest `testthat` blocks with `skip_long_checks()` to keep
   `R CMD check` within the Bioconductor 15-minute limit.
+- Added `skip_long_checks()` guard to the `calculateCGEnrichment` test, which
+  also fails in CI due to a missing `strand<-` in the MEDIPS namespace.
+  ([#799](https://github.com/cruk-mi/mesa/issues/799))
 
 # mesa 0.99.3
 
