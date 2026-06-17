@@ -1,5 +1,11 @@
 # mesa 0.99.3.9000
 
+## Bug Fixes
+- `calculateCGEnrichment()` no longer depends on `MEDIPS` and works correctly
+  in a fresh session where `GenomicRanges` is not already attached.
+- `calculateCGEnrichment()` no longer silently truncates reads on chromosomes
+  longer than 2^29 bp when `chr.select` is supplied.
+
 ## Testing
 - Guarded the slowest `testthat` blocks with `skip_long_checks()` to keep
   `R CMD check` within the Bioconductor 15-minute limit.
