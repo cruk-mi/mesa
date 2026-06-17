@@ -164,14 +164,22 @@ calculateCGEnrichment <- function(
         )
     }
 
+    chr.lengths <- if (!is.null(chr.select)) {
+        GenomeInfoDb::seqlengths(dataset)[chr.select]
+    } else {
+        NULL
+    }
+
     if (!paired) {
         GRange.Reads <- readSingleEndFragments(
             file = file, chr.select = chr.select,
+            chr.lengths = chr.lengths,
             extend = extend, shift = shift
         )
     } else {
         GRange.Reads <- readPairedFragments(
-            file = file, chr.select = chr.select
+            file = file, chr.select = chr.select,
+            chr.lengths = chr.lengths
         )
     }
 
@@ -351,12 +359,15 @@ getCGPositions <- function(BSgenome, chr.select) {
 #' \code{chr.select} is supplied).
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
+#' @param chr.lengths Named integer vector of chromosome lengths (one entry per
+#' element of \code{chr.select}), used as the upper bound of the scan range.
+#' Ignored when \code{chr.select} is \code{NULL}.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of fragment ranges.
 #'
 #' @keywords internal
 #' @noRd
-readPairedFragments <- function(file, chr.select = NULL) {
+readPairedFragments <- function(file, chr.select = NULL, chr.lengths = NULL) {
 
     flag <- Rsamtools::scanBamFlag(
         isPaired = TRUE, isProperPair = TRUE,
@@ -370,7 +381,7 @@ readPairedFragments <- function(file, chr.select = NULL) {
     } else {
         which <- GenomicRanges::GRanges(
             as.character(chr.select),
-            IRanges::IRanges(start = 1, end = 536870912)
+            IRanges::IRanges(start = 1, end = as.integer(chr.lengths))
         )
         param <- Rsamtools::ScanBamParam(
             what = what, flag = flag, which = which
@@ -406,6 +417,9 @@ readPairedFragments <- function(file, chr.select = NULL) {
 #' \code{chr.select} is supplied).
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
+#' @param chr.lengths Named integer vector of chromosome lengths (one entry per
+#' element of \code{chr.select}), used as the upper bound of the scan range.
+#' Ignored when \code{chr.select} is \code{NULL}.
 #' @param extend Integer(1). If non-zero, reads are extended to this length.
 #' @param shift Integer(1). Optional strand-aware offset applied to reads.
 #'
@@ -414,7 +428,7 @@ readPairedFragments <- function(file, chr.select = NULL) {
 #' @keywords internal
 #' @noRd
 readSingleEndFragments <- function(file, chr.select = NULL,
-    extend = 0, shift = 0) {
+    chr.lengths = NULL, extend = 0, shift = 0) {
 
     flag <- Rsamtools::scanBamFlag(isUnmappedQuery = FALSE)
     what <- c("rname", "pos", "strand", "qwidth")
@@ -424,7 +438,7 @@ readSingleEndFragments <- function(file, chr.select = NULL,
     } else {
         which <- GenomicRanges::GRanges(
             as.character(chr.select),
-            IRanges::IRanges(start = 1, end = 536870912)
+            IRanges::IRanges(start = 1, end = as.integer(chr.lengths))
         )
         param <- Rsamtools::ScanBamParam(
             what = what, flag = flag, which = which

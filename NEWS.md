@@ -3,6 +3,8 @@
 ## Bug Fixes
 - `calculateCGEnrichment()` and `calculateCGEnrichmentGRanges()` no longer
   depend on `MEDIPS` and work correctly in a fresh session.
+- `calculateCGEnrichment()` no longer silently truncates reads on chromosomes
+  longer than 2^29 bp when `chr.select` is supplied.
 
 ## Testing
 - Added a regression test for the single-end `calculateCGEnrichment()` path.
