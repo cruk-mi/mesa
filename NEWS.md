@@ -1,4 +1,4 @@
-# mesa 0.99.4
+# mesa 0.99.4.9000
 
 ## Testing
 - Guarded the slowest `testthat` blocks with `skip_long_checks()` to keep
