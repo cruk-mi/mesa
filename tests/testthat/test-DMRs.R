@@ -174,6 +174,8 @@ test_that("Calculating DMRs", {
 
 test_that("plotting DMRs", {
 
+    skip_long_checks()
+
     BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 
     randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
