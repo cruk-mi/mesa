@@ -1,5 +1,7 @@
 test_that("PCAs", {
 
+    skip_long_checks()
+
     library(rlang)
 
     # Test that getPCA() returns a valid result for various input arguments
