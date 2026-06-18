@@ -1,3 +1,11 @@
+# mesa 0.99.4.9000
+
+## Infrastructure
+- Bumped minimum R dependency to 4.6.0 and Bioconductor to 3.23.
+  Updated CI workflow (cache keys, Docker image, R version matrix) and
+  devcontainer `versions.env` accordingly.
+  ([#XX](https://github.com/cruk-mi/mesa/pull/XX))
+  
 # mesa 0.99.4
 
 ## Testing
