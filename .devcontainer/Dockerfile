@@ -56,7 +56,7 @@ RUN echo "Building ${VARIANT} image with R=${R_VERSION}, Bioc=${BIOC_VERSION}" \
       R_VERSION=${R_VERSION} \
       BIOC_VERSION=${BIOC_VERSION} \
       MESA_VARIANT=${VARIANT} \
-      /opt/conda/envs/mesa_env/bin/R -f .devcontainer/install.R; \
+      /opt/conda/envs/mesa_env/bin/Rscript .devcontainer/install.R; \
     fi \
  && conda clean -afy && mamba clean -afy
 
@@ -72,7 +72,7 @@ RUN if [ "${R_VERSION}" = "4.5" ] && [ "${BIOC_VERSION}" = "3.22" ]; then \
       mamba install -y -n mesa_env -c conda-forge \
         r-devtools r-roxygen2 r-rcmdcheck r-pkgload r-usethis; \
     else \
-      /opt/conda/envs/mesa_env/bin/R -e "install.packages(c('devtools','roxygen2','rcmdcheck','pkgload','usethis'), repos='https://cloud.r-project.org')"; \
+      /opt/conda/envs/mesa_env/bin/Rscript -e "install.packages(c('devtools','roxygen2','rcmdcheck','pkgload','usethis'), repos='https://cloud.r-project.org')"; \
     fi \
  && conda clean -afy && mamba clean -afy
 
