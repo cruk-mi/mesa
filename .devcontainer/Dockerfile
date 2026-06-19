@@ -35,17 +35,29 @@ RUN conda update -n base -c conda-forge conda -y \
 # Copy both package lists
 COPY .devcontainer/conda/package_list.slim.txt /opt/package_list.slim.txt
 COPY .devcontainer/conda/package_list.full.txt /opt/package_list.full.txt
-RUN cp /opt/package_list.${VARIANT}.txt /opt/package_list.txt \
- && echo "Using package list: /opt/package_list.${VARIANT}.txt" && head -n 40 /opt/package_list.txt
 
 # Create conda env — r-base version injected from ARG
 # Note: r-base is NOT in the package list files (see comment there)
-RUN cp /opt/package_list.${VARIANT}.txt /opt/package_list.txt \
- && echo "Building ${VARIANT} image with R=${R_VERSION}, Bioc=${BIOC_VERSION}" \
- && mamba create -vv -y -n mesa_env \
-      --override-channels -c conda-forge -c bioconda \
-      --file /opt/package_list.txt \
-      r-base=${R_VERSION} \
+RUN echo "Building ${VARIANT} image with R=${R_VERSION}, Bioc=${BIOC_VERSION}" \
+ && if [ "${R_VERSION}" = "4.5" ] && [ "${BIOC_VERSION}" = "3.22" ]; then \
+      cp /opt/package_list.${VARIANT}.txt /opt/package_list.txt \
+   && echo "Using package list: /opt/package_list.${VARIANT}.txt" \
+   && head -n 40 /opt/package_list.txt \
+   && mamba create -vv -y -n mesa_env \
+        --override-channels -c conda-forge -c bioconda \
+        --file /opt/package_list.txt \
+        r-base=${R_VERSION}; \
+    else \
+      echo "Falling back to source installs for R/Bioconductor packages" \
+   && mamba create -y -n mesa_env \
+        --override-channels -c conda-forge \
+        r-base=${R_VERSION} \
+   && export R_LIBS_USER=/opt/conda/envs/mesa_env/lib/R/library \
+        R_VERSION=${R_VERSION} \
+        BIOC_VERSION=${BIOC_VERSION} \
+        MESA_VARIANT=${VARIANT} \
+   && /opt/conda/envs/mesa_env/bin/R -f .devcontainer/install.R; \
+    fi \
  && conda clean -afy && mamba clean -afy
 
 # Write R and Bioc versions into the environment activation script
@@ -55,9 +67,13 @@ RUN mkdir -p /opt/conda/envs/mesa_env/etc/conda/activate.d \
       "${R_VERSION}" "${BIOC_VERSION}" \
       > /opt/conda/envs/mesa_env/etc/conda/activate.d/mesa_env_vars.sh
       
-# Dev tools via conda (both variants)
-RUN mamba install -y -n mesa_env -c conda-forge \
-      r-devtools r-roxygen2 r-rcmdcheck r-pkgload r-usethis \
+# Dev tools via conda when available; otherwise install from source
+RUN if [ "${R_VERSION}" = "4.5" ] && [ "${BIOC_VERSION}" = "3.22" ]; then \
+      mamba install -y -n mesa_env -c conda-forge \
+        r-devtools r-roxygen2 r-rcmdcheck r-pkgload r-usethis; \
+    else \
+      /opt/conda/envs/mesa_env/bin/R -e "install.packages(c('devtools','roxygen2','rcmdcheck','pkgload','usethis'), repos='https://cloud.r-project.org')"; \
+    fi \
  && conda clean -afy && mamba clean -afy
 
 # Put env on PATH
@@ -77,4 +93,3 @@ RUN useradd -m -s /bin/bash vscode \
 USER vscode
 WORKDIR /workspaces/mesa
 CMD ["R"]
-

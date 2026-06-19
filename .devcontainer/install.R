@@ -27,8 +27,9 @@ if (!dir.exists(user_lib)) {
 # Set by Dockerfile via conda activation script
 r_ver   <- Sys.getenv("R_VERSION",   unset = paste0(version$major, ".", substr(version$minor, 1, 1)))
 bioc_ver <- Sys.getenv("BIOC_VERSION", unset = "3.22")
+variant <- Sys.getenv("MESA_VARIANT", unset = "slim")
 
-message(sprintf("── Environment: R %s  |  Bioc %s ──────────────────", r_ver, bioc_ver))
+message(sprintf("── Environment: R %s  |  Bioc %s  |  Variant %s ──────────────────", r_ver, bioc_ver, variant))
 message(sprintf("── Installing to: %s", user_lib))
 
 # --- Package repositories -----------------------------------
@@ -103,6 +104,15 @@ install.packages(c(
 BiocManager::install(c(
   "plyranges", "ComplexHeatmap", "biomaRt", "circlize"
 ), lib = user_lib, ask = FALSE, update = FALSE)
+
+if (identical(variant, "full")) {
+  BiocManager::install(c(
+    "BSgenome.Hsapiens.NCBI.GRCh38",
+    "BSgenome.Hsapiens.UCSC.hg19",
+    "MEDIPSData",
+    "org.Hs.eg.db"
+  ), lib = user_lib, ask = FALSE, update = FALSE)
+}
 
 # --- ggtree (dev version) -----------------------------------
 # Requires ggplot2 >= 4.0.0 — confirmed available in Bioc 3.22
