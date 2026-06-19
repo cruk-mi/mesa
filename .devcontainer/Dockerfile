@@ -52,11 +52,11 @@ RUN echo "Building ${VARIANT} image with R=${R_VERSION}, Bioc=${BIOC_VERSION}" \
    && mamba create -y -n mesa_env \
         --override-channels -c conda-forge \
         r-base=${R_VERSION} \
-   && export R_LIBS_USER=/opt/conda/envs/mesa_env/lib/R/library \
-        R_VERSION=${R_VERSION} \
-        BIOC_VERSION=${BIOC_VERSION} \
-        MESA_VARIANT=${VARIANT} \
-   && /opt/conda/envs/mesa_env/bin/R -f .devcontainer/install.R; \
+   && R_LIBS_USER=/opt/conda/envs/mesa_env/lib/R/library \
+      R_VERSION=${R_VERSION} \
+      BIOC_VERSION=${BIOC_VERSION} \
+      MESA_VARIANT=${VARIANT} \
+      /opt/conda/envs/mesa_env/bin/R -f .devcontainer/install.R; \
     fi \
  && conda clean -afy && mamba clean -afy
 
