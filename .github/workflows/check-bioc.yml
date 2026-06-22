@@ -65,7 +65,7 @@ jobs:
       - name: Resolve versions
         id: parse
         run: |
-          bash .devcontainer/resolve_versions.sh >> "$GITHUB_ENV"
+          source <(bash .devcontainer/resolve_versions.sh | tee -a "$GITHUB_ENV")
           echo "r-version=${R_VERSION_FULL}" >> "$GITHUB_OUTPUT"
           echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
           echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
