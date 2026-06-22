@@ -3,13 +3,11 @@
 ## Infrastructure
 - Upgraded to R 4.6.0 and Bioconductor 3.23.
   ([#91](https://github.com/cruk-mi/mesa/pull/91))
-- Made `.devcontainer/versions.env` the single source of truth for CI:
-  `check-bioc.yml` derives the R version, Bioc version, and Docker tag from
-  it, so future upgrades only require editing that file.
-  ([#91](https://github.com/cruk-mi/mesa/pull/91))
-- Fixed the slim devcontainer build for R/Bioc releases not yet on conda by
-  falling back to source installs via `install.R`.
-  ([#91](https://github.com/cruk-mi/mesa/pull/91))
+- Re-based devcontainer (slim + full) on `bioconductor/bioconductor_docker`,
+  dropping conda; devcontainer and CI now share the same toolchain. The
+  `R (>=)` line in `DESCRIPTION` is the single source of truth: Bioc version
+  and image tag are derived automatically; upgrading R requires editing that
+  one line only.
   
 # mesa 0.99.4
 
