@@ -39,8 +39,8 @@ jobs:
           push: true
           tags: |
             ghcr.io/cruk-mi/mesa/devcontainer:${{ matrix.variant == 'slim' && 'codespaces-slim' || 'full' }}
-          cache-from: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache
-          cache-to: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache-${{ matrix.variant }}
+          cache-to: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache-${{ matrix.variant }},mode=max
       - name: Tag latest = codespaces-slim
         if: matrix.variant == 'slim'
         run: |
