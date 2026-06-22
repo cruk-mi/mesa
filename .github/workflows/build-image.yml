@@ -24,13 +24,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Load versions
-        run: |
-          set -a
-          source .devcontainer/versions.env
-          set +a
-          echo "R_VERSION=${R_VERSION}" >> $GITHUB_ENV
-          echo "BIOC_VERSION=${BIOC_VERSION}" >> $GITHUB_ENV
+      - name: Resolve versions
+        run: bash .devcontainer/resolve_versions.sh >> "$GITHUB_ENV"
       - name: Build & Push ${{ matrix.variant }}
         uses: docker/build-push-action@v6
         with:
@@ -40,6 +35,7 @@ jobs:
             VARIANT=${{ matrix.variant }}
             R_VERSION=${{ env.R_VERSION }}
             BIOC_VERSION=${{ env.BIOC_VERSION }}
+            BIOC_RELEASE=${{ env.BIOC_RELEASE }}
           push: true
           tags: |
             ghcr.io/cruk-mi/mesa/devcontainer:${{ matrix.variant == 'slim' && 'codespaces-slim' || 'full' }}

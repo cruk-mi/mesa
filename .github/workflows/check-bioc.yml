@@ -50,8 +50,9 @@ env:
   run_docker: 'true'
 
 jobs:
-  ## Derive the R and Bioconductor versions from the single source of truth
-  ## (.devcontainer/versions.env) so upgrades only require editing that file.
+  ## Resolve the R and Bioconductor versions from the single source of truth
+  ## (DESCRIPTION's `R (>=)` line) so upgrades only require editing that file.
+  ## resolve_versions.sh derives the Bioc version + Docker tag from R.
   read-versions:
     runs-on: ubuntu-latest
     outputs:
@@ -61,13 +62,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Parse versions.env
+      - name: Resolve versions
         id: parse
         run: |
-          set -a; source .devcontainer/versions.env; set +a
+          set -a; eval "$(bash .devcontainer/resolve_versions.sh)"; set +a
           echo "r-version=${R_VERSION}.0" >> "$GITHUB_OUTPUT"
           echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "bioc-release=RELEASE_${BIOC_VERSION/./_}" >> "$GITHUB_OUTPUT"
+          echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
 
   r-build-and-check:
     needs: read-versions
