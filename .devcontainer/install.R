@@ -88,8 +88,14 @@ for (pkg in c("devtools", "roxygen2", "rcmdcheck")) {
   if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
 }
 
-# ggtree dev version (needs ggplot2 >= 4.0.0) and immunedeconv from GitHub.
-remotes::install_github("YuLab-SMU/ggtree", upgrade = "never")
-remotes::install_github("omnideconv/immunedeconv", upgrade = "never")
+# ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases on GitHub,
+# pinned to a specific SHA for reproducibility.
+# immunedeconv is only available from GitHub; pinned to the SHA for v2.1.4.
+remotes::install_github("YuLab-SMU/ggtree",
+                        ref = "9f645a2b89e4150d9748547b3ea1b03906275c27",
+                        upgrade = "never")
+remotes::install_github("omnideconv/immunedeconv",
+                        ref = "e625e6c28ed14a30f9f40f159925cc9f0df4fa49",
+                        upgrade = "never")
 
 message("✅ mesa dependency stack ready")

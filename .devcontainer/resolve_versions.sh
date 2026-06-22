@@ -39,14 +39,20 @@ if [ -f "${versions_env}" ]; then
 fi
 
 # 2. R_VERSION from DESCRIPTION's "R (>= X.Y.Z)" -> "X.Y" unless overridden.
+#    R_VERSION_FULL preserves the full patch string (e.g. "4.6.0") so CI
+#    workflows don't need to hardcode a ".0" suffix.
 if [ -z "${R_VERSION:-}" ]; then
-    R_VERSION="$(grep -oE 'R \(>=[ ]*[0-9]+\.[0-9]+' "${description}" \
-        | grep -oE '[0-9]+\.[0-9]+' | head -1)"
+    R_VERSION_FULL="$(grep -oE 'R \(>=[ ]*[0-9]+\.[0-9]+(\.[0-9]+)?' "${description}" \
+        | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)"
+    R_VERSION="$(printf '%s\n' "${R_VERSION_FULL}" | grep -oE '^[0-9]+\.[0-9]+')"
 fi
 if [ -z "${R_VERSION:-}" ]; then
     echo "resolve_versions.sh: could not parse 'R (>= X.Y.Z)' from ${description}" >&2
     exit 1
 fi
+# If R_VERSION was provided via versions.env override, R_VERSION_FULL may be
+# unset; fall back to the bare major.minor in that case.
+: "${R_VERSION_FULL:=${R_VERSION}}"
 
 # 3. BIOC_VERSION: latest released Bioc for this R, from config.yaml,
 #    unless pinned via versions.env.
@@ -86,6 +92,7 @@ fi
 
 BIOC_RELEASE="RELEASE_${BIOC_VERSION/./_}"
 
-printf 'R_VERSION=%s\n'    "${R_VERSION}"
-printf 'BIOC_VERSION=%s\n' "${BIOC_VERSION}"
-printf 'BIOC_RELEASE=%s\n' "${BIOC_RELEASE}"
+printf 'R_VERSION=%s\n'      "${R_VERSION}"
+printf 'R_VERSION_FULL=%s\n' "${R_VERSION_FULL}"
+printf 'BIOC_VERSION=%s\n'   "${BIOC_VERSION}"
+printf 'BIOC_RELEASE=%s\n'   "${BIOC_RELEASE}"
