@@ -50,7 +50,27 @@ env:
   run_docker: 'true'
 
 jobs:
+  ## Derive the R and Bioconductor versions from the single source of truth
+  ## (.devcontainer/versions.env) so upgrades only require editing that file.
+  read-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      r-version: ${{ steps.parse.outputs.r-version }}
+      bioc-version: ${{ steps.parse.outputs.bioc-version }}
+      bioc-release: ${{ steps.parse.outputs.bioc-release }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Parse versions.env
+        id: parse
+        run: |
+          set -a; source .devcontainer/versions.env; set +a
+          echo "r-version=${R_VERSION}.0" >> "$GITHUB_OUTPUT"
+          echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "bioc-release=RELEASE_${BIOC_VERSION/./_}" >> "$GITHUB_OUTPUT"
+
   r-build-and-check:
+    needs: read-versions
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
     container: ${{ matrix.config.cont }}
@@ -60,7 +80,11 @@ jobs:
       fail-fast: true
       matrix:
         config:
-          - { os: ubuntu-latest, r: '4.6.0', bioc: '3.23', cont: "bioconductor/bioconductor_docker:RELEASE_3_23", rspm: "https://packagemanager.posit.co/cran/__linux__/jammy/latest" }
+          - os: ubuntu-latest
+            r: ${{ needs.read-versions.outputs.r-version }}
+            bioc: ${{ needs.read-versions.outputs.bioc-version }}
+            cont: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
+            rspm: "https://packagemanager.posit.co/cran/__linux__/jammy/latest"
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       RSPM: ${{ matrix.config.rspm }}
