@@ -1,3 +1,4 @@
+# check=skip=InvalidDefaultArgInFrom
 # ============================================================
 # Devcontainer image for mesa — slim and full variants.
 #
@@ -16,9 +17,7 @@
 # ARG before FROM is only usable in FROM; re-declare after FROM to reuse below.
 # No default: any hardcoded value would need updating on each Bioc upgrade,
 # breaking the single-file (DESCRIPTION-only) upgrade path. The workflow
-# always supplies BIOC_RELEASE via --build-arg; this directive silences the
-# resulting lint warning without affecting builds.
-# check=skip=InvalidDefaultArgInFrom
+# always supplies BIOC_RELEASE via --build-arg.
 ARG BIOC_RELEASE
 FROM bioconductor/bioconductor_docker:${BIOC_RELEASE}
 
