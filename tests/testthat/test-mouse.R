@@ -17,6 +17,9 @@ test_that("Mouse plotting", {
 
 test_that("Mouse annotation", {
 
+    skip_if_not_installed("TxDb.Mmusculus.UCSC.mm10.knownGene")
+    skip_if_not_installed("org.Mm.eg.db")
+
     # expect an error if global settings not set
     setMesaTxDb(NULL)
     setMesaAnnoDb(NULL)
