@@ -2,8 +2,13 @@
 
 ## Infrastructure
 - Bumped minimum R dependency to 4.6.0 and Bioconductor to 3.23.
-  Updated CI workflow (cache keys, Docker image, R version matrix) and
-  devcontainer `versions.env` accordingly.
+- Fixed the slim devcontainer build for R/Bioc releases not yet on conda:
+  for R >= 4.6 the Dockerfile skips the conda package list and installs R
+  packages from source via `install.R`.
+- Made `.devcontainer/versions.env` the true single source of truth for CI:
+  `check-bioc.yml` now derives the R version, Bioc version, and Docker
+  release tag from it via a `read-versions` pre-job, so future upgrades only
+  require editing `versions.env`.
   ([#XX](https://github.com/cruk-mi/mesa/pull/XX))
   
 # mesa 0.99.4
