@@ -36,6 +36,9 @@ RUN conda update -n base -c conda-forge conda -y \
 COPY .devcontainer/conda/package_list.slim.txt /opt/package_list.slim.txt
 COPY .devcontainer/conda/package_list.full.txt /opt/package_list.full.txt
 
+# Copy the source-install script (used by the R >= 4.6 fallback path below)
+COPY .devcontainer/install.R /opt/install.R
+
 # Create conda env — r-base version injected from ARG
 # Note: r-base is NOT in the package list files (see comment there)
 RUN echo "Building ${VARIANT} image with R=${R_VERSION}, Bioc=${BIOC_VERSION}" \
@@ -56,7 +59,7 @@ RUN echo "Building ${VARIANT} image with R=${R_VERSION}, Bioc=${BIOC_VERSION}" \
       R_VERSION=${R_VERSION} \
       BIOC_VERSION=${BIOC_VERSION} \
       MESA_VARIANT=${VARIANT} \
-      /opt/conda/envs/mesa_env/bin/Rscript .devcontainer/install.R; \
+      /opt/conda/envs/mesa_env/bin/Rscript /opt/install.R; \
     fi \
  && conda clean -afy && mamba clean -afy
 
