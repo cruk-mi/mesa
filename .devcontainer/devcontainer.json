@@ -11,8 +11,8 @@
         "ms-python.python"
       ],
       "settings": {
-        "r.rterm.linux": "/opt/conda/envs/mesa_env/bin/R",
-        "r.lsp.path": "/opt/conda/envs/mesa_env/bin/R",
+        "r.rterm.linux": "/usr/local/bin/R",
+        "r.lsp.path": "/usr/local/bin/R",
         "r.alwaysUseActiveTerminal": true,
         "r.bracketedPaste": true,
         "r.plot.devArgs": { "width": 1200, "height": 500 }
@@ -22,6 +22,5 @@
   "containerEnv": {
     "R_REMOTES_NO_ERRORS_FROM_WARNINGS": "true"
   },
-  "postCreateCommand": "R -e \"user_lib <- file.path(Sys.getenv('HOME'), 'R', paste0(version[['arch']], '-conda-linux-gnu-library'), paste0(version[['major']], '.', substr(version[['minor']], 1, 1))); if (!dir.exists(user_lib)) dir.create(user_lib, recursive = TRUE); .libPaths(c(user_lib, .libPaths())); source('.devcontainer/install.R'); remotes::install_local('.', upgrade='never', lib = user_lib)\"",
-  "postStartCommand": "source /opt/conda/etc/profile.d/conda.sh && conda activate mesa_env"
+  "postCreateCommand": "R -e \"remotes::install_local('.', upgrade = 'never', dependencies = FALSE)\""
 }
