@@ -24,10 +24,8 @@ FROM bioconductor/bioconductor_docker:${BIOC_RELEASE}
 # Variant selector: "slim" (default) or "full"
 ARG VARIANT=slim
 
-# Versions, for use inside the image (install.R reads these).
-ARG R_VERSION
+# Bioc version, for use inside the image (install.R reads BIOC_VERSION).
 ARG BIOC_VERSION
-ENV R_VERSION=${R_VERSION}
 ENV BIOC_VERSION=${BIOC_VERSION}
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 

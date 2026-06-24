@@ -2,7 +2,7 @@
 
 ## Infrastructure
 - Upgraded to R 4.6.0 and Bioconductor 3.23.
-  ([#91](https://github.com/cruk-mi/mesa/pull/91))
+  ([#92](https://github.com/cruk-mi/mesa/pull/92))
 - Re-based devcontainer (slim + full) on `bioconductor/bioconductor_docker`,
   dropping conda; devcontainer and CI now share the same toolchain. The
   `R (>=)` line in `DESCRIPTION` is the single source of truth: Bioc version

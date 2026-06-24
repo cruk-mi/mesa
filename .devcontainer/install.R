@@ -50,7 +50,7 @@ message(sprintf("✅ Bioconductor version: %s", BiocManager::version()))
 # builds (avoids compiling from source) — then the Bioc + CRAN repos
 # for the pinned Bioc version so every declared dependency is found.
 options(repos = c(
-  RSPM = "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+  RSPM = "https://packagemanager.posit.co/cran/__linux__/noble/latest",
   BiocManager::repositories()
 ))
 

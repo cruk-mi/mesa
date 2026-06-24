@@ -33,7 +33,6 @@ jobs:
           file: .devcontainer/Dockerfile
           build-args: |
             VARIANT=${{ matrix.variant }}
-            R_VERSION=${{ env.R_VERSION }}
             BIOC_VERSION=${{ env.BIOC_VERSION }}
             BIOC_RELEASE=${{ env.BIOC_RELEASE }}
           push: true

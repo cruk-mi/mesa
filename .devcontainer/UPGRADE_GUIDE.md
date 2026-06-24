@@ -122,7 +122,7 @@ bash .devcontainer/resolve_versions.sh
 > versions automatically once DESCRIPTION is updated.
 >
 > **RSPM Ubuntu codename:** the only value still hardcoded is the `rspm` URL
-> codename (`jammy`) in `check-bioc.yml` and `install.R`. It tracks the Bioc
+> codename (`noble`) in `check-bioc.yml` and `install.R`. It tracks the Bioc
 > Docker base image's Ubuntu version, not the R/Bioc version. Only change it if
 > the base image changed Ubuntu (focal = 20.04, jammy = 22.04, noble = 24.04).
 
