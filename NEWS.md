@@ -8,6 +8,7 @@
   `R (>=)` line in `DESCRIPTION` is the single source of truth: Bioc version
   and image tag are derived automatically; upgrading R requires editing that
   one line only.
+  ([#92](https://github.com/cruk-mi/mesa/pull/92))
   
 # mesa 0.99.4
 
