@@ -4,8 +4,8 @@
 #
 # Single place that maps R -> Bioconductor for the whole repo.
 #
-# It prints three KEY=VALUE lines (R_VERSION, BIOC_VERSION,
-# BIOC_RELEASE) that can be appended to $GITHUB_OUTPUT /
+# It prints four KEY=VALUE lines (R_VERSION, R_VERSION_FULL,
+# BIOC_VERSION, BIOC_RELEASE) that can be appended to $GITHUB_OUTPUT /
 # $GITHUB_ENV in CI, or read locally.
 #
 # Resolution order (DESCRIPTION is the single source of truth):
@@ -64,7 +64,11 @@ if [ -z "${BIOC_VERSION:-}" ]; then
 
     # Newest released Bioc; anything above it is devel and excluded.
     release_version="$(printf '%s\n' "${config}" \
-        | grep -E '^release_version:' | grep -oE '[0-9]+\.[0-9]+' | head -1)"
+        | grep -E '^release_version:' | grep -oE '[0-9]+\.[0-9]+' | head -1 || true)"
+    if [ -z "${release_version}" ]; then
+        echo "resolve_versions.sh: could not parse 'release_version' from ${config_url} (config.yaml format may have changed)" >&2
+        exit 1
+    fi
 
     # Bioc versions mapped to this R, from the r_ver_for_bioc_ver: block.
     # Lines look like:  "3.23": "4.6"   (key = Bioc, value = R).
