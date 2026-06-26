@@ -180,7 +180,7 @@ mutate.qseaSet <- function(.data, ...) {
 #'   **Default:** `NULL` (deferred to [dplyr::left_join()] behaviour).
 #'
 #' @param ... Additional arguments passed to [dplyr::left_join()],
-#'   e.g. `relationship = "one-to-one"` (dplyr ≥ 1.1).
+#'   e.g. `relationship = "one-to-one"` (dplyr >= 1.1).
 #'   **Default:** none.
 #'
 #' @return A `qseaSet` object with its `sampleTable` updated:

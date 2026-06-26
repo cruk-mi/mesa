@@ -1,4 +1,13 @@
-# mesa 0.99.4.9000
+# mesa 0.99.4.9000 
+
+## Documentation
+- Replaced Unicode math symbols (`≥`, `≤`, `∈`) with ASCII equivalents (`>=`,
+  `<=`, `in`) in roxygen2 comments and `.Rd` files to fix LaTeX errors in the
+  PDF manual.
+  ([#88](https://github.com/cruk-mi/mesa/pull/88))
+- Wrapped the `summariseDMRsByGene()` example in `\donttest{}` to keep
+  `R CMD check` within the 10-minute limit (~52 s saved).
+  ([#88](https://github.com/cruk-mi/mesa/pull/88))
 
 ## Infrastructure
 - Upgraded to R 4.6.0 and Bioconductor 3.23.

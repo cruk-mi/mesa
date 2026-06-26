@@ -28,8 +28,8 @@ windows called methylated.
 }
 \description{
 For each sample, compute the proportion of \emph{Edgar et al.} “ultra-stable”
-windows that are clearly methylated (beta ≥ \code{minBeta}) after filtering by
-CpG density (≥ \code{minDensity}). The result is added to the sample table as
+windows that are clearly methylated (beta >= \code{minBeta}) after filtering by
+CpG density (>= \code{minDensity}). The result is added to the sample table as
 \code{hyperStableEdgar} (overwriting any existing column of that name).
 }
 \details{
@@ -43,7 +43,7 @@ from array data (\emph{Edgar et al.}, 2014).
 beta values are computed via \code{qsea::makeTable(norm_methods = "beta")},
 windows with \code{CpG_density < minDensity} are dropped, \code{NA} beta
 are treated as \code{0} for thresholding, and the per-sample
-fraction with beta ≥ \code{minBeta} is returned.
+fraction with beta >= \code{minBeta} is returned.
 }
 }
 \examples{

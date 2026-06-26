@@ -80,7 +80,7 @@ if there are 50\% of the total fragments in the windows present in the current
 samples, 0.5*\code{nReadsTotal} fragments will be sampled.
 \itemize{
 \item Validates that \code{sample1}, \code{sample2}, \code{sample3} exist; \code{nReadsTotal >= 0};
-\verb{proportion1, proportion2 ∈ [0, 1]}; and \verb{proportion1 + proportion2 ≤ 1}.
+\verb{proportion1, proportion2 in [0, 1]}; and \code{proportion1 + proportion2 < 1}.
 \item The mixing strategy follows the package implementation (proportional
 allocation / sampling); use \code{renormalise = TRUE} if downstream steps rely on
 offsets/enrichment being recomputed.
