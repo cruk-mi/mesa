@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.4.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.5</span>
       </span>
     </div>
 
@@ -70,16 +70,17 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.99.4.9000" id="mesa-09949000">mesa 0.99.4.9000<a class="anchor" aria-label="anchor" href="#mesa-09949000"></a></h2>
+<h2 class="page-header" data-toc-text="0.99.5" id="mesa-0995">mesa 0.99.5<a class="anchor" aria-label="anchor" href="#mesa-0995"></a></h2>
 <div class="section level3">
-<h3 id="documentation-0-99-4-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-4-9000"></a></h3>
+<h3 id="documentation-0-99-5">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-5"></a></h3>
 <ul><li>Replaced Unicode math symbols (<code>≥</code>, <code>≤</code>, <code>∈</code>) with ASCII equivalents (<code>&gt;=</code>, <code>&lt;=</code>, <code>in</code>) in roxygen2 comments and <code>.Rd</code> files to fix LaTeX errors in the PDF manual. (<a href="https://github.com/cruk-mi/mesa/pull/88" class="external-link">#88</a>)</li>
 <li>Wrapped the <code><a href="../reference/summariseDMRsByGene.html">summariseDMRsByGene()</a></code> example in <code>\donttest{}</code> to keep <code>R CMD check</code> within the 10-minute limit (~52 s saved). (<a href="https://github.com/cruk-mi/mesa/pull/88" class="external-link">#88</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="infrastructure-0-99-4-9000">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-4-9000"></a></h3>
+<h3 id="infrastructure-0-99-5">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-5"></a></h3>
 <ul><li>Upgraded to R 4.6.0 and Bioconductor 3.23. (<a href="https://github.com/cruk-mi/mesa/pull/92" class="external-link">#92</a>)</li>
 <li>Re-based devcontainer (slim + full) on <code>bioconductor/bioconductor_docker</code>, dropping conda; devcontainer and CI now share the same toolchain. The <code>R (&gt;=)</code> line in <code>DESCRIPTION</code> is the single source of truth: Bioc version and image tag are derived automatically; upgrading R requires editing that one line only. (<a href="https://github.com/cruk-mi/mesa/pull/92" class="external-link">#92</a>)</li>
+<li>Bumped all GitHub Actions to Node 24-compatible releases, clearing the Node 20 deprecation warnings on the devcontainer image build. (<a href="https://github.com/cruk-mi/mesa/pull/93" class="external-link">#93</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
