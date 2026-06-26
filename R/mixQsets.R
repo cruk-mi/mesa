@@ -301,7 +301,7 @@ mixSamples <- function(
 #'
 #' @details
 #' * Validates that `sample1`, `sample2`, `sample3` exist; `nReadsTotal >= 0`;
-#' `proportion1, proportion2 in [0, 1]`; and `proportion1 + proportion2 <= 1`.
+#' `proportion1, proportion2 in [0, 1]`; and `proportion1 + proportion2 < 1`.
 #' * The mixing strategy follows the package implementation (proportional
 #' allocation / sampling); use `renormalise = TRUE` if downstream steps rely on
 #' offsets/enrichment being recomputed.
