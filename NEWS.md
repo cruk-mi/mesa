@@ -9,6 +9,16 @@
   `R CMD check` within the 10-minute limit (~52 s saved).
   ([#88](https://github.com/cruk-mi/mesa/pull/88))
 
+## Infrastructure
+- Upgraded to R 4.6.0 and Bioconductor 3.23.
+  ([#92](https://github.com/cruk-mi/mesa/pull/92))
+- Re-based devcontainer (slim + full) on `bioconductor/bioconductor_docker`,
+  dropping conda; devcontainer and CI now share the same toolchain. The
+  `R (>=)` line in `DESCRIPTION` is the single source of truth: Bioc version
+  and image tag are derived automatically; upgrading R requires editing that
+  one line only.
+  ([#92](https://github.com/cruk-mi/mesa/pull/92))
+  
 # mesa 0.99.4
 
 ## Testing

@@ -24,13 +24,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Load versions
-        run: |
-          set -a
-          source .devcontainer/versions.env
-          set +a
-          echo "R_VERSION=${R_VERSION}" >> $GITHUB_ENV
-          echo "BIOC_VERSION=${BIOC_VERSION}" >> $GITHUB_ENV
+      - name: Resolve versions
+        run: bash .devcontainer/resolve_versions.sh >> "$GITHUB_ENV"
       - name: Build & Push ${{ matrix.variant }}
         uses: docker/build-push-action@v6
         with:
@@ -38,13 +33,13 @@ jobs:
           file: .devcontainer/Dockerfile
           build-args: |
             VARIANT=${{ matrix.variant }}
-            R_VERSION=${{ env.R_VERSION }}
             BIOC_VERSION=${{ env.BIOC_VERSION }}
+            BIOC_RELEASE=${{ env.BIOC_RELEASE }}
           push: true
           tags: |
             ghcr.io/cruk-mi/mesa/devcontainer:${{ matrix.variant == 'slim' && 'codespaces-slim' || 'full' }}
-          cache-from: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache
-          cache-to: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache-${{ matrix.variant }}
+          cache-to: type=registry,ref=ghcr.io/cruk-mi/mesa/devcontainer:cache-${{ matrix.variant }},mode=max
       - name: Tag latest = codespaces-slim
         if: matrix.variant == 'slim'
         run: |

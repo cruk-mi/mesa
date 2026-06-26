@@ -5,8 +5,8 @@
 #          are available in the target Bioconductor version.
 #
 # Usage:
-#   Rscript .devcontainer/check_bioc_compat.R 3.22
-#   Rscript .devcontainer/check_bioc_compat.R 3.23
+#   Rscript .devcontainer/check_bioc_compat.R <bioc_version>
+#   e.g. Rscript .devcontainer/check_bioc_compat.R 3.23
 # ============================================================
 
 # --- Setup --------------------------------------------------

@@ -1,38 +1,56 @@
 # MESA R Version Upgrade Guide
 
-> **Who this is for:** anyone upgrading MESA to a new R / Bioconductor release.  
-> **Time required:** ~2–3 hours (most of which is `devtools::check()` running unattended).  
+> **Who this is for:** anyone upgrading MESA to a new R / Bioconductor release.
+> **Time required:** ~2–3 hours (most of which is `devtools::check()` running unattended).
 > **When to do it:** when a new Bioconductor release is announced. Check dates at
 > https://bioconductor.org/about/release-announcements/
 
 ---
 
-## Version map
+## TL;DR — what you actually edit
+
+```
+DESCRIPTION   ← bump the one line:  R (>= X.Y.0)
+```
+
+**That's it.** Everything else derives from that single line:
+
+- `.devcontainer/resolve_versions.sh` parses `R (>= X.Y.0)` from `DESCRIPTION`,
+  then looks up the latest *released* Bioconductor for that R version from
+  Bioconductor's published `config.yaml`.
+- **CI** (`check-bioc.yml`) and the **devcontainer image build**
+  (`build-image.yml`) both call that resolver, so they pick the right R, the
+  right Bioc, and the right `bioconductor/bioconductor_docker:RELEASE_X_Y` base
+  image automatically.
+- Both devcontainer variants (`slim`, `full`) install mesa's dependencies
+  straight from `DESCRIPTION`, so the package list is never edited by hand.
+
+### Optional: pinning a specific Bioconductor version
+
+Each R version covers **two** Bioc releases (e.g. R 4.6 ↔ Bioc 3.23 and 3.24).
+By default the resolver picks the **newest released** one. To stay on an older
+Bioc while a newer one exists, uncomment a line in `.devcontainer/versions.env`:
+
+```bash
+BIOC_VERSION=3.23   # pin; otherwise auto-derived from DESCRIPTION
+```
+
+---
+
+## Version map (reference only — you do not edit this)
 
 | R version | Bioconductor    | Status              |
 |-----------|-----------------|---------------------|
 | 4.3       | 3.17 / 3.18     | superseded          |
 | 4.4       | 3.19 / 3.20     | superseded          |
-| 4.5       | 3.21 / **3.22** | **current**         |
-| 4.6       | 3.23            | ~April 29 2026      |
+| 4.5       | 3.21 / 3.22     | superseded          |
+| 4.6       | 3.23 / 3.24     | current             |
 
 **Rules:**
-- Each R version covers two Bioc releases. Always use the latest Bioc for a given R.
+- Each R version covers two Bioc releases. The resolver uses the latest released
+  one unless you pin (see above).
 - Bioconductor releases in April and October. R major releases happen once per year.
 - Do not upgrade mid-project. Coordinate with the team before starting.
-
----
-
-## Files you will touch
-
-```
-DESCRIPTION                              ← bump R (>= X.X.0)
-.devcontainer/versions.env               ← bump R_VERSION and BIOC_VERSION
-.github/workflows/check-bioc.yml         ← bump R version and Bioc Docker image tag
-```
-
-Everything else (Dockerfile, package lists, install.R, build-image.yml) reads from
-`versions.env` automatically - you should not need to edit them.
 
 ---
 
@@ -43,9 +61,6 @@ every DESCRIPTION dependency is available.
 
 ```bash
 Rscript .devcontainer/check_bioc_compat.R <new_bioc_version>
-
-# Example:
-Rscript .devcontainer/check_bioc_compat.R 3.23
 ```
 
 ### Reading the output
@@ -60,40 +75,15 @@ Rscript .devcontainer/check_bioc_compat.R 3.23
 
 ```bash
 # 1. Check if it was renamed - scan the Bioc release notes
-#    https://bioconductor.org/news/bioc_X.XX_release/
+#    https://bioconductor.org/news/
 
-# 2. Check if it's available on bioconda under a different name
-mamba search -c bioconda <package_name>
-
-# 3. If it's genuinely dropped, consider moving it from Imports → Suggests
+# 2. If it's genuinely dropped, consider moving it from Imports → Suggests
 #    in DESCRIPTION (only if it's not called in every workflow)
 ```
 
 ---
 
-## Step 2 - Verify R is available on your system (5 min)
-
-### HPC
-
-```bash
-module avail R
-
-# Load the new version
-module load R/4.6.0       # adjust as needed
-R --version               # confirm version
-```
-
-If the module is not available yet, ask your sysadmin. Do not proceed until
-the new R is properly installed - do not try to install R yourself on a shared HPC.
-
-### Codespaces / local
-
-The container will be rebuilt automatically in Step 7 once you update `versions.env`.
-You do not need to install R manually.
-
----
-
-## Step 3 - Create a branch (2 min)
+## Step 2 - Create a branch (2 min)
 
 Always work on a dedicated branch. Never upgrade directly on `dev` or `main`.
 
@@ -101,104 +91,67 @@ Always work on a dedicated branch. Never upgrade directly on `dev` or `main`.
 git checkout dev
 git pull origin dev
 git checkout -b update_to_R_<version>
-
-# Example:
-git checkout -b update_to_R_4.6
 ```
 
 ---
 
-## Step 4 - Update DESCRIPTION (2 min)
+## Step 3 - Update DESCRIPTION (2 min)
 
 One line change only:
 
 ```bash
-# Replace old R version constraint with new one
+# Replace the old R version constraint with the new one (example):
 sed -i 's/R (>= 4.5.0)/R (>= 4.6.0)/' DESCRIPTION
 
 # Verify
 grep "R (>=" DESCRIPTION
 ```
 
-Expected output:
-```
-    R (>= 4.6.0),
-```
-
----
-
-## Step 5 - Update versions.env (2 min)
-
-This is the single source of truth. Changing this file triggers the Docker
-image rebuild in CI.
+Then confirm the whole toolchain resolves correctly from that one edit:
 
 ```bash
-sed -i 's/R_VERSION=4.5/R_VERSION=4.6/' .devcontainer/versions.env
-sed -i 's/BIOC_VERSION=3.22/BIOC_VERSION=3.23/' .devcontainer/versions.env
-
-# Verify
-cat .devcontainer/versions.env
+bash .devcontainer/resolve_versions.sh
+# Expected (example):
+#   R_VERSION=4.6
+#   BIOC_VERSION=3.23
+#   BIOC_RELEASE=RELEASE_3_23
 ```
 
-Expected output:
-```
-R_VERSION=4.6
-BIOC_VERSION=3.23
-IMAGE_TAG_SLIM=codespaces-slim
-IMAGE_TAG_FULL=full
-```
+> **CI and the image build need no edits.** `check-bioc.yml` and
+> `build-image.yml` both call `resolve_versions.sh`, so they pick up the new
+> versions automatically once DESCRIPTION is updated.
+>
+> **RSPM Ubuntu codename:** the only value still hardcoded is the `rspm` URL
+> codename (`noble`) in `check-bioc.yml` and `install.R`. It tracks the Bioc
+> Docker base image's Ubuntu version, not the R/Bioc version. Only change it if
+> the base image changed Ubuntu (focal = 20.04, jammy = 22.04, noble = 24.04).
 
 ---
 
-## Step 6 - Update CI workflow (2 min)
-
-`check-bioc.yml` has the R version and Bioc Docker image tag hardcoded
-in the matrix config. Update both:
-
-```bash
-# Update R version
-sed -i "s/r: '4.5.1'/r: '4.6.0'/" .github/workflows/check-bioc.yml
-
-# Update Bioc Docker image tag
-sed -i 's/RELEASE_3_22/RELEASE_3_23/' .github/workflows/check-bioc.yml
-
-# Update RSPM URL Ubuntu codename if needed (check Bioc Docker image release notes)
-# focal = Ubuntu 20.04, jammy = Ubuntu 22.04, noble = Ubuntu 24.04
-# Only change this if the Bioc Docker base image changed Ubuntu version
-sed -i 's/jammy/jammy/' .github/workflows/check-bioc.yml   # no-op if unchanged
-
-# Verify
-grep -E "r:|bioc:|cont:|rspm:" .github/workflows/check-bioc.yml
-```
-
----
-
-## Step 7 - Update your R library on HPC (20 min)
+## Step 4 - Update your R library on HPC (20 min)
 
 On the HPC with the new R loaded:
 
 ```r
-# Set Bioc to the new version
+# Set Bioc to the new version (use the version resolve_versions.sh reported)
 BiocManager::install(version = "3.23", ask = FALSE)
 
 # Update all installed packages to their new Bioc-compatible versions
-# Choose "a" (all) when prompted
 BiocManager::install(ask = FALSE, update = TRUE)
-
-# Install any Suggests packages that are not auto-installed
-BiocManager::install("BSgenome.Scerevisiae.UCSC.sacCer3", ask = FALSE)
 ```
+
+If R itself is not yet available on the HPC, ask your sysadmin — do not install R
+yourself on a shared system.
 
 ---
 
-## Step 8 - Test MESA on HPC (30–60 min)
+## Step 5 - Test MESA on HPC (30–60 min)
 
 ```r
 devtools::load_all()
 devtools::check()
 ```
 
-Most of the time is `devtools::check()` running examples and vignettes unattended.
 Look at the **final summary only**:
 
 ```
@@ -213,10 +166,7 @@ X errors   | X warnings              ← must fix, see below
 Error: 'mutate' is not an exported object from 'namespace:plyranges'
 ```
 ```bash
-# Find all calls using the old namespace
 grep -rn "plyranges::mutate" R/
-
-# Fix: replace with the true owner
 sed -i 's/plyranges::mutate(/dplyr::mutate(/g' R/*.R
 ```
 
@@ -225,10 +175,7 @@ sed -i 's/plyranges::mutate(/dplyr::mutate(/g' R/*.R
 Error: could not find function "X"
 ```
 ```bash
-# Check the package changelog
-browseURL("https://bioconductor.org/packages/<PKG>/news/")
-
-# Find all usages in MESA
+# Check the package changelog at https://bioconductor.org/packages/<PKG>/
 grep -rn "PKG::X" R/
 ```
 
@@ -237,10 +184,7 @@ grep -rn "PKG::X" R/
 Warning: @seealso refers to unavailable topic GenomeInfoDb::genome
 ```
 ```bash
-# Find and remove or fix the broken link
 grep -rn "seealso.*GenomeInfoDb::genome" R/
-
-# Fix: remove the broken entry, or update to the correct function name
 ```
 
 **4. S4 class missing package anchor**
@@ -248,7 +192,6 @@ grep -rn "seealso.*GenomeInfoDb::genome" R/
 Note: Rd \link{} targets missing package anchors: GRanges-class
 ```
 ```bash
-# Fix all instances across R/ files
 sed -i 's/\\linkS4class{GRanges}/\\link[GenomicRanges]{GRanges-class}/g' R/*.R
 ```
 
@@ -259,21 +202,19 @@ Error: dev.control() called without an open graphics device
 ```r
 # Add to the first knitr::opts_chunk$set() in the failing vignette:
 knitr::opts_chunk$set(dev = "png")
-# Remove any dev.args = list(type = "cairo") - requires a display
 ```
 
 ---
 
-## Step 9 - Test the devcontainer in Codespaces (30 min)
+## Step 6 - Test the devcontainer in Codespaces (30 min)
 
-This step verifies the Docker image built correctly with the new R version
-before merging.
+This verifies the Docker image built correctly with the new R version.
 
-### 9.1 - Trigger the image build
+### 6.1 - Trigger the image build
 
-The `build-image.yml` workflow builds and pushes the Docker image to ghcr.io.
-It triggers automatically on push to `dev` and `main` when `.devcontainer/**`
-changes. For a feature branch, trigger it manually:
+`build-image.yml` builds and pushes the `slim` and `full` images to ghcr.io. It
+triggers automatically on push to `dev`/`main` when `.devcontainer/**` or
+`DESCRIPTION` changes. For a feature branch, trigger it manually:
 
 ```
 github.com/cruk-mi/mesa
@@ -281,150 +222,78 @@ github.com/cruk-mi/mesa
 → Run workflow → select your branch → Run workflow
 ```
 
-Wait for both `build (slim)` and `build (full)` jobs to complete (~20–40 min).
+Wait for both `build (slim)` and `build (full)` to complete (~20–40 min).
 
-> **Note:** The "Run workflow" button only appears when `build-image.yml` exists
-> on the default branch (`main`). If you don't see it, temporarily add your
-> branch to the `branches:` list in `build-image.yml`, push, then revert after
-> testing.
+> **Note:** the "Run workflow" button only appears when `build-image.yml` exists
+> on the default branch. If you don't see it, temporarily add your branch to the
+> `branches:` list in `build-image.yml`, push, then revert after testing.
 
-### 9.2 - Open a new Codespace on your branch
+### 6.2 - Open a new Codespace on your branch
 
 ```
 github.com/cruk-mi/mesa
 → Code (green button) → Codespaces tab
 → "..." → New with options
-→ Branch: update_to_R_4.6
+→ Branch: your branch
 → Machine type: 4-core (minimum for R)
 → Create codespace
 ```
 
-> **Important:** Use "New with options" to select your branch.
-> A plain "New codespace" defaults to `main`.
+> **Important:** use "New with options" to select your branch — a plain "New
+> codespace" defaults to `main`.
+>
+> **Existing Codespace?** It uses a cached old image. Force a rebuild:
+> `Ctrl+Shift+P` → "Codespaces: Rebuild Container".
 
-> **If you have an existing Codespace:** it will use a cached old image.
-> Force a rebuild: `Ctrl+Shift+P` → "Codespaces: Rebuild Container".
+### 6.3 - Verify R, Bioc and mesa
 
-### 9.3 - Activate the R environment
-
-The `mesa_env` conda environment is not activated by default in new terminal
-sessions. Run:
-
-```bash
-source /opt/conda/etc/profile.d/conda.sh
-conda activate mesa_env
-```
-
-To make this permanent for all future terminal sessions in this Codespace:
+The container is the Bioconductor base image — R is on the default `PATH`
+(`/usr/local/bin/R`); there is **no conda environment to activate**.
 
 ```bash
-echo "source /opt/conda/etc/profile.d/conda.sh && conda activate mesa_env" >> ~/.bashrc
-source ~/.bashrc
+# Confirm the resolved versions
+R --version | head -1            # Expected: R version 4.6.x (matches DESCRIPTION)
+bash .devcontainer/resolve_versions.sh
 ```
-
-### 9.4 - Verify R version and environment
-
-```bash
-# Confirm R version matches versions.env
-R --version | head -1
-# Expected: R version 4.6.x
-
-# Confirm versions.env was used correctly
-cat .devcontainer/versions.env
-
-# Confirm which image variant is running (slim vs full)
-cat .devcontainer/devcontainer.json | grep image
-```
-
-### 9.5 - Verify mesa is installed inside R
 
 ```r
-# Start R
-R
-
-# Check R and Bioc versions
-R.version$version.string
-BiocManager::version()     # should match BIOC_VERSION in versions.env
-
-# Check mesa is installed
+# Start R, then:
+BiocManager::version()           # should match the resolved BIOC_VERSION
 packageVersion("mesa")
 library(mesa)
 
-# Confirm slim vs full variant
-# Returns FALSE for slim (full-only package), TRUE for full
+# Confirm slim vs full variant:
+# FALSE on slim (heavy data package absent), TRUE on full
 requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)
 
-# Run the test suite
+# Run the test suite (data-dependent tests skip on slim)
 devtools::test()
 ```
 
-### 9.6 - Expected output for slim variant
+#### Expected output for the slim variant
 
 ```
 R version 4.6.x
 BiocManager: 3.23
-packageVersion("mesa"): 0.99.0 (or current version)
 requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38"): FALSE  ← correct for slim
 devtools::test(): [ PASS x | FAIL 0 | WARN 0 | SKIP x ]
 ```
 
 ---
 
-## Step 10 - Snapshot installed packages (5 min)
-
-Save a record of what's installed for future comparison and for the PR description.
-
-```r
-pkgs <- as.data.frame(
-  installed.packages(lib.loc = .libPaths()[1])[, c("Package", "Version")],
-  stringsAsFactors = FALSE
-)
-write.csv(pkgs,
-  sprintf("installed_packages_R%s_bioc%s.csv",
-    paste0(R.version$major, ".", substr(R.version$minor, 1, 1)),
-    BiocManager::version()),
-  row.names = FALSE)
-```
-
-To compare against the previous snapshot:
-
-```r
-old <- read.csv("installed_packages_R4.5_bioc3.22.csv")
-new <- read.csv("installed_packages_R4.6_bioc3.23.csv")
-
-dplyr::full_join(old, new, by = "Package", suffix = c("_old", "_new")) |>
-  dplyr::mutate(status = dplyr::case_when(
-    is.na(Version_old) ~ "new",
-    is.na(Version_new) ~ "removed",
-    Version_old == Version_new ~ "unchanged",
-    TRUE ~ "updated"
-  )) |>
-  dplyr::filter(status != "unchanged") |>
-  dplyr::arrange(status, Package) |>
-  print(n = Inf)
-```
-
----
-
-## Step 11 - Commit and open PR (5 min)
+## Step 7 - Commit and open PR (5 min)
 
 ```bash
-# Stage all changed files
 git add DESCRIPTION \
-        .devcontainer/versions.env \
-        .github/workflows/check-bioc.yml \
-        R/*.R \       # only if code fixes were needed in Step 8
+        R/*.R \       # only if code fixes were needed in Step 5
         man/*.Rd      # only if docs were regenerated
 
-# Commit - adjust the bullet list to match what actually changed
-git commit -m "fix: update compatibility for R 4.6 / Bioconductor 3.23
+git commit -m "fix: update compatibility for R X.Y / Bioconductor A.B
 
-- Bump minimum R requirement to 4.6.0 in DESCRIPTION
-- Update versions.env to R_VERSION=4.6, BIOC_VERSION=3.23
-- Update check-bioc.yml matrix to R 4.6.0 / RELEASE_3_23
-- [any code fixes from Step 8]"
+- Bump minimum R requirement to X.Y.0 in DESCRIPTION
+- [any code fixes from Step 5]"
 
-git push origin update_to_R_4.6
+git push origin update_to_R_<version>
 
 # Open PR against dev (not main)
 ```
@@ -437,14 +306,11 @@ Copy this into your PR description:
 
 ```
 - [ ] check_bioc_compat.R shows all green for target Bioc version
-- [ ] DESCRIPTION: R (>= X.X.0) updated
-- [ ] versions.env: R_VERSION and BIOC_VERSION updated
-- [ ] check-bioc.yml: R version and RELEASE tag updated
+- [ ] DESCRIPTION: R (>= X.Y.0) updated
+- [ ] resolve_versions.sh reports the expected R / Bioc / RELEASE tag
 - [ ] BiocManager updated to new Bioc version on HPC
-- [ ] All packages updated via BiocManager::install(update=TRUE)
 - [ ] devtools::check() shows 0 errors, 0 warnings
-- [ ] Codespaces: image built and verified (correct R version, mesa loads, tests pass)
-- [ ] Package snapshot CSV saved (installed_packages_RX.X_biocX.XX.csv)
+- [ ] Codespaces: both images built; correct R version, mesa loads, tests pass
 - [ ] PR opened against dev
 ```
 
@@ -454,8 +320,7 @@ Copy this into your PR description:
 
 | File | What to change | Command |
 |------|---------------|---------|
-| `DESCRIPTION` | `R (>= X.X.0)` | `sed -i 's/R (>= 4.5.0)/R (>= 4.6.0)/' DESCRIPTION` |
-| `versions.env` | `R_VERSION`, `BIOC_VERSION` | `sed -i 's/R_VERSION=4.5/R_VERSION=4.6/'` |
-| `check-bioc.yml` | `r:`, `cont: RELEASE_X_XX` | `sed -i "s/r: '4.5.1'/r: '4.6.0'/"` |
-| `R/*.R` | Only if breaking changes found in Step 8 | varies |
+| `DESCRIPTION` | `R (>= X.Y.0)` | `sed -i 's/R (>= 4.5.0)/R (>= 4.6.0)/' DESCRIPTION` |
+| `R/*.R` | Only if breaking changes found in Step 5 | varies |
 | `man/*.Rd` | Auto-regenerated by `devtools::document()` | do not edit manually |
+| `.devcontainer/versions.env` | Optional — only to pin a non-latest Bioc | uncomment `BIOC_VERSION=` |

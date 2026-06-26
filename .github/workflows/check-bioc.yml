@@ -50,7 +50,34 @@ env:
   run_docker: 'true'
 
 jobs:
+  ## Resolve the R and Bioconductor versions from the single source of truth
+  ## (DESCRIPTION's `R (>=)` line) so upgrades only require editing that file.
+  ## resolve_versions.sh derives the Bioc version + Docker tag from R.
+  read-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      r-version: ${{ steps.parse.outputs.r-version }}
+      bioc-version: ${{ steps.parse.outputs.bioc-version }}
+      bioc-release: ${{ steps.parse.outputs.bioc-release }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Resolve versions
+        id: parse
+        run: |
+          # Write to a file first so a resolver failure (set -euo pipefail)
+          # aborts this step under the default `bash -eo pipefail`, instead of
+          # being swallowed inside a `source <(...)` process substitution.
+          resolved="$(mktemp)"
+          bash .devcontainer/resolve_versions.sh > "$resolved"
+          cat "$resolved" >> "$GITHUB_ENV"
+          source "$resolved"
+          echo "r-version=${R_VERSION_FULL}" >> "$GITHUB_OUTPUT"
+          echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
+
   r-build-and-check:
+    needs: read-versions
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
     container: ${{ matrix.config.cont }}
@@ -60,7 +87,11 @@ jobs:
       fail-fast: true
       matrix:
         config:
-          - { os: ubuntu-latest, r: '4.5.1', bioc: '3.22', cont: "bioconductor/bioconductor_docker:RELEASE_3_22", rspm: "https://packagemanager.posit.co/cran/__linux__/jammy/latest" }
+          - os: ubuntu-latest
+            r: ${{ needs.read-versions.outputs.r-version }}
+            bioc: ${{ needs.read-versions.outputs.bioc-version }}
+            cont: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
+            rspm: "https://packagemanager.posit.co/cran/__linux__/noble/latest"
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       RSPM: ${{ matrix.config.rspm }}
@@ -119,16 +150,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-RELEASE_3_18-r-4.3.1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-RELEASE_3_18-r-4.3.1-
+          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-
 
       - name: Cache R packages on Linux
         if: "!contains(github.event.head_commit.message, '/nocache') && runner.os == 'Linux' "
         uses: actions/cache@v4
         with:
           path: /home/runner/work/_temp/Library
-          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-RELEASE_3_18-r-4.3.1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-RELEASE_3_18-r-4.3.1-
+          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
@@ -290,7 +321,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@master
         with:
-          name: ${{ runner.os }}-biocversion-RELEASE_3_18-r-4.3.1-results
+          name: ${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-results
           path: check
       
   dockerhub-build-and-push:

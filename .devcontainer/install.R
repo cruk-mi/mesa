@@ -1,111 +1,101 @@
 # ============================================================
 # install.R
-# Purpose: Install R packages not managed by conda inside the
-#          Codespaces container. Called once by postCreateCommand.
+# Purpose: Install mesa's dependency stack into the devcontainer
+#          image, on top of the Bioconductor base image.
 #
-# DO NOT hardcode R or Bioconductor version numbers here.
-# Both are read from environment variables set by the conda
-# activation script (written by the Dockerfile from versions.env).
+# The base image already provides R, the Bioc core stack, pandoc and
+# all system libraries, so this script only installs:
+#   1. mesa's declared dependencies, read from DESCRIPTION
+#      (DESCRIPTION is the single source of truth for *which*
+#      packages; already-present base packages are no-ops).
+#   2. A small set of genuine extras the base image / DESCRIPTION
+#      do not cover (dev versions + IDE tooling).
+#
+# The slim/full split is one explicit list: `full_only` below.
+#
+# DO NOT hardcode R or Bioconductor version numbers here — the Bioc
+# version is read from the BIOC_VERSION env var (set by the Dockerfile
+# from the resolver). mesa itself is NOT installed here; it is
+# installed from the live workspace by devcontainer.json.
 # ============================================================
 
-# --- User library setup -------------------------------------
-user_lib <- Sys.getenv("R_LIBS_USER")
-if (!nzchar(user_lib)) {
-  # Fallback: construct path dynamically if env var not set
-  user_lib <- file.path(
-    Sys.getenv("HOME"), "R",
-    paste0(version[["arch"]], "-conda-linux-gnu-library"),
-    paste0(version[["major"]], ".", substr(version[["minor"]], 1, 1))
-  )
-}
-if (!dir.exists(user_lib)) {
-  dir.create(user_lib, recursive = TRUE, showWarnings = FALSE)
-}
-.libPaths(c(user_lib, .libPaths()))
+# --- Read context from environment --------------------------
+bioc_ver <- Sys.getenv("BIOC_VERSION")
+variant  <- Sys.getenv("MESA_VARIANT", unset = "slim")
+pkg_dir  <- Sys.getenv("MESA_PKG_DIR", unset = ".")
 
-# --- Read versions from environment -------------------------
-# Set by Dockerfile via conda activation script
-r_ver   <- Sys.getenv("R_VERSION",   unset = paste0(version$major, ".", substr(version$minor, 1, 1)))
-bioc_ver <- Sys.getenv("BIOC_VERSION", unset = "3.22")
+message(sprintf("── Environment: Bioc %s  |  Variant %s ──", bioc_ver, variant))
 
-message(sprintf("── Environment: R %s  |  Bioc %s ──────────────────", r_ver, bioc_ver))
-message(sprintf("── Installing to: %s", user_lib))
-
-# --- Package repositories -----------------------------------
-# Posit Package Manager provides pre-built Linux binaries —
-# critical for fast builds (avoids compiling from source)
-options(
-  repos = c(
-    RSPM = "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-    CRAN = "https://cloud.r-project.org"
-  ),
-  install.packages.check.source = "no"
-)
+# --- Bootstrap remotes + BiocManager (usually present in base) ----
+options(repos = c(CRAN = "https://cloud.r-project.org"),
+        install.packages.check.source = "no")
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS = "true")
-
-# --- Bootstrap remotes + BiocManager ------------------------
 if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes", lib = user_lib)
+  install.packages("remotes")
 }
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager", lib = user_lib)
+  install.packages("BiocManager")
 }
 
-# --- Set Bioconductor version --------------------------------
-# Version read from env var — no hardcoding needed
-BiocManager::install(version = bioc_ver, ask = FALSE)
-message(sprintf("✅ Bioconductor version set to: %s", BiocManager::version()))
+# Re-assert the Bioc version (the base image already pins it; this is a
+# safe no-op when they match, and honours an override if one was set).
+if (nzchar(bioc_ver)) {
+  BiocManager::install(version = bioc_ver, ask = FALSE, update = FALSE)
+}
+message(sprintf("✅ Bioconductor version: %s", BiocManager::version()))
 
-# --- Install devtools ----------------------------------------
-install.packages("devtools", lib = user_lib,
-                 dependencies = TRUE,
-                 INSTALL_opts = "--no-multiarch")
+# --- Package repositories -----------------------------------
+# Resolve both CRAN and Bioconductor packages. Posit Package Manager
+# (RSPM) provides pre-built Linux binaries first — critical for fast
+# builds (avoids compiling from source) — then the Bioc + CRAN repos
+# for the pinned Bioc version so every declared dependency is found.
+options(repos = c(
+  RSPM = "https://packagemanager.posit.co/cran/__linux__/noble/latest",
+  BiocManager::repositories()
+))
 
-# --- Core CRAN packages -------------------------------------
-install.packages(c(
-  "httr", "png", "RCurl", "igraph", "ggraph",
-  "rlang", "dplyr", "tibble", "tidyr", "readr",
-  "purrr", "stringr", "forcats",
-  "Rcpp", "RcppAnnoy", "RcppProgress", "uwot"
-), lib = user_lib, update = FALSE)
+# --- Dependencies, derived from DESCRIPTION -----------------
+deps <- remotes::dev_package_deps(pkg_dir, dependencies = TRUE)$package
 
-# --- Critical Bioc packages ---------------------------------
-BiocManager::install("fgsea", lib = user_lib, ask = FALSE, update = FALSE)
-BiocManager::install("qsea",  lib = user_lib, ask = FALSE, update = FALSE)
-
-# Core infrastructure
-BiocManager::install(c(
-  "BiocGenerics", "GenomeInfoDb", "IRanges", "S4Vectors",
-  "Biostrings", "GenomicRanges", "Rhtslib", "Rsamtools",
-  "SummarizedExperiment"
-), lib = user_lib, ask = FALSE, update = FALSE)
-
-# Annotation + genomics
-BiocManager::install(c(
-  "AnnotationDbi", "GenomicFeatures", "GenomicAlignments", "BSgenome",
+# The ONLY difference between slim and full: these heavy genome /
+# annotation data packages (declared in DESCRIPTION Suggests). slim
+# omits them; the test suite skips the cases that need them via
+# skip_if_not_installed() / skip_long_checks().
+full_only <- c(
+  "BSgenome.Hsapiens.NCBI.GRCh38",
+  "BSgenome.Hsapiens.UCSC.hg19",
+  "BSgenome.Scerevisiae.UCSC.sacCer3",
+  "MEDIPSData",
+  "org.Hs.eg.db",
+  "org.Mm.eg.db",
   "TxDb.Hsapiens.UCSC.hg38.knownGene",
-  "TxDb.Mmusculus.UCSC.mm10.knownGene",
-  "org.Mm.eg.db"
-), lib = user_lib, ask = FALSE, update = FALSE)
+  "TxDb.Hsapiens.UCSC.hg19.knownGene",
+  "TxDb.Mmusculus.UCSC.mm10.knownGene"
+)
+if (!identical(variant, "full")) {
+  deps <- setdiff(deps, full_only)
+}
 
-# High-level analysis
-BiocManager::install(c(
-  "qsea", "MEDIPS", "ChIPseeker", "clusterProfiler",
-  "DOSE", "GOSemSim", "enrichplot", "ReactomePA",
-  "treeio", "tidytree"
-), lib = user_lib, ask = FALSE, update = FALSE)
+message(sprintf("── Installing %d declared dependencies ──", length(deps)))
+BiocManager::install(deps, ask = FALSE, update = FALSE)
 
-# --- Additional packages ------------------------------------
-install.packages(c(
-  "pheatmap", "janitor", "hues"
-), lib = user_lib)
+# --- Genuine extras (not in DESCRIPTION) --------------------
+# IDE tooling and dev-only / GitHub-only packages.
+for (pkg in c("languageserver", "imsig")) {
+  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
+}
+for (pkg in c("devtools", "roxygen2", "rcmdcheck")) {
+  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
+}
 
-BiocManager::install(c(
-  "plyranges", "ComplexHeatmap", "biomaRt", "circlize"
-), lib = user_lib, ask = FALSE, update = FALSE)
+# ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases on GitHub,
+# pinned to a specific SHA for reproducibility.
+# immunedeconv is only available from GitHub; pinned to the SHA for v2.1.4.
+remotes::install_github("YuLab-SMU/ggtree",
+                        ref = "9f645a2b89e4150d9748547b3ea1b03906275c27",
+                        upgrade = "never")
+remotes::install_github("omnideconv/immunedeconv",
+                        ref = "e625e6c28ed14a30f9f40f159925cc9f0df4fa49",
+                        upgrade = "never")
 
-# --- ggtree (dev version) -----------------------------------
-# Requires ggplot2 >= 4.0.0 — confirmed available in Bioc 3.22
-remotes::install_github("YuLab-SMU/ggtree", lib = user_lib, upgrade = "never")
-
-message(sprintf("✅ Full R dev environment ready in: %s", user_lib))
+message("✅ mesa dependency stack ready")
