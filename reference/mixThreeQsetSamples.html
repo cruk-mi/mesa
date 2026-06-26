@@ -168,7 +168,7 @@ fraction of fragments present in the current qseaSet is calculated, such that
 the total number of reads would have been approximately <code>nReadsTotal</code>. E.g.
 if there are 50% of the total fragments in the windows present in the current
 samples, 0.5*<code>nReadsTotal</code> fragments will be sampled.</p><ul><li><p>Validates that <code>sample1</code>, <code>sample2</code>, <code>sample3</code> exist; <code>nReadsTotal &gt;= 0</code>;
-<code>proportion1, proportion2 ∈ [0, 1]</code>; and <code>proportion1 + proportion2 ≤ 1</code>.</p></li>
+<code>proportion1, proportion2 in [0, 1]</code>; and <code>proportion1 + proportion2 &lt; 1</code>.</p></li>
 <li><p>The mixing strategy follows the package implementation (proportional
 allocation / sampling); use <code>renormalise = TRUE</code> if downstream steps rely on
 offsets/enrichment being recomputed.</p></li>

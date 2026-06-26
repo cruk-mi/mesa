@@ -162,7 +162,7 @@ The <code>sampleTable</code>, counts, and relevant slots are updated consistentl
 fraction of fragments present in the current qseaSet is calculated, such that
 the total number of reads would have been approximately <code>nReadsTotal</code>. E.g.
 if there are 50% of the total fragments in the windows present in the current
-samples, 0.5*<code>nReadsTotal</code> fragments will be sampled.</p><ul><li><p>Input validation ensures <code>sample1</code>/<code>sample2</code> exist, <code>proportion ∈ [0,1]</code>,
+samples, 0.5*<code>nReadsTotal</code> fragments will be sampled.</p><ul><li><p>Input validation ensures <code>sample1</code>/<code>sample2</code> exist, <code>proportion in [0,1]</code>,
 and <code>nReadsTotal</code> is non-negative.</p></li>
 <li><p>The mixing strategy (e.g., proportional allocation vs sampling) follows
 the package’s implementation; set <code>renormalise = TRUE</code> to recompute
