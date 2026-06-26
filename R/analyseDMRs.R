@@ -192,6 +192,7 @@ summariseDMRsByContrast <- function(
 #' @family DMR-helpers
 #'
 #' @examples
+#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Summarise DMRs with explicit annotation databases
@@ -202,6 +203,7 @@ summariseDMRsByContrast <- function(
 #'         annoDb = "org.Hs.eg.db"
 #'     ) %>%
 #'     summariseDMRsByGene()
+#' }
 #' @export
 summariseDMRsByGene <- function(DMRtable) {
     if (!("ENSEMBL" %in% colnames(DMRtable))) {

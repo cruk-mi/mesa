@@ -106,8 +106,8 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' * **GoGe** — sample GoGe normalised by genome GoGe.
 #' * **nReads** — total reads considered.
 #' * **nReadsWithoutPattern** — reads lacking `"CG"` motif.
-#' * **n100bpReads** — reads with length ≥ 100 bp.
-#' * **n100bpReadsWithoutPattern** — reads ≥ 100 bp lacking `"CG"`.
+#' * **n100bpReads** — reads with length >= 100 bp.
+#' * **n100bpReadsWithoutPattern** — reads >= 100 bp lacking `"CG"`.
 #'
 #' @details
 #' Reads are scanned for `"CG"` dinucleotides. Counts are normalised against
@@ -345,8 +345,8 @@ getCGPositions <- function(BSgenome, chr.select) {
 #' * **GoGe** — sample GoGe normalised by genome GoGe.
 #' * **nReads** — total reads (fragments).
 #' * **nReadsWithoutPattern** — reads lacking `"CG"` motif.
-#' * **n100bpReads** — reads with length ≥ 100 bp.
-#' * **n100bpReadsWithoutPattern** — reads ≥ 100 bp lacking `"CG"`.
+#' * **n100bpReads** — reads with length >= 100 bp.
+#' * **n100bpReadsWithoutPattern** — reads >= 100 bp lacking `"CG"`.
 #'
 #' @details
 #' relH and GoGe are computed by counting `"CG"` dinucleotides in the provided

@@ -53,7 +53,7 @@
 #' The `sampleTable`, counts, and relevant slots are updated consistently.
 #'
 #' @details
-#' * Input validation ensures `sample1`/`sample2` exist, `proportion ∈ [0,1]`,
+#' * Input validation ensures `sample1`/`sample2` exist, `proportion in [0,1]`,
 #' and `nReadsTotal` is non-negative.
 #' * The mixing strategy (e.g., proportional allocation vs sampling) follows
 #' the package’s implementation; set `renormalise = TRUE` to recompute
@@ -301,7 +301,7 @@ mixSamples <- function(
 #'
 #' @details
 #' * Validates that `sample1`, `sample2`, `sample3` exist; `nReadsTotal >= 0`;
-#' `proportion1, proportion2 ∈ [0, 1]`; and `proportion1 + proportion2 ≤ 1`.
+#' `proportion1, proportion2 in [0, 1]`; and `proportion1 + proportion2 < 1`.
 #' * The mixing strategy follows the package implementation (proportional
 #' allocation / sampling); use `renormalise = TRUE` if downstream steps rely on
 #' offsets/enrichment being recomputed.

@@ -41,7 +41,7 @@ If \code{FALSE}, only keys from \code{x} are kept.
 \strong{Default:} \code{NULL} (deferred to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} behaviour).}
 
 \item{...}{Additional arguments passed to \code{\link[dplyr:mutate-joins]{dplyr::left_join()}},
-e.g. \code{relationship = "one-to-one"} (dplyr ≥ 1.1).
+e.g. \code{relationship = "one-to-one"} (dplyr >= 1.1).
 \strong{Default:} none.}
 }
 \value{

@@ -73,7 +73,7 @@ the total number of reads would have been approximately \code{nReadsTotal}. E.g.
 if there are 50\% of the total fragments in the windows present in the current
 samples, 0.5*\code{nReadsTotal} fragments will be sampled.
 \itemize{
-\item Input validation ensures \code{sample1}/\code{sample2} exist, \verb{proportion ∈ [0,1]},
+\item Input validation ensures \code{sample1}/\code{sample2} exist, \verb{proportion in [0,1]},
 and \code{nReadsTotal} is non-negative.
 \item The mixing strategy (e.g., proportional allocation vs sampling) follows
 the package’s implementation; set \code{renormalise = TRUE} to recompute
