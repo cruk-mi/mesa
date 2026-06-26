@@ -1,4 +1,4 @@
-# mesa 0.99.4.9000
+# mesa 0.99.4.9000 
 
 ## Documentation
 - Replaced Unicode math symbols (`≥`, `≤`, `∈`) with ASCII equivalents (`>=`,
