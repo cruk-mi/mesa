@@ -9,10 +9,8 @@
   and image tag are derived automatically; upgrading R requires editing that
   one line only.
   ([#92](https://github.com/cruk-mi/mesa/pull/92))
-- Bumped all GitHub Actions to Node 24-compatible releases (`checkout`,
-  `setup-buildx-action`, `login-action`, `build-push-action`, `cache`,
-  `metadata-action`, and `upload-artifact`, the last also pinned from
-  `@master` to a release tag), clearing the Node 20 deprecation warnings
+- Bumped all GitHub Actions to Node 24-compatible releases,
+  clearing the Node 20 deprecation warnings
   on the devcontainer image build.
   ([#93](https://github.com/cruk-mi/mesa/pull/93))
   
