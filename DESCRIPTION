@@ -74,7 +74,7 @@ Imports:
     BiocParallel,
     matrixStats,
     IRanges,
-    GenomicAlignments,
+    cigarillo,
     data.table,
     Rsamtools,
     tools,

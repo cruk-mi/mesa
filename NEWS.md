@@ -1,5 +1,10 @@
 # mesa 0.99.5.9000
 
+## Bug fixes
+- Replaced the defunct `GenomicAlignments::cigarWidthAlongReferenceSpace()` with
+  `cigarillo::cigar_extent_along_ref()`, fixing the vignette build on
+  Bioconductor devel (GenomicAlignments >= 1.49.1).
+
 # mesa 0.99.5
 
 ## Documentation

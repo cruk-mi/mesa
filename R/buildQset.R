@@ -318,7 +318,7 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
         dplyr::filter(
             # require good mapq and at least minReferenceLength ref span
             mapq >= minMapQual,
-            GenomicAlignments::cigarWidthAlongReferenceSpace(cigar) >=
+            cigarillo::cigar_extent_along_ref(cigar) >=
                 minReferenceLength
         )
 
