@@ -1,4 +1,4 @@
-# mesa 0.99.5.9000
+# mesa 0.99.6
 
 ## Bug fixes
 - Replaced the defunct `GenomicAlignments::cigarWidthAlongReferenceSpace()` with
