@@ -33,20 +33,30 @@ containing the read GRanges. If \code{NULL}, no files are written.
 
 \item{extend}{\code{integer(1)}
 Extension length for single-end reads (used only when \code{paired = FALSE}):
-reads are resized to this length in the 5'->3' direction. Unused for paired
-reads.
+reads shorter than this are lengthened to it in the 5'->3' direction, and
+reads already longer are left unchanged. Unused for paired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
 Offset applied to fragment/read positions.
 \strong{Default:} \code{0}.}
 
-\item{uniq}{\code{integer(1)}
-If non-zero, duplicate fragments are collapsed.
+\item{uniq}{\code{numeric(1)}
+How to handle duplicate fragments, following \pkg{MEDIPS}:
+\itemize{
+\item \code{0} --- keep every read.
+\item \code{1} --- keep at most one read per genomic location and strand.
+\item a p-value in \code{(0, 1)} --- keep at most \code{qpois(1 - uniq, rate)}
+reads per location, where \code{rate} is the mean read depth per base.
+}
+
+Any other value, and any logical, is an error.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
-Subset of chromosomes to use.
+Subset of chromosomes to use. The BAM index is used to restrict the scan
+when one is present; otherwise the whole file is scanned and the selection
+applied afterwards.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}

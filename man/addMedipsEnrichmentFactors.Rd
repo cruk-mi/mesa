@@ -33,15 +33,17 @@ under \verb{@libraries$file_name}).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Extension length for unpaired reads;
+reads already longer than this are left unchanged.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Shift applied to read positions.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Duplicate handling: \code{0} keeps all
+reads, \code{1} keeps one per location, a p-value in \code{(0, 1)} caps duplicates.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
