@@ -211,3 +211,32 @@ test_that("calculateCGEnrichment works", {
     expect_equal(enr$GoGe, 1.631612, tolerance = 5)
 
 })
+
+test_that("calculateCGEnrichment works (single-end)", {
+
+    # skip check unless options(run_long_checks = TRUE)
+    skip_long_checks()
+
+    if (!rlang::is_installed("MEDIPSData")) {
+        skip("MEDIPSData Not installed")
+    }
+
+    # The fresh-session failure (#81) only manifested when GenomicRanges was
+    # not attached to the search path. Assert that here so this regression
+    # test keeps exercising that failure mode regardless of test order.
+    expect_false("package:GenomicRanges" %in% search())
+
+    enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+        exportPath = NULL,
+        extend = 0, shift = 0, uniq = 0,
+        chr.select = "chr22", paired = FALSE)
+
+    expect_true(all(c("file", "relH", "GoGe", "nReads",
+        "nReadsWithoutPattern", "n100bpReads",
+        "n100bpReadsWithoutPattern") %in% colnames(enr)))
+    expect_gt(enr$nReads, 0)
+    expect_true(is.numeric(enr$relH) && is.finite(enr$relH))
+    expect_true(is.numeric(enr$GoGe) && is.finite(enr$GoGe))
+
+})

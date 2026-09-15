@@ -1,5 +1,14 @@
 # mesa 0.99.6.9000
 
+## Bug fixes
+- `calculateCGEnrichment()` and `getCGPositions()` no longer call `MEDIPS`.
+  Reads are imported directly with `Rsamtools::scanBam()` and CpG positions
+  located with `Biostrings`. This fixes two bugs: a crash in a fresh session
+  where `GenomicRanges` is not attached (`could not find function "strand<-"`),
+  and silent read truncation caused by the hardcoded `IRanges(1, 536870912)`
+  chromosome bound in `MEDIPS`, which dropped reads on longer chromosomes.
+  ([#81](https://github.com/cruk-mi/mesa/issues/81))
+
 # mesa 0.99.6
 
 ## Bug fixes
