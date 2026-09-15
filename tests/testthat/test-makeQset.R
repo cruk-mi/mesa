@@ -206,7 +206,20 @@ test_that("calculateCGEnrichment works", {
         extend = 0, shift = 0, uniq = 0,
         chr.select = "chr22", paired = TRUE)
 
+    # nReads is pinned exactly. It is the fragment count this BAM yielded
+    # under the MEDIPS implementation, recorded in 9997e94 (2023-01-10) and
+    # kept when calculateCGEnrichment() was reimplemented on Rsamtools (#81),
+    # so its job is to prove the two implementations agree. A change here is
+    # either a real regression or a deliberate change to read filtering
+    # (minMapQual, properPairsOnly, chr.select) - not a stale expectation to
+    # be updated casually. Re-derive by counting the first mates of properly
+    # paired reads on chr22 of the BAM above.
     expect_equal(enr$nReads, 636130)
+
+    # TODO: tolerance is relative, so tolerance = 5 passes for relH anywhere
+    # from ~0.5 to ~5 against an expected 3.35. These catch gross breakage
+    # only. Tighten when this block is re-enabled and the values can be
+    # measured against the Rsamtools implementation.
     expect_equal(enr$relH, 3.353462, tolerance = 5)
     expect_equal(enr$GoGe, 1.631612, tolerance = 5)
 
