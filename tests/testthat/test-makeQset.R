@@ -235,8 +235,16 @@ test_that("calculateCGEnrichment works (single-end)", {
     }
 
     # The fresh-session failure (#81) only manifested when GenomicRanges was
-    # not attached to the search path. Assert that here so this regression
-    # test keeps exercising that failure mode regardless of test order.
+    # not attached to the search path, so the assertion below is only
+    # meaningful while that holds. It is NOT order-independent: with
+    # skip_long_checks disabled the makeQset blocks above run first and
+    # attach GenomicRanges, so skip rather than report a false failure.
+    # The same guarantee runs unconditionally in test-readFragments.R,
+    # which needs neither MEDIPSData nor a BSgenome.
+    skip_if(
+        "package:GenomicRanges" %in% search(),
+        "GenomicRanges already attached by an earlier test"
+    )
     expect_false("package:GenomicRanges" %in% search())
 
     enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),

@@ -72,8 +72,16 @@ test_that("fragments import without GenomicRanges attached (#81)", {
     # only surfaced when GenomicRanges was absent from the search path. The
     # equivalent assertion in test-makeQset.R sits behind skip_long_checks(),
     # which tests/testthat.R enables unconditionally, so it never runs under
-    # R CMD check. This block carries no skip, so the guarantee is checked on
-    # every run.
+    # R CMD check. This block carries no skip_long_checks(), so the guarantee
+    # is checked on every run.
+    #
+    # The precondition is not order-independent: running the suite with
+    # skip_long_checks disabled attaches GenomicRanges in an earlier file.
+    # Skip rather than report a false failure in that configuration.
+    skip_if(
+        "package:GenomicRanges" %in% search(),
+        "GenomicRanges already attached by an earlier test"
+    )
     expect_false("package:GenomicRanges" %in% search())
 
     dir <- tempfile("mesaBam")
