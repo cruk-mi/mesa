@@ -359,10 +359,12 @@ getCGPositions <- function(BSgenome, chr.select) {
 #' was absent, scanned the whole file and filtered chromosomes afterwards, so
 #' unindexed BAMs stayed usable. This reproduces that behaviour.
 #'
-#' \code{simpleCigar = TRUE} matches the \pkg{MEDIPS} default (\pkg{Rsamtools}
-#' defaults to \code{FALSE}): reads whose CIGAR contains \code{N}, \code{S},
-#' \code{H} or \code{P} are excluded, so soft-clipped and spliced alignments do
-#' not inflate the read count.
+#' \code{simpleCigar = FALSE} is deliberate. \pkg{MEDIPS} defaults it to
+#' \code{TRUE}, which drops reads whose CIGAR contains \code{N}, \code{S},
+#' \code{H} or \code{P}, but mesa has overridden that to \code{FALSE} on both
+#' \code{getGRange()} and \code{getPairedGRange()} since its first commit
+#' (\code{f28d678}) - soft-clipped and spliced alignments are counted. Do not
+#' "restore" the \pkg{MEDIPS} default here: it would silently drop reads.
 #'
 #' @param file Character(1). Path to the BAM file.
 #' @param what Character vector of BAM fields to read.
@@ -396,7 +398,7 @@ bamScanParam <- function(file, what, flag, chr.select = NULL,
         }
         return(list(
             param = Rsamtools::ScanBamParam(
-                what = what, flag = flag, simpleCigar = TRUE
+                what = what, flag = flag, simpleCigar = FALSE
             ),
             prefiltered = is.null(chr.select)
         ))
@@ -419,7 +421,7 @@ bamScanParam <- function(file, what, flag, chr.select = NULL,
 
     list(
         param = Rsamtools::ScanBamParam(
-            what = what, flag = flag, simpleCigar = TRUE, which = which
+            what = what, flag = flag, simpleCigar = FALSE, which = which
         ),
         prefiltered = TRUE
     )

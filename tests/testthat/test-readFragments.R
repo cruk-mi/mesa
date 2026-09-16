@@ -39,7 +39,7 @@ writeTestBam <- function(dir) {
         rec("se_rev", 16, "chr1", 3000, "50M", 50),
         # secondary alignment: excluded by isSecondaryAlignment = FALSE
         rec("se_secondary", 256, "chr1", 4000, "50M", 50),
-        # soft-clipped: excluded by simpleCigar = TRUE
+        # soft-clipped: KEPT, because mesa passes simpleCigar = FALSE
         rec("se_softclip", 0, "chr1", 5000, "10S40M", 50),
 
         # --- chr2: paired-end, properly paired ---
@@ -111,15 +111,17 @@ test_that("readSingleEndFragments applies the MEDIPS read filters", {
         file = bam, chr.select = "chr1", chr.lengths = testChrLengths
     )
 
-    # se_long, se_short, se_dupA, se_dupB, se_rev - the secondary alignment
-    # and the soft-clipped read are both dropped, and chr2 is excluded.
-    expect_equal(length(reads), 5L)
+    # se_long, se_short, se_dupA, se_dupB, se_rev, se_softclip - only the
+    # secondary alignment is dropped, and chr2 is excluded.
+    expect_equal(length(reads), 6L)
     expect_equal(
         as.character(unique(GenomeInfoDb::seqnames(reads))), "chr1"
     )
-    # secondary alignment at 4000, soft-clipped read at 5000
+    # secondary alignment at 4000 is dropped
     expect_false(4000 %in% BiocGenerics::start(reads))
-    expect_false(5000 %in% BiocGenerics::start(reads))
+    # soft-clipped read at 5000 is kept: mesa overrides the MEDIPS
+    # simpleCigar default, and has done since f28d678
+    expect_true(5000 %in% BiocGenerics::start(reads))
     # strand is stripped only after filtering and deduplication
     expect_true(all(as.character(BiocGenerics::strand(reads)) == "*"))
 })
@@ -162,15 +164,15 @@ test_that("uniq reproduces the four MEDIPS duplicate-handling branches", {
         )
     }
 
-    expect_equal(length(readChr1(uniq = 0)), 5L)
+    expect_equal(length(readChr1(uniq = 0)), 6L)
 
     # se_dupA and se_dupB collapse; se_rev shares their coordinates but sits
     # on the minus strand, so MEDIPS kept it as a separate location.
-    expect_equal(length(readChr1(uniq = 1)), 4L)
+    expect_equal(length(readChr1(uniq = 1)), 5L)
 
     # a p-value caps duplicates per location; at this read depth the Poisson
     # quantile floors to 1, matching uniq = 1
-    expect_equal(length(readChr1(uniq = 1e-3)), 4L)
+    expect_equal(length(readChr1(uniq = 1e-3)), 5L)
 
     expect_error(readChr1(uniq = TRUE), "not logical")
     expect_error(readChr1(uniq = 2), "in \\[0, 1\\]")
@@ -227,7 +229,7 @@ test_that("chr.select works on a BAM with no index", {
         "No BAM index"
     )
 
-    expect_equal(length(reads), 5L)
+    expect_equal(length(reads), 6L)
     expect_equal(
         as.character(unique(GenomeInfoDb::seqnames(reads))), "chr1"
     )

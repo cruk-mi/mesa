@@ -10,9 +10,9 @@
   ([#81](https://github.com/cruk-mi/mesa/issues/81))
 - `calculateCGEnrichment()` now reproduces the `MEDIPS` read filtering it
   replaced, fixing four silent behaviour changes introduced with the
-  `Rsamtools` rewrite: secondary alignments and soft-clipped reads are excluded
-  again (`isSecondaryAlignment = FALSE`, `simpleCigar = TRUE`), so `nReads` is
-  no longer inflated; `extend` only ever lengthens a read and no longer
+  `Rsamtools` rewrite: secondary alignments are excluded again
+  (`isSecondaryAlignment = FALSE`), so `nReads` is no longer inflated;
+  `extend` only ever lengthens a read and no longer
   truncates reads longer than it; `uniq` supports all the documented `MEDIPS`
   values again (`0`, `1`, and a p-value in `(0, 1)` capping duplicates at a
   Poisson quantile) and deduplicates strand-aware, rejecting invalid values
