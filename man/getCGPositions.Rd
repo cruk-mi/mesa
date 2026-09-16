@@ -22,7 +22,7 @@ specified BSgenome and chromosomes, located directly with \pkg{Biostrings}.
 \examples{
 # Requires a BSgenome package
 # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "chr22")
+#   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "22")
 # }
 }
 \seealso{

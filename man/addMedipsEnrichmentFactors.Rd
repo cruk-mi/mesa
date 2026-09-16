@@ -38,10 +38,11 @@ reads already longer than this are left unchanged.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Shift applied to read positions.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Shift applied to unpaired read
+positions; unused for paired reads.
 \strong{Default:} \code{0}.}
 
-\item{uniq}{\code{integer(1)}
+\item{uniq}{\code{numeric(1)}
 Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Duplicate handling: \code{0} keeps all
 reads, \code{1} keeps one per location, a p-value in \code{(0, 1)} caps duplicates.
 \strong{Default:} \code{0}.}

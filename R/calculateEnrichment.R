@@ -87,7 +87,9 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
-#' Offset applied to fragment/read positions.
+#' Strand-aware offset applied to read positions, used only when
+#' `paired = FALSE`. Unused for paired reads, where the true fragment
+#' position is known.
 #'   **Default:** `0`.
 #'
 #' @param uniq `numeric(1)`
@@ -322,7 +324,7 @@ calculateCGEnrichment <- function(
 #' @examples
 #' # Requires a BSgenome package
 #' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "chr22")
+#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "22")
 #' # }
 getCGPositions <- function(BSgenome, chr.select) {
     dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
@@ -472,9 +474,9 @@ dedupeReads <- function(reads, uniq, genomeLength) {
 
     if (is.logical(uniq)) {
         stop(
-            "Parameter 'uniq' is not logical: supply 0 to keep all reads, ",
-            "1 to keep one read per genomic location, or a p-value in ",
-            "(0, 1) to cap duplicates.",
+            "Parameter 'uniq' must be numeric, not logical: supply 0 to ",
+            "keep all reads, 1 to keep one read per genomic location, or ",
+            "a p-value in (0, 1) to cap duplicates.",
             call. = FALSE
         )
     }
@@ -843,10 +845,11 @@ calculateCGEnrichmentGRanges <- function(
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
-#' Passed to [calculateCGEnrichment()]. Shift applied to read positions.
+#' Passed to [calculateCGEnrichment()]. Shift applied to unpaired read
+#' positions; unused for paired reads.
 #'   **Default:** `0`.
 #'
-#' @param uniq `integer(1)`
+#' @param uniq `numeric(1)`
 #' Passed to [calculateCGEnrichment()]. Duplicate handling: `0` keeps all
 #' reads, `1` keeps one per location, a p-value in `(0, 1)` caps duplicates.
 #'   **Default:** `0`.

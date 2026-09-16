@@ -38,7 +38,9 @@ reads already longer are left unchanged. Unused for paired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Offset applied to fragment/read positions.
+Strand-aware offset applied to read positions, used only when
+\code{paired = FALSE}. Unused for paired reads, where the true fragment
+position is known.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{numeric(1)}
