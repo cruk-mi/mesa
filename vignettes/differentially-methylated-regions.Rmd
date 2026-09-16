@@ -1,8 +1,8 @@
 ---
-title: "Differentially Methylated Regions and Annotatation"
+title: "Differentially Methylated Regions and Annotation"
 output: rmarkdown::html_vignette
 vignette: >
-    %\VignetteIndexEntry{Differentially Methylated Regions and Annotatation}
+    %\VignetteIndexEntry{Differentially Methylated Regions and Annotation}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -31,7 +31,7 @@ conditions. It should be noted that technically these are differentially
 methylated windows, but we use the more common term here.
 
 This is a computationally expensive process, so we recommend using
-paralellisation where possible, as detailed at the end of the introduction:
+parallelisation where possible, as detailed at the end of the introduction:
 `vignette("introduction")`. Here we enable the global parallelisation, with two
 cores:
 
@@ -333,7 +333,7 @@ be 100% reliable.
 
 ## Other Genomes
 The underlying function being used here is `annotatePeak` from the `ChIPseeker`
-package. This requires two databases, a `TxDb` and an `annoDb` datbase. These
+package. This requires two databases, a `TxDb` and an `annoDb` database. These
 may be given explicitly using the arguments to `annotateWindows`, as for
 instance for this example mouse dataset:
 

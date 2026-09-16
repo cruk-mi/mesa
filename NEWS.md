@@ -1,5 +1,20 @@
 # mesa 0.99.6.9000
 
+## Continuous integration
+- Added a `lint` workflow running `lintr`, `actionlint` and `spelling`. It uses
+  neither the Bioconductor container nor the package dependencies, so it
+  reports style and workflow errors in under a minute instead of at the end of
+  the full `R CMD check`.
+- Added `.lintr.R`, encoding the coding standards from the contributor guide.
+
+## Documentation
+- Set `Language: en-GB` in `DESCRIPTION`, matching the British spelling already
+  used throughout the documentation.
+- Corrected six misspellings surfaced by the new spell check, including one in
+  the title of the differential methylation vignette.
+- Added `inst/WORDLIST` covering the genomics vocabulary and mesa function
+  names that are not in the dictionary.
+
 # mesa 0.99.6
 
 ## Bug fixes
@@ -170,7 +185,7 @@
 * Made `calculateFractionReadsInGRanges` internal as it seems to be returning the fraction of windows that overlap not reads. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Made `countWindowsAboveCutoff` internal as it needs the arguments renaming and better documentation.  [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Removed internal functions`getAnnotationDataFrame` and `getAnnotationDataFrameIndividual` as they are superseded by `getAnnotation` and the shift to tidy evaluation via `sampleAnnotation` in the plotting functions. [!14](https://github.com/cruk-mi/mesa/pull/14)
-* Removed `colnames` function definion on a qseaSet, which was not working anyway. [!14](https://github.com/cruk-mi/mesa/pull/14)
+* Removed `colnames` function definition on a qseaSet, which was not working anyway. [!14](https://github.com/cruk-mi/mesa/pull/14)
 * Removed `dropAvgFragDetails` as no longer required. [!63](https://github.com/cruk-mi/mesa/pull/63)
 * Removed GitLab CI files; updated `.Rbuildignore` to exclude `.github`, `.devcontainer`, `docs/` and other non-package files from the build — silences related `R CMD check` notes. [!70](https://github.com/cruk-mi/mesa/pull/70)
 * Removed `installDependencies.R`. [!72](https://github.com/cruk-mi/mesa/pull/72)
@@ -308,7 +323,7 @@ This is the first released version on github, following a lengthy period of inte
 
     -   The colours for the annotations have been overhauled.
         These now try to choose appropriate colour scales for continuous data based on whether they are strictly positive or not.
-        For discrete annotations, the colours are set globally for the entire annotation set, to try and prevent the occurrance of different annotations using very similar colours.
+        For discrete annotations, the colours are set globally for the entire annotation set, to try and prevent the occurrence of different annotations using very similar colours.
 
 -   `getDataTable` function can now keep the suffix (e.g. `_nrpm` or `_beta`) if required.
 
