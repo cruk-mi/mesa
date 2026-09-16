@@ -1,5 +1,16 @@
 # mesa 0.99.6.9000
 
+## Continuous deployment
+- Added a `release` workflow, triggered by pushing a `vX.Y.Z` tag. It checks
+  that the tag, the `DESCRIPTION` version and the top `NEWS.md` heading agree
+  and that the version is not a `.9000` development version; runs the
+  r-universe Bioconductor build (Linux, macOS, Windows and WebAssembly, plus
+  BiocCheck) by calling the same reusable workflow Bioconductor uses; and then
+  publishes a GitHub Release with the source tarball and the release notes
+  taken from `NEWS.md`.
+- `workflow_dispatch` runs every step except publishing, so a release can be
+  rehearsed against an existing tag.
+
 # mesa 0.99.6
 
 ## Bug fixes
