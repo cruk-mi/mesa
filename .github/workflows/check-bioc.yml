@@ -278,6 +278,31 @@ jobs:
         if:  env.has_testthat == 'true'
         run: find . -name testthat.Rout -exec cat '{}' ';'
 
+      - name: Run long checks (MEDIPS parity)
+        if:  env.has_testthat == 'true'
+        run: |
+          ## tests/testthat.R sets skip_long_checks = TRUE unconditionally, so
+          ## R CMD check never runs the blocks guarded by it. One of those,
+          ## expect_equal(enr$nReads, 636130) in test-makeQset.R, is the only
+          ## exact evidence that the Rsamtools import path reproduces the
+          ## MEDIPS implementation it replaced (#81, #102) - so without this
+          ## step that claim is never checked anywhere.
+          ##
+          ## This runner already installs MEDIPSData and
+          ## BSgenome.Hsapiens.UCSC.hg19, so the block can run here with the
+          ## option disabled. Scoped to makeQset to keep the added runtime to
+          ## the tests that need the heavy data.
+          options(skip_long_checks = FALSE)
+          BiocParallel::register(BiocParallel::SerialParam())
+          testthat::test_dir(
+              "tests/testthat",
+              package = "mesa",
+              load_package = "installed",
+              filter = "makeQset",
+              stop_on_failure = TRUE
+          )
+        shell: Rscript {0}
+
       - name: Run RUnit tests
         if:  env.has_RUnit == 'true'
         run: |
