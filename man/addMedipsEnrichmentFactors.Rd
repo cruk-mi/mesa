@@ -87,10 +87,10 @@ pulldown, \verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelis
 uses \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
-# Requires BAM files and the MEDIPS package; see \dontrun{} for a full
+# Requires BAM files from MEDIPSData; see \dontrun{} for a full
 # usage example.
 \dontrun{
-if (requireNamespace("MEDIPS", quietly = TRUE) &&
+if (requireNamespace("MEDIPSData", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
     bam <- system.file(
         "extdata",

@@ -25,6 +25,10 @@
   otherwise the whole file is scanned and chromosomes are selected afterwards,
   as `MEDIPS::getGRange()` did.
   ([#85](https://github.com/cruk-mi/mesa/pull/85))
+- `MEDIPS` dropped from `Suggests`. No code in the package calls it any more,
+  so it was an install-time cost for no benefit. `MEDIPSData` is unaffected and
+  is still used for test and example data.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
 
 # mesa 0.99.6
 
