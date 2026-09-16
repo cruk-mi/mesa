@@ -66,6 +66,40 @@ writeTestBam <- function(dir) {
 testChrLengths <- c(chr1 = 10000, chr2 = 10000)
 
 
+test_that("fragments import without GenomicRanges attached (#81)", {
+
+    # The #81 crash - MEDIPS raising `could not find function "strand<-"` -
+    # only surfaced when GenomicRanges was absent from the search path. The
+    # equivalent assertion in test-makeQset.R sits behind skip_long_checks(),
+    # which tests/testthat.R enables unconditionally, so it never runs under
+    # R CMD check. This block carries no skip, so the guarantee is checked on
+    # every run.
+    expect_false("package:GenomicRanges" %in% search())
+
+    dir <- tempfile("mesaBam")
+    dir.create(dir)
+    on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+    bam <- writeTestBam(dir)
+
+    expect_no_error(
+        single <- readSingleEndFragments(
+            file = bam, chr.select = "chr1", chr.lengths = testChrLengths
+        )
+    )
+    expect_no_error(
+        paired <- readPairedFragments(
+            file = bam, chr.select = "chr2", chr.lengths = testChrLengths
+        )
+    )
+
+    expect_gt(length(single), 0L)
+    expect_gt(length(paired), 0L)
+
+    # and the helpers must not have attached it as a side effect
+    expect_false("package:GenomicRanges" %in% search())
+})
+
+
 test_that("readSingleEndFragments applies the MEDIPS read filters", {
 
     dir <- tempfile("mesaBam")
