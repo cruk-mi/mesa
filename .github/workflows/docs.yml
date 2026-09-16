@@ -1,0 +1,134 @@
+## Coverage and pkgdown site for mesa.
+##
+## Split out of check-bioc.yml. Both steps re-execute work the check has
+## already done -- covr re-runs the test suite under tracing (~3m50s) and
+## pkgdown re-runs every @examples block to render the reference pages
+## (~14m) -- so together they were adding ~18 minutes to every push to main
+## and, worse, a pkgdown failure showed up as a failed R-CMD-check-bioc.
+##
+## Keeping them here means the check verdict and the docs build fail
+## independently, and the check goes green without waiting for pkgdown.
+
+name: docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  cache-version: 'cache-v4'
+
+jobs:
+  read-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      r-version: ${{ steps.parse.outputs.r-version }}
+      bioc-version: ${{ steps.parse.outputs.bioc-version }}
+      bioc-release: ${{ steps.parse.outputs.bioc-release }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Resolve versions
+        id: parse
+        run: |
+          resolved="$(mktemp)"
+          bash .devcontainer/resolve_versions.sh > "$resolved"
+          cat "$resolved" >> "$GITHUB_ENV"
+          source "$resolved"
+          echo "r-version=${R_VERSION_FULL}" >> "$GITHUB_OUTPUT"
+          echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
+
+  docs:
+    needs: read-versions
+    runs-on: ubuntu-latest
+    name: coverage and pkgdown
+    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RSPM: "https://packagemanager.posit.co/cran/__linux__/noble/latest"
+      NOT_CRAN: true
+      TZ: UTC
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Set R Library home on Linux
+        run: |
+          mkdir -p /__w/_temp/Library
+          echo ".libPaths('/__w/_temp/Library')" > ~/.Rprofile
+
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+        shell: Rscript {0}
+
+      ## Same key as check-bioc.yml and pr-check.yml, so all three share a
+      ## single warm library cache.
+      - name: Cache R packages
+        uses: actions/cache@v6
+        with:
+          path: /home/runner/work/_temp/Library
+          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ needs.read-versions.outputs.bioc-version }}-r-${{ needs.read-versions.outputs.r-version }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ needs.read-versions.outputs.bioc-version }}-r-${{ needs.read-versions.outputs.r-version }}-
+
+      - name: Install Linux system dependencies
+        run: |
+          sysreqs=$(Rscript -e 'cat("apt-get update -y && apt-get install -y", paste(gsub("apt-get install -y ", "", remotes::system_requirements("ubuntu", "20.04")), collapse = " "))')
+          echo "$sysreqs"
+          sudo -s eval "$sysreqs"
+
+      - name: Install BiocManager
+        run: |
+          remotes::install_cran("BiocManager")
+        shell: Rscript {0}
+
+      - name: Set BiocVersion
+        run: |
+          BiocManager::install(version = "${{ needs.read-versions.outputs.bioc-version }}", ask = FALSE)
+        shell: Rscript {0}
+
+      - name: Install dependencies
+        run: |
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
+          remotes::install_cran(c("covr", "pkgdown"))
+        shell: Rscript {0}
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
+      - name: Test coverage
+        run: |
+          covr::codecov()
+        shell: Rscript {0}
+
+      - name: Install package
+        run: R CMD INSTALL .
+
+      ## Note that you need to run pkgdown::deploy_to_branch(new_process = FALSE)
+      ## at least once locally before this will work. That creates the gh-pages
+      ## branch (erasing anything you haven't version controlled!) and makes the
+      ## git history recognizable by pkgdown.
+      - name: Deploy package
+        run: |
+          git config --global --add safe.directory /__w/mesa/mesa
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          Rscript -e "pkgdown::deploy_to_branch(new_process = FALSE)"
+        shell: bash {0}

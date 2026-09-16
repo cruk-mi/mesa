@@ -1,0 +1,177 @@
+## Fast pull-request gate for mesa.
+##
+## This is the tier that runs on every PR. The full Bioconductor check
+## (vignettes, BiocCheck, the long MEDIPS parity tests) lives in
+## check-bioc.yml and runs on main, nightly, and on demand.
+##
+## Two things make this ~12 minutes instead of the ~29 that check-bioc.yml
+## takes:
+##
+##   1. Dependencies are installed WITHOUT building vignettes. The full check
+##      workflow used to build the five vignettes three times before
+##      R CMD check even started - twice via install_local(build_vignettes =
+##      TRUE, force = TRUE) and once more in R CMD build - and then run their
+##      code a fourth time. That was ~14.5 of its 29 minutes.
+##   2. R CMD check is passed --no-vignettes as well as --no-build-vignettes.
+##      --no-build-vignettes alone still runs "checking running R code from
+##      vignettes", which took 3m37s.
+##
+## R CMD build does still build the vignettes once, and that is deliberate.
+## Passing --no-build-vignettes to build as well leaves inst/doc empty, and
+## R CMD check then reports two WARNINGs ("Files in the 'vignettes' directory
+## but no files in 'inst/doc'" and "Package vignette without corresponding
+## single PDF/HTML"), which error_on = "warning" would turn into a permanent
+## failure. Verified against R 4.5.1 before landing this.
+##
+## There is no `push:` trigger on purpose. check-bioc.yml used to have both
+## `push:` and `pull_request:`, so once a PR was open every push started two
+## identical 29-minute runs.
+
+name: PR check
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  cache-version: 'cache-v4'
+
+jobs:
+  ## Resolve the R and Bioconductor versions from the single source of truth
+  ## (DESCRIPTION's `R (>=)` line) so upgrades only require editing that file.
+  ## resolve_versions.sh derives the Bioc version + Docker tag from R.
+  read-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      r-version: ${{ steps.parse.outputs.r-version }}
+      bioc-version: ${{ steps.parse.outputs.bioc-version }}
+      bioc-release: ${{ steps.parse.outputs.bioc-release }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Resolve versions
+        id: parse
+        run: |
+          # Write to a file first so a resolver failure (set -euo pipefail)
+          # aborts this step under the default `bash -eo pipefail`, instead of
+          # being swallowed inside a `source <(...)` process substitution.
+          resolved="$(mktemp)"
+          bash .devcontainer/resolve_versions.sh > "$resolved"
+          cat "$resolved" >> "$GITHUB_ENV"
+          source "$resolved"
+          echo "r-version=${R_VERSION_FULL}" >> "$GITHUB_OUTPUT"
+          echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
+
+  check:
+    needs: read-versions
+    runs-on: ubuntu-latest
+    name: R CMD check (no vignettes)
+    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RSPM: "https://packagemanager.posit.co/cran/__linux__/noble/latest"
+      NOT_CRAN: true
+      TZ: UTC
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      ## Set the R library to the directory matching the R packages cache step
+      ## further below when running on Docker (Linux).
+      - name: Set R Library home on Linux
+        run: |
+          mkdir -p /__w/_temp/Library
+          echo ".libPaths('/__w/_temp/Library')" > ~/.Rprofile
+
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+        shell: Rscript {0}
+
+      ## Same key as check-bioc.yml, so the two workflows share one cache.
+      - name: Cache R packages
+        if: "!contains(github.event.pull_request.title, '/nocache')"
+        uses: actions/cache@v6
+        with:
+          path: /home/runner/work/_temp/Library
+          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ needs.read-versions.outputs.bioc-version }}-r-${{ needs.read-versions.outputs.r-version }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ needs.read-versions.outputs.bioc-version }}-r-${{ needs.read-versions.outputs.r-version }}-
+
+      - name: Install Linux system dependencies
+        run: |
+          sysreqs=$(Rscript -e 'cat("apt-get update -y && apt-get install -y", paste(gsub("apt-get install -y ", "", remotes::system_requirements("ubuntu", "20.04")), collapse = " "))')
+          echo "$sysreqs"
+          sudo -s eval "$sysreqs"
+
+      - name: Install BiocManager
+        run: |
+          message(paste('****', Sys.time(), 'installing BiocManager ****'))
+          remotes::install_cran("BiocManager")
+        shell: Rscript {0}
+
+      - name: Set BiocVersion
+        run: |
+          BiocManager::install(version = "${{ needs.read-versions.outputs.bioc-version }}", ask = FALSE)
+        shell: Rscript {0}
+
+      ## Two passes, as in check-bioc.yml, because a single pass can miss
+      ## dependencies - see
+      ## https://stat.ethz.ch/pipermail/bioc-devel/2020-April/016675.html
+      ## Unlike check-bioc.yml, neither pass builds vignettes and neither
+      ## forces a reinstall, which is what makes this tier fast.
+      - name: Install dependencies pass 1
+        run: |
+          message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: local dependencies ****'))
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
+        continue-on-error: true
+        shell: Rscript {0}
+
+      - name: Install dependencies pass 2
+        run: |
+          message(paste('****', Sys.time(), 'pass number 2 at installing dependencies: any remaining dependencies ****'))
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
+          message(paste('****', Sys.time(), 'installing rcmdcheck ****'))
+          remotes::install_cran("rcmdcheck")
+        shell: Rscript {0}
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
+      - name: Run CMD check
+        env:
+          _R_CHECK_CRAN_INCOMING_: false
+        run: |
+          rcmdcheck::rcmdcheck(
+              args = c("--no-vignettes", "--no-build-vignettes", "--no-manual", "--timings"),
+              build_args = c("--no-manual", "--no-resave-data"),
+              error_on = "warning",
+              check_dir = "check"
+          )
+        shell: Rscript {0}
+
+      - name: Reveal testthat details
+        if: always()
+        run: find . -name testthat.Rout -exec cat '{}' ';'
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-check-results
+          path: check

@@ -20,22 +20,29 @@
 ## * GHA: GitHub Action
 ## * OS: operating system
 
+## Triggers: main, nightly, and on demand.
+##
+## This used to fire on `push:` AND `pull_request:`, which meant that once a PR
+## was open every push started two identical ~29-minute runs. Pull requests are
+## now covered by the much faster pr-check.yml, and this tier -- the full
+## Bioconductor check, with vignettes and BiocCheck -- runs where a slow,
+## thorough result is what is actually wanted.
 on:
   push:
-    paths:
-        - 'R/**'
-        - 'tests/**'
-        - 'vignettes/**'
-        - 'inst/**'
-        - 'DESCRIPTION'
-        - 'NAMESPACE'
-  pull_request:
+    branches: [main]
+  schedule:
+    ## 03:00 UTC daily.
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 name: R-CMD-check-bioc
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 ## These environment variables control whether to run GHA code later on that is
-## specific to testthat, covr, and pkgdown.
+## specific to testthat. Coverage and pkgdown moved to docs.yml.
 ##
 ## If you need to clear the cache of packages, update the number inside
 ## cache-version as discussed at https://github.com/r-lib/actions/issues/86.
@@ -43,11 +50,8 @@ name: R-CMD-check-bioc
 ## "/nocache" in the commit message.
 env:
   has_testthat: 'true'
-  run_covr: 'true'
-  run_pkgdown: 'true'
   has_RUnit: 'false'
   cache-version: 'cache-v4'
-  run_docker: 'true'
 
 jobs:
   ## Resolve the R and Bioconductor versions from the single source of truth
@@ -218,8 +222,12 @@ jobs:
           ## Ideally, all dependencies should get installed in the first pass.
 
           ## Pass #1 at installing dependencies
+          ## build_vignettes = FALSE: R CMD build below builds them once, and
+          ## R CMD check then re-builds them as its final step. Building them
+          ## here too (and again in pass 2) meant the five vignettes ran four
+          ## times per job, ~14.5 of the 29 minutes.
           message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: local dependencies ****'))
-          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE, force = TRUE)
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
         continue-on-error: true
         shell: Rscript {0}
 
@@ -227,7 +235,7 @@ jobs:
         run: |
           ## Pass #2 at installing dependencies
           message(paste('****', Sys.time(), 'pass number 2 at installing dependencies: any remaining dependencies ****'))
-          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE, force = TRUE)
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
 
           ## For running the checks
           message(paste('****', Sys.time(), 'installing rcmdcheck and BiocCheck ****'))
@@ -242,18 +250,6 @@ jobs:
           BiocManager::install("BiocGenerics")
         shell: Rscript {0}
 
-      - name: Install covr
-        if: github.ref == 'refs/heads/main' && env.run_covr == 'true' && runner.os == 'Linux'
-        run: |
-          remotes::install_cran("covr")
-        shell: Rscript {0}
-
-      - name: Install pkgdown
-        if: github.ref == 'refs/heads/main' && env.run_pkgdown == 'true' && runner.os == 'Linux'
-        run: |
-          remotes::install_cran("pkgdown")
-        shell: Rscript {0}
-
       - name: Session info
         run: |
           options(width = 100)
@@ -265,8 +261,12 @@ jobs:
         env:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
+          ## --no-build-vignettes is deliberately absent. With it, "checking
+          ## re-building of vignette outputs" reported SKIPPED, so the
+          ## vignettes were built three times per job and verified zero times.
+          ## Bioconductor requires that step to pass.
           rcmdcheck::rcmdcheck(
-              args = c("--no-build-vignettes", "--no-manual", "--timings"),
+              args = c("--no-manual", "--timings"),
               build_args = c("--no-manual", "--no-resave-data"),
               error_on = "warning",
               check_dir = "check"
@@ -319,63 +319,9 @@ jobs:
           )
         shell: Rscript {0}
 
-      - name: Test coverage
-        if: github.ref == 'refs/heads/main' && env.run_covr == 'true' && runner.os == 'Linux'
-        run: |
-          covr::codecov()
-        shell: Rscript {0}
-
-      - name: Install package
-        if: github.ref == 'refs/heads/main' && env.run_pkgdown == 'true' && runner.os == 'Linux'
-        run: R CMD INSTALL .
-
-      - name: Deploy package
-        if: github.ref == 'refs/heads/main' && env.run_pkgdown == 'true' && runner.os == 'Linux'
-        run: |
-          git config --global --add safe.directory /__w/mesa/mesa
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          Rscript -e "pkgdown::deploy_to_branch(new_process = FALSE)"
-        shell: bash {0}
-        ## Note that you need to run pkgdown::deploy_to_branch(new_process = FALSE)
-        ## at least one locally before this will work. This creates the gh-pages
-        ## branch (erasing anything you haven't version controlled!) and
-        ## makes the git history recognizable by pkgdown.
-
       - name: Upload check results
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: ${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-results
           path: check
-      
-  dockerhub-build-and-push:
-    if: false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
-    steps:      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-        
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: crukmi/mesa
-        
-      - name: Login to DockerHub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-      
-      - uses: docker/build-push-action@v7
-        #if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && runner.os == 'Linux' "
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}

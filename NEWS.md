@@ -1,5 +1,25 @@
 # mesa 0.99.6.9000
 
+## Continuous integration
+- Split the CI into tiers. Pull requests now run a new `PR check` workflow
+  (`R CMD check` without the vignette code, no BiocCheck), while
+  `R-CMD-check-bioc` runs the full Bioconductor check on `main`, nightly, and
+  on demand.
+- `R-CMD-check-bioc` no longer triggers on both `push` and `pull_request`.
+  Once a pull request was open, every push started two identical ~29 minute
+  runs.
+- Dependency installation no longer builds the vignettes, and no longer forces
+  a reinstall. Between the two `install_local()` passes and `R CMD build`, the
+  five vignettes were being built three times per job before `R CMD check`
+  started, then run a fourth time.
+- `R-CMD-check-bioc` now verifies the vignettes. `--no-build-vignettes` meant
+  "checking re-building of vignette outputs" reported `SKIPPED`, so the
+  vignettes were built repeatedly and checked never.
+- Moved `covr` and `pkgdown` into a separate `docs` workflow, so a
+  documentation failure no longer reads as a failed check.
+- Removed the `dockerhub-build-and-push` job, which was disabled with
+  `if: false`.
+
 ## Bug fixes
 - `calculateCGEnrichment()` and `getCGPositions()` no longer call `MEDIPS`.
   Reads are imported directly with `Rsamtools::scanBam()` and CpG positions
