@@ -8,12 +8,11 @@
   and silent read truncation caused by the hardcoded `IRanges(1, 536870912)`
   chromosome bound in `MEDIPS`, which dropped reads on longer chromosomes.
   ([#81](https://github.com/cruk-mi/mesa/issues/81))
-- `calculateCGEnrichment()` now reproduces the `MEDIPS` read filtering it
-  replaced, fixing four silent behaviour changes introduced with the
-  `Rsamtools` rewrite: secondary alignments are excluded again
-  (`isSecondaryAlignment = FALSE`), so `nReads` is no longer inflated;
-  `extend` only ever lengthens a read and no longer
-  truncates reads longer than it; `uniq` supports all the documented `MEDIPS`
+- `calculateCGEnrichment()` returns the same counts as previous releases. The
+  `Rsamtools` rewrite had changed four behaviours without meaning to:
+  secondary alignments are excluded again (`isSecondaryAlignment = FALSE`), so
+  `nReads` is no longer inflated; `extend` only ever lengthens a read and no
+  longer truncates reads longer than it; `uniq` accepts all its documented
   values again (`0`, `1`, and a p-value in `(0, 1)` capping duplicates at a
   Poisson quantile) and deduplicates strand-aware, rejecting invalid values
   instead of silently collapsing duplicates; and `getCGPositions()` returns
@@ -22,8 +21,7 @@
   ([#85](https://github.com/cruk-mi/mesa/pull/85))
 - `calculateCGEnrichment()` accepts unindexed BAM files together with
   `chr.select` again. The index is used to restrict the scan when present;
-  otherwise the whole file is scanned and chromosomes are selected afterwards,
-  as `MEDIPS::getGRange()` did.
+  otherwise the whole file is scanned and chromosomes are selected afterwards.
   ([#85](https://github.com/cruk-mi/mesa/pull/85))
 - `MEDIPS` dropped from `Suggests`. No code in the package calls it any more,
   so it was an install-time cost for no benefit. `MEDIPSData` is unaffected and

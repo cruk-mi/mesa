@@ -44,7 +44,7 @@ position is known.
 \strong{Default:} \code{0}.}
 
 \item{uniq}{\code{numeric(1)}
-How to handle duplicate fragments, following \pkg{MEDIPS}:
+How to handle duplicate fragments:
 \itemize{
 \item \code{0} --- keep every read.
 \item \code{1} --- keep at most one read per genomic location and strand.

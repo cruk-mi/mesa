@@ -93,7 +93,7 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'   **Default:** `0`.
 #'
 #' @param uniq `numeric(1)`
-#' How to handle duplicate fragments, following \pkg{MEDIPS}:
+#' How to handle duplicate fragments:
 #' * `0` — keep every read.
 #' * `1` — keep at most one read per genomic location and strand.
 #' * a p-value in `(0, 1)` — keep at most `qpois(1 - uniq, rate)` reads per
