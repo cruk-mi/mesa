@@ -7,3 +7,6 @@
 ^docs/\.nojekyll$
 ^CLAUDE\.md$
 ^tests/testthat/Rplots\.pdf$
+^\.claude$
+^AGENTS\.md$
+^\.git$
