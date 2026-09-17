@@ -1,5 +1,39 @@
 # mesa 0.99.6.9000
 
+## Bug fixes
+- `calculateCGEnrichment()` and `getCGPositions()` no longer call `MEDIPS`.
+  Reads are imported directly with `Rsamtools::scanBam()` and CpG positions
+  located with `Biostrings`. This fixes two bugs: a crash in a fresh session
+  where `GenomicRanges` is not attached (`could not find function "strand<-"`),
+  and silent read truncation caused by the hardcoded `IRanges(1, 536870912)`
+  chromosome bound in `MEDIPS`, which dropped reads on longer chromosomes.
+  ([#81](https://github.com/cruk-mi/mesa/issues/81))
+- `calculateCGEnrichment()` returns the same counts as previous releases. The
+  `Rsamtools` rewrite had changed four behaviours without meaning to:
+  secondary alignments are excluded again (`isSecondaryAlignment = FALSE`), so
+  `nReads` is no longer inflated; `extend` only ever lengthens a read and no
+  longer truncates reads longer than it; `uniq` deduplicates strand-aware and
+  rejects invalid values instead of silently collapsing duplicates; and
+  `getCGPositions()` returns
+  one-base motif positions, so a read starting on the G of a CpG is no longer
+  counted as containing `"CG"`.
+  ([#85](https://github.com/cruk-mi/mesa/pull/85))
+- `calculateCGEnrichment()` accepts unindexed BAM files together with
+  `chr.select` again. The index is used to restrict the scan when present;
+  otherwise the whole file is scanned and chromosomes are selected afterwards.
+  ([#85](https://github.com/cruk-mi/mesa/pull/85))
+- `uniq` in `calculateCGEnrichment()` and `addMedipsEnrichmentFactors()` now
+  accepts only `0` (keep all reads) or `1` (keep one read per genomic
+  location). The p-value form, which capped duplicates per location at a
+  Poisson quantile, has been removed; it was inherited from `MEDIPS` and is
+  not used. Passing any other value is now an error rather than silently
+  collapsing duplicates.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- `MEDIPS` dropped from `Suggests`. No code in the package calls it any more,
+  so it was an install-time cost for no benefit. `MEDIPSData` is unaffected and
+  is still used for test and example data.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+
 # mesa 0.99.6
 
 ## Bug fixes

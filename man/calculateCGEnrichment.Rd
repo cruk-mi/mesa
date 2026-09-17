@@ -32,24 +32,37 @@ containing the read GRanges. If \code{NULL}, no files are written.
 \strong{Default:} \code{NULL}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Extension length for single-end reads (used only when \code{paired = FALSE}):
+reads shorter than this are lengthened to it in the 5'->3' direction, and
+reads already longer are left unchanged. Unused for paired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Strand-aware offset applied to read positions, used only when
+\code{paired = FALSE}. Unused for paired reads, where the true fragment
+position is known.
 \strong{Default:} \code{0}.}
 
-\item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+\item{uniq}{\code{numeric(1)}
+How to handle duplicate fragments:
+\itemize{
+\item \code{0} --- keep every read.
+\item \code{1} --- keep at most one read per genomic location and strand.
+}
+
+Any other value, and any logical, is an error.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
-Passed to \code{\link[MEDIPS:MEDIPSset-class]{MEDIPS::getGRange()}}. Subset of chromosomes to use.
+Subset of chromosomes to use. The BAM index is used to restrict the scan
+when one is present; otherwise the whole file is scanned and the selection
+applied afterwards.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
-Whether BAM contains paired-end reads (passed to
-\code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
+Whether the BAM contains paired-end reads. When \code{TRUE}, properly paired
+fragments are reconstructed from the template length; when \code{FALSE}, single
+reads are used (optionally extended via \code{extend}).
 \strong{Default:} \code{TRUE}.}
 }
 \value{
@@ -66,9 +79,10 @@ A \code{data.frame} with columns:
 }
 \description{
 Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM
-file. Uses \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
-interrogate the reference genome. Optionally exports a fragment-length
-density plot (PDF) and a serialized RDS with the GRanges of reads.
+file. Reads are imported directly with \pkg{Rsamtools}, and
+\pkg{Biostrings} is used to interrogate the reference genome. Optionally
+exports a fragment-length density plot (PDF) and a serialized RDS with the
+GRanges of reads.
 }
 \details{
 Reads are scanned for \code{"CG"} dinucleotides. Counts are normalised against
@@ -80,10 +94,8 @@ with \pkg{mesa} for efficiency.
 }
 }
 \examples{
-if (requireNamespace("MEDIPS", quietly = TRUE) &&
-    requireNamespace("MEDIPSData", quietly = TRUE) &&
-    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
-    require("GenomicRanges", quietly = TRUE)) {
+if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
     calculateCGEnrichment(
         file = system.file(
             "extdata",
@@ -99,5 +111,5 @@ if (requireNamespace("MEDIPS", quietly = TRUE) &&
 }
 \seealso{
 \code{\link[=calculateCGEnrichmentGRanges]{calculateCGEnrichmentGRanges()}}, \code{\link[=calculateGenomicCGDistribution]{calculateGenomicCGDistribution()}},
-\pkg{MEDIPS}, \pkg{BSgenome}
+\pkg{BSgenome}
 }

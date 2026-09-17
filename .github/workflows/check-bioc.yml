@@ -278,6 +278,31 @@ jobs:
         if:  env.has_testthat == 'true'
         run: find . -name testthat.Rout -exec cat '{}' ';'
 
+      - name: Run long checks (read-count regression)
+        if:  env.has_testthat == 'true'
+        run: |
+          ## tests/testthat.R sets skip_long_checks = TRUE unconditionally, so
+          ## R CMD check never runs the blocks guarded by it. One of those,
+          ## expect_equal(enr$nReads, 636130) in test-makeQset.R, is the only
+          ## exact check that calculateCGEnrichment() still returns the read
+          ## counts mesa has always returned for this data - so without this
+          ## step nothing catches a silent change to them (#81, #102).
+          ##
+          ## This runner already installs MEDIPSData and
+          ## BSgenome.Hsapiens.UCSC.hg19, so the block can run here with the
+          ## option disabled. Scoped to makeQset to keep the added runtime to
+          ## the tests that need the heavy data.
+          options(skip_long_checks = FALSE)
+          BiocParallel::register(BiocParallel::SerialParam())
+          testthat::test_dir(
+              "tests/testthat",
+              package = "mesa",
+              load_package = "installed",
+              filter = "makeQset",
+              stop_on_failure = TRUE
+          )
+        shell: Rscript {0}
+
       - name: Run RUnit tests
         if:  env.has_RUnit == 'true'
         run: |

@@ -60,9 +60,10 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' CpG enrichment from a BAM file (MEDIPS-style)
 #'
 #' Compute CpG enrichment metrics (relH and GoGe) from aligned reads in a BAM
-#' file. Uses \pkg{MEDIPS} to obtain fragment ranges and \pkg{Biostrings} to
-#' interrogate the reference genome. Optionally exports a fragment-length
-#' density plot (PDF) and a serialized RDS with the GRanges of reads.
+#' file. Reads are imported directly with \pkg{Rsamtools}, and
+#' \pkg{Biostrings} is used to interrogate the reference genome. Optionally
+#' exports a fragment-length density plot (PDF) and a serialized RDS with the
+#' GRanges of reads.
 #'
 #' @param file `character(1)`
 #' Path to the BAM file.
@@ -80,24 +81,35 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'   **Default:** `NULL`.
 #'
 #' @param extend `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Extension length for unpaired reads.
+#' Extension length for single-end reads (used only when `paired = FALSE`):
+#' reads shorter than this are lengthened to it in the 5'->3' direction, and
+#' reads already longer are left unchanged. Unused for paired reads.
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Shift applied to read positions.
+#' Strand-aware offset applied to read positions, used only when
+#' `paired = FALSE`. Unused for paired reads, where the true fragment
+#' position is known.
 #'   **Default:** `0`.
 #'
-#' @param uniq `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Minimum mapping uniqueness.
+#' @param uniq `numeric(1)`
+#' How to handle duplicate fragments:
+#' * `0` — keep every read.
+#' * `1` — keep at most one read per genomic location and strand.
+#'
+#' Any other value, and any logical, is an error.
 #'   **Default:** `0`.
 #'
 #' @param chr.select `character()` or `NULL`
-#' Passed to [MEDIPS::getGRange()]. Subset of chromosomes to use.
+#' Subset of chromosomes to use. The BAM index is used to restrict the scan
+#' when one is present; otherwise the whole file is scanned and the selection
+#' applied afterwards.
 #'   **Default:** `NULL` (all chromosomes).
 #'
 #' @param paired `logical(1)`
-#' Whether BAM contains paired-end reads (passed to
-#' [MEDIPS::getPairedGRange()]).
+#' Whether the BAM contains paired-end reads. When `TRUE`, properly paired
+#' fragments are reconstructed from the template length; when `FALSE`, single
+#' reads are used (optionally extended via `extend`).
 #'   **Default:** `TRUE`.
 #'
 #' @return A `data.frame` with columns:
@@ -118,14 +130,12 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'
 #' @seealso
 #' [calculateCGEnrichmentGRanges()], [calculateGenomicCGDistribution()],
-#' \pkg{MEDIPS}, \pkg{BSgenome}
+#' \pkg{BSgenome}
 #'
 #'
 #' @examples
-#' if (requireNamespace("MEDIPS", quietly = TRUE) &&
-#'     requireNamespace("MEDIPSData", quietly = TRUE) &&
-#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE) &&
-#'     require("GenomicRanges", quietly = TRUE)) {
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
 #'     calculateCGEnrichment(
 #'         file = system.file(
 #'             "extdata",
@@ -143,12 +153,6 @@ calculateCGEnrichment <- function(
     file = NULL, BSgenome = NULL, exportPath = NULL,
     extend = 0, shift = 0, uniq = 0,
     chr.select = NULL, paired = TRUE) {
-    if (!requireNamespace("MEDIPS", quietly = TRUE)) {
-        stop(
-            "Package \"MEDIPS\" must be installed to use this function.",
-            call. = FALSE
-        )
-    }
 
     dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
 
@@ -168,15 +172,21 @@ calculateCGEnrichment <- function(
         )
     }
 
+    chr.lengths <- GenomeInfoDb::seqlengths(dataset)
+
+    # uniq is applied inside the import helpers, while reads still carry their
+    # real strand, as MEDIPS did. Collapsing here instead would additionally
+    # merge reads sharing coordinates on opposite strands.
     if (!paired) {
-        GRange.Reads <- MEDIPS::getGRange(
-            fileName, path, extend, shift, chr.select, dataset,
-            uniq, simpleCigar = FALSE
+        GRange.Reads <- readSingleEndFragments(
+            file = file, chr.select = chr.select,
+            chr.lengths = chr.lengths,
+            extend = extend, shift = shift, uniq = uniq
         )
     } else {
-        GRange.Reads <- MEDIPS::getPairedGRange(
-            fileName, path, extend, shift, chr.select, dataset,
-            uniq, simpleCigar = FALSE
+        GRange.Reads <- readPairedFragments(
+            file = file, chr.select = chr.select,
+            chr.lengths = chr.lengths, uniq = uniq
         )
     }
 
@@ -295,28 +305,309 @@ calculateCGEnrichment <- function(
 }
 
 
-#' Genomic positions of a motif (CG) from MEDIPS
+#' Genomic positions of a motif (CG)
 #'
-#' Convenience wrapper that returns genomic positions of the \code{"CG"} motif
-#' for the specified BSgenome and chromosomes, via
-#' \code{MEDIPS::MEDIPS.getPositions()}.
+#' Return the genomic positions of the \code{"CG"} dinucleotide for the
+#' specified BSgenome and chromosomes, located directly with \pkg{Biostrings}.
 #'
 #' @param BSgenome Character(1). BSgenome package name.
 #' @param chr.select Character vector of chromosome names to include (e.g.,
-#' \code{paste0("chr", 1:22)}).
+#' \code{paste0("chr", 1:22)}). If \code{NULL}, all chromosomes are used.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of motif positions.
 #'
 #' @seealso \code{\link{calculateCGEnrichment}},
-#' \code{\link{calculateCGEnrichmentGRanges}}, \pkg{MEDIPS}
+#' \code{\link{calculateCGEnrichmentGRanges}}, \pkg{Biostrings}
 #'
 #' @examples
-#' # Requires MEDIPS and a BSgenome package
+#' # Requires a BSgenome package
 #' # if (requireNamespace("BSgenome.Hsapiens.NCBI.GRCh38", quietly = TRUE)) {
-#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = 22)
+#' #   getCGPositions("BSgenome.Hsapiens.NCBI.GRCh38", chr.select = "22")
 #' # }
 getCGPositions <- function(BSgenome, chr.select) {
-    MEDIPS::MEDIPS.getPositions(BSgenome, "CG", chr.select)
+    dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
+
+    chrs <- if (is.null(chr.select)) {
+        GenomeInfoDb::seqnames(dataset)
+    } else {
+        as.character(chr.select)
+    }
+
+    perChr <- lapply(chrs, function(chr) {
+        hits <- Biostrings::matchPattern("CG", dataset[[chr]])
+        # Width 1, not 2, matching MEDIPS::MEDIPS.getPositions(), which
+        # returned IRanges(start = start, end = start). Callers classify reads
+        # with filter_by_non_overlaps(), where any overlap counts: a width-2
+        # range would mark a read starting on the G of a CpG as containing
+        # "CG" even though its extracted sequence does not.
+        GenomicRanges::GRanges(
+            chr,
+            IRanges::IRanges(start = BiocGenerics::start(hits), width = 1L)
+        )
+    })
+
+    unlist(GenomicRanges::GRangesList(perChr), use.names = FALSE)
+}
+
+
+#' Build a ScanBamParam, using the BAM index only when one exists
+#'
+#' \code{Rsamtools::scanBam()} requires an index whenever \code{which} is
+#' supplied. \code{MEDIPS::getGRange()} tested for the index first and, when it
+#' was absent, scanned the whole file and filtered chromosomes afterwards, so
+#' unindexed BAMs stayed usable. This reproduces that behaviour.
+#'
+#' \code{simpleCigar = FALSE} is deliberate. \pkg{MEDIPS} defaults it to
+#' \code{TRUE}, which drops reads whose CIGAR contains \code{N}, \code{S},
+#' \code{H} or \code{P}, but mesa has overridden that to \code{FALSE} on both
+#' \code{getGRange()} and \code{getPairedGRange()} since its first commit
+#' (\code{f28d678}) - soft-clipped and spliced alignments are counted. Do not
+#' "restore" the \pkg{MEDIPS} default here: it would silently drop reads.
+#'
+#' @param file Character(1). Path to the BAM file.
+#' @param what Character vector of BAM fields to read.
+#' @param flag A \code{Rsamtools::scanBamFlag()} object.
+#' @param chr.select Character vector of chromosomes, or \code{NULL} for all.
+#' @param chr.lengths Named numeric vector of chromosome lengths for the whole
+#' genome, used as the upper bound of each scan range.
+#'
+#' @return A \code{list} of \code{param} (the \code{ScanBamParam}) and
+#' \code{prefiltered}: \code{TRUE} when the scan is already restricted to
+#' \code{chr.select}, \code{FALSE} when the caller must filter afterwards.
+#'
+#' @keywords internal
+#' @noRd
+bamScanParam <- function(file, what, flag, chr.select = NULL,
+    chr.lengths = NULL) {
+
+    hasIndex <- any(file.exists(c(
+        paste0(file, ".bai"),
+        sub("\\.bam$", ".bai", file, ignore.case = TRUE),
+        paste0(file, ".csi")
+    )))
+
+    if (is.null(chr.select) || !hasIndex) {
+        if (!is.null(chr.select)) {
+            message(
+                "No BAM index found for ", basename(file),
+                "; scanning the whole file and selecting ",
+                paste(chr.select, collapse = ", "), " afterwards."
+            )
+        }
+        return(list(
+            param = Rsamtools::ScanBamParam(
+                what = what, flag = flag, simpleCigar = FALSE
+            ),
+            prefiltered = is.null(chr.select)
+        ))
+    }
+
+    lengths <- chr.lengths[as.character(chr.select)]
+
+    if (anyNA(lengths)) {
+        stop(
+            "chr.select entries absent from the BSgenome: ",
+            paste(chr.select[is.na(lengths)], collapse = ", "),
+            call. = FALSE
+        )
+    }
+
+    which <- GenomicRanges::GRanges(
+        as.character(chr.select),
+        IRanges::IRanges(start = 1, end = as.integer(lengths))
+    )
+
+    list(
+        param = Rsamtools::ScanBamParam(
+            what = what, flag = flag, simpleCigar = FALSE, which = which
+        ),
+        prefiltered = TRUE
+    )
+}
+
+
+#' Apply the \code{uniq} duplicate-handling rule
+#'
+#' Must be called while \code{reads} still carries its real strand: the
+#' previous implementation deduplicated before setting the strand to
+#' \code{"*"}, so collapsing afterwards would additionally merge reads that
+#' share coordinates on opposite strands.
+#'
+#' @param reads A \link[GenomicRanges]{GRanges-class} of reads.
+#' @param uniq Numeric(1). \code{0} keeps every read; \code{1} keeps at most
+#' one read per genomic location and strand. Any other value, and any logical,
+#' is an error.
+#'
+#' @return A \link[GenomicRanges]{GRanges-class} of reads.
+#'
+#' @keywords internal
+#' @noRd
+dedupeReads <- function(reads, uniq) {
+
+    if (is.logical(uniq) || length(uniq) != 1 || is.na(uniq) ||
+        !uniq %in% c(0, 1)) {
+        stop(
+            "Parameter 'uniq' must be 0 (keep all reads) or 1 (keep one ",
+            "read per genomic location); got ",
+            paste(format(uniq), collapse = ", "), ".",
+            call. = FALSE
+        )
+    }
+
+    if (uniq == 0) {
+        return(reads)
+    }
+
+    BiocGenerics::unique(reads)
+}
+
+
+#' Import paired-end fragments from a BAM file
+#'
+#' Read the properly paired fragments from a BAM file and return them as a
+#' \link[GenomicRanges]{GRanges-class}, one range per fragment. Replaces the
+#' previous reliance on \code{MEDIPS::getPairedGRange()}, which is only usable
+#' when \pkg{GenomicRanges} happens to be attached to the search path.
+#'
+#' Mirrors \code{MEDIPS::getPairedGRange()}: the first mate of each properly
+#' mapped, non-secondary pair is taken, and the fragment span is reconstructed
+#' from the leftmost of the read and its mate position plus the template length
+#' (\code{isize}). \code{shift} / \code{extend} are intentionally ignored for
+#' paired data (the true fragment span is known).
+#'
+#' @param file Character(1). Path to the BAM file. An index is used when
+#' present; without one the whole file is scanned and \code{chr.select} applied
+#' afterwards.
+#' @param chr.select Character vector of chromosomes to import, or \code{NULL}
+#' for all chromosomes.
+#' @param chr.lengths Named numeric vector of chromosome lengths for the whole
+#' genome, used as the upper bound of the scan range and as the denominator of
+#' the \code{uniq} Poisson rate.
+#' @param uniq Numeric(1). Duplicate handling, see \code{dedupeReads()}.
+#'
+#' @return A \link[GenomicRanges]{GRanges-class} of fragment ranges.
+#'
+#' @keywords internal
+#' @noRd
+readPairedFragments <- function(file, chr.select = NULL, chr.lengths = NULL,
+    uniq = 0) {
+
+    flag <- Rsamtools::scanBamFlag(
+        isPaired = TRUE, isProperPair = TRUE,
+        hasUnmappedMate = FALSE, isUnmappedQuery = FALSE,
+        isFirstMateRead = TRUE, isSecondMateRead = FALSE,
+        isSecondaryAlignment = FALSE
+    )
+    what <- c("rname", "pos", "strand", "isize", "mpos")
+
+    scan <- bamScanParam(file, what, flag, chr.select, chr.lengths)
+
+    readDF <- Rsamtools::scanBam(file = file, param = scan$param) %>%
+        purrr::map_df(as.data.frame)
+
+    if (!scan$prefiltered) {
+        readDF <- readDF %>%
+            dplyr::filter(as.character(rname) %in% as.character(chr.select))
+    }
+
+    fragments <- readDF %>%
+        dplyr::mutate(
+            seqnames = as.character(rname),
+            start = pmin(pos, mpos),
+            end = pmin(pos, mpos) + abs(isize) - 1,
+            strand = as.character(strand)
+        ) %>%
+        plyranges::as_granges()
+
+    fragments <- dedupeReads(fragments, uniq)
+
+    BiocGenerics::strand(fragments) <- "*"
+
+    fragments
+}
+
+
+#' Import single-end reads from a BAM file
+#'
+#' Read mapped single-end reads from a BAM file and return them as a
+#' \link[GenomicRanges]{GRanges-class}, one range per read. Replaces the
+#' previous reliance on \code{MEDIPS::getGRange()}, which is only usable when
+#' \pkg{GenomicRanges} happens to be attached to the search path.
+#'
+#' Read spans are \code{[pos, pos + qwidth - 1]} (mirroring
+#' \code{MEDIPS::getGRange()}). When \code{extend > 0}, reads shorter than
+#' \code{extend} are lengthened to it in the 5'->3' (strand-aware) direction;
+#' reads already longer are left alone.
+#'
+#' @param file Character(1). Path to the BAM file. An index is used when
+#' present; without one the whole file is scanned and \code{chr.select} applied
+#' afterwards.
+#' @param chr.select Character vector of chromosomes to import, or \code{NULL}
+#' for all chromosomes.
+#' @param chr.lengths Named numeric vector of chromosome lengths for the whole
+#' genome, used as the upper bound of the scan range and as the denominator of
+#' the \code{uniq} Poisson rate.
+#' @param extend Integer(1). If non-zero, reads shorter than this are extended
+#' to it.
+#' @param shift Integer(1). Optional strand-aware offset applied to reads.
+#' @param uniq Numeric(1). Duplicate handling, see \code{dedupeReads()}.
+#'
+#' @return A \link[GenomicRanges]{GRanges-class} of read ranges.
+#'
+#' @keywords internal
+#' @noRd
+readSingleEndFragments <- function(file, chr.select = NULL,
+    chr.lengths = NULL, extend = 0, shift = 0, uniq = 0) {
+
+    flag <- Rsamtools::scanBamFlag(
+        isUnmappedQuery = FALSE, isSecondaryAlignment = FALSE
+    )
+    what <- c("rname", "pos", "strand", "qwidth")
+
+    scan <- bamScanParam(file, what, flag, chr.select, chr.lengths)
+
+    readDF <- Rsamtools::scanBam(file = file, param = scan$param) %>%
+        purrr::map_df(as.data.frame)
+
+    if (!scan$prefiltered) {
+        readDF <- readDF %>%
+            dplyr::filter(as.character(rname) %in% as.character(chr.select))
+    }
+
+    reads <- readDF %>%
+        dplyr::mutate(
+            seqnames = as.character(rname),
+            start = pos,
+            end = pos + qwidth - 1
+        ) %>%
+        plyranges::as_granges()
+
+    if (shift != 0) {
+        offsets <- ifelse(
+            BiocGenerics::strand(reads) == "-", -shift, shift
+        )
+        reads <- GenomicRanges::shift(reads, offsets)
+    }
+
+    if (extend > 0) {
+        # resize() on a GRanges is strand-aware: fix = "start" extends from
+        # the 5' end regardless of strand (not the lower genomic
+        # coordinate), so this already matches the 5'->3' extension
+        # described above. pmax() reproduces the pmax(0, extend - width)
+        # clamp in MEDIPS::adjustReads(): extend only ever lengthens a read,
+        # it never truncates one that is already longer.
+        reads <- GenomicRanges::resize(
+            reads,
+            width = pmax(BiocGenerics::width(reads), extend),
+            fix = "start"
+        )
+    }
+
+    reads <- dedupeReads(reads, uniq)
+
+    BiocGenerics::strand(reads) <- "*"
+
+    reads
 }
 
 
@@ -380,13 +671,6 @@ getCGPositions <- function(BSgenome, chr.select) {
 calculateCGEnrichmentGRanges <- function(
     readGRanges = NULL, BSgenome = NULL, chr.select = NULL
 ) {
-    if (!requireNamespace("MEDIPS", quietly = TRUE)) {
-        stop(
-            "Package \"MEDIPS\" must be installed to use this function.",
-            call. = FALSE
-        )
-    }
-
     dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
 
     chromosomes <- gtools::mixedsort(
@@ -505,15 +789,18 @@ calculateCGEnrichmentGRanges <- function(
 #'   **Default:** `FALSE`.
 #'
 #' @param extend `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Extension length for unpaired reads.
+#' Passed to [calculateCGEnrichment()]. Extension length for unpaired reads;
+#' reads already longer than this are left unchanged.
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Shift applied to read positions.
+#' Passed to [calculateCGEnrichment()]. Shift applied to unpaired read
+#' positions; unused for paired reads.
 #'   **Default:** `0`.
 #'
-#' @param uniq `integer(1)`
-#' Passed to [MEDIPS::getGRange()]. Minimum mapping uniqueness.
+#' @param uniq `numeric(1)`
+#' Passed to [calculateCGEnrichment()]. Duplicate handling: `0` keeps all
+#' reads, `1` keeps one per genomic location.
 #'   **Default:** `0`.
 #'
 #' @param chr.select `character()` or `NULL`
@@ -551,10 +838,10 @@ calculateCGEnrichmentGRanges <- function(
 #' [calculateCGEnrichment()], [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
-#' # Requires BAM files and the MEDIPS package; see \dontrun{} for a full
+#' # Requires BAM files from MEDIPSData; see \dontrun{} for a full
 #' # usage example.
 #' \dontrun{
-#' if (requireNamespace("MEDIPS", quietly = TRUE) &&
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
 #'     bam <- system.file(
 #'         "extdata",
@@ -590,13 +877,6 @@ addMedipsEnrichmentFactors <- function(
     file_name = "file_name",
     nCores = 1) {
     BSgenome <- qsea::getParameters(qseaSet)[["BSgenome"]]
-
-    if (!requireNamespace("MEDIPS", quietly = TRUE)) {
-        stop(
-            "Package \"MEDIPS\" must be installed to use this function.",
-            call. = FALSE
-        )
-    }
 
     if (nonEnrich) {
         typeString <- "non-enriched"
