@@ -1,12 +1,15 @@
 # AGENTS.md
 
-Canonical, tool-agnostic instructions for **any** AI agent working on **mesa**
-(Claude Code, GitHub Copilot coding agent, Copilot Chat / agent mode, etc.).
+Canonical, tool-agnostic instructions for **any** AI agent working on **mesa**.
 
 > This file is the single source of truth for how agents work on this repo.
-> `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/*`, and the
-> per-agent definitions in `.github/agents/*` and `.claude/agents/*` all defer to it.
-> If they ever disagree, **AGENTS.md wins** — fix the other file.
+> `CLAUDE.md`, the skills in `.claude/skills/*` and the agent definitions in
+> `.claude/agents/*` all defer to it. If they ever disagree, **AGENTS.md wins** — fix the
+> other file.
+>
+> Copilot-specific adapters are archived, inactive, in
+> [`.github/archive/copilot/`](.github/archive/copilot/) — see the README there to
+> reactivate them.
 
 ---
 
@@ -265,6 +268,24 @@ around release cadence, versioning and `BiocCheck`.
 | Roxygen docs, `NEWS.md` entries | `mesa-docs-news` |
 | CI workflows, devcontainer, toolchain versions | `mesa-ci` |
 | Capturing a new procedure as a skill | `capture-skill` |
+
+---
+
+## Output format
+
+For any task that changes code, structure the response like this. Keep each part short —
+this is a checklist for the reader, not an essay.
+
+1. **Plan** — one short paragraph or a few bullets.
+2. **Branch** — the branch created or used.
+3. **Files changed** — a list with a one-line reason each.
+4. **Implementation notes** — key decisions, trade-offs, anything surprising.
+5. **Test steps** — the concrete checks run, and their result. Say plainly which checks
+   could not run here and why (see `bioc-check-ladder`).
+6. **Commit message** — the Conventional Commit message used.
+
+Then state what was pushed and the draft PR opened, if any. Scale it down for trivial
+changes; a one-line fix does not need six headings.
 
 ---
 
