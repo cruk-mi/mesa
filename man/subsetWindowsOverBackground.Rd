@@ -79,10 +79,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
 
-Other window-helpers: 
-\code{\link{calculateFractionReadsInGRanges}()},
-\code{\link{convertToArrayBetaTable}()},
-\code{\link{downSample}()},
-\code{\link{subsetWindowsBySignal}()}
+Other window-helpers:
+\code{\link[=calculateFractionReadsInGRanges]{calculateFractionReadsInGRanges()}},
+\code{\link[=convertToArrayBetaTable]{convertToArrayBetaTable()}},
+\code{\link[=downSample]{downSample()}},
+\code{\link[=subsetWindowsBySignal]{subsetWindowsBySignal()}}
 }
 \concept{window-helpers}

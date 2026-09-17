@@ -41,6 +41,6 @@ exampleTumourNormal \%>\% pull(group, name = sample_name)
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}},
 \code{\link[dplyr:pull]{dplyr::pull()}}
 }

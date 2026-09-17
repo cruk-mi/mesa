@@ -32,5 +32,5 @@ exampleTumourNormal \%>\% getPattern()
 
 }
 \seealso{
-\code{\link[qsea:addPatternDensity]{qsea::addPatternDensity()}}, \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[S4Vectors:Vector-class]{S4Vectors::mcols()}}
+\code{\link[qsea:addPatternDensity]{qsea::addPatternDensity()}}, \code{\link[qsea:getRegions]{qsea::getRegions()}}, \code{\link[S4Vectors:mcols]{S4Vectors::mcols()}}
 }
