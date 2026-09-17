@@ -158,7 +158,7 @@ test_that("extend lengthens short reads but never truncates long ones", {
 })
 
 
-test_that("uniq reproduces the four MEDIPS duplicate-handling branches", {
+test_that("uniq keeps all reads or one per location", {
 
     dir <- tempfile("mesaBam")
     dir.create(dir)
@@ -178,12 +178,10 @@ test_that("uniq reproduces the four MEDIPS duplicate-handling branches", {
     # on the minus strand, so MEDIPS kept it as a separate location.
     expect_equal(length(readChr1(uniq = 1)), 5L)
 
-    # a p-value caps duplicates per location; at this read depth the Poisson
-    # quantile floors to 1, matching uniq = 1
-    expect_equal(length(readChr1(uniq = 1e-3)), 5L)
-
-    expect_error(readChr1(uniq = TRUE), "not logical")
-    expect_error(readChr1(uniq = 2), "in \\[0, 1\\]")
+    # the p-value branch MEDIPS offered is gone: anything but 0 or 1 errors
+    expect_error(readChr1(uniq = 1e-3), "must be 0 .* or 1")
+    expect_error(readChr1(uniq = TRUE), "must be 0 .* or 1")
+    expect_error(readChr1(uniq = 2), "must be 0 .* or 1")
 })
 
 

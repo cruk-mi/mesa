@@ -48,8 +48,6 @@ How to handle duplicate fragments:
 \itemize{
 \item \code{0} --- keep every read.
 \item \code{1} --- keep at most one read per genomic location and strand.
-\item a p-value in \code{(0, 1)} --- keep at most \code{qpois(1 - uniq, rate)}
-reads per location, where \code{rate} is the mean read depth per base.
 }
 
 Any other value, and any logical, is an error.

@@ -96,8 +96,6 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #' How to handle duplicate fragments:
 #' * `0` — keep every read.
 #' * `1` — keep at most one read per genomic location and strand.
-#' * a p-value in `(0, 1)` — keep at most `qpois(1 - uniq, rate)` reads per
-#' location, where `rate` is the mean read depth per base.
 #'
 #' Any other value, and any logical, is an error.
 #'   **Default:** `0`.
@@ -428,64 +426,29 @@ bamScanParam <- function(file, what, flag, chr.select = NULL,
 }
 
 
-#' Total length of the sequences being scanned
+#' Apply the \code{uniq} duplicate-handling rule
 #'
-#' The denominator of the \code{uniq} Poisson rate. MEDIPS used
-#' \code{sum(seqlengths(dataset)[chr.select])}, which is \code{0} when
-#' \code{chr.select} is \code{NULL}; fall back to the whole genome instead.
-#'
-#' @param chr.select Character vector of chromosomes, or \code{NULL} for all.
-#' @param chr.lengths Named numeric vector of chromosome lengths for the whole
-#' genome.
-#'
-#' @return Numeric(1).
-#'
-#' @keywords internal
-#' @noRd
-genomeLengthOf <- function(chr.select, chr.lengths) {
-    if (is.null(chr.select)) {
-        return(sum(as.numeric(chr.lengths)))
-    }
-    sum(as.numeric(chr.lengths[as.character(chr.select)]))
-}
-
-
-#' Apply the MEDIPS \code{uniq} duplicate-handling rule
-#'
-#' Reproduces the four branches of \code{MEDIPS::getGRange()} and
-#' \code{MEDIPS::getPairedGRange()}.
-#'
-#' Must be called while \code{reads} still carries its real strand: MEDIPS
-#' deduplicated before setting the strand to \code{"*"}, so collapsing
-#' afterwards would additionally merge reads that share coordinates on opposite
-#' strands.
+#' Must be called while \code{reads} still carries its real strand: the
+#' previous implementation deduplicated before setting the strand to
+#' \code{"*"}, so collapsing afterwards would additionally merge reads that
+#' share coordinates on opposite strands.
 #'
 #' @param reads A \link[GenomicRanges]{GRanges-class} of reads.
-#' @param uniq Numeric(1). \code{0} keeps every read; \code{1} keeps at most one
-#' read per genomic location; a value in \code{(0, 1)} is a p-value capping the
-#' reads per location at a Poisson quantile of the per-base read rate. Any
-#' other value, and any logical, is an error.
-#' @param genomeLength Numeric(1). Total length of the sequences scanned, the
-#' denominator of the Poisson rate.
+#' @param uniq Numeric(1). \code{0} keeps every read; \code{1} keeps at most
+#' one read per genomic location and strand. Any other value, and any logical,
+#' is an error.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of reads.
 #'
 #' @keywords internal
 #' @noRd
-dedupeReads <- function(reads, uniq, genomeLength) {
+dedupeReads <- function(reads, uniq) {
 
-    if (is.logical(uniq)) {
+    if (is.logical(uniq) || length(uniq) != 1 || is.na(uniq) ||
+        !uniq %in% c(0, 1)) {
         stop(
-            "Parameter 'uniq' must be numeric, not logical: supply 0 to ",
-            "keep all reads, 1 to keep one read per genomic location, or ",
-            "a p-value in (0, 1) to cap duplicates.",
-            call. = FALSE
-        )
-    }
-
-    if (length(uniq) != 1 || is.na(uniq) || uniq < 0 || uniq > 1) {
-        stop(
-            "Parameter 'uniq' must be a single value in [0, 1]; got ",
+            "Parameter 'uniq' must be 0 (keep all reads) or 1 (keep one ",
+            "read per genomic location); got ",
             paste(format(uniq), collapse = ", "), ".",
             call. = FALSE
         )
@@ -495,19 +458,7 @@ dedupeReads <- function(reads, uniq, genomeLength) {
         return(reads)
     }
 
-    if (uniq == 1) {
-        return(BiocGenerics::unique(reads))
-    }
-
-    maxDup <- max(1, stats::qpois(1 - uniq, length(reads) / genomeLength))
-
-    uniqReads <- BiocGenerics::unique(reads)
-    dupNumber <- tabulate(
-        BiocGenerics::match(reads, uniqReads),
-        nbins = length(uniqReads)
-    )
-
-    rep(uniqReads, times = pmin(dupNumber, maxDup))
+    BiocGenerics::unique(reads)
 }
 
 
@@ -568,9 +519,7 @@ readPairedFragments <- function(file, chr.select = NULL, chr.lengths = NULL,
         ) %>%
         plyranges::as_granges()
 
-    fragments <- dedupeReads(
-        fragments, uniq, genomeLengthOf(chr.select, chr.lengths)
-    )
+    fragments <- dedupeReads(fragments, uniq)
 
     BiocGenerics::strand(fragments) <- "*"
 
@@ -654,9 +603,7 @@ readSingleEndFragments <- function(file, chr.select = NULL,
         )
     }
 
-    reads <- dedupeReads(
-        reads, uniq, genomeLengthOf(chr.select, chr.lengths)
-    )
+    reads <- dedupeReads(reads, uniq)
 
     BiocGenerics::strand(reads) <- "*"
 
@@ -853,7 +800,7 @@ calculateCGEnrichmentGRanges <- function(
 #'
 #' @param uniq `numeric(1)`
 #' Passed to [calculateCGEnrichment()]. Duplicate handling: `0` keeps all
-#' reads, `1` keeps one per location, a p-value in `(0, 1)` caps duplicates.
+#' reads, `1` keeps one per genomic location.
 #'   **Default:** `0`.
 #'
 #' @param chr.select `character()` or `NULL`

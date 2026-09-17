@@ -12,10 +12,9 @@
   `Rsamtools` rewrite had changed four behaviours without meaning to:
   secondary alignments are excluded again (`isSecondaryAlignment = FALSE`), so
   `nReads` is no longer inflated; `extend` only ever lengthens a read and no
-  longer truncates reads longer than it; `uniq` accepts all its documented
-  values again (`0`, `1`, and a p-value in `(0, 1)` capping duplicates at a
-  Poisson quantile) and deduplicates strand-aware, rejecting invalid values
-  instead of silently collapsing duplicates; and `getCGPositions()` returns
+  longer truncates reads longer than it; `uniq` deduplicates strand-aware and
+  rejects invalid values instead of silently collapsing duplicates; and
+  `getCGPositions()` returns
   one-base motif positions, so a read starting on the G of a CpG is no longer
   counted as containing `"CG"`.
   ([#85](https://github.com/cruk-mi/mesa/pull/85))
@@ -23,6 +22,13 @@
   `chr.select` again. The index is used to restrict the scan when present;
   otherwise the whole file is scanned and chromosomes are selected afterwards.
   ([#85](https://github.com/cruk-mi/mesa/pull/85))
+- `uniq` in `calculateCGEnrichment()` and `addMedipsEnrichmentFactors()` now
+  accepts only `0` (keep all reads) or `1` (keep one read per genomic
+  location). The p-value form, which capped duplicates per location at a
+  Poisson quantile, has been removed; it was inherited from `MEDIPS` and is
+  not used. Passing any other value is now an error rather than silently
+  collapsing duplicates.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
 - `MEDIPS` dropped from `Suggests`. No code in the package calls it any more,
   so it was an install-time cost for no benefit. `MEDIPSData` is unaffected and
   is still used for test and example data.
