@@ -19,7 +19,7 @@ rules in `.github/instructions/*`, and the
   `@return`, runnable `@examples` (no gratuitous `\dontrun{}`), `@seealso`.
 - **`man/` and `NAMESPACE`** are roxygen2 output and consistent with the `R/` roxygen
   comments — flag any sign of a generated file being hand-edited, and any stray
-  `RoxygenNote` bump riding along in a work PR.
+  `Config/roxygen2/version` bump riding along in a work PR.
 - **Tests:** new functions tested, bug fixes have regression tests, coverage not regressed,
   heavy data guarded with `skip_if_not_installed()`.
 - **NEWS.md** updated under `# mesa X.Y.Z.9000` for user-visible changes.

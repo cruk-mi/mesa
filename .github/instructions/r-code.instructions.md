@@ -22,7 +22,8 @@ Follow [`AGENTS.md`](../../AGENTS.md). For files under `R/`:
   are genuinely required.
 - Add `@seealso` cross-references.
 - **`man/` and `NAMESPACE` are roxygen-generated — never hand-edit them.** Regenerate with
-  `roxygen2::roxygenise()`, and only when your roxygen2 matches `DESCRIPTION`'s `RoxygenNote`.
+  `roxygen2::roxygenise()`, using the version pinned in `DESCRIPTION`'s
+  `Config/roxygen2/version`. CI fails the build if they drift.
 
 Any user-visible change must also be recorded in `NEWS.md` under the current devel heading
 `# mesa X.Y.Z.9000`, and needs a test (see `tests` instructions).
