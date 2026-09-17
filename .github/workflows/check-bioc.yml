@@ -59,6 +59,7 @@ jobs:
       r-version: ${{ steps.parse.outputs.r-version }}
       bioc-version: ${{ steps.parse.outputs.bioc-version }}
       bioc-release: ${{ steps.parse.outputs.bioc-release }}
+      roxygen-version: ${{ steps.parse.outputs.roxygen-version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -75,6 +76,49 @@ jobs:
           echo "r-version=${R_VERSION_FULL}" >> "$GITHUB_OUTPUT"
           echo "bioc-version=${BIOC_VERSION}" >> "$GITHUB_OUTPUT"
           echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
+          echo "roxygen-version=${ROXYGEN_VERSION}" >> "$GITHUB_OUTPUT"
+
+  ## man/ and NAMESPACE are roxygen2 output. Nothing else checks that they
+  ## match the roxygen comments in R/, so they can drift silently until a
+  ## reviewer notices. Regenerate and fail on any diff.
+  ##
+  ## Runs the roxygen2 recorded in DESCRIPTION (Config/roxygen2/version), NOT
+  ## the latest release -- otherwise every upstream roxygen release would turn
+  ## this job red and it would become the churn it exists to prevent.
+  ##
+  ## Uses the devcontainer image because roxygenise() loads the package, which
+  ## needs mesa's full dependency stack.
+  roxygen-drift:
+    needs: read-versions
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cruk-mi/mesa/devcontainer:codespaces-slim
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Install the pinned roxygen2
+        run: |
+          Rscript -e 'v <- "${{ needs.read-versions.outputs.roxygen-version }}"
+            if (!requireNamespace("roxygen2", quietly = TRUE) ||
+                !identical(as.character(packageVersion("roxygen2")), v)) {
+              remotes::install_version("roxygen2", version = v, upgrade = "never")
+            }'
+
+      - name: Regenerate documentation
+        run: Rscript -e 'roxygen2::roxygenise()'
+
+      - name: Fail if man/ or NAMESPACE drifted
+        run: |
+          # The repo is checked out inside a container, so git may refuse to
+          # operate on it as a different user.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if ! git diff --exit-code -- man/ NAMESPACE DESCRIPTION; then
+            echo "::error::man/, NAMESPACE or DESCRIPTION is out of sync with the roxygen comments in R/."
+            echo "Run roxygen2::roxygenise() with roxygen2 ${{ needs.read-versions.outputs.roxygen-version }} and commit the result."
+            exit 1
+          fi
+          echo "Documentation is in sync."
 
   r-build-and-check:
     needs: read-versions
