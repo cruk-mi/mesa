@@ -24,6 +24,9 @@ review guidelines at all times. Current version: pre-submission `0.99.x` series.
 Agents operate on a **dedicated branch as a sandbox**. The human owns when work becomes a
 pull request and when anything merges.
 
+- **Check the state of the repo first.** Run `git status` and `git log --oneline -5`
+  before making changes, and say so if the working tree is dirty or HEAD is not where you
+  expected — do not fold someone else's uncommitted work into your commit.
 - **Branch off `main`.** Never commit directly to `main`. (`dev` is no longer the working
   branch — everything is cut from and PRs back to `main`.)
 - Make the **smallest** set of changes needed. Do not refactor unrelated code.
@@ -128,6 +131,23 @@ Full detail lives in the `bioc-release-cycle` skill.
 
 ---
 
+## Issue workflow
+
+Before creating an issue, **check whether a matching one already exists**:
+
+```bash
+gh issue list --repo cruk-mi/mesa --state open
+```
+
+If one does, report its number and title rather than opening a duplicate. If none does,
+draft the title and body and show them to the human — say plainly that an agent wrote the
+text, per the attribution rule above.
+
+Reference issues from commits with `Fixes #<n>` (closes on merge) or `Refs #<n>`
+(cross-reference only).
+
+---
+
 ## Toolchain versions — single source of truth
 
 **`DESCRIPTION` is the single source of truth; everything else derives from it.** If you
@@ -159,6 +179,8 @@ Follow the [Bioconductor coding guidelines](https://contributions.bioconductor.o
 - Avoid `:::` to reach unexported functions of other packages.
 - No `library()` / `require()` inside package code — declare in `DESCRIPTION` `Imports`
   and call `pkg::fn()`.
+- **Never** call `install.packages()` or `BiocManager::install()` from package source. A
+  package must not install anything when it is loaded.
 - Prefer vectorised ops and Bioconductor structures (`GRanges`, `DataFrame`, …) over base
   loops where natural.
 - Keep functions short and single-purpose; split rather than nest deeply.
