@@ -202,10 +202,12 @@ Follow the [Bioconductor coding guidelines](https://contributions.bioconductor.o
 - Use `@seealso` to cross-reference related functions.
 - **`man/*.Rd` and `NAMESPACE` are roxygen-generated — never hand-edit them.** Both carry
   roxygen2's `do not edit by hand` header. Regenerate with `roxygen2::roxygenise()`.
-- **Before regenerating, check that your installed `roxygen2` matches `DESCRIPTION`'s
-  `RoxygenNote`.** If it does not, **stop and tell the human** — regenerating with a
-  different roxygen rewrites all 100+ man pages and bumps `RoxygenNote`, which must never
-  ride along in a work PR. A roxygen upgrade is its own dedicated PR.
+- **The roxygen2 version is pinned.** `DESCRIPTION`'s `Config/roxygen2/version` records
+  which roxygen2 generated the committed docs, `.devcontainer/install.R` installs exactly
+  that version, and the `roxygen-drift` CI job regenerates and fails on any diff. If your
+  local roxygen2 differs, install the pinned version — do **not** regenerate with a
+  different one, which rewrites every man page. Upgrading roxygen2 is its own dedicated PR
+  (see `mesa-ci`).
 
 ### Testing
 

@@ -84,8 +84,33 @@ BiocManager::install(deps, ask = FALSE, update = FALSE)
 for (pkg in c("languageserver", "imsig")) {
   if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
 }
-for (pkg in c("devtools", "roxygen2", "rcmdcheck")) {
+for (pkg in c("devtools", "rcmdcheck")) {
   if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
+}
+
+# roxygen2 is pinned, not merely present. DESCRIPTION's
+# `Config/roxygen2/version` records the roxygen2 that generated the committed
+# man/ and NAMESPACE; a different one rewrites every man page and produces a
+# huge spurious diff. Note the presence check used above is not enough here --
+# an image that already carries the wrong version would never be corrected --
+# so compare the version and reinstall on mismatch.
+roxygen_ver <- Sys.getenv("ROXYGEN_VERSION")
+if (!nzchar(roxygen_ver)) {
+  desc_path <- file.path(pkg_dir, "DESCRIPTION")
+  fields <- c("Config/roxygen2/version", "RoxygenNote")  # 8.x field, then 7.x
+  found <- fields[fields %in% colnames(read.dcf(desc_path))]
+  if (length(found)) roxygen_ver <- unname(read.dcf(desc_path, fields = found[1])[1, 1])
+}
+if (!nzchar(roxygen_ver)) {
+  stop("install.R: no roxygen2 version in DESCRIPTION or $ROXYGEN_VERSION. ",
+       "See .devcontainer/UPGRADE_GUIDE.md.")
+}
+have_roxygen <- requireNamespace("roxygen2", quietly = TRUE) &&
+  identical(as.character(packageVersion("roxygen2")), roxygen_ver)
+if (!have_roxygen) {
+  message(sprintf("── Installing pinned roxygen2 %s ──", roxygen_ver))
+  remotes::install_version("roxygen2", version = roxygen_ver,
+                           repos = getOption("repos"), upgrade = "never")
 }
 
 # ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases on GitHub,

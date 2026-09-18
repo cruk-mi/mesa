@@ -43,5 +43,5 @@ exampleTumourNormal \%>\% getWindowNames() \%>\% head()
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=asValidGranges]{asValidGranges()}}
+\code{\link[qsea:getRegions]{qsea::getRegions()}}, \code{\link[=asValidGranges]{asValidGranges()}}
 }

@@ -43,7 +43,7 @@ exampleTumourNormal \%>\% arrange(desc(tissue), tumour)
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}},
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}},
 \code{\link[=subsetQset]{subsetQset()}},
 \code{\link[=sort.qseaSet]{sort.qseaSet()}} (for natural sorting of sample names).
 }

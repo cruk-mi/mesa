@@ -4,9 +4,9 @@
 #
 # Single place that maps R -> Bioconductor for the whole repo.
 #
-# It prints four KEY=VALUE lines (R_VERSION, R_VERSION_FULL,
-# BIOC_VERSION, BIOC_RELEASE) that can be appended to $GITHUB_OUTPUT /
-# $GITHUB_ENV in CI, or read locally.
+# It prints five KEY=VALUE lines (R_VERSION, R_VERSION_FULL,
+# BIOC_VERSION, BIOC_RELEASE, ROXYGEN_VERSION) that can be appended to
+# $GITHUB_OUTPUT / $GITHUB_ENV in CI, or read locally.
 #
 # Resolution order (DESCRIPTION is the single source of truth):
 #   1. R_VERSION   = DESCRIPTION "R (>= X.Y.Z)"  -> "X.Y"
@@ -15,6 +15,9 @@
 #                    looked up in https://bioconductor.org/config.yaml
 #                    (overridable via versions.env to pin a release)
 #   3. BIOC_RELEASE= RELEASE_<BIOC_VERSION with . -> _>  (Docker tag)
+#   4. ROXYGEN_VERSION = DESCRIPTION "Config/roxygen2/version"
+#                    (the roxygen2 that generated man/ and NAMESPACE;
+#                    installing a different one rewrites every man page)
 #
 # No R or extra tooling required: runs on a bare runner with
 # curl, grep, sed and POSIX awk, before any container is pulled.
@@ -96,7 +99,23 @@ fi
 
 BIOC_RELEASE="RELEASE_${BIOC_VERSION/./_}"
 
-printf 'R_VERSION=%s\n'      "${R_VERSION}"
-printf 'R_VERSION_FULL=%s\n' "${R_VERSION_FULL}"
-printf 'BIOC_VERSION=%s\n'   "${BIOC_VERSION}"
-printf 'BIOC_RELEASE=%s\n'   "${BIOC_RELEASE}"
+# 4. ROXYGEN_VERSION from DESCRIPTION's "Config/roxygen2/version".
+#    roxygen2 >= 8.0.0 records itself there; 7.x used "RoxygenNote", which we
+#    still accept so the script keeps working on older branches. This is the
+#    roxygen2 that generated the committed man/ and NAMESPACE — installing a
+#    different one rewrites every man page, so tooling installs this exact
+#    version rather than "latest".
+if [ -z "${ROXYGEN_VERSION:-}" ]; then
+    ROXYGEN_VERSION="$(grep -oE '^(Config/roxygen2/version|RoxygenNote):[[:space:]]*[0-9]+\.[0-9]+(\.[0-9]+)?' "${description}" \
+        | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || true)"
+fi
+if [ -z "${ROXYGEN_VERSION:-}" ]; then
+    echo "resolve_versions.sh: could not parse 'Config/roxygen2/version' or 'RoxygenNote' from ${description}" >&2
+    exit 1
+fi
+
+printf 'R_VERSION=%s\n'       "${R_VERSION}"
+printf 'R_VERSION_FULL=%s\n'  "${R_VERSION_FULL}"
+printf 'BIOC_VERSION=%s\n'    "${BIOC_VERSION}"
+printf 'BIOC_RELEASE=%s\n'    "${BIOC_RELEASE}"
+printf 'ROXYGEN_VERSION=%s\n' "${ROXYGEN_VERSION}"

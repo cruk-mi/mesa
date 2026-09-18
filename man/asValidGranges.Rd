@@ -11,12 +11,12 @@ asValidGranges(object)
 \strong{Default:} none (must be supplied).}
 }
 \value{
-A \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} built from \code{object}.
+A \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} built from \code{object}.
 Errors if no supported schema is found.
 }
 \description{
 Accept a \code{GRanges} or a data frame containing window coordinates and
-return a valid \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges}. Supported data-frame schemas:
+return a valid \link[GenomicRanges:GRanges]{GenomicRanges::GRanges}. Supported data-frame schemas:
 \itemize{
 \item \code{seqnames}, \code{start}, \code{end}
 \item \code{chr}, \code{start}, \code{end} (renamed to \code{seqnames})
