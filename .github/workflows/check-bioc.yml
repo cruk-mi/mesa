@@ -97,6 +97,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
 
+      - name: Install any dependencies this branch adds
+        # The image is rebuilt only on pushes to dev/main, so a PR that adds a
+        # dependency to DESCRIPTION would otherwise fail in roxygenise() (which
+        # loads the package) before the drift gate ever runs.
+        run: |
+          Rscript -e 'miss <- setdiff(
+              remotes::local_package_deps(dependencies = TRUE),
+              rownames(installed.packages()))
+            if (length(miss)) {
+              message("Installing missing dependencies: ", paste(miss, collapse = ", "))
+              BiocManager::install(miss, ask = FALSE, update = FALSE)
+            } else message("No missing dependencies.")'
+
       - name: Install the pinned roxygen2
         run: |
           Rscript -e 'v <- "${{ needs.read-versions.outputs.roxygen-version }}"
@@ -113,7 +126,17 @@ jobs:
           # The repo is checked out inside a container, so git may refuse to
           # operate on it as a different user.
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          if ! git diff --exit-code -- man/ NAMESPACE DESCRIPTION; then
+          drifted=0
+          git diff --exit-code -- man/ NAMESPACE DESCRIPTION || drifted=1
+          # git diff ignores untracked files, so a man page missing from the
+          # commit would be regenerated here and still look clean.
+          untracked="$(git ls-files --others --exclude-standard -- man/ NAMESPACE)"
+          if [ -n "$untracked" ]; then
+            echo "Generated files missing from the commit:"
+            echo "$untracked"
+            drifted=1
+          fi
+          if [ "$drifted" -ne 0 ]; then
             echo "::error::man/, NAMESPACE or DESCRIPTION is out of sync with the roxygen comments in R/."
             echo "Run roxygen2::roxygenise() with roxygen2 ${{ needs.read-versions.outputs.roxygen-version }} and commit the result."
             exit 1

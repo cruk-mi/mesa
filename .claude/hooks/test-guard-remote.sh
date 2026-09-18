@@ -34,10 +34,20 @@ for cmd in \
     'gh pr merge 102' \
     'gh pr merge 102 --squash' \
     'gh pr ready 102' \
+    'gh pr edit 104 --ready' \
     'gh pr review 102 --approve' \
     'git push origin --delete old-branch' \
     'git branch -D old-branch' \
-    'git tag -d v0.99.6'
+    'git tag -d v0.99.6' \
+    'git -C /repo push origin main' \
+    'git -c user.name=x push origin main' \
+    'git push origin refs/heads/main' \
+    'git push --dry-run origin main && git push origin main' \
+    'git push origin main; echo done' \
+    'git push --mirror origin' \
+    'git push --all origin' \
+    'git push origin :main' \
+    'git push origin +main'
 do check 2 "$cmd"; done
 
 # --- must be allowed -------------------------------------------------
@@ -45,14 +55,17 @@ for cmd in \
     'git push origin chore/agent-setup' \
     'git push -u origin chore/agent-setup' \
     'git push origin chore/main-cleanup' \
+    'git push origin HEAD:refs/heads/fix/81' \
     'git push --dry-run origin main' \
     'git status' \
     'git log --oneline -5' \
     'git diff main...HEAD' \
     'git fetch origin' \
     'git checkout main' \
+    'git branch --show-current' \
     'gh pr create --draft --title "x" --body "y"' \
     'gh pr view 102' \
+    'gh pr list --state open' \
     'Rscript -e "devtools::test()"'
 do check 0 "$cmd"; done
 
@@ -67,6 +80,34 @@ if [ "$(echo '{"tool_name":"Read","tool_input":{"file_path":"/x"}}' | python3 "$
     echo "FAIL: non-Bash tool was not passed through"
     fails=$((fails + 1))
 fi
+
+# --- stateful rule ---------------------------------------------------
+# `git commit` / `git merge` are blocked by inspecting the CURRENT branch, not
+# the command string, so the rule survives being split across separate tool
+# calls (checkout in one, commit in the next). Exercised in a throwaway repo
+# because it depends on real repo state.
+tmp="$(mktemp -d)"
+(
+    cd "$tmp" || exit 1
+    git init -q -b main . && git commit -q --allow-empty -m init
+) >/dev/null 2>&1
+state_check() { # state_check <expected> <cmd>
+    local expected="$1" cmd="$2" actual
+    actual="$(cd "$tmp" && printf '%s' "$cmd" \
+        | python3 -c 'import json,sys; print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
+        | python3 "$hook" >/dev/null 2>&1; echo $?)"
+    if [ "$actual" != "$expected" ]; then
+        printf 'FAIL (stateful, expected %s, got %s): %s\n' "$expected" "$actual" "$cmd"
+        fails=$((fails + 1))
+    fi
+}
+state_check 2 'git commit -m "x"'          # on main -> blocked
+state_check 2 'git merge some-branch'      # on main -> blocked
+state_check 2 'git push'                   # bare push on main -> blocked
+(cd "$tmp" && git checkout -q -b feat/x) >/dev/null 2>&1
+state_check 0 'git commit -m "x"'          # on a feature branch -> allowed
+state_check 0 'git push'                   # bare push on a feature branch -> allowed
+rm -rf "$tmp"
 
 if [ "$fails" -eq 0 ]; then
     echo "guard-remote: all cases pass"

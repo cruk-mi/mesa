@@ -41,8 +41,15 @@ test_that("something slow", {
 })
 ```
 
-CI runs the skipped long checks in a dedicated job so they are still verified — do not
-assume a `skip` means untested.
+**These tests are currently not run anywhere.** `tests/testthat.R` sets the option
+unconditionally and `check-bioc.yml` does not override it, so `skip_long_checks()` tests
+skip locally *and* in CI. Do not report them as verified. If you need one to actually run:
+
+```r
+withr::with_options(list(skip_long_checks = FALSE), devtools::test())
+```
+
+A dedicated CI job to run them is still outstanding.
 
 ## Skip guards for heavy data
 

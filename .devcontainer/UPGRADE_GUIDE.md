@@ -52,8 +52,21 @@ updated in one file and silently missed in another.
 | Bioconductor version | derived from R via `bioconductor.org/config.yaml` | the same resolver | derived (optional pin in `versions.env`) |
 | Dependency list | `DESCRIPTION` → `Imports` / `Depends` / `Suggests` | `install.R` reads it directly | derived |
 | roxygen2 | `DESCRIPTION` → `Config/roxygen2/version` | `resolve_versions.sh` → `install.R`, `roxygen-drift` CI job | derived |
-| RSPM Ubuntu codename (`noble`) | none — tracks the Bioc base image's Ubuntu | hardcoded in **two** places: `check-bioc.yml` and `.devcontainer/install.R` | **duplicated — update both** |
+| RSPM Ubuntu codename (`noble`) | none — tracks the Bioc base image's Ubuntu | hardcoded in `check-bioc.yml` and `.devcontainer/install.R` | **duplicated — update both** |
+| `system_requirements("ubuntu", "20.04")` | none — same base-image Ubuntu | `check-bioc.yml` (sysreqs step) | **out of step with `noble` (24.04) — see below** |
 | `ggtree`, `immunedeconv` | explicit GitHub SHAs in `install.R` | — | pinned on purpose |
+
+### The two Ubuntu values disagree
+
+`check-bioc.yml` names the base image's Ubuntu twice, and they currently say different
+things: the RSPM URL uses `noble` (24.04) while the system-requirements step asks for
+`20.04`. That step resolves apt packages for the wrong release. It has not broken the build
+— the Bioconductor base image already carries most system libraries — but it will silently
+resolve the wrong package set for anything new.
+
+When the base image's Ubuntu changes, **both** must change, and they should agree with each
+other. Neither is derivable from `DESCRIPTION`, because Ubuntu tracks the Docker base image
+rather than the R version.
 
 ### roxygen2
 
