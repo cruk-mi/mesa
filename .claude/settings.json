@@ -52,5 +52,6 @@
     "github@posit-dev-skills": true,
     "open-source@posit-dev-skills": true,
     "posit-dev@posit-dev-skills": true
-  }
+  },
+  "outputStyle": "Concise"
 }

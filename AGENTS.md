@@ -193,8 +193,11 @@ Follow the [Bioconductor coding guidelines](https://contributions.bioconductor.o
 
 ### roxygen2 / documentation
 
-- Every exported function needs `@title`, `@description`, `@param`, `@return`, and at least
-  one runnable `@examples` block. Use `exampleMouse` / `exampleTumourNormal` data objects;
+- Every exported function needs a title, a description, `@param` for every argument,
+  `@return`, and at least one runnable `@examples` block. **This package writes the title
+  and description implicitly** — the first roxygen line is the title, the following
+  paragraph the description. There are no `@title` / `@description` tags anywhere in `R/`;
+  follow that convention rather than introducing them. Use `exampleMouse` / `exampleTumourNormal` data objects;
   avoid `\dontrun{}` unless an example genuinely needs network/files.
 - Use `@seealso` to cross-reference related functions.
 - **`man/*.Rd` and `NAMESPACE` are roxygen-generated — never hand-edit them.** Both carry
