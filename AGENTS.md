@@ -268,19 +268,36 @@ around release cadence, versioning and `BiocCheck`.
 
 ## Output format
 
-For any task that changes code, structure the response like this. Keep each part short —
-this is a checklist for the reader, not an essay.
+**Lead with the result.** No preamble, no plan-of-attack, no restating the task back.
 
-1. **Plan** — one short paragraph or a few bullets.
-2. **Branch** — the branch created or used.
-3. **Files changed** — a list with a one-line reason each.
-4. **Implementation notes** — key decisions, trade-offs, anything surprising.
-5. **Test steps** — the concrete checks run, and their result. Say plainly which checks
-   could not run here and why (see `bioc-check-ladder`).
-6. **Commit message** — the Conventional Commit message used.
+Answers use the same labelled parts every time, so the reader knows where to look. Each
+part is **one or two lines**. A part with nothing to say is **left out** — never write
+"N/A" or pad it.
 
-Then state what was pushed and the draft PR opened, if any. Scale it down for trivial
-changes; a one-line fix does not need six headings.
+| Part | Content |
+|---|---|
+| **Result** | What now works, or what changed and why. Always first, always present. |
+| **Files** | One line per file: `path` — the reason it changed. |
+| **Verified** | What was actually run and what it said, and which checks could not run here and why (see `bioc-check-ladder`). Never imply a check that did not run. |
+| **Decide** | What the human has to choose, or what was deliberately left undone. Omit when there is nothing. |
+| **Notes** | A real trade-off or surprise only. Omit when the work was routine. |
+| **Commit** | The Conventional Commit subject, and the branch it landed on. |
+
+**Scale to the size of the change:**
+
+- **One-line fix, single file** — one sentence and the commit subject. Nothing else.
+- **A few files, no design decisions** — Result, Files, Verified, Commit.
+- **Multi-file or design-affecting** — the full set.
+
+**Leave out:**
+
+- Closing recaps and summary sections that repeat what was just said. The last part is
+  the last word.
+- Narration of what is about to happen ("Next I'll run the tests…"). Do it, then report it.
+- Tool output already on screen — diffs, file listings, full test logs. Quote only the
+  line that carries the verdict.
+
+A push or a draft PR is one line under **Result**, with the URL — not a section of its own.
 
 ---
 

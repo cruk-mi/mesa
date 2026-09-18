@@ -7,6 +7,14 @@ release cycle, the toolchain version doctrine and the attribution rule all live 
 it is imported above. This file adds only Claude-Code-specific notes. Where the two
 disagree, `AGENTS.md` wins.
 
+## How to answer
+
+Lead with the result — no preamble, no restating the request, no closing recap. Use the
+labelled parts in [`AGENTS.md`](AGENTS.md#output-format): one or two lines each, dropped
+entirely when empty. A one-line fix gets a sentence and the commit subject, nothing more.
+Do not narrate what you are about to do, and do not re-print tool output already on screen.
+Say plainly what was verified and what could not run here.
+
 ## The contract, in one line
 
 Branch off `main`, commit atomically, push the feature branch, open a **draft** PR if asked
