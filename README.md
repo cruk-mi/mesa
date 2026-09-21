@@ -10,7 +10,7 @@
 <!--
 Bioconductor shields. These 404 until mesa is accepted and appears in the
 Bioconductor repository at 1.0, so they stay commented out until then.
-Tracked in the issue linked from the README PR.
+Tracked in issue #109.
 
 [![BioC release](https://bioconductor.org/shields/build/release/bioc/mesa.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/mesa)
 [![BioC devel](https://bioconductor.org/shields/build/devel/bioc/mesa.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/mesa)
