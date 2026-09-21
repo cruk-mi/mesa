@@ -8,7 +8,7 @@ Refresh mesa's project state, then say what to do next.
 ## 1. Regenerate the facts
 
 ```bash
-python3 .claude/scripts/mesa-status.py
+python3 .claude/scripts/mesa-status.py --html
 ```
 
 This rewrites `.claude/state/status.json` and `STATUS.md` from `git`, `gh`, `NEWS.md` and the
@@ -22,8 +22,12 @@ before drawing any conclusion from them.
 
 The script derives facts; the recommendation is yours. Overwrite
 `.claude/state/recommendation.md` with what should happen next — the thing a maintainer
-returning after two weeks would otherwise miss. Then re-run the script so it renders into
-`STATUS.md`.
+returning after two weeks would otherwise miss. Then re-run the script, again with `--html`,
+so the judgement renders into `STATUS.md` and into the page step 3 publishes:
+
+```bash
+python3 .claude/scripts/mesa-status.py --html
+```
 
 Keep it to one decision plus at most two standing observations. Ground each in a specific
 number or issue from the status. Overwrite it — never append, or it becomes a changelog of
@@ -37,8 +41,9 @@ Useless: *"Continue working on open issues."*
 - **File exists:** `Artifact` with `action: "read"` and that `url` first (required before
   updating an artifact this conversation has not published), then publish to the same `url`
   so the link stays stable.
-- **File missing:** load the `artifact-design` skill, build the page, publish it, and write
-  the returned URL to that file. It is gitignored — the URL is per-person.
+- **File missing:** publish `.claude/state/dashboard.html` — step 1 has just rebuilt it from
+  the template — and write the returned URL to that file. It is gitignored: the URL is
+  per-person. Only reach for the `artifact-design` skill if the template itself needs work.
 
 The page inlines the JSON. It declares **no** `capabilities`: a snapshot needs none, and
 there is no GitHub connector for it to read live anyway. Show the snapshot time and warn

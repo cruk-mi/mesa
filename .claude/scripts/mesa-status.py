@@ -28,6 +28,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -776,10 +777,34 @@ def render_html(state):
 
 
 def write_atomic(path, text):
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as handle:
-        handle.write(text)
-    os.replace(tmp, path)
+    """Replace `path` in one step, without a temp name anyone else can share.
+
+    The SessionStart refresh and a manual `/mesa-status` can overlap, and a
+    fixed `<path>.tmp` would have them writing the same file. A unique name in
+    the same directory keeps `os.replace` atomic, and the `finally` means an
+    interrupted run leaves nothing behind - `STATUS.md.tmp` sits in the package
+    root, where a stray file is not just untidy.
+    """
+    directory = os.path.dirname(path) or "."
+    # Prefixed with the target's own name, not hidden with a leading dot, so
+    # `^STATUS\.md` in .Rbuildignore covers a leftover as well as the real file.
+    fd, tmp = tempfile.mkstemp(dir=directory, prefix=os.path.basename(path) + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+        # mkstemp is 0600 by design; these are ordinary derived files, so give
+        # them the mode a plain open() would have.
+        umask = os.umask(0)
+        os.umask(umask)
+        os.chmod(tmp, 0o666 & ~umask)
+        os.replace(tmp, path)
+        tmp = None
+    finally:
+        if tmp is not None:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
 
 
 def main():
