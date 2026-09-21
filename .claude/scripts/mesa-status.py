@@ -4,7 +4,7 @@
 Writes two files:
 
   .claude/state/status.json   machine-readable state (gitignored)
-  STATUS.md                   the committed human/agent summary
+  STATUS.md                   the human/agent summary (gitignored: it is derived)
 
 Nothing here is hand-maintained, so nothing can go stale: every fact is read
 back from the place humans and agents both actually write to. A change made on

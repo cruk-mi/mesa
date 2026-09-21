@@ -14,13 +14,20 @@ git + gh + NEWS.md + gh-pages
             |
   .claude/scripts/mesa-status.py        read-only, deterministic, no model involved
             |
-  .claude/state/status.json             gitignored intermediate
+  .claude/state/status.json             intermediate
             |
     +-------+--------+
     |                |
-STATUS.md      dashboard artifact
-committed      private claude.ai page
+STATUS.md      dashboard.html
+what Claude    what you look at, from
+reads          disk or published
 ```
+
+**All three outputs are gitignored.** They are derived, so committing one would put a
+snapshot in the repo to go stale — the exact drift this design exists to avoid. Only the two
+genuine inputs are committed: `.claude/state/recommendation.md` and
+`.claude/state/bioccheck-history.jsonl`. A fresh clone has no `STATUS.md` until the script
+runs, which the `SessionStart` hook does anyway.
 
 ## The rule
 
@@ -30,8 +37,9 @@ silently discards your correction.
 
 The single hand-written input is `.claude/state/recommendation.md`: the "what to do next"
 judgement a script cannot derive. The script renders it into `STATUS.md`. It is
-**overwritten**, never appended to, or it decays into a log of stale advice. It is committed,
-so regenerating on any machine reproduces `STATUS.md` byte for byte.
+**overwritten**, never appended to, or it decays into a log of stale advice. It is committed
+— being an input, not an output — so regenerating on any machine reproduces the same
+`STATUS.md`.
 
 ## Refreshing
 
@@ -99,7 +107,7 @@ Add a `collect_*()` that returns a plain dict and degrades to `None`/`unknown` o
 call it in `main()`, and render it in `render()`. Two constraints:
 
 1. **Idempotent.** Two runs with no repo change must produce a byte-identical `STATUS.md`
-   apart from the trailing timestamp, or every refresh churns a committed file. Provenance
+   apart from the trailing timestamp, so a refresh is a no-op when nothing moved. Provenance
    that varies between runs (cache vs live) belongs in `status.json`, not `STATUS.md`.
 2. **Degrades quietly.** Call `degrade("why this is unknown")` and carry on. Never raise.
 

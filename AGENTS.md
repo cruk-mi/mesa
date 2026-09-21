@@ -136,9 +136,11 @@ Full detail lives in the `bioc-release-cycle` skill.
 
 ## Project state
 
-[`STATUS.md`](STATUS.md) answers "what landed, what is in flight, what is next". It is
-**generated** — every figure in it is read back from `git`, `gh`, `NEWS.md` and the
-`gh-pages` build commit by `.claude/scripts/mesa-status.py`.
+`STATUS.md` answers "what landed, what is in flight, what is next". It is **generated** —
+every figure in it is read back from `git`, `gh`, `NEWS.md` and the `gh-pages` build commit
+by `.claude/scripts/mesa-status.py` — and therefore **gitignored**: a derived snapshot
+committed to the repo would go stale there, which is the whole failure this avoids. If you
+do not have it, run the script and you do.
 
 - **Never hand-edit it**, and never correct a number in it. A wrong figure means a wrong
   probe: fix the script.
@@ -164,7 +166,7 @@ GitHub, so it cannot refresh itself.
 | `.claude/scripts/mesa-status.py` | the generator | **yes** — this is where a wrong figure gets fixed |
 | `.claude/scripts/dashboard-template.html` | the dashboard's design and markup | **yes** — this is the page |
 | `.claude/state/recommendation.md` | the "what next" judgement | **yes** — overwrite it |
-| `STATUS.md` | generated | no |
+| `STATUS.md` | generated, gitignored | no |
 | `.claude/state/status.json` | generated, gitignored | no |
 | `.claude/state/dashboard.html` | generated, gitignored | no — edits here vanish on the next run |
 | `.claude/state/bioccheck-history.jsonl` | append-only record | no — the script appends |
