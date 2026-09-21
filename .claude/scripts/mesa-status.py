@@ -56,6 +56,20 @@ def degrade(message):
         DEGRADED.append(message)
 
 
+def fetch_refs():
+    """Update the remote-tracking refs every probe below reads.
+
+    Without this, `origin/main` and `origin/gh-pages` are only as fresh as the
+    last time a human fetched, so a refresh could report a stale SHA and an
+    "N commits behind" count that contradicts GitHub - the exact drift this
+    script exists to prevent. Degrades like every other probe: on failure the
+    comparisons still run, against whatever is already local.
+    """
+    if git("fetch", "--quiet", "origin", "main", "gh-pages", timeout=60) is None:
+        degrade("`git fetch origin` failed, so main/gh-pages comparisons use "
+                "possibly stale local refs")
+
+
 def run(argv, timeout=30):
     """Run a command in the repo. Returns stdout, or None on any failure."""
     try:
@@ -270,11 +284,21 @@ def collect_next_up():
     return groups
 
 
-def latest_main_run():
-    data = gh_json([
+def latest_main_run(successful=False):
+    """The newest main run, or the newest that actually finished green.
+
+    CI wants the newest run whatever its verdict - that is the current state.
+    BiocCheck wants the newest *successful* one: a failed or in-progress run
+    may never have reached the BiocCheck step, and parsing its log would report
+    "not parsed" while pointing at a run that was never checked.
+    """
+    argv = [
         "run", "list", "--repo", REPO, "--workflow", WORKFLOW, "--branch", "main",
         "--limit", "1", "--json", "databaseId,conclusion,headSha,createdAt,url",
-    ])
+    ]
+    if successful:
+        argv += ["--status", "success"]
+    data = gh_json(argv)
     if not data:
         return None
     return data[0]
@@ -332,7 +356,16 @@ BIOC_SUMMARY = re.compile(
     r"(\d+)\s+ERRORS?\s*\|\s*\D*(\d+)\s+WARNINGS?\s*\|\s*\D*(\d+)\s+NOTES?", re.I
 )
 # `gh run view --log` prefixes every line with "<job>\t<step>\t<timestamp> ".
+# The step column is not usable here - gh reports "UNKNOWN STEP" for every line
+# of this workflow's logs - so the BiocCheck section is delimited by BiocCheck's
+# own banners instead. Without that bound, an "ERROR: " from dependency install
+# or R CMD check would be collected and rendered as a BiocCheck finding.
 LOG_PREFIX = re.compile(r"^.*?\d{4}-\d{2}-\d{2}T[\d:.]+Z\s?")
+BIOC_START = re.compile(r"Running BiocCheck on ")
+BIOC_END = re.compile(r"BiocCheck v[\d.]+ results")
+# BiocCheck prefixes its own findings with a glyph; a bare "ERROR: " anywhere
+# else in the log is some other tool's.
+BIOC_ERROR = re.compile(r"^[*\u2716]\s*ERROR:\s*(.+)$")
 # A BiocCheck finding starts with one of these; anything else continues the
 # previous one, because long messages wrap onto their own lines.
 FINDING_START = re.compile(r"^[*\u2716\u2139\u26a0\u2714]")
@@ -384,9 +417,13 @@ def collect_bioccheck(run_info, allow_log):
         degrade("CI log for the latest main run could not be fetched, so BiocCheck counts are the cached ones")
         return {"latest": latest, "history": history, "source": "cache"}
 
-    counts, errors, pending = None, [], None
+    counts, errors, pending, inside = None, [], None, False
     for line in log.splitlines():
         message = log_message(line)
+        if not inside:
+            if BIOC_START.search(message):
+                inside = True
+            continue
         match = BIOC_SUMMARY.search(message)
         if match:
             counts = {
@@ -394,10 +431,14 @@ def collect_bioccheck(run_info, allow_log):
                 "warning": int(match.group(2)),
                 "note": int(match.group(3)),
             }
+            break
+        if BIOC_END.search(message):
+            # The banner precedes the summary; keep reading for one more line.
             pending = None
             continue
-        if "ERROR: " in message:
-            pending = message.split("ERROR: ", 1)[1].strip()
+        found = BIOC_ERROR.match(message)
+        if found:
+            pending = found.group(1).strip()
             errors.append(pending)
         elif pending is not None:
             if message and not FINDING_START.match(message):
@@ -405,6 +446,9 @@ def collect_bioccheck(run_info, allow_log):
             else:
                 pending = None
     errors = list(dict.fromkeys(error for error in errors if error))
+    if not inside:
+        degrade("BiocCheck output not found in the CI log for this run")
+        return {"latest": latest, "history": history, "source": "not parsed"}
     if counts is None:
         degrade("BiocCheck summary line not found in the CI log (output format may have changed)")
         return {"latest": latest, "history": history, "source": "not parsed"}
@@ -484,18 +528,24 @@ def collect_branches():
     ]
     prs = gh_json([
         "pr", "list", "--repo", REPO, "--state", "all", "--limit", "300",
-        "--json", "number,headRefName,state",
+        "--json", "number,headRefName,state,isCrossRepository",
     ])
     if prs is None:
         return None
+    # An OPEN PR outranks everything: a branch backing live work must never be
+    # classified as landed, because that is what fills the prune block below.
+    RANK = {"OPEN": 3, "MERGED": 2, "CLOSED": 1}
     state_of = {}
     for pr in prs:
         ref = pr.get("headRefName")
         if not ref:
             continue
-        # A branch reused across PRs: the most advanced state wins.
-        rank = {"MERGED": 3, "OPEN": 2, "CLOSED": 1}
-        if rank.get(pr.get("state"), 0) >= rank.get(state_of.get(ref, {}).get("state"), 0):
+        # headRefName is only the short name, so a fork's branch can collide
+        # with an unrelated ref of ours. The branches listed above are all this
+        # repository's, so a fork PR can say nothing about them.
+        if pr.get("isCrossRepository"):
+            continue
+        if RANK.get(pr.get("state"), 0) >= RANK.get(state_of.get(ref, {}).get("state"), 0):
             state_of[ref] = {"state": pr.get("state"), "number": pr.get("number")}
 
     current = git("rev-parse", "--abbrev-ref", "HEAD")
@@ -740,7 +790,11 @@ def main():
                 print(f"STATUS.md is under {args.max_age}s old; not refreshing.")
             return 0
 
+    fetch_refs()
     run_info = latest_main_run()
+    bioc_run = run_info
+    if run_info is not None and run_info.get("conclusion") != "success":
+        bioc_run = latest_main_run(successful=True)
     state = {
         "generated": iso(now()),
         "repo": REPO,
@@ -753,7 +807,7 @@ def main():
         "next_up": collect_next_up(),
         "ci": collect_ci(run_info),
         "coverage": collect_coverage(),
-        "bioccheck": collect_bioccheck(run_info, allow_log=not args.no_log),
+        "bioccheck": collect_bioccheck(bioc_run, allow_log=not args.no_log),
         "pkgdown": collect_pkgdown(),
         "branches": collect_branches(),
     }
