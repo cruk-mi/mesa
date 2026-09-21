@@ -47,7 +47,12 @@ for cmd in \
     'git push --mirror origin' \
     'git push --all origin' \
     'git push origin :main' \
-    'git push origin +main'
+    'git push origin +main' \
+    'gh api -X PUT repos/cruk-mi/mesa/pulls/106/merge' \
+    'gh api repos/cruk-mi/mesa/pulls/106/merge -X PUT' \
+    'gh api --method PATCH repos/cruk-mi/mesa/pulls/106 -f draft=false' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews -f event=APPROVE' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking'
 do check 2 "$cmd"; done
 
 # --- must be allowed -------------------------------------------------
@@ -66,6 +71,10 @@ for cmd in \
     'gh pr create --draft --title "x" --body "y"' \
     'gh pr view 102' \
     'gh pr list --state open' \
+    'gh api repos/cruk-mi/mesa/pulls/106/comments' \
+    'gh api repos/cruk-mi/mesa/pulls/106 --jq .state' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/comments/4063116787/replies -f body=fixed' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/comments/1/replies -f body="see /pulls/106/merge"' \
     'Rscript -e "devtools::test()"'
 do check 0 "$cmd"; done
 

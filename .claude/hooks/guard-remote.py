@@ -10,6 +10,7 @@ Blocked:
   * force pushes, --mirror, --all, and remote ref deletion
   * committing or merging while HEAD is on a protected branch
   * gh pr merge / ready / review --approve
+  * the same four actions reached through `gh api`
   * deleting branches or tags
 
 The command is split on shell separators and tokenised, so each segment is
@@ -35,6 +36,19 @@ PROTECTED = {"main", "dev", "master"}
 # Git's own options that swallow the following token, so the subcommand can be
 # located without mistaking an option's argument for it.
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+
+# `gh api` reaches every endpoint `gh pr` does, so the same four rules have to
+# hold there or the contract is one flag away from being bypassed. Matched on
+# the endpoint rather than the method: the path is what names the action.
+GH_API_OPTS_WITH_VALUE = {
+    "-X", "--method", "-f", "--field", "-F", "--raw-field", "-H", "--header",
+    "-q", "--jq", "-t", "--template", "--input", "--cache", "-p", "--preview",
+    "--hostname",
+}
+GH_API_MERGE = re.compile(r"/pulls/\d+/merge/?$")
+GH_API_PULL = re.compile(r"/pulls/\d+/?$")
+GH_API_REVIEWS = re.compile(r"/pulls/\d+/reviews/?$")
+GH_API_REF = re.compile(r"/git/refs?(/|$)")
 
 
 def split_segments(command):
@@ -88,6 +102,66 @@ def targets_protected_ref(args):
     return False
 
 
+def gh_api_endpoint(tokens):
+    """The endpoint argument of `gh api`, skipping flags and their values.
+
+    Parsed rather than grepped so a reply body that merely mentions a path
+    (`-f body='... /pulls/1/merge ...'`) is not mistaken for one.
+    """
+    try:
+        i = next(n for n, t in enumerate(tokens) if not t.startswith("-")
+                 and os.path.basename(t) != "gh") + 1
+    except StopIteration:
+        return None
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok in GH_API_OPTS_WITH_VALUE:
+            i += 2
+            continue
+        if tok.startswith("-"):
+            i += 1
+            continue
+        return tok
+    return None
+
+
+def gh_api_method(tokens):
+    """The HTTP method a `gh api` call will use."""
+    for i, tok in enumerate(tokens):
+        if tok in ("-X", "--method") and i + 1 < len(tokens):
+            return tokens[i + 1].upper()
+        if tok.startswith("--method="):
+            return tok.split("=", 1)[1].upper()
+    # gh switches to POST as soon as a field is supplied.
+    if any(t in ("-f", "--field", "-F", "--raw-field") or
+           t.startswith(("--field=", "--raw-field=")) for t in tokens):
+        return "POST"
+    return "GET"
+
+
+def check_gh_api(tokens):
+    """`gh api` is not a read-only escape hatch from the `gh pr` rules.
+
+    Reads stay allowed, and so do the writes an agent is meant to make —
+    posting a review reply is `POST .../pulls/N/comments/ID/replies`, which
+    none of these patterns match.
+    """
+    endpoint = gh_api_endpoint(tokens)
+    if not endpoint:
+        return None
+    method = gh_api_method(tokens)
+    if GH_API_MERGE.search(endpoint):
+        return "Merging pull requests is the human's decision, not the agent's."
+    if GH_API_REVIEWS.search(endpoint) and "APPROVE" in " ".join(tokens).upper():
+        return "An agent does not approve pull requests on this repo."
+    if GH_API_PULL.search(endpoint) and method != "GET":
+        return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
+                "ready for review.")
+    if GH_API_REF.search(endpoint) and method == "DELETE":
+        return "Deleting branches is not allowed — they are the human's audit trail."
+    return None
+
+
 def current_branch():
     try:
         out = subprocess.run(
@@ -108,6 +182,8 @@ def check_segment(segment):
     # --- gh ---------------------------------------------------------------
     if os.path.basename(tokens[0]) == "gh":
         rest = [t for t in tokens[1:] if not t.startswith("-")]
+        if rest[:1] == ["api"]:
+            return check_gh_api(tokens)
         if rest[:2] == ["pr", "merge"]:
             return "Merging pull requests is the human's decision, not the agent's."
         if rest[:2] == ["pr", "ready"]:

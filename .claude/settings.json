@@ -21,7 +21,6 @@
       "Bash(bash .devcontainer/resolve_versions.sh)",
       "Bash(bash .claude/hooks/test-guard-remote.sh)",
       "Bash(gh pr checks:*)",
-      "Bash(gh api:*)",
       "Bash(python3 .claude/scripts/mesa-status.py:*)"
     ],
     "deny": [

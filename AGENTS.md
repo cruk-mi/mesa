@@ -42,8 +42,10 @@ pull request and when anything merges.
   published history.
 - When in doubt about an irreversible or outward-facing action, ask first.
 
-These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`. If the hook
-and this file ever disagree, that is a bug — fix both.
+These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
+as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
+approval through the raw API is blocked the same way. If the hook and this file ever
+disagree, that is a bug — fix both.
 
 ---
 
