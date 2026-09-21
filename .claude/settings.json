@@ -19,7 +19,10 @@
       "Bash(gh run view:*)",
       "Bash(Rscript -e:*)",
       "Bash(bash .devcontainer/resolve_versions.sh)",
-      "Bash(bash .claude/hooks/test-guard-remote.sh)"
+      "Bash(bash .claude/hooks/test-guard-remote.sh)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh api:*)",
+      "Bash(python3 .claude/scripts/mesa-status.py:*)"
     ],
     "deny": [
       "Read(./.Renviron)",
@@ -34,6 +37,17 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-remote.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/scripts/mesa-status.py\" --max-age 14400 --no-log --quiet || true",
+            "timeout": 60
           }
         ]
       }

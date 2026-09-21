@@ -134,6 +134,25 @@ Full detail lives in the `bioc-release-cycle` skill.
 
 ---
 
+## Project state
+
+[`STATUS.md`](STATUS.md) answers "what landed, what is in flight, what is next". It is
+**generated** — every figure in it is read back from `git`, `gh`, `NEWS.md` and the
+`gh-pages` build commit by `.claude/scripts/mesa-status.py`.
+
+- **Never hand-edit it**, and never correct a number in it. A wrong figure means a wrong
+  probe: fix the script.
+- Refresh with `/mesa-status`, or `python3 .claude/scripts/mesa-status.py`. A `SessionStart`
+  hook refreshes it automatically once it is over four hours old.
+- The one hand-written part is `.claude/state/recommendation.md`, the "what to do next"
+  judgement. It is overwritten, never appended to, and rendered into `STATUS.md` by the
+  script.
+
+Because the state is derived, a change made by anyone — you, a co-maintainer on github.com,
+Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.
+
+---
+
 ## Issue workflow
 
 Before creating an issue, **check whether a matching one already exists**:
@@ -265,6 +284,7 @@ around release cadence, versioning and `BiocCheck`.
 | Writing or fixing tests | `mesa-tests` |
 | Roxygen docs, `NEWS.md` entries | `mesa-docs-news` |
 | CI workflows, devcontainer, toolchain versions | `mesa-ci` |
+| Project state, `STATUS.md`, the status generator | `mesa-status` |
 | Capturing a new procedure as a skill | `capture-skill` |
 
 ---

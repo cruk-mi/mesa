@@ -1,0 +1,679 @@
+<title>mesa Status Board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    /* Teal-biased neutrals: a lab instrument, not a marketing page. */
+    --ground: #f5f8f8;
+    --surface: #ffffff;
+    --surface-2: #eef3f3;
+    --line: #d3dedd;
+    --ink: #17211f;
+    --ink-2: #4d5c5a;
+    --ink-3: #7b8a88;
+    --accent: #0f6e6a;
+    --ok: #2c7048;
+    --warn: #8a5f11;
+    --bad: #9d2f2f;
+    --ok-bg: #e6f1ea;
+    --warn-bg: #f7efdd;
+    --bad-bg: #f6e5e5;
+    --radius: 6px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0d1413;
+      --surface: #141d1c;
+      --surface-2: #1b2625;
+      --line: #2b3837;
+      --ink: #e4ecea;
+      --ink-2: #a5b4b2;
+      --ink-3: #788886;
+      --accent: #4bb5ad;
+      --ok: #62b487;
+      --warn: #d0a14e;
+      --bad: #e08585;
+      --ok-bg: #16281f;
+      --warn-bg: #2b2415;
+      --bad-bg: #2c1a1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0d1413;
+    --surface: #141d1c;
+    --surface-2: #1b2625;
+    --line: #2b3837;
+    --ink: #e4ecea;
+    --ink-2: #a5b4b2;
+    --ink-3: #788886;
+    --accent: #4bb5ad;
+    --ok: #62b487;
+    --warn: #d0a14e;
+    --bad: #e08585;
+    --ok-bg: #16281f;
+    --warn-bg: #2b2415;
+    --bad-bg: #2c1a1a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-inline: 16px;
+    padding-block: 28px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  code, .mono, th, .num { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; }
+  code {
+    font-size: 0.88em;
+    background: var(--surface-2);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  /* ---- masthead ---- */
+  .masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+  .masthead h1 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .version {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .version .devel { color: var(--accent); font-weight: 600; }
+  .phase {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--ink-3);
+    margin-left: auto;
+  }
+
+  /* ---- readouts: severity stripe, no card chrome ---- */
+  .readouts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .readout { background: var(--surface); padding: 13px 15px 14px; border-left: 3px solid var(--line); }
+  .readout.is-ok { border-left-color: var(--ok); }
+  .readout.is-warn { border-left-color: var(--warn); }
+  .readout.is-bad { border-left-color: var(--bad); }
+  .readout .label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-bottom: 5px;
+  }
+  .readout .value {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 19px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .readout .note { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
+  .meter { height: 3px; background: var(--surface-2); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--warn); }
+
+  /* ---- panels ---- */
+  .cols { display: grid; grid-template-columns: 1.35fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+  .col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+  section { min-width: 0; }
+  section > h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--ink-3);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 12px;
+  }
+
+  /* the recommendation is the one thing that is lifted */
+  .rec {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .rec h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .rec p { margin: 0 0 9px; max-width: 68ch; }
+  .rec ul { margin: 0; padding-left: 18px; }
+  .rec li { margin-bottom: 6px; max-width: 66ch; }
+  .rec > :last-child { margin-bottom: 0; }
+
+  .rows { display: flex; flex-direction: column; }
+  .row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .row:last-child { border-bottom: 0; }
+  .row .id {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    color: var(--ink-3);
+    flex: none;
+    min-width: 3.4em;
+  }
+  .row .body { flex: 1; min-width: 0; }
+  .row .title { display: block; }
+  .row .sub {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+    word-break: break-all;
+  }
+  .pill {
+    flex: none;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1px 7px;
+    border-radius: 99px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+  }
+  .pill.is-ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.is-warn { background: var(--warn-bg); color: var(--warn); }
+  .pill.is-bad { background: var(--bad-bg); color: var(--bad); }
+  .group-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+    margin: 14px 0 3px;
+  }
+  .group-label:first-child { margin-top: 0; }
+
+  .tally { display: flex; gap: 16px; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .tally div { font-size: 13px; }
+  .tally b { font-size: 17px; font-weight: 600; display: block; }
+  .tally .e b { color: var(--bad); }
+  .tally .w b { color: var(--warn); }
+  .tally .n b { color: var(--ink-2); }
+  .findings { margin: 12px 0 0; padding: 0; list-style: none; }
+  .findings li {
+    font-size: 12.5px;
+    padding: 7px 0 0;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+  }
+  .findings li::before { content: "\2716"; color: var(--bad); margin-right: 7px; }
+
+  .trend { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+  .trend th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    padding: 0 8px 4px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .trend td { padding: 4px 8px 4px 0; font-variant-numeric: tabular-nums; border-bottom: 1px solid var(--line); }
+  .trend tr:last-child td { border-bottom: 0; }
+
+  .prose p { margin: 0 0 9px; max-width: 68ch; }
+  .prose ul { margin: 0 0 9px; padding-left: 18px; }
+  .prose li { margin-bottom: 5px; max-width: 66ch; }
+  .prose > :last-child { margin-bottom: 0; }
+  .muted { color: var(--ink-2); }
+
+  details.prune {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 15px;
+  }
+  details.prune summary { cursor: pointer; font-size: 13px; }
+  details.prune summary::marker { color: var(--ink-3); }
+  details.prune[open] summary { margin-bottom: 10px; }
+  pre.sh {
+    background: var(--surface-2);
+    border-radius: 4px;
+    padding: 11px 12px;
+    overflow-x: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    margin: 0 0 10px;
+  }
+  .warnbox {
+    background: var(--warn-bg);
+    border-left: 3px solid var(--warn);
+    border-radius: 4px;
+    padding: 10px 13px;
+    font-size: 12.5px;
+    color: var(--warn);
+  }
+  .badbox {
+    background: var(--bad-bg);
+    border-left: 3px solid var(--bad);
+    border-radius: 4px;
+    padding: 10px 13px;
+    font-size: 12.5px;
+    color: var(--bad);
+  }
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script id="status-data" type="application/json">/*__STATUS_JSON__*/</script>
+<script>
+  (function () {
+    var DATA = JSON.parse(document.getElementById("status-data").textContent);
+    var app = document.getElementById("app");
+
+    function el(tag, cls, text) {
+      var node = document.createElement(tag);
+      if (cls) node.className = cls;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    /* Minimal inline markdown: the source is NEWS.md and our own recommendation,
+       so only code spans, bold, links and bullets need to survive. */
+    function inline(text) {
+      var out = "";
+      var i = 0;
+      while (i < text.length) {
+        var rest = text.slice(i);
+        var m = rest.match(/^`([^`]+)`/);
+        if (m) { out += "<code>" + esc(m[1]) + "</code>"; i += m[0].length; continue; }
+        m = rest.match(/^\*\*([^*]+)\*\*/);
+        if (m) { out += "<strong>" + esc(m[1]) + "</strong>"; i += m[0].length; continue; }
+        m = rest.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/);
+        if (m) {
+          out += '<a href="' + esc(m[2]) + '" target="_blank" rel="noopener">' + esc(m[1]) + "</a>";
+          i += m[0].length; continue;
+        }
+        out += esc(rest[0]); i += 1;
+      }
+      return out;
+    }
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function prose(lines, cls) {
+      var box = el("div", cls || "prose");
+      var para = [];
+      var list = null;
+      function flushPara() {
+        if (!para.length) return;
+        var p = el("p");
+        p.innerHTML = inline(para.join(" "));
+        box.appendChild(p);
+        para = [];
+      }
+      (lines || []).forEach(function (raw) {
+        var line = raw.replace(/\s+$/, "");
+        var bullet = line.match(/^\s*[-*]\s+(.*)$/);
+        if (bullet) {
+          flushPara();
+          if (!list) { list = el("ul"); box.appendChild(list); }
+          var li = el("li");
+          li.innerHTML = inline(bullet[1]);
+          li.dataset.open = "1";
+          list.appendChild(li);
+          return;
+        }
+        if (!line.trim()) { flushPara(); list = null; return; }
+        // An indented line continues the bullet above it.
+        if (list && /^\s{2,}\S/.test(raw)) {
+          var last = list.lastChild;
+          last.innerHTML = last.innerHTML + " " + inline(line.trim());
+          return;
+        }
+        list = null;
+        if (/^#{1,6}\s/.test(line)) { flushPara(); box.appendChild(el("p", "muted", line.replace(/^#+\s*/, ""))); return; }
+        para.push(line.trim());
+      });
+      flushPara();
+      return box;
+    }
+
+    function section(title, node) {
+      var s = el("section");
+      s.appendChild(el("h2", null, title));
+      s.appendChild(node);
+      return s;
+    }
+
+    function readout(label, value, note, level, meter) {
+      var box = el("div", "readout" + (level ? " is-" + level : ""));
+      box.appendChild(el("div", "label", label));
+      box.appendChild(el("div", "value", value));
+      if (note) box.appendChild(el("div", "note", note));
+      if (meter != null) {
+        var bar = el("div", "meter");
+        var fill = el("i");
+        fill.style.width = Math.max(0, Math.min(100, meter)) + "%";
+        bar.appendChild(fill);
+        box.appendChild(bar);
+      }
+      return box;
+    }
+
+    // ---- masthead -------------------------------------------------------
+    var head = el("div", "masthead");
+    var h1 = el("h1", null, "mesa");
+    head.appendChild(h1);
+    var version = el("div", "version");
+    var raw = DATA.release.version || "unknown";
+    // The .9000 suffix is what decides the cycle phase, so it is marked.
+    var parts = raw.match(/^(.*?)(\.9000)$/);
+    version.innerHTML = parts
+      ? esc(parts[1]) + '<span class="devel">' + esc(parts[2]) + "</span>"
+      : esc(raw);
+    head.appendChild(version);
+    head.appendChild(el("div", "phase", DATA.release.phase || ""));
+    app.appendChild(head);
+
+    // ---- readouts -------------------------------------------------------
+    var readouts = el("div", "readouts");
+
+    var ci = DATA.ci || {};
+    var ciLevel = ci.conclusion === "success" ? "ok" : (ci.conclusion === "unknown" ? null : "bad");
+    var ciNote = ci.sha ? "at " + ci.sha + " · " + ci.when : "no run found";
+    if (ci.behind) ciNote += " · main is " + ci.behind + " commit(s) ahead";
+    readouts.appendChild(readout("R CMD check · main", ci.conclusion || "unknown", ciNote, ciLevel));
+
+    var cov = DATA.coverage || {};
+    if (cov.pct == null) {
+      readouts.appendChild(readout("Coverage", "unknown", "Codecov unreachable", null));
+    } else {
+      var stale = cov.stale_days != null && cov.stale_days > 30;
+      readouts.appendChild(readout(
+        "Coverage",
+        cov.pct + "%",
+        "target " + cov.target + "%" + (stale ? " · last upload " + cov.updated + ", " + cov.stale_days + "d ago" : ""),
+        cov.pct >= cov.target ? "ok" : "warn",
+        cov.pct
+      ));
+    }
+
+    var bioc = (DATA.bioccheck || {}).latest;
+    if (bioc) {
+      readouts.appendChild(readout(
+        "BiocCheck",
+        bioc.error + "E / " + bioc.warning + "W / " + bioc.note + "N",
+        "at " + bioc.sha + " · " + bioc.date,
+        bioc.error ? "bad" : (bioc.warning ? "warn" : "ok")
+      ));
+    } else {
+      readouts.appendChild(readout("BiocCheck", "unknown", "no run recorded", null));
+    }
+
+    var pkg = DATA.pkgdown || {};
+    readouts.appendChild(readout(
+      "pkgdown site",
+      pkg.commits_behind ? pkg.commits_behind + " behind" : (pkg.site_sha ? "current" : "unknown"),
+      pkg.site_sha ? "built from " + pkg.site_sha : "build commit not found",
+      pkg.commits_behind ? "warn" : (pkg.site_sha ? "ok" : null)
+    ));
+    app.appendChild(readouts);
+
+    // ---- degraded -------------------------------------------------------
+    if ((DATA.degraded || []).length) {
+      var warn = el("div", "warnbox");
+      warn.innerHTML = "<strong>Incomplete data.</strong> " +
+        DATA.degraded.map(esc).join(" · ");
+      app.appendChild(warn);
+    }
+
+    // ---- recommendation -------------------------------------------------
+    if (DATA.recommendation) {
+      var rec = el("div", "rec");
+      rec.appendChild(el("h2", null, "Recommended next step"));
+      rec.appendChild(prose(DATA.recommendation.split("\n"), "recbody"));
+      app.appendChild(rec);
+    }
+
+    // ---- two columns ----------------------------------------------------
+    var cols = el("div", "cols");
+    var left = el("div", "col");
+    var right = el("div", "col");
+
+    // in flight
+    var flight = el("div", "rows");
+    if (DATA.in_flight == null) {
+      flight.appendChild(el("div", "muted", "Unknown — GitHub unreachable."));
+    } else if (!DATA.in_flight.length) {
+      flight.appendChild(el("div", "muted", "Nothing open."));
+    } else {
+      DATA.in_flight.forEach(function (pr) {
+        var row = el("div", "row");
+        var link = el("a", "id", "#" + pr.number);
+        link.href = "https://github.com/" + DATA.repo + "/pull/" + pr.number;
+        link.target = "_blank"; link.rel = "noopener";
+        row.appendChild(link);
+        var body = el("div", "body");
+        body.appendChild(el("span", "title", pr.title + (pr.draft ? " (draft)" : "")));
+        body.appendChild(el("span", "sub", pr.branch + " · " + pr.updated));
+        row.appendChild(body);
+        var level = pr.ci === "green" ? "ok" : (pr.ci === "failing" ? "bad" : (pr.ci === "running" ? "warn" : null));
+        row.appendChild(el("span", "pill" + (level ? " is-" + level : ""), pr.ci));
+        flight.appendChild(row);
+      });
+    }
+    left.appendChild(section("In flight", flight));
+
+    // next up
+    var next = el("div");
+    if (DATA.next_up == null) {
+      next.appendChild(el("div", "muted", "Unknown — GitHub unreachable."));
+    } else {
+      var labels = Object.keys(DATA.next_up);
+      var priority = ["ERROR_fix", "WARNING_fix", "NOTE_fix", "Bioc_feedback_fix"];
+      labels.sort(function (a, b) {
+        var ia = priority.indexOf(a), ib = priority.indexOf(b);
+        if (ia !== ib) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+        return a.localeCompare(b);
+      });
+      labels.forEach(function (label) {
+        next.appendChild(el("div", "group-label", label + " · " + DATA.next_up[label].length));
+        var rows = el("div", "rows");
+        DATA.next_up[label].forEach(function (issue) {
+          var row = el("div", "row");
+          var link = el("a", "id", "#" + issue.number);
+          link.href = "https://github.com/" + DATA.repo + "/issues/" + issue.number;
+          link.target = "_blank"; link.rel = "noopener";
+          row.appendChild(link);
+          var body = el("div", "body");
+          body.appendChild(el("span", "title", issue.title));
+          row.appendChild(body);
+          rows.appendChild(row);
+        });
+        next.appendChild(rows);
+      });
+    }
+    left.appendChild(section("Next up", next));
+
+    // bioc readiness
+    var ready = el("div");
+    if (bioc) {
+      var tally = el("div", "tally");
+      [["e", bioc.error, "ERRORS"], ["w", bioc.warning, "WARNINGS"], ["n", bioc.note, "NOTES"]]
+        .forEach(function (row) {
+          var cell = el("div", row[0]);
+          cell.appendChild(el("b", null, String(row[1])));
+          cell.appendChild(document.createTextNode(row[2]));
+          tally.appendChild(cell);
+        });
+      ready.appendChild(tally);
+      if ((bioc.errors || []).length) {
+        var list = el("ul", "findings");
+        bioc.errors.forEach(function (text) {
+          var li = el("li");
+          li.innerHTML = inline(text);
+          list.appendChild(li);
+        });
+        ready.appendChild(list);
+      }
+      var history = (DATA.bioccheck || {}).history || [];
+      if (history.length > 1) {
+        var table = el("table", "trend");
+        table.innerHTML =
+          "<thead><tr><th>Commit</th><th>Date</th><th>E</th><th>W</th><th>N</th></tr></thead>";
+        var tbody = el("tbody");
+        history.slice(-6).forEach(function (entry) {
+          var tr = el("tr");
+          [entry.sha, entry.date, entry.error, entry.warning, entry.note].forEach(function (cell) {
+            tr.appendChild(el("td", null, String(cell)));
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        var scroll = el("div");
+        scroll.style.overflowX = "auto";
+        scroll.appendChild(table);
+        ready.appendChild(scroll);
+      }
+    } else {
+      ready.appendChild(el("div", "muted", "No BiocCheck run recorded yet."));
+    }
+    right.appendChild(section("Bioconductor readiness", ready));
+
+    // devel news
+    var news = DATA.news || {};
+    right.appendChild(section(
+      news.heading || "Devel changes",
+      (news.body && news.body.length)
+        ? prose(news.body)
+        : el("div", "muted", "No entries yet — nothing user-visible has landed in this cycle.")
+    ));
+
+    // landed
+    var landed = el("div", "rows");
+    if (DATA.landed == null) {
+      landed.appendChild(el("div", "muted", "Unknown — GitHub unreachable."));
+    } else {
+      DATA.landed.forEach(function (pr) {
+        var row = el("div", "row");
+        var link = el("a", "id", "#" + pr.number);
+        link.href = "https://github.com/" + DATA.repo + "/pull/" + pr.number;
+        link.target = "_blank"; link.rel = "noopener";
+        row.appendChild(link);
+        var body = el("div", "body");
+        body.appendChild(el("span", "title", pr.title));
+        row.appendChild(body);
+        row.appendChild(el("span", "pill", pr.merged));
+        landed.appendChild(row);
+      });
+    }
+    right.appendChild(section("Recently landed", landed));
+
+    cols.appendChild(left);
+    cols.appendChild(right);
+    app.appendChild(cols);
+
+    // ---- branch hygiene -------------------------------------------------
+    var branches = DATA.branches;
+    if (branches) {
+      var prunable = branches.landed.concat(branches.abandoned);
+      var details = el("details", "prune");
+      var summary = el("summary");
+      summary.textContent = prunable.length + " branch(es) safe to prune — " +
+        branches.landed.length + " landed, " + branches.abandoned.length + " closed unmerged, " +
+        branches.unknown.length + " with no PR";
+      details.appendChild(summary);
+
+      var localNames = prunable.filter(function (b) { return b.where.indexOf("local") === 0 || b.where === "local+remote"; })
+                               .map(function (b) { return b.branch; });
+      var remoteNames = prunable.filter(function (b) { return b.where.indexOf("remote") >= 0; })
+                                .map(function (b) { return b.branch; });
+      var cmds = [];
+      if (localNames.length) cmds.push("git branch -D " + localNames.join(" "));
+      if (remoteNames.length) cmds.push("git push origin --delete " + remoteNames.join(" "));
+      if (cmds.length) {
+        details.appendChild(el("pre", "sh", cmds.join("\n\n")));
+        details.appendChild(el("div", "muted", "Run these yourself — agents do not delete branches."));
+      }
+      if (branches.unknown.length) {
+        details.appendChild(el("div", "group-label", "No PR found — check before deleting"));
+        var unknownRows = el("div", "rows");
+        branches.unknown.forEach(function (b) {
+          var row = el("div", "row");
+          row.appendChild(el("div", "body")).appendChild(el("span", "sub", b.branch));
+          row.appendChild(el("span", "pill", b.where));
+          unknownRows.appendChild(row);
+        });
+        details.appendChild(unknownRows);
+      }
+      app.appendChild(section("Branch hygiene", details));
+    }
+
+    // ---- footer ---------------------------------------------------------
+    var foot = el("footer");
+    var ts = new Date(DATA.generated);
+    var hours = (Date.now() - ts.getTime()) / 36e5;
+    foot.appendChild(el("span", null, "snapshot " + DATA.generated.replace("T", " ").replace("Z", " UTC")));
+    var tree = DATA.worktree || {};
+    if (tree.branch) {
+      foot.appendChild(el("span", null, "checkout on " + tree.branch +
+        (tree.dirty && tree.dirty.length ? " · " + tree.dirty.length + " uncommitted" : " · clean")));
+    }
+    var repoLink = el("a", null, DATA.repo);
+    repoLink.href = "https://github.com/" + DATA.repo;
+    repoLink.target = "_blank"; repoLink.rel = "noopener";
+    foot.appendChild(repoLink);
+    app.appendChild(foot);
+
+    if (hours > 24) {
+      var stalebox = el("div", "badbox");
+      stalebox.innerHTML = "<strong>This snapshot is " + Math.floor(hours / 24) +
+        " day(s) old.</strong> It cannot refresh itself — run <code>/mesa-status</code> to rebuild it.";
+      app.insertBefore(stalebox, app.children[2]);
+    }
+  })();
+</script>

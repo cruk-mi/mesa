@@ -38,6 +38,7 @@ Load the skill rather than guessing; each one loads only when the task matches.
 | Writing or fixing tests | `mesa-tests` |
 | Roxygen docs, `NEWS.md` entries | `mesa-docs-news` |
 | CI, devcontainer, toolchain versions | `mesa-ci` |
+| Project state, `STATUS.md`, the status generator | `mesa-status` |
 | Capturing a new procedure as a skill | `capture-skill` |
 
 Generic R practice comes from the `posit-dev/skills` plugins (`r-lib`, `github`,

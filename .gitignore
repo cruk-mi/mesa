@@ -7,3 +7,6 @@ inst/doc
 .RData
 Rplots.pdf
 .claude/settings.local.json
+.claude/state/status.json
+.claude/state/artifact-url.txt
+.claude/state/dashboard.html
