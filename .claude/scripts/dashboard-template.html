@@ -455,11 +455,16 @@
     }
 
     var pkg = DATA.pkgdown || {};
+    // null is "could not compare", not "zero behind" - saying "current" there
+    // would claim freshness exactly when nothing is known.
+    var behind = pkg.commits_behind;
+    var behindKnown = typeof behind === "number";
     readouts.appendChild(readout(
       "pkgdown site",
-      pkg.commits_behind ? pkg.commits_behind + " behind" : (pkg.site_sha ? "current" : "unknown"),
+      behindKnown ? (behind ? behind + " behind" : "current")
+                  : (pkg.site_sha ? "drift unknown" : "unknown"),
       pkg.site_sha ? "built from " + pkg.site_sha : "build commit not found",
-      pkg.commits_behind ? "warn" : (pkg.site_sha ? "ok" : null)
+      behindKnown ? (behind ? "warn" : "ok") : null
     ));
     app.appendChild(readouts);
 
@@ -628,13 +633,16 @@
         branches.unknown.length + " with no PR";
       details.appendChild(summary);
 
+      // Matches the Markdown renderer: a git ref may contain ; $ ` & | ( ), and
+      // this block exists to be copied into a shell, so quote every name.
+      var shq = function (name) { return "'" + String(name).replace(/'/g, "'\\''") + "'"; };
       var localNames = prunable.filter(function (b) { return b.where.indexOf("local") === 0 || b.where === "local+remote"; })
-                               .map(function (b) { return b.branch; });
+                               .map(function (b) { return shq(b.branch); });
       var remoteNames = prunable.filter(function (b) { return b.where.indexOf("remote") >= 0; })
-                                .map(function (b) { return b.branch; });
+                                .map(function (b) { return shq(b.branch); });
       var cmds = [];
-      if (localNames.length) cmds.push("git branch -D " + localNames.join(" "));
-      if (remoteNames.length) cmds.push("git push origin --delete " + remoteNames.join(" "));
+      if (localNames.length) cmds.push("git branch -D -- " + localNames.join(" "));
+      if (remoteNames.length) cmds.push("git push origin --delete -- " + remoteNames.join(" "));
       if (cmds.length) {
         details.appendChild(el("pre", "sh", cmds.join("\n\n")));
         details.appendChild(el("div", "muted", "Run these yourself — agents do not delete branches."));

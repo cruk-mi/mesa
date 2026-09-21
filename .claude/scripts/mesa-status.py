@@ -25,6 +25,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 import time
@@ -670,7 +671,13 @@ def render(state):
     # --- published site ---------------------------------------------------
     out += ["## Published site", ""]
     if pkg["site_sha"]:
-        if pkg["commits_behind"]:
+        # None means the comparison could not be made at all. Folding that into
+        # "current with main" would be a freshness claim precisely when nothing
+        # is known, so the three cases stay distinct.
+        if pkg["commits_behind"] is None:
+            out.append(f"pkgdown site built from `{pkg['site_sha']}`; how far main has moved "
+                       "past it could not be determined.")
+        elif pkg["commits_behind"]:
             out.append(f"pkgdown site built from `{pkg['site_sha']}`; main is `{pkg['main_sha']}` "
                        f"- **{pkg['commits_behind']} commit(s) behind**.")
         else:
@@ -718,12 +725,15 @@ def render(state):
         if prunable:
             out += ["Safe to prune (landed or closed without merging). **Run these yourself** - "
                     "agents do not delete branches.", "", "```bash"]
-            local = [row["branch"] for row in prunable if "local" in row["where"]]
-            remote = [row["branch"] for row in prunable if "remote" in row["where"]]
+            # A git ref may contain ; $ ` & | ( ), all of which a shell acts on.
+            # This block is meant to be pasted into one, so every name is quoted
+            # and `--` ends the option list.
+            local = [shlex.quote(row["branch"]) for row in prunable if "local" in row["where"]]
+            remote = [shlex.quote(row["branch"]) for row in prunable if "remote" in row["where"]]
             if local:
-                out.append("git branch -D " + " ".join(local))
+                out.append("git branch -D -- " + " ".join(local))
             if remote:
-                out.append("git push origin --delete " + " ".join(remote))
+                out.append("git push origin --delete -- " + " ".join(remote))
             out += ["```", ""]
         if buckets["unknown"]:
             out += ["No PR found for these - check before deleting:", ""]
