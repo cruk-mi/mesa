@@ -1,6 +1,6 @@
 ---
 name: bioc-check-ladder
-description: How to verify mesa — devtools::test, R CMD check, BiocCheck and coverage — and crucially WHERE each can actually run, since a typical laptop cannot run the full ladder. Use before declaring work done, when a check fails, or when interpreting BiocCheck output.
+description: How to verify mesa — devtools::test, R CMD check, BiocCheck and coverage — where each can run, and how to set a macOS machine up to run the whole ladder locally. Use before declaring work done, when a check fails, or when interpreting BiocCheck output.
 ---
 
 # The mesa check ladder
@@ -40,6 +40,8 @@ Common blockers on a local machine:
 
 ### The real venues
 
+- **A local macOS machine** — set up once, this runs the whole ladder and reproduces CI's
+  BiocCheck result exactly. See below.
 - **Devcontainer / Codespaces** — `ghcr.io/cruk-mi/mesa/devcontainer:codespaces-slim`.
   Carries the right R and the full Bioc stack. The `slim` variant omits heavy genome data
   packages, so data-dependent tests skip; `full` has them.
@@ -48,6 +50,57 @@ Common blockers on a local machine:
 
 When a check cannot run locally, say so plainly and push the branch so CI runs it. That is
 a legitimate outcome, not a failure to report.
+
+## Setting a macOS machine up to run the whole ladder
+
+Done once on an arm64 Mac, verified reproducing CI's result for `97dd9f2`. Versions come
+from `.devcontainer/resolve_versions.sh` — never pick them by hand:
+
+```bash
+bash .devcontainer/resolve_versions.sh   # -> R_VERSION_FULL=4.6.0, BIOC_VERSION=3.23
+```
+
+```bash
+brew install r-rig                       # a formula; `--cask r-rig` does not exist (that is r-rig-app, the GUI)
+rig add 4.6.0 && rig default 4.6.0       # needs sudo; an agent cannot do this step
+Rscript .claude/scripts/setup-r-toolchain.R
+```
+
+`setup-r-toolchain.R` pins Bioconductor to the resolved release, installs every declared
+dependency, and installs `rcmdcheck` + `BiocCheck`. Then:
+
+```bash
+R CMD build .
+R CMD check --no-manual mesa_0.99.6.9000.tar.gz
+Rscript -e 'BiocCheck::BiocCheck("mesa_0.99.6.9000.tar.gz")'
+```
+
+### The five things that actually bite on macOS
+
+Each of these was hit and fixed; none is obvious from the error message.
+
+| Symptom | Cause and fix |
+|---|---|
+| `R-4.6.0-arm64.pkg` 404s under `big-sur-arm64` | The 4.6 series moved to `sonoma-arm64`. rig handles this; a hand-built CRAN URL will not. |
+| Installer fails: *"unexpected error while moving files to the final destination"* | Only `/Applications/R.app` failed — macOS blocks modifying an existing signed app bundle without App Management permission. **The framework installed fine and the ladder does not use R.app.** Check `R --version` before assuming the install failed. |
+| `not available as a binary package` for `org.*.db`, `TxDb.*`, `BSgenome.*`, `MEDIPSData` | Bioconductor ships annotation and experiment data **source-only**. They are pure data, so `type = "source"` needs no compiler. A binary-only pass silently leaves them out. |
+| Vignettes fail: `libXrender.1.dylib` not found under `/opt/X11` | P3M's `gdtools` binary links XQuartz's cairo. Rebuild from source against Homebrew's: needs `pkg-config`, `cairo`, and `LIBRARY_PATH` including `/opt/homebrew/opt/gettext/lib` (else `ld: library 'intl' not found`). No XQuartz required. |
+| `symbol not found in flat namespace '___kmpc_barrier'` | An OpenMP package (`stringdist`, a BiocCheck dependency) needs the runtime. `brew install libomp` plus a `~/.R/Makevars` carrying **both** `-Xclang -fopenmp` (compile) and `-lomp` (link) — Apple clang adds neither on its own. |
+
+Also: `R CMD build` needs `pandoc` (`brew install pandoc`). The Bioconductor docker images
+bundle it, so CI never surfaces this.
+
+### Reading a local result against CI
+
+Local reproduces CI's findings exactly, plus **one extra NOTE**:
+
+```
+NOTE: Cannot determine whether maintainer is subscribed to the Bioc-Devel mailing list
+```
+
+That is an environment artifact — the check cannot reach the list locally. Do not treat it
+as a regression, and do not "fix" it. Anything beyond it is a genuine divergence worth
+investigating.
 
 ## Reading BiocCheck output
 
@@ -67,6 +120,9 @@ Recurring ones in this package:
   package file gets flagged. Agent config (`CLAUDE.md`, `AGENTS.md`, `.claude/`) must stay
   in `.Rbuildignore`.
 - **Coverage below 80 %** — see `mesa-tests`.
+- **`Invalid package Version`** — BiocCheck rejects the four-part devel form
+  `X.Y.Z.9000`. **Expected while a devel section is open**; it clears when the cycle is
+  cut. Do not "fix" it by changing the version. See `bioc-release-cycle`.
 
 Verify the tarball directly rather than assuming:
 
