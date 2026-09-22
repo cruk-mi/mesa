@@ -7,6 +7,9 @@
   two published papers that use the package.
 - Corrected the "Annotatation" typo in the title of the differentially
   methylated regions vignette.
+- Added an architecture diagram to the README, showing how sequencing data
+  becomes a `qseaSet` and which file in `R/` implements each part of the
+  package. The Mermaid source is maintained in `data-raw/figures/`.
 
 ## Infrastructure
 - Test coverage is now measured and uploaded on pull requests, not only on
