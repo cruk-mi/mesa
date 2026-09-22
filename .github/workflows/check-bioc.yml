@@ -299,7 +299,25 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          covr::codecov()
+          ## covr::codecov() returns the parsed HTTP response invisibly and
+          ## never inspects the status, so a rejected upload leaves this step
+          ## green. Uploads failed unnoticed from 2026-06-17 for exactly that
+          ## reason: first a 429 rate limit, then a 404 on a stale token.
+          ## Treat anything without a success marker as a failure, and print
+          ## the response so the cause is visible in the log.
+          res <- covr::codecov()
+          print(res)
+          ok <- if (is.list(res)) {
+              isTRUE(res$uploaded) ||
+                  (!is.null(res$url) && nzchar(as.character(res$url)[1]))
+          } else if (is.character(res)) {
+              any(grepl("codecov.io", res, fixed = TRUE))
+          } else {
+              FALSE
+          }
+          if (!ok) {
+              stop("Codecov upload failed; see the response printed above.")
+          }
         shell: Rscript {0}
 
       - name: Install package
