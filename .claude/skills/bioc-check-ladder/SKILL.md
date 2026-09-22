@@ -54,20 +54,30 @@ a legitimate outcome, not a failure to report.
 ## Setting a macOS machine up to run the whole ladder
 
 Done once on an arm64 Mac, verified reproducing CI's result for `97dd9f2`. Versions come
-from `.devcontainer/resolve_versions.sh` — never pick them by hand:
+from `.devcontainer/resolve_versions.sh` — never pick them by hand. Ask it which R you
+need, since that is the one step needing sudo:
 
 ```bash
-bash .devcontainer/resolve_versions.sh   # -> R_VERSION_FULL=4.6.0, BIOC_VERSION=3.23
+bash .devcontainer/resolve_versions.sh
+# R_VERSION_FULL=4.6.0  BIOC_VERSION=3.23  ROXYGEN_VERSION=8.1.0
 ```
 
 ```bash
 brew install r-rig                       # a formula; `--cask r-rig` does not exist (that is r-rig-app, the GUI)
-rig add 4.6.0 && rig default 4.6.0       # needs sudo; an agent cannot do this step
+rig add 4.6.0 && rig default 4.6.0       # use the resolved R_VERSION_FULL; needs sudo, so an agent cannot do this step
 Rscript .claude/scripts/setup-r-toolchain.R
 ```
 
-`setup-r-toolchain.R` pins Bioconductor to the resolved release, installs every declared
-dependency, and installs `rcmdcheck` + `BiocCheck`. Then:
+`setup-r-toolchain.R` calls the resolver itself, so nothing is passed to it and nothing is
+hardcoded in it. It pins Bioconductor to the resolved release, installs every declared
+dependency, installs the check tooling (`rcmdcheck`, `BiocCheck`, `devtools`, `covr`), and
+installs the **pinned** roxygen2 — the version `DESCRIPTION` records as having generated
+the committed `man/`, not the current release. It refuses to run against a different R
+than the resolver names, and its closing line restates the three versions so a mismatch is
+visible before you regenerate anything.
+
+On a branch predating `ROXYGEN_VERSION` in the resolver, it says so and skips that pin;
+do not regenerate `man/` from such a machine. Then:
 
 ```bash
 R CMD build .
