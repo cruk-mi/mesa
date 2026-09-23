@@ -1,0 +1,171 @@
+## Release CD for mesa.
+##
+## Triggered by pushing a `vX.Y.Z` tag, which is the last step of phase 3 of
+## the release cycle described in the contributor guide.
+##
+## Tags have been cut up to v0.99.5 but the newest GitHub Release is v0.5.1
+## (March 2024), and v0.99.6 was never tagged at all - nothing built a release
+## tarball or published notes. This workflow closes that gap and, before
+## publishing anything, gates the tag on the same multi-platform build
+## Bioconductor itself uses.
+##
+## Order matters: `verify` is seconds and catches a half-finished version bump
+## before `runiverse` spends ~90 minutes on it.
+
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to rehearse the release for (no Release is published)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify version consistency
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      bioc-release: ${{ steps.parse.outputs.bioc-release }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      ## Same single source of truth as the other workflows: DESCRIPTION's
+      ## `R (>=)` line drives the Bioconductor version and Docker tag.
+      - name: Resolve versions
+        id: parse
+        run: |
+          resolved="$(mktemp)"
+          bash .devcontainer/resolve_versions.sh > "$resolved"
+          source "$resolved"
+          echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
+
+      - name: Check tag against DESCRIPTION and NEWS.md
+        id: check
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+
+          DESC_VERSION="$(grep -E '^Version:' DESCRIPTION | sed -E 's/^Version:[[:space:]]*//')"
+          NEWS_HEADING="$(grep -m1 -E '^# mesa ' NEWS.md | sed -E 's/^# mesa[[:space:]]*//')"
+
+          echo "tag:         ${TAG} (version ${VERSION})"
+          echo "DESCRIPTION: ${DESC_VERSION}"
+          echo "NEWS.md:     ${NEWS_HEADING}"
+
+          fail=0
+          if [ "${VERSION}" != "${DESC_VERSION}" ]; then
+            echo "::error::Tag ${TAG} does not match DESCRIPTION Version ${DESC_VERSION}"
+            fail=1
+          fi
+          if [ "${VERSION}" != "${NEWS_HEADING}" ]; then
+            echo "::error::Tag ${TAG} does not match the top NEWS.md heading '# mesa ${NEWS_HEADING}'"
+            fail=1
+          fi
+          case "${VERSION}" in
+            *.9000)
+              echo "::error::${VERSION} is a development version; finish the release bump before tagging."
+              fail=1
+              ;;
+          esac
+          [ "${fail}" -eq 0 ] || exit 1
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Version check passed for ${VERSION}."
+
+  ## The exact pipeline r-universe runs for Bioconductor, called as a reusable
+  ## workflow: source + vignettes, Linux release/devel, macOS x86_64/arm64,
+  ## Windows release/devel/oldrel, WASM, and BiocCheck.
+  ##
+  ## `organization: bioconductor` is what enables the Bioconductor Checks job.
+  ## build.yml has no deploy job, so calling it from here publishes nothing to
+  ## r-universe.dev; it only builds and checks.
+  ##
+  ## This is deliberately NOT on the pull-request path - the equivalent
+  ## biocstaging run for mesa 0.99.6 took 1h30m of wall clock.
+  ##
+  ## Note that `@v3` is r-universe's default BRANCH, not a tag (their only
+  ## tags are v1-final and v2-final), so it moves. That is the reference their
+  ## own documentation prescribes; pin it to a commit if a build ever breaks
+  ## from under a release.
+  runiverse:
+    name: r-universe
+    needs: verify
+    permissions:
+      contents: read
+    uses: r-universe-org/workflows/.github/workflows/build.yml@v3
+    with:
+      universe: bioc
+      organization: bioconductor
+      ref: ${{ inputs.tag || github.ref_name }}
+
+  release:
+    name: Publish GitHub Release
+    needs: [verify, runiverse]
+    ## A manual dispatch is a rehearsal: everything runs, nothing is published.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container: "bioconductor/bioconductor_docker:${{ needs.verify.outputs.bioc-release }}"
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NOT_CRAN: true
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          install.packages("remotes")
+          remotes::install_cran("BiocManager")
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
+        shell: Rscript {0}
+
+      - name: Build source tarball
+        id: build
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          R CMD build --no-manual --no-resave-data .
+          TARBALL="mesa_${VERSION}.tar.gz"
+          test -f "${TARBALL}" || { echo "::error::${TARBALL} was not produced"; ls -la; exit 1; }
+          echo "tarball=${TARBALL}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract release notes from NEWS.md
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          awk -v want="# mesa ${VERSION}" '
+            $0 == want { grab = 1; next }
+            grab && /^# mesa / { exit }
+            grab { print }
+          ' NEWS.md > RELEASE_NOTES.md
+
+          if [ ! -s RELEASE_NOTES.md ] || ! grep -q '[^[:space:]]' RELEASE_NOTES.md; then
+            echo "::warning::No NEWS.md entries under '# mesa ${VERSION}'."
+            echo "See [NEWS.md](https://github.com/cruk-mi/mesa/blob/main/NEWS.md)." > RELEASE_NOTES.md
+          fi
+          cat RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        env:
+          TAG: ${{ github.ref_name }}
+          TARBALL: ${{ steps.build.outputs.tarball }}
+        run: |
+          gh release create "${TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "mesa ${TAG}" \
+            --notes-file RELEASE_NOTES.md \
+            "${TARBALL}"
