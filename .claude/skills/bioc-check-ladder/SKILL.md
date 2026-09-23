@@ -59,7 +59,8 @@ need, since that is the one step needing sudo:
 
 ```bash
 bash .devcontainer/resolve_versions.sh
-# R_VERSION_FULL=4.6.0  BIOC_VERSION=3.23  ROXYGEN_VERSION=8.1.0
+# R_VERSION=4.6  R_VERSION_FULL=4.6.0  BIOC_VERSION=3.23  BIOC_RELEASE=RELEASE_3_23
+# (a ROXYGEN_VERSION=... line is added once the resolver learns it, in #105)
 ```
 
 ```bash
