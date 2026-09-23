@@ -29,6 +29,7 @@ on:
         - 'inst/**'
         - 'DESCRIPTION'
         - 'NAMESPACE'
+        - 'man/**'
   pull_request:
   workflow_dispatch:
 
@@ -100,10 +101,12 @@ jobs:
       - name: Install any dependencies this branch adds
         # The image is rebuilt only on pushes to dev/main, so a PR that adds a
         # dependency to DESCRIPTION would otherwise fail in roxygenise() (which
-        # loads the package) before the drift gate ever runs.
+        # loads the package) before the drift gate ever runs. dependencies = NA
+        # is Depends/Imports/LinkingTo only: roxygenise() never needs Suggests,
+        # which the slim image deliberately omits (genome and annotation data).
         run: |
           Rscript -e 'miss <- setdiff(
-              remotes::local_package_deps(dependencies = TRUE),
+              remotes::local_package_deps(dependencies = NA),
               rownames(installed.packages()))
             if (length(miss)) {
               message("Installing missing dependencies: ", paste(miss, collapse = ", "))
@@ -119,7 +122,10 @@ jobs:
             }'
 
       - name: Regenerate documentation
-        run: Rscript -e 'roxygen2::roxygenise()'
+        # clean = TRUE first deletes every file roxygen generated, so a page
+        # whose object was removed or renamed in R/ shows up as a deletion in
+        # the diff below instead of lingering and passing as in sync.
+        run: Rscript -e 'roxygen2::roxygenise(clean = TRUE)'
 
       - name: Fail if man/ or NAMESPACE drifted
         run: |
