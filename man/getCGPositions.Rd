@@ -10,7 +10,10 @@ getCGPositions(BSgenome, chr.select)
 \item{BSgenome}{Character(1). BSgenome package name.}
 
 \item{chr.select}{Character vector of chromosome names to include (e.g.,
-\code{paste0("chr", 1:22)}). If \code{NULL}, all chromosomes are used.}
+\code{paste0("chr", 1:22)}). If \code{NULL}, the standard chromosomes of
+the BSgenome are used -- not every seqlevel. Scaffolds, patches and alt
+haplotypes are excluded, because scanning all 298 hg19 seqlevels costs
+~22 s and ~1.3 GB for positions no read maps to.}
 }
 \value{
 A \link[GenomicRanges]{GRanges-class} of motif positions.

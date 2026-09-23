@@ -39,6 +39,15 @@
   its clamp is `extend - width + 1`; the rewrite extended to `extend` instead
   and left reads of exactly `extend` bases untouched.
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- `getCGPositions()` with `chr.select = NULL` now scans the BSgenome's
+  standard chromosomes rather than every seqlevel it carries. For hg19 that is
+  25 sequences instead of 298, cutting a call from ~22 s and ~1.3 GB to a
+  fraction of that, multiplied again by each fork in
+  `addMedipsEnrichmentFactors(nCores = n)`. Scaffolds, patches and alt
+  haplotypes are no longer counted, so `nReadsWithoutPattern` can change for
+  callers that left `chr.select` unset; pass `chr.select` explicitly to keep
+  the old set.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
 
 # mesa 0.99.6
 

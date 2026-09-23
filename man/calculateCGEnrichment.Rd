@@ -46,8 +46,8 @@ position is known.
 \item{uniq}{\code{numeric(1)}
 How to handle duplicate fragments:
 \itemize{
-\item \code{0} --- keep every read.
-\item \code{1} --- keep at most one read per genomic location and strand.
+\item \code{0} — keep every read.
+\item \code{1} — keep at most one read per genomic location and strand.
 }
 
 Any other value, and any logical, is an error.
@@ -104,7 +104,8 @@ if (requireNamespace("MEDIPSData", quietly = TRUE) &&
         ),
         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = tempdir(),
-        paired     = FALSE
+        paired     = FALSE,
+        chr.select = "chr22"
     )
 }
 

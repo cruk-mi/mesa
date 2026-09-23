@@ -144,7 +144,8 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'         ),
 #'         BSgenome   = "BSgenome.Hsapiens.UCSC.hg19",
 #'         exportPath = tempdir(),
-#'         paired     = FALSE
+#'         paired     = FALSE,
+#'         chr.select = "chr22"
 #'     )
 #' }
 #'
@@ -312,7 +313,10 @@ calculateCGEnrichment <- function(
 #'
 #' @param BSgenome Character(1). BSgenome package name.
 #' @param chr.select Character vector of chromosome names to include (e.g.,
-#' \code{paste0("chr", 1:22)}). If \code{NULL}, all chromosomes are used.
+#' \code{paste0("chr", 1:22)}). If \code{NULL}, the standard chromosomes of
+#' the BSgenome are used -- not every seqlevel. Scaffolds, patches and alt
+#' haplotypes are excluded, because scanning all 298 hg19 seqlevels costs
+#' ~22 s and ~1.3 GB for positions no read maps to.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of motif positions.
 #'
@@ -327,8 +331,12 @@ calculateCGEnrichment <- function(
 getCGPositions <- function(BSgenome, chr.select) {
     dataset <- eval(parse(text = paste0(BSgenome, "::", BSgenome)))
 
+    # standardChromosomes(), not seqnames(): the latter is every seqlevel the
+    # BSgenome carries (298 for hg19, including scaffolds, patches and alt
+    # haplotypes), which costs ~22 s and ~1.3 GB per call and is multiplied
+    # again by each fork in addMedipsEnrichmentFactors(nCores = n).
     chrs <- if (is.null(chr.select)) {
-        GenomeInfoDb::seqnames(dataset)
+        GenomeInfoDb::standardChromosomes(dataset)
     } else {
         as.character(chr.select)
     }
