@@ -39,6 +39,7 @@ Description: A package for the analysis of methylation enrichment sequencing
     originally defined in 'qsea'. 
 License: GPL (>=2)
 Encoding: UTF-8
+Language: en-GB
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)

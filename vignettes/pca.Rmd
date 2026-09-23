@@ -78,7 +78,7 @@ pca1 <- pca0 |>
 
 ## `PlotPCA` function arguments
 
-### Anotating samples by colour and/or shape
+### Annotating samples by colour and/or shape
 
 The `colour` and `shape` arguments to `plotPCA()` specify variables to use to
 set the colour and/or shape of the points (samples) on the PCA plot. These

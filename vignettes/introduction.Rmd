@@ -293,7 +293,7 @@ function.
 The qseaSet object can also contain information on the copy number variation
 (CNV) that has been calculated for each sample. This is where the number of
 copies of each chromosome, or parts of the chromosome, are varying, for instance
-during cancerigenesis. For known variation of entire chromosomes, e.g. sex
+during carcinogenesis. For known variation of entire chromosomes, e.g. sex
 chromosomes, the `zygosity` option can be set, as detailed in the `qsea`
 documentation.
 
@@ -359,7 +359,7 @@ recently registered instance will be used.
 
 Setting this parameter globally via `options` means that we don't have to
 explicitly call `parallel = TRUE` inside functions in order for them to
-paralellise across the available calls.
+parallelise across the available calls.
 
 ## Session info
 ```{r session-info, echo=FALSE}
