@@ -105,9 +105,15 @@ BIOC_RELEASE="RELEASE_${BIOC_VERSION/./_}"
 #    roxygen2 that generated the committed man/ and NAMESPACE — installing a
 #    different one rewrites every man page, so tooling installs this exact
 #    version rather than "latest".
+#    Fields are tried in preference order, not file order, matching
+#    install.R's read.dcf() lookup; and the whole dotted version is kept, so a
+#    dev roxygen2 such as 8.1.0.9000 is not truncated to 8.1.0.
 if [ -z "${ROXYGEN_VERSION:-}" ]; then
-    ROXYGEN_VERSION="$(grep -oE '^(Config/roxygen2/version|RoxygenNote):[[:space:]]*[0-9]+\.[0-9]+(\.[0-9]+)?' "${description}" \
-        | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || true)"
+    for field in 'Config/roxygen2/version' 'RoxygenNote'; do
+        ROXYGEN_VERSION="$(grep -E "^${field}:" "${description}" \
+            | grep -oE '[0-9]+(\.[0-9]+)+' | head -1 || true)"
+        [ -n "${ROXYGEN_VERSION}" ] && break
+    done
 fi
 if [ -z "${ROXYGEN_VERSION:-}" ]; then
     echo "resolve_versions.sh: could not parse 'Config/roxygen2/version' or 'RoxygenNote' from ${description}" >&2
