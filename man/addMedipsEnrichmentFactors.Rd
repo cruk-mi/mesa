@@ -48,11 +48,12 @@ reads, \code{1} keeps one per genomic location.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
-Passed to MEDIPS range extraction; subset of chromosomes to analyse.
-\strong{Default:} \code{NULL} (all chromosomes).}
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}; subset of chromosomes to analyse.
+\strong{Default:} \code{NULL} (the BSgenome's standard chromosomes).}
 
 \item{paired}{\code{logical(1)}
-Whether BAMs are paired-end (uses \code{\link[MEDIPS:MEDIPS.createSet]{MEDIPS::getPairedGRange()}}).
+Whether BAMs are paired-end. Paired reads are read as the fragment span
+between the first mate's start and its mate's end.
 \strong{Default:} \code{TRUE}.}
 
 \item{file_name}{\code{character(1)}

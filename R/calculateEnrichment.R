@@ -816,11 +816,12 @@ calculateCGEnrichmentGRanges <- function(
 #'   **Default:** `0`.
 #'
 #' @param chr.select `character()` or `NULL`
-#' Passed to MEDIPS range extraction; subset of chromosomes to analyse.
-#'   **Default:** `NULL` (all chromosomes).
+#' Passed to [calculateCGEnrichment()]; subset of chromosomes to analyse.
+#'   **Default:** `NULL` (the BSgenome's standard chromosomes).
 #'
 #' @param paired `logical(1)`
-#' Whether BAMs are paired-end (uses [MEDIPS::getPairedGRange()]).
+#' Whether BAMs are paired-end. Paired reads are read as the fragment span
+#' between the first mate's start and its mate's end.
 #'   **Default:** `TRUE`.
 #'
 #' @param file_name `character(1)`
