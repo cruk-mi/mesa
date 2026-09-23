@@ -489,8 +489,7 @@ dedupeReads <- function(reads, uniq) {
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
 #' @param chr.lengths Named numeric vector of chromosome lengths for the whole
-#' genome, used as the upper bound of the scan range and as the denominator of
-#' the \code{uniq} Poisson rate.
+#' genome, used as the upper bound of the scan range.
 #' @param uniq Numeric(1). Duplicate handling, see \code{dedupeReads()}.
 #'
 #' @return A \link[GenomicRanges]{GRanges-class} of fragment ranges.
@@ -554,8 +553,7 @@ readPairedFragments <- function(file, chr.select = NULL, chr.lengths = NULL,
 #' @param chr.select Character vector of chromosomes to import, or \code{NULL}
 #' for all chromosomes.
 #' @param chr.lengths Named numeric vector of chromosome lengths for the whole
-#' genome, used as the upper bound of the scan range and as the denominator of
-#' the \code{uniq} Poisson rate.
+#' genome, used as the upper bound of the scan range.
 #' @param extend Integer(1). If non-zero, reads shorter than
 #' \code{extend + 1} are extended to that width, as
 #' \code{MEDIPS::adjustReads()} does.
