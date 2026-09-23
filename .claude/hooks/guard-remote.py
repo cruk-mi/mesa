@@ -50,6 +50,15 @@ GH_API_PULL = re.compile(r"/pulls/\d+/?$")
 GH_API_REVIEWS = re.compile(r"/pulls/\d+/reviews/?$")
 GH_API_REF = re.compile(r"/git/refs?(/|$)")
 
+# `gh api graphql` carries the action in the query body, not the endpoint, so
+# the path patterns above never see it. These are the mutations that do what
+# the four rules forbid; everything else (resolveReviewThread, comments, ...)
+# stays allowed.
+GH_GRAPHQL_MERGE = re.compile(r"\b(mergePullRequest|enablePullRequestAutoMerge)\b")
+GH_GRAPHQL_READY = re.compile(r"\bmarkPullRequestReadyForReview\b")
+GH_GRAPHQL_REVIEW = re.compile(r"\b(addPullRequestReview|submitPullRequestReview)\b")
+GH_GRAPHQL_DELETE_REF = re.compile(r"\bdeleteRef\b")
+
 
 def split_segments(command):
     """Split a shell command into separately-executed segments."""
@@ -121,7 +130,9 @@ def gh_api_endpoint(tokens):
         if tok.startswith("-"):
             i += 1
             continue
-        return tok
+        # Drop any query string or fragment: the patterns below are anchored
+        # at the end of the path, so `.../merge?` would otherwise slip past.
+        return re.split(r"[?#]", tok, maxsplit=1)[0]
     return None
 
 
@@ -139,6 +150,57 @@ def gh_api_method(tokens):
     return "GET"
 
 
+def graphql_text(tokens):
+    """Everything a `gh api graphql` call could send as its query.
+
+    The query can arrive inline (`-f query=...`), from a file (`-F query=@f`,
+    `--input f`) or on stdin (`--input -`). Files are read so a mutation cannot
+    hide in one; stdin cannot be inspected, so it is reported as None.
+    """
+    parts = []
+    for i, tok in enumerate(tokens):
+        value = None
+        if tok in ("-f", "--field", "-F", "--raw-field", "--input") and i + 1 < len(tokens):
+            value = tokens[i + 1]
+        elif tok.startswith(("--field=", "--raw-field=", "--input=")):
+            value = tok.split("=", 1)[1]
+        if value is None:
+            continue
+        path = None
+        if tok.startswith("--input"):
+            path = value
+        elif "=@" in value:
+            path = value.split("=@", 1)[1]
+        if path == "-":
+            return None
+        if path:
+            try:
+                with open(os.path.expanduser(path), encoding="utf-8") as fh:
+                    parts.append(fh.read())
+            except OSError:
+                return None
+        else:
+            parts.append(value)
+    return "\n".join(parts)
+
+
+def check_gh_graphql(tokens):
+    text = graphql_text(tokens)
+    if text is None:
+        return ("A `gh api graphql` query read from stdin or an unreadable file "
+                "cannot be checked, so it is refused. Pass it with -f query=...")
+    if GH_GRAPHQL_MERGE.search(text):
+        return "Merging pull requests is the human's decision, not the agent's."
+    if GH_GRAPHQL_READY.search(text):
+        return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
+                "ready for review.")
+    if GH_GRAPHQL_REVIEW.search(text) and "APPROVE" in text.upper():
+        return "An agent does not approve pull requests on this repo."
+    if GH_GRAPHQL_DELETE_REF.search(text):
+        return "Deleting branches is not allowed — they are the human's audit trail."
+    return None
+
+
 def check_gh_api(tokens):
     """`gh api` is not a read-only escape hatch from the `gh pr` rules.
 
@@ -149,6 +211,8 @@ def check_gh_api(tokens):
     endpoint = gh_api_endpoint(tokens)
     if not endpoint:
         return None
+    if endpoint.strip("/") == "graphql":
+        return check_gh_graphql(tokens)
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):
         return "Merging pull requests is the human's decision, not the agent's."
