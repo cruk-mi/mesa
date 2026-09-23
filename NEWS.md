@@ -1,5 +1,18 @@
 # mesa 0.99.6.9000
 
+## Documentation
+- Rewrote the README: status badges for CI, coverage, licence and lifecycle; a
+  quick start built on the packaged `exampleTumourNormal` dataset; a table
+  linking the pkgdown site and the five vignettes; and full citations for the
+  two published papers that use the package.
+- Corrected the "Annotatation" typo in the title of the differentially
+  methylated regions vignette.
+
+## Infrastructure
+- Test coverage is now measured and uploaded on pull requests, not only on
+  pushes to `main`, so coverage no longer goes months out of date between
+  releases. Codecov is configured to report without blocking checks.
+
 # mesa 0.99.6
 
 ## Bug fixes
