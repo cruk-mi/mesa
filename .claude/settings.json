@@ -45,8 +45,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/scripts/mesa-status.py\" --max-age 14400 --no-log --quiet || true",
-            "timeout": 60
+            "command": "perl -e 'alarm shift; exec @ARGV' 110 python3 \"$CLAUDE_PROJECT_DIR/.claude/scripts/mesa-status.py\" --max-age 14400 --no-log --quiet || echo 'mesa-status: STATUS.md refresh failed or ran past 110 s, so it may be stale. Run /mesa-status before relying on it.'",
+            "timeout": 120
           }
         ]
       }
