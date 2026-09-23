@@ -9,8 +9,9 @@ config:
 %% mesa package architecture. This file is the maintained source;
 %% man/figures/README-architecture.svg is generated from it by
 %% render-architecture.sh -- edit here, never the SVG.
-%% Each node is labelled with the file in R/ that implements it. When a file is
-%% renamed, split or removed, update this diagram in the same commit.
+%% Each node is labelled with the file in R/ that implements it, except the
+%% qseaSet, which is the qsea package's class (mesa Depends on qsea). When a
+%% file is renamed, split or removed, update this diagram in the same commit.
 %% The figure is rendered into a README column, so it is deliberately portrait:
 %% height is free, width is not. Do not "tidy" the `direction LR` lines to TB --
 %% counter-intuitively, LR inside a TD flowchart is what stacks the clusters
@@ -22,7 +23,7 @@ flowchart TD
         direction TB
         makeqset["Qset construction<br/><code>makeQset.R</code>"]
         buildqset["Coverage &amp; normalisation<br/><code>buildQset.R</code>"]
-        qset["<b>qseaSet</b><br/><code>classes.R</code>"]
+        qset["<b>qseaSet</b><br/>class from the <code>qsea</code> package"]
         makeqset -->|counts windows| buildqset
         buildqset -->|normalises coverage| qset
     end
@@ -39,7 +40,7 @@ flowchart TD
         direction LR
         sampleqc["Sample QC<br/><code>sampleQC.R</code>"]
         enrichment["CG enrichment<br/><code>calculateEnrichment.R</code>"]
-        pca["Dimension reduction<br/><code>PCA.R</code>"]
+        pca["Dimension reduction<br/><code>PCA.R</code>, <code>classes.R</code>"]
     end
 
     subgraph stats["Analyse"]
@@ -57,7 +58,7 @@ flowchart TD
 
     subgraph reference["Session setup &amp; packaged reference data"]
         direction LR
-        setup["Genome, TxDb &amp; parallel setup<br/><code>utilityFunctions.R</code>"]
+        setup["Genome, TxDb &amp; parallel setup<br/><code>utilityFunctions.R</code>, <code>genome.R</code>"]
         genomemap["Genome mapping<br/><code>map_hg38.R</code>"]
         refregions["Reference regions<br/><code>ENCODEbadRegions.R</code>"]
     end
