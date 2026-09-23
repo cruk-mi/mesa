@@ -67,7 +67,11 @@ def fetch_refs():
     script exists to prevent. Degrades like every other probe: on failure the
     comparisons still run, against whatever is already local.
     """
-    if git("fetch", "--quiet", "origin", "main", "gh-pages", timeout=60) is None:
+    # The configured refspec (every branch) plus --prune, not just main and
+    # gh-pages: the branch report prints paste-ready `git push origin --delete`
+    # lines, and those must not be built from remote-tracking refs for
+    # branches that no longer exist.
+    if git("fetch", "--quiet", "--prune", "origin", timeout=60) is None:
         degrade("`git fetch origin` failed, so main/gh-pages comparisons use "
                 "possibly stale local refs")
 
@@ -408,7 +412,10 @@ def collect_bioccheck(run_info, allow_log):
     if run_info is None:
         return {"latest": latest, "history": history, "source": "cache"}
     sha = (run_info.get("headSha") or "")[:7]
-    if latest and latest.get("sha") == sha:
+    # Keyed on the sha anywhere in history, not on the last row: a re-run of an
+    # older commit would otherwise append it after newer rows and render a
+    # regression that never happened, durably, since the file is append-only.
+    if any(entry.get("sha") == sha for entry in history):
         return {"latest": latest, "history": history, "source": "cache"}
     if not allow_log:
         return {"latest": latest, "history": history, "source": "cache (log fetch skipped)"}
@@ -591,7 +598,11 @@ def render(state):
     ci_text = "unknown"
     if ci["sha"]:
         ci_text = f"{ci['conclusion']} at `{ci['sha']}` ({ci['when']})"
-        if ci["behind"]:
+        # None is "could not compare", not "zero behind": same three-way split
+        # as the pkgdown tile, so an unknown distance is never read as current.
+        if ci["behind"] is None:
+            ci_text += " - how far main has moved past this could not be determined"
+        elif ci["behind"]:
             # check-bioc.yml only fires on pushes touching R/, tests/, vignettes/,
             # inst/, DESCRIPTION or NAMESPACE, so a docs- or tooling-only commit
             # leaves main un-run. That is expected, not a failure.

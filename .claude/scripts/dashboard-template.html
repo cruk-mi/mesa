@@ -425,7 +425,9 @@
     var ci = DATA.ci || {};
     var ciLevel = ci.conclusion === "success" ? "ok" : (ci.conclusion === "unknown" ? null : "bad");
     var ciNote = ci.sha ? "at " + ci.sha + " · " + ci.when : "no run found";
-    if (ci.behind) ciNote += " · main is " + ci.behind + " commit(s) ahead";
+    // null is "could not compare", not "zero behind", as for the pkgdown tile.
+    if (typeof ci.behind !== "number") ciNote += " · distance to main unknown";
+    else if (ci.behind) ciNote += " · main is " + ci.behind + " commit(s) ahead";
     readouts.appendChild(readout("R CMD check · main", ci.conclusion || "unknown", ciNote, ciLevel));
 
     var cov = DATA.coverage || {};
