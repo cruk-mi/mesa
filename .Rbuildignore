@@ -3,6 +3,10 @@
 ^Dockerfile$
 ^Dockerfile_dependencies_only$
 ^data-raw$
-
 ^docs$
 ^docs/\.nojekyll$
+^CLAUDE\.md$
+^tests/testthat/Rplots\.pdf$
+^\.claude$
+^AGENTS\.md$
+^\.git$
