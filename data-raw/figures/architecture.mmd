@@ -1,0 +1,89 @@
+---
+config:
+  theme: neutral
+  flowchart:
+    curve: basis
+    nodeSpacing: 40
+    rankSpacing: 50
+---
+%% mesa package architecture. This file is the maintained source;
+%% man/figures/README-architecture.svg is generated from it by
+%% render-architecture.sh -- edit here, never the SVG.
+%% Each node is labelled with the file in R/ that implements it, except the
+%% qseaSet, which is the qsea package's class (mesa Depends on qsea). When a
+%% file is renamed, split or removed, update this diagram in the same commit.
+%% The figure is rendered into a README column, so it is deliberately portrait:
+%% height is free, width is not. Do not "tidy" the `direction LR` lines to TB --
+%% counter-intuitively, LR inside a TD flowchart is what stacks the clusters
+%% vertically here; TB renders the whole figure twice as wide and half as tall.
+flowchart TD
+    rawdata["Enriched sequencing data<br/>MBD-seq / MeDIP-seq BAMs"]
+
+    subgraph input["Build the qseaSet"]
+        direction TB
+        makeqset["Qset construction<br/><code>makeQset.R</code>"]
+        buildqset["Coverage &amp; normalisation<br/><code>buildQset.R</code>"]
+        qset["<b>qseaSet</b><br/>class from the <code>qsea</code> package"]
+        makeqset -->|counts windows| buildqset
+        buildqset -->|normalises coverage| qset
+    end
+
+    subgraph manipulate["Manipulate"]
+        direction LR
+        dplyrverbs["Tidy qset verbs<br/><code>dplyrVerbs.R</code>"]
+        subsetfilter["Subset, filter &amp; rename<br/><code>alterQset.R</code>"]
+        combine["Qset combination<br/><code>combineQsets.R</code>"]
+        mixing["Sample mixing<br/><code>mixQsets.R</code>"]
+    end
+
+    subgraph qc["Quality control"]
+        direction LR
+        sampleqc["Sample QC<br/><code>sampleQC.R</code>"]
+        enrichment["CG enrichment<br/><code>calculateEnrichment.R</code>"]
+        pca["Dimension reduction<br/><code>PCA.R</code>, <code>classes.R</code>"]
+    end
+
+    subgraph stats["Analyse"]
+        direction LR
+        makedmrs["DMR calling<br/><code>makeDMRs.R</code>"]
+        cnv["CNV analysis<br/><code>qseaCNV.R</code>"]
+    end
+
+    subgraph output["Annotate &amp; report"]
+        direction LR
+        tables["Window annotation &amp; tables<br/><code>qseaExtra.R</code>"]
+        plots["Plots &amp; heatmaps<br/><code>plotting.R</code>"]
+        export["DMR summaries &amp; export<br/><code>analyseDMRs.R</code>"]
+    end
+
+    subgraph reference["Session setup &amp; packaged reference data"]
+        direction LR
+        setup["Genome, TxDb &amp; parallel setup<br/><code>utilityFunctions.R</code>, <code>genome.R</code>"]
+        genomemap["Genome mapping<br/><code>map_hg38.R</code>"]
+        refregions["Reference regions<br/><code>ENCODEbadRegions.R</code>"]
+    end
+
+    rawdata --> makeqset
+    qset -->|tidyverse verbs| manipulate
+    qset -->|checks samples| qc
+    qset -->|differential methylation| stats
+    stats --> output
+    qc --> output
+
+    reference -.->|annotation sources| output
+    reference -.->|excluded regions| stats
+    reference -.->|genome &amp; window setup| input
+
+    classDef entry fill:#dbeafe,stroke:#1e40af,color:#1e3a8a
+    classDef state fill:#93c5fd,stroke:#1d4ed8,color:#1e3a8a
+    classDef ref fill:#ede9fe,stroke:#6d28d9,color:#4c1d95
+    classDef work fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef analysis fill:#d1fae5,stroke:#047857,color:#064e3b
+    classDef viz fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+
+    class rawdata,makeqset,buildqset entry
+    class qset state
+    class setup,genomemap,refregions ref
+    class dplyrverbs,subsetfilter,combine,mixing,sampleqc,enrichment,pca work
+    class makedmrs,cnv analysis
+    class tables,plots,export viz

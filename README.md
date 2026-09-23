@@ -32,6 +32,16 @@ Development was undertaken internally between September 2022 and March 2024; the
 
 The package is under active development, with plans to submit to Bioconductor.
 
+### How the package fits together
+
+Sequencing data is read into a `qseaSet`, which every other part of the package
+takes as its input. Each box below names the file in `R/` that implements it.
+
+<a href="man/figures/README-architecture.svg">
+  <img src="man/figures/README-architecture.svg" width="100%"
+       alt="mesa architecture. Enriched sequencing data is read by makeQset.R, given coverage and normalisation by buildQset.R, and held as a qseaSet, the class from the qsea package. The qseaSet is consumed by three groups of functions: manipulation (dplyrVerbs.R, alterQset.R, combineQsets.R, mixQsets.R), quality control (sampleQC.R, calculateEnrichment.R, PCA.R with classes.R) and analysis (makeDMRs.R, qseaCNV.R). Results reach the reader through qseaExtra.R, plotting.R and analyseDMRs.R. Packaged reference data and session setup come from utilityFunctions.R, genome.R, map_hg38.R and ENCODEbadRegions.R.">
+</a>
+
 ## Install the package
 
 **Manual installation:**
