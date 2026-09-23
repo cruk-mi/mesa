@@ -307,14 +307,29 @@ jobs:
           ## the response so the cause is visible in the log.
           res <- covr::codecov()
           print(res)
-          ok <- if (is.list(res)) {
-              isTRUE(res$uploaded) ||
-                  (!is.null(res$url) && nzchar(as.character(res$url)[1]))
-          } else if (is.character(res)) {
-              any(grepl("codecov.io", res, fixed = TRUE))
-          } else {
-              FALSE
+          ## Fork PRs get no secrets, so CODECOV_TOKEN is empty and a tokenless
+          ## upload is expected to be refused. Report it, but do not fail an
+          ## external contributor's check for it.
+          if (!nzchar(Sys.getenv("CODECOV_TOKEN"))) {
+              message("No CODECOV_TOKEN (fork PR?): upload not verified.")
+              quit(save = "no", status = 0)
           }
+          ## Success is the commit page Codecov links to. The host is anchored,
+          ## because error bodies link to docs.codecov.io and a bare
+          ## "codecov.io" match would score those as uploads.
+          commit_url <- paste0("^https://(app\\.)?codecov\\.io/",
+                               "(gh|github)/[^/]+/[^/]+/commit/[0-9a-f]{7,40}")
+          lines <- if (is.list(res)) {
+              if (isTRUE(res$uploaded)) "uploaded" else as.character(res$url)
+          } else if (is.character(res)) {
+              unlist(strsplit(res, "[[:space:]]+"))
+          } else {
+              character(0)
+          }
+          ## length() first: as.character(character(0))[1] is NA, and
+          ## nzchar(NA) is TRUE, so an empty url used to score as success.
+          ok <- length(lines) > 0 &&
+              (identical(lines, "uploaded") || any(grepl(commit_url, lines)))
           if (!ok) {
               stop("Codecov upload failed; see the response printed above.")
           }
