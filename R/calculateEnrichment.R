@@ -536,8 +536,9 @@ readPairedFragments <- function(file, chr.select = NULL, chr.lengths = NULL,
 #'
 #' Read spans are \code{[pos, pos + qwidth - 1]} (mirroring
 #' \code{MEDIPS::getGRange()}). When \code{extend > 0}, reads shorter than
-#' \code{extend} are lengthened to it in the 5'->3' (strand-aware) direction;
-#' reads already longer are left alone.
+#' \code{extend + 1} are lengthened to that width in the 5'->3'
+#' (strand-aware) direction, matching \code{MEDIPS::adjustReads()}; reads
+#' already that long are left alone.
 #'
 #' @param file Character(1). Path to the BAM file. An index is used when
 #' present; without one the whole file is scanned and \code{chr.select} applied
@@ -547,8 +548,9 @@ readPairedFragments <- function(file, chr.select = NULL, chr.lengths = NULL,
 #' @param chr.lengths Named numeric vector of chromosome lengths for the whole
 #' genome, used as the upper bound of the scan range and as the denominator of
 #' the \code{uniq} Poisson rate.
-#' @param extend Integer(1). If non-zero, reads shorter than this are extended
-#' to it.
+#' @param extend Integer(1). If non-zero, reads shorter than
+#' \code{extend + 1} are extended to that width, as
+#' \code{MEDIPS::adjustReads()} does.
 #' @param shift Integer(1). Optional strand-aware offset applied to reads.
 #' @param uniq Numeric(1). Duplicate handling, see \code{dedupeReads()}.
 #'
@@ -593,12 +595,14 @@ readSingleEndFragments <- function(file, chr.select = NULL,
         # resize() on a GRanges is strand-aware: fix = "start" extends from
         # the 5' end regardless of strand (not the lower genomic
         # coordinate), so this already matches the 5'->3' extension
-        # described above. pmax() reproduces the pmax(0, extend - width)
-        # clamp in MEDIPS::adjustReads(): extend only ever lengthens a read,
-        # it never truncates one that is already longer.
+        # described above. MEDIPS::adjustReads() adds
+        # pmax(0, extend - stop + start) to the read, and its spans are
+        # inclusive (stop = pos + qwidth - 1), so that clamp is
+        # extend - width + 1 and the extended width is extend + 1, not
+        # extend. A read already that long is left alone.
         reads <- GenomicRanges::resize(
             reads,
-            width = pmax(BiocGenerics::width(reads), extend),
+            width = pmax(BiocGenerics::width(reads), extend + 1L),
             fix = "start"
         )
     }

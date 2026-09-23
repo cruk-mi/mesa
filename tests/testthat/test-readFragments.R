@@ -150,11 +150,17 @@ test_that("extend lengthens short reads but never truncates long ones", {
     widths <- BiocGenerics::width(reads)
     names(widths) <- BiocGenerics::start(reads)
 
-    # MEDIPS::adjustReads() clamped the extension at pmax(0, extend - width),
-    # so the 100 bp read is untouched and the 30 bp read grows to 50.
+    # MEDIPS::adjustReads() adds pmax(0, extend - stop + start), and its spans
+    # are inclusive (stop = pos + qwidth - 1), so the clamp is
+    # extend - width + 1 and an extended read is extend + 1 long, not extend.
+    # The 100 bp read is past that and is untouched.
     expect_equal(unname(widths["1000"]), 100L)
-    expect_equal(unname(widths["2000"]), 50L)
-    expect_true(all(widths >= 50L))
+    expect_equal(unname(widths["2000"]), 51L)
+    expect_true(all(widths >= 51L))
+
+    # A minus-strand read extends downwards from its 5' end, so the 50 bp read
+    # at 3000-3049 becomes 2999-3049 -- exactly what MEDIPS produces.
+    expect_true(2999 %in% BiocGenerics::start(reads))
 })
 
 

@@ -33,6 +33,12 @@
   so it was an install-time cost for no benefit. `MEDIPSData` is unaffected and
   is still used for test and example data.
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- `extend` in `calculateCGEnrichment()` and `addMedipsEnrichmentFactors()`
+  again lengthens a read to `extend + 1` bases, matching `MEDIPS`. `MEDIPS`
+  added `pmax(0, extend - stop + start)` to each read over inclusive spans, so
+  its clamp is `extend - width + 1`; the rewrite extended to `extend` instead
+  and left reads of exactly `extend` bases untouched.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
 
 # mesa 0.99.6
 
