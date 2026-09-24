@@ -144,3 +144,11 @@ to an artifact a conversation has not read requires an `action: "read"` first.
 It is a **snapshot with the data inlined**, not a live view: a published artifact can only
 reach claude.ai connectors, and there is no GitHub connector, so it cannot query the repo
 itself. It therefore shows its snapshot time and warns when over 24h old.
+
+## The Parked section
+
+`collect_parked()` reads the parking lot that `/park` writes (see "Session scope and the
+parking lot" in `AGENTS.md`): one `- ` line per out-of-scope finding. The file lives in the
+**main checkout's** `.claude/state/parking-lot.md`, resolved through
+`git rev-parse --git-common-dir`, so a refresh run from any worktree sees the same items. It
+is gitignored and per-machine. An empty or missing file renders as "Nothing parked".
