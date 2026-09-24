@@ -1,21 +1,12 @@
 # mesa 0.99.6.9000
 
 ## Infrastructure
-- Pinned the roxygen2 toolchain. `DESCRIPTION` now records the roxygen2 that
-  generated `man/` and `NAMESPACE` (in `Config/roxygen2/version`, which
-  roxygen2 8.0.0 renamed from `RoxygenNote`), `.devcontainer/resolve_versions.sh`
-  exposes it as `ROXYGEN_VERSION`, and `.devcontainer/install.R` installs that
-  exact version instead of the latest release. Upgrading roxygen2 is now a
-  one-line `DESCRIPTION` edit, matching how the R and Bioconductor versions are
-  already derived.
+- Pinned roxygen2 via `Config/roxygen2/version` in `DESCRIPTION`; the
+  devcontainer installs that exact version. Regenerated `man/` and `NAMESPACE`
+  with roxygen2 8.1.0 (link anchors and `importFrom()` formatting only).
   ([#105](https://github.com/cruk-mi/mesa/pull/105))
-- Added a `roxygen-drift` CI job that regenerates the documentation and fails
-  the build if `man/`, `NAMESPACE` or `DESCRIPTION` no longer match the roxygen
-  comments in `R/`.
-  ([#105](https://github.com/cruk-mi/mesa/pull/105))
-- Regenerated `man/` and `NAMESPACE` with roxygen2 8.1.0. Cross-reference link
-  anchors and `importFrom()` formatting changed; the exported and imported
-  symbols are unchanged.
+- Added a `roxygen-drift` CI job that fails when `man/` or `NAMESPACE` is out
+  of sync with the roxygen comments in `R/`.
   ([#105](https://github.com/cruk-mi/mesa/pull/105))
 
 # mesa 0.99.6
