@@ -546,6 +546,24 @@
     }
     left.appendChild(section("Next up", next));
 
+    // parked: out-of-scope findings from /park, waiting for triage
+    var parked = DATA.parked || [];
+    var park = el("div");
+    if (!parked.length) {
+      park.appendChild(el("div", "muted", "Nothing parked."));
+    } else {
+      var prow = el("div", "rows");
+      parked.forEach(function (item) {
+        var row = el("div", "row");
+        var body = el("div", "body");
+        body.appendChild(el("span", "title", item));
+        row.appendChild(body);
+        prow.appendChild(row);
+      });
+      park.appendChild(prow);
+    }
+    left.appendChild(section("Parked · " + parked.length, park));
+
     // bioc readiness
     var ready = el("div");
     if (bioc) {
