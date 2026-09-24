@@ -47,7 +47,8 @@ GH_API_OPTS_WITH_VALUE = {
 }
 GH_API_MERGE = re.compile(r"/pulls/\d+/merge/?$")
 GH_API_PULL = re.compile(r"/pulls/\d+/?$")
-GH_API_REVIEWS = re.compile(r"/pulls/\d+/reviews/?$")
+# Also the nested submit of a pending review: .../reviews/{id}/events.
+GH_API_REVIEWS = re.compile(r"/pulls/\d+/reviews(/\d+/events)?/?$")
 GH_API_REF = re.compile(r"/git/refs?(/|$)")
 
 # `gh api graphql` carries the action in the query body, not the endpoint, so
@@ -150,12 +151,13 @@ def gh_api_method(tokens):
     return "GET"
 
 
-def graphql_text(tokens):
-    """Everything a `gh api graphql` call could send as its query.
+def payload_text(tokens):
+    """Everything a `gh api` call could send as its request body.
 
-    The query can arrive inline (`-f query=...`), from a file (`-F query=@f`,
-    `--input f`) or on stdin (`--input -`). Files are read so a mutation cannot
-    hide in one; stdin cannot be inspected, so it is reported as None.
+    A field can arrive inline (`-f query=...`), from a file (`-F query=@f`,
+    `--input f`) or on stdin (`--input -`). Files are read so a mutation or an
+    APPROVE event cannot hide in one; stdin cannot be inspected, so it is
+    reported as None.
     """
     parts = []
     for i, tok in enumerate(tokens):
@@ -185,7 +187,7 @@ def graphql_text(tokens):
 
 
 def check_gh_graphql(tokens):
-    text = graphql_text(tokens)
+    text = payload_text(tokens)
     if text is None:
         return ("A `gh api graphql` query read from stdin or an unreadable file "
                 "cannot be checked, so it is refused. Pass it with -f query=...")
@@ -216,8 +218,14 @@ def check_gh_api(tokens):
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):
         return "Merging pull requests is the human's decision, not the agent's."
-    if GH_API_REVIEWS.search(endpoint) and "APPROVE" in " ".join(tokens).upper():
-        return "An agent does not approve pull requests on this repo."
+    # Only a write can submit a review; a GET that filters on "APPROVED" is a read.
+    if GH_API_REVIEWS.search(endpoint) and method != "GET":
+        body = payload_text(tokens)
+        if body is None:
+            return ("A review payload read from stdin or an unreadable file cannot "
+                    "be checked, so it is refused. Pass it with -f event=...")
+        if "APPROVE" in (" ".join(tokens) + "\n" + body).upper():
+            return "An agent does not approve pull requests on this repo."
     if GH_API_PULL.search(endpoint) and method != "GET":
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")

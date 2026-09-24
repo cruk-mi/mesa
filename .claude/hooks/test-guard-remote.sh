@@ -63,7 +63,10 @@ for cmd in \
     "gh api graphql -f query='mutation { addPullRequestReview(input:{pullRequestId:\"X\", event: APPROVE}) { clientMutationId } }'" \
     "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
     "gh api graphql --raw-field query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
-    'gh api graphql --input -'
+    'gh api graphql --input -' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=APPROVE' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input -' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events --input -'
 do check 2 "$cmd"; done
 
 # A mutation hidden in a query file must be read and caught, not waved through.
@@ -72,6 +75,16 @@ printf 'mutation { mergePullRequest(input:{pullRequestId:"X"}) { clientMutationI
 check 2 "gh api graphql -F query=@$qfile"
 check 2 "gh api graphql --input $qfile"
 rm -f "$qfile"
+
+# Same for a REST review payload: APPROVE in a file is caught, COMMENT is not.
+rfile="$(mktemp)"
+printf '{"event":"APPROVE"}' >"$rfile"
+check 2 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input $rfile"
+check 2 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events --input $rfile"
+printf '{"event":"COMMENT","body":"x"}' >"$rfile"
+check 0 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input $rfile"
+check 0 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=COMMENT"
+rm -f "$rfile"
 
 # --- must be allowed -------------------------------------------------
 for cmd in \
@@ -97,6 +110,7 @@ for cmd in \
     "gh api graphql -f query='query { repository(owner:\"cruk-mi\", name:\"mesa\") { pullRequest(number:106) { state } } }'" \
     "gh api graphql -f query='mutation { addPullRequestReview(input:{pullRequestId:\"X\", event: COMMENT, body:\"x\"}) { clientMutationId } }'" \
     "gh api 'repos/cruk-mi/mesa/pulls/106/comments?per_page=100'" \
+    "gh api repos/cruk-mi/mesa/pulls/106/reviews --jq '.[] | select(.state == \"APPROVED\")'" \
     'Rscript -e "devtools::test()"'
 do check 0 "$cmd"; done
 
