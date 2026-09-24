@@ -537,7 +537,7 @@ def collect_branches():
     ]
     prs = gh_json([
         "pr", "list", "--repo", REPO, "--state", "all", "--limit", "300",
-        "--json", "number,headRefName,state,isCrossRepository",
+        "--json", "number,headRefName,headRefOid,state,isCrossRepository",
     ])
     if prs is None:
         return None
@@ -554,8 +554,14 @@ def collect_branches():
         # repository's, so a fork PR can say nothing about them.
         if pr.get("isCrossRepository"):
             continue
-        if RANK.get(pr.get("state"), 0) >= RANK.get(state_of.get(ref, {}).get("state"), 0):
-            state_of[ref] = {"state": pr.get("state"), "number": pr.get("number")}
+        rank = RANK.get(pr.get("state"), 0)
+        held = state_of.get(ref)
+        held_rank = RANK.get(held["state"], 0) if held else 0
+        if rank > held_rank:
+            state_of[ref] = {"state": pr.get("state"), "number": pr.get("number"),
+                             "oids": {pr.get("headRefOid")}}
+        elif rank == held_rank:
+            held["oids"].add(pr.get("headRefOid"))
 
     current = git("rev-parse", "--abbrev-ref", "HEAD")
     buckets = {"landed": [], "abandoned": [], "open": [], "unknown": []}
@@ -566,7 +572,13 @@ def collect_branches():
         info = state_of.get(name)
         where = "local+remote" if name in local and name in remote else ("local" if name in local else "remote")
         row = {"branch": name, "where": where, "pr": info.get("number") if info else None}
-        if info is None:
+        # A finished PR only speaks for the commit it ended on. A reused name
+        # that has moved on since is live work, so it is not a prune candidate.
+        tips = [git("rev-parse", "--verify", "-q", ref) for ref in
+                ([f"refs/heads/{name}"] if name in local else []) +
+                ([f"refs/remotes/origin/{name}"] if name in remote else [])]
+        if info is None or (info["state"] != "OPEN" and
+                            not all(t and t in info["oids"] for t in tips)):
             buckets["unknown"].append(row)
         elif info["state"] == "MERGED":
             buckets["landed"].append(row)
@@ -859,17 +871,22 @@ def main():
     }
     state["degraded"] = DEGRADED
 
+    # Render first: a template problem is recorded in DEGRADED, and it must
+    # reach status.json and STATUS.md like every other incomplete field.
+    html = render_html(state) if args.html else None
+
     os.makedirs(STATE_DIR, exist_ok=True)
     write_atomic(JSON_PATH, json.dumps(state, indent=2, sort_keys=True) + "\n")
     written = ["status.json"]
     if not args.json_only:
         write_atomic(MD_PATH, render(state))
         written.append("STATUS.md")
-    if args.html:
-        html = render_html(state)
-        if html is not None:
-            write_atomic(HTML_OUT, html)
-            written.append("dashboard.html")
+    if html is not None:
+        write_atomic(HTML_OUT, html)
+        written.append("dashboard.html")
+    elif args.html and os.path.exists(HTML_OUT):
+        # Never leave an old page behind for /mesa-status to republish as new.
+        os.unlink(HTML_OUT)
     if not args.quiet:
         print("Wrote " + ", ".join(written) + "."
               + (f" {len(DEGRADED)} field(s) incomplete." if DEGRADED else ""))
