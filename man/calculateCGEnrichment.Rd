@@ -33,8 +33,9 @@ containing the read GRanges. If \code{NULL}, no files are written.
 
 \item{extend}{\code{integer(1)}
 Extension length for single-end reads (used only when \code{paired = FALSE}):
-reads shorter than this are lengthened to it in the 5'->3' direction, and
-reads already longer are left unchanged. Unused for paired reads.
+reads shorter than \code{extend + 1} bases are lengthened to \code{extend + 1} in the
+5'->3' direction, as MEDIPS did, and longer reads are left unchanged.
+Unused for paired reads.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}

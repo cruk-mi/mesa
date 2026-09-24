@@ -33,8 +33,9 @@ under \verb{@libraries$file_name}).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Extension length for unpaired reads;
-reads already longer than this are left unchanged.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Extension length for unpaired reads:
+shorter reads are lengthened to \code{extend + 1} bases, longer ones left
+unchanged.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
@@ -49,7 +50,7 @@ reads, \code{1} keeps one per genomic location.
 
 \item{chr.select}{\code{character()} or \code{NULL}
 Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}; subset of chromosomes to analyse.
-\strong{Default:} \code{NULL} (the BSgenome's standard chromosomes).}
+\strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
 Whether BAMs are paired-end. Paired reads are read as the fragment span

@@ -82,8 +82,9 @@ calculateGenomicCGDistribution <- function(BSgenome) {
 #'
 #' @param extend `integer(1)`
 #' Extension length for single-end reads (used only when `paired = FALSE`):
-#' reads shorter than this are lengthened to it in the 5'->3' direction, and
-#' reads already longer are left unchanged. Unused for paired reads.
+#' reads shorter than `extend + 1` bases are lengthened to `extend + 1` in the
+#' 5'->3' direction, as MEDIPS did, and longer reads are left unchanged.
+#' Unused for paired reads.
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
@@ -819,8 +820,9 @@ calculateCGEnrichmentGRanges <- function(
 #'   **Default:** `FALSE`.
 #'
 #' @param extend `integer(1)`
-#' Passed to [calculateCGEnrichment()]. Extension length for unpaired reads;
-#' reads already longer than this are left unchanged.
+#' Passed to [calculateCGEnrichment()]. Extension length for unpaired reads:
+#' shorter reads are lengthened to `extend + 1` bases, longer ones left
+#' unchanged.
 #'   **Default:** `0`.
 #'
 #' @param shift `integer(1)`
