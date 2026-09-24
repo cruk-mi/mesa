@@ -277,7 +277,14 @@ calculateCGEnrichment <- function(
         )
     }
 
-    genomeCGranges <- getCGPositions(BSgenome, chr.select)
+    # With chr.select unset, look up CpGs on every chromosome the reads fall
+    # on, not getCGPositions()' standard-chromosome default: a read on a
+    # scaffold would otherwise always be counted as lacking "CG".
+    if (is.null(chr.select)) {
+        genomeCGranges <- getCGPositions(BSgenome, chromosomes)
+    } else {
+        genomeCGranges <- getCGPositions(BSgenome, chr.select)
+    }
 
 
     numWithoutPattern <- GRange.Reads %>%
@@ -747,7 +754,14 @@ calculateCGEnrichmentGRanges <- function(
     enrichment.score.relH <- regions.relH / genome.relH
     enrichment.score.GoGe <- regions.GoGe / genome.GoGe
 
-    genomeCGranges <- getCGPositions(BSgenome, chr.select)
+    # As in calculateCGEnrichment(): cover every chromosome carrying reads.
+    if (is.null(chr.select)) {
+        genomeCGranges <- getCGPositions(
+            BSgenome, GenomeInfoDb::seqlevelsInUse(readGRanges)
+        )
+    } else {
+        genomeCGranges <- getCGPositions(BSgenome, chr.select)
+    }
 
     numReads <- length(readsChars)
 
@@ -815,7 +829,7 @@ calculateCGEnrichmentGRanges <- function(
 #'
 #' @param chr.select `character()` or `NULL`
 #' Passed to [calculateCGEnrichment()]; subset of chromosomes to analyse.
-#'   **Default:** `NULL` (the BSgenome's standard chromosomes).
+#'   **Default:** `NULL` (all chromosomes).
 #'
 #' @param paired `logical(1)`
 #' Whether BAMs are paired-end. Paired reads are read as the fragment span

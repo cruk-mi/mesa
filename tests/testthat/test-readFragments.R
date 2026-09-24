@@ -262,3 +262,23 @@ test_that("getCGPositions returns one-base motif positions", {
     expect_true(all(BiocGenerics::width(positions) == 1L))
     expect_gt(length(positions), 0L)
 })
+
+
+test_that("reads off the standard chromosomes are classified against CpGs", {
+
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
+
+    # chrUn_gl000220 is not a standard chromosome, and carries a CpG at
+    # 133-134. With chr.select = NULL the CpG lookup must still cover every
+    # chromosome the reads fall on, or this read is reported as lacking "CG".
+    gr <- GenomicRanges::GRanges(
+        "chrUn_gl000220", IRanges::IRanges(start = 100, width = 100)
+    )
+
+    enr <- calculateCGEnrichmentGRanges(
+        readGRanges = gr, BSgenome = "BSgenome.Hsapiens.UCSC.hg19"
+    )
+
+    expect_equal(enr$nReads, 1L)
+    expect_equal(enr$nReadsWithoutPattern, 0L)
+})
