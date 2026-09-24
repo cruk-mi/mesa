@@ -395,11 +395,27 @@ getCGPositions <- function(BSgenome, chr.select) {
 bamScanParam <- function(file, what, flag, chr.select = NULL,
     chr.lengths = NULL) {
 
-    hasIndex <- any(file.exists(c(
-        paste0(file, ".bai"),
-        sub("\\.bam$", ".bai", file, ignore.case = TRUE),
-        paste0(file, ".csi")
-    )))
+    # The foo.bai sibling only applies to a foo.bam: for any other path, sub()
+    # would return the BAM itself, which exists and would pass as its index.
+    indexFiles <- c(paste0(file, ".bai"), paste0(file, ".csi"))
+    if (grepl("\\.bam$", file, ignore.case = TRUE)) {
+        indexFiles <- c(
+            indexFiles, sub("\\.bam$", ".bai", file, ignore.case = TRUE)
+        )
+    }
+    hasIndex <- any(file.exists(indexFiles))
+
+    # Validate before branching on the index, so an unindexed BAM rejects a
+    # misspelt chromosome too instead of silently returning no reads.
+    lengths <- chr.lengths[as.character(chr.select)]
+
+    if (!is.null(chr.select) && !is.null(chr.lengths) && anyNA(lengths)) {
+        stop(
+            "chr.select entries absent from the BSgenome: ",
+            paste(chr.select[is.na(lengths)], collapse = ", "),
+            call. = FALSE
+        )
+    }
 
     if (is.null(chr.select) || !hasIndex) {
         if (!is.null(chr.select)) {
@@ -415,16 +431,6 @@ bamScanParam <- function(file, what, flag, chr.select = NULL,
             ),
             prefiltered = is.null(chr.select)
         ))
-    }
-
-    lengths <- chr.lengths[as.character(chr.select)]
-
-    if (anyNA(lengths)) {
-        stop(
-            "chr.select entries absent from the BSgenome: ",
-            paste(chr.select[is.na(lengths)], collapse = ", "),
-            call. = FALSE
-        )
     }
 
     which <- GenomicRanges::GRanges(

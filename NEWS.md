@@ -47,6 +47,10 @@
   unchanged: reads on scaffolds, patches and alt haplotypes are still
   classified against their own CpGs.
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- `calculateCGEnrichment()` rejects a `chr.select` entry absent from the
+  BSgenome for unindexed BAMs too, instead of silently returning no reads, and
+  no longer mistakes a BAM path without a `.bam` extension for its own index.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
 
 # mesa 0.99.6
 

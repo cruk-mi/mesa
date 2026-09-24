@@ -264,6 +264,51 @@ test_that("getCGPositions returns one-base motif positions", {
 })
 
 
+test_that("an invalid chr.select errors on a BAM with no index", {
+
+    dir <- tempfile("mesaBam")
+    dir.create(dir)
+    on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+    bam <- writeTestBam(dir)
+
+    unindexed <- file.path(dir, "noindex.bam")
+    file.copy(bam, unindexed)
+
+    # validated before branching on the index, so a typo is not silently
+    # turned into an empty read set
+    expect_error(
+        readSingleEndFragments(
+            file = unindexed, chr.select = "chrX",
+            chr.lengths = testChrLengths
+        ),
+        "absent from the BSgenome"
+    )
+})
+
+
+test_that("a BAM path without a .bam extension is not taken as indexed", {
+
+    dir <- tempfile("mesaBam")
+    dir.create(dir)
+    on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+    bam <- writeTestBam(dir)
+
+    # sub("\\.bam$", ".bai", file) leaves such a path unchanged, which then
+    # exists and was mistaken for its own index
+    noext <- file.path(dir, "reads")
+    file.copy(bam, noext)
+
+    expect_message(
+        reads <- readSingleEndFragments(
+            file = noext, chr.select = "chr1",
+            chr.lengths = testChrLengths
+        ),
+        "No BAM index"
+    )
+    expect_equal(length(reads), 6L)
+})
+
+
 test_that("reads off the standard chromosomes are classified against CpGs", {
 
     skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
