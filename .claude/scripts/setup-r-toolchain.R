@@ -151,7 +151,8 @@ say("BiocManager::valid():")
 print(BiocManager::valid())
 if (length(failed)) {
     say("COULD NOT INSTALL:", paste(failed, collapse = ", "))
-    say("These are Suggests-or-Imports gaps; note them, do not paper over them.")
+    say("These are declared dependencies (Depends/Imports/Suggests); the full",
+        "check ladder cannot run until they install.")
 } else {
     say("every dependency installed")
 }
@@ -164,3 +165,5 @@ say("toolchain: R", have, "| Bioconductor",
         sprintf("(MISMATCH — man/ must be regenerated with %s only)", ROXYGEN)
     } else "")
 say("next: R CMD build . && R CMD check --no-manual mesa_*.tar.gz")
+# Fail last, after the toolchain line, so the summary is still printed.
+if (length(failed)) quit(status = 1L)
