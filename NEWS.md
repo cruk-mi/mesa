@@ -1,55 +1,24 @@
 # mesa 0.99.6.9000
 
 ## Bug fixes
-- `calculateCGEnrichment()` and `getCGPositions()` no longer call `MEDIPS`.
-  Reads are imported directly with `Rsamtools::scanBam()` and CpG positions
-  located with `Biostrings`. This fixes two bugs: a crash in a fresh session
-  where `GenomicRanges` is not attached (`could not find function "strand<-"`),
-  and silent read truncation caused by the hardcoded `IRanges(1, 536870912)`
-  chromosome bound in `MEDIPS`, which dropped reads on longer chromosomes.
-  ([#81](https://github.com/cruk-mi/mesa/issues/81))
-- `calculateCGEnrichment()` returns the same counts as previous releases. The
-  `Rsamtools` rewrite had changed four behaviours without meaning to:
-  secondary alignments are excluded again (`isSecondaryAlignment = FALSE`), so
-  `nReads` is no longer inflated; `extend` only ever lengthens a read and no
-  longer truncates reads longer than it; `uniq` deduplicates strand-aware and
-  rejects invalid values instead of silently collapsing duplicates; and
-  `getCGPositions()` returns
-  one-base motif positions, so a read starting on the G of a CpG is no longer
-  counted as containing `"CG"`.
-  ([#85](https://github.com/cruk-mi/mesa/pull/85))
-- `calculateCGEnrichment()` accepts unindexed BAM files together with
-  `chr.select` again. The index is used to restrict the scan when present;
-  otherwise the whole file is scanned and chromosomes are selected afterwards.
-  ([#85](https://github.com/cruk-mi/mesa/pull/85))
-- `uniq` in `calculateCGEnrichment()` and `addMedipsEnrichmentFactors()` now
-  accepts only `0` (keep all reads) or `1` (keep one read per genomic
-  location). The p-value form, which capped duplicates per location at a
-  Poisson quantile, has been removed; it was inherited from `MEDIPS` and is
-  not used. Passing any other value is now an error rather than silently
-  collapsing duplicates.
+- `calculateCGEnrichment()` no longer depends on `MEDIPS`: reads are imported
+  with `Rsamtools` and CpGs located with `Biostrings`. This fixes a crash in a
+  fresh session (`could not find function "strand<-"`) and silent read loss on
+  chromosomes longer than 2^29 bp. Read counts are otherwise unchanged.
+  ([#81](https://github.com/cruk-mi/mesa/issues/81),
+  [#102](https://github.com/cruk-mi/mesa/pull/102))
+- `calculateCGEnrichment()` now errors on a `chr.select` entry absent from the
+  BSgenome instead of returning no reads.
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
-- `MEDIPS` dropped from `Suggests`. No code in the package calls it any more,
-  so it was an install-time cost for no benefit. `MEDIPSData` is unaffected and
-  is still used for test and example data.
+
+## Other changes
+- `uniq` now accepts only `0` (keep all reads) or `1` (one read per location);
+  the unused p-value form is removed.
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
-- `extend` in `calculateCGEnrichment()` and `addMedipsEnrichmentFactors()`
-  again lengthens a read to `extend + 1` bases, matching `MEDIPS`. `MEDIPS`
-  added `pmax(0, extend - stop + start)` to each read over inclusive spans, so
-  its clamp is `extend - width + 1`; the rewrite extended to `extend` instead
-  and left reads of exactly `extend` bases untouched.
+- With `chr.select = NULL`, CpGs are located only on chromosomes that carry
+  reads, which is much faster on genomes with many scaffolds (e.g. hg19).
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
-- `calculateCGEnrichment()` and `calculateCGEnrichmentGRanges()` with
-  `chr.select = NULL` now locate CpGs only on the chromosomes the reads fall
-  on, rather than every seqlevel the BSgenome carries. For hg19 that avoids
-  scanning up to 298 sequences (~22 s and ~1.3 GB per call, multiplied again
-  by each fork in `addMedipsEnrichmentFactors(nCores = n)`). Counts are
-  unchanged: reads on scaffolds, patches and alt haplotypes are still
-  classified against their own CpGs.
-  ([#102](https://github.com/cruk-mi/mesa/pull/102))
-- `calculateCGEnrichment()` rejects a `chr.select` entry absent from the
-  BSgenome for unindexed BAMs too, instead of silently returning no reads, and
-  no longer mistakes a BAM path without a `.bam` extension for its own index.
+- `MEDIPS` removed from `Suggests`.
   ([#102](https://github.com/cruk-mi/mesa/pull/102))
 
 # mesa 0.99.6
