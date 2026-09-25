@@ -38,14 +38,11 @@ COPY .devcontainer/install.R /tmp/install.R
 RUN MESA_VARIANT=${VARIANT} MESA_PKG_DIR=/tmp/mesa Rscript /tmp/install.R \
  && rm -rf /tmp/downloaded_packages /tmp/Rtmp*
 
-# GitHub-only packages, in their own step so the GitHub API token is mounted
-# here only (anonymous API calls are rate-limited to 60/hour per IP, which
-# shared CI runners exhaust). The token is a BuildKit secret, supplied by
-# build-image.yml: it is never written to a layer or the cache. The mount is
-# optional, so a local build without it still works, anonymously.
+# GitHub-only packages, pinned and fetched as github.com archives rather than
+# through the rate-limited GitHub API, so no token is needed (see the script).
+# A separate step, so bumping a pin does not rebuild the dependency layer.
 COPY .devcontainer/install_github.R /tmp/install_github.R
-RUN --mount=type=secret,id=github_pat \
-    Rscript /tmp/install_github.R \
+RUN Rscript /tmp/install_github.R \
  && rm -rf /tmp/downloaded_packages /tmp/Rtmp*
 
 # Non-root user for Codespaces. Builds above ran as root and installed into

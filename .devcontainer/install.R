@@ -115,6 +115,6 @@ if (!have_roxygen) {
 }
 
 # GitHub-only packages (ggtree, immunedeconv) are installed by
-# install_github.R, in a separate build step that holds the GitHub token.
+# install_github.R, in a separate build step.
 
 message("✅ mesa dependency stack ready")

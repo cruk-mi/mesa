@@ -65,11 +65,13 @@ data-dependent tests skip there (see `mesa-tests`).
 
 Genuine extras are installed separately. GitHub-only packages (`ggtree`, `immunedeconv`)
 live in `.devcontainer/install_github.R` and are **pinned to explicit SHAs** for
-reproducibility — keep that pattern for anything installed from GitHub. That script runs
-in its own Dockerfile step, the only one that mounts the `github_pat` BuildKit secret
-(`GITHUB_TOKEN`, passed by `build-image.yml`): anonymous GitHub API calls are capped at
-60/hour per IP and shared runners exhaust them. Keep the token out of the `install.R` step,
-so the CRAN/Bioc dependency install scripts never see it.
+reproducibility — keep that pattern for anything installed from GitHub, including
+immunedeconv's `Remotes:` (also pinned there; re-check them when bumping immunedeconv).
+The script fetches each pin as a `github.com/<repo>/archive/<sha>.tar.gz` archive and
+installs it with `dependencies = FALSE` after its CRAN/Bioc dependencies — **never through
+the GitHub API** (`install_github()`, or `Remotes:` resolution). Anonymous API calls are
+capped at 60/hour per IP and shared runners exhaust them, and a token would put the
+workflow's `packages: write` credential in reach of third-party install code.
 
 Note that the extras loop installs only when a package is **absent**
 (`if (!requireNamespace(pkg))`), so it will not correct an image that already carries a
