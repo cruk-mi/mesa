@@ -494,6 +494,33 @@ def collect_recommendation():
     return text or None
 
 
+def parking_lot_path():
+    """The parking lot lives in the main checkout, never in a worktree.
+
+    `/park` is used from per-issue worktrees, and each worktree has its own
+    `.claude/state/`. Resolving through the common git dir sends every session
+    to the same gitignored file, so nothing is split across worktrees.
+    """
+    common = git("rev-parse", "--path-format=absolute", "--git-common-dir")
+    if not common:
+        return os.path.join(STATE_DIR, "parking-lot.md")
+    return os.path.join(os.path.dirname(common.rstrip("/")), ".claude", "state", "parking-lot.md")
+
+
+def collect_parked():
+    """Out-of-scope findings waiting for triage (AGENTS.md "Session scope").
+
+    One `- ` line per item, written by /park. The file is gitignored, so this is
+    per-machine: it shows what this checkout has parked, not the whole team's.
+    """
+    try:
+        with open(parking_lot_path(), encoding="utf-8") as handle:
+            lines = handle.read().splitlines()
+    except OSError:
+        return []
+    return [line[2:].strip() for line in lines if line.startswith("- ")]
+
+
 def collect_pkgdown():
     """Is the published site built from current main?
 
@@ -670,6 +697,16 @@ def render(state):
             for issue in groups[label]:
                 out.append(f"- #{issue['number']} {issue['title']}")
             out.append("")
+
+    # --- parked -------------------------------------------------------------
+    parked = state.get("parked") or []
+    out += [f"## Parked ({len(parked)})", ""]
+    if parked:
+        out += ["Out-of-scope findings from `/park`, waiting for triage:", ""]
+        out += [f"- {item}" for item in parked]
+    else:
+        out.append("Nothing parked.")
+    out.append("")
 
     # --- bioc readiness ---------------------------------------------------
     out += ["## Bioconductor readiness", ""]
@@ -863,6 +900,7 @@ def main():
         "in_flight": collect_in_flight(),
         "landed": collect_landed(),
         "next_up": collect_next_up(),
+        "parked": collect_parked(),
         "ci": collect_ci(run_info),
         "coverage": collect_coverage(),
         "bioccheck": collect_bioccheck(bioc_run, allow_log=not args.no_log),
