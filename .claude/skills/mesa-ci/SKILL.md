@@ -47,7 +47,7 @@ it only changes when the base image does — and when it does, **both** files ne
 | Workflow | Purpose |
 |---|---|
 | `check-bioc.yml` | The authoritative check. biocthis-generated (`biocthis::use_bioc_github_action()`), runs `R CMD check` + `BiocCheck` across platforms, plus covr and pkgdown on `main`. Triggered by changes to `R/`, `tests/`, `vignettes/`, `inst/`, `DESCRIPTION`, `NAMESPACE`, and by any PR. |
-| `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. ~20–40 min. |
+| `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. On a PR that touches `.devcontainer/**` or the workflow it only builds (no login, push or cache write), so a broken image fails the PR, not `main`. ~20–40 min. |
 
 Because `check-bioc.yml` is biocthis-generated, prefer regenerating or making surgical
 edits over rewriting it — gratuitous divergence from upstream makes future biocthis updates
@@ -64,8 +64,14 @@ the package list is never hand-maintained. The `slim`/`full` split is the single
 data-dependent tests skip there (see `mesa-tests`).
 
 Genuine extras are installed separately. GitHub-only packages (`ggtree`, `immunedeconv`)
-are **pinned to explicit SHAs** for reproducibility — keep that pattern for anything
-installed from GitHub.
+live in `.devcontainer/install_github.R` and are **pinned to explicit SHAs** for
+reproducibility — keep that pattern for anything installed from GitHub, including
+immunedeconv's `Remotes:` (also pinned there; re-check them when bumping immunedeconv).
+The script fetches each pin as a `github.com/<repo>/archive/<sha>.tar.gz` archive and
+installs it with `dependencies = FALSE` after its CRAN/Bioc dependencies — **never through
+the GitHub API** (`install_github()`, or `Remotes:` resolution). Anonymous API calls are
+capped at 60/hour per IP and shared runners exhaust them, and a token would put the
+workflow's `packages: write` credential in reach of third-party install code.
 
 Note that the extras loop installs only when a package is **absent**
 (`if (!requireNamespace(pkg))`), so it will not correct an image that already carries a

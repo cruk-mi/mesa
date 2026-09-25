@@ -54,7 +54,7 @@ updated in one file and silently missed in another.
 | roxygen2 | `DESCRIPTION` → `Config/roxygen2/version` | `resolve_versions.sh` → `install.R`, `roxygen-drift` CI job | derived |
 | RSPM Ubuntu codename (`noble`) | none — tracks the Bioc base image's Ubuntu | hardcoded in `check-bioc.yml` and `.devcontainer/install.R` | **duplicated — update both** |
 | `system_requirements("ubuntu", "20.04")` | none — same base-image Ubuntu | `check-bioc.yml` (sysreqs step) | **out of step with `noble` (24.04) — see below** |
-| `ggtree`, `immunedeconv` | explicit GitHub SHAs in `install.R` | — | pinned on purpose |
+| `ggtree`, `immunedeconv` and immunedeconv's `Remotes:` (xCell, EPIC, MCPcounter, mMCPcounter, ConsensusTME) | explicit GitHub SHAs in `install_github.R` | — | pinned on purpose; re-check the `Remotes:` pins when bumping immunedeconv |
 
 ### The two Ubuntu values disagree
 

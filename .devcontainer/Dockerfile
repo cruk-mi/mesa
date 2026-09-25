@@ -38,6 +38,13 @@ COPY .devcontainer/install.R /tmp/install.R
 RUN MESA_VARIANT=${VARIANT} MESA_PKG_DIR=/tmp/mesa Rscript /tmp/install.R \
  && rm -rf /tmp/downloaded_packages /tmp/Rtmp*
 
+# GitHub-only packages, pinned and fetched as github.com archives rather than
+# through the rate-limited GitHub API, so no token is needed (see the script).
+# A separate step, so bumping a pin does not rebuild the dependency layer.
+COPY .devcontainer/install_github.R /tmp/install_github.R
+RUN Rscript /tmp/install_github.R \
+ && rm -rf /tmp/downloaded_packages /tmp/Rtmp*
+
 # Non-root user for Codespaces. Builds above ran as root and installed into
 # /usr/local/lib/R/site-library; hand that library to vscode so the
 # postCreateCommand (run as vscode) can install mesa into it.

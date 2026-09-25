@@ -29,6 +29,11 @@
 - Added a `roxygen-drift` CI job that fails when `man/` or `NAMESPACE` is out
   of sync with the roxygen comments in `R/`.
   ([#105](https://github.com/cruk-mi/mesa/pull/105))
+- The devcontainer image build installs its GitHub-only packages from pinned
+  archives instead of the rate-limited GitHub API, fixing its rate-limit
+  failures, and fails if any of them does not install at its pinned SHA.
+  Pull requests that change the devcontainer now build it (without pushing).
+  ([#127](https://github.com/cruk-mi/mesa/pull/127))
 
 # mesa 0.99.6
 
