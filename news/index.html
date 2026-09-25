@@ -72,6 +72,21 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.6.9000" id="mesa-09969000">mesa 0.99.6.9000<a class="anchor" aria-label="anchor" href="#mesa-09969000"></a></h2>
 <div class="section level3">
+<h3 id="bug-fixes-0-99-6-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-6-9000"></a></h3>
+<ul><li>
+<code><a href="../reference/calculateCGEnrichment.html">calculateCGEnrichment()</a></code> no longer depends on <code>MEDIPS</code>: reads are imported with <code>Rsamtools</code> and CpGs located with <code>Biostrings</code>. This fixes a crash in a fresh session (<code>could not find function "strand&lt;-"</code>) and silent read loss on chromosomes longer than 2^29 bp. Read counts are otherwise unchanged. (<a href="https://github.com/cruk-mi/mesa/issues/81" class="external-link">#81</a>, <a href="https://github.com/cruk-mi/mesa/pull/102" class="external-link">#102</a>)</li>
+<li>
+<code><a href="../reference/calculateCGEnrichment.html">calculateCGEnrichment()</a></code> now errors on a <code>chr.select</code> entry absent from the BSgenome instead of returning no reads. (<a href="https://github.com/cruk-mi/mesa/pull/102" class="external-link">#102</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-changes-0-99-6-9000">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-99-6-9000"></a></h3>
+<ul><li>
+<code>uniq</code> now accepts only <code>0</code> (keep all reads) or <code>1</code> (one read per location); the unused p-value form is removed. (<a href="https://github.com/cruk-mi/mesa/pull/102" class="external-link">#102</a>)</li>
+<li>With <code>chr.select = NULL</code>, CpGs are located only on chromosomes that carry reads, which is much faster on genomes with many scaffolds (e.g. hg19). (<a href="https://github.com/cruk-mi/mesa/pull/102" class="external-link">#102</a>)</li>
+<li>
+<code>MEDIPS</code> removed from <code>Suggests</code>. (<a href="https://github.com/cruk-mi/mesa/pull/102" class="external-link">#102</a>)</li>
+</ul></div>
+<div class="section level3">
 <h3 id="infrastructure-0-99-6-9000">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-6-9000"></a></h3>
 <ul><li>Pinned roxygen2 via <code>Config/roxygen2/version</code> in <code>DESCRIPTION</code>; the devcontainer installs that exact version. Regenerated <code>man/</code> and <code>NAMESPACE</code> with roxygen2 8.1.0 (link anchors and <code>importFrom()</code> formatting only). (<a href="https://github.com/cruk-mi/mesa/pull/105" class="external-link">#105</a>)</li>
 <li>Added a <code>roxygen-drift</code> CI job that fails when <code>man/</code> or <code>NAMESPACE</code> is out of sync with the roxygen comments in <code>R/</code>. (<a href="https://github.com/cruk-mi/mesa/pull/105" class="external-link">#105</a>)</li>

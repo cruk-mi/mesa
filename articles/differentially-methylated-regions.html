@@ -315,7 +315,7 @@ values for the values of the variable under consideration, e.g.
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>,</span>
 <span>                contrasts <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>group1 <span class="op">=</span> <span class="st">"Tumour"</span>, group2 <span class="op">=</span> <span class="st">"Normal"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of nrpm values for 819 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; Fitting initial GLM on 309 windows, using 2 cores</span></span>
 <span><span class="co">#&gt; Performing contrast Tumour_vs_Normal</span></span>
@@ -623,7 +623,7 @@ one way of which is to use the default hg38 annotation by specifying
 <span><span class="co">#&gt; 'select()' returned 1:1 mapping between keys and columns</span></span>
 <span></span>
 <span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "seqnames"                   "start"                     </span></span>
 <span><span class="co">#&gt;  [3] "end"                        "CpG_density"               </span></span>
 <span><span class="co">#&gt;  [5] "Tumour_vs_Normal_log2FC"    "Tumour_vs_Normal_adjPval"  </span></span>

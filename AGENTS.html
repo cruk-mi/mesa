@@ -92,7 +92,7 @@
 <li>You <strong>may open a pull request, but only as a draft.</strong> Never mark it ready for review, never request review, never merge.</li>
 <li>You may <strong>never</strong> push or force-push to <code>main</code>, delete branches or tags, or rewrite published history.</li>
 <li>When in doubt about an irreversible or outward-facing action, ask first.</li>
-</ul><p>These rules are also enforced mechanically by <code>.claude/hooks/guard-remote.py</code>. If the hook and this file ever disagree, that is a bug — fix both.</p>
+</ul><p>These rules are also enforced mechanically by <code>.claude/hooks/guard-remote.py</code>, on <code>gh api</code> as well as on <code>git</code> and <code>gh pr</code> — the endpoint names the action, so reaching a merge or an approval through the raw API is blocked the same way. If the hook and this file ever disagree, that is a bug — fix both.</p>
 <hr></div>
 <div class="section level2">
 <h2 id="attribution-required">Attribution (required)<a class="anchor" aria-label="anchor" href="#attribution-required"></a></h2>
@@ -158,6 +158,45 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 <p><strong>Phase 3 — cut the release.</strong> After the work PRs merge, branch <code>chore/bump-version-X.Y.(Z+1)</code> off <code>main</code>. One commit <code>chore(version): bump to X.Y.(Z+1)</code> (reference: PR #99 = <code>b5e80a0</code>): bump <code>DESCRIPTION</code> and rename the <code>NEWS.md</code> heading.</p>
 <p><strong>Stop after each phase.</strong> Tell the human to push and open the PR. Tag format <code>vX.Y.Z</code>, applied by the human after merge to <code>main</code>.</p>
 <p>Full detail lives in the <code>bioc-release-cycle</code> skill.</p>
+<hr></div>
+<div class="section level2">
+<h2 id="project-state">Project state<a class="anchor" aria-label="anchor" href="#project-state"></a></h2>
+<p><code>STATUS.md</code> answers “what landed, what is in flight, what is next”. It is <strong>generated</strong> — every figure in it is read back from <code>git</code>, <code>gh</code>, <code>NEWS.md</code> and the <code>gh-pages</code> build commit by <code>.claude/scripts/mesa-status.py</code> — and therefore <strong>gitignored</strong>: a derived snapshot committed to the repo would go stale there, which is the whole failure this avoids. If you do not have it, run the script and you do.</p>
+<ul><li>
+<strong>Never hand-edit it</strong>, and never correct a number in it. A wrong figure means a wrong probe: fix the script.</li>
+<li>Refresh with <code>/mesa-status</code>, or <code>python3 .claude/scripts/mesa-status.py</code>. A <code>SessionStart</code> hook refreshes it automatically once it is over four hours old.</li>
+<li>The one hand-written part is <code>.claude/state/recommendation.md</code>, the “what to do next” judgement. It is overwritten, never appended to, and rendered into <code>STATUS.md</code> by the script.</li>
+</ul><p>Because the state is derived, a change made by anyone — you, a co-maintainer on github.com, Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.</p>
+<p><code>/mesa-status</code> also builds a dashboard page from the same data and publishes it as a private claude.ai artifact (its URL sits in <code>.claude/state/artifact-url.txt</code>, which is per-person). The page is deterministic output, not something a model writes each time: the script inlines the state into a committed template. It is a snapshot — a published artifact cannot reach GitHub, so it cannot refresh itself.</p>
+<p><strong>Which file to edit:</strong></p>
+<table class="table"><colgroup><col width="33%"><col width="33%"><col width="33%"></colgroup><thead><tr><th>File</th>
+<th></th>
+<th>Edit it?</th>
+</tr></thead><tbody><tr><td><code>.claude/scripts/mesa-status.py</code></td>
+<td>the generator</td>
+<td>
+<strong>yes</strong> — this is where a wrong figure gets fixed</td>
+</tr><tr><td><code>.claude/scripts/dashboard-template.html</code></td>
+<td>the dashboard’s design and markup</td>
+<td>
+<strong>yes</strong> — this is the page</td>
+</tr><tr><td><code>.claude/state/recommendation.md</code></td>
+<td>the “what next” judgement</td>
+<td>
+<strong>yes</strong> — overwrite it</td>
+</tr><tr><td><code>STATUS.md</code></td>
+<td>generated, gitignored</td>
+<td>no</td>
+</tr><tr><td><code>.claude/state/status.json</code></td>
+<td>generated, gitignored</td>
+<td>no</td>
+</tr><tr><td><code>.claude/state/dashboard.html</code></td>
+<td>generated, gitignored</td>
+<td>no — edits here vanish on the next run</td>
+</tr><tr><td><code>.claude/state/bioccheck-history.jsonl</code></td>
+<td>append-only record</td>
+<td>no — the script appends</td>
+</tr></tbody></table><p>The <code>mesa-status</code> skill covers the probes, what is fragile about each, and how to add one.</p>
 <hr></div>
 <div class="section level2">
 <h2 id="issue-workflow">Issue workflow<a class="anchor" aria-label="anchor" href="#issue-workflow"></a></h2>
@@ -245,6 +284,8 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 <td><code>mesa-docs-news</code></td>
 </tr><tr><td>CI workflows, devcontainer, toolchain versions</td>
 <td><code>mesa-ci</code></td>
+</tr><tr><td>Project state, <code>STATUS.md</code>, the status generator</td>
+<td><code>mesa-status</code></td>
 </tr><tr><td>Capturing a new procedure as a skill</td>
 <td><code>capture-skill</code></td>
 </tr></tbody></table><hr></div>

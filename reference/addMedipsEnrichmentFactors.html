@@ -121,31 +121,36 @@ under <code>@libraries$file_name</code>).
 
 <dt id="arg-extend">extend<a class="anchor" aria-label="anchor" href="#arg-extend"></a></dt>
 <dd><p><code>integer(1)</code>
-Passed to <code><a href="https://rdrr.io/pkg/MEDIPS/man/MEDIPSset-class.html" class="external-link">MEDIPS::getGRange()</a></code>. Extension length for unpaired reads.
+Passed to <code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>. Extension length for unpaired reads:
+shorter reads are lengthened to <code>extend + 1</code> bases, longer ones left
+unchanged.
 <strong>Default:</strong> <code>0</code>.</p></dd>
 
 
 <dt id="arg-shift">shift<a class="anchor" aria-label="anchor" href="#arg-shift"></a></dt>
 <dd><p><code>integer(1)</code>
-Passed to <code><a href="https://rdrr.io/pkg/MEDIPS/man/MEDIPSset-class.html" class="external-link">MEDIPS::getGRange()</a></code>. Shift applied to read positions.
+Passed to <code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>. Shift applied to unpaired read
+positions; unused for paired reads.
 <strong>Default:</strong> <code>0</code>.</p></dd>
 
 
 <dt id="arg-uniq">uniq<a class="anchor" aria-label="anchor" href="#arg-uniq"></a></dt>
-<dd><p><code>integer(1)</code>
-Passed to <code><a href="https://rdrr.io/pkg/MEDIPS/man/MEDIPSset-class.html" class="external-link">MEDIPS::getGRange()</a></code>. Minimum mapping uniqueness.
+<dd><p><code>numeric(1)</code>
+Passed to <code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>. Duplicate handling: <code>0</code> keeps all
+reads, <code>1</code> keeps one per genomic location.
 <strong>Default:</strong> <code>0</code>.</p></dd>
 
 
 <dt id="arg-chr-select">chr.select<a class="anchor" aria-label="anchor" href="#arg-chr-select"></a></dt>
 <dd><p><code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> or <code>NULL</code>
-Passed to MEDIPS range extraction; subset of chromosomes to analyse.
+Passed to <code><a href="calculateCGEnrichment.html">calculateCGEnrichment()</a></code>; subset of chromosomes to analyse.
 <strong>Default:</strong> <code>NULL</code> (all chromosomes).</p></dd>
 
 
 <dt id="arg-paired">paired<a class="anchor" aria-label="anchor" href="#arg-paired"></a></dt>
 <dd><p><code>logical(1)</code>
-Whether BAMs are paired-end (uses <code><a href="https://rdrr.io/pkg/MEDIPS/man/MEDIPS.createSet.html" class="external-link">MEDIPS::getPairedGRange()</a></code>).
+Whether BAMs are paired-end. Paired reads are read as the fragment span
+between the first mate's start and its mate's end.
 <strong>Default:</strong> <code>TRUE</code>.</p></dd>
 
 
@@ -184,10 +189,10 @@ uses <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-li
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Requires BAM files and the MEDIPS package; see \dontrun{} for a full</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Requires BAM files from MEDIPSData; see \dontrun{} for a full</span></span></span>
 <span class="r-in"><span><span class="co"># usage example.</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPS"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPSData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>        <span class="st">"extdata"</span>,</span></span>
