@@ -47,7 +47,7 @@ it only changes when the base image does — and when it does, **both** files ne
 | Workflow | Purpose |
 |---|---|
 | `check-bioc.yml` | The authoritative check. biocthis-generated (`biocthis::use_bioc_github_action()`), runs `R CMD check` + `BiocCheck` across platforms, plus covr and pkgdown on `main`. Triggered by changes to `R/`, `tests/`, `vignettes/`, `inst/`, `DESCRIPTION`, `NAMESPACE`, and by any PR. |
-| `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. ~20–40 min. |
+| `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. On a PR that touches `.devcontainer/**` or the workflow it only builds (no login, push or cache write), so a broken image fails the PR, not `main`. ~20–40 min. |
 
 Because `check-bioc.yml` is biocthis-generated, prefer regenerating or making surgical
 edits over rewriting it — gratuitous divergence from upstream makes future biocthis updates
