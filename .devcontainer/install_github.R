@@ -37,11 +37,27 @@ options(repos = BiocManager::repositories())
 # ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases on GitHub,
 # pinned to a specific SHA for reproducibility.
 # immunedeconv is only available from GitHub; pinned to the SHA for v2.1.4.
-remotes::install_github("YuLab-SMU/ggtree",
-                        ref = "9f645a2b89e4150d9748547b3ea1b03906275c27",
-                        upgrade = "never")
-remotes::install_github("omnideconv/immunedeconv",
-                        ref = "e625e6c28ed14a30f9f40f159925cc9f0df4fa49",
-                        upgrade = "never")
+pinned <- c(
+  "YuLab-SMU/ggtree"        = "9f645a2b89e4150d9748547b3ea1b03906275c27",
+  "omnideconv/immunedeconv" = "e625e6c28ed14a30f9f40f159925cc9f0df4fa49"
+)
+for (repo in names(pinned)) {
+  remotes::install_github(repo, ref = pinned[[repo]], upgrade = "never")
+}
+
+# remotes only warns when an install fails (R_REMOTES_NO_ERRORS_FROM_WARNINGS
+# is set in the Dockerfile), so a failed install -- e.g. a dependency download
+# timing out -- would still pass the build and ship an image without the
+# package. Fail the build unless each package loads at its pinned SHA.
+ok <- vapply(names(pinned), function(repo) {
+  pkg <- basename(repo)
+  requireNamespace(pkg, quietly = TRUE) &&
+    identical(packageDescription(pkg)$RemoteSha, pinned[[repo]])
+}, logical(1))
+if (!all(ok)) {
+  stop("install_github.R: not installed at the pinned SHA: ",
+       paste(names(pinned)[!ok], collapse = ", "),
+       ". See the install log above for the cause.")
+}
 
 message("✅ GitHub-only packages ready")
