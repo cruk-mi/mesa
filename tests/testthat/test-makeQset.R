@@ -206,8 +206,58 @@ test_that("calculateCGEnrichment works", {
         extend = 0, shift = 0, uniq = 0,
         chr.select = "chr22", paired = TRUE)
 
+    # nReads is pinned exactly. It is the fragment count this BAM yielded
+    # under the MEDIPS implementation, recorded in 9997e94 (2023-01-10) and
+    # kept when calculateCGEnrichment() was reimplemented on Rsamtools (#81),
+    # so its job is to prove the two implementations agree. A change here is
+    # either a real regression or a deliberate change to read filtering
+    # (minMapQual, properPairsOnly, chr.select) - not a stale expectation to
+    # be updated casually. Re-derive by counting the first mates of properly
+    # paired reads on chr22 of the BAM above.
     expect_equal(enr$nReads, 636130)
+
+    # TODO: tolerance is relative, so tolerance = 5 passes for relH anywhere
+    # from ~0.5 to ~5 against an expected 3.35. These catch gross breakage
+    # only. Tighten when this block is re-enabled and the values can be
+    # measured against the Rsamtools implementation.
     expect_equal(enr$relH, 3.353462, tolerance = 5)
     expect_equal(enr$GoGe, 1.631612, tolerance = 5)
+
+})
+
+test_that("calculateCGEnrichment works (single-end)", {
+
+    # skip check unless options(run_long_checks = TRUE)
+    skip_long_checks()
+
+    if (!rlang::is_installed("MEDIPSData")) {
+        skip("MEDIPSData Not installed")
+    }
+
+    # The fresh-session failure (#81) only manifested when GenomicRanges was
+    # not attached to the search path, so the assertion below is only
+    # meaningful while that holds. It is NOT order-independent: with
+    # skip_long_checks disabled the makeQset blocks above run first and
+    # attach GenomicRanges, so skip rather than report a false failure.
+    # The same guarantee runs unconditionally in test-readFragments.R,
+    # which needs neither MEDIPSData nor a BSgenome.
+    skip_if(
+        "package:GenomicRanges" %in% search(),
+        "GenomicRanges already attached by an earlier test"
+    )
+    expect_false("package:GenomicRanges" %in% search())
+
+    enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+        exportPath = NULL,
+        extend = 0, shift = 0, uniq = 0,
+        chr.select = "chr22", paired = FALSE)
+
+    expect_true(all(c("file", "relH", "GoGe", "nReads",
+        "nReadsWithoutPattern", "n100bpReads",
+        "n100bpReadsWithoutPattern") %in% colnames(enr)))
+    expect_gt(enr$nReads, 0)
+    expect_true(is.numeric(enr$relH) && is.finite(enr$relH))
+    expect_true(is.numeric(enr$GoGe) && is.finite(enr$GoGe))
 
 })
