@@ -25,7 +25,8 @@ options(repos = BiocManager::repositories())
 pinned <- c(
   # ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases.
   "YuLab-SMU/ggtree"        = "9f645a2b89e4150d9748547b3ea1b03906275c27",
-  # immunedeconv's `Remotes:`, pinned to the commits current at v2.1.4.
+  # immunedeconv's `Remotes:`: their HEAD on 2026-09-25, built and
+  # loaded with immunedeconv v2.1.4 (#127).
   "dviraran/xCell"          = "20e2919eefd37e15af35f29f4944e30697098a28",
   "GfellerLab/EPIC"         = "50a4f404f96c2842b2891b517b4e3bfaa6c64b8f",
   "grst/MCPcounter"         = "7ea6e040af68d8e0641d80ddf6b0d06226752b87",
