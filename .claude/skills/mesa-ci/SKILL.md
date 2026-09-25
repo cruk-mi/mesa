@@ -64,8 +64,12 @@ the package list is never hand-maintained. The `slim`/`full` split is the single
 data-dependent tests skip there (see `mesa-tests`).
 
 Genuine extras are installed separately. GitHub-only packages (`ggtree`, `immunedeconv`)
-are **pinned to explicit SHAs** for reproducibility — keep that pattern for anything
-installed from GitHub.
+live in `.devcontainer/install_github.R` and are **pinned to explicit SHAs** for
+reproducibility — keep that pattern for anything installed from GitHub. That script runs
+in its own Dockerfile step, the only one that mounts the `github_pat` BuildKit secret
+(`GITHUB_TOKEN`, passed by `build-image.yml`): anonymous GitHub API calls are capped at
+60/hour per IP and shared runners exhaust them. Keep the token out of the `install.R` step,
+so the CRAN/Bioc dependency install scripts never see it.
 
 Note that the extras loop installs only when a package is **absent**
 (`if (!requireNamespace(pkg))`), so it will not correct an image that already carries a

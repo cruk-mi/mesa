@@ -9,7 +9,8 @@
 #      (DESCRIPTION is the single source of truth for *which*
 #      packages; already-present base packages are no-ops).
 #   2. A small set of genuine extras the base image / DESCRIPTION
-#      do not cover (dev versions + IDE tooling).
+#      do not cover (IDE tooling, pinned roxygen2). GitHub-only
+#      packages are installed afterwards by install_github.R.
 #
 # The slim/full split is one explicit list: `full_only` below.
 #
@@ -80,7 +81,7 @@ message(sprintf("── Installing %d declared dependencies ──", length(deps
 BiocManager::install(deps, ask = FALSE, update = FALSE)
 
 # --- Genuine extras (not in DESCRIPTION) --------------------
-# IDE tooling and dev-only / GitHub-only packages.
+# IDE tooling and dev-only packages.
 for (pkg in c("languageserver", "imsig")) {
   if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
 }
@@ -113,14 +114,7 @@ if (!have_roxygen) {
                            repos = getOption("repos"), upgrade = "never")
 }
 
-# ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases on GitHub,
-# pinned to a specific SHA for reproducibility.
-# immunedeconv is only available from GitHub; pinned to the SHA for v2.1.4.
-remotes::install_github("YuLab-SMU/ggtree",
-                        ref = "9f645a2b89e4150d9748547b3ea1b03906275c27",
-                        upgrade = "never")
-remotes::install_github("omnideconv/immunedeconv",
-                        ref = "e625e6c28ed14a30f9f40f159925cc9f0df4fa49",
-                        upgrade = "never")
+# GitHub-only packages (ggtree, immunedeconv) are installed by
+# install_github.R, in a separate build step that holds the GitHub token.
 
 message("✅ mesa dependency stack ready")

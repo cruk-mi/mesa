@@ -35,6 +35,9 @@ jobs:
             VARIANT=${{ matrix.variant }}
             BIOC_VERSION=${{ env.BIOC_VERSION }}
             BIOC_RELEASE=${{ env.BIOC_RELEASE }}
+          # Authenticates install_github.R's GitHub API calls (rate limit).
+          secrets: |
+            github_pat=${{ secrets.GITHUB_TOKEN }}
           push: true
           tags: |
             ghcr.io/cruk-mi/mesa/devcontainer:${{ matrix.variant == 'slim' && 'codespaces-slim' || 'full' }}
