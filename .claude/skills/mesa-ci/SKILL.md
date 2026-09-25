@@ -19,6 +19,7 @@ bash .devcontainer/resolve_versions.sh
 # R_VERSION_FULL=4.6.0
 # BIOC_VERSION=3.23
 # BIOC_RELEASE=RELEASE_3_23
+# ROXYGEN_VERSION=8.1.0
 ```
 
 It is deliberately dependency-free — curl, grep, sed and POSIX awk only, no gawk
@@ -69,7 +70,15 @@ installed from GitHub.
 Note that the extras loop installs only when a package is **absent**
 (`if (!requireNamespace(pkg))`), so it will not correct an image that already carries a
 wrong version. Anything that needs a specific version must compare `packageVersion()` and
-reinstall on mismatch, not merely check presence.
+reinstall on mismatch, not merely check presence — that is what the roxygen2 block just
+below it does.
+
+**roxygen2 is pinned.** `resolve_versions.sh` emits `ROXYGEN_VERSION` from `DESCRIPTION`'s
+`Config/roxygen2/version` (falling back to the pre-8.0 `RoxygenNote`), `install.R` installs
+exactly that version, and the `roxygen-drift` job in `check-bioc.yml` regenerates the docs
+with it and fails on any diff. The job deliberately does **not** use the latest roxygen —
+otherwise every upstream release would turn it red and it would become the churn it exists
+to prevent. Upgrading roxygen2 is a one-line `DESCRIPTION` edit, in its own PR.
 
 ## Upgrading R or Bioconductor
 

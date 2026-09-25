@@ -14,19 +14,41 @@ Both `NAMESPACE` and every file in `man/` carry roxygen2's
 roxygen2::roxygenise()
 ```
 
-> **Check your roxygen version first.** Compare `packageVersion("roxygen2")` against
-> `DESCRIPTION`'s `RoxygenNote`. If they differ, **stop and tell the human.** Regenerating
-> with a different roxygen rewrites all 100+ man pages and bumps `RoxygenNote`, producing a
-> huge diff unrelated to your change. A roxygen upgrade is its own dedicated PR — it must
-> never ride along in a work PR.
+> **The roxygen2 version is pinned.** `DESCRIPTION`'s `Config/roxygen2/version` records
+> which roxygen2 generated the committed docs. Check yours matches:
+>
+> ```r
+> packageVersion("roxygen2")   # must equal Config/roxygen2/version
+> ```
+>
+> If it differs, **install the pinned version** rather than regenerating — a different
+> roxygen rewrites all 100+ man pages and produces a huge diff unrelated to your change.
+> The `roxygen-drift` CI job regenerates with the pinned version and fails on any diff, so
+> a mismatch will be caught. Upgrading roxygen2 is its own dedicated PR.
 
 If you believe `NAMESPACE` needs an export that roxygen is not producing, the fix is an
 `@export` tag in the `R/` source, not an edit to `NAMESPACE`.
 
 ## roxygen requirements for exported functions
 
-Every exported function needs `@title`, `@description`, `@param` (all arguments),
+Every exported function needs a title, a description, `@param` for every argument,
 `@return`, and at least one **runnable** `@examples` block.
+
+**Titles and descriptions are implicit in this package.** The first roxygen line is the
+title; the paragraph after it is the description. `R/` contains no `@title` or
+`@description` tags — match that, do not add them.
+
+```r
+#' Add a hyper-stable fraction to a qseaSet
+#'
+#' Longer description goes here, as its own paragraph.
+#'
+#' @param qseaSet A `qseaSet` object.
+#' @return The `qseaSet` with the fraction added.
+#' @examples
+#' addHyperStableFraction(exampleTumourNormal)
+#' @export
+```
 
 - Examples use the shipped `exampleMouse` / `exampleTumourNormal` data objects.
 - Avoid `\dontrun{}` unless the example genuinely needs network access or external files.
