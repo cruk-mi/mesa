@@ -1,5 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
+<url><loc>/AGENTS.html</loc></url>
+<url><loc>/CLAUDE.html</loc></url>
 <url><loc>/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>/articles/data-and-qc.html</loc></url>
 <url><loc>/articles/differentially-methylated-regions.html</loc></url>

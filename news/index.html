@@ -71,6 +71,11 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.6.9000" id="mesa-09969000">mesa 0.99.6.9000<a class="anchor" aria-label="anchor" href="#mesa-09969000"></a></h2>
+<div class="section level3">
+<h3 id="infrastructure-0-99-6-9000">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-6-9000"></a></h3>
+<ul><li>Pinned roxygen2 via <code>Config/roxygen2/version</code> in <code>DESCRIPTION</code>; the devcontainer installs that exact version. Regenerated <code>man/</code> and <code>NAMESPACE</code> with roxygen2 8.1.0 (link anchors and <code>importFrom()</code> formatting only). (<a href="https://github.com/cruk-mi/mesa/pull/105" class="external-link">#105</a>)</li>
+<li>Added a <code>roxygen-drift</code> CI job that fails when <code>man/</code> or <code>NAMESPACE</code> is out of sync with the roxygen comments in <code>R/</code>. (<a href="https://github.com/cruk-mi/mesa/pull/105" class="external-link">#105</a>)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.6" id="mesa-0996">mesa 0.99.6<a class="anchor" aria-label="anchor" href="#mesa-0996"></a></h2>
