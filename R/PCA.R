@@ -1534,8 +1534,8 @@ plotUMAP <- function(object,
 #' Plot dimensionality reduction results
 #'
 #' Visualise PCA or UMAP coordinates stored in a [mesaDimRed] object. Wrappers
-#' such as [plotPCA()] and [plotUMAP()] provide convenient shortcuts for common
-#' use cases.
+#' such as [BiocGenerics::plotPCA()] and [plotUMAP()] provide convenient
+#' shortcuts for common use cases.
 #'
 #' @param object `mesaDimRed`.
 #' A dimensionality reduction container returned by [getPCA()] or [getUMAP()].

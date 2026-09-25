@@ -15,11 +15,13 @@ rules in `.github/instructions/*`, and the
 - **Bioconductor coding standards:** 4-space indent, ≤ 80-char lines, `<-` not `=`, no
   `T`/`F`, `seq_len`/`seq_along` not `1:n`, no `:::`/`<<-`, no `library()`/`require()` or
   `install.packages()`/`BiocManager::install()` in `R/`.
-- **roxygen completeness:** every exported function has `@title`, `@description`, `@param`,
-  `@return`, runnable `@examples` (no gratuitous `\dontrun{}`), `@seealso`.
+- **roxygen completeness:** every exported function has a title, a description, `@param`,
+  `@return`, runnable `@examples` (no gratuitous `\dontrun{}`) and `@seealso`. Titles and
+  descriptions are implicit in this package — flag *added* `@title` / `@description` tags
+  as inconsistent, not missing ones.
 - **`man/` and `NAMESPACE`** are roxygen2 output and consistent with the `R/` roxygen
   comments — flag any sign of a generated file being hand-edited, and any stray
-  `RoxygenNote` bump riding along in a work PR.
+  `Config/roxygen2/version` bump riding along in a work PR.
 - **Tests:** new functions tested, bug fixes have regression tests, coverage not regressed,
   heavy data guarded with `skip_if_not_installed()`.
 - **NEWS.md** updated under `# mesa X.Y.Z.9000` for user-visible changes.

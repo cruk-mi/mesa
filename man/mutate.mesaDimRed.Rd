@@ -21,7 +21,7 @@ A \code{mesaDimRed} object:
 }
 \description{
 Extend \code{\link[dplyr:mutate]{dplyr::mutate()}} to operate on the \code{sampleTable} slot of a
-\linkS4class{mesaDimRed} object.
+\link[=mesaDimRed-class]{mesaDimRed} object.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
