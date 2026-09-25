@@ -19,7 +19,9 @@
       "Bash(gh run view:*)",
       "Bash(Rscript -e:*)",
       "Bash(bash .devcontainer/resolve_versions.sh)",
-      "Bash(bash .claude/hooks/test-guard-remote.sh)"
+      "Bash(bash .claude/hooks/test-guard-remote.sh)",
+      "Bash(gh pr checks:*)",
+      "Bash(python3 .claude/scripts/mesa-status.py:*)"
     ],
     "deny": [
       "Read(./.Renviron)",
@@ -34,6 +36,17 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-remote.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "perl -e 'alarm shift; exec @ARGV' 110 python3 \"$CLAUDE_PROJECT_DIR/.claude/scripts/mesa-status.py\" --max-age 14400 --no-log --quiet || echo 'mesa-status: STATUS.md refresh failed or ran past 110 s, so it may be stale. Run /mesa-status before relying on it.'",
+            "timeout": 120
           }
         ]
       }

@@ -96,7 +96,6 @@ Suggests:
     UpSetR,
     rtracklayer,
     ggrepel,
-    MEDIPS,
     workflows,
     MEDIPSData,
     uwot,

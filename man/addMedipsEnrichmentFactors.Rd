@@ -33,23 +33,28 @@ under \verb{@libraries$file_name}).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Extension length for unpaired reads.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Extension length for unpaired reads:
+shorter reads are lengthened to \code{extend + 1} bases, longer ones left
+unchanged.
 \strong{Default:} \code{0}.}
 
 \item{shift}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Shift applied to read positions.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Shift applied to unpaired read
+positions; unused for paired reads.
 \strong{Default:} \code{0}.}
 
-\item{uniq}{\code{integer(1)}
-Passed to \code{\link[MEDIPS:getGRange]{MEDIPS::getGRange()}}. Minimum mapping uniqueness.
+\item{uniq}{\code{numeric(1)}
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}. Duplicate handling: \code{0} keeps all
+reads, \code{1} keeps one per genomic location.
 \strong{Default:} \code{0}.}
 
 \item{chr.select}{\code{character()} or \code{NULL}
-Passed to MEDIPS range extraction; subset of chromosomes to analyse.
+Passed to \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}}; subset of chromosomes to analyse.
 \strong{Default:} \code{NULL} (all chromosomes).}
 
 \item{paired}{\code{logical(1)}
-Whether BAMs are paired-end (uses \code{\link[MEDIPS:getPairedGRange]{MEDIPS::getPairedGRange()}}).
+Whether BAMs are paired-end. Paired reads are read as the fragment span
+between the first mate's start and its mate's end.
 \strong{Default:} \code{TRUE}.}
 
 \item{file_name}{\code{character(1)}
@@ -84,10 +89,10 @@ pulldown, \verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelis
 uses \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
 \examples{
-# Requires BAM files and the MEDIPS package; see \dontrun{} for a full
+# Requires BAM files from MEDIPSData; see \dontrun{} for a full
 # usage example.
 \dontrun{
-if (requireNamespace("MEDIPS", quietly = TRUE) &&
+if (requireNamespace("MEDIPSData", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
     bam <- system.file(
         "extdata",

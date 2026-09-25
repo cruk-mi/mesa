@@ -7,3 +7,8 @@ inst/doc
 .RData
 Rplots.pdf
 .claude/settings.local.json
+STATUS.md
+.claude/state/status.json
+.claude/state/artifact-url.txt
+.claude/state/dashboard.html
+__pycache__/

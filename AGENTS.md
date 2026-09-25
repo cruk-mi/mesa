@@ -42,8 +42,10 @@ pull request and when anything merges.
   published history.
 - When in doubt about an irreversible or outward-facing action, ask first.
 
-These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`. If the hook
-and this file ever disagree, that is a bug — fix both.
+These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
+as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
+approval through the raw API is blocked the same way. If the hook and this file ever
+disagree, that is a bug — fix both.
 
 ---
 
@@ -131,6 +133,47 @@ and rename the `NEWS.md` heading.
 applied by the human after merge to `main`.
 
 Full detail lives in the `bioc-release-cycle` skill.
+
+---
+
+## Project state
+
+`STATUS.md` answers "what landed, what is in flight, what is next". It is **generated** —
+every figure in it is read back from `git`, `gh`, `NEWS.md` and the `gh-pages` build commit
+by `.claude/scripts/mesa-status.py` — and therefore **gitignored**: a derived snapshot
+committed to the repo would go stale there, which is the whole failure this avoids. If you
+do not have it, run the script and you do.
+
+- **Never hand-edit it**, and never correct a number in it. A wrong figure means a wrong
+  probe: fix the script.
+- Refresh with `/mesa-status`, or `python3 .claude/scripts/mesa-status.py`. A `SessionStart`
+  hook refreshes it automatically once it is over four hours old.
+- The one hand-written part is `.claude/state/recommendation.md`, the "what to do next"
+  judgement. It is overwritten, never appended to, and rendered into `STATUS.md` by the
+  script.
+
+Because the state is derived, a change made by anyone — you, a co-maintainer on github.com,
+Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.
+
+`/mesa-status` also builds a dashboard page from the same data and publishes it as a private
+claude.ai artifact (its URL sits in `.claude/state/artifact-url.txt`, which is per-person).
+The page is deterministic output, not something a model writes each time: the script inlines
+the state into a committed template. It is a snapshot — a published artifact cannot reach
+GitHub, so it cannot refresh itself.
+
+**Which file to edit:**
+
+| File | | Edit it? |
+|---|---|---|
+| `.claude/scripts/mesa-status.py` | the generator | **yes** — this is where a wrong figure gets fixed |
+| `.claude/scripts/dashboard-template.html` | the dashboard's design and markup | **yes** — this is the page |
+| `.claude/state/recommendation.md` | the "what next" judgement | **yes** — overwrite it |
+| `STATUS.md` | generated, gitignored | no |
+| `.claude/state/status.json` | generated, gitignored | no |
+| `.claude/state/dashboard.html` | generated, gitignored | no — edits here vanish on the next run |
+| `.claude/state/bioccheck-history.jsonl` | append-only record | no — the script appends |
+
+The `mesa-status` skill covers the probes, what is fragile about each, and how to add one.
 
 ---
 
@@ -267,6 +310,7 @@ around release cadence, versioning and `BiocCheck`.
 | Writing or fixing tests | `mesa-tests` |
 | Roxygen docs, `NEWS.md` entries | `mesa-docs-news` |
 | CI workflows, devcontainer, toolchain versions | `mesa-ci` |
+| Project state, `STATUS.md`, the status generator | `mesa-status` |
 | Capturing a new procedure as a skill | `capture-skill` |
 
 ---

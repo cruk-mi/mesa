@@ -1,5 +1,26 @@
 # mesa 0.99.6.9000
 
+## Bug fixes
+- `calculateCGEnrichment()` no longer depends on `MEDIPS`: reads are imported
+  with `Rsamtools` and CpGs located with `Biostrings`. This fixes a crash in a
+  fresh session (`could not find function "strand<-"`) and silent read loss on
+  chromosomes longer than 2^29 bp. Read counts are otherwise unchanged.
+  ([#81](https://github.com/cruk-mi/mesa/issues/81),
+  [#102](https://github.com/cruk-mi/mesa/pull/102))
+- `calculateCGEnrichment()` now errors on a `chr.select` entry absent from the
+  BSgenome instead of returning no reads.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+
+## Other changes
+- `uniq` now accepts only `0` (keep all reads) or `1` (one read per location);
+  the unused p-value form is removed.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- With `chr.select = NULL`, CpGs are located only on chromosomes that carry
+  reads, which is much faster on genomes with many scaffolds (e.g. hg19).
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- `MEDIPS` removed from `Suggests`.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+
 ## Infrastructure
 - Pinned roxygen2 via `Config/roxygen2/version` in `DESCRIPTION`; the
   devcontainer installs that exact version. Regenerated `man/` and `NAMESPACE`
