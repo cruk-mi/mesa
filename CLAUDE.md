@@ -40,6 +40,7 @@ Load the skill rather than guessing; each one loads only when the task matches.
 | CI, devcontainer, toolchain versions | `mesa-ci` |
 | Project state, `STATUS.md`, the status generator | `mesa-status` |
 | Capturing a new procedure as a skill | `capture-skill` |
+| Reviewing a PR, branch or diff (auto-requested for large PRs) | `pr-review` |
 
 Generic R practice comes from the `posit-dev/skills` plugins (`r-lib`, `github`,
 `open-source`, `posit-dev`). **A mesa skill beats a plugin skill** wherever they disagree —

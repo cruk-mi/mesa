@@ -363,6 +363,25 @@ around release cadence, versioning and `BiocCheck`.
 | CI workflows, devcontainer, toolchain versions | `mesa-ci` |
 | Project state, `STATUS.md`, the status generator | `mesa-status` |
 | Capturing a new procedure as a skill | `capture-skill` |
+| Reviewing a PR, branch or diff | `pr-review` |
+
+### Pull request reviews
+
+Reviews are done locally with the `pr-review` skill (🔴 High / 🟠 Medium / 🟡 Low), not by
+GitHub Copilot, so they don't use Copilot quota.
+
+- **Large PRs are reviewed automatically.** After `gh pr create`,
+  `.claude/hooks/review-after-pr.py` measures the diff. It leaves out generated files
+  (`man/`, `NAMESPACE`) and `DESCRIPTION`/`NEWS.md`. If the PR is over 150 lines, over 5
+  files, or over 30 lines under `R/`, hooks or workflows, the session is asked to review it.
+- **Small PRs** (version bumps, one-line docs) are reviewed only when a human asks:
+  `/pr-review <N>`.
+- A review is reported in the session. Posting it to the PR is outward-facing, so it
+  happens only when the human asks.
+- Turn Copilot's automatic review off in your own GitHub settings
+  (github.com/settings/copilot). No repo ruleset requests it.
+
+Agents without Claude Code hooks can follow the skill file by hand.
 
 ---
 
