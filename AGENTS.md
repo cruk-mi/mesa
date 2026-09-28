@@ -41,6 +41,8 @@ pull request and when anything merges.
 - You may **never** push or force-push to `main`, delete branches or tags, or rewrite
   published history.
 - When in doubt about an irreversible or outward-facing action, ask first.
+- **Never push to Bioconductor** (`BiocStaging/mesa`) without the human's explicit
+  permission, asked every time. The human runs that push by default.
 
 These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
 as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
@@ -131,6 +133,10 @@ and rename the `NEWS.md` heading.
 
 **Stop after each phase.** Tell the human to push and open the PR. Tag format `vX.Y.Z`,
 applied by the human after merge to `main`.
+
+**After phase 3 merges**, the human tags the release and pushes it to Bioconductor
+(`BiocStaging/mesa`, branch `devel`) before phase 1 opens. The `bioc-release-cycle` skill
+has the checklist. A release that never reaches Bioconductor has not shipped.
 
 Full detail lives in the `bioc-release-cycle` skill.
 
