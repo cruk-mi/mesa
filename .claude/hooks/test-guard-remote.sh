@@ -8,6 +8,8 @@
 
 set -uo pipefail
 hook="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/guard-remote.py"
+# No network: skip the stacked-PR probe (a deletion is then still asked).
+export MESA_GUARD_OFFLINE=1
 fails=0
 
 check() { # check <expected-exit> <command>
@@ -45,7 +47,17 @@ for cmd in \
     "gh api graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
     "gh api graphql -f query='mutation { enablePullRequestAutoMerge(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
     "gh api graphql --raw-field query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
-    'gh pr view 102 && gh pr merge 102 --squash'
+    'gh pr view 102 && gh pr merge 102 --squash' \
+    'gh pr merge 102 --squash --delete-branch' \
+    'gh pr merge 102 -d' \
+    'gh pr merge -R cruk-mi/mesa 102 --squash --delete-branch' \
+    'git push origin --delete old-branch' \
+    'git push -d origin old-branch other-branch' \
+    'git push origin :old-branch' \
+    'git branch -D old-branch' \
+    'git branch -d old-branch' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking' \
+    "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'"
 do ask_check "$cmd"; done
 
 # --- must be blocked -------------------------------------------------
@@ -59,13 +71,16 @@ for cmd in \
     'git push --force-with-lease origin my-branch' \
     'cd /somewhere && git push origin main' \
     'gh pr ready 102' \
-    'gh pr merge 102 --squash --delete-branch' \
-    'gh pr merge 102 -d' \
+    'git push origin --delete main' \
+    'git push -d origin dev' \
+    'git branch -D main' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/main' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/tags/v0.99.6' \
+    'git push origin --delete refs/tags/v0.99.6' \
+    'gh pr merge 102 -d && git push origin main' \
     'gh pr merge 102 --squash && git push origin main' \
     'gh pr edit 104 --ready' \
     'gh pr review 102 --approve' \
-    'git push origin --delete old-branch' \
-    'git branch -D old-branch' \
     'git tag -d v0.99.6' \
     'git -C /repo push origin main' \
     'git -c user.name=x push origin main' \
@@ -78,11 +93,9 @@ for cmd in \
     'git push origin +main' \
     'gh api --method PATCH repos/cruk-mi/mesa/pulls/106 -f draft=false' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews -f event=APPROVE' \
-    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking' \
     "gh api -X PATCH 'repos/cruk-mi/mesa/pulls/106?' -f draft=false" \
     "gh api graphql -f query='mutation { markPullRequestReadyForReview(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
     "gh api graphql -f query='mutation { addPullRequestReview(input:{pullRequestId:\"X\", event: APPROVE}) { clientMutationId } }'" \
-    "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
     'gh api graphql --input -' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=APPROVE' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input -' \

@@ -40,18 +40,26 @@ pull request and decides when anything merges.
   request review.
 - You **may merge a pull request only when the human explicitly approves that merge or
   asks for it** in the conversation. An approving review on GitHub is not, on its own,
-  that approval. Squash-merge, and never pass `--delete-branch`, because deleting
-  branches stays the human's job. The hook asks the human to confirm every merge.
-- You may **never** push or force-push to `main`, delete branches or tags, or rewrite
-  published history.
+  that approval. Squash-merge. The hook asks the human to confirm every merge.
+- You **may delete a branch only when it is safe and the human explicitly approves**.
+  Safe means:
+  - its PR is merged or closed;
+  - it is not `main` or `dev`;
+  - no open PR uses it as its base, or those PRs have been retargeted to `main` first
+    (`gh pr edit N --base main`). Otherwise deleting it closes those PRs instead of
+    retargeting them.
+  This covers `git branch -d/-D`, `git push --delete` and `gh pr merge --delete-branch`.
+  The hook asks the human to confirm each deletion and refuses the unsafe ones.
+- You may **never** push or force-push to `main`, delete tags, or rewrite published
+  history.
 - When in doubt about an irreversible or outward-facing action, ask first.
 - **Never push to Bioconductor** (`BiocStaging/mesa`) without the human's explicit
   permission, asked every time. The human runs that push by default.
 
 These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
 as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
-approval through the raw API is treated the same way. A merge is not blocked but raised
-as a permission prompt, so the human confirms each one. If the hook and this file ever
+approval through the raw API is treated the same way. A merge or a safe branch deletion is
+not blocked but raised as a permission prompt, so the human confirms each one. If the hook and this file ever
 disagree, that is a bug — fix both.
 
 ---

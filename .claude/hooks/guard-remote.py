@@ -7,17 +7,21 @@ mechanically so the contract does not depend on the model remembering it.
 
 Blocked:
   * any push that targets a protected branch (main / dev / master)
-  * force pushes, --mirror, --all, and remote ref deletion
+  * force pushes, --mirror and --all
   * committing or merging while HEAD is on a protected branch
   * gh pr ready / review --approve
   * the same actions reached through `gh api`
-  * deleting branches or tags, including `gh pr merge --delete-branch`
+  * deleting a protected branch, or a branch an open PR uses as its base
+    (deleting it would close that PR instead of retargeting it)
+  * deleting tags
 
 Asked, not blocked:
   * merging a pull request (`gh pr merge`, or the same through `gh api`).
-    AGENTS.md allows it only when the human explicitly approves or asks, so
-    the hook returns a permission "ask": Claude Code shows the command and the
-    human confirms every merge.
+  * deleting any other branch (`git branch -d/-D`, `git push --delete`,
+    `gh pr merge --delete-branch`, or the same through `gh api`).
+  AGENTS.md allows these only when the human explicitly approves or asks, so
+  the hook returns a permission "ask": Claude Code shows the command and the
+  human confirms each one.
 
 The command is split on shell separators and tokenised, so each segment is
 judged on its own. That matters: `git push --dry-run origin main && git push
@@ -25,8 +29,8 @@ origin main` must not be waved through because the first half is harmless, and
 `git -C /repo push origin main` must not slip past because `git` and `push` are
 not adjacent.
 
-Exit codes: 0 = allow, 2 = block (stderr is shown to the agent). A merge
-exits 0 with a PreToolUse "ask" decision on stdout.
+Exit codes: 0 = allow, 2 = block (stderr is shown to the agent). A merge or a
+safe branch deletion exits 0 with a PreToolUse "ask" decision on stdout.
 Read-only inspection is never blocked. When this hook and AGENTS.md disagree,
 that is a bug: fix both.
 """
@@ -67,9 +71,82 @@ GH_GRAPHQL_READY = re.compile(r"\bmarkPullRequestReadyForReview\b")
 GH_GRAPHQL_REVIEW = re.compile(r"\b(addPullRequestReview|submitPullRequestReview)\b")
 GH_GRAPHQL_DELETE_REF = re.compile(r"\bdeleteRef\b")
 
-# A merge is not refused outright: it needs the human's explicit approval, so
-# main() turns this marker into a permission prompt instead of a block.
-MERGE = "Merging a pull request needs the human's explicit approval."
+
+
+class Ask:
+    """Not refused outright: needs the human's explicit approval, so main()
+    turns it into a permission prompt instead of a block."""
+
+    def __init__(self, what):
+        self.what = what
+
+
+MERGE = Ask("merge a pull request")
+
+# The stacked-PR probe calls `gh`. MESA_GUARD_OFFLINE=1 skips it (the tests do,
+# so they need no network); the deletion is then still asked, with a warning.
+OFFLINE = os.environ.get("MESA_GUARD_OFFLINE") == "1"
+
+
+def open_prs_based_on(branch):
+    """Numbers of open PRs whose base is `branch`; None if it cannot be checked."""
+    if OFFLINE:
+        return None
+    try:
+        out = subprocess.run(
+            ["gh", "pr", "list", "--base", branch, "--state", "open",
+             "--json", "number", "--jq", ".[].number"],
+            capture_output=True, text=True, timeout=20,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if out.returncode != 0:
+        return None
+    return [n for n in out.stdout.split() if n.isdigit()]
+
+
+def pr_head_branch(pr_args):
+    """Head branch of the PR `gh pr merge` targets; None if it cannot be found."""
+    if OFFLINE:
+        return None
+    try:
+        out = subprocess.run(["gh", "pr", "view", *pr_args, "--json", "headRefName",
+                              "--jq", ".headRefName"],
+                             capture_output=True, text=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out.stdout.strip() or None if out.returncode == 0 else None
+
+
+def check_branch_deletion(branches, remote):
+    """Block unsafe deletions; ask for the rest.
+
+    A protected branch is never deleted. A remote branch that an open PR uses
+    as its base is refused too: GitHub closes such a PR rather than
+    retargeting it (#114 and #125 were closed that way), so it has to be
+    retargeted first.
+    """
+    names = [re.sub(r"^refs/heads/", "", b) for b in branches if b]
+    if not names:
+        return None
+    for name in names:
+        if name in PROTECTED:
+            return f"Deleting the protected branch '{name}' is not allowed."
+    unchecked = []
+    if remote:
+        for name in names:
+            stacked = open_prs_based_on(name)
+            if stacked is None:
+                unchecked.append(name)
+            elif stacked:
+                prs = ", ".join("#" + n for n in stacked)
+                return (f"Open PR(s) {prs} use '{name}' as their base; deleting it "
+                        f"would close them. Retarget first: gh pr edit <N> --base main.")
+    what = "delete branch " + ", ".join(names)
+    if unchecked:
+        what += (" (could not check whether an open PR is based on "
+                 + ", ".join(unchecked) + ")")
+    return Ask(what)
 
 
 def split_segments(command):
@@ -210,7 +287,8 @@ def check_gh_graphql(tokens):
     if GH_GRAPHQL_REVIEW.search(text) and "APPROVE" in text.upper():
         return "An agent does not approve pull requests on this repo."
     if GH_GRAPHQL_DELETE_REF.search(text):
-        return "Deleting branches is not allowed — they are the human's audit trail."
+        return Ask("delete a ref through the deleteRef mutation (the branch and "
+                   "any PR stacked on it cannot be checked; prefer git push --delete)")
     return None
 
 
@@ -241,8 +319,33 @@ def check_gh_api(tokens):
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")
     if GH_API_REF.search(endpoint) and method == "DELETE":
-        return "Deleting branches is not allowed — they are the human's audit trail."
+        ref = re.split(r"/git/refs?/", endpoint, maxsplit=1)[-1].strip("/")
+        if not ref.startswith("heads/"):
+            return "Deleting tags or other refs is not allowed."
+        return check_branch_deletion([ref[len("heads/"):]], remote=True)
     return None
+
+
+GH_PR_OPTS_WITH_VALUE = {"-R", "--repo", "-t", "--subject", "-b", "--body",
+                         "-F", "--body-file", "--match-head-commit", "-A",
+                         "--author-email"}
+
+
+def gh_pr_target(tokens):
+    """Arguments that make `gh pr view` look at the PR `gh pr merge` targets."""
+    args, i, seen = [], 0, []
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok in GH_PR_OPTS_WITH_VALUE and i + 1 < len(tokens):
+            if tok in ("-R", "--repo"):
+                args += [tok, tokens[i + 1]]
+            i += 2
+            continue
+        if not tok.startswith("-"):
+            seen.append(tok)
+        i += 1
+    # seen: gh, pr, merge, [number | url | branch]
+    return (seen[3:4] if len(seen) > 3 else []) + args
 
 
 def current_branch():
@@ -269,8 +372,14 @@ def check_segment(segment):
             return check_gh_api(tokens)
         if rest[:2] == ["pr", "merge"]:
             if "--delete-branch" in tokens or "-d" in tokens:
-                return ("Deleting branches is not allowed — they are the human's "
-                        "audit trail. Merge without --delete-branch.")
+                head = pr_head_branch(gh_pr_target(tokens))
+                if head is None:
+                    return Ask("merge a pull request and delete its branch (could not "
+                               "check whether an open PR is based on that branch)")
+                verdict = check_branch_deletion([head], remote=True)
+                if isinstance(verdict, Ask):
+                    return Ask("merge a pull request and " + verdict.what)
+                return verdict
             return MERGE
         if rest[:2] == ["pr", "ready"]:
             return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
@@ -301,10 +410,15 @@ def check_segment(segment):
             return "`git push --mirror` can delete remote refs and is not allowed."
         if "--all" in args:
             return "`git push --all` would push protected branches too."
+        positional = [a for a in args if not a.startswith("-")]
+        deleting = []
         if "--delete" in args or "-d" in args:
-            return "Deleting remote refs is not allowed."
-        if any(a.startswith(":") for a in args if not a.startswith("-")):
-            return "Deleting a remote ref via ':ref' is not allowed."
+            deleting = positional[1:]
+        deleting += [a[1:] for a in positional[1:] if a.startswith(":")]
+        if deleting:
+            if any(d.startswith("refs/tags/") for d in deleting):
+                return "Deleting tags is not allowed. Tags are applied by the human after merge."
+            return check_branch_deletion(deleting, remote=True)
         if targets_protected_ref(args):
             return ("Pushing to a protected branch (main/dev) is not allowed. "
                     "Push your feature branch instead and open a pull request.")
@@ -328,7 +442,8 @@ def check_segment(segment):
 
     # --- deletions --------------------------------------------------------
     if sub == "branch" and any(a in ("-D", "-d", "--delete") for a in args):
-        return "Deleting branches is not allowed — they are the human's audit trail."
+        return check_branch_deletion([a for a in args if not a.startswith("-")],
+                                     remote=False)
     if sub == "tag" and any(a in ("-d", "--delete") for a in args):
         return "Deleting tags is not allowed. Tags are applied by the human after merge."
 
@@ -351,11 +466,11 @@ def main():
     if not command:
         return 0
 
-    merge = False
+    asks = []
     for segment in split_segments(command):
         message = check_segment(segment)
-        if message == MERGE:
-            merge = True
+        if isinstance(message, Ask):
+            asks.append(message.what)
         elif message:
             print(
                 f"Blocked by mesa's workflow contract (AGENTS.md):\n  {message}\n\n"
@@ -364,13 +479,14 @@ def main():
                 file=sys.stderr,
             )
             return 2
-    if merge:
+    if asks:
         print(json.dumps({"hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "ask",
             "permissionDecisionReason": (
-                "mesa (AGENTS.md): merging a pull request needs your explicit "
-                "approval. Allow only if you asked for this merge."),
+                "mesa (AGENTS.md) needs your explicit approval to "
+                + "; ".join(dict.fromkeys(asks))
+                + ". Allow only if you asked for it."),
         }}))
     return 0
 
