@@ -75,7 +75,9 @@ this checklist, and do not open phase 1 until they confirm step 2 is done:
    `devel` branch, so push `main`'s commit to it:
 
    ```bash
-   git remote add biocstaging https://github.com/BiocStaging/mesa.git   # once
+   # the remote persists in the clone; this adds it only if it is missing (fresh clone)
+   git remote get-url biocstaging >/dev/null 2>&1 ||
+     git remote add biocstaging https://github.com/BiocStaging/mesa.git
    git fetch biocstaging
    git merge-base --is-ancestor biocstaging/devel origin/main && echo fast-forward
    git push biocstaging origin/main:devel
