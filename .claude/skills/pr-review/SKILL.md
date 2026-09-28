@@ -6,8 +6,9 @@ description: Copilot-style review of a mesa pull request or branch — findings 
 # PR review
 
 A local, read-only review that stands in for Copilot's. It runs on the Claude plan, not on
-Copilot quota. Large PRs get one automatically: `.claude/hooks/review-after-pr.py` asks for
-it after `gh pr create`. Small PRs (version bumps, one-line docs) get one only when a human
+Copilot quota. Large PRs get one automatically: after `gh pr create`,
+`.claude/hooks/review-after-pr.py` sizes the PR with one `gh pr view` call and asks for a
+review if it's large. Small PRs (version bumps, one-line docs) get one only when a human
 asks: `/pr-review <PR number>`.
 
 **Read-only.** Do not edit, commit or push while reviewing. Fixes are a separate step,

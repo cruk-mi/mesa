@@ -371,9 +371,12 @@ Reviews are done locally with the `pr-review` skill (🔴 High / 🟠 Medium / �
 GitHub Copilot, so they don't use Copilot quota.
 
 - **Large PRs are reviewed automatically.** After `gh pr create`,
-  `.claude/hooks/review-after-pr.py` measures the diff. It leaves out generated files
-  (`man/`, `NAMESPACE`) and `DESCRIPTION`/`NEWS.md`. If the PR is over 150 lines, over 5
-  files, or over 30 lines under `R/`, hooks or workflows, the session is asked to review it.
+  `.claude/hooks/review-after-pr.py` reads the new PR's file list from GitHub with one
+  `gh pr view <N> --json baseRefName,files` call, so the size is the PR's, whichever
+  checkout the session is in. It leaves out generated files (`man/`, `NAMESPACE`) and
+  `DESCRIPTION`/`NEWS.md`. If the PR is over 150 lines, over 5 files, or over 30 lines under
+  `R/`, hooks or workflows, the session is asked to review it. If the call fails, it stays
+  silent.
 - **Small PRs** (version bumps, one-line docs) are reviewed only when a human asks:
   `/pr-review <N>`.
 - A review is reported in the session. Posting it to the PR is outward-facing, so it
