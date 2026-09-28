@@ -292,6 +292,25 @@ if needs_toml("bare fence, generated markers present"):
             fail("bare fence: #124 would carry the TOML twice")
         elif "Hand-written note." not in new:
             fail("bare fence: hand-written text dropped")
+
+# Data markers kept but generated markers tidied away: no TypeError, one data
+# block, and the hand-written text survives.
+if needs_toml("data markers without generated markers"):
+    roadmap, body = roadmap_for(live_body(gen=False))
+    toml_text = roadmap.pop("toml")
+    try:
+        verdict, new = synced(roadmap, body, toml_text)
+    except Exception as exc:
+        fail(f"no generated markers: sync raised {type(exc).__name__}: {exc}")
+    else:
+        if new is None:
+            fail(f"no generated markers: nothing written ({verdict!r})")
+        elif new.count(ms.DATA_START) != 1 or new.count("```toml") != 1:
+            fail("no generated markers: the data block is duplicated or lost")
+        elif new.count(ms.GEN_START) != 1:
+            fail("no generated markers: the generated half was not put back")
+        elif "Hand-written note." not in new:
+            fail("no generated markers: hand-written text dropped")
 PYEOF
 while IFS= read -r line; do
     case "$line" in

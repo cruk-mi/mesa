@@ -1052,33 +1052,43 @@ def render_roadmap_issue(roadmap, page_url=None):
     return "\n".join(out)
 
 
+def _data_block(toml_text):
+    return (f"{DATA_START}\n<details><summary><b>Roadmap data</b> - edit this to change "
+            f"the plan, then run <code>/mesa-status</code></summary>\n\n```toml\n"
+            f"{toml_text.strip()}\n```\n\n</details>\n{DATA_END}")
+
+
+def _set_data(body, toml_text):
+    """`body` with its data block replaced, or added in place of a bare fence."""
+    if toml_text is None:
+        return body
+    if DATA_START in body and DATA_END in body:
+        before, rest = body.split(DATA_START, 1)
+        return before + _data_block(toml_text) + rest.split(DATA_END, 1)[1]
+    # The bare fence the TOML was read from moves into the marked block,
+    # rather than staying behind as a second copy.
+    body = TOML_FENCE.sub("", body, count=1)
+    return body.rstrip() + "\n\n" + _data_block(toml_text) + "\n"
+
+
 def compose_issue_body(old_body, generated, toml_text):
     """Swap the generated half into #124 and leave everything else as it is.
 
-    The first sync (no markers yet) replaces the hand-written checklist, and
+    `toml_text` None keeps #124's own data block. Only the very first sync
+    (no markers of either kind) replaces the hand-written checklist, and it
     carries over only its <details> blocks - the review summary.
     """
-    data = None if toml_text is None else (
-        f"{DATA_START}\n<details><summary><b>Roadmap data</b> - edit this to change "
-        f"the plan, then run <code>/mesa-status</code></summary>\n\n```toml\n"
-        f"{toml_text.strip()}\n```\n\n</details>\n{DATA_END}")
-    if old_body and GEN_START in old_body and GEN_END in old_body:
-        head, rest = old_body.split(GEN_START, 1)
-        tail = rest.split(GEN_END, 1)[1]
-        body = head + generated + tail
-        if data is None:
-            return body
-        if DATA_START not in body:
-            # The bare fence the TOML was read from moves into the marked block,
-            # rather than staying behind as a second copy.
-            body = TOML_FENCE.sub("", body, count=1)
-            body = body.rstrip() + "\n\n" + data + "\n"
-        else:
-            before, after = body.split(DATA_START, 1)
-            body = before + data + after.split(DATA_END, 1)[1]
-        return body
-    kept = re.findall(r"<details>.*?</details>", old_body or "", re.S)
-    return "\n\n".join([generated, data] + kept) + "\n"
+    body = old_body or ""
+    if GEN_START in body and GEN_END in body:
+        head, rest = body.split(GEN_START, 1)
+        return _set_data(head + generated + rest.split(GEN_END, 1)[1], toml_text)
+    if DATA_START in body and DATA_END in body:
+        # The generated markers were tidied away on github.com: put the
+        # generated half back on top and keep every hand-written line.
+        return _set_data(generated + "\n\n" + body.strip() + "\n", toml_text)
+    kept = re.findall(r"<details>.*?</details>", TOML_FENCE.sub("", body, count=1), re.S)
+    data = [] if toml_text is None else [_data_block(toml_text)]
+    return "\n\n".join([generated] + data + kept) + "\n"
 
 
 def sync_issue(roadmap, old_body, page_url, dry_run, toml_text, from_file):
