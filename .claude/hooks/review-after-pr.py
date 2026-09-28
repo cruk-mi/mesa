@@ -6,12 +6,18 @@ so the hook stays silent for them and a human runs `/pr-review <N>` if they
 want one. Large PRs get the review automatically: the hook hands the session
 an instruction to run the `pr-review` skill before it stops.
 
-Size is measured locally against the merge base, with no network call. Files
-that are generated or bookkeeping (man/*.Rd, NAMESPACE, DESCRIPTION, NEWS.md,
-.claude/state/) are left out, so a version bump measures zero.
+Size comes from GitHub, not from the session's checkout: the PR number and
+repository are read from the URL `gh pr create` prints, then one
+`gh pr view <N> --json baseRefName,files` call (15 s timeout) lists the files
+and their added and deleted lines. The session's cwd, branch and the command's
+`--base`/`--head` are never consulted, so `cd <worktree> && gh pr create` and a
+stacked PR are measured as GitHub sees them. Files that are generated or
+bookkeeping (man/*.Rd, NAMESPACE, DESCRIPTION, NEWS.md, .claude/state/) are left
+out, so a version bump measures zero.
 
 Never blocks and never fails the tool call: anything unexpected (no PR URL in
-the output, an unresolvable base, git missing) means silence. Skipped in CI.
+the output, `gh` missing, failing, slow or printing something unparsable) means
+silence. Skipped in CI.
 
 Exit code is always 0. Output, when there is any, is PostToolUse JSON with
 `additionalContext`.
@@ -31,7 +37,7 @@ HOT_PATHS = ("R/", ".claude/hooks/", ".github/workflows/")
 MAX_HOT_LINES = 30    # counted lines under HOT_PATHS
 
 IGNORED = re.compile(r"^(man/.*\.Rd|NAMESPACE|DESCRIPTION|NEWS\.md|\.claude/state/.*)$")
-PR_URL = re.compile(r"https://github\.com/[^/\s]+/[^/\s]+/pull/(\d+)")
+PR_URL = re.compile(r"https://github\.com/([^/\s]+/[^/\s]+)/pull/(\d+)")
 
 
 def split_segments(command):
@@ -57,58 +63,29 @@ def pr_create_args(command):
     return None
 
 
-def option(args, names):
-    """Value of the first of `names` (`--base x`, `-B x`, `--base=x`)."""
-    for i, tok in enumerate(args):
-        if tok in names and i + 1 < len(args):
-            return args[i + 1]
-        for name in names:
-            if name.startswith("--") and tok.startswith(name + "="):
-                return tok.split("=", 1)[1]
-    return None
-
-
-def git(cwd, *args):
+def pr_size(repo, number):
+    """(base, lines, files, hot_lines) for the PR as GitHub reports it, else None."""
     try:
-        out = subprocess.run(["git", *args], cwd=cwd, capture_output=True,
-                             text=True, timeout=15)
-    except (OSError, subprocess.TimeoutExpired):
-        return None
-    return out.stdout.strip() if out.returncode == 0 else None
-
-
-def resolve(cwd, ref):
-    """Prefer the remote-tracking ref, so a stale local branch is not used."""
-    for candidate in (f"origin/{ref}", ref):
-        if git(cwd, "rev-parse", "--verify", "--quiet", candidate + "^{commit}"):
-            return candidate
-    return None
-
-
-def measure(cwd, base, head):
-    """(lines, files, hot_lines) counted between merge-base(base, head) and head."""
-    merge_base = git(cwd, "merge-base", base, head)
-    if not merge_base:
-        return None
-    numstat = git(cwd, "diff", "--numstat", merge_base, head)
-    if numstat is None:
+        out = subprocess.run(
+            ["gh", "pr", "view", number, "--repo", repo, "--json", "baseRefName,files"],
+            capture_output=True, text=True, timeout=15)
+        if out.returncode != 0:
+            return None
+        info = json.loads(out.stdout)
+        entries = info["files"]
+    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError):
         return None
     lines = files = hot = 0
-    for row in numstat.splitlines():
-        parts = row.split("\t")
-        if len(parts) != 3:
-            continue
-        added, deleted, path = parts
-        # A rename shows as "old => new"; judge the new path.
-        path = re.sub(r"\{[^}]* => ([^}]*)\}", r"\1", path).split(" => ")[-1]
+    for entry in entries:
+        path = entry.get("path") or ""
         if IGNORED.match(path):
             continue
-        changed = (int(added) if added.isdigit() else 0) + (int(deleted) if deleted.isdigit() else 0)
+        changed = int(entry.get("additions") or 0) + int(entry.get("deletions") or 0)
         files += 1
         lines += changed
         if path.startswith(HOT_PATHS):
             hot += changed
-    return lines, files, hot
+    return info.get("baseRefName") or "?", lines, files, hot
 
 
 def main():
@@ -120,30 +97,25 @@ def main():
         return
     if data.get("tool_name") != "Bash":
         return
-    args = pr_create_args((data.get("tool_input") or {}).get("command") or "")
-    if args is None:
+    if pr_create_args((data.get("tool_input") or {}).get("command") or "") is None:
         return
     # No PR URL in the output means the create failed: nothing to review.
-    match = PR_URL.search(json.dumps(data.get("tool_response") or ""))
+    response = data.get("tool_response") or ""
+    stdout = (response.get("stdout") or "") if isinstance(response, dict) else str(response)
+    match = PR_URL.search(stdout)
     if not match:
         return
-    number = match.group(1)
+    repo, number = match.groups()
 
-    cwd = data.get("cwd") or os.getcwd()
-    base = resolve(cwd, option(args, ("--base", "-B")) or "main")
-    head_name = option(args, ("--head", "-H"))
-    head = resolve(cwd, head_name) if head_name else "HEAD"
-    if not base or not head:
-        return
-    size = measure(cwd, base, head)
+    size = pr_size(repo, number)
     if size is None:
         return
-    lines, files, hot = size
+    base, lines, files, hot = size
     if lines <= MAX_LINES and files <= MAX_FILES and hot <= MAX_HOT_LINES:
         return
 
     context = (
-        f"PR #{number} is large ({lines} changed lines across {files} files, "
+        f"PR #{number} (into {base}) is large ({lines} changed lines across {files} files, "
         f"{hot} of them under {', '.join(HOT_PATHS)}; generated files not counted). "
         f"Before stopping, run the `pr-review` skill on PR #{number} and report the "
         "findings here. Do not post them to GitHub unless the human asks."
