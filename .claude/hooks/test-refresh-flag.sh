@@ -104,7 +104,8 @@ out="$(echo '{}' | "$PY" "$hook" session)"
 status_script="$(dirname "$hook")/../scripts/mesa-status.py"
 "$PY" "$status_script" --help >/dev/null 2>&1 \
     || fail "mesa-status.py --help fails under $("$PY" --version 2>&1)"
-roadmap_out="$("$PY" - "$status_script" 2>&1 <<'PYEOF'
+# Output goes to a file: bash 3.2 misparses a heredoc inside $(...).
+"$PY" - "$status_script" >"$flags/roadmap-cases.out" 2>&1 <<'PYEOF'
 import importlib.util
 import os
 import sys
@@ -208,7 +209,8 @@ if needs_toml("CRLF body"):
         fail(f"CRLF body: roadmap unknown: {ms.DEGRADED}")
     else:
         current = ms.compose_issue_body(live_body(), ms.render_roadmap_issue(roadmap), None)
-        verdict = ms.sync_issue(roadmap, current.replace("\n", "\r\n"), None, True, None)
+        verdict = ms.sync_issue(roadmap, current.replace("\n", "\r\n"), None, True,
+                                roadmap.pop("toml"), False)
         if "already current" not in verdict:
             fail(f"CRLF body that is current: {verdict!r}")
 
@@ -261,8 +263,36 @@ if needs_toml("closed PR status"):
     roadmap, _ = roadmap_for(live_body(), states={**STATES, 10: closed})
     if roadmap is None or roadmap["items"][0]["status"] == "done":
         fail("an item whose PR was closed without merging shows Done")
+
+
+def synced(roadmap, body, toml_text, from_file=False):
+    """Run a real (stubbed) sync as main() does; (verdict, body written or None)."""
+    if os.path.exists(ms.ROADMAP_MD):
+        os.unlink(ms.ROADMAP_MD)
+    verdict = ms.sync_issue(roadmap, body, None, False, toml_text, from_file)
+    if not os.path.exists(ms.ROADMAP_MD):
+        return verdict, None
+    with open(ms.ROADMAP_MD, encoding="utf-8") as handle:
+        return verdict, handle.read()
+
+
+# A bare ```toml fence (data markers deleted on github.com): no KeyError, and
+# the new marked block replaces the fence instead of sitting next to it.
+if needs_toml("bare fence, generated markers present"):
+    roadmap, body = roadmap_for(live_body(data=False))
+    toml_text = roadmap.pop("toml")  # as main() does, before the sync
+    try:
+        verdict, new = synced(roadmap, body, toml_text)
+    except Exception as exc:
+        fail(f"bare fence: sync raised {type(exc).__name__}: {exc}")
+    else:
+        if new is None:
+            fail(f"bare fence: nothing written ({verdict!r})")
+        elif new.count(ms.DATA_START) != 1 or new.count("```toml") != 1:
+            fail("bare fence: #124 would carry the TOML twice")
+        elif "Hand-written note." not in new:
+            fail("bare fence: hand-written text dropped")
 PYEOF
-)"
 while IFS= read -r line; do
     case "$line" in
         "") ;;
@@ -270,7 +300,7 @@ while IFS= read -r line; do
         FAIL:*) fail "${line#FAIL: }" ;;
         *) fail "mesa-status.py: $line" ;;
     esac
-done <<<"$roadmap_out"
+done <"$flags/roadmap-cases.out"
 
 rm -rf "$flags"
 if [ "$fails" -eq 0 ]; then

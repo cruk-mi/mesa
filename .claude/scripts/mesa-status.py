@@ -1069,6 +1069,9 @@ def compose_issue_body(old_body, generated, toml_text):
         if data is None:
             return body
         if DATA_START not in body:
+            # The bare fence the TOML was read from moves into the marked block,
+            # rather than staying behind as a second copy.
+            body = TOML_FENCE.sub("", body, count=1)
             body = body.rstrip() + "\n\n" + data + "\n"
         else:
             before, after = body.split(DATA_START, 1)
@@ -1078,14 +1081,20 @@ def compose_issue_body(old_body, generated, toml_text):
     return "\n\n".join([generated, data] + kept) + "\n"
 
 
-def sync_issue(roadmap, old_body, page_url, dry_run, seed_toml):
-    """Rewrite #124 when its generated half is out of date. Returns a verdict."""
+def sync_issue(roadmap, old_body, page_url, dry_run, toml_text, from_file):
+    """Rewrite #124 when its generated half is out of date. Returns a verdict.
+
+    `toml_text` is the roadmap TOML that was read; `from_file` says it came
+    from --roadmap-file rather than from #124 itself.
+    """
     if roadmap is None:
         return "roadmap unknown - #124 left alone"
     # A github.com edit saves CRLF; compare in LF, or every run looks like a change.
     old_body = None if old_body is None else old_body.replace("\r\n", "\n")
-    toml_text = seed_toml if seed_toml is not None else (
-        None if old_body and DATA_START in old_body else roadmap["toml"])
+    # A file replaces #124's data block. Otherwise the block #124 already has
+    # stays as it is, and a bare ```toml fence is moved into a marked block.
+    if not from_file and old_body and DATA_START in old_body:
+        toml_text = None
     generated = render_roadmap_issue(roadmap, page_url)
     new_body = compose_issue_body(old_body, generated, toml_text)
 
@@ -1463,12 +1472,12 @@ def main():
         # parse_roadmap() checks the shape; this is the net for what it misses.
         degrade(f"roadmap data has an unexpected shape ({type(exc).__name__}: {exc})")
         roadmap, issue_body = None, None
-    seed_toml = roadmap.pop("toml") if roadmap else None
+    toml_text = roadmap.pop("toml") if roadmap else None
     state["roadmap"] = roadmap
     sync_verdict = None
     if args.sync_issue:
         sync_verdict = sync_issue(roadmap, issue_body, read_artifact_url(url_file),
-                                  args.dry_run, seed_toml if args.roadmap_file else None)
+                                  args.dry_run, toml_text, bool(args.roadmap_file))
     state["degraded"] = DEGRADED
 
     # Render first: a template problem is recorded in DEGRADED, and it must
