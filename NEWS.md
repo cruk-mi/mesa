@@ -36,6 +36,10 @@
   failures, and fails if any of them does not install at its pinned SHA.
   Pull requests that change the devcontainer now build it (without pushing).
   ([#127](https://github.com/cruk-mi/mesa/pull/127))
+- The devcontainer image no longer installs `immunedeconv` (with its GitHub
+  dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
+  Bioconductor instead of a GitHub pin. It now installs nothing from GitHub.
+  ([#132](https://github.com/cruk-mi/mesa/pull/132))
 
 # mesa 0.99.6
 
