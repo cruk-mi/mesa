@@ -72,6 +72,8 @@ GH_API_PULL = re.compile(r"/pulls/\d+/?$")
 # Also the nested submit of a pending review: .../reviews/{id}/events.
 GH_API_REVIEWS = re.compile(r"/pulls/\d+/reviews(/\d+/events)?/?$")
 GH_API_REF = re.compile(r"/git/refs?(/|$)")
+# POST .../merges merges one branch into another, main included, with no PR.
+GH_API_MERGES = re.compile(r"/merges/?$")
 
 # `gh api graphql` carries the action in the query body, not the endpoint, so
 # the path patterns above never see it. These are the mutations that do what
@@ -80,7 +82,10 @@ GH_API_REF = re.compile(r"/git/refs?(/|$)")
 GH_GRAPHQL_MERGE = re.compile(r"\b(mergePullRequest|enablePullRequestAutoMerge)\b")
 GH_GRAPHQL_READY = re.compile(r"\bmarkPullRequestReadyForReview\b")
 GH_GRAPHQL_REVIEW = re.compile(r"\b(addPullRequestReview|submitPullRequestReview)\b")
-GH_GRAPHQL_DELETE_REF = re.compile(r"\bdeleteRef\b")
+# These take an opaque ref ID or a batch, so which ref they delete, move or
+# merge into cannot be checked: main or a tag looks the same as a feature
+# branch. git push covers every legitimate use.
+GH_GRAPHQL_REF_WRITE = re.compile(r"\b(deleteRef|updateRefs?|createRef|mergeBranch)\b")
 
 
 
@@ -357,9 +362,34 @@ def check_gh_graphql(tokens):
                 "ready for review.")
     if GH_GRAPHQL_REVIEW.search(text) and "APPROVE" in text.upper():
         return "An agent does not approve pull requests on this repo."
-    if GH_GRAPHQL_DELETE_REF.search(text):
-        return Ask("delete a ref through the deleteRef mutation (the branch and "
-                   "any PR stacked on it cannot be checked; prefer git push --delete)")
+    ref_write = GH_GRAPHQL_REF_WRITE.search(text)
+    if ref_write:
+        return (f"The {ref_write.group(1)} mutation is not allowed: which ref it changes "
+                "cannot be checked. Use git push (or git push origin --delete <branch>).")
+    return None
+
+
+def check_ref_write(endpoint, method, tokens):
+    """PATCH or POST on .../git/refs: moving or creating main or a tag, or
+    forcing any ref, is the push the rules forbid, made through the API."""
+    body = payload_text(tokens)
+    if body is None:
+        return ("A ref update read from stdin or an unreadable file cannot be checked, "
+                "so it is refused.")
+    if re.search(r'force"?\s*[=:]\s*"?true', body, re.IGNORECASE):
+        return ("Force-updating a ref is not allowed — it can destroy published history. "
+                "If a branch genuinely needs rewriting, ask the human to do it.")
+    if method == "PATCH":
+        ref = re.split(r"/git/refs?/", endpoint, maxsplit=1)[-1].strip("/")
+    else:
+        found = re.search(r'(?:^|[\s"{,])ref"?\s*[=:]\s*"?([^"\s,}]+)', body)
+        ref = found.group(1) if found else ""
+    name = branch_name(ref) if ref else None
+    if name is None:
+        return f"Writing the ref '{ref or '?'}' through the API is not allowed: only branches."
+    if name in PROTECTED:
+        return ("Pushing to a protected branch (main/dev) is not allowed. "
+                "Push your feature branch instead and open a pull request.")
     return None
 
 
@@ -389,6 +419,11 @@ def check_gh_api(tokens):
     if GH_API_PULL.search(endpoint) and method != "GET":
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")
+    if GH_API_MERGES.search(endpoint) and method != "GET":
+        return ("Merging branches through the merges endpoint is not allowed; "
+                "merge a pull request instead.")
+    if GH_API_REF.search(endpoint) and method in ("PATCH", "POST", "PUT"):
+        return check_ref_write(endpoint, method, tokens)
     if GH_API_REF.search(endpoint) and method == "DELETE":
         ref = re.split(r"/git/refs?/", endpoint, maxsplit=1)[-1].strip("/")
         if not ref.startswith("heads/"):

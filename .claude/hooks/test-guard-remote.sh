@@ -101,8 +101,7 @@ for cmd in \
     'git push origin :old-branch' \
     'git branch -D old-branch' \
     'git branch -d old-branch' \
-    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking' \
-    "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'"
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking'
 do ask_check "$cmd"; done
 
 # --- must be blocked -------------------------------------------------
@@ -144,7 +143,17 @@ for cmd in \
     'gh api graphql --input -' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=APPROVE' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input -' \
-    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events --input -'
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events --input -' \
+    "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { updateRefs(input:{repositoryId:\"X\", refUpdates:[]}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { mergeBranch(input:{repositoryId:\"X\", base:\"main\", head:\"x\"}) { clientMutationId } }'" \
+    'gh api -X POST repos/cruk-mi/mesa/merges -f base=main -f head=feat/x' \
+    'gh api repos/cruk-mi/mesa/merges -f base=feat/y -f head=feat/x' \
+    'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/main -f sha=abc' \
+    'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/feat/x -f sha=abc -F force=true' \
+    'gh api -X PATCH repos/cruk-mi/mesa/git/refs/tags/v0.99.6 -f sha=abc' \
+    'gh api -X POST repos/cruk-mi/mesa/git/refs -f ref=refs/tags/v0.99.9 -f sha=abc' \
+    'gh api -X POST repos/cruk-mi/mesa/git/refs -f ref=refs/heads/main -f sha=abc'
 do check 2 "$cmd"; done
 
 # A mutation hidden in a query file must be read and caught, not waved through.
@@ -181,6 +190,8 @@ for cmd in \
     'gh pr view 102' \
     'gh pr list --state open' \
     'gh api repos/cruk-mi/mesa/pulls/106/comments' \
+    'gh api repos/cruk-mi/mesa/git/refs/heads/main' \
+    'gh api -X POST repos/cruk-mi/mesa/git/refs -f ref=refs/heads/feat/x -f sha=abc' \
     'gh api repos/cruk-mi/mesa/pulls/106 --jq .state' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/comments/4063116787/replies -f body=fixed' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/comments/1/replies -f body="see /pulls/106/merge"' \
