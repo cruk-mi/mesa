@@ -194,6 +194,22 @@ check 2 'gh pr merge 108 -d'
 ask_check 'git push origin --delete feat/clean' 'no open PR'
 ask_check 'gh pr merge 102 --squash --delete-branch' 'no open PR'
 
+# gh (pflag) also spells --delete-branch as --delete-branch=true, and bundles
+# -d with other shorthand. Each must reach the same check, and the prompt must
+# name the PR and the branch it deletes.
+check 2 'gh pr merge 108 --delete-branch=true'
+check 2 'gh pr merge 108 -sd'
+check 2 'gh pr merge 108 -ds'
+check 2 'gh pr close 108 -d'
+check 2 'gh pr close 108 --delete-branch'
+check 2 'gh pr merge 999 -d'                # PR not found: cannot tell what goes
+ask_check 'gh pr merge 102 --delete-branch=true' "PR #102 and delete its branch 'feat/clean'"
+ask_check 'gh pr merge 102 -sd' "merge PR #102 and delete its branch 'feat/clean'"
+ask_check 'gh pr merge 102 -ds' "delete its branch 'feat/clean'"
+ask_check 'gh pr merge 102 -d' "delete its branch 'feat/clean'"
+ask_check 'gh pr close 102 -d' "close PR #102 and delete its branch 'feat/clean'"
+check 0 'gh pr close 102'
+
 # --- failure modes ---------------------------------------------------
 # Malformed input must fail closed (block), not fall open.
 if [ "$(printf 'not json' | "$PY" "$hook" >/dev/null 2>&1; echo $?)" != "2" ]; then

@@ -114,14 +114,18 @@ def open_prs_based_on(branch):
     return [str(p.get("number")) for p in prs if p.get("baseRefName") == branch]
 
 
-def pr_head_branch(pr_args):
-    """Head branch of the PR `gh pr merge` targets; None if it cannot be found."""
+def pr_number_and_head(pr_args):
+    """(number, head branch) of the PR a `gh pr` command targets; None if unknown."""
     pr = gh_json(["pr", "view", *pr_args, "--json", "number,headRefName"])
-    head = pr.get("headRefName") if isinstance(pr, dict) else None
-    return head if isinstance(head, str) and head else None
+    if not isinstance(pr, dict):
+        return None
+    number, head = pr.get("number"), pr.get("headRefName")
+    if not isinstance(number, int) or not isinstance(head, str) or not head:
+        return None
+    return number, head
 
 
-def check_branch_deletion(branches, remote):
+def check_branch_deletion(branches, remote, what="delete branch"):
     """Block unsafe deletions; ask for the rest.
 
     A protected branch is never deleted. A remote branch that an open PR uses
@@ -145,7 +149,7 @@ def check_branch_deletion(branches, remote):
                 prs = ", ".join("#" + n for n in stacked)
                 return (f"Open PR(s) {prs} use '{name}' as their base; deleting it "
                         f"would close them. Retarget first: gh pr edit <N> --base main.")
-    what = "delete branch " + ", ".join(names)
+    what += " " + ", ".join(f"'{n}'" for n in names)
     if remote and not unchecked:
         what += " (checked: no open PR is based on it)"
     if unchecked:
@@ -349,8 +353,30 @@ def gh_pr_target(tokens):
         if not tok.startswith("-"):
             seen.append(tok)
         i += 1
-    # seen: gh, pr, merge, [number | url | branch]
+    # seen: gh, pr, merge|close, [number | url | branch]
     return (seen[3:4] if len(seen) > 3 else []) + args
+
+
+def deletes_branch(tokens):
+    """True if `gh pr merge` / `gh pr close` also deletes the head branch.
+
+    gh (pflag) accepts `--delete-branch=true` and bundled shorthand such as
+    `-sd`, so matching the exact tokens is not enough. A `d` bundled with any
+    other letter counts; the cost of a false match is only an extra check.
+    """
+    return any(t == "--delete-branch" or t.startswith("--delete-branch=")
+               or (re.fullmatch(r"-[A-Za-z]+", t) and "d" in t) for t in tokens)
+
+
+def check_pr_branch_deletion(verb, tokens):
+    """`gh pr merge|close --delete-branch`: name the PR and the branch it deletes."""
+    pr = pr_number_and_head(gh_pr_target(tokens))
+    if pr is None:
+        return (f"Cannot tell which branch `gh pr {verb} --delete-branch` would delete, "
+                "so it is refused. Ask the human to run it.")
+    number, head = pr
+    return check_branch_deletion([head], remote=True,
+                                 what=f"{verb} PR #{number} and delete its branch")
 
 
 def current_branch():
@@ -375,17 +401,10 @@ def check_segment(segment):
         rest = [t for t in tokens[1:] if not t.startswith("-")]
         if rest[:1] == ["api"]:
             return check_gh_api(tokens)
-        if rest[:2] == ["pr", "merge"]:
-            if "--delete-branch" in tokens or "-d" in tokens:
-                head = pr_head_branch(gh_pr_target(tokens))
-                if head is None:
-                    return Ask("merge a pull request and delete its branch (could not "
-                               "check whether an open PR is based on that branch)")
-                verdict = check_branch_deletion([head], remote=True)
-                if isinstance(verdict, Ask):
-                    return Ask("merge a pull request and " + verdict.what)
-                return verdict
-            return MERGE
+        if rest[:2] in (["pr", "merge"], ["pr", "close"]):
+            if deletes_branch(tokens):
+                return check_pr_branch_deletion(rest[1], tokens)
+            return MERGE if rest[1] == "merge" else None
         if rest[:2] == ["pr", "ready"]:
             return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                     "ready for review.")
