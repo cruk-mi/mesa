@@ -28,7 +28,8 @@
       "Bash(python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run)",
       "Bash(python3 .claude/scripts/mesa-status.py --artifact-url)",
       "Bash(python3 .claude/scripts/mesa-status.py --set-artifact-url:*)",
-      "Bash(python3 .claude/scripts/mesa-status.py --mark-published)"
+      "Bash(python3 .claude/scripts/mesa-status.py --mark-published)",
+      "Bash(python3 .claude/scripts/mesa-status.py --park:*)"
     ],
     "deny": [
       "Read(./.Renviron)",

@@ -400,7 +400,8 @@ for command in (f"{script} --sync-issue", f"{script} --html --sync-issue",
         if allows(rule, command):
             print(f"FAIL: {rule} pre-approves `{command}`")
 for command in (f"{script} --html --sync-issue --dry-run", f"{script} --html --no-log",
-                f"{script} --artifact-url", f"{script} --mark-published"):
+                f"{script} --artifact-url", f"{script} --mark-published",
+                f"{script} --park 136"):
     if not any(allows(rule, command) for rule in rules):
         print(f"FAIL: /mesa-status's read-only step `{command}` would prompt")
 PYEOF
