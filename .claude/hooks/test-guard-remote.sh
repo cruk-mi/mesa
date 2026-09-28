@@ -44,9 +44,14 @@ chmod +x "$stub_dir/gh"
 export PATH="$stub_dir:$PATH"
 trap 'rm -rf "$stub_dir"' EXIT
 
-# Hook input as Claude Code sends it; MODE sets permission_mode.
+# Hook input as Claude Code sends it; MODE sets permission_mode (- leaves it out).
 payload() {
-    MODE="${MODE:-default}" "$PY" -c 'import json,os,sys; print(json.dumps({"tool_name":"Bash","permission_mode":os.environ["MODE"],"tool_input":{"command":sys.stdin.read()}}))'
+    MODE="${MODE:-default}" "$PY" -c '
+import json, os, sys
+p = {"tool_name": "Bash", "tool_input": {"command": sys.stdin.read()}}
+if os.environ["MODE"] != "-":
+    p["permission_mode"] = os.environ["MODE"]
+print(json.dumps(p))'
 }
 
 check() { # check <expected-exit> <command>
@@ -209,6 +214,35 @@ ask_check 'gh pr merge 102 -ds' "delete its branch 'feat/clean'"
 ask_check 'gh pr merge 102 -d' "delete its branch 'feat/clean'"
 ask_check 'gh pr close 102 -d' "close PR #102 and delete its branch 'feat/clean'"
 check 0 'gh pr close 102'
+
+# --- permission modes -------------------------------------------------
+# An "ask" is only a safeguard if a human sees it. bypassPermissions approves
+# it automatically, auto may, and dontAsk denies it silently; a payload with
+# no mode is not trusted either. There a merge or deletion is blocked outright.
+mode_check() { # mode_check <mode> <expected-exit> <command>
+    local actual err
+    err="$(printf '%s' "$3" | MODE="$1" payload | "$PY" "$hook" 2>&1 >/dev/null)"
+    actual=$?
+    if [ "$actual" != "$2" ]; then
+        printf 'FAIL (mode %s, expected %s, got %s): %s\n' "$1" "$2" "$actual" "$3"
+        fails=$((fails + 1))
+    elif [ "$2" = 2 ] && ! printf '%s' "$err" | grep -q 'run it themselves'; then
+        printf 'FAIL (mode %s, block does not tell the human to run it): %s\n' "$1" "$3"
+        fails=$((fails + 1))
+    fi
+}
+for mode in bypassPermissions auto dontAsk -; do
+    mode_check "$mode" 2 'gh pr merge 102'
+    mode_check "$mode" 2 'gh pr merge 102 --squash --delete-branch'
+    mode_check "$mode" 2 'git push origin --delete feat/clean'
+    mode_check "$mode" 2 'git branch -D old-branch'
+    mode_check "$mode" 0 'git status'
+    mode_check "$mode" 0 'git push origin chore/agent-setup'
+done
+for mode in default acceptEdits plan; do
+    ask=$(printf '%s' 'gh pr merge 102' | MODE="$mode" payload | "$PY" "$hook" 2>/dev/null)
+    printf '%s' "$ask" | grep -q '"ask"' || { echo "FAIL (mode $mode did not ask)"; fails=$((fails + 1)); }
+done
 
 # --- failure modes ---------------------------------------------------
 # Malformed input must fail closed (block), not fall open.

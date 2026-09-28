@@ -45,6 +45,13 @@ import sys
 
 PROTECTED = {"main", "dev", "master"}
 
+# Permission modes in which Claude Code shows a hook's "ask" to the human.
+# bypassPermissions approves it automatically, auto may (a hook ask forces a
+# prompt there only from v2.1.211), and dontAsk denies it without a word. In
+# those, or when the mode is missing, an ask would not reach a human, so a
+# merge or deletion is blocked outright instead.
+PROMPTING_MODES = {"default", "acceptEdits", "plan"}
+
 # Git's own options that swallow the following token, so the subcommand can be
 # located without mistaking an option's argument for it.
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
@@ -503,6 +510,18 @@ def main():
                 file=sys.stderr,
             )
             return 2
+    if asks and payload.get("permission_mode") not in PROMPTING_MODES:
+        mode = payload.get("permission_mode") or "unknown"
+        print(
+            "Blocked by mesa's workflow contract (AGENTS.md):\n  This needs the human's "
+            "explicit approval to " + "; ".join(dict.fromkeys(asks)) + f", but the "
+            f"'{mode}' permission mode would not show them a confirmation.\n\n"
+            f"Command: {command.strip()[:300]}\n\n"
+            "Do not work around this. Tell the human to run it themselves, or to "
+            "switch to a permission mode that prompts and ask again.",
+            file=sys.stderr,
+        )
+        return 2
     if asks:
         print(json.dumps({"hookSpecificOutput": {
             "hookEventName": "PreToolUse",
