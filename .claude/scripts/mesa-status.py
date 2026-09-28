@@ -19,6 +19,9 @@ Usage:
   mesa-status.py --max-age 14400  refresh only if STATUS.md is older than 4h
   mesa-status.py --no-log         skip the BiocCheck CI-log fetch (the slow probe)
   mesa-status.py --json-only      write status.json but not STATUS.md
+  mesa-status.py --park 115 <<'EOF'
+  <note>
+  EOF                             append a finding to the parking lot, then stop
 """
 
 import argparse
@@ -521,6 +524,30 @@ def collect_parked():
     return [line[2:].strip() for line in lines if line.startswith("- ")]
 
 
+def park(issue, note):
+    """Append one finding to the parking lot. Returns the line written, or None.
+
+    The note arrives on stdin, not as an argument, so it never passes through
+    the shell: `$`, backticks and quotes in R code survive as written. Newlines
+    are collapsed so each finding stays one `- ` line, which is all
+    collect_parked() reads.
+    """
+    note = " ".join(note.split())
+    if not note:
+        return None
+    issue = issue.strip()
+    if issue not in ("", "-") and not issue.startswith("#"):
+        issue = "#" + issue
+    branch = git("branch", "--show-current") or "-"
+    today = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d")
+    line = f"- {today} ({branch}, {issue or '-'}) {note}"
+    path = parking_lot_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(line + "\n")
+    return line
+
+
 def collect_pkgdown():
     """Is the published site built from current main?
 
@@ -877,7 +904,18 @@ def main():
     parser.add_argument("--html", action="store_true",
                         help="also write .claude/state/dashboard.html, ready to publish")
     parser.add_argument("--quiet", action="store_true", help="print nothing on success")
+    parser.add_argument("--park", metavar="ISSUE",
+                        help="append the note on stdin to the parking lot for ISSUE "
+                             "(#N, N or -), then exit without refreshing")
     args = parser.parse_args()
+
+    if args.park is not None:
+        line = park(args.park, sys.stdin.read())
+        if line is None:
+            print("Nothing parked: the note on stdin is empty.", file=sys.stderr)
+            return 1
+        print(f"Parked in {parking_lot_path()}: {line[2:]}")
+        return 0
 
     if args.max_age is not None and os.path.exists(MD_PATH):
         if time.time() - os.path.getmtime(MD_PATH) < args.max_age:

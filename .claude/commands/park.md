@@ -1,7 +1,7 @@
 ---
 description: Park an out-of-scope finding for later triage instead of fixing it now
 argument-hint: <what you found, and where>
-allowed-tools: Bash(git rev-parse:*), Bash(git branch --show-current), Bash(mkdir -p:*), Bash(printf:*)
+allowed-tools: Bash(python3 .claude/scripts/mesa-status.py --park:*)
 ---
 
 Park this finding: $ARGUMENTS
@@ -10,23 +10,24 @@ It is out of scope for the current session (see "Session scope and the parking l
 `AGENTS.md`). **Do not fix it, do not open an issue for it, and do not touch any file for it
 other than the parking lot.**
 
-1. Resolve the parking lot in the **main checkout**, so every worktree writes to the same
-   file:
+1. Rewrite the finding as `<note>`: one self-contained sentence that names the file (and
+   line, if known).
+
+2. Append it with **one** command, where `<issue>` is the issue this session is working on
+   (`115`, or `-` if none):
 
    ```bash
-   LOT="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")/.claude/state/parking-lot.md"
-   mkdir -p "$(dirname "$LOT")"
+   python3 .claude/scripts/mesa-status.py --park <issue> <<'EOF'
+   <note>
+   EOF
    ```
 
-2. Append exactly one line, where `<issue>` is the issue this session is working on
-   (`#N`, or `-` if none) and `<note>` is the finding rewritten as one self-contained
-   sentence that names the file (and line, if known):
-
-   ```bash
-   printf -- '- %s (%s, %s) %s\n' "$(date +%F)" "$(git branch --show-current)" "<issue>" "<note>" >> "$LOT"
-   ```
+   The note goes in on stdin through a quoted heredoc, so `$`, backticks and quotes in it
+   reach the file as written. The script adds the date and branch, collapses the note to
+   one line, and writes to the **main checkout's** `.claude/state/parking-lot.md`, so
+   every worktree shares one lot.
 
 3. Reply with one line, `Parked: <note>`, then carry on with the session's issue.
 
 At the end of the session, list everything parked from it in the PR description under
-**Parked**.
+**Parked**. That list is the durable copy: the lot itself is per-machine.
