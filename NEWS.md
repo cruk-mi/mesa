@@ -1,4 +1,4 @@
-# mesa 0.99.6.9000
+# mesa 0.99.7
 
 ## Bug fixes
 - `calculateCGEnrichment()` no longer depends on `MEDIPS`: reads are imported
