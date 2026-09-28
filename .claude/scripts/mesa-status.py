@@ -44,7 +44,6 @@ import subprocess
 import sys
 import tempfile
 import time
-import tomllib
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
@@ -738,6 +737,12 @@ def parse_roadmap(text):
     Maintainers edit this on github.com, so a typo is expected, not
     exceptional: it must cost the roadmap section, never the whole refresh.
     """
+    try:
+        import tomllib  # 3.11+; macOS's /usr/bin/python3 is 3.9
+    except ImportError:
+        degrade("the roadmap needs Python >= 3.11 (tomllib); this is Python "
+                + ".".join(map(str, sys.version_info[:2])))
+        return None
     try:
         data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
