@@ -42,6 +42,7 @@ import re
 import shlex
 import subprocess
 import sys
+import urllib.parse
 
 PROTECTED = {"main", "dev", "master"}
 
@@ -55,6 +56,8 @@ PROMPTING_MODES = {"default", "acceptEdits", "plan"}
 # Git's own options that swallow the following token, so the subcommand can be
 # located without mistaking an option's argument for it.
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+# Same for `git push`, so an option's value is not read as the remote or a ref.
+PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--exec"}
 
 # `gh api` reaches every endpoint `gh pr` does, so the same four rules have to
 # hold there or the contract is one flag away from being bypassed. Matched on
@@ -132,15 +135,45 @@ def pr_number_and_head(pr_args):
     return number, head
 
 
+def branch_name(ref):
+    """The branch `ref` names, or None if it names a tag or any other ref.
+
+    The remote resolves `heads/main` and `refs/heads/main` alike to main, so
+    both prefixes are dropped; anything else under refs/ or tags/ is not a
+    branch.
+    """
+    ref = re.sub(r"^(refs/)?heads/", "", ref)
+    return None if ref.startswith(("refs/", "tags/")) else ref
+
+
+def is_remote_tag(name):
+    """True if `name` is a tag on GitHub; None if that cannot be checked.
+
+    A short name in `git push --delete` resolves to a tag when one exists.
+    """
+    refs = gh_json(["api", "repos/{owner}/{repo}/git/matching-refs/tags/"
+                    + urllib.parse.quote(name, safe="/")])
+    if not isinstance(refs, list):
+        return None
+    return any(isinstance(r, dict) and r.get("ref") == "refs/tags/" + name for r in refs)
+
+
 def check_branch_deletion(branches, remote, what="delete branch"):
     """Block unsafe deletions; ask for the rest.
 
-    A protected branch is never deleted. A remote branch that an open PR uses
-    as its base is refused too: GitHub closes such a PR rather than
-    retargeting it (#114 and #125 were closed that way), so it has to be
-    retargeted first.
+    A protected branch or a tag is never deleted, however it is spelled. A
+    remote branch that an open PR uses as its base is refused too: GitHub
+    closes such a PR rather than retargeting it (#114 and #125 were closed
+    that way), so it has to be retargeted first.
     """
-    names = [re.sub(r"^refs/heads/", "", b) for b in branches if b]
+    names = []
+    for ref in branches:
+        if not ref:
+            continue
+        name = branch_name(ref)
+        if name is None:
+            return f"Deleting '{ref}' is not allowed: only branches may be deleted, never tags."
+        names.append(name)
     if not names:
         return None
     for name in names:
@@ -148,6 +181,13 @@ def check_branch_deletion(branches, remote, what="delete branch"):
             return f"Deleting the protected branch '{name}' is not allowed."
     unchecked = []
     if remote:
+        for name in names:
+            tag = is_remote_tag(name)
+            if tag is None:
+                return (f"Could not check whether '{name}' is a tag on GitHub, so deleting "
+                        "it is refused. Ask the human to run it.")
+            if tag:
+                return f"'{name}' is a tag on GitHub. Deleting tags is not allowed."
         for name in names:
             stacked = open_prs_based_on(name)
             if stacked is None:
@@ -201,17 +241,32 @@ def git_subcommand(tokens):
     return None, []
 
 
-def targets_protected_ref(args):
-    """True if any positional refspec of a push resolves to a protected branch."""
-    for arg in args:
-        if arg.startswith("-"):
+def short_flags(args):
+    """Letters of every bundled short option (`-uf` -> {"u", "f"})."""
+    return {c for a in args if re.fullmatch(r"-[A-Za-z0-9]+", a) for c in a[1:]}
+
+
+def push_positionals(args):
+    """The remote and refspecs of a `git push`, skipping options and their values."""
+    out, i = [], 0
+    while i < len(args):
+        if args[i] in PUSH_OPTS_WITH_VALUE:
+            i += 2
             continue
+        if not args[i].startswith("-"):
+            out.append(args[i])
+        i += 1
+    return out
+
+
+def targets_protected_ref(positional):
+    """True if any refspec of a push resolves to a protected branch."""
+    for arg in positional[1:]:
         ref = arg.lstrip("+")
         # A refspec's destination is what matters: src:dst -> dst.
         if ":" in ref:
             ref = ref.split(":", 1)[1]
-        ref = re.sub(r"^refs/heads/", "", ref)
-        if ref in PROTECTED:
+        if branch_name(ref) in PROTECTED:
             return True
     return False
 
@@ -427,11 +482,14 @@ def check_segment(segment):
 
     # --- git push ---------------------------------------------------------
     if sub == "push":
+        # Short options bundle (`-uf`, `-dq`), so flags are read letter by letter.
+        flags = short_flags(args)
+        positional = push_positionals(args)
         # A dry run mutates nothing, but only this segment is exempt.
-        if "--dry-run" in args or "-n" in args:
+        if "--dry-run" in args or "n" in flags:
             return None
-        if any(a in ("--force", "-f", "--force-with-lease") or
-               a.startswith("--force-with-lease=") for a in args):
+        if "f" in flags or any(a in ("--force", "--force-with-lease") or
+                               a.startswith("--force-with-lease=") for a in args):
             return ("Force pushing is not allowed — it can destroy published history. "
                     "If a branch genuinely needs rewriting, ask the human to do it.")
         if any(a.lstrip("+").startswith("+") or a.startswith("+") for a in args
@@ -441,20 +499,23 @@ def check_segment(segment):
             return "`git push --mirror` can delete remote refs and is not allowed."
         if "--all" in args:
             return "`git push --all` would push protected branches too."
-        positional = [a for a in args if not a.startswith("-")]
+        if "--prune" in args:
+            return "`git push --prune` deletes remote branches and is not allowed."
+        if any("*" in a for a in positional[1:]):
+            return "A wildcard refspec can reach protected branches and is not allowed."
         deleting = []
-        if "--delete" in args or "-d" in args:
+        if "--delete" in args or "d" in flags:
+            if "tag" in positional[1:]:
+                return "Deleting tags is not allowed. Tags are applied by the human after merge."
             deleting = positional[1:]
         deleting += [a[1:] for a in positional[1:] if a.startswith(":")]
         if deleting:
-            if any(d.startswith("refs/tags/") for d in deleting):
-                return "Deleting tags is not allowed. Tags are applied by the human after merge."
             return check_branch_deletion(deleting, remote=True)
-        if targets_protected_ref(args):
+        if targets_protected_ref(positional):
             return ("Pushing to a protected branch (main/dev) is not allowed. "
                     "Push your feature branch instead and open a pull request.")
         # No refspec: git pushes the current branch to its upstream.
-        if not [a for a in args if not a.startswith("-")][1:]:
+        if not positional[1:]:
             branch = current_branch()
             if branch in PROTECTED:
                 return (f"HEAD is on '{branch}', so a bare `git push` would publish a "
@@ -472,10 +533,12 @@ def check_segment(segment):
         return None
 
     # --- deletions --------------------------------------------------------
-    if sub == "branch" and any(a in ("-D", "-d", "--delete") for a in args):
+    if sub == "branch" and ("--delete" in args or {"d", "D"} & short_flags(args)):
         return check_branch_deletion([a for a in args if not a.startswith("-")],
                                      remote=False)
-    if sub == "tag" and any(a in ("-d", "--delete") for a in args):
+    if sub == "tag" and ("--delete" in args or "d" in short_flags(args)):
+        return "Deleting tags is not allowed. Tags are applied by the human after merge."
+    if sub == "update-ref" and "-d" in args and any("tags/" in a for a in args):
         return "Deleting tags is not allowed. Tags are applied by the human after merge."
 
     return None

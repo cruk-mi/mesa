@@ -215,6 +215,34 @@ ask_check 'gh pr merge 102 -d' "delete its branch 'feat/clean'"
 ask_check 'gh pr close 102 -d' "close PR #102 and delete its branch 'feat/clean'"
 check 0 'gh pr close 102'
 
+# --- other spellings of a protected branch or a tag --------------------
+# The remote resolves heads/main to refs/heads/main, and a short name to a tag
+# when one exists (the fake gh knows v0.99.6), so each must be refused.
+for cmd in \
+    'git push origin :heads/main' \
+    'git push origin :refs/heads/main' \
+    'git push origin --delete heads/dev' \
+    'git push origin HEAD:heads/main' \
+    'git branch -D heads/main' \
+    'git push origin --delete v0.99.6' \
+    'git push origin :v0.99.6' \
+    'git push origin --delete tags/v0.99.6' \
+    'git push origin :tags/v0.99.6' \
+    'git push origin :refs/tags/v0.99.6' \
+    'git push origin --delete tag v0.99.6' \
+    'git push origin --delete refs/remotes/origin/feat/clean' \
+    'git push -dq origin v0.99.6' \
+    'git push -uf origin my-branch' \
+    'git push -o ci.skip -f origin my-branch' \
+    'git push --prune origin refs/heads/*:refs/heads/*' \
+    "git push origin 'refs/heads/*'" \
+    'git tag --delete v0.99.6' \
+    'git update-ref -d refs/tags/v0.99.6'
+do check 2 "$cmd"; done
+ask_check 'git push -dq origin feat/clean' "'feat/clean'"
+ask_check 'git push -o ci.skip origin --delete feat/clean' "'feat/clean'"
+check 0 'git push -o ci.skip origin chore/agent-setup'
+
 # --- permission modes -------------------------------------------------
 # An "ask" is only a safeguard if a human sees it. bypassPermissions approves
 # it automatically, auto may, and dontAsk denies it silently; a payload with
