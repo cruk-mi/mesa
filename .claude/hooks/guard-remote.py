@@ -9,9 +9,15 @@ Blocked:
   * any push that targets a protected branch (main / dev / master)
   * force pushes, --mirror, --all, and remote ref deletion
   * committing or merging while HEAD is on a protected branch
-  * gh pr merge / ready / review --approve
-  * the same four actions reached through `gh api`
-  * deleting branches or tags
+  * gh pr ready / review --approve
+  * the same actions reached through `gh api`
+  * deleting branches or tags, including `gh pr merge --delete-branch`
+
+Asked, not blocked:
+  * merging a pull request (`gh pr merge`, or the same through `gh api`).
+    AGENTS.md allows it only when the human explicitly approves or asks, so
+    the hook returns a permission "ask": Claude Code shows the command and the
+    human confirms every merge.
 
 The command is split on shell separators and tokenised, so each segment is
 judged on its own. That matters: `git push --dry-run origin main && git push
@@ -19,7 +25,8 @@ origin main` must not be waved through because the first half is harmless, and
 `git -C /repo push origin main` must not slip past because `git` and `push` are
 not adjacent.
 
-Exit codes: 0 = allow, 2 = block (stderr is shown to the agent).
+Exit codes: 0 = allow, 2 = block (stderr is shown to the agent). A merge
+exits 0 with a PreToolUse "ask" decision on stdout.
 Read-only inspection is never blocked. When this hook and AGENTS.md disagree,
 that is a bug: fix both.
 """
@@ -59,6 +66,10 @@ GH_GRAPHQL_MERGE = re.compile(r"\b(mergePullRequest|enablePullRequestAutoMerge)\
 GH_GRAPHQL_READY = re.compile(r"\bmarkPullRequestReadyForReview\b")
 GH_GRAPHQL_REVIEW = re.compile(r"\b(addPullRequestReview|submitPullRequestReview)\b")
 GH_GRAPHQL_DELETE_REF = re.compile(r"\bdeleteRef\b")
+
+# A merge is not refused outright: it needs the human's explicit approval, so
+# main() turns this marker into a permission prompt instead of a block.
+MERGE = "Merging a pull request needs the human's explicit approval."
 
 
 def split_segments(command):
@@ -192,7 +203,7 @@ def check_gh_graphql(tokens):
         return ("A `gh api graphql` query read from stdin or an unreadable file "
                 "cannot be checked, so it is refused. Pass it with -f query=...")
     if GH_GRAPHQL_MERGE.search(text):
-        return "Merging pull requests is the human's decision, not the agent's."
+        return MERGE
     if GH_GRAPHQL_READY.search(text):
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")
@@ -217,7 +228,7 @@ def check_gh_api(tokens):
         return check_gh_graphql(tokens)
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):
-        return "Merging pull requests is the human's decision, not the agent's."
+        return MERGE
     # Only a write can submit a review; a GET that filters on "APPROVED" is a read.
     if GH_API_REVIEWS.search(endpoint) and method != "GET":
         body = payload_text(tokens)
@@ -257,7 +268,10 @@ def check_segment(segment):
         if rest[:1] == ["api"]:
             return check_gh_api(tokens)
         if rest[:2] == ["pr", "merge"]:
-            return "Merging pull requests is the human's decision, not the agent's."
+            if "--delete-branch" in tokens or "-d" in tokens:
+                return ("Deleting branches is not allowed — they are the human's "
+                        "audit trail. Merge without --delete-branch.")
+            return MERGE
         if rest[:2] == ["pr", "ready"]:
             return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                     "ready for review.")
@@ -293,7 +307,7 @@ def check_segment(segment):
             return "Deleting a remote ref via ':ref' is not allowed."
         if targets_protected_ref(args):
             return ("Pushing to a protected branch (main/dev) is not allowed. "
-                    "Push your feature branch instead and let a human merge.")
+                    "Push your feature branch instead and open a pull request.")
         # No refspec: git pushes the current branch to its upstream.
         if not [a for a in args if not a.startswith("-")][1:]:
             branch = current_branch()
@@ -337,9 +351,12 @@ def main():
     if not command:
         return 0
 
+    merge = False
     for segment in split_segments(command):
         message = check_segment(segment)
-        if message:
+        if message == MERGE:
+            merge = True
+        elif message:
             print(
                 f"Blocked by mesa's workflow contract (AGENTS.md):\n  {message}\n\n"
                 f"Command: {command.strip()[:300]}\n\n"
@@ -347,6 +364,14 @@ def main():
                 file=sys.stderr,
             )
             return 2
+    if merge:
+        print(json.dumps({"hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "ask",
+            "permissionDecisionReason": (
+                "mesa (AGENTS.md): merging a pull request needs your explicit "
+                "approval. Allow only if you asked for this merge."),
+        }}))
     return 0
 
 

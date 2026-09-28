@@ -18,7 +18,8 @@ Say plainly what was verified and what could not run here.
 ## The contract, in one line
 
 Branch off `main`, commit atomically, push the feature branch, open a **draft** PR if asked
-— never mark ready, never merge, never touch `main`. `.claude/hooks/guard-remote.py`
+— never mark ready, merge only when the human explicitly approves or asks (the hook makes
+them confirm), never touch `main`. `.claude/hooks/guard-remote.py`
 enforces this; a blocked command means the contract said no, so do not work around it.
 
 ## Attribution

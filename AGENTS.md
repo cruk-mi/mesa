@@ -25,7 +25,7 @@ review guidelines at all times. Current version: pre-submission `0.99.x` series.
 ## Workflow contract (read this first)
 
 Agents operate on a **dedicated branch as a sandbox**. The human owns when work becomes a
-pull request and when anything merges.
+pull request and decides when anything merges.
 
 - **Check the state of the repo first.** Run `git status` and `git log --oneline -5`
   before making changes, and say so if the working tree is dirty or HEAD is not where you
@@ -36,8 +36,12 @@ pull request and when anything merges.
 - Commit in **atomic** steps, each a single logical change, using
   [Conventional Commits](#conventional-commit-messages).
 - You **may push the feature branch** (with attribution — see below).
-- You **may open a pull request, but only as a draft.** Never mark it ready for review,
-  never request review, never merge.
+- You **may open a pull request, but only as a draft.** Never mark it ready for review or
+  request review.
+- You **may merge a pull request only when the human explicitly approves that merge or
+  asks for it** in the conversation. An approving review on GitHub is not, on its own,
+  that approval. Squash-merge, and never pass `--delete-branch`, because deleting
+  branches stays the human's job. The hook asks the human to confirm every merge.
 - You may **never** push or force-push to `main`, delete branches or tags, or rewrite
   published history.
 - When in doubt about an irreversible or outward-facing action, ask first.
@@ -46,7 +50,8 @@ pull request and when anything merges.
 
 These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
 as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
-approval through the raw API is blocked the same way. If the hook and this file ever
+approval through the raw API is treated the same way. A merge is not blocked but raised
+as a permission prompt, so the human confirms each one. If the hook and this file ever
 disagree, that is a bug — fix both.
 
 ---

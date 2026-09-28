@@ -21,6 +21,33 @@ check() { # check <expected-exit> <command>
     fi
 }
 
+ask_check() { # ask_check <command>: allowed only via a permission prompt
+    local cmd="$1" out code
+    out="$(printf '%s' "$cmd" \
+        | python3 -c 'import json,sys; print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
+        | python3 "$hook" 2>/dev/null)"
+    code=$?
+    if [ "$code" != 0 ] || ! printf '%s' "$out" | grep -q '"permissionDecision": "ask"'; then
+        printf 'FAIL (expected ask, got exit %s): %s\n' "$code" "$cmd"
+        fails=$((fails + 1))
+    fi
+}
+
+# --- must ask the human (merging needs explicit approval) ------------
+for cmd in \
+    'gh pr merge 102' \
+    'gh pr merge 102 --squash' \
+    'gh api -X PUT repos/cruk-mi/mesa/pulls/106/merge' \
+    'gh api repos/cruk-mi/mesa/pulls/106/merge -X PUT' \
+    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge?'" \
+    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge?merge_method=squash'" \
+    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge#x'" \
+    "gh api graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { enablePullRequestAutoMerge(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql --raw-field query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    'gh pr view 102 && gh pr merge 102 --squash'
+do ask_check "$cmd"; done
+
 # --- must be blocked -------------------------------------------------
 for cmd in \
     'git push origin HEAD:main' \
@@ -31,9 +58,10 @@ for cmd in \
     'git push --force origin HEAD' \
     'git push --force-with-lease origin my-branch' \
     'cd /somewhere && git push origin main' \
-    'gh pr merge 102' \
-    'gh pr merge 102 --squash' \
     'gh pr ready 102' \
+    'gh pr merge 102 --squash --delete-branch' \
+    'gh pr merge 102 -d' \
+    'gh pr merge 102 --squash && git push origin main' \
     'gh pr edit 104 --ready' \
     'gh pr review 102 --approve' \
     'git push origin --delete old-branch' \
@@ -48,21 +76,13 @@ for cmd in \
     'git push --all origin' \
     'git push origin :main' \
     'git push origin +main' \
-    'gh api -X PUT repos/cruk-mi/mesa/pulls/106/merge' \
-    'gh api repos/cruk-mi/mesa/pulls/106/merge -X PUT' \
     'gh api --method PATCH repos/cruk-mi/mesa/pulls/106 -f draft=false' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews -f event=APPROVE' \
     'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking' \
-    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge?'" \
-    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge?merge_method=squash'" \
-    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge#x'" \
     "gh api -X PATCH 'repos/cruk-mi/mesa/pulls/106?' -f draft=false" \
-    "gh api graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
-    "gh api graphql -f query='mutation { enablePullRequestAutoMerge(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
     "gh api graphql -f query='mutation { markPullRequestReadyForReview(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
     "gh api graphql -f query='mutation { addPullRequestReview(input:{pullRequestId:\"X\", event: APPROVE}) { clientMutationId } }'" \
     "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
-    "gh api graphql --raw-field query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
     'gh api graphql --input -' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=APPROVE' \
     'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input -' \
@@ -72,8 +92,8 @@ do check 2 "$cmd"; done
 # A mutation hidden in a query file must be read and caught, not waved through.
 qfile="$(mktemp)"
 printf 'mutation { mergePullRequest(input:{pullRequestId:"X"}) { clientMutationId } }' >"$qfile"
-check 2 "gh api graphql -F query=@$qfile"
-check 2 "gh api graphql --input $qfile"
+ask_check "gh api graphql -F query=@$qfile"
+ask_check "gh api graphql --input $qfile"
 rm -f "$qfile"
 
 # Same for a REST review payload: APPROVE in a file is caught, COMMENT is not.
