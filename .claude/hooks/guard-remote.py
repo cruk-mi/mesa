@@ -35,6 +35,7 @@ Read-only inspection is never blocked. When this hook and AGENTS.md disagree,
 that is a bug: fix both.
 """
 
+import functools
 import json
 import os
 import re
@@ -83,39 +84,41 @@ class Ask:
 
 MERGE = Ask("merge a pull request")
 
-# The stacked-PR probe calls `gh`. MESA_GUARD_OFFLINE=1 skips it (the tests do,
-# so they need no network); the deletion is then still asked, with a warning.
-OFFLINE = os.environ.get("MESA_GUARD_OFFLINE") == "1"
+def gh_json(args):
+    """Parsed JSON from a read-only `gh` call; None if it fails in any way.
+
+    The tests put a fake `gh` first on PATH, so the lookups run offline.
+    """
+    try:
+        out = subprocess.run(["gh", *args], capture_output=True, text=True, timeout=15)
+        return json.loads(out.stdout) if out.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return None
+
+
+@functools.lru_cache(maxsize=None)
+def open_prs():
+    """Every open PR as {number, baseRefName, headRefName}; None if unknown."""
+    prs = gh_json(["pr", "list", "--state", "open", "--limit", "500",
+                   "--json", "number,baseRefName,headRefName"])
+    if not isinstance(prs, list) or not all(isinstance(p, dict) for p in prs):
+        return None
+    return prs
 
 
 def open_prs_based_on(branch):
     """Numbers of open PRs whose base is `branch`; None if it cannot be checked."""
-    if OFFLINE:
+    prs = open_prs()
+    if prs is None:
         return None
-    try:
-        out = subprocess.run(
-            ["gh", "pr", "list", "--base", branch, "--state", "open",
-             "--json", "number", "--jq", ".[].number"],
-            capture_output=True, text=True, timeout=20,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return None
-    if out.returncode != 0:
-        return None
-    return [n for n in out.stdout.split() if n.isdigit()]
+    return [str(p.get("number")) for p in prs if p.get("baseRefName") == branch]
 
 
 def pr_head_branch(pr_args):
     """Head branch of the PR `gh pr merge` targets; None if it cannot be found."""
-    if OFFLINE:
-        return None
-    try:
-        out = subprocess.run(["gh", "pr", "view", *pr_args, "--json", "headRefName",
-                              "--jq", ".headRefName"],
-                             capture_output=True, text=True, timeout=20)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    return out.stdout.strip() or None if out.returncode == 0 else None
+    pr = gh_json(["pr", "view", *pr_args, "--json", "number,headRefName"])
+    head = pr.get("headRefName") if isinstance(pr, dict) else None
+    return head if isinstance(head, str) and head else None
 
 
 def check_branch_deletion(branches, remote):
@@ -143,6 +146,8 @@ def check_branch_deletion(branches, remote):
                 return (f"Open PR(s) {prs} use '{name}' as their base; deleting it "
                         f"would close them. Retarget first: gh pr edit <N> --base main.")
     what = "delete branch " + ", ".join(names)
+    if remote and not unchecked:
+        what += " (checked: no open PR is based on it)"
     if unchecked:
         what += (" (could not check whether an open PR is based on "
                  + ", ".join(unchecked) + ")")

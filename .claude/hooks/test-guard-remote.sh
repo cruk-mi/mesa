@@ -8,29 +8,65 @@
 
 set -uo pipefail
 hook="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/guard-remote.py"
-# No network: skip the stacked-PR probe (a deletion is then still asked).
-export MESA_GUARD_OFFLINE=1
+# The interpreter under test: PY=/usr/bin/python3 checks the macOS system 3.9.
+PY="${PY:-python3}"
 fails=0
+
+# The hook asks `gh` about open PRs and tags. A fake `gh` first on PATH answers
+# from a fixed set, so the refusal paths run offline and never depend on which
+# PRs happen to be open. #110 is stacked on #108's branch `stacked-base`.
+stub_dir="$(mktemp -d)"
+cat >"$stub_dir/gh" <<'STUB'
+#!/usr/bin/env bash
+[ "${GH_STUB_FAIL:-}" = 1 ] && exit 1
+case "$1 $2" in
+"pr list")
+    echo '[{"number":110,"baseRefName":"stacked-base","headRefName":"feat/on-top"},
+           {"number":108,"baseRefName":"main","headRefName":"stacked-base"},
+           {"number":114,"baseRefName":"main","headRefName":"chore/open-head"},
+           {"number":102,"baseRefName":"main","headRefName":"feat/clean"}]' ;;
+"pr view")
+    case "$3" in
+    108) echo '{"number":108,"headRefName":"stacked-base"}' ;;
+    110) echo '{"number":110,"headRefName":"feat/on-top"}' ;;
+    102|feat/clean|-*) echo '{"number":102,"headRefName":"feat/clean"}' ;;
+    *) exit 1 ;;
+    esac ;;
+"api repos/{owner}/{repo}/git/matching-refs/tags/"*)
+    case "${2##*/tags/}" in
+    v*) echo '[{"ref":"refs/tags/v0.99.6"}]' ;;
+    *) echo '[]' ;;
+    esac ;;
+*) exit 1 ;;
+esac
+STUB
+chmod +x "$stub_dir/gh"
+export PATH="$stub_dir:$PATH"
+trap 'rm -rf "$stub_dir"' EXIT
+
+# Hook input as Claude Code sends it; MODE sets permission_mode.
+payload() {
+    MODE="${MODE:-default}" "$PY" -c 'import json,os,sys; print(json.dumps({"tool_name":"Bash","permission_mode":os.environ["MODE"],"tool_input":{"command":sys.stdin.read()}}))'
+}
 
 check() { # check <expected-exit> <command>
     local expected="$1" cmd="$2" actual
-    actual="$(printf '%s' "$cmd" \
-        | python3 -c 'import json,sys; print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
-        | python3 "$hook" >/dev/null 2>&1; echo $?)"
+    actual="$(printf '%s' "$cmd" | payload | "$PY" "$hook" >/dev/null 2>&1; echo $?)"
     if [ "$actual" != "$expected" ]; then
         printf 'FAIL (expected %s, got %s): %s\n' "$expected" "$actual" "$cmd"
         fails=$((fails + 1))
     fi
 }
 
-ask_check() { # ask_check <command>: allowed only via a permission prompt
-    local cmd="$1" out code
-    out="$(printf '%s' "$cmd" \
-        | python3 -c 'import json,sys; print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
-        | python3 "$hook" 2>/dev/null)"
+ask_check() { # ask_check <command> [text]: allowed only via a permission prompt
+    local cmd="$1" text="${2:-}" out code
+    out="$(printf '%s' "$cmd" | payload | "$PY" "$hook" 2>/dev/null)"
     code=$?
     if [ "$code" != 0 ] || ! printf '%s' "$out" | grep -q '"permissionDecision": "ask"'; then
         printf 'FAIL (expected ask, got exit %s): %s\n' "$code" "$cmd"
+        fails=$((fails + 1))
+    elif [ -n "$text" ] && ! printf '%s' "$out" | grep -qF -- "$text"; then
+        printf 'FAIL (ask does not say "%s"): %s\n  %s\n' "$text" "$cmd" "$out"
         fails=$((fails + 1))
     fi
 }
@@ -147,14 +183,25 @@ for cmd in \
     'Rscript -e "devtools::test()"'
 do check 0 "$cmd"; done
 
+# --- stacked PRs (answered by the fake gh) --------------------------
+# Deleting a branch an open PR is based on closes that PR: refused.
+check 2 'git push origin --delete stacked-base'
+check 2 'git push origin :stacked-base'
+check 2 'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/stacked-base'
+check 2 'gh pr merge 108 --delete-branch'
+check 2 'gh pr merge 108 -d'
+# Nothing is built on feat/clean: asked, and the prompt says it was checked.
+ask_check 'git push origin --delete feat/clean' 'no open PR'
+ask_check 'gh pr merge 102 --squash --delete-branch' 'no open PR'
+
 # --- failure modes ---------------------------------------------------
 # Malformed input must fail closed (block), not fall open.
-if [ "$(printf 'not json' | python3 "$hook" >/dev/null 2>&1; echo $?)" != "2" ]; then
+if [ "$(printf 'not json' | "$PY" "$hook" >/dev/null 2>&1; echo $?)" != "2" ]; then
     echo "FAIL: malformed input did not fail closed"
     fails=$((fails + 1))
 fi
 # Non-Bash tools are none of this hook's business.
-if [ "$(echo '{"tool_name":"Read","tool_input":{"file_path":"/x"}}' | python3 "$hook" >/dev/null 2>&1; echo $?)" != "0" ]; then
+if [ "$(echo '{"tool_name":"Read","tool_input":{"file_path":"/x"}}' | "$PY" "$hook" >/dev/null 2>&1; echo $?)" != "0" ]; then
     echo "FAIL: non-Bash tool was not passed through"
     fails=$((fails + 1))
 fi
@@ -171,9 +218,7 @@ tmp="$(mktemp -d)"
 ) >/dev/null 2>&1
 state_check() { # state_check <expected> <cmd>
     local expected="$1" cmd="$2" actual
-    actual="$(cd "$tmp" && printf '%s' "$cmd" \
-        | python3 -c 'import json,sys; print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
-        | python3 "$hook" >/dev/null 2>&1; echo $?)"
+    actual="$(cd "$tmp" && printf '%s' "$cmd" | payload | "$PY" "$hook" >/dev/null 2>&1; echo $?)"
     if [ "$actual" != "$expected" ]; then
         printf 'FAIL (stateful, expected %s, got %s): %s\n' "$expected" "$actual" "$cmd"
         fails=$((fails + 1))
