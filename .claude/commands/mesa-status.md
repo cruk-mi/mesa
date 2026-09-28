@@ -1,6 +1,6 @@
 ---
 description: Refresh mesa's project state and roadmap, and republish the Next steps page
-allowed-tools: Bash(python3 .claude/scripts/mesa-status.py:*), Bash(cat .claude/state/status.json), Read, Write, Edit, Artifact
+allowed-tools: Bash(python3 .claude/scripts/mesa-status.py), Bash(python3 .claude/scripts/mesa-status.py --no-log), Bash(python3 .claude/scripts/mesa-status.py --html --no-log), Bash(python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run), Bash(python3 .claude/scripts/mesa-status.py --artifact-url), Bash(python3 .claude/scripts/mesa-status.py --set-artifact-url:*), Bash(python3 .claude/scripts/mesa-status.py --mark-published), Bash(cat .claude/state/status.json), Read, Write, Edit, Artifact
 ---
 
 Refresh mesa's project state and roadmap, then say what to do next.
@@ -8,15 +8,26 @@ Refresh mesa's project state and roadmap, then say what to do next.
 ## 1. Regenerate the facts
 
 ```bash
-python3 .claude/scripts/mesa-status.py --html --sync-issue
+python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run
 ```
 
 This rewrites `.claude/state/status.json` and `STATUS.md` from `git`, `gh`, `NEWS.md` and the
 `gh-pages` build commit. It also derives every roadmap item's status from the TOML block in
-#124, and rewrites #124's generated checklist when a status changed. Everything in them is
-derived: never hand-edit `STATUS.md` or the generated half of #124, and never "correct" a
-status. If one looks wrong, either the probe is wrong (fix the script) or the plan is (edit
-the **Roadmap data** block in #124).
+#124, and prints the diff #124's generated checklist would get.
+
+**#124 is public, so it changes only on the human's say-so.** If the verdict is "would
+change", show which statuses move and ask. Only on a yes, run
+
+```bash
+python3 .claude/scripts/mesa-status.py --html --sync-issue
+```
+
+which is deliberately not pre-approved, so it prompts. If the verdict is "left alone", say
+why and do not retry. The sync refuses whenever any data is incomplete.
+
+Everything here is derived: never hand-edit `STATUS.md` or the generated half of #124, and
+never "correct" a status. If one looks wrong, either the probe is wrong (fix the script) or
+the plan is (edit the **Roadmap data** block in #124).
 
 Read `STATUS.md`. If it has an **Incomplete data** section, say which fields are unknown
 before drawing any conclusion from them.

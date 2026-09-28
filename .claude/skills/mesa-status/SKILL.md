@@ -12,7 +12,8 @@ write to.
 ```
 git + gh + NEWS.md + gh-pages + #124 roadmap TOML
             |
-  .claude/scripts/mesa-status.py        read-only, deterministic, no model involved
+  .claude/scripts/mesa-status.py        deterministic, no model involved; read-only except
+                                        --sync-issue, a human-approved edit of #124
             |
   .claude/state/status.json             intermediate
             |
@@ -49,8 +50,9 @@ python3 .claude/scripts/mesa-status.py --no-log     # skip the slow CI-log probe
 python3 .claude/scripts/mesa-status.py --max-age N  # no-op if STATUS.md is under N seconds old
 ```
 
-`/mesa-status` does the whole job: regenerate, sync #124, rewrite the recommendation,
-republish the page. A `SessionStart` hook runs `--max-age 14400 --no-log --quiet`, so state
+`/mesa-status` does the whole job: regenerate, show the diff #124 would get (and sync it
+only when the human says yes), rewrite the recommendation and republish the page. A real
+`--sync-issue` is kept out of the permission allowlist, so it always prompts. A `SessionStart` hook runs `--max-age 14400 --no-log --quiet`, so state
 is current at the start of any session without paying a `gh` round-trip every time.
 
 ### Keeping the published page current

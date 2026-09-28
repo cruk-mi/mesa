@@ -22,7 +22,13 @@
       "Bash(bash .claude/hooks/test-guard-remote.sh)",
       "Bash(bash .claude/hooks/test-refresh-flag.sh)",
       "Bash(gh pr checks:*)",
-      "Bash(python3 .claude/scripts/mesa-status.py:*)"
+      "Bash(python3 .claude/scripts/mesa-status.py)",
+      "Bash(python3 .claude/scripts/mesa-status.py --no-log)",
+      "Bash(python3 .claude/scripts/mesa-status.py --html --no-log)",
+      "Bash(python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run)",
+      "Bash(python3 .claude/scripts/mesa-status.py --artifact-url)",
+      "Bash(python3 .claude/scripts/mesa-status.py --set-artifact-url:*)",
+      "Bash(python3 .claude/scripts/mesa-status.py --mark-published)"
     ],
     "deny": [
       "Read(./.Renviron)",

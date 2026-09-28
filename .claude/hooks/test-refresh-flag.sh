@@ -364,6 +364,50 @@ while IFS= read -r line; do
     esac
 done <"$flags/roadmap-cases.out"
 
+# --- a real --sync-issue always prompts ----------------------------------
+# No allow rule (settings or /mesa-status's allowed-tools) may pre-approve the
+# write, so the human sees each edit of #124 before it happens.
+"$PY" - "$(dirname "$hook")/.." >"$flags/allow-cases.out" 2>&1 <<'PYEOF'
+import json
+import os
+import re
+import sys
+
+claude = sys.argv[1]
+with open(os.path.join(claude, "settings.json"), encoding="utf-8") as handle:
+    rules = json.load(handle)["permissions"]["allow"]
+with open(os.path.join(claude, "commands", "mesa-status.md"), encoding="utf-8") as handle:
+    front = re.search(r"^allowed-tools:(.*)$", handle.read(), re.M).group(1)
+rules += re.findall(r"Bash\([^)]*\)", front)
+
+
+def allows(rule, command):
+    body = re.fullmatch(r"Bash\((.*)\)", rule)
+    if not body:
+        return False
+    pattern = body.group(1)
+    if pattern.endswith(":*"):
+        return command.startswith(pattern[:-2])
+    if "*" in pattern:
+        return re.fullmatch(".*".join(map(re.escape, pattern.split("*"))), command) is not None
+    return command == pattern
+
+
+script = "python3 .claude/scripts/mesa-status.py"
+for command in (f"{script} --sync-issue", f"{script} --html --sync-issue",
+                f"{script} --roadmap-file seed.toml --sync-issue"):
+    for rule in rules:
+        if allows(rule, command):
+            print(f"FAIL: {rule} pre-approves `{command}`")
+for command in (f"{script} --html --sync-issue --dry-run", f"{script} --html --no-log",
+                f"{script} --artifact-url", f"{script} --mark-published"):
+    if not any(allows(rule, command) for rule in rules):
+        print(f"FAIL: /mesa-status's read-only step `{command}` would prompt")
+PYEOF
+while IFS= read -r line; do
+    [ -n "$line" ] && fail "${line#FAIL: }"
+done <"$flags/allow-cases.out"
+
 rm -rf "$flags"
 if [ "$fails" -eq 0 ]; then
     echo "refresh-flag: all cases pass"
