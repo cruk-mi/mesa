@@ -14,17 +14,28 @@ Every probe degrades on its own. A missing `gh`, a revoked token or a dead
 network yields "unknown" fields and a `degraded` list, never a traceback and
 never a half-written file (both outputs are written atomically at the end).
 
+The roadmap is the one input that is judgement rather than fact: which items,
+in which order, for which release. It lives as a TOML block in the pinned
+roadmap issue (#124), editable on github.com. Every item's *status* is still
+derived - from the state of the issues and PRs it names, remote branches and
+release tags - and the issue's readable checklist is regenerated from it.
+
 Usage:
   mesa-status.py                  refresh unconditionally
   mesa-status.py --max-age 14400  refresh only if STATUS.md is older than 4h
   mesa-status.py --no-log         skip the BiocCheck CI-log fetch (the slow probe)
   mesa-status.py --json-only      write status.json but not STATUS.md
+  mesa-status.py --html           also build the page /mesa-status publishes
+  mesa-status.py --sync-issue     rewrite #124's generated checklist if it changed
+  mesa-status.py --artifact-url   print the published page's URL, if known
+  mesa-status.py --mark-published clear the "page needs a refresh" flags
   mesa-status.py --park 115 <<'EOF'
   <note>
   EOF                             append a finding to the parking lot, then stop
 """
 
 import argparse
+import difflib
 import json
 import os
 import re
@@ -33,15 +44,18 @@ import subprocess
 import sys
 import tempfile
 import time
+import tomllib
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 REPO = "cruk-mi/mesa"
 WORKFLOW = "R-CMD-check-bioc"
 PROTECTED = {"main", "dev", "master", "gh-pages", "HEAD"}
 COVERAGE_TARGET = 80  # AGENTS.md "Local verification"
-FIX_LABELS = ("ERROR_fix", "WARNING_fix", "NOTE_fix", "Bioc_feedback_fix")
+# Only labels that exist on GitHub: a name here that nobody can apply is noise.
+FIX_LABELS = ("ERROR_fix", "NOTE_fix", "Bioc_feedback_fix")
+ROADMAP_ISSUE = 124
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 STATE_DIR = os.path.join(ROOT, ".claude", "state")
@@ -51,8 +65,23 @@ BIOC_HISTORY = os.path.join(STATE_DIR, "bioccheck-history.jsonl")
 RECOMMENDATION = os.path.join(STATE_DIR, "recommendation.md")
 TEMPLATE = os.path.join(ROOT, ".claude", "scripts", "dashboard-template.html")
 HTML_OUT = os.path.join(STATE_DIR, "dashboard.html")
+ROADMAP_MD = os.path.join(STATE_DIR, "roadmap-issue.md")
 
 DEGRADED = []
+
+
+def shared_dir():
+    """Per-clone state every worktree must see: the page URL, the refresh flags.
+
+    `.claude/state` is per worktree, so a URL saved there by one checkout is
+    invisible to the next, and /mesa-status run from a fresh worktree would
+    publish a second page instead of updating the first. The git common dir
+    is the one place all worktrees of a clone share, and git never commits it.
+    """
+    common = git("rev-parse", "--path-format=absolute", "--git-common-dir")
+    path = os.path.join(common, "mesa-status") if common else STATE_DIR
+    os.makedirs(path, exist_ok=True)
+    return path
 
 
 def degrade(message):
@@ -279,7 +308,10 @@ def collect_next_up():
         return None
     groups = {}
     for issue in data:
-        names = [label.get("name") for label in issue.get("labels") or []]
+        # A `status:` label says how far along an issue is, not what it is
+        # about, so it must never become the group an issue is filed under.
+        names = [label.get("name") for label in issue.get("labels") or []
+                 if not str(label.get("name", "")).startswith("status:")]
         key = next((name for name in FIX_LABELS if name in names), None)
         if key is None:
             key = names[0] if names else "unlabelled"
@@ -644,6 +676,402 @@ def collect_branches():
 
 
 # --------------------------------------------------------------------------
+# roadmap
+# --------------------------------------------------------------------------
+
+GEN_START, GEN_END = "<!-- roadmap:generated:start -->", "<!-- roadmap:generated:end -->"
+DATA_START, DATA_END = "<!-- roadmap:data:start -->", "<!-- roadmap:data:end -->"
+TOML_FENCE = re.compile(r"```toml[ \t]*\n(.*?)\n```", re.S)
+
+# The five statuses, in the order the page lists them. Each names where an
+# item *is*, never an action: "delete" could mean done or to-do, "In review"
+# cannot. Who has to act is the separate `owner` field.
+STATUSES = ("todo", "waiting", "review", "done", "later")
+STATUS_LABEL = {"todo": "To do", "waiting": "Waiting", "review": "In review",
+                "done": "Done", "later": "Later"}
+STATUS_MARK = {"todo": "⬜", "waiting": "⏳", "review": "\U0001f50d",
+               "done": "✅", "later": "\U0001f4a4"}
+ROLLUP_WORD = {"SUCCESS": "green", "FAILURE": "failing", "ERROR": "failing",
+               "PENDING": "running", "EXPECTED": "running"}
+
+
+def _iso_date(value):
+    return value.isoformat() if isinstance(value, (date, datetime)) else value
+
+
+def _fmt_day(text):
+    """'2026-09-25T14:24:16Z' -> '25 Sep', for the one-line ref summaries."""
+    ts = parse_ts(text)
+    return f"{ts.day} {ts.strftime('%b')}" if ts else "?"
+
+
+def fetch_issue_body():
+    data = gh_json(["issue", "view", str(ROADMAP_ISSUE), "--repo", REPO, "--json", "body"])
+    return None if data is None else (data.get("body") or "")
+
+
+def read_roadmap_source(override=None):
+    """(issue body, TOML text) - from a local file when testing, else #124."""
+    body = fetch_issue_body()
+    if override:
+        try:
+            with open(override, encoding="utf-8") as handle:
+                return body, handle.read()
+        except OSError:
+            degrade(f"roadmap file {override} could not be read")
+            return body, None
+    if body is None:
+        return None, None
+    section = body
+    if DATA_START in body and DATA_END in body:
+        section = body.split(DATA_START, 1)[1].split(DATA_END, 1)[0]
+    match = TOML_FENCE.search(section)
+    if not match:
+        degrade(f"#{ROADMAP_ISSUE} has no ```toml roadmap block, so the roadmap is unknown")
+        return body, None
+    return body, match.group(1)
+
+
+def parse_roadmap(text):
+    """Parse and check the roadmap TOML. None, with a reason, if it is unusable.
+
+    Maintainers edit this on github.com, so a typo is expected, not
+    exceptional: it must cost the roadmap section, never the whole refresh.
+    """
+    try:
+        data = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        degrade(f"roadmap TOML in #{ROADMAP_ISSUE} does not parse ({exc})")
+        return None
+    waves = data.get("wave") or []
+    items = data.get("item") or []
+    wave_ids = [w.get("id") for w in waves]
+    problems = []
+    keys = set()
+    for index, item in enumerate(items):
+        refs = item.get("refs") or []
+        # A key only needs writing when two items would otherwise share one,
+        # or when the item has no ref to borrow it from.
+        item.setdefault("key", str(refs[0]) if refs else f"item{index + 1}")
+        item["key"] = str(item["key"])
+        if item["key"] in keys:
+            problems.append(f"duplicate item key {item['key']!r}")
+        keys.add(item["key"])
+        if item.get("wave") not in wave_ids:
+            problems.append(f"item {item['key']!r} names unknown wave {item.get('wave')!r}")
+        if not item.get("title"):
+            problems.append(f"item {item['key']!r} has no title")
+        if not all(isinstance(ref, int) for ref in refs):
+            problems.append(f"item {item['key']!r} has a non-numeric ref")
+    for item in items:
+        for dep in item.get("after") or []:
+            if str(dep) not in keys:
+                problems.append(f"item {item['key']!r} waits on unknown key {dep!r}")
+    if problems:
+        degrade("roadmap TOML is inconsistent: " + "; ".join(problems[:4]))
+        return None
+    return data
+
+
+def fetch_ref_states(numbers):
+    """State of every issue/PR the roadmap names, in one GraphQL round trip."""
+    if not numbers:
+        return {}
+    owner, name = REPO.split("/")
+    rollup = "commits(last: 1) { nodes { commit { statusCheckRollup { state } } } }"
+    fields = []
+    for number in sorted(numbers):
+        fields.append(
+            f"n{number}: issueOrPullRequest(number: {number}) {{ __typename "
+            f"... on Issue {{ title state closedAt url "
+            f"closedByPullRequestsReferences(first: 5, includeClosedPrs: false) "
+            f"{{ nodes {{ number state isDraft url {rollup} }} }} }} "
+            f"... on PullRequest {{ title state isDraft mergedAt closedAt url {rollup} }} }}"
+        )
+    query = f'query {{ repository(owner: "{owner}", name: "{name}") {{ {" ".join(fields)} }} }}'
+    data = gh_json(["api", "graphql", "-f", f"query={query}"])
+    if data is None:
+        return None
+    repo = (data.get("data") or {}).get("repository") or {}
+    return {int(key[1:]): value for key, value in repo.items() if value}
+
+
+def _ci_word(node):
+    commits = ((node.get("commits") or {}).get("nodes")) or []
+    state = ((commits[0].get("commit") or {}).get("statusCheckRollup") or {}).get("state") if commits else None
+    return ROLLUP_WORD.get(state, "no CI")
+
+
+def remote_refs():
+    """(branch names, tag names) on origin right now - not the local cache."""
+    out = git("ls-remote", "--heads", "--tags", "origin", timeout=60)
+    if out is None:
+        degrade("`git ls-remote origin` failed, so branch and tag checks are unknown")
+        return None, None
+    heads, tags = set(), set()
+    for line in out.splitlines():
+        ref = line.split("\t", 1)[-1]
+        if ref.startswith("refs/heads/"):
+            heads.add(ref[len("refs/heads/"):])
+        elif ref.startswith("refs/tags/"):
+            tags.add(ref[len("refs/tags/"):].removesuffix("^{}"))
+    return heads, tags
+
+
+def describe_ref(number, info):
+    """One ref as the page shows it: resolved or not, plus a short summary."""
+    url = f"https://github.com/{REPO}/issues/{number}"
+    if info is None:
+        return {"number": number, "kind": "?", "resolved": False, "open_prs": [],
+                "text": "state unknown", "url": url}
+    if info.get("__typename") == "PullRequest":
+        state = info.get("state")
+        if state == "MERGED":
+            text = f"merged {_fmt_day(info.get('mergedAt'))}"
+        elif state == "CLOSED":
+            text = "closed without merging"
+        else:
+            text = ("draft" if info.get("isDraft") else "ready") + " · CI " + _ci_word(info)
+        return {"number": number, "kind": "pr", "resolved": state != "OPEN",
+                "open_prs": [number] if state == "OPEN" else [],
+                "text": text, "url": info.get("url") or url, "title": info.get("title")}
+    if info.get("state") == "CLOSED":
+        return {"number": number, "kind": "issue", "resolved": True, "open_prs": [],
+                "text": f"closed {_fmt_day(info.get('closedAt'))}",
+                "url": info.get("url") or url, "title": info.get("title")}
+    # An open issue with an open PR that says "Fixes #N" is already in review,
+    # whether or not the roadmap lists the PR: GitHub knows the link.
+    linked = [pr for pr in ((info.get("closedByPullRequestsReferences") or {}).get("nodes") or [])
+              if pr.get("state") == "OPEN"]
+    text = "open"
+    if linked:
+        text += " → " + ", ".join(
+            f"PR #{pr['number']} ({'draft' if pr.get('isDraft') else 'ready'}, CI {_ci_word(pr)})"
+            for pr in linked)
+    return {"number": number, "kind": "issue", "resolved": False,
+            "open_prs": [pr["number"] for pr in linked],
+            "text": text, "url": info.get("url") or url, "title": info.get("title")}
+
+
+def run_check(check, heads, tags):
+    """A `kind:value` check the page can verify. (passed or None, label)."""
+    kind, _, value = str(check).partition(":")
+    if kind == "branch-gone":
+        return (None if heads is None else value not in heads), f"branch {value} deleted"
+    if kind == "tag":
+        return (None if tags is None else value in tags), f"tag {value} pushed"
+    degrade(f"roadmap check {check!r} is not a known kind (branch-gone:, tag:)")
+    return None, str(check)
+
+
+def derive_status(item, wave, refs, checks, done_keys, key_label):
+    """(status, reason) for one item. The table in the mesa-status skill.
+
+    Order matters: finished beats everything, "Later" beats open work, an
+    explicit `waiting_on` beats an open PR (e.g. a PR waiting on re-review),
+    and an open PR beats a pending dependency (someone is already on it).
+    """
+    signals = bool(refs or checks)
+    finished = (all(r["resolved"] for r in refs)
+                and all(passed is True for passed, _ in checks))
+    if item.get("done") or (signals and finished):
+        return "done", ""
+    if wave.get("later"):
+        return "later", ""
+    if item.get("waiting_on"):
+        return "waiting", "on " + item["waiting_on"]
+    open_prs = [n for r in refs for n in r["open_prs"]]
+    if open_prs:
+        return "review", ""
+    pending = [str(dep) for dep in item.get("after") or [] if str(dep) not in done_keys]
+    if pending:
+        return "waiting", "on " + ", ".join(key_label[dep] for dep in pending)
+    return "todo", ""
+
+
+def collect_roadmap(override=None):
+    body, text = read_roadmap_source(override)
+    if text is None:
+        return None, body
+    data = parse_roadmap(text)
+    if data is None:
+        return None, body
+    items = data.get("item") or []
+    numbers = {ref for item in items for ref in item.get("refs") or []}
+    states = fetch_ref_states(numbers)
+    if states is None:
+        degrade("issue/PR states for the roadmap could not be fetched")
+        states = {}
+    needs_remote = any(item.get("check") for item in items)
+    heads, tags = remote_refs() if needs_remote or data.get("release") else (set(), set())
+
+    waves = {w["id"]: w for w in data.get("wave") or []}
+    key_label = {item["key"]: item.get("short") or
+                 (f"#{item['key']}" if item["key"].isdigit() else item["title"])
+                 for item in items}
+    # Dependencies point backwards through the file (a plan lists what comes
+    # first, first), so one ordered pass sees each dependency settled before
+    # the items waiting on it.
+    done_keys, out_items = set(), []
+    for position, item in enumerate(items, 1):
+        wave = waves[item["wave"]]
+        refs = [describe_ref(n, states.get(n)) for n in item.get("refs") or []]
+        checks = [run_check(c, heads, tags) for c in item.get("check") or []]
+        status, why = derive_status(item, wave, refs, checks, done_keys, key_label)
+        if status == "done":
+            done_keys.add(item["key"])
+        out_items.append({
+            "key": item["key"],
+            "order": position,
+            "wave": item["wave"],
+            "title": item["title"],
+            "note": item.get("note"),
+            "release": item.get("release"),
+            "owner": item.get("owner", "claude"),
+            "status": status,
+            "why": why,
+            "refs": refs,
+            "checks": [{"passed": p, "label": label} for p, label in checks],
+        })
+
+    releases = []
+    for rel in data.get("release") or []:
+        version = str(rel.get("version"))
+        # The item that cuts the release (its tag check) is the release, not
+        # something it ships.
+        shipped = [i for i in out_items if i["release"] == version
+                   and not any(c["label"] == f"tag v{version} pushed" for c in i["checks"])]
+        releases.append({
+            "version": version,
+            "date": _iso_date(rel.get("date")),
+            "approx": bool(rel.get("approx")),
+            "note": rel.get("note"),
+            "released": (None if tags is None else f"v{version}" in tags),
+            "items": [{"key": i["key"], "title": i["title"], "status": i["status"]} for i in shipped],
+        })
+
+    counts = {s: sum(1 for i in out_items if i["status"] == s) for s in STATUSES}
+    return {
+        "issue": ROADMAP_ISSUE,
+        "title": data.get("title") or "Roadmap",
+        "target": data.get("target"),
+        "deadline": _iso_date(data.get("deadline")),
+        "deadline_note": data.get("deadline_note"),
+        "waves": [{"id": w["id"], "name": w.get("name"), "start": _iso_date(w.get("start")),
+                   "end": _iso_date(w.get("end")), "later": bool(w.get("later")),
+                   "note": w.get("note")}
+                  for w in data.get("wave") or []],
+        "items": out_items,
+        "releases": releases,
+        "counts": counts,
+        "next": [i["key"] for i in out_items if i["status"] == "todo"][:3],
+        "toml": text,
+    }, body
+
+
+def render_roadmap_issue(roadmap, page_url=None):
+    """The readable half of #124. Regenerated, so it carries no checkboxes:
+    a box ticked by hand would be overwritten on the next refresh."""
+    out = [GEN_START, f"# {roadmap['title']}", ""]
+    lead = []
+    if page_url:
+        lead.append(f"**Readable view:** {page_url}")
+    if roadmap.get("target"):
+        lead.append(f"**Target:** {roadmap['target']}")
+    if roadmap.get("deadline"):
+        lead.append(f"**Acceptance deadline ≈ {roadmap['deadline']}**"
+                    + (f" ({roadmap['deadline_note']})" if roadmap.get("deadline_note") else ""))
+    out += [" · ".join(lead), ""] if lead else []
+    out += [
+        "> **Generated - do not edit this part.** Each status is derived from GitHub "
+        "(issue/PR state, branches, tags) by `.claude/scripts/mesa-status.py`. To change "
+        "the plan (add, drop, reorder, re-note an item), edit the **Roadmap data** block "
+        "below, then run `/mesa-status`.",
+        "",
+        "Status: " + " · ".join(f"{STATUS_MARK[s]} {STATUS_LABEL[s]}" for s in STATUSES)
+        + " · \U0001f464 = a maintainer has to act",
+        "",
+    ]
+    for wave in roadmap["waves"]:
+        span = f" ({wave['start']} → {wave['end']})" if wave.get("start") else ""
+        out += [f"## {wave['name']}{span}", ""]
+        for item in (i for i in roadmap["items"] if i["wave"] == wave["id"]):
+            refs = ", ".join(f"#{r['number']}" for r in item["refs"])
+            line = f"- {STATUS_MARK[item['status']]} **{item['title']}**"
+            if refs:
+                line += f" ({refs})"
+            if item["owner"] == "maintainer":
+                line += " \U0001f464"
+            if item["why"]:
+                line += f" - _waiting {item['why']}_"
+            out.append(line)
+        out.append("")
+    if roadmap["releases"]:
+        out += ["## Releases", "", "| Version | When | Ships |", "|---|---|---|"]
+        for rel in roadmap["releases"]:
+            when = ("released" if rel["released"] else
+                    (("~" if rel["approx"] else "") + (rel["date"] or "as needed")))
+            ships = ", ".join(f"{STATUS_MARK[i['status']]} {i['title']}" for i in rel["items"])
+            out.append(f"| {rel['version']} | {when} | {ships or rel.get('note') or ''} |")
+        out.append("")
+    out += [f"_Generated by Claude (AI) via `/mesa-status`; statuses as of {iso(now())}._", GEN_END]
+    return "\n".join(out)
+
+
+def compose_issue_body(old_body, generated, toml_text):
+    """Swap the generated half into #124 and leave everything else as it is.
+
+    The first sync (no markers yet) replaces the hand-written checklist, and
+    carries over only its <details> blocks - the review summary.
+    """
+    data = None if toml_text is None else (
+        f"{DATA_START}\n<details><summary><b>Roadmap data</b> - edit this to change "
+        f"the plan, then run <code>/mesa-status</code></summary>\n\n```toml\n"
+        f"{toml_text.strip()}\n```\n\n</details>\n{DATA_END}")
+    if old_body and GEN_START in old_body and GEN_END in old_body:
+        head, rest = old_body.split(GEN_START, 1)
+        tail = rest.split(GEN_END, 1)[1]
+        body = head + generated + tail
+        if data is None:
+            return body
+        if DATA_START not in body:
+            body = body.rstrip() + "\n\n" + data + "\n"
+        else:
+            before, after = body.split(DATA_START, 1)
+            body = before + data + after.split(DATA_END, 1)[1]
+        return body
+    kept = re.findall(r"<details>.*?</details>", old_body or "", re.S)
+    return "\n\n".join([generated, data] + kept) + "\n"
+
+
+def sync_issue(roadmap, old_body, page_url, dry_run, seed_toml):
+    """Rewrite #124 when its generated half is out of date. Returns a verdict."""
+    if roadmap is None:
+        return "roadmap unknown - #124 left alone"
+    toml_text = seed_toml if seed_toml is not None else (
+        None if old_body and DATA_START in old_body else roadmap["toml"])
+    generated = render_roadmap_issue(roadmap, page_url)
+    new_body = compose_issue_body(old_body, generated, toml_text)
+
+    def comparable(text):  # the timestamp alone is not a change
+        return re.sub(r"statuses as of \S+", "", text or "").strip()
+
+    if comparable(new_body) == comparable(old_body):
+        return f"#{ROADMAP_ISSUE} already current"
+    if dry_run:
+        sys.stdout.writelines(difflib.unified_diff(
+            (old_body or "").splitlines(True), new_body.splitlines(True),
+            f"#{ROADMAP_ISSUE} (now)", f"#{ROADMAP_ISSUE} (after sync)"))
+        return f"#{ROADMAP_ISSUE} would change (dry run)"
+    write_atomic(ROADMAP_MD, new_body)
+    if run(["gh", "issue", "edit", str(ROADMAP_ISSUE), "--repo", REPO,
+            "--body-file", ROADMAP_MD], timeout=60) is None:
+        degrade(f"#{ROADMAP_ISSUE} could not be updated (gh issue edit failed)")
+        return f"#{ROADMAP_ISSUE} update FAILED"
+    return f"#{ROADMAP_ISSUE} updated"
+
+
+# --------------------------------------------------------------------------
 # render
 # --------------------------------------------------------------------------
 
@@ -693,6 +1121,25 @@ def render(state):
 
     if state["recommendation"]:
         out += ["## Recommended next step", "", state["recommendation"], ""]
+
+    # --- roadmap ----------------------------------------------------------
+    out += [f"## Roadmap (#{ROADMAP_ISSUE})", ""]
+    roadmap = state.get("roadmap")
+    if roadmap is None:
+        out += ["_unknown - see Incomplete data._", ""]
+    else:
+        out.append(" · ".join(f"{roadmap['counts'][s]} {STATUS_LABEL[s]}" for s in STATUSES))
+        out.append("")
+        # Everything still open, in plan order: the list to work down.
+        for item in roadmap["items"]:
+            if item["status"] in ("done", "later"):
+                continue
+            refs = " ".join(f"#{r['number']}" for r in item["refs"])
+            owner = " (maintainer)" if item["owner"] == "maintainer" else ""
+            why = f" - {item['why']}" if item["why"] else ""
+            out.append(f"- **{STATUS_LABEL[item['status']]}**{owner} {item['title']}"
+                       f"{' ' + refs if refs else ''}{why}")
+        out.append("")
 
     # --- in flight --------------------------------------------------------
     out += ["## In flight", ""]
@@ -904,6 +1351,19 @@ def main():
     parser.add_argument("--html", action="store_true",
                         help="also write .claude/state/dashboard.html, ready to publish")
     parser.add_argument("--quiet", action="store_true", help="print nothing on success")
+    parser.add_argument("--sync-issue", action="store_true",
+                        help=f"rewrite #{ROADMAP_ISSUE}'s generated checklist if it is out of date")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="with --sync-issue: print the diff instead of editing the issue")
+    parser.add_argument("--roadmap-file", metavar="PATH",
+                        help=f"read the roadmap TOML from PATH instead of #{ROADMAP_ISSUE}; with "
+                             "--sync-issue, also write it into the issue's data block")
+    parser.add_argument("--artifact-url", action="store_true",
+                        help="print the published page's URL (empty if none yet) and exit")
+    parser.add_argument("--set-artifact-url", metavar="URL",
+                        help="record the published page's URL and exit")
+    parser.add_argument("--mark-published", action="store_true",
+                        help="clear the refresh flags the hooks set, and exit")
     parser.add_argument("--park", metavar="ISSUE",
                         help="append the note on stdin to the parking lot for ISSUE "
                              "(#N, N or -), then exit without refreshing")
@@ -915,6 +1375,22 @@ def main():
             print("Nothing parked: the note on stdin is empty.", file=sys.stderr)
             return 1
         print(f"Parked in {parking_lot_path()}: {line[2:]}")
+        return 0
+
+    shared = shared_dir()
+    url_file = os.path.join(shared, "artifact-url.txt")
+    if args.set_artifact_url:
+        write_atomic(url_file, args.set_artifact_url.strip() + "\n")
+        return 0
+    if args.artifact_url:
+        print(read_artifact_url(url_file) or "")
+        return 0
+    if args.mark_published:
+        for name in ("refresh-needed", "refresh-pending"):
+            try:
+                os.unlink(os.path.join(shared, name))
+            except FileNotFoundError:
+                pass
         return 0
 
     if args.max_age is not None and os.path.exists(MD_PATH):
@@ -945,6 +1421,13 @@ def main():
         "pkgdown": collect_pkgdown(),
         "branches": collect_branches(),
     }
+    roadmap, issue_body = collect_roadmap(args.roadmap_file)
+    seed_toml = roadmap.pop("toml") if roadmap else None
+    state["roadmap"] = roadmap
+    sync_verdict = None
+    if args.sync_issue:
+        sync_verdict = sync_issue(roadmap, issue_body, read_artifact_url(url_file),
+                                  args.dry_run, seed_toml if args.roadmap_file else None)
     state["degraded"] = DEGRADED
 
     # Render first: a template problem is recorded in DEGRADED, and it must
@@ -965,8 +1448,34 @@ def main():
         os.unlink(HTML_OUT)
     if not args.quiet:
         print("Wrote " + ", ".join(written) + "."
+              + (f" {sync_verdict}." if sync_verdict else "")
               + (f" {len(DEGRADED)} field(s) incomplete." if DEGRADED else ""))
     return 0
+
+
+def read_artifact_url(url_file):
+    """The page's URL, migrating it from the old per-worktree location once."""
+    try:
+        with open(url_file, encoding="utf-8") as handle:
+            return handle.read().strip() or None
+    except OSError:
+        pass
+    # Before the shared dir, the URL sat in .claude/state of whichever checkout
+    # first published - usually the main one, listed first by `worktree list`.
+    main_tree = (git("worktree", "list", "--porcelain") or "").split("\n", 1)[0]
+    candidates = [os.path.join(STATE_DIR, "artifact-url.txt")]
+    if main_tree.startswith("worktree "):
+        candidates.append(os.path.join(main_tree[len("worktree "):], ".claude", "state", "artifact-url.txt"))
+    for legacy in candidates:
+        try:
+            with open(legacy, encoding="utf-8") as handle:
+                url = handle.read().strip()
+        except OSError:
+            continue
+        if url:
+            write_atomic(url_file, url + "\n")
+            return url
+    return None
 
 
 if __name__ == "__main__":
