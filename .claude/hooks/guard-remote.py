@@ -116,14 +116,6 @@ def open_prs():
     return prs
 
 
-def open_prs_based_on(branch):
-    """Numbers of open PRs whose base is `branch`; None if it cannot be checked."""
-    prs = open_prs()
-    if prs is None:
-        return None
-    return [str(p.get("number")) for p in prs if p.get("baseRefName") == branch]
-
-
 def pr_number_and_head(pr_args):
     """(number, head branch) of the PR a `gh pr` command targets; None if unknown."""
     pr = gh_json(["pr", "view", *pr_args, "--json", "number,headRefName"])
@@ -158,13 +150,16 @@ def is_remote_tag(name):
     return any(isinstance(r, dict) and r.get("ref") == "refs/tags/" + name for r in refs)
 
 
-def check_branch_deletion(branches, remote, what="delete branch"):
+def check_branch_deletion(branches, remote, what="delete branch", exempt=None):
     """Block unsafe deletions; ask for the rest.
 
     A protected branch or a tag is never deleted, however it is spelled. A
-    remote branch that an open PR uses as its base is refused too: GitHub
-    closes such a PR rather than retargeting it (#114 and #125 were closed
-    that way), so it has to be retargeted first.
+    remote branch is refused while an open PR uses it: as its head, because
+    deleting it closes that PR (AGENTS.md: "its PR is merged or closed"), or
+    as its base, because GitHub then closes the stacked PR rather than
+    retargeting it (#114 and #125 were closed that way). `exempt` is the PR
+    that `gh pr merge|close --delete-branch` acts on. If any of this cannot
+    be checked, the deletion is refused rather than asked.
     """
     names = []
     for ref in branches:
@@ -179,8 +174,12 @@ def check_branch_deletion(branches, remote, what="delete branch"):
     for name in names:
         if name in PROTECTED:
             return f"Deleting the protected branch '{name}' is not allowed."
-    unchecked = []
     if remote:
+        prs = open_prs()
+        if prs is None:
+            return ("Could not list the open PRs to check that deleting "
+                    + ", ".join(f"'{n}'" for n in names)
+                    + " closes none of them, so it is refused. Ask the human to run it.")
         for name in names:
             tag = is_remote_tag(name)
             if tag is None:
@@ -189,19 +188,20 @@ def check_branch_deletion(branches, remote, what="delete branch"):
             if tag:
                 return f"'{name}' is a tag on GitHub. Deleting tags is not allowed."
         for name in names:
-            stacked = open_prs_based_on(name)
-            if stacked is None:
-                unchecked.append(name)
-            elif stacked:
-                prs = ", ".join("#" + n for n in stacked)
-                return (f"Open PR(s) {prs} use '{name}' as their base; deleting it "
-                        f"would close them. Retarget first: gh pr edit <N> --base main.")
+            heads = [p.get("number") for p in prs
+                     if p.get("headRefName") == name and p.get("number") != exempt]
+            if heads:
+                return (f"'{name}' is the head branch of open PR(s) "
+                        + ", ".join(f"#{n}" for n in heads)
+                        + "; deleting it would close them. Merge or close them first.")
+            stacked = [p.get("number") for p in prs if p.get("baseRefName") == name]
+            if stacked:
+                return (f"Open PR(s) " + ", ".join(f"#{n}" for n in stacked)
+                        + f" use '{name}' as their base; deleting it would close them. "
+                        "Retarget first: gh pr edit <N> --base main.")
     what += " " + ", ".join(f"'{n}'" for n in names)
-    if remote and not unchecked:
-        what += " (checked: no open PR is based on it)"
-    if unchecked:
-        what += (" (could not check whether an open PR is based on "
-                 + ", ".join(unchecked) + ")")
+    if remote:
+        what += " (checked: no open PR uses it as its head or base)"
     return Ask(what)
 
 
@@ -437,7 +437,7 @@ def check_pr_branch_deletion(verb, tokens):
         return (f"Cannot tell which branch `gh pr {verb} --delete-branch` would delete, "
                 "so it is refused. Ask the human to run it.")
     number, head = pr
-    return check_branch_deletion([head], remote=True,
+    return check_branch_deletion([head], remote=True, exempt=number,
                                  what=f"{verb} PR #{number} and delete its branch")
 
 

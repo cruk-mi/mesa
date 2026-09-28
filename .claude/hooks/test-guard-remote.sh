@@ -18,7 +18,11 @@ fails=0
 stub_dir="$(mktemp -d)"
 cat >"$stub_dir/gh" <<'STUB'
 #!/usr/bin/env bash
-[ "${GH_STUB_FAIL:-}" = 1 ] && exit 1
+# GH_STUB_FAIL=1 fails every call; =list fails only the open-PR listing.
+case "${GH_STUB_FAIL:-}" in
+1) exit 1 ;;
+list) [ "$1 $2" = "pr list" ] && exit 1 ;;
+esac
 case "$1 $2" in
 "pr list")
     echo '[{"number":110,"baseRefName":"stacked-base","headRefName":"feat/on-top"},
@@ -195,8 +199,8 @@ check 2 'git push origin :stacked-base'
 check 2 'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/stacked-base'
 check 2 'gh pr merge 108 --delete-branch'
 check 2 'gh pr merge 108 -d'
-# Nothing is built on feat/clean: asked, and the prompt says it was checked.
-ask_check 'git push origin --delete feat/clean' 'no open PR'
+# Nothing uses feat/merged (its PR is closed): asked, and the prompt says so.
+ask_check 'git push origin --delete feat/merged' 'no open PR'
 ask_check 'gh pr merge 102 --squash --delete-branch' 'no open PR'
 
 # gh (pflag) also spells --delete-branch as --delete-branch=true, and bundles
@@ -215,6 +219,22 @@ ask_check 'gh pr merge 102 -d' "delete its branch 'feat/clean'"
 ask_check 'gh pr close 102 -d' "close PR #102 and delete its branch 'feat/clean'"
 check 0 'gh pr close 102'
 
+# Deleting the head branch of an open PR closes that PR: refused, except for
+# the PR that `gh pr merge|close --delete-branch` itself acts on.
+check 2 'git push origin --delete chore/open-head'
+check 2 'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/open-head'
+ask_check 'gh pr merge 110 --delete-branch' "PR #110 and delete its branch 'feat/on-top'"
+ask_check 'git branch -D chore/open-head'   # local only: no PR is touched
+# If gh cannot answer, nothing is verified: refused, not asked.
+export GH_STUB_FAIL=1
+check 2 'git push origin --delete feat/merged'
+check 2 'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/feat/merged'
+check 2 'gh pr merge 102 --delete-branch'
+ask_check 'gh pr merge 102'                 # no deletion, nothing to look up
+export GH_STUB_FAIL=list
+check 2 'git push origin --delete feat/merged'
+unset GH_STUB_FAIL
+
 # --- other spellings of a protected branch or a tag --------------------
 # The remote resolves heads/main to refs/heads/main, and a short name to a tag
 # when one exists (the fake gh knows v0.99.6), so each must be refused.
@@ -230,7 +250,7 @@ for cmd in \
     'git push origin :tags/v0.99.6' \
     'git push origin :refs/tags/v0.99.6' \
     'git push origin --delete tag v0.99.6' \
-    'git push origin --delete refs/remotes/origin/feat/clean' \
+    'git push origin --delete refs/remotes/origin/feat/merged' \
     'git push -dq origin v0.99.6' \
     'git push -uf origin my-branch' \
     'git push -o ci.skip -f origin my-branch' \
@@ -239,8 +259,8 @@ for cmd in \
     'git tag --delete v0.99.6' \
     'git update-ref -d refs/tags/v0.99.6'
 do check 2 "$cmd"; done
-ask_check 'git push -dq origin feat/clean' "'feat/clean'"
-ask_check 'git push -o ci.skip origin --delete feat/clean' "'feat/clean'"
+ask_check 'git push -dq origin feat/merged' "'feat/merged'"
+ask_check 'git push -o ci.skip origin --delete feat/merged' "'feat/merged'"
 check 0 'git push -o ci.skip origin chore/agent-setup'
 
 # --- permission modes -------------------------------------------------
@@ -262,7 +282,7 @@ mode_check() { # mode_check <mode> <expected-exit> <command>
 for mode in bypassPermissions auto dontAsk -; do
     mode_check "$mode" 2 'gh pr merge 102'
     mode_check "$mode" 2 'gh pr merge 102 --squash --delete-branch'
-    mode_check "$mode" 2 'git push origin --delete feat/clean'
+    mode_check "$mode" 2 'git push origin --delete feat/merged'
     mode_check "$mode" 2 'git branch -D old-branch'
     mode_check "$mode" 0 'git status'
     mode_check "$mode" 0 'git push origin chore/agent-setup'
