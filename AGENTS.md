@@ -64,12 +64,21 @@ issue it was opened for, and nothing else.
   missing test, a "while I'm here". This holds even when the agent itself suggests the fix
   and even when it looks like one line. Run `/park <finding>`, say `Parked: …`, and carry on.
   Agents must not offer to fix out-of-scope findings; they park them.
-- List what was parked in the PR description under **Parked**.
+- Agents without `/park` (Copilot, Codex, …) run the same step directly. `<issue>` is the
+  session's issue number, or `-`:
+  `python3 .claude/scripts/mesa-status.py --park <issue> <<'EOF'`, then the note on its own
+  line, then `EOF`.
+- List what was parked in the PR description under **Parked**. That list is the durable
+  copy.
 
-The parking lot is `.claude/state/parking-lot.md` in the **main checkout** (`/park` resolves
-it through `git rev-parse --git-common-dir`, so every worktree writes to the same file). It
-is gitignored: it never conflicts between branches and never ships. `/mesa-status` shows its
-count and items.
+The parking lot is `.claude/state/parking-lot.md` in the **main checkout**. The script
+resolves it through `git rev-parse --git-common-dir`, so every worktree writes to the same
+file. It is gitignored, so it never conflicts between branches and is never committed. It
+is also **per-machine**: a session in the devcontainer, a Codespace or on the web writes to
+a checkout that goes away, which is why the PR's **Parked** list matters.
+`/mesa-status` shows the count and the items, and they are inlined into the dashboard it
+publishes as a (private) claude.ai artifact, so don't park anything that must stay on this
+machine.
 
 **Triage (human, weekly):** promote each line to a GitHub issue labelled `parked` — per the
 issue workflow below, check for a duplicate first — or delete it. Then delete the line.
