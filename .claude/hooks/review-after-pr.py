@@ -37,30 +37,67 @@ HOT_PATHS = ("R/", ".claude/hooks/", ".github/workflows/")
 MAX_HOT_LINES = 30    # counted lines under HOT_PATHS
 
 IGNORED = re.compile(r"^(man/.*\.Rd|NAMESPACE|DESCRIPTION|NEWS\.md|\.claude/state/.*)$")
-PR_URL = re.compile(r"https://github\.com/([^/\s]+/[^/\s]+)/pull/(\d+)")
+# A bare PR URL on a line of its own, as `gh pr create` prints it. Not an
+# `#issuecomment-…` / `#discussion_r…` link, and not a push's `/pull/new/<branch>`.
+PR_URL = re.compile(r"^https://github\.com/([^/\s]+/[^/\s]+)/pull/(\d+)/?\s*$", re.M)
+HEREDOC = re.compile(r"<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+SEPARATORS = set(";&|()\n")
+GH_OPTS_WITH_VALUE = ("-R", "--repo")
 
 
-def split_segments(command):
-    """Split a shell command into separately-executed segments."""
-    return [s for s in re.split(r"\|\||&&|;|\n|\||&", command) if s.strip()]
+def strip_heredocs(command):
+    """Drop heredoc bodies: text fed to a command's stdin is not a command."""
+    lines = command.split("\n")
+    kept, i = [], 0
+    while i < len(lines):
+        line = lines[i]
+        kept.append(line)
+        i += 1
+        for match in HEREDOC.finditer(line):
+            while i < len(lines) and lines[i].strip() != match.group(2):
+                i += 1
+            i += 1  # the terminator line
+    return "\n".join(kept)
 
 
-def tokenise(segment):
+def simple_commands(command):
+    """The word list of each simple command. Quoted text stays one word, even
+    across lines, so a body that mentions `gh pr create` is not a command."""
+    lex = shlex.shlex(strip_heredocs(command), posix=True, punctuation_chars=";&|()\n")
+    lex.whitespace = " \t\r"
+    lex.whitespace_split = True
+    lex.commenters = ""
+    words = []
+    for token in lex:
+        if token and set(token) <= SEPARATORS:
+            if words:
+                yield words
+            words = []
+        else:
+            words.append(token)
+    if words:
+        yield words
+
+
+def runs_pr_create(words):
+    """True if this simple command is `[env] [VAR=x …] gh [-R repo] pr create …`."""
+    i = 0
+    while i < len(words) and (ASSIGNMENT.match(words[i]) or os.path.basename(words[i]) == "env"):
+        i += 1
+    if i >= len(words) or os.path.basename(words[i]) != "gh":
+        return False
+    i += 1
+    while i < len(words) and words[i].startswith("-"):
+        i += 2 if words[i] in GH_OPTS_WITH_VALUE else 1
+    return words[i:i + 2] == ["pr", "create"]
+
+
+def is_pr_create(command):
     try:
-        return shlex.split(segment)
-    except ValueError:
-        return segment.split()
-
-
-def pr_create_args(command):
-    """The arguments after `gh pr create`, or None if no segment runs it."""
-    for segment in split_segments(command):
-        tokens = tokenise(segment)
-        for i in range(len(tokens) - 2):
-            if (os.path.basename(tokens[i]) == "gh"
-                    and tokens[i + 1] == "pr" and tokens[i + 2] == "create"):
-                return tokens[i + 3:]
-    return None
+        return any(runs_pr_create(words) for words in simple_commands(command))
+    except ValueError:  # unbalanced quotes: not a command we can read, stay silent
+        return False
 
 
 def pr_size(repo, number):
@@ -97,15 +134,15 @@ def main():
         return
     if data.get("tool_name") != "Bash":
         return
-    if pr_create_args((data.get("tool_input") or {}).get("command") or "") is None:
+    if not is_pr_create((data.get("tool_input") or {}).get("command") or ""):
         return
     # No PR URL in the output means the create failed: nothing to review.
     response = data.get("tool_response") or ""
     stdout = (response.get("stdout") or "") if isinstance(response, dict) else str(response)
-    match = PR_URL.search(stdout)
-    if not match:
+    urls = PR_URL.findall(stdout)
+    if not urls:
         return
-    repo, number = match.groups()
+    repo, number = urls[-1]
 
     size = pr_size(repo, number)
     if size is None:

@@ -132,6 +132,28 @@ EOF
 )\" --base feat"
 check silent '--base after a heredoc body'       "$ahead" "$heredoc"
 
+# --- only a real `gh … pr create` command, only a bare PR URL (review #138)
+fixture R/new.R:200:0
+check reviews 'gh -R owner/repo pr create'       "$none" "gh -R cruk-mi/mesa pr create --draft"
+check reviews 'gh --repo=owner/repo pr create'   "$none" "gh --repo=cruk-mi/mesa pr create --draft"
+check reviews 'env VAR= prefix'                  "$none" "env GH_PROMPT_DISABLED=1 gh pr create --draft"
+check reviews 'VAR= prefix'                      "$none" "GH_REPO=cruk-mi/mesa gh pr create --draft"
+check reviews 'progress line before the URL'     "$none" "$create" "$(printf 'Creating draft pull request for feat into main\n\n%s\n' "$url")"
+check reviews 'create inside ( … )'              "$none" "(cd /x && gh pr create --draft)"
+check silent 'echo gh pr create'                 "$none" "echo gh pr create"
+comment="gh pr comment 125 --body \"\$(cat <<'EOF'
+Next step: gh pr create --draft
+EOF
+)\""
+check silent 'gh pr comment body mentions create' "$none" "$comment" 'https://github.com/cruk-mi/mesa/pull/125#issuecomment-123'
+unquoted="cat > notes.md <<EOF
+gh pr create --draft
+EOF"
+check silent 'create inside an unquoted heredoc' "$none" "$unquoted"
+check silent 'issuecomment link, not a PR URL'   "$none" "$create" 'https://github.com/cruk-mi/mesa/pull/999#issuecomment-1'
+check silent 'discussion link, not a PR URL'     "$none" "$create" 'https://github.com/cruk-mi/mesa/pull/999#discussion_r1'
+check silent 'push hint /pull/new/<branch>'      "$none" "git push -u origin feat" 'remote:   https://github.com/cruk-mi/mesa/pull/new/feat'
+
 result="$(CI=true run_hook "$none" "$create")"
 case "$result" in
     *additionalContext*) printf 'FAIL (expected silent in CI)\n'; fails=$((fails + 1)) ;;
