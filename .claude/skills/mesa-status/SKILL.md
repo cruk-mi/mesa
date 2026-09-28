@@ -151,6 +151,14 @@ a change before editing #124, save the block to a file and run
 `mesa-status.py --roadmap-file FILE --sync-issue --dry-run`, which prints the diff #124
 would get.
 
+`--sync-issue` refuses, dry run included, when anything is incomplete:
+- the roadmap or #124's current body could not be read;
+- any probe degraded;
+- any ref state or check is unknown.
+
+#124 is public, and a single failed lookup would otherwise turn Done items back into To
+do there. Fix the cause and run it again.
+
 ## Adding a signal
 
 Add a `collect_*()` that returns a plain dict and degrades to `None`/`unknown` on failure,

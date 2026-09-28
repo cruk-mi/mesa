@@ -311,6 +311,42 @@ if needs_toml("data markers without generated markers"):
             fail("no generated markers: the generated half was not put back")
         elif "Hand-written note." not in new:
             fail("no generated markers: hand-written text dropped")
+
+# --sync-issue never writes #124 from incomplete data, dry run or not.
+def edits():
+    return [c for c in CALLS if c[:3] == ["gh", "issue", "edit"]]
+
+
+def expect_refusal(name, roadmap, body, toml_text, from_file=False):
+    for dry_run in (True, False):
+        CALLS.clear()
+        verdict = ms.sync_issue(roadmap, body, None, dry_run, toml_text, from_file)
+        if "left alone" not in verdict or edits():
+            fail(f"{name}: synced #124 anyway (dry_run={dry_run}, {verdict!r})")
+
+
+expect_refusal("roadmap unknown", None, live_body(), None)
+if needs_toml("refusals on degraded data"):
+    roadmap, body = roadmap_for(live_body(), states=None)
+    expect_refusal("issue/PR states not fetched", roadmap, body, roadmap.pop("toml"))
+    roadmap, body = roadmap_for(live_body(), refs=(None, None))
+    expect_refusal("ls-remote failed", roadmap, body, roadmap.pop("toml"))
+    roadmap, body = roadmap_for(live_body(), states={10: STATES[10]})
+    if ms.DEGRADED:
+        fail(f"a ref missing from the answer degraded by itself: {ms.DEGRADED}")
+    expect_refusal("one ref state unknown", roadmap, body, roadmap.pop("toml"))
+    seed = os.path.join(tempfile.mkdtemp(), "seed.toml")
+    with open(seed, "w", encoding="utf-8") as handle:
+        handle.write(TOML)
+    roadmap, body = roadmap_for(None, override=seed)
+    ms.DEGRADED.clear()  # isolate the missing body from the fetch failure
+    expect_refusal("#124 body unknown with --roadmap-file", roadmap, body,
+                   roadmap.pop("toml"), from_file=True)
+    # Positive control: complete data does reach `gh issue edit`, exactly once.
+    roadmap, body = roadmap_for(live_body())
+    verdict, new = synced(roadmap, body, roadmap.pop("toml"))
+    if len(edits()) != 1 or new is None:
+        fail(f"complete data did not sync: {verdict!r}, {len(edits())} edit(s)")
 PYEOF
 while IFS= read -r line; do
     case "$line" in

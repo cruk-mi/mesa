@@ -1097,10 +1097,23 @@ def sync_issue(roadmap, old_body, page_url, dry_run, toml_text, from_file):
     `toml_text` is the roadmap TOML that was read; `from_file` says it came
     from --roadmap-file rather than from #124 itself.
     """
+    # #124 is public: publish only from complete data. One failed lookup
+    # would otherwise turn Done items back into To do on the issue.
+    why = None
     if roadmap is None:
-        return "roadmap unknown - #124 left alone"
+        why = "the roadmap is unknown"
+    elif old_body is None:
+        why = f"#{ROADMAP_ISSUE}'s current body could not be read"
+    elif DEGRADED:
+        why = "some data is incomplete (" + "; ".join(DEGRADED[:2]) + ")"
+    elif any(r["kind"] == "?" for i in roadmap["items"] for r in i["refs"]):
+        why = "some issue/PR states are unknown"
+    elif any(c["passed"] is None for i in roadmap["items"] for c in i["checks"]):
+        why = "some branch/tag checks are unknown"
+    if why:
+        return f"#{ROADMAP_ISSUE} left alone: {why}"
     # A github.com edit saves CRLF; compare in LF, or every run looks like a change.
-    old_body = None if old_body is None else old_body.replace("\r\n", "\n")
+    old_body = old_body.replace("\r\n", "\n")
     # A file replaces #124's data block. Otherwise the block #124 already has
     # stays as it is, and a bare ```toml fence is moved into a marked block.
     if not from_file and old_body and DATA_START in old_body:
