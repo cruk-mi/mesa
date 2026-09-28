@@ -789,10 +789,16 @@ def parse_roadmap(text):
             problems.append(f"item {item['key']!r} has no title")
         if not all(isinstance(ref, int) for ref in refs):
             problems.append(f"item {item['key']!r} has a non-numeric ref")
+    # collect_roadmap() settles statuses in one pass, so every dependency must
+    # come earlier in the file. That also rules out self and cyclic waits.
+    seen = set()
     for item in items:
         for dep in item.get("after") or []:
             if str(dep) not in keys:
                 problems.append(f"item {item['key']!r} waits on unknown key {dep!r}")
+            elif str(dep) not in seen:
+                problems.append(f"item {item['key']!r} waits on {dep!r}, which is not listed before it")
+        seen.add(item["key"])
     if problems:
         degrade("roadmap TOML is inconsistent: " + "; ".join(problems[:4]))
         return None

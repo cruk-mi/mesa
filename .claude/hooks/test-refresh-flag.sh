@@ -234,6 +234,23 @@ for name, text in BAD_SHAPES.items():
             fail(f"bad shape gave no reason: {name}")
     except Exception as exc:  # the bug: a traceback aborts the whole refresh
         fail(f"bad shape raised {type(exc).__name__}: {name}")
+
+# `after` must point backwards: forward, self and cyclic waits are reported.
+TWO = '[[wave]]\nid = "w1"\n[[item]]\nkey = "a"\nwave = "w1"\ntitle = "A"\n{a}\n' \
+      '[[item]]\nkey = "b"\nwave = "w1"\ntitle = "B"\ndone = true\n{b}\n'
+BAD_AFTER = {
+    "forward": TWO.format(a='after = ["b"]', b=""),
+    "self": TWO.format(a='after = ["a"]', b=""),
+    "cycle": TWO.format(a='after = ["b"]', b='after = ["a"]'),
+}
+for name, text in BAD_AFTER.items():
+    if not needs_toml(f"after: {name}"):
+        break
+    ms.DEGRADED.clear()
+    if ms.parse_roadmap(text) is not None:
+        fail(f"{name} `after` passed validation")
+    elif not any("not listed before it" in d for d in ms.DEGRADED):
+        fail(f"{name} `after` gave the wrong reason: {ms.DEGRADED}")
 PYEOF
 )"
 while IFS= read -r line; do
