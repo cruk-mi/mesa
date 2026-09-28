@@ -132,7 +132,7 @@ markers) only when a status changed:
 
 | Status | Means | Derived when (first match wins) |
 |---|---|---|
-| **Done** | Merged, released, closed or decided | every ref merged/closed and every `check` passes, or `done = true` |
+| **Done** | Merged, released, closed or decided | every PR ref merged, every issue ref closed and every `check` passes, or `done = true` (a PR closed without merging does not count) |
 | **Later** | Deliberately after the Bioc release | the item's wave has `later = true` |
 | **Waiting** | Blocked; the page says on what | `waiting_on` is set, or (below) an `after` item is not Done |
 | **In review** | A PR is open | a ref is an open PR, or an open issue has an open PR that says `Fixes #N` |

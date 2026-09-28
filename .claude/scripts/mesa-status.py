@@ -864,7 +864,9 @@ def describe_ref(number, info):
             text = "closed without merging"
         else:
             text = ("draft" if info.get("isDraft") else "ready") + " · CI " + _ci_word(info)
-        return {"number": number, "kind": "pr", "resolved": state != "OPEN",
+        # Closed without merging landed nothing (often superseded by a re-cut PR);
+        # an item that is finished anyway says so with `done = true`.
+        return {"number": number, "kind": "pr", "resolved": state == "MERGED",
                 "open_prs": [number] if state == "OPEN" else [],
                 "text": text, "url": info.get("url") or url, "title": info.get("title")}
     if info.get("state") == "CLOSED":

@@ -251,6 +251,16 @@ for name, text in BAD_AFTER.items():
         fail(f"{name} `after` passed validation")
     elif not any("not listed before it" in d for d in ms.DEGRADED):
         fail(f"{name} `after` gave the wrong reason: {ms.DEGRADED}")
+
+# A PR closed without merging landed nothing: its item is not Done.
+closed = {"__typename": "PullRequest", "state": "CLOSED", "closedAt": "2026-09-02T00:00:00Z",
+          "url": "u10", "title": "A"}
+if ms.describe_ref(10, closed)["resolved"]:
+    fail("a PR closed without merging counts as resolved")
+if needs_toml("closed PR status"):
+    roadmap, _ = roadmap_for(live_body(), states={**STATES, 10: closed})
+    if roadmap is None or roadmap["items"][0]["status"] == "done":
+        fail("an item whose PR was closed without merging shows Done")
 PYEOF
 )"
 while IFS= read -r line; do
