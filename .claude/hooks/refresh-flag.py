@@ -3,16 +3,18 @@
 
 The page is a snapshot that only `/mesa-status` can republish (the Artifact
 tool is the model's, not a script's), so the hooks cannot publish it
-themselves. Instead they make sure the model is asked to, at the moment it
-matters:
+themselves. Instead they remind the human to run it, at the moment it
+matters. They never have the model run it: /mesa-status can edit the public
+#124, and that edit happens only when a human asks for it.
 
   post     PostToolUse(Bash). When a command changed GitHub state - a push,
            a tag, a PR or issue created, edited, merged or closed, a label or
            release changed, a `gh api` write - raise the `refresh-needed` flag.
-  stop     Stop. If the flag is up, block the stop ONCE with a request to run
-           /mesa-status, and lower it to `refresh-pending` so a user who
-           declines is not asked again on every later turn.
-  session  SessionStart. Say so if a refresh was left pending last time.
+  stop     Stop. If the flag is up, suggest /mesa-status to the human ONCE
+           (a `systemMessage`, never a block, which would make the model act),
+           and lower it to `refresh-pending` so the user is not told again on
+           every later turn.
+  session  SessionStart. Tell the human if a refresh was left pending.
 
 The flags sit in the git common dir (see `shared_dir()` in mesa-status.py),
 so every worktree of the clone shares them. `mesa-status.py --mark-published`
@@ -45,11 +47,10 @@ GH_WRITES = {
 }
 GRAPHQL_MUTATION = re.compile(r"^\s*mutation\b|\bmutation\s*[({]", re.M)
 
-REASON = ("GitHub state changed in this session, so the mesa Next steps page and the #124 "
-          "checklist are now stale. Refresh them before finishing: follow "
-          ".claude/commands/mesa-status.md (run the script with --html --sync-issue, update "
-          "the recommendation, republish the page, then --mark-published). If the user has "
-          "said not to, just stop.")
+STOP_MESSAGE = ("mesa-status: this session changed GitHub, so the Next steps page and the "
+                "#124 checklist may be stale. Run /mesa-status when you want them refreshed.")
+SESSION_MESSAGE = ("mesa-status: GitHub changed in an earlier session and the Next steps page was "
+                   "not republished afterwards. Run /mesa-status before relying on it.")
 
 
 def flag_dir():
@@ -111,19 +112,17 @@ def mode_post(payload, flags):
 
 def mode_stop(payload, flags):
     needed = os.path.join(flags, "refresh-needed")
-    # stop_hook_active: this stop is already the model's answer to a block.
-    # Blocking again could loop, so it always goes through.
+    # stop_hook_active: another hook has already held this stop; stay quiet.
     if payload.get("stop_hook_active") or not os.path.exists(needed):
         return 0
     os.replace(needed, os.path.join(flags, "refresh-pending"))
-    print(json.dumps({"decision": "block", "reason": REASON}))
+    print(json.dumps({"systemMessage": STOP_MESSAGE}))
     return 0
 
 
 def mode_session(payload, flags):
     if any(os.path.exists(os.path.join(flags, n)) for n in ("refresh-needed", "refresh-pending")):
-        print("mesa-status: GitHub changed in an earlier session and the Next steps page was not "
-              "republished afterwards. Run /mesa-status before relying on it.")
+        print(json.dumps({"systemMessage": SESSION_MESSAGE}))
     return 0
 
 

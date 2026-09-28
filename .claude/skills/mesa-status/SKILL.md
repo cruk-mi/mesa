@@ -56,18 +56,22 @@ is current at the start of any session without paying a `gh` round-trip every ti
 ### Keeping the published page current
 
 The page can only be republished by the model (the Artifact tool is not a script's), so
-`.claude/hooks/refresh-flag.py` makes sure the model is asked at the right moment:
+`.claude/hooks/refresh-flag.py` reminds the human at the right moment. The hooks never
+have the model run `/mesa-status` itself, because it can edit the public #124:
 
 | Hook | What it does |
 |---|---|
 | `PostToolUse` (Bash) | A command that changed GitHub (`git push`, `git tag`, `gh pr/issue create·edit·merge·close…`, `gh label`, `gh release`, a `gh api` write) raises `refresh-needed`. |
-| `Stop` | If the flag is up, blocks the stop **once** and asks for `/mesa-status`, lowering the flag to `refresh-pending` so a declined refresh does not nag every turn. Never blocks while `stop_hook_active`. |
-| `SessionStart` | Reports a refresh left pending by an earlier session. |
+| `Stop` | If the flag is up, suggests `/mesa-status` to the human **once** (a `systemMessage`, never a block), lowering the flag to `refresh-pending` so it does not repeat every turn. |
+| `SessionStart` | Tells the human about a refresh left pending by an earlier session. |
 
 The flags and the page URL live in `<git common dir>/mesa-status/`, shared by every worktree
 of the clone and never committed. `--mark-published` clears the flags. Changes made on
 github.com raise no flag: the page's ">24h old" banner is the safety net for those.
-`bash .claude/hooks/test-refresh-flag.sh` covers the hook.
+`bash .claude/hooks/test-refresh-flag.sh` covers the hook and the roadmap and #124 sync logic
+in `mesa-status.py`. `PYTHON=/usr/bin/python3 bash .claude/hooks/test-refresh-flag.sh` runs it
+under macOS's Python 3.9, where the roadmap degrades (it needs 3.11's `tomllib`) and
+everything else still works.
 
 ## Degradation is deliberate
 

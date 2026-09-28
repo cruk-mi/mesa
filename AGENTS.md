@@ -200,8 +200,9 @@ Copilot, Claude — shows up on the next refresh. There is nothing to keep in sy
 private claude.ai artifact (its URL is per-clone: `mesa-status.py --artifact-url` prints it).
 The page is deterministic output, not something a model writes each time: the script inlines
 the state into a committed template. It is a snapshot, since a published artifact cannot
-reach GitHub. So hooks raise a flag whenever a session changes GitHub, and ask for
-`/mesa-status` before that session ends.
+reach GitHub. So hooks raise a flag whenever a session changes GitHub, and remind the human
+to run `/mesa-status` before that session ends. Hooks never run it themselves, and never
+edit #124: that public edit happens only when a human asks for it.
 
 **The roadmap** (what to do, in which order, for which release) is a TOML block in the
 pinned issue #124, edited on github.com. Every item's status (To do, Waiting, In review,

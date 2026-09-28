@@ -69,25 +69,32 @@ do
     [ -f "$flags/refresh-needed" ] && fail "flag raised for read-only: $cmd"
 done
 
-# --- Stop blocks once, then lets go ------------------------------------
+# --- Stop suggests /mesa-status once, and never drives it -------------
+# Hooks must never lead to an unprompted edit of the public #124: Stop only
+# tells the human, and it never blocks (a block makes the model act).
 rm -f "$flags"/refresh-*
 out="$(echo '{}' | "$PY" "$hook" stop)"
-[ -z "$out" ] || fail "stop blocked with no flag raised"
+[ -z "$out" ] || fail "stop spoke with no flag raised"
 
 post 'gh pr merge 1'
 out="$(echo '{"stop_hook_active": false}' | "$PY" "$hook" stop)"
-echo "$out" | grep -q '"decision": "block"' || fail "stop did not block with the flag raised"
+echo "$out" | grep -q '"systemMessage"' || fail "stop did not suggest /mesa-status with the flag raised"
+echo "$out" | grep -q '/mesa-status' || fail "stop's suggestion does not name /mesa-status"
+echo "$out" | grep -q '"decision"' && fail "stop blocked, which has the model act instead of the human"
+echo "$out" | grep -q 'sync-issue' && fail "stop's message asks for --sync-issue"
 [ -f "$flags/refresh-pending" ] || fail "stop did not lower the flag to pending"
 out="$(echo '{"stop_hook_active": false}' | "$PY" "$hook" stop)"
-[ -z "$out" ] || fail "stop blocked a second time for the same change"
+[ -z "$out" ] || fail "stop spoke a second time for the same change"
 
 post 'gh pr merge 2'
 out="$(echo '{"stop_hook_active": true}' | "$PY" "$hook" stop)"
-[ -z "$out" ] || fail "stop blocked while stop_hook_active (would loop)"
+[ -z "$out" ] || fail "stop spoke while stop_hook_active"
 
-# --- SessionStart reports a pending refresh ----------------------------
+# --- SessionStart tells the human about a pending refresh ---------------
 out="$(echo '{}' | "$PY" "$hook" session)"
+echo "$out" | grep -q '"systemMessage"' || fail "session start did not address the human"
 echo "$out" | grep -q 'not republished' || fail "session start did not report the pending refresh"
+echo "$out" | grep -q 'sync-issue' && fail "session start's message asks for --sync-issue"
 rm -f "$flags"/refresh-*
 out="$(echo '{}' | "$PY" "$hook" session)"
 [ -z "$out" ] || fail "session start reported a refresh with no flag"
