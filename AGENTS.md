@@ -51,6 +51,41 @@ disagree, that is a bug — fix both.
 
 ---
 
+## Session scope and the parking lot
+
+**One issue = one session = one branch = one draft PR.** A session exists to close the
+issue it was opened for, and nothing else.
+
+- Start a fresh session (or `/clear`) for each issue. Do not carry context from one issue
+  into the next. Use a separate worktree per issue (`claude --worktree`, or
+  `git worktree add`) so sessions running in parallel never share a checkout.
+- Change only the files the issue needs. The PR references it with `Fixes #<n>`.
+- **Anything else you notice is parked, not fixed** — a second bug, a typo, a refactor, a
+  missing test, a "while I'm here". This holds even when the agent itself suggests the fix
+  and even when it looks like one line. Run `/park <finding>`, say `Parked: …`, and carry on.
+  Agents must not offer to fix out-of-scope findings; they park them.
+- Agents without `/park` (Copilot, Codex, …) run the same step directly. `<issue>` is the
+  session's issue number, or `-`:
+  `python3 .claude/scripts/mesa-status.py --park <issue> <<'EOF'`, then the note on its own
+  line, then `EOF`.
+- List what was parked in the PR description under **Parked**. That list is the durable
+  copy.
+
+The parking lot is `.claude/state/parking-lot.md` in the **main checkout**. The script
+resolves it through `git rev-parse --git-common-dir`, so every worktree writes to the same
+file. It is gitignored, so it never conflicts between branches and is never committed. It
+is also **per-machine**: a session in the devcontainer, a Codespace or on the web writes to
+a checkout that goes away, which is why the PR's **Parked** list matters.
+`/mesa-status` shows the count and the items, and they are inlined into the dashboard it
+publishes as a (private) claude.ai artifact, so don't park anything that must stay on this
+machine.
+
+**Triage (human, weekly):** promote each line to a GitHub issue labelled `parked` — per the
+issue workflow below, check for a duplicate first — or delete it. Then delete the line.
+Nothing stays parked for more than a week.
+
+---
+
 ## Attribution (required)
 
 This repo is public and used for Bioconductor review, so **authorship must never be
