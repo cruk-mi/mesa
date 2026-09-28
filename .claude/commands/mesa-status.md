@@ -1,19 +1,22 @@
 ---
-description: Refresh mesa's project state (STATUS.md) and republish the dashboard
-allowed-tools: Bash(python3 .claude/scripts/mesa-status.py:*), Bash(cat .claude/state/status.json), Bash(cat .claude/state/artifact-url.txt), Read, Write, Edit, Artifact
+description: Refresh mesa's project state and roadmap, and republish the Next steps page
+allowed-tools: Bash(python3 .claude/scripts/mesa-status.py:*), Bash(cat .claude/state/status.json), Read, Write, Edit, Artifact
 ---
 
-Refresh mesa's project state, then say what to do next.
+Refresh mesa's project state and roadmap, then say what to do next.
 
 ## 1. Regenerate the facts
 
 ```bash
-python3 .claude/scripts/mesa-status.py --html
+python3 .claude/scripts/mesa-status.py --html --sync-issue
 ```
 
 This rewrites `.claude/state/status.json` and `STATUS.md` from `git`, `gh`, `NEWS.md` and the
-`gh-pages` build commit. Everything in them is derived — never hand-edit `STATUS.md`, and
-never "correct" a number in it. If a figure looks wrong, the probe is wrong: fix the script.
+`gh-pages` build commit. It also derives every roadmap item's status from the TOML block in
+#124, and rewrites #124's generated checklist when a status changed. Everything in them is
+derived: never hand-edit `STATUS.md` or the generated half of #124, and never "correct" a
+status. If one looks wrong, either the probe is wrong (fix the script) or the plan is (edit
+the **Roadmap data** block in #124).
 
 Read `STATUS.md`. If it has an **Incomplete data** section, say which fields are unknown
 before drawing any conclusion from them.
@@ -26,30 +29,44 @@ returning after two weeks would otherwise miss. Then re-run the script, again wi
 so the judgement renders into `STATUS.md` and into the page step 3 publishes:
 
 ```bash
-python3 .claude/scripts/mesa-status.py --html
+python3 .claude/scripts/mesa-status.py --html --no-log
 ```
 
 Keep it to one decision plus at most two standing observations. Ground each in a specific
-number or issue from the status. Overwrite it — never append, or it becomes a changelog of
-stale advice. Good: *"Close #85 in favour of #102 — both rewrite `calculateEnrichment`."*
-Useless: *"Continue working on open issues."*
+number or issue from the status. Do not repeat the page's "Do next" list: say what it
+cannot, such as which of those items to start first and why, or a risk to the deadline.
+Overwrite it — never append, or it becomes a changelog of stale advice. Good: *"Close #85
+in favour of #102 — both rewrite `calculateEnrichment`."* Useless: *"Continue working on
+open issues."*
 
-## 3. Republish the dashboard
+## 3. Republish the page
 
-`.claude/state/artifact-url.txt` holds the dashboard's URL.
+```bash
+python3 .claude/scripts/mesa-status.py --artifact-url
+```
 
-- **File exists:** `Artifact` with `action: "read"` and that `url` first (required before
-  updating an artifact this conversation has not published), then publish to the same `url`
-  so the link stays stable.
-- **File missing:** publish `.claude/state/dashboard.html` — step 1 has just rebuilt it from
-  the template — and write the returned URL to that file. It is gitignored: the URL is
-  per-person. Only reach for the `artifact-design` skill if the template itself needs work.
+prints the page's URL. It is kept in the git common dir, so every worktree of this clone
+sees the same one.
+
+- **A URL is printed:** `Artifact` with `action: "read"` and that `url` first (required before
+  updating an artifact this conversation has not published), then publish
+  `.claude/state/dashboard.html` to the same `url` so the link stays stable.
+- **Nothing is printed:** publish `.claude/state/dashboard.html` as a new artifact, then
+  record it with `python3 .claude/scripts/mesa-status.py --set-artifact-url <url>`. Only
+  reach for the `artifact-design` skill if the template itself needs work.
 
 The page inlines the JSON. It declares **no** `capabilities`: a snapshot needs none, and
-there is no GitHub connector for it to read live anyway. Show the snapshot time and warn
+there is no GitHub connector for it to read live anyway. It shows the snapshot time and warns
 visibly when it is over 24h old, so it can never quietly mislead.
+
+Then clear the flags that asked for this refresh:
+
+```bash
+python3 .claude/scripts/mesa-status.py --mark-published
+```
 
 ## 4. Report
 
-Lead with what changed since the last refresh, then the recommendation, in the labelled
-style `AGENTS.md` sets out. Give the dashboard link once. Do not re-print `STATUS.md`.
+Lead with the roadmap items whose status changed since the last refresh (e.g. "#114 In
+review → Done"), then the recommendation, in the labelled style `AGENTS.md` sets out. Give
+the page link once. Do not re-print `STATUS.md`.

@@ -196,11 +196,18 @@ do not have it, run the script and you do.
 Because the state is derived, a change made by anyone — you, a co-maintainer on github.com,
 Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.
 
-`/mesa-status` also builds a dashboard page from the same data and publishes it as a private
-claude.ai artifact (its URL sits in `.claude/state/artifact-url.txt`, which is per-person).
+`/mesa-status` also builds the **Next steps** page from the same data and publishes it as a
+private claude.ai artifact (its URL is per-clone: `mesa-status.py --artifact-url` prints it).
 The page is deterministic output, not something a model writes each time: the script inlines
-the state into a committed template. It is a snapshot — a published artifact cannot reach
-GitHub, so it cannot refresh itself.
+the state into a committed template. It is a snapshot, since a published artifact cannot
+reach GitHub. So hooks raise a flag whenever a session changes GitHub, and ask for
+`/mesa-status` before that session ends.
+
+**The roadmap** (what to do, in which order, for which release) is a TOML block in the
+pinned issue #124, edited on github.com. Every item's status (To do, Waiting, In review,
+Done, Later) is derived from the issues, PRs, branches and tags it names. Never tick or set a
+status by hand, and do not use the `status:` labels for this. Open a draft PR with
+`Fixes #N` and the roadmap picks it up.
 
 **Which file to edit:**
 
@@ -209,9 +216,11 @@ GitHub, so it cannot refresh itself.
 | `.claude/scripts/mesa-status.py` | the generator | **yes** — this is where a wrong figure gets fixed |
 | `.claude/scripts/dashboard-template.html` | the dashboard's design and markup | **yes** — this is the page |
 | `.claude/state/recommendation.md` | the "what next" judgement | **yes** — overwrite it |
+| #124's **Roadmap data** block | the plan: items, order, releases | **yes** — on github.com |
+| #124's generated checklist | derived from the block | no — `--sync-issue` rewrites it |
 | `STATUS.md` | generated, gitignored | no |
 | `.claude/state/status.json` | generated, gitignored | no |
-| `.claude/state/dashboard.html` | generated, gitignored | no — edits here vanish on the next run |
+| `.claude/state/dashboard.html` | the Next steps page, generated, gitignored | no — edits here vanish on the next run |
 | `.claude/state/bioccheck-history.jsonl` | append-only record | no — the script appends |
 
 The `mesa-status` skill covers the probes, what is fragile about each, and how to add one.

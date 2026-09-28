@@ -88,6 +88,9 @@ this checklist, and do not open phase 1 until they confirm step 2 is done:
 
 3. **Then open the next cycle:** phase 1, `X.Y.(Z+1).9000`.
 
+4. **Refresh the roadmap:** `/mesa-status`. The release's `tag:vX.Y.(Z+1)` check turns its
+   "Cut …" item Done and marks the release as released on the Next steps page and in #124.
+
 **Pushing to Bioconductor is outward-facing and starts a public build. An agent never does
 it without asking.** Ask the human for explicit permission every time, even when an earlier
 push was approved, and show the exact command and the commits it will send

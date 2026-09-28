@@ -1,6 +1,6 @@
 ---
 name: mesa-status
-description: How mesa's project state is derived — STATUS.md, the status generator, the BiocCheck history and the dashboard. Use when reading or refreshing project status, when a figure in STATUS.md looks wrong, or when adding a signal to the status view.
+description: How mesa's project state and roadmap are derived — STATUS.md, the status generator, the roadmap data in #124, the BiocCheck history, the Next steps page and the hooks that keep it current. Use when reading or refreshing project status, when a figure or a roadmap status looks wrong, when changing the plan, or when adding a signal to the status view.
 ---
 
 # Project state
@@ -10,7 +10,7 @@ it cannot drift: every figure is read back from the places humans and agents bot
 write to.
 
 ```
-git + gh + NEWS.md + gh-pages
+git + gh + NEWS.md + gh-pages + #124 roadmap TOML
             |
   .claude/scripts/mesa-status.py        read-only, deterministic, no model involved
             |
@@ -49,9 +49,25 @@ python3 .claude/scripts/mesa-status.py --no-log     # skip the slow CI-log probe
 python3 .claude/scripts/mesa-status.py --max-age N  # no-op if STATUS.md is under N seconds old
 ```
 
-`/mesa-status` does the whole job: regenerate, rewrite the recommendation, republish the
-dashboard. A `SessionStart` hook runs `--max-age 14400 --no-log --quiet`, so state is current
-at the start of any session without paying a `gh` round-trip every time.
+`/mesa-status` does the whole job: regenerate, sync #124, rewrite the recommendation,
+republish the page. A `SessionStart` hook runs `--max-age 14400 --no-log --quiet`, so state
+is current at the start of any session without paying a `gh` round-trip every time.
+
+### Keeping the published page current
+
+The page can only be republished by the model (the Artifact tool is not a script's), so
+`.claude/hooks/refresh-flag.py` makes sure the model is asked at the right moment:
+
+| Hook | What it does |
+|---|---|
+| `PostToolUse` (Bash) | A command that changed GitHub (`git push`, `git tag`, `gh pr/issue create·edit·merge·close…`, `gh label`, `gh release`, a `gh api` write) raises `refresh-needed`. |
+| `Stop` | If the flag is up, blocks the stop **once** and asks for `/mesa-status`, lowering the flag to `refresh-pending` so a declined refresh does not nag every turn. Never blocks while `stop_hook_active`. |
+| `SessionStart` | Reports a refresh left pending by an earlier session. |
+
+The flags and the page URL live in `<git common dir>/mesa-status/`, shared by every worktree
+of the clone and never committed. `--mark-published` clears the flags. Changes made on
+github.com raise no flag: the page's ">24h old" banner is the safety net for those.
+`bash .claude/hooks/test-refresh-flag.sh` covers the hook.
 
 ## Degradation is deliberate
 
@@ -102,6 +118,39 @@ branch whose tip has moved past its PR's head is listed as unknown, not prunable
 block for the human to run: per `AGENTS.md`, agents do not delete branches, and
 `guard-remote.py` blocks it mechanically.
 
+## The roadmap
+
+The plan lives in the pinned roadmap issue **#124**, as a TOML block between
+`<!-- roadmap:data:start -->` and `<!-- roadmap:data:end -->`. It holds only what GitHub
+cannot know: the items, their order, wave, release, owner, dependencies and notes. The
+comment at the top of the block documents every field. Maintainers edit it on github.com;
+no PR is needed.
+
+**No status is ever written by hand.** `collect_roadmap()` derives each item's status, and
+`--sync-issue` rewrites the generated half of #124 (between the `roadmap:generated`
+markers) only when a status changed:
+
+| Status | Means | Derived when (first match wins) |
+|---|---|---|
+| **Done** | Merged, released, closed or decided | every ref merged/closed and every `check` passes, or `done = true` |
+| **Later** | Deliberately after the Bioc release | the item's wave has `later = true` |
+| **Waiting** | Blocked; the page says on what | `waiting_on` is set, or (below) an `after` item is not Done |
+| **In review** | A PR is open | a ref is an open PR, or an open issue has an open PR that says `Fixes #N` |
+| **Waiting** | … on another item | an `after` item is not Done |
+| **To do** | Nobody has started it | none of the above |
+
+`owner = "maintainer"` marks items a human has to act on (decisions, releases, the Bioc
+push). It is a separate tag, not a status, so "delete branches" reads as **To do ·
+Maintainer** until `git ls-remote` shows the branches gone, then **Done**.
+
+Checks: `branch-gone:NAME` (the branch no longer exists on origin) and `tag:vX.Y.Z` (the
+tag exists on origin). A release's row is "released" once its `vX.Y.Z` tag exists.
+
+A TOML typo degrades only the roadmap: the page says so and the rest still renders. To try
+a change before editing #124, save the block to a file and run
+`mesa-status.py --roadmap-file FILE --sync-issue --dry-run`, which prints the diff #124
+would get.
+
 ## Adding a signal
 
 Add a `collect_*()` that returns a plain dict and degrades to `None`/`unknown` on failure,
@@ -112,9 +161,13 @@ call it in `main()`, and render it in `render()`. Two constraints:
    that varies between runs (cache vs live) belongs in `status.json`, not `STATUS.md`.
 2. **Degrades quietly.** Call `degrade("why this is unknown")` and carry on. Never raise.
 
-## Dashboard
+## The Next steps page
 
-The dashboard is **generated by the same script**, not written by a model each run:
+The page has two tabs: **Next steps** (the roadmap, "Do next", the recommendation, a
+timeline, a status filter and the release calendar) and **Health** (CI, coverage, BiocCheck,
+pkgdown, PRs in flight, NEWS, branch hygiene). `#health` in the link opens the second tab.
+
+The page is **generated by the same script**, not written by a model each run:
 
 ```
 .claude/scripts/dashboard-template.html     committed — the page: CSS, layout, rendering JS
@@ -137,9 +190,11 @@ so a new probe needs a matching branch in the template's script to appear on the
 You can open `.claude/state/dashboard.html` straight from disk in a browser; publishing is
 only what makes it reachable from elsewhere.
 
-`/mesa-status` publishes it to the URL in `.claude/state/artifact-url.txt` (gitignored, so
-each person gets their own page) rather than spawning a new artifact each time. Publishing
-to an artifact a conversation has not read requires an `action: "read"` first.
+`/mesa-status` publishes it to the URL that `mesa-status.py --artifact-url` prints (kept in
+the git common dir, so each person's clone has its own page and all its worktrees share
+it) rather than spawning a new artifact each time. The first run migrates a URL from the
+old `.claude/state/artifact-url.txt`. Publishing to an artifact a conversation has not read
+requires an `action: "read"` first.
 
 It is a **snapshot with the data inlined**, not a live view: a published artifact can only
 reach claude.ai connectors, and there is no GitHub connector, so it cannot query the repo
