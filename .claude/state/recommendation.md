@@ -1,11 +1,11 @@
-**Review #102 next.** It is the only open PR that changes package behaviour (drops MEDIPS
-from `calculateEnrichment`, fixes #81), and its CI is green. The tooling PRs can follow.
+**Decide #34 (keep or remove `mesaPCA`/`mesaUMAP`) by ~1 Oct.** It starts the longest chain
+in Wave 2: #34 → #115/#116 → #117 → the 0.99.8 cut, due ~9 Oct. Until it is decided, a Claude
+session can start #129, #118 or #120, which depend on nothing.
 
-Two standing signals, neither urgent:
+Two standing signals:
 
-- **Coverage is well below target.** 48.45% against the 80% in `AGENTS.md`, and Codecov last
-  heard from us on 2026-06-17. Uploads run only when a push touches `R/`, `tests/`,
-  `vignettes/`, `inst/`, `DESCRIPTION` or `NAMESPACE`, so part of the gap is expected.
-- **The single BiocCheck ERROR is benign.** "Invalid package Version" is BiocCheck objecting
-  to the four-part devel version `0.99.6.9000`; it clears when the cycle is cut to `0.99.7`.
-  Do not "fix" it.
+- **Land #114 (tiered CI) before the Wave 2 PRs open.** It cuts a PR check from about 58 to
+  about 15 minutes, and Wave 2 holds eight PRs. It is a draft that has to be updated from
+  `main` first.
+- **#108 → #110 also blocks 0.99.8.** Both wait on a fresh review, and their failing checks
+  are Codecov upload errors, not test failures.
