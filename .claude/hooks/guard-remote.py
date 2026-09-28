@@ -59,6 +59,15 @@ GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "-
 # Same for `git push`, so an option's value is not read as the remote or a ref.
 PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--exec"}
 
+# Commands that run the command after them. The rules follow gh or git behind
+# them (`env FOO=1 gh pr merge`, `sudo git push`, `xargs gh pr merge`), and
+# into the string a shell -c or eval runs.
+WRAPPERS = {"env", "command", "builtin", "exec", "nohup", "time", "nice", "timeout",
+            "sudo", "xargs", "stdbuf", "caffeinate"}
+SHELLS = {"bash", "sh", "zsh", "dash", "ksh"}
+# Beyond this many levels of bash -c / eval / $( ) the command is refused.
+MAX_DEPTH = 5
+
 # `gh api` reaches every endpoint `gh pr` does, so the same four rules have to
 # hold there or the contract is one flag away from being bypassed. Matched on
 # the endpoint rather than the method: the path is what names the action.
@@ -210,6 +219,25 @@ def check_branch_deletion(branches, remote, what="delete branch", exempt=None):
     return Ask(what)
 
 
+def substitutions(command):
+    """Commands run inside $( ), <( ), >( ) or backticks, at every depth.
+
+    Read on the raw text, even inside quotes: a false match costs only a
+    check of harmless text, a missed one lets a merge through unseen.
+    """
+    found = re.findall(r"`([^`]*)`", command)
+    for start in [m.end() for m in re.finditer(r"[$<>]\(", command)]:
+        depth = 1
+        for end in range(start, len(command)):
+            depth += {"(": 1, ")": -1}.get(command[end], 0)
+            if depth == 0:
+                found.append(command[start:end])
+                break
+        else:
+            found.append(command[start:])
+    return found
+
+
 def split_segments(command):
     """Split a shell command into separately-executed segments."""
     return [s for s in re.split(r"\|\||&&|;|\n|\||&", command) if s.strip()]
@@ -223,17 +251,55 @@ def tokenise(segment):
         return segment.split()
 
 
+def command_tokens(tokens):
+    """The tokens from the command that actually runs.
+
+    Drops `VAR=value` prefixes, a subshell's brackets, and wrappers such as
+    env, sudo, timeout or xargs (with their options), so `FOO=1 gh pr merge`
+    is judged as `gh pr merge`.
+    """
+    tokens = list(tokens)
+    if tokens and tokens[0][:1] in ("(", "{", "!"):
+        tokens[0] = tokens[0].lstrip("({! ")
+        if tokens[-1].endswith((")", "}")):
+            tokens[-1] = tokens[-1].rstrip(")} ;")
+        tokens = [t for t in tokens if t]
+    known = WRAPPERS | SHELLS | {"gh", "git", "eval"}
+    while tokens:
+        name = os.path.basename(tokens[0])
+        if re.match(r"[A-Za-z_][A-Za-z0-9_]*=", tokens[0]):
+            tokens = tokens[1:]
+        elif name in WRAPPERS:
+            # A wrapper's own options and values come first; the command is
+            # the first known program after it.
+            nxt = next((n for n, t in enumerate(tokens[1:], 1)
+                        if os.path.basename(t) in known), None)
+            if nxt is None:
+                return tokens
+            tokens = tokens[nxt:]
+        else:
+            return tokens
+    return tokens
+
+
+def gh_positionals(tokens):
+    """gh's subcommand words, skipping `-R/--repo <repo>` wherever it sits."""
+    out, i = [], 1
+    while i < len(tokens):
+        if tokens[i] in ("-R", "--repo"):
+            i += 2
+            continue
+        if not tokens[i].startswith("-"):
+            out.append(tokens[i])
+        i += 1
+    return out
+
+
 def git_subcommand(tokens):
     """Return (subcommand, remaining_args) for a git invocation, else (None, [])."""
-    if not tokens:
+    if not tokens or os.path.basename(tokens[0]) != "git":
         return None, []
-    # Strip a leading `env FOO=bar` or absolute path to git.
-    i = 0
-    while i < len(tokens) and ("=" in tokens[i] and not tokens[i].startswith("-")):
-        i += 1
-    if i >= len(tokens) or os.path.basename(tokens[i]) != "git":
-        return None, []
-    i += 1
+    i = 1
     while i < len(tokens):
         tok = tokens[i]
         if tok in GIT_OPTS_WITH_VALUE:
@@ -283,9 +349,8 @@ def gh_api_endpoint(tokens):
     (`-f body='... /pulls/1/merge ...'`) is not mistaken for one.
     """
     try:
-        i = next(n for n, t in enumerate(tokens) if not t.startswith("-")
-                 and os.path.basename(t) != "gh") + 1
-    except StopIteration:
+        i = tokens.index("api") + 1
+    except ValueError:
         return None
     while i < len(tokens):
         tok = tokens[i]
@@ -447,6 +512,8 @@ def gh_pr_target(tokens):
                 args += [tok, tokens[i + 1]]
             i += 2
             continue
+        if tok.startswith("--repo="):
+            args.append(tok)
         if not tok.startswith("-"):
             seen.append(tok)
         i += 1
@@ -487,15 +554,33 @@ def current_branch():
         return None
 
 
-def check_segment(segment):
-    """Return a refusal message for this segment, or None to allow it."""
-    tokens = tokenise(segment)
+def check_nested(command, depth):
+    """Judge a command that bash -c or eval runs, as one segment's verdict."""
+    block, asks = evaluate(command, depth + 1)
+    if block:
+        return block
+    return Ask("; ".join(dict.fromkeys(asks))) if asks else None
+
+
+def check_segment(segment, depth=0):
+    """Return a refusal message for this segment, an Ask, or None to allow it."""
+    tokens = command_tokens(tokenise(segment))
     if not tokens:
+        return None
+    program = os.path.basename(tokens[0])
+
+    # --- a shell running a string: judge the string ------------------------
+    if program == "eval":
+        return check_nested(" ".join(tokens[1:]), depth)
+    if program in SHELLS:
+        for n, tok in enumerate(tokens[1:-1], 1):
+            if re.fullmatch(r"-[A-Za-z]*c[A-Za-z]*", tok):
+                return check_nested(tokens[n + 1], depth)
         return None
 
     # --- gh ---------------------------------------------------------------
-    if os.path.basename(tokens[0]) == "gh":
-        rest = [t for t in tokens[1:] if not t.startswith("-")]
+    if program == "gh":
+        rest = gh_positionals(tokens)
         if rest[:1] == ["api"]:
             return check_gh_api(tokens)
         if rest[:2] in (["pr", "merge"], ["pr", "close"]):
@@ -579,6 +664,25 @@ def check_segment(segment):
     return None
 
 
+def evaluate(command, depth=0):
+    """(refusal, asks) for a whole command line, nested commands included."""
+    if depth > MAX_DEPTH:
+        return "Commands nested this deeply cannot be checked, so this is refused.", []
+    asks = []
+    for segment in split_segments(command):
+        message = check_segment(segment, depth)
+        if isinstance(message, Ask):
+            asks.append(message.what)
+        elif message:
+            return message, []
+    for inner in substitutions(command):
+        message, more = evaluate(inner, depth + 1)
+        if message:
+            return message, []
+        asks += more
+    return None, asks
+
+
 def main():
     try:
         payload = json.load(sys.stdin)
@@ -595,19 +699,15 @@ def main():
     if not command:
         return 0
 
-    asks = []
-    for segment in split_segments(command):
-        message = check_segment(segment)
-        if isinstance(message, Ask):
-            asks.append(message.what)
-        elif message:
-            print(
-                f"Blocked by mesa's workflow contract (AGENTS.md):\n  {message}\n\n"
-                f"Command: {command.strip()[:300]}\n\n"
-                "Do not work around this — report it to the human instead.",
-                file=sys.stderr,
-            )
-            return 2
+    message, asks = evaluate(command)
+    if message:
+        print(
+            f"Blocked by mesa's workflow contract (AGENTS.md):\n  {message}\n\n"
+            f"Command: {command.strip()[:300]}\n\n"
+            "Do not work around this — report it to the human instead.",
+            file=sys.stderr,
+        )
+        return 2
     if asks and payload.get("permission_mode") not in PROMPTING_MODES:
         mode = payload.get("permission_mode") or "unknown"
         print(

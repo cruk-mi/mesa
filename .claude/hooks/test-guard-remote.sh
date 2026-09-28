@@ -274,6 +274,54 @@ ask_check 'git push -dq origin feat/merged' "'feat/merged'"
 ask_check 'git push -o ci.skip origin --delete feat/merged' "'feat/merged'"
 check 0 'git push -o ci.skip origin chore/agent-setup'
 
+# --- wrappers, prefixes and nested shells -------------------------------
+# The rules follow the command wherever it actually runs: behind VAR=x, env,
+# sudo, timeout or xargs; with gh's -R before or after `pr`; inside bash -c,
+# sh -c or eval; and in $( ), backticks or a subshell.
+for cmd in \
+    'FOO=1 gh pr merge 102' \
+    'env gh pr merge 102' \
+    'env -i FOO=1 gh pr merge 102' \
+    'command gh pr merge 102' \
+    'timeout 30 gh pr merge 102' \
+    'echo 102 | xargs gh pr merge' \
+    '/opt/homebrew/bin/gh pr merge 102' \
+    'gh -R cruk-mi/mesa pr merge 102' \
+    'gh pr -R cruk-mi/mesa merge 102' \
+    'gh --repo=cruk-mi/mesa pr merge 102' \
+    'bash -c "gh pr merge 102"' \
+    "sh -c 'gh pr merge 102'" \
+    'bash -lc "gh pr merge 102"' \
+    'eval gh pr merge 102' \
+    "eval 'gh pr merge 102'" \
+    'echo $(gh pr merge 102)' \
+    'echo `gh pr merge 102`' \
+    '(gh pr merge 102)'
+do ask_check "$cmd"; done
+for cmd in \
+    'env git push origin main' \
+    'sudo git push origin main' \
+    'nohup git push --force origin x' \
+    'bash -c "git push origin main"' \
+    'sh -c "gh pr ready 102"' \
+    'zsh -c "gh pr merge 108 -d"' \
+    'eval "git push --force origin x"' \
+    'echo $(git push origin main)' \
+    'x=`git push origin main`' \
+    'cat <(git push origin :main)' \
+    'bash -c "bash -c \"git push origin main\""' \
+    'bash -c "gh pr merge 102" && git push origin main' \
+    'gh -R cruk-mi/mesa pr ready 102' \
+    'gh -R cruk-mi/mesa pr merge 108 --delete-branch' \
+    'gh pr -R cruk-mi/mesa review 102 --approve' \
+    'FOO=1 gh pr edit 104 --ready'
+do check 2 "$cmd"; done
+for cmd in \
+    'bash -c "git status"' \
+    'echo $(git rev-parse HEAD)' \
+    'env FOO=1 git push origin chore/agent-setup' \
+    'gh -R cruk-mi/mesa pr view 102'
+do check 0 "$cmd"; done
 # --- permission modes -------------------------------------------------
 # An "ask" is only a safeguard if a human sees it. bypassPermissions approves
 # it automatically, auto may, and dontAsk denies it silently; a payload with
@@ -298,6 +346,7 @@ for mode in bypassPermissions auto dontAsk -; do
     mode_check "$mode" 0 'git status'
     mode_check "$mode" 0 'git push origin chore/agent-setup'
 done
+mode_check bypassPermissions 2 'bash -c "gh pr merge 102"'
 for mode in default acceptEdits plan; do
     ask=$(printf '%s' 'gh pr merge 102' | MODE="$mode" payload | "$PY" "$hook" 2>/dev/null)
     printf '%s' "$ask" | grep -q '"ask"' || { echo "FAIL (mode $mode did not ask)"; fails=$((fails + 1)); }
