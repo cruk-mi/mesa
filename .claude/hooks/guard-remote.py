@@ -7,27 +7,36 @@ mechanically so the contract does not depend on the model remembering it.
 
 Blocked:
   * any push that targets a protected branch (main / dev / master)
-  * force pushes, --mirror and --all
+  * force pushes, --mirror, --all, --prune and wildcard refspecs
   * committing or merging while HEAD is on a protected branch
   * gh pr ready / review --approve
-  * the same actions reached through `gh api`
-  * deleting a protected branch, or a branch an open PR uses as its base
-    (deleting it would close that PR instead of retargeting it)
-  * deleting tags
+  * the same actions reached through `gh api`, plus the ref and merge
+    endpoints whose target cannot be checked (deleteRef, updateRefs,
+    mergeBranch, POST .../merges)
+  * deleting a protected branch or any tag, however the ref is spelled
+  * deleting a remote branch that an open PR uses as its head or its base
+    (deleting it would close that PR), or one that cannot be checked
+  * any merge or deletion when the permission mode would not show the human
+    a prompt (bypassPermissions, auto, dontAsk, or no mode given)
 
 Asked, not blocked:
   * merging a pull request (`gh pr merge`, or the same through `gh api`).
   * deleting any other branch (`git branch -d/-D`, `git push --delete`,
-    `gh pr merge --delete-branch`, or the same through `gh api`).
+    `gh pr merge|close --delete-branch`, or the same through `gh api`).
   AGENTS.md allows these only when the human explicitly approves or asks, so
   the hook returns a permission "ask": Claude Code shows the command and the
-  human confirms each one.
+  human confirms each one. The prompt names the PR and the branch.
 
 The command is split on shell separators and tokenised, so each segment is
 judged on its own. That matters: `git push --dry-run origin main && git push
 origin main` must not be waved through because the first half is harmless, and
 `git -C /repo push origin main` must not slip past because `git` and `push` are
-not adjacent.
+not adjacent. Each segment is judged from the command that actually runs, past
+`VAR=x`, `env`, `sudo` and similar wrappers, and the strings that `bash -c`,
+`eval`, `$( )` and backticks run are judged as commands of their own.
+
+The remote checks ask `gh` (one `gh pr list`, a `gh pr view` and a tag lookup
+per branch); if any of them fails, the deletion is refused rather than asked.
 
 Exit codes: 0 = allow, 2 = block (stderr is shown to the agent). A merge or a
 safe branch deletion exits 0 with a PreToolUse "ask" decision on stdout.

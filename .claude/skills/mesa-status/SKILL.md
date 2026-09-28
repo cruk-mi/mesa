@@ -101,7 +101,8 @@ state, not from git — and a finished PR only vouches for the commit it ended o
 branch whose tip has moved past its PR's head is listed as unknown, not prunable. The output is a ready-to-paste `git branch -D` / `git push --delete`
 block for the human to run. Per `AGENTS.md`, an agent deletes a branch only with the
 human's explicit approval and only when it is safe. `guard-remote.py` enforces this: it
-asks the human to confirm, and it refuses a branch that an open PR uses as its base.
+asks the human to confirm, and it refuses a branch that an open PR uses as its head or
+base.
 
 ## Adding a signal
 

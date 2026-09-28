@@ -48,8 +48,10 @@ pull request and decides when anything merges.
   - no open PR uses it as its base, or those PRs have been retargeted to `main` first
     (`gh pr edit N --base main`). Otherwise deleting it closes those PRs instead of
     retargeting them.
-  This covers `git branch -d/-D`, `git push --delete` and `gh pr merge --delete-branch`.
-  The hook asks the human to confirm each deletion and refuses the unsafe ones.
+  This covers `git branch -d/-D`, `git push --delete` and `gh pr merge|close
+  --delete-branch`. The hook asks the human to confirm each deletion. It refuses a
+  protected branch or a tag in any spelling, a remote branch that is the head or the base
+  of an open PR, and a remote branch it cannot check.
 - You may **never** push or force-push to `main`, delete tags, or rewrite published
   history.
 - When in doubt about an irreversible or outward-facing action, ask first.
@@ -59,8 +61,10 @@ pull request and decides when anything merges.
 These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
 as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
 approval through the raw API is treated the same way. A merge or a safe branch deletion is
-not blocked but raised as a permission prompt, so the human confirms each one. If the hook and this file ever
-disagree, that is a bug — fix both.
+not blocked but raised as a permission prompt, so the human confirms each one. In a
+permission mode that shows no prompt (`bypassPermissions`, `auto`, `dontAsk`), the hook
+blocks it instead: the human runs it. If the hook and this file ever disagree, that is a
+bug — fix both.
 
 ---
 

@@ -749,7 +749,7 @@ def render(state):
         if prunable:
             out += ["Safe to prune (landed or closed without merging). Run these yourself, or "
                     "ask an agent: it deletes only with your approval, and never a branch "
-                    "an open PR is based on.", "", "```bash"]
+                    "an open PR still uses.", "", "```bash"]
             # A git ref may contain ; $ ` & | ( ), all of which a shell acts on.
             # This block is meant to be pasted into one, so every name is quoted
             # and `--` ends the option list.
