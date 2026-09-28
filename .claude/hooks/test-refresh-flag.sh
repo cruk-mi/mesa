@@ -199,6 +199,18 @@ finally:
         sys.modules.pop("tomllib", None)
     else:
         sys.modules["tomllib"] = saved
+
+# CRLF: github.com edits come back with \r\n line endings.
+if needs_toml("CRLF body"):
+    crlf = live_body().replace("\n", "\r\n")
+    roadmap, body = roadmap_for(crlf)
+    if roadmap is None:
+        fail(f"CRLF body: roadmap unknown: {ms.DEGRADED}")
+    else:
+        current = ms.compose_issue_body(live_body(), ms.render_roadmap_issue(roadmap), None)
+        verdict = ms.sync_issue(roadmap, current.replace("\n", "\r\n"), None, True, None)
+        if "already current" not in verdict:
+            fail(f"CRLF body that is current: {verdict!r}")
 PYEOF
 )"
 while IFS= read -r line; do

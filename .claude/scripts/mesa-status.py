@@ -680,7 +680,8 @@ def collect_branches():
 
 GEN_START, GEN_END = "<!-- roadmap:generated:start -->", "<!-- roadmap:generated:end -->"
 DATA_START, DATA_END = "<!-- roadmap:data:start -->", "<!-- roadmap:data:end -->"
-TOML_FENCE = re.compile(r"```toml[ \t]*\n(.*?)\n```", re.S)
+# \r?: bodies saved from the github.com editor come back with CRLF line endings.
+TOML_FENCE = re.compile(r"```toml[ \t]*\r?\n(.*?)\r?\n```", re.S)
 
 # The five statuses, in the order the page lists them. Each names where an
 # item *is*, never an action: "delete" could mean done or to-do, "In review"
@@ -1053,6 +1054,8 @@ def sync_issue(roadmap, old_body, page_url, dry_run, seed_toml):
     """Rewrite #124 when its generated half is out of date. Returns a verdict."""
     if roadmap is None:
         return "roadmap unknown - #124 left alone"
+    # A github.com edit saves CRLF; compare in LF, or every run looks like a change.
+    old_body = None if old_body is None else old_body.replace("\r\n", "\n")
     toml_text = seed_toml if seed_toml is not None else (
         None if old_body and DATA_START in old_body else roadmap["toml"])
     generated = render_roadmap_issue(roadmap, page_url)
