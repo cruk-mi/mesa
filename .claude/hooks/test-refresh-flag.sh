@@ -211,6 +211,29 @@ if needs_toml("CRLF body"):
         verdict = ms.sync_issue(roadmap, current.replace("\n", "\r\n"), None, True, None)
         if "already current" not in verdict:
             fail(f"CRLF body that is current: {verdict!r}")
+
+# TOML that parses but has the wrong shape degrades; it never raises.
+BAD_SHAPES = {
+    "refs = 5": TOML.replace("refs = [10]", "refs = 5"),
+    'wave = "w1" at the top': 'wave = "w1"\n[[item]]\nwave = "w1"\ntitle = "x"\n',
+    "a single [wave] table": '[wave]\nid = "w1"\n[[item]]\nwave = "w1"\ntitle = "x"\n',
+    "wave without id, item without wave": '[[wave]]\nname = "W"\n[[item]]\ntitle = "x"\n',
+    'after = "x"': TOML.replace('after = ["10"]', 'after = "10"'),
+    'check = "tag:v1"': TOML.replace('check = ["branch-gone:old"]', 'check = "tag:v1"'),
+    'release = "0.99.8"': 'release = "0.99.8"\n' + TOML,
+    "title = 5": TOML.replace('title = "Fix A"', "title = 5"),
+}
+for name, text in BAD_SHAPES.items():
+    if not needs_toml(f"bad shape: {name}"):
+        break
+    ms.DEGRADED.clear()
+    try:
+        if ms.parse_roadmap(text) is not None:
+            fail(f"bad shape passed validation: {name}")
+        elif not ms.DEGRADED:
+            fail(f"bad shape gave no reason: {name}")
+    except Exception as exc:  # the bug: a traceback aborts the whole refresh
+        fail(f"bad shape raised {type(exc).__name__}: {name}")
 PYEOF
 )"
 while IFS= read -r line; do

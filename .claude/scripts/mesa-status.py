@@ -749,10 +749,30 @@ def parse_roadmap(text):
     except tomllib.TOMLDecodeError as exc:
         degrade(f"roadmap TOML in #{ROADMAP_ISSUE} does not parse ({exc})")
         return None
-    waves = data.get("wave") or []
-    items = data.get("item") or []
-    wave_ids = [w.get("id") for w in waves]
     problems = []
+    tables = {}
+    # Shape first: everything below and in collect_roadmap() indexes into these.
+    for name in ("wave", "item", "release"):
+        value = data.get(name) or []
+        if not (isinstance(value, list) and all(isinstance(v, dict) for v in value)):
+            problems.append(f"`{name}` must be [[{name}]] tables")
+            value = []
+        tables[name] = value
+    waves, items = tables["wave"], tables["item"]
+    wave_ids = [w.get("id") for w in waves]
+    if not all(isinstance(wave_id, str) for wave_id in wave_ids):
+        problems.append("every [[wave]] needs a string `id`")
+    for index, item in enumerate(items):
+        for field in ("refs", "after", "check"):
+            if not isinstance(item.get(field, []), list):
+                problems.append(f"item {index + 1}'s `{field}` must be a list")
+                item[field] = []
+        for field in ("title", "wave", "waiting_on"):
+            if field in item and not isinstance(item[field], str):
+                problems.append(f"item {index + 1}'s `{field}` must be a string")
+    if problems:
+        degrade("roadmap TOML is inconsistent: " + "; ".join(problems[:4]))
+        return None
     keys = set()
     for index, item in enumerate(items):
         refs = item.get("refs") or []
@@ -1429,7 +1449,12 @@ def main():
         "pkgdown": collect_pkgdown(),
         "branches": collect_branches(),
     }
-    roadmap, issue_body = collect_roadmap(args.roadmap_file)
+    try:
+        roadmap, issue_body = collect_roadmap(args.roadmap_file)
+    except (TypeError, AttributeError, KeyError, ValueError) as exc:
+        # parse_roadmap() checks the shape; this is the net for what it misses.
+        degrade(f"roadmap data has an unexpected shape ({type(exc).__name__}: {exc})")
+        roadmap, issue_body = None, None
     seed_toml = roadmap.pop("toml") if roadmap else None
     state["roadmap"] = roadmap
     sync_verdict = None
