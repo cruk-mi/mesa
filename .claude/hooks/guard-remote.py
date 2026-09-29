@@ -555,9 +555,10 @@ def check_gh_graphql(tokens):
                 "cannot be checked. Use git push (or git push origin --delete <branch>).")
     if not re.search(r"\bmutation\b", text):
         return None  # a query only reads
-    # Every field called with arguments must be a known-safe mutation. A
-    # nested field with arguments, or an operation name, only costs an ask.
-    body = re.sub(r"\bmutation\s+\w+", "mutation", text)
+    # Every field called with arguments must be a known-safe mutation. The
+    # operation name and variable definitions (`mutation Name($t: ID!)`) are
+    # dropped first; a nested field with arguments only costs an ask.
+    body = re.sub(r"\bmutation\b\s*\w*\s*(\([^)]*\))?", "mutation", text)
     unknown = set(re.findall(r"\b([A-Za-z_]\w*)\s*\(", body)) - GH_GRAPHQL_SAFE_MUTATIONS
     if unknown or not re.search(r"\w\s*\(", body):
         return Ask("run the GraphQL mutation " + ", ".join(sorted(unknown) or ["?"])

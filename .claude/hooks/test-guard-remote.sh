@@ -242,6 +242,11 @@ for cmd in \
 do check 2 "$cmd"; done
 ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/1/comments/../merge'
 check 0 'gh api https://api.github.com/repos/cruk-mi/mesa/pulls/106'
+# A mutation with variables is judged by its fields, not its header.
+check 0 "gh api graphql -f query='mutation(\$id:ID!){resolveReviewThread(input:{threadId:\$id}){thread{id}}}' -f id=X"
+check 0 "gh api graphql -f query='mutation Resolve(\$id: ID!) { resolveReviewThread(input:{threadId:\$id}) { thread { id } } }' -f id=X"
+ask_check "gh api graphql -f query='mutation(\$id:ID!){closePullRequest(input:{pullRequestId:\$id}){clientMutationId}}' -f id=X" 'closePullRequest'
+check 2 "gh api graphql -f query='mutation(\$id:ID!){deleteRef(input:{refId:\$id}){clientMutationId}}' -f id=X"
 
 # gh api writes are allow-listed: the writes an agent is meant to make pass,
 # any other write is asked, whatever its spelling.
