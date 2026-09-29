@@ -19,6 +19,7 @@ bash .devcontainer/resolve_versions.sh
 # R_VERSION_FULL=4.6.0
 # BIOC_VERSION=3.23
 # BIOC_RELEASE=RELEASE_3_23
+# ROXYGEN_VERSION=8.1.0
 ```
 
 It is deliberately dependency-free — curl, grep, sed and POSIX awk only, no gawk
@@ -46,7 +47,7 @@ it only changes when the base image does — and when it does, **both** files ne
 | Workflow | Purpose |
 |---|---|
 | `check-bioc.yml` | The authoritative check. biocthis-generated (`biocthis::use_bioc_github_action()`), runs `R CMD check` + `BiocCheck` across platforms, plus covr and pkgdown on `main`. Triggered by changes to `R/`, `tests/`, `vignettes/`, `inst/`, `DESCRIPTION`, `NAMESPACE`, and by any PR. |
-| `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. ~20–40 min. |
+| `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. On a PR that touches `.devcontainer/**` or the workflow it only builds (no login, push or cache write), so a broken image fails the PR, not `main`. ~20–40 min. |
 
 Because `check-bioc.yml` is biocthis-generated, prefer regenerating or making surgical
 edits over rewriting it — gratuitous divergence from upstream makes future biocthis updates
@@ -62,14 +63,28 @@ the package list is never hand-maintained. The `slim`/`full` split is the single
 `full_only` list in that file; `slim` omits heavy genome/annotation packages, so
 data-dependent tests skip there (see `mesa-tests`).
 
-Genuine extras are installed separately. GitHub-only packages (`ggtree`, `immunedeconv`)
-are **pinned to explicit SHAs** for reproducibility — keep that pattern for anything
-installed from GitHub.
+Genuine extras (IDE and dev tooling, pinned roxygen2) are installed after the declared
+dependencies. The image installs **nothing from GitHub**: `ggtree` (needed via ChIPseeker →
+enrichplot) comes from Bioconductor with the rest of the stack. If a GitHub-only package is
+ever genuinely needed, pin it to a SHA and fetch it as a
+`github.com/<repo>/archive/<sha>.tar.gz` archive — **never through the GitHub API**
+(`install_github()`, or `Remotes:` resolution). Anonymous API calls are capped at 60/hour
+per IP and shared runners exhaust them, and a token would put the workflow's
+`packages: write` credential in reach of third-party install code. #127 has a worked
+example (`install_github.R`, since removed).
 
 Note that the extras loop installs only when a package is **absent**
 (`if (!requireNamespace(pkg))`), so it will not correct an image that already carries a
 wrong version. Anything that needs a specific version must compare `packageVersion()` and
-reinstall on mismatch, not merely check presence.
+reinstall on mismatch, not merely check presence — that is what the roxygen2 block just
+below it does.
+
+**roxygen2 is pinned.** `resolve_versions.sh` emits `ROXYGEN_VERSION` from `DESCRIPTION`'s
+`Config/roxygen2/version` (falling back to the pre-8.0 `RoxygenNote`), `install.R` installs
+exactly that version, and the `roxygen-drift` job in `check-bioc.yml` regenerates the docs
+with it and fails on any diff. The job deliberately does **not** use the latest roxygen —
+otherwise every upstream release would turn it red and it would become the churn it exists
+to prevent. Upgrading roxygen2 is a one-line `DESCRIPTION` edit, in its own PR.
 
 ## Upgrading R or Bioconductor
 

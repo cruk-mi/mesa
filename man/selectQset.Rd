@@ -11,7 +11,7 @@ selectQset(qseaSet, ...)
 A qseaSet object whose \code{sampleTable} columns will be selected or renamed.}
 
 \item{...}{Additional arguments passed to \code{\link[dplyr:select]{dplyr::select()}}. Supports tidyselect helpers
-(e.g., \code{\link[dplyr:reexports]{dplyr::matches()}}, \code{\link[dplyr:reexports]{dplyr::starts_with()}}) and renaming
+(e.g., \code{\link[dplyr:matches]{dplyr::matches()}}, \code{\link[dplyr:starts_with]{dplyr::starts_with()}}) and renaming
 (\code{newName = oldName}). Negative selection is supported, but \code{sample_name}
 and \code{group} cannot be removed.
 \strong{Default:} none.}
@@ -49,5 +49,5 @@ exampleTumourNormal \%>\%
 }
 \seealso{
 \code{\link[=select.qseaSet]{select.qseaSet()}} for the dplyr S3 method,
-\code{\link[qsea:qseaSet-class]{qsea::getSampleTable()}} to inspect the updated table.
+\code{\link[qsea:getSampleTable]{qsea::getSampleTable()}} to inspect the updated table.
 }

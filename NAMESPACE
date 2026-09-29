@@ -102,14 +102,18 @@ exportMethods(getMart)
 exportMethods(setMart)
 import(qsea)
 importFrom(BiocGenerics,colnames)
-importFrom(dplyr,arrange)
-importFrom(dplyr,filter)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,pull)
-importFrom(dplyr,select)
+importFrom(dplyr,
+  arrange,
+  filter,
+  left_join,
+  mutate,
+  pull,
+  select
+)
 importFrom(glue,glue)
 importFrom(magrittr,"%>%")
 importFrom(rlang,":=")
-importFrom(tibble,column_to_rownames)
-importFrom(tibble,rownames_to_column)
+importFrom(tibble,
+  column_to_rownames,
+  rownames_to_column
+)

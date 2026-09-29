@@ -73,7 +73,7 @@ A \code{qseaGLM} object containing:
 }
 \description{
 Fit a negative-binomial GLM using \code{\link[qsea:fitNBglm]{qsea::fitNBglm()}} on counts from a
-\link[qsea:qseaSet-class]{qsea::qseaSet}, and add one or more contrasts.
+\link[qsea:qseaSet]{qsea::qseaSet}, and add one or more contrasts.
 This is the low-level worker used by \code{\link[=calculateDMRs]{calculateDMRs()}}.
 }
 \details{
@@ -93,9 +93,9 @@ fitQseaGLM(qs, variable = "type", contrasts = contr)
 
 }
 \seealso{
-Other DMR-detection: 
-\code{\link{calculateDMRs}()},
-\code{\link{getDMRsData}()},
-\code{\link{makeAllContrasts}()}
+Other DMR-detection:
+\code{\link[=calculateDMRs]{calculateDMRs()}},
+\code{\link[=getDMRsData]{getDMRsData()}},
+\code{\link[=makeAllContrasts]{makeAllContrasts()}}
 }
 \concept{DMR-detection}

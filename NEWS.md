@@ -1,4 +1,48 @@
-# mesa 0.99.6.9000
+# mesa 0.99.7.9000
+
+## Infrastructure
+- The devcontainer image no longer installs `immunedeconv` (with its GitHub
+  dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
+  Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,
+  so it no longer needs the pinned archives and SHA check added in 0.99.7.
+  ([#132](https://github.com/cruk-mi/mesa/pull/132))
+
+# mesa 0.99.7
+
+## Bug fixes
+- `calculateCGEnrichment()` no longer depends on `MEDIPS`: reads are imported
+  with `Rsamtools` and CpGs located with `Biostrings`. This fixes a crash in a
+  fresh session (`could not find function "strand<-"`) and silent read loss on
+  chromosomes longer than 2^29 bp. Read counts are otherwise unchanged.
+  ([#81](https://github.com/cruk-mi/mesa/issues/81),
+  [#102](https://github.com/cruk-mi/mesa/pull/102))
+- `calculateCGEnrichment()` now errors on a `chr.select` entry absent from the
+  BSgenome instead of returning no reads.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+
+## Other changes
+- `uniq` now accepts only `0` (keep all reads) or `1` (one read per location);
+  the unused p-value form is removed.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- With `chr.select = NULL`, CpGs are located only on chromosomes that carry
+  reads, which is much faster on genomes with many scaffolds (e.g. hg19).
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+- `MEDIPS` removed from `Suggests`.
+  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+
+## Infrastructure
+- Pinned roxygen2 via `Config/roxygen2/version` in `DESCRIPTION`; the
+  devcontainer installs that exact version. Regenerated `man/` and `NAMESPACE`
+  with roxygen2 8.1.0 (link anchors and `importFrom()` formatting only).
+  ([#105](https://github.com/cruk-mi/mesa/pull/105))
+- Added a `roxygen-drift` CI job that fails when `man/` or `NAMESPACE` is out
+  of sync with the roxygen comments in `R/`.
+  ([#105](https://github.com/cruk-mi/mesa/pull/105))
+- The devcontainer image build installs its GitHub-only packages from pinned
+  archives instead of the rate-limited GitHub API, fixing its rate-limit
+  failures, and fails if any of them does not install at its pinned SHA.
+  Pull requests that change the devcontainer now build it (without pushing).
+  ([#127](https://github.com/cruk-mi/mesa/pull/127))
 
 ## Documentation
 - Rewrote the README: status badges for CI, coverage, licence and lifecycle; a
