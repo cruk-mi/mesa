@@ -79,9 +79,12 @@ this checklist, and do not open phase 1 until they confirm step 2 is done:
    gh release view vX.Y.(Z+1) --repo cruk-mi/mesa                     # tarball attached
    ```
 
-   If `verify` fails, the tag is on the wrong commit or the bump is incomplete. If
-   `runiverse` fails, fix it in a new patch release. Don't move the tag: a moved tag starts
-   a new run, and the old one refuses to publish.
+   A failed run has published nothing, so the fix is to re-tag. If `verify` fails, the tag
+   is on the wrong commit or the bump is incomplete. If `runiverse` or `build` fails, fix
+   it on `main` first. Then move the tag to the right commit
+   (`git tag -f -a vX.Y.(Z+1) <commit> -m …` and `git push -f origin vX.Y.(Z+1)`), which
+   starts a fresh run. Never move a tag while its run is still going: that run refuses to
+   publish, and only the new one releases.
 
 2. **Push to Bioconductor.** During review, Bioconductor builds from the `devel` branch of
    [`BiocStaging/mesa`](https://github.com/BiocStaging/mesa), not from
