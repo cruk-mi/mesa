@@ -196,6 +196,29 @@ check 0 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input $rfile"
 check 0 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=COMMENT"
 rm -f "$rfile"
 
+# gh sends POST when --input is given, and the last -X wins; GitHub decodes
+# the path (%6Dain is main) and reads +1 as 1; a JSON --input body is decoded
+# before GraphQL reads it. Each check must see what is actually sent.
+jfile="$(mktemp)"
+printf '{"base":"main","head":"feat/x"}' >"$jfile"
+check 2 "gh api repos/cruk-mi/mesa/merges --input $jfile"
+printf '{"event":"APPROVE"}' >"$jfile"
+check 2 "gh api repos/cruk-mi/mesa/pulls/1/reviews --input $jfile"
+printf '{"query":"mutation{\\u0064eleteRef(input:{refId:\\"X\\"}){clientMutationId}}"}' >"$jfile"
+check 2 "gh api graphql --input $jfile"
+printf '{"query":"mutation{\\u006dergePullRequest(input:{pullRequestId:\\"X\\"}){clientMutationId}}"}' >"$jfile"
+ask_check "gh api graphql --input $jfile"
+rm -f "$jfile"
+for cmd in \
+    'gh api -X GET -X DELETE repos/cruk-mi/mesa/git/refs/tags/v0.99.6' \
+    'gh api --method GET -X POST repos/cruk-mi/mesa/pulls/1/reviews -f event=APPROVE' \
+    'gh api -X GET -X PATCH repos/cruk-mi/mesa/pulls/1 -F draft=false' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/%64ev' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/stacked%2Dbase' \
+    'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/%6Dain -f sha=abc'
+do check 2 "$cmd"; done
+ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/+138/merge'
+
 # --- must be allowed -------------------------------------------------
 for cmd in \
     'git push origin chore/agent-setup' \

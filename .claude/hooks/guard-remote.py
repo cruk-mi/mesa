@@ -419,20 +419,26 @@ def gh_api_endpoint(tokens):
             continue
         # Drop any query string or fragment: the patterns below are anchored
         # at the end of the path, so `.../merge?` would otherwise slip past.
-        return re.split(r"[?#]", tok, maxsplit=1)[0]
+        # GitHub decodes the path (`heads/%64ev` is dev) and reads `+1` as 1,
+        # so every check sees the path the way GitHub does.
+        path = urllib.parse.unquote(re.split(r"[?#]", tok, maxsplit=1)[0])
+        return re.sub(r"/\+(?=\d)", "/", path)
     return None
 
 
 def gh_api_method(tokens):
     """The HTTP method a `gh api` call will use."""
+    method = None
     for i, tok in enumerate(tokens):
         if tok in ("-X", "--method") and i + 1 < len(tokens):
-            return tokens[i + 1].upper()
-        if tok.startswith("--method="):
-            return tok.split("=", 1)[1].upper()
-    # gh switches to POST as soon as a field is supplied.
-    if any(t in ("-f", "--field", "-F", "--raw-field") or
-           t.startswith(("--field=", "--raw-field=")) for t in tokens):
+            method = tokens[i + 1].upper()  # pflag: the last one wins
+        elif tok.startswith("--method="):
+            method = tok.split("=", 1)[1].upper()
+    if method:
+        return method
+    # gh switches to POST as soon as a field or an --input body is supplied.
+    if any(t in ("-f", "--field", "-F", "--raw-field", "--input") or
+           t.startswith(("--field=", "--raw-field=", "--input=")) for t in tokens):
         return "POST"
     return "GET"
 
@@ -464,7 +470,12 @@ def payload_text(tokens):
         if path:
             try:
                 with open(os.path.expanduser(path), encoding="utf-8") as fh:
-                    parts.append(fh.read())
+                    text = fh.read()
+                parts.append(text)
+                try:  # a JSON escape (`\u0052`) would hide a mutation name
+                    parts.append(json.dumps(json.loads(text), ensure_ascii=False))
+                except ValueError:
+                    pass
             except OSError:
                 return None
         else:
