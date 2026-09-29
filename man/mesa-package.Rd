@@ -12,7 +12,8 @@ A package for the analysis of methylation enrichment sequencing data (e.g. MBD-s
 Useful links:
 \itemize{
   \item \url{https://github.com/cruk-mi/mesa}
-  \item Report bugs at \url{https://github.com/cruk-mi/mesa}
+  \item \url{https://cruk-mi.github.io/mesa/}
+  \item Report bugs at \url{https://github.com/cruk-mi/mesa/issues}
 }
 
 }
