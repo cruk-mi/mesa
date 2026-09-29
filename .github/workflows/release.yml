@@ -33,6 +33,7 @@ jobs:
     name: Verify version consistency
     runs-on: ubuntu-latest
     outputs:
+      tag: ${{ steps.check.outputs.tag }}
       version: ${{ steps.check.outputs.version }}
       bioc-release: ${{ steps.parse.outputs.bioc-release }}
     steps:
@@ -81,6 +82,7 @@ jobs:
           esac
           [ "${fail}" -eq 0 ] || exit 1
 
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Version check passed for ${VERSION}."
 
@@ -110,21 +112,20 @@ jobs:
       organization: bioconductor
       ref: ${{ inputs.tag || github.ref_name }}
 
-  release:
-    name: Publish GitHub Release
+  ## Runs on a manual dispatch too, so a rehearsal builds the tarball and the
+  ## notes exactly as a tag would; only `publish` is skipped.
+  build:
+    name: Build release tarball
     needs: [verify, runiverse]
-    ## A manual dispatch is a rehearsal: everything runs, nothing is published.
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     container: "bioconductor/bioconductor_docker:${{ needs.verify.outputs.bioc-release }}"
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: true
       TZ: UTC
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
 
       - name: Install dependencies
         run: |
@@ -159,13 +160,36 @@ jobs:
           fi
           cat RELEASE_NOTES.md
 
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: |
+            ${{ steps.build.outputs.tarball }}
+            RELEASE_NOTES.md
+          if-no-files-found: error
+
+  ## The Bioconductor image has no `gh`, so publishing runs on the bare runner,
+  ## which does. A manual dispatch is a rehearsal and stops before this job.
+  publish:
+    name: Publish GitHub Release
+    needs: [verify, build]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+
       - name: Create GitHub Release
         env:
-          TAG: ${{ github.ref_name }}
-          TARBALL: ${{ steps.build.outputs.tarball }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.verify.outputs.tag }}
+          VERSION: ${{ needs.verify.outputs.version }}
         run: |
           gh release create "${TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
             --title "mesa ${TAG}" \
             --notes-file RELEASE_NOTES.md \
-            "${TARBALL}"
+            "mesa_${VERSION}.tar.gz"
