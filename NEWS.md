@@ -9,6 +9,9 @@
 - Corrected the "Annotatation" typo in the title of the differentially
   methylated regions vignette.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- Added `inst/CITATION`, so `citation("mesa")` returns the two published
+  papers that use the package, with full author lists.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
 
 ## Infrastructure
 - Test coverage is now measured and uploaded on pull requests, not only on
