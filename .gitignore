@@ -12,4 +12,8 @@ STATUS.md
 .claude/state/parking-lot.md
 .claude/state/artifact-url.txt
 .claude/state/dashboard.html
+.claude/state/roadmap-issue.md
+# retired: the roadmap is now generated from #124 into dashboard.html
+.claude/state/roadmap.html
+.claude/state/roadmap-url.txt
 __pycache__/
