@@ -8,6 +8,9 @@
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
 - `citation("mesa")` now returns the two published papers.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- Added a package architecture diagram to the README; its Mermaid source is
+  in `data-raw/figures/`.
+  ([#110](https://github.com/cruk-mi/mesa/pull/110))
 
 ## Infrastructure
 - Coverage is now uploaded on pull requests as well as `main`; Codecov
