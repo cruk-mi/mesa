@@ -60,11 +60,18 @@ pull request and decides when anything merges.
 
 These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
 as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
-approval through the raw API is treated the same way. A merge or a safe branch deletion is
+approval through the raw API is treated the same way. `gh api` writes are allow-listed:
+reads, comments, review replies, non-approving reviews, resolving threads and
+feature-branch refs pass, and any other write is asked. A merge or a safe branch deletion is
 not blocked but raised as a permission prompt, so the human confirms each one. In a
 permission mode that shows no prompt (`bypassPermissions`, `auto`, `dontAsk`), the hook
 blocks it instead: the human runs it. If the hook and this file ever disagree, that is a
 bug — fix both.
+
+The hook is a safety net, not a security boundary. It does not follow git or gh aliases,
+push behaviour set through config (`git -c remote.origin.mirror=true`,
+`push.default=matching`), `env -S`, or a command run by another interpreter
+(`python3 -c`). None of those are allowed ways around the rules above.
 
 ---
 

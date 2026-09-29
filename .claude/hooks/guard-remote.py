@@ -20,6 +20,8 @@ Blocked:
     a prompt (bypassPermissions, auto, dontAsk, or no mode given)
 
 Asked, not blocked:
+  * any `gh api` write that is not on the allow-list (GH_API_SAFE_WRITES,
+    GH_GRAPHQL_SAFE_MUTATIONS, a non-approving review, a feature-branch ref).
   * merging a pull request (`gh pr merge`, or the same through `gh api`).
   * deleting any other branch (`git branch -d/-D`, `git push --delete`,
     `gh pr merge|close --delete-branch`, or the same through `gh api`).
@@ -34,6 +36,10 @@ origin main` must not be waved through because the first half is harmless, and
 not adjacent. Each segment is judged from the command that actually runs, past
 `VAR=x`, `env`, `sudo` and similar wrappers, and the strings that `bash -c`,
 `eval`, `$( )` and backticks run are judged as commands of their own.
+
+Not covered (see AGENTS.md): git and gh aliases, push behaviour set through
+config (`-c remote.origin.mirror=true`, `push.default=matching`), `env -S`,
+and commands run by other interpreters.
 
 The remote checks ask `gh` (one `gh pr list`, a `gh pr view` and a tag lookup
 per branch); if any of them fails, the deletion is refused rather than asked.
