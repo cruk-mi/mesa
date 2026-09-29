@@ -114,6 +114,12 @@ Tracked in issue #109.
 <p>This package has been used in two published papers, in <a href="https://www.nature.com/articles/s43018-022-00415-9" class="external-link">Nature Cancer</a> and <a href="https://www.nature.com/articles/s41467-024-47195-7" class="external-link">Nature Communications</a>.</p>
 <p>Development was undertaken internally between September 2022 and March 2024; these commits are now incorporated into this repository. This has involved an extensive rewriting of the package functions, with many function names changing, see <a href="NEWS.html">the NEWS.md file for all the details</a>.</p>
 <p>The package is under active development. It has been submitted to Bioconductor and is under review.</p>
+<div class="section level3">
+<h3 id="how-the-package-fits-together">How the package fits together<a class="anchor" aria-label="anchor" href="#how-the-package-fits-together"></a>
+</h3>
+<p>Sequencing data is read into a <code>qseaSet</code>, which every other part of the package takes as its input. Each box below names the file in <code>R/</code> that implements it.</p>
+<p><img src="reference/figures/README-architecture.svg" width="100%" alt="mesa architecture. Enriched sequencing data is read by makeQset.R, given coverage and normalisation by buildQset.R, and held as a qseaSet, the class from the qsea package. The qseaSet is consumed by three groups of functions: manipulation (dplyrVerbs.R, alterQset.R, combineQsets.R, mixQsets.R), quality control (sampleQC.R, calculateEnrichment.R, PCA.R with classes.R) and analysis (makeDMRs.R, qseaCNV.R). Results reach the reader through qseaExtra.R, plotting.R and analyseDMRs.R. Packaged reference data and session setup come from utilityFunctions.R, genome.R, the mappability bins in map_hg38.R and ENCODEbadRegions.R."></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="install-the-package">Install the package<a class="anchor" aria-label="anchor" href="#install-the-package"></a>
