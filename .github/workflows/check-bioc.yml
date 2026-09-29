@@ -20,8 +20,12 @@
 ## * GHA: GitHub Action
 ## * OS: operating system
 
+## Every check runs on every pull request. Pushes only trigger on main (for
+## the pkgdown deploy): with `push:` on every branch, each push to an open PR
+## started a second, identical run.
 on:
   push:
+    branches: [main]
     paths:
         - 'R/**'
         - 'tests/**'
@@ -35,6 +39,12 @@ on:
 
 name: R-CMD-check-bioc
 
+## A new push to a pull request cancels its superseded run. Runs on main are
+## never cancelled, so a pkgdown deploy is not cut off halfway.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 ## These environment variables control whether to run GHA code later on that is
 ## specific to testthat, covr, and pkgdown.
 ##
@@ -42,13 +52,23 @@ name: R-CMD-check-bioc
 ## cache-version as discussed at https://github.com/r-lib/actions/issues/86.
 ## Note that you can always run a GHA test without the cache by using the word
 ## "/nocache" in the commit message.
+##
+## Layout: r-build-and-check, long-checks, coverage and pkgdown run in
+## parallel, each after the shared .github/actions/setup-mesa. They used to be
+## steps of one ~37-minute job, run one after the other.
 env:
   has_testthat: 'true'
   run_covr: 'true'
   run_pkgdown: 'true'
   has_RUnit: 'false'
   cache-version: 'cache-v4'
-  run_docker: 'true'
+  ## Shared by every R job below.
+  R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+  RSPM: "https://packagemanager.posit.co/cran/__linux__/noble/latest"
+  NOT_CRAN: true
+  TZ: UTC
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   ## Resolve the R and Bioconductor versions from the single source of truth
@@ -151,158 +171,23 @@ jobs:
 
   r-build-and-check:
     needs: read-versions
-    runs-on: ${{ matrix.config.os }}
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-    container: ${{ matrix.config.cont }}
-    ## Environment variables unique to this job.
-
-    strategy:
-      fail-fast: true
-      matrix:
-        config:
-          - os: ubuntu-latest
-            r: ${{ needs.read-versions.outputs.r-version }}
-            bioc: ${{ needs.read-versions.outputs.bioc-version }}
-            cont: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
-            rspm: "https://packagemanager.posit.co/cran/__linux__/noble/latest"
-    env:
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      RSPM: ${{ matrix.config.rspm }}
-      NOT_CRAN: true
-      TZ: UTC
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    name: R CMD check + BiocCheck
+    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
 
     steps:
-
-      ## Set the R library to the directory matching the
-      ## R packages cache step further below when running on Docker (Linux).
-      - name: Set R Library home on Linux
-        if: runner.os == 'Linux'
-        run: |
-          mkdir /__w/_temp/Library
-          echo ".libPaths('/__w/_temp/Library')" > ~/.Rprofile
-
-      ## Most of these steps are the same as the ones in
-      ## https://github.com/r-lib/actions/blob/master/examples/check-standard.yaml
-      ## If they update their steps, we will also need to update ours.
       - name: Checkout Repository
         uses: actions/checkout@v7
 
-      - name: System info
-        run: |
-          echo "Git version: $(git --version)"
-          echo "Runner OS: $RUNNER_OS"
-          echo "Runner image: $ImageVersion"
-          echo "Current user: $(whoami)"
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            echo "Workspace owner: $(stat -c '%U' $GITHUB_WORKSPACE)"
-          fi
-
-      ## R is already included in the Bioconductor docker images
-      - name: Setup R from r-lib
-        if: runner.os != 'Linux'
-        uses: r-lib/actions/setup-r@v2
+      - name: Set up mesa
+        uses: ./.github/actions/setup-mesa
         with:
-          r-version: ${{ matrix.config.r }}
+          bioc-version: ${{ needs.read-versions.outputs.bioc-version }}
+          r-version: ${{ needs.read-versions.outputs.r-version }}
+          cache-version: ${{ env.cache-version }}
 
-      ## pandoc is already included in the Bioconductor docker images
-      - name: Setup pandoc from r-lib
-        if: runner.os != 'Linux'
-        uses: r-lib/actions/setup-pandoc@v2
-
-      - name: Query dependencies
+      - name: Install rcmdcheck and BiocCheck
         run: |
-          install.packages('remotes')
-          #remotes::install_version('dbplyr', version = '2.3.4')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-        shell: Rscript {0}
-
-      - name: Cache R packages
-        if: "!contains(github.event.head_commit.message, '/nocache') && runner.os != 'Linux'"
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-
-
-      - name: Cache R packages on Linux
-        if: "!contains(github.event.head_commit.message, '/nocache') && runner.os == 'Linux' "
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/work/_temp/Library
-          key: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-
-
-      - name: Install Linux system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sysreqs=$(Rscript -e 'cat("apt-get update -y && apt-get install -y", paste(gsub("apt-get install -y ", "", remotes::system_requirements("ubuntu", "20.04")), collapse = " "))')
-          echo $sysreqs
-          sudo -s eval "$sysreqs"
-          sudo apt-get install -y nginx
-
-      - name: Install macOS system dependencies
-        if: matrix.config.os == 'macOS-latest'
-        run: |
-          ## Enable installing XML from source if needed
-          brew install libxml2
-          echo "XML_CONFIG=/usr/local/opt/libxml2/bin/xml2-config" >> $GITHUB_ENV
-
-          ## Required to install magick as noted at
-          ## https://github.com/r-lib/usethis/commit/f1f1e0d10c1ebc75fd4c18fa7e2de4551fd9978f#diff-9bfee71065492f63457918efcd912cf2
-          brew install imagemagick@6
-
-          ## For textshaping, required by ragg, and required by pkgdown
-          brew install harfbuzz fribidi
-
-          ## For installing usethis's dependency gert
-          brew install libgit2
-
-      - name: Install X11 dependencies on MacOS
-        if: runner.os == 'macOS'
-        run: |
-          brew install --cask xquartz
-
-      - name: Install Windows system dependencies
-        if: runner.os == 'Windows'
-        run: |
-          ## Edit below if you have any Windows system dependencies
-        shell: Rscript {0}
-
-      - name: Install BiocManager
-        run: |
-          message(paste('****', Sys.time(), 'installing BiocManager ****'))
-          remotes::install_cran("BiocManager")
-        shell: Rscript {0}
-
-      - name: Set BiocVersion
-        run: |
-          BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE)
-        shell: Rscript {0}
-
-      - name: Install dependencies pass 1
-        run: |
-          ## Try installing the package dependencies in steps. First the local
-          ## dependencies, then any remaining dependencies to avoid the
-          ## issues described at
-          ## https://stat.ethz.ch/pipermail/bioc-devel/2020-April/016675.html
-          ## https://github.com/r-lib/remotes/issues/296
-          ## Ideally, all dependencies should get installed in the first pass.
-
-          ## Pass #1 at installing dependencies
-          message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: local dependencies ****'))
-          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE, force = TRUE)
-        continue-on-error: true
-        shell: Rscript {0}
-
-      - name: Install dependencies pass 2
-        run: |
-          ## Pass #2 at installing dependencies
-          message(paste('****', Sys.time(), 'pass number 2 at installing dependencies: any remaining dependencies ****'))
-          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE, force = TRUE)
-
-          ## For running the checks
           message(paste('****', Sys.time(), 'installing rcmdcheck and BiocCheck ****'))
           remotes::install_cran("rcmdcheck")
           BiocManager::install("BiocCheck")
@@ -313,18 +198,6 @@ jobs:
         run: |
           ## Install BiocGenerics
           BiocManager::install("BiocGenerics")
-        shell: Rscript {0}
-
-      - name: Install covr
-        if: env.run_covr == 'true' && runner.os == 'Linux'
-        run: |
-          remotes::install_cran("covr")
-        shell: Rscript {0}
-
-      - name: Install pkgdown
-        if: github.ref == 'refs/heads/main' && env.run_pkgdown == 'true' && runner.os == 'Linux'
-        run: |
-          remotes::install_cran("pkgdown")
         shell: Rscript {0}
 
       - name: Session info
@@ -338,8 +211,16 @@ jobs:
         env:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
+          ## R CMD build builds the vignettes once. R CMD check then re-builds
+          ## them ("checking re-building of vignette outputs"), which
+          ## Bioconductor requires to pass, and in that case skips the separate
+          ## "running R code from vignettes" step
+          ## (_R_CHECK_VIGNETTES_SKIP_RUN_MAYBE_ defaults to TRUE). So the
+          ## vignettes run twice per check, as on the Bioconductor builders.
+          ## --no-build-vignettes used to swap the re-build for that code run:
+          ## same cost, but the Bioconductor step reported SKIPPED.
           rcmdcheck::rcmdcheck(
-              args = c("--no-build-vignettes", "--no-manual", "--timings"),
+              args = c("--no-manual", "--timings"),
               build_args = c("--no-manual", "--no-resave-data"),
               error_on = "warning",
               check_dir = "check"
@@ -350,6 +231,46 @@ jobs:
       - name: Reveal testthat details
         if:  env.has_testthat == 'true'
         run: find . -name testthat.Rout -exec cat '{}' ';'
+
+      - name: Run RUnit tests
+        if:  env.has_RUnit == 'true'
+        run: |
+          BiocGenerics:::testPackage()
+        shell: Rscript {0}
+
+      - name: Run BiocCheck
+        run: |
+          BiocCheck::BiocCheck(
+              dir('check', 'tar.gz$', full.names = TRUE),
+              `quit-with-status` = FALSE,
+              `no-check-R-ver` = TRUE,
+              `no-check-bioc-help` = TRUE
+          )
+        shell: Rscript {0}
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ runner.os }}-biocversion-${{ needs.read-versions.outputs.bioc-version }}-r-${{ needs.read-versions.outputs.r-version }}-results
+          path: check
+
+  long-checks:
+    needs: read-versions
+    runs-on: ubuntu-latest
+    name: Long checks (read-count regression)
+    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up mesa
+        uses: ./.github/actions/setup-mesa
+        with:
+          bioc-version: ${{ needs.read-versions.outputs.bioc-version }}
+          r-version: ${{ needs.read-versions.outputs.r-version }}
+          cache-version: ${{ env.cache-version }}
 
       - name: Run long checks (read-count regression)
         if:  env.has_testthat == 'true'
@@ -376,24 +297,30 @@ jobs:
           )
         shell: Rscript {0}
 
-      - name: Run RUnit tests
-        if:  env.has_RUnit == 'true'
-        run: |
-          BiocGenerics:::testPackage()
-        shell: Rscript {0}
+  pkgdown:
+    needs: read-versions
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: pkgdown site
+    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
 
-      - name: Run BiocCheck
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up mesa
+        uses: ./.github/actions/setup-mesa
+        with:
+          bioc-version: ${{ needs.read-versions.outputs.bioc-version }}
+          r-version: ${{ needs.read-versions.outputs.r-version }}
+          cache-version: ${{ env.cache-version }}
+
+      - name: Install pkgdown
         run: |
-          BiocCheck::BiocCheck(
-              dir('check', 'tar.gz$', full.names = TRUE),
-              `quit-with-status` = FALSE,
-              `no-check-R-ver` = TRUE,
-              `no-check-bioc-help` = TRUE
-          )
+          remotes::install_cran("pkgdown")
         shell: Rscript {0}
 
       - name: Install package
-        if: github.ref == 'refs/heads/main' && env.run_pkgdown == 'true' && runner.os == 'Linux'
         run: R CMD INSTALL .
 
       - name: Deploy package
@@ -409,9 +336,28 @@ jobs:
         ## branch (erasing anything you haven't version controlled!) and
         ## makes the git history recognizable by pkgdown.
 
-      ## Coverage runs after the pkgdown deploy on purpose: this step fails
-      ## the job when Codecov rejects the upload, and a failing step skips
-      ## every step after it, which would otherwise stop the site updating.
+  coverage:
+    needs: read-versions
+    runs-on: ubuntu-latest
+    name: Test coverage
+    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up mesa
+        uses: ./.github/actions/setup-mesa
+        with:
+          bioc-version: ${{ needs.read-versions.outputs.bioc-version }}
+          r-version: ${{ needs.read-versions.outputs.r-version }}
+          cache-version: ${{ env.cache-version }}
+
+      - name: Install covr
+        run: |
+          remotes::install_cran("covr")
+        shell: Rscript {0}
+
       - name: Test coverage
         if: env.run_covr == 'true' && runner.os == 'Linux'
         env:
@@ -469,41 +415,3 @@ jobs:
                    " attempts; see the responses printed above.")
           }
         shell: Rscript {0}
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ runner.os }}-biocversion-${{ matrix.config.bioc }}-r-${{ matrix.config.r }}-results
-          path: check
-      
-  dockerhub-build-and-push:
-    if: false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
-    steps:      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-        
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: crukmi/mesa
-        
-      - name: Login to DockerHub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-      
-      - uses: docker/build-push-action@v7
-        #if: "!contains(github.event.head_commit.message, '/nodocker') && env.run_docker == 'true' && runner.os == 'Linux' "
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}

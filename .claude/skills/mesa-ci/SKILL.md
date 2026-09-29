@@ -46,12 +46,18 @@ it only changes when the base image does — and when it does, **both** files ne
 
 | Workflow | Purpose |
 |---|---|
-| `check-bioc.yml` | The authoritative check. biocthis-generated (`biocthis::use_bioc_github_action()`), runs `R CMD check` + `BiocCheck` across platforms, plus covr and pkgdown on `main`. Triggered by changes to `R/`, `tests/`, `vignettes/`, `inst/`, `DESCRIPTION`, `NAMESPACE`, and by any PR. |
+| `check-bioc.yml` | The authoritative check. Started from biocthis (`biocthis::use_bioc_github_action()`). Four parallel jobs after the shared `.github/actions/setup-mesa` (dependencies, no vignettes): `R CMD check` + `BiocCheck`, the long read-count checks, covr, and pkgdown (`main` only). Plus `roxygen-drift`. Runs on every PR, and on pushes to `main` that touch `R/`, `tests/`, `vignettes/`, `inst/`, `DESCRIPTION`, `NAMESPACE` or `man/`. A new push to a PR cancels its superseded run. |
 | `build-image.yml` | Builds and pushes the `slim` and `full` devcontainer images to ghcr.io. Triggers on `.devcontainer/**` or `DESCRIPTION` changes. On a PR that touches `.devcontainer/**` or the workflow it only builds (no login, push or cache write), so a broken image fails the PR, not `main`. ~20–40 min. |
 
 Because `check-bioc.yml` is biocthis-generated, prefer regenerating or making surgical
 edits over rewriting it — gratuitous divergence from upstream makes future biocthis updates
 painful.
+
+**Vignettes run twice per check, on purpose, and never more.** R CMD build builds them and
+R CMD check re-builds them ("checking re-building of vignette outputs", which Bioconductor
+requires). Never pass `--no-build-vignettes` to check: it swaps that re-build for "running R
+code from vignettes", which costs the same and verifies less. Never set `build_vignettes =
+TRUE` in the dependency install: that output is thrown away.
 
 Put `/nocache` in a commit message to bypass the CI package cache; bump `cache-version` in
 the workflow env to invalidate it for everyone.
