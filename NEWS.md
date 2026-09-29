@@ -12,9 +12,8 @@
 - Added `inst/CITATION`, so `citation("mesa")` returns the two published
   papers that use the package, with full author lists.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
-- Added an architecture diagram to the README, showing how sequencing data
-  becomes a `qseaSet` and which file in `R/` implements each part of the
-  package. The Mermaid source is maintained in `data-raw/figures/`.
+- Added a package architecture diagram to the README; its Mermaid source is
+  in `data-raw/figures/`.
   ([#110](https://github.com/cruk-mi/mesa/pull/110))
 
 ## Infrastructure
