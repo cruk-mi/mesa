@@ -74,17 +74,18 @@ this checklist, and do not open phase 1 until they confirm step 2 is done:
    step 2**, because that build is the gate Bioconductor's own build would otherwise be:
 
    ```bash
-   gh run list --repo cruk-mi/mesa --workflow release.yml --limit 1   # note the run ID
+   gh run list --repo cruk-mi/mesa --workflow release.yml --branch vX.Y.(Z+1) --limit 1   # note the run ID
    gh run watch <run-id> --repo cruk-mi/mesa --exit-status
    gh release view vX.Y.(Z+1) --repo cruk-mi/mesa                     # tarball attached
    ```
 
-   A failed run has published nothing, so the fix is to re-tag. If `verify` fails, the tag
-   is on the wrong commit or the bump is incomplete. If `runiverse` or `build` fails, fix
-   it on `main` first. Then move the tag to the right commit
-   (`git tag -f -a vX.Y.(Z+1) <commit> -m …` and `git push -f origin vX.Y.(Z+1)`), which
-   starts a fresh run. Never move a tag while its run is still going: that run refuses to
-   publish, and only the new one releases.
+   A failed run has published nothing. If a job failed for a transient reason (a runner or
+   network error), re-run it: `gh run rerun <run-id> --repo cruk-mi/mesa --failed`.
+   Otherwise re-tag. If `verify` fails, the tag is on the wrong commit or the bump is
+   incomplete. If `runiverse` or `build` fails, fix it on `main` first. Then move the tag
+   to the right commit (`git tag -f -a vX.Y.(Z+1) <commit> -m …` and
+   `git push -f origin vX.Y.(Z+1)`), which starts a fresh run. Never move a tag while its
+   run is still going: that run refuses to publish, and only the new one releases.
 
 2. **Push to Bioconductor.** During review, Bioconductor builds from the `devel` branch of
    [`BiocStaging/mesa`](https://github.com/BiocStaging/mesa), not from
