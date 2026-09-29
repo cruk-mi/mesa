@@ -64,7 +64,8 @@ PROMPTING_MODES = {"default", "acceptEdits", "plan"}
 
 # Git's own options that swallow the following token, so the subcommand can be
 # located without mistaking an option's argument for it.
-GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path",
+                       "--config-env", "--attr-source"}
 # Same for `git push`, so an option's value is not read as the remote or a ref.
 PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--exec"}
 # git takes any unambiguous prefix of a long option (`--del` is `--delete`), so

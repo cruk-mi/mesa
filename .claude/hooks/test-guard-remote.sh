@@ -131,6 +131,8 @@ for cmd in \
     'git tag -d v0.99.6' \
     'git -C /repo push origin main' \
     'git -c user.name=x push origin main' \
+    'git --config-env core.x=HOME push origin main' \
+    'git --attr-source HEAD push origin main' \
     'git push origin refs/heads/main' \
     'git push --dry-run origin main && git push origin main' \
     'git push origin main; echo done' \
