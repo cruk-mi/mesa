@@ -6,14 +6,9 @@
   Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,
   so it no longer needs the pinned archives and SHA check added in 0.99.7.
   ([#132](https://github.com/cruk-mi/mesa/pull/132))
-- Added a `release` workflow, triggered by pushing a `vX.Y.Z` tag. It checks
-  that the tag, the `DESCRIPTION` version and the top `NEWS.md` heading agree
-  and that the version is not a `.9000` development version; runs the
-  r-universe Bioconductor build (Linux, macOS, Windows and WebAssembly, plus
-  BiocCheck) by calling the same reusable workflow Bioconductor uses; and then
-  publishes a GitHub Release with the source tarball and the release notes
-  taken from `NEWS.md`. Running it by hand against an existing tag does
-  everything except publishing, as a rehearsal.
+- Pushing a `vX.Y.Z` tag now publishes a GitHub Release with the source
+  tarball and that version's `NEWS.md` notes, once the tag matches
+  `DESCRIPTION` and `NEWS.md` and passes the r-universe Bioconductor build.
   ([#112](https://github.com/cruk-mi/mesa/pull/112))
 
 # mesa 0.99.7
