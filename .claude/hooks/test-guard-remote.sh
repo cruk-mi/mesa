@@ -219,6 +219,29 @@ for cmd in \
 do check 2 "$cmd"; done
 ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/+138/merge'
 
+# gh api writes are allow-listed: the writes an agent is meant to make pass,
+# any other write is asked, whatever its spelling.
+for cmd in \
+    'gh api -X POST repos/cruk-mi/mesa/issues/1/labels -f labels[]=bug' \
+    'gh api -X PATCH repos/cruk-mi/mesa/issues/124 -f body=x' \
+    'gh api -X PUT repos/cruk-mi/mesa/branches/main/protection --input -' \
+    'gh api -X DELETE repos/cruk-mi/mesa/actions/caches' \
+    'gh api repos/cruk-mi/mesa/dispatches -f event_type=x' \
+    "gh api graphql -f query='mutation { closePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { updatePullRequestBranch(input:{pullRequestId:\"X\"}) { clientMutationId } }'"
+do ask_check "$cmd" 'does not recognise'; done
+for cmd in \
+    'gh api repos/cruk-mi/mesa/pulls/106/comments --input -' \
+    'gh api repos/cruk-mi/mesa/pulls/106/comments/1/replies --input -' \
+    'gh api repos/cruk-mi/mesa/issues/106/comments -f body=x' \
+    'gh api -X PATCH repos/cruk-mi/mesa/issues/comments/1 -f body=x' \
+    'gh api -X DELETE repos/cruk-mi/mesa/pulls/comments/1' \
+    'gh api -X HEAD repos/cruk-mi/mesa' \
+    "gh api graphql -f query='mutation Resolve { resolveReviewThread(input:{threadId:\"X\"}) { thread { isResolved } } }'" \
+    "gh api graphql -f query='mutation { addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:\"X\", body:\"x\"}) { comment { id } } }'"
+do check 0 "$cmd"; done
+MODE=bypassPermissions check 2 'gh api -X PATCH repos/cruk-mi/mesa/issues/124 -f body=x'
+
 # --- must be allowed -------------------------------------------------
 for cmd in \
     'git push origin chore/agent-setup' \

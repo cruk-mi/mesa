@@ -120,6 +120,26 @@ GH_GRAPHQL_REVIEW = re.compile(r"\b(addPullRequestReview|submitPullRequestReview
 # branch. git push covers every legitimate use.
 GH_GRAPHQL_REF_WRITE = re.compile(r"\b(deleteRef|updateRefs?|createRef|mergeBranch)\b")
 
+# `gh api` writes are allow-listed, not deny-listed: gh and GitHub accept too
+# many spellings of the same request to enumerate the bad ones. Reads pass, and
+# so do the writes an agent is meant to make; any other write is asked (and so
+# blocked where no prompt is shown). The checks above still refuse the writes
+# the contract forbids outright.
+GH_API_SAFE_WRITES = [
+    ({"POST"}, re.compile(r"/pulls/\d+/comments/?$")),              # inline comment
+    ({"POST"}, re.compile(r"/pulls/\d+/comments/\d+/replies/?$")),  # reply
+    ({"POST"}, re.compile(r"/issues/\d+/comments/?$")),             # PR/issue comment
+    ({"PATCH", "DELETE"}, re.compile(r"/(issues|pulls)/comments/\d+/?$")),
+]
+GH_GRAPHQL_SAFE_MUTATIONS = {
+    "resolveReviewThread", "unresolveReviewThread", "addPullRequestReviewThreadReply",
+    "addPullRequestReviewThread", "addPullRequestReviewComment", "addPullRequestReview",
+    "submitPullRequestReview", "deletePullRequestReview", "addComment",
+    "updateIssueComment", "deleteIssueComment", "updatePullRequestReviewComment",
+    "deletePullRequestReviewComment", "minimizeComment", "addReaction", "removeReaction",
+    "convertPullRequestToDraft",
+}
+
 
 
 class Ask:
@@ -499,6 +519,15 @@ def check_gh_graphql(tokens):
     if ref_write:
         return (f"The {ref_write.group(1)} mutation is not allowed: which ref it changes "
                 "cannot be checked. Use git push (or git push origin --delete <branch>).")
+    if not re.search(r"\bmutation\b", text):
+        return None  # a query only reads
+    # Every field called with arguments must be a known-safe mutation. A
+    # nested field with arguments, or an operation name, only costs an ask.
+    body = re.sub(r"\bmutation\s+\w+", "mutation", text)
+    unknown = set(re.findall(r"\b([A-Za-z_]\w*)\s*\(", body)) - GH_GRAPHQL_SAFE_MUTATIONS
+    if unknown or not re.search(r"\w\s*\(", body):
+        return Ask("run the GraphQL mutation " + ", ".join(sorted(unknown) or ["?"])
+                   + ", which the hook does not recognise")
     return None
 
 
@@ -545,9 +574,9 @@ def split_attached(tokens):
 def check_gh_api(tokens):
     """`gh api` is not a read-only escape hatch from the `gh pr` rules.
 
-    Reads stay allowed, and so do the writes an agent is meant to make —
-    posting a review reply is `POST .../pulls/N/comments/ID/replies`, which
-    none of these patterns match.
+    Reads stay allowed, and so do the writes an agent is meant to make
+    (GH_API_SAFE_WRITES, a non-approving review, a feature-branch ref). Any
+    other write is asked.
     """
     tokens = split_attached(tokens)
     endpoint = gh_api_endpoint(tokens)
@@ -559,18 +588,21 @@ def check_gh_api(tokens):
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):
         return MERGE
+    if method in ("GET", "HEAD"):
+        return None
     # Only a write can submit a review; a GET that filters on "APPROVED" is a read.
-    if GH_API_REVIEWS.search(endpoint) and method != "GET":
+    if GH_API_REVIEWS.search(endpoint):
         body = payload_text(tokens)
         if body is None:
             return ("A review payload read from stdin or an unreadable file cannot "
                     "be checked, so it is refused. Pass it with -f event=...")
         if "APPROVE" in (" ".join(tokens) + "\n" + body).upper():
             return "An agent does not approve pull requests on this repo."
-    if GH_API_PULL.search(endpoint) and method != "GET":
+        return None  # a comment or a request-changes review
+    if GH_API_PULL.search(endpoint):
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")
-    if GH_API_MERGES.search(endpoint) and method != "GET":
+    if GH_API_MERGES.search(endpoint):
         return ("Merging branches through the merges endpoint is not allowed; "
                 "merge a pull request instead.")
     if GH_API_REF.search(endpoint) and method in ("PATCH", "POST", "PUT"):
@@ -580,7 +612,11 @@ def check_gh_api(tokens):
         if not ref.startswith("heads/"):
             return "Deleting tags or other refs is not allowed."
         return check_branch_deletion([ref[len("heads/"):]], remote=True)
-    return None
+    if any(method in methods and pattern.search(endpoint)
+           for methods, pattern in GH_API_SAFE_WRITES):
+        return None
+    return Ask(f"send {method} {endpoint} through gh api, a write the hook "
+               "does not recognise")
 
 
 GH_PR_OPTS_WITH_VALUE = {"-R", "--repo", "-t", "--subject", "-b", "--body",
