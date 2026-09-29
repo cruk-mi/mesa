@@ -67,6 +67,16 @@ PROMPTING_MODES = {"default", "acceptEdits", "plan"}
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
 # Same for `git push`, so an option's value is not read as the remote or a ref.
 PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--exec"}
+# git takes any unambiguous prefix of a long option (`--del` is `--delete`), so
+# these are expanded before the checks read them. A missing entry costs at most
+# an extra block, never a missed one.
+PUSH_LONG = ("--delete", "--force", "--force-with-lease", "--force-if-includes",
+             "--mirror", "--all", "--branches", "--prune", "--dry-run", "--tags",
+             "--follow-tags", "--repo", "--receive-pack", "--exec", "--push-option",
+             "--set-upstream", "--atomic", "--signed", "--thin", "--porcelain",
+             "--progress", "--verbose", "--quiet", "--verify", "--no-verify",
+             "--recurse-submodules", "--ipv4", "--ipv6")
+BRANCH_TAG_LONG = ("--delete", "--list", "--verify", "--force")
 
 # Commands that run the command after them. The rules follow gh or git behind
 # them (`env FOO=1 gh pr merge`, `sudo git push`, `xargs gh pr merge`), and
@@ -327,6 +337,19 @@ def git_subcommand(tokens):
 def short_flags(args):
     """Letters of every bundled short option (`-uf` -> {"u", "f"})."""
     return {c for a in args if re.fullmatch(r"-[A-Za-z0-9]+", a) for c in a[1:]}
+
+
+def expand_long(args, known):
+    """Expand a unique prefix of a long option to its full name, as git does."""
+    out = []
+    for a in args:
+        name, eq, val = a.partition("=")
+        if name.startswith("--") and name not in known:
+            hits = [k for k in known if k.startswith(name)]
+            if len(hits) == 1:
+                name = hits[0]
+        out.append(name + eq + val)
+    return out
 
 
 def push_positionals(args):
@@ -629,6 +652,7 @@ def check_segment(segment, depth=0):
 
     # --- git push ---------------------------------------------------------
     if sub == "push":
+        args = expand_long(args, PUSH_LONG)
         # Short options bundle (`-uf`, `-dq`), so flags are read letter by letter.
         flags = short_flags(args)
         positional = push_positionals(args)
@@ -680,6 +704,8 @@ def check_segment(segment, depth=0):
         return None
 
     # --- deletions --------------------------------------------------------
+    if sub in ("branch", "tag"):
+        args = expand_long(args, BRANCH_TAG_LONG)
     if sub == "branch" and ("--delete" in args or {"d", "D"} & short_flags(args)):
         return check_branch_deletion([a for a in args if not a.startswith("-")],
                                      remote=False)

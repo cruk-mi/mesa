@@ -286,6 +286,22 @@ for cmd in \
     'git tag --delete v0.99.6' \
     'git update-ref -d refs/tags/v0.99.6'
 do check 2 "$cmd"; done
+# git takes any unambiguous prefix of a long option: `--del` is `--delete`.
+for cmd in \
+    'git push origin --del stacked-base' \
+    'git push origin --del v0.99.6' \
+    'git push --force-w origin feat/x' \
+    'git push --force-w=feat/x origin feat/x' \
+    'git push origin --mirr' \
+    'git push origin --pru' \
+    'git push origin --al' \
+    'git tag --del v0.99.6' \
+    'git branch --del main'
+do check 2 "$cmd"; done
+ask_check 'git push origin --del feat/merged' "'feat/merged'"
+ask_check 'git branch --del old-branch'
+check 0 'git push --dry origin main'
+check 0 'git push --set-up origin chore/agent-setup'
 ask_check 'git push -dq origin feat/merged' "'feat/merged'"
 ask_check 'git push -o ci.skip origin --delete feat/merged' "'feat/merged'"
 check 0 'git push -o ci.skip origin chore/agent-setup'
