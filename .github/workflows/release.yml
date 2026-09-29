@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.check.outputs.tag }}
+      sha: ${{ steps.check.outputs.sha }}
       version: ${{ steps.check.outputs.version }}
       bioc-release: ${{ steps.parse.outputs.bioc-release }}
     steps:
@@ -82,8 +83,11 @@ jobs:
           esac
           [ "${fail}" -eq 0 ] || exit 1
 
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          {
+            echo "tag=${TAG}"
+            echo "sha=$(git rev-parse HEAD)"
+            echo "version=${VERSION}"
+          } >> "$GITHUB_OUTPUT"
           echo "Version check passed for ${VERSION}."
 
   ## The exact pipeline r-universe runs for Bioconductor, called as a reusable
@@ -110,7 +114,7 @@ jobs:
     with:
       universe: bioc
       organization: bioconductor
-      ref: ${{ inputs.tag || github.ref_name }}
+      ref: ${{ needs.verify.outputs.sha }}
 
   ## Runs on a manual dispatch too, so a rehearsal builds the tarball and the
   ## notes exactly as a tag would; only `publish` is skipped.
@@ -125,7 +129,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ needs.verify.outputs.tag }}
+          ref: ${{ needs.verify.outputs.sha }}
 
       - name: Install dependencies
         run: |
