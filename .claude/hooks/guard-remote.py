@@ -12,7 +12,7 @@ Blocked:
   * gh pr ready / review --approve
   * the same actions reached through `gh api`, plus the ref and merge
     endpoints whose target cannot be checked (deleteRef, updateRefs,
-    mergeBranch, POST .../merges)
+    createRef, mergeBranch, POST .../merges)
   * deleting a protected branch or any tag, however the ref is spelled
   * deleting a remote branch that an open PR uses as its head or its base
     (deleting it would close that PR), or one that cannot be checked
