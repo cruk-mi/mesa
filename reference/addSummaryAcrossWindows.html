@@ -36,7 +36,7 @@ qseaSet sample table."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -173,7 +173,7 @@ summary function (and include <code>suffix</code> when provided).</p>
 <span class="r-in"><span>    fn         <span class="op">=</span> <span class="va">mean</span>,</span></span>
 <span class="r-in"><span>    normMethod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nrpm"</span>,<span class="st">"beta"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getSampleTable</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 10 samples.Generating table of beta values for 819 regions across 10 samples.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group patient        type tumour tissue age gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon Normal  Colon  80      F</span>
@@ -209,7 +209,7 @@ summary function (and include <code>suffix</code> when provided).</p>
 <span class="r-in"><span>    fn         <span class="op">=</span> <span class="va">max</span>,</span></span>
 <span class="r-in"><span>    normMethod <span class="op">=</span> <span class="st">"nrpm"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getSampleTable</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 5 regions across 10 samples.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group patient        type tumour tissue age gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon Normal  Colon  80      F</span>
@@ -251,7 +251,7 @@ summary function (and include <code>suffix</code> when provided).</p>
 <span class="r-in"><span>    normMethod <span class="op">=</span> <span class="st">"nrpm"</span>,</span></span>
 <span class="r-in"><span>    suffix     <span class="op">=</span> <span class="st">"all"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getSampleTable</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 5 regions across 10 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 10 samples.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group patient        type tumour tissue age gender</span>

@@ -37,7 +37,7 @@ in its sampleTable."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -80,7 +80,7 @@ in its <code>sampleTable</code>.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'qseaSet'</span></span>
-<span><span class="fu">arrange</span><span class="op">(</span><span class="va">.data</span>, <span class="va">...</span>, .by_group <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">.data</span>, <span class="va">...</span>, .by_group <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -123,7 +123,7 @@ Both the <code>count_matrix</code> and the <code>sampleTable</code> are updated 
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Reorder samples by age</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">arrange</span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 10 Samples: </span>
@@ -131,7 +131,7 @@ Both the <code>count_matrix</code> and the <code>sampleTable</code> are updated 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 819 Regions in 22 chromosomes of BSgenome.Hsapiens.NCBI.GRCh38</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Reorder by tissue</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">arrange</span><span class="op">(</span><span class="va">tissue</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">tissue</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 10 Samples: </span>
@@ -139,7 +139,7 @@ Both the <code>count_matrix</code> and the <code>sampleTable</code> are updated 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 819 Regions in 22 chromosomes of BSgenome.Hsapiens.NCBI.GRCh38</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Reorder by tissue (descending), then tumour type</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">tissue</span><span class="op">)</span>, <span class="va">tumour</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">tissue</span><span class="op">)</span>, <span class="va">tumour</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 10 Samples: </span>

@@ -36,7 +36,7 @@ of a qseaSet."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/li
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -78,7 +78,7 @@ of a <code>qseaSet</code>.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'qseaSet'</span></span>
-<span><span class="fu">pull</span><span class="op">(</span><span class="va">.data</span>, var <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">.data</span>, var <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -121,16 +121,16 @@ If <code>name</code> is provided, the vector is named accordingly.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Pull the 'group' column as a vector</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">pull</span><span class="op">(</span><span class="va">group</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">group</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "Colon1_N" "Colon1_T" "Colon2_N" "Colon2_T" "Lung1_N"  "Lung1_T" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "Lung2_N"  "Lung2_T"  "Lung3_N"  "Lung3_T" </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Pull by column position (last column by default)</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">pull</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] NA    "III" NA    "IV"  NA    "IIA" NA    "IA"  NA    "IB" </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Pull a column and name it by sample_name</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">pull</span><span class="op">(</span><span class="va">group</span>, name <span class="op">=</span> <span class="va">sample_name</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">group</span>, name <span class="op">=</span> <span class="va">sample_name</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Colon1_N   Colon1_T   Colon2_N   Colon2_T    Lung1_N    Lung1_T    Lung2_N </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "Colon1_N" "Colon1_T" "Colon2_N" "Colon2_T"  "Lung1_N"  "Lung1_T"  "Lung2_N" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Lung2_T    Lung3_N    Lung3_T </span>

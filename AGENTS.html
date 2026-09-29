@@ -35,7 +35,7 @@
       <a href="articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="articles/generation.html">Generating qseaSets</a>
@@ -92,7 +92,21 @@
 <li>You <strong>may open a pull request, but only as a draft.</strong> Never mark it ready for review, never request review, never merge.</li>
 <li>You may <strong>never</strong> push or force-push to <code>main</code>, delete branches or tags, or rewrite published history.</li>
 <li>When in doubt about an irreversible or outward-facing action, ask first.</li>
+<li>
+<strong>Never push to Bioconductor</strong> (<code>BiocStaging/mesa</code>) without the human’s explicit permission, asked every time. The human runs that push by default.</li>
 </ul><p>These rules are also enforced mechanically by <code>.claude/hooks/guard-remote.py</code>, on <code>gh api</code> as well as on <code>git</code> and <code>gh pr</code> — the endpoint names the action, so reaching a merge or an approval through the raw API is blocked the same way. If the hook and this file ever disagree, that is a bug — fix both.</p>
+<hr></div>
+<div class="section level2">
+<h2 id="session-scope-and-the-parking-lot">Session scope and the parking lot<a class="anchor" aria-label="anchor" href="#session-scope-and-the-parking-lot"></a></h2>
+<p><strong>One issue = one session = one branch = one draft PR.</strong> A session exists to close the issue it was opened for, and nothing else.</p>
+<ul><li>Start a fresh session (or <code>/clear</code>) for each issue. Do not carry context from one issue into the next. Use a separate worktree per issue (<code>claude --worktree</code>, or <code>git worktree add</code>) so sessions running in parallel never share a checkout.</li>
+<li>Change only the files the issue needs. The PR references it with <code>Fixes #&lt;n&gt;</code>.</li>
+<li>
+<strong>Anything else you notice is parked, not fixed</strong> — a second bug, a typo, a refactor, a missing test, a “while I’m here”. This holds even when the agent itself suggests the fix and even when it looks like one line. Run <code>/park &lt;finding&gt;</code>, say <code>Parked: …</code>, and carry on. Agents must not offer to fix out-of-scope findings; they park them.</li>
+<li>Agents without <code>/park</code> (Copilot, Codex, …) run the same step directly. <code>&lt;issue&gt;</code> is the session’s issue number, or <code>-</code>: <code>python3 .claude/scripts/mesa-status.py --park &lt;issue&gt; &lt;&lt;'EOF'</code>, then the note on its own line, then <code>EOF</code>.</li>
+<li>List what was parked in the PR description under <strong>Parked</strong>. That list is the durable copy.</li>
+</ul><p>The parking lot is <code>.claude/state/parking-lot.md</code> in the <strong>main checkout</strong>. The script resolves it through <code>git rev-parse --git-common-dir</code>, so every worktree writes to the same file. It is gitignored, so it never conflicts between branches and is never committed. It is also <strong>per-machine</strong>: a session in the devcontainer, a Codespace or on the web writes to a checkout that goes away, which is why the PR’s <strong>Parked</strong> list matters. <code>/mesa-status</code> shows the count and the items, and they are inlined into the dashboard it publishes as a (private) claude.ai artifact, so don’t park anything that must stay on this machine.</p>
+<p><strong>Triage (human, weekly):</strong> promote each line to a GitHub issue labelled <code>parked</code> — per the issue workflow below, check for a duplicate first — or delete it. Then delete the line. Nothing stays parked for more than a week.</p>
 <hr></div>
 <div class="section level2">
 <h2 id="attribution-required">Attribution (required)<a class="anchor" aria-label="anchor" href="#attribution-required"></a></h2>
@@ -157,6 +171,7 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 </tr></tbody></table><p><strong>Phase 2 — the work.</strong> Each feature/fix PR targets <code>main</code> and records its user-visible changes under the <code># mesa X.Y.Z.9000</code> heading, in the same PR that makes the change.</p>
 <p><strong>Phase 3 — cut the release.</strong> After the work PRs merge, branch <code>chore/bump-version-X.Y.(Z+1)</code> off <code>main</code>. One commit <code>chore(version): bump to X.Y.(Z+1)</code> (reference: PR #99 = <code>b5e80a0</code>): bump <code>DESCRIPTION</code> and rename the <code>NEWS.md</code> heading.</p>
 <p><strong>Stop after each phase.</strong> Tell the human to push and open the PR. Tag format <code>vX.Y.Z</code>, applied by the human after merge to <code>main</code>.</p>
+<p><strong>After phase 3 merges</strong>, the human tags the release and pushes it to Bioconductor (<code>BiocStaging/mesa</code>, branch <code>devel</code>) before phase 1 opens. The <code>bioc-release-cycle</code> skill has the checklist. A release that never reaches Bioconductor has not shipped.</p>
 <p>Full detail lives in the <code>bioc-release-cycle</code> skill.</p>
 <hr></div>
 <div class="section level2">
@@ -167,7 +182,8 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 <li>Refresh with <code>/mesa-status</code>, or <code>python3 .claude/scripts/mesa-status.py</code>. A <code>SessionStart</code> hook refreshes it automatically once it is over four hours old.</li>
 <li>The one hand-written part is <code>.claude/state/recommendation.md</code>, the “what to do next” judgement. It is overwritten, never appended to, and rendered into <code>STATUS.md</code> by the script.</li>
 </ul><p>Because the state is derived, a change made by anyone — you, a co-maintainer on github.com, Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.</p>
-<p><code>/mesa-status</code> also builds a dashboard page from the same data and publishes it as a private claude.ai artifact (its URL sits in <code>.claude/state/artifact-url.txt</code>, which is per-person). The page is deterministic output, not something a model writes each time: the script inlines the state into a committed template. It is a snapshot — a published artifact cannot reach GitHub, so it cannot refresh itself.</p>
+<p><code>/mesa-status</code> also builds the <strong>Next steps</strong> page from the same data and publishes it as a private claude.ai artifact (its URL is per-clone: <code>mesa-status.py --artifact-url</code> prints it). The page is deterministic output, not something a model writes each time: the script inlines the state into a committed template. It is a snapshot, since a published artifact cannot reach GitHub. So hooks raise a flag whenever a session changes GitHub, and remind the human to run <code>/mesa-status</code> before that session ends. Hooks never run it themselves, and never edit #124: that public edit happens only when a human asks for it.</p>
+<p><strong>The roadmap</strong> (what to do, in which order, for which release) is a TOML block in the pinned issue #124, edited on github.com. Every item’s status (To do, Waiting, In review, Done, Later) is derived from the issues, PRs, branches and tags it names. Never tick or set a status by hand, and do not use the <code>status:</code> labels for this. Open a draft PR with <code>Fixes #N</code> and the roadmap picks it up.</p>
 <p><strong>Which file to edit:</strong></p>
 <table class="table"><colgroup><col width="33%"><col width="33%"><col width="33%"></colgroup><thead><tr><th>File</th>
 <th></th>
@@ -184,6 +200,13 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 <td>the “what next” judgement</td>
 <td>
 <strong>yes</strong> — overwrite it</td>
+</tr><tr><td>#124’s <strong>Roadmap data</strong> block</td>
+<td>the plan: items, order, releases</td>
+<td>
+<strong>yes</strong> — on github.com</td>
+</tr><tr><td>#124’s generated checklist</td>
+<td>derived from the block</td>
+<td>no — <code>--sync-issue</code> rewrites it</td>
 </tr><tr><td><code>STATUS.md</code></td>
 <td>generated, gitignored</td>
 <td>no</td>
@@ -191,7 +214,7 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 <td>generated, gitignored</td>
 <td>no</td>
 </tr><tr><td><code>.claude/state/dashboard.html</code></td>
-<td>generated, gitignored</td>
+<td>the Next steps page, generated, gitignored</td>
 <td>no — edits here vanish on the next run</td>
 </tr><tr><td><code>.claude/state/bioccheck-history.jsonl</code></td>
 <td>append-only record</td>
@@ -288,7 +311,20 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 <td><code>mesa-status</code></td>
 </tr><tr><td>Capturing a new procedure as a skill</td>
 <td><code>capture-skill</code></td>
-</tr></tbody></table><hr></div>
+</tr><tr><td>Reviewing a PR, branch or diff</td>
+<td><code>pr-review</code></td>
+</tr></tbody></table><div class="section level3">
+<h3 id="pull-request-reviews">Pull request reviews<a class="anchor" aria-label="anchor" href="#pull-request-reviews"></a></h3>
+<p>Reviews are done locally with the <code>pr-review</code> skill (🔴 High / 🟠 Medium / 🟡 Low), not by GitHub Copilot, so they don’t use Copilot quota.</p>
+<ul><li>
+<strong>Large PRs are reviewed automatically.</strong> After <code>gh pr create</code>, <code>.claude/hooks/review-after-pr.py</code> reads the new PR’s file list from GitHub with one <code>gh pr view &lt;N&gt; --json baseRefName,files</code> call, so the size is the PR’s, whichever checkout the session is in. It leaves out generated files (<code>man/</code>, <code>NAMESPACE</code>) and <code>DESCRIPTION</code>/<code>NEWS.md</code>. If the PR is over 150 lines, over 5 files, or over 30 lines under <code>R/</code>, hooks or workflows, the session is asked to review it. If the call fails, it stays silent.</li>
+<li>
+<strong>Small PRs</strong> (version bumps, one-line docs) are reviewed only when a human asks: <code>/pr-review &lt;N&gt;</code>.</li>
+<li>A review is reported in the session. Posting it to the PR is outward-facing, so it happens only when the human asks.</li>
+<li>Turn Copilot’s automatic review off in your own GitHub settings (github.com/settings/copilot). No repo ruleset requests it.</li>
+</ul><p>Agents without Claude Code hooks can follow the skill file by hand.</p>
+<hr></div>
+</div>
 <div class="section level2">
 <h2 id="output-format">Output format<a class="anchor" aria-label="anchor" href="#output-format"></a></h2>
 <p><strong>Lead with the result.</strong> No preamble, no plan-of-attack, no restating the task back.</p>

@@ -37,7 +37,7 @@ tumour/normal, multiple runs) and need to be combined into one container."><!-- 
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -142,8 +142,8 @@ combining (saves memory). Accepts <code>GRanges</code> or a data frame with <cod
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Split a cohort into Tumour and Normal, create a list, then combine back</span></span></span>
-<span class="r-in"><span><span class="va">tumours</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">normals</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Normal"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tumours</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">normals</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Normal"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">qsetList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">tumours</span>, <span class="va">normals</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combineQsetsList</span><span class="op">(</span><span class="va">qsetList</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No initial qseaSet given, using first element as initial qseaSet</span>

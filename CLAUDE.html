@@ -35,7 +35,7 @@
       <a href="articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="articles/generation.html">Generating qseaSets</a>
@@ -87,7 +87,7 @@
 <div class="section level2">
 <h2 id="where-the-detail-lives">Where the detail lives<a class="anchor" aria-label="anchor" href="#where-the-detail-lives"></a></h2>
 <p>Load the skill rather than guessing; each one loads only when the task matches.</p>
-<table class="table"><thead><tr><th>Task</th>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>Task</th>
 <th>Skill</th>
 </tr></thead><tbody><tr><td>Version bumps, opening/closing a devel cycle</td>
 <td><code>bioc-release-cycle</code></td>
@@ -103,6 +103,8 @@
 <td><code>mesa-status</code></td>
 </tr><tr><td>Capturing a new procedure as a skill</td>
 <td><code>capture-skill</code></td>
+</tr><tr><td>Reviewing a PR, branch or diff (auto-requested for large PRs)</td>
+<td><code>pr-review</code></td>
 </tr></tbody></table><p>Generic R practice comes from the <code>posit-dev/skills</code> plugins (<code>r-lib</code>, <code>github</code>, <code>open-source</code>, <code>posit-dev</code>). <strong>A mesa skill beats a plugin skill</strong> wherever they disagree — the plugins know CRAN and tidyverse conventions, not Bioconductor’s.</p>
 </div>
 <div class="section level2">

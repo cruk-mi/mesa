@@ -40,7 +40,7 @@ left NULL to use mesa defaults for GRCh38)."><!-- mathjax --><script src="https:
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -317,7 +317,7 @@ trailing parenthetical), and—when contexts are provided—<code>landscape</cod
 <span class="r-in"><span><span class="co"># Mouse example (mm10): supply mouse TxDb and OrgDb</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleMouse</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">exampleMouse</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">getRegions</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">annotateWindows</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    TxDb   <span class="op">=</span> <span class="st">"TxDb.Mmusculus.UCSC.mm10.knownGene"</span>,</span></span>
 <span class="r-in"><span>    annoDb <span class="op">=</span> <span class="st">"org.Mm.eg.db"</span></span></span>

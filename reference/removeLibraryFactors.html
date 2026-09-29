@@ -37,7 +37,7 @@ keep beta unchanged; NRPM may change depending on downstream use."><!-- mathjax 
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -123,7 +123,7 @@ synchronising the <code>sampleTable</code>.</p>
 <span class="r-in"><span><span class="co"># Show current factors then reset to 1 and show again</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="addLibraryInformation.html">addLibraryInformation</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">pull</span><span class="op">(</span><span class="va">library_factor</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">library_factor</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.0160834 0.9149047 0.9700701 0.9537051 1.0365441 1.0701382</span>
 <span class="r-in"><span></span></span>

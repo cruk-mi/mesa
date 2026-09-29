@@ -35,7 +35,7 @@
       <a href="../articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="../articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="../articles/generation.html">Generating qseaSets</a>
@@ -71,6 +71,19 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.7.9000" id="mesa-09979000">mesa 0.99.7.9000<a class="anchor" aria-label="anchor" href="#mesa-09979000"></a></h2>
+<div class="section level3">
+<h3 id="documentation-0-99-7-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-7-9000"></a></h3>
+<ul><li>Rewrote the README: badges, a quick start on <code>exampleTumourNormal</code>, links to the pkgdown site and vignettes, and citations. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
+<li>Fixed the “Annotatation” typo in the DMR vignette title. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
+<li>
+<code>citation("mesa")</code> now returns the two published papers. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="infrastructure-0-99-7-9000">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-7-9000"></a></h3>
+<ul><li>Coverage is now uploaded on pull requests as well as <code>main</code>; Codecov statuses are informational. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
+<li>CI fails if Codecov rejects the upload after three attempts; fork pull requests are exempt. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
+<li>The devcontainer image no longer installs <code>immunedeconv</code> (with its GitHub dependencies) or <code>imsig</code>, which mesa does not use, and takes <code>ggtree</code> from Bioconductor instead of a GitHub pin. It now installs nothing from GitHub, so it no longer needs the pinned archives and SHA check added in 0.99.7. (<a href="https://github.com/cruk-mi/mesa/pull/132" class="external-link">#132</a>)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.7" id="mesa-0997">mesa 0.99.7<a class="anchor" aria-label="anchor" href="#mesa-0997"></a></h2>

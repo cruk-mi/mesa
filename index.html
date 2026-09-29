@@ -53,7 +53,7 @@
       <a href="articles/data-and-qc.html">Data Tables and Quality Control</a>
     </li>
     <li>
-      <a href="articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotatation</a>
+      <a href="articles/differentially-methylated-regions.html">Differentially Methylated Regions and Annotation</a>
     </li>
     <li>
       <a href="articles/generation.html">Generating qseaSets</a>
@@ -92,6 +92,20 @@
 <div class="section level1">
 <div class="page-header"><h1 id="mesa">mesa<a class="anchor" aria-label="anchor" href="#mesa"></a>
 </h1></div>
+<!-- badges: start -->
+
+<!--
+Bioconductor shields. These 404 until mesa is accepted and appears in the
+Bioconductor repository at 1.0, so they stay commented out until then.
+Tracked in issue #109.
+
+[![BioC release](https://bioconductor.org/shields/build/release/bioc/mesa.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/mesa)
+[![BioC devel](https://bioconductor.org/shields/build/devel/bioc/mesa.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/mesa)
+[![Platforms](https://bioconductor.org/shields/availability/devel/mesa.svg)](https://bioconductor.org/packages/devel/bioc/html/mesa.html)
+[![Downloads](https://bioconductor.org/shields/downloads/release/mesa.svg)](https://bioconductor.org/packages/stats/bioc/mesa/)
+[![Support posts](https://bioconductor.org/shields/posts/mesa.svg)](https://support.bioconductor.org/tag/mesa)
+[![Years in BioC](https://bioconductor.org/shields/years-in-bioc/mesa.svg)](https://bioconductor.org/packages/release/bioc/html/mesa.html)
+-->
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -99,7 +113,7 @@
 <p>This package builds off the <a href="https://github.com/MatthiasLienhard/qsea" class="external-link">qsea package</a>, using the <code>qseaSet</code> object type defined in that package as the object that holds the data. One of the most useful features of the package is in defining tidyverse verbs to act on a qseaSet, such as <code>filter</code>, <code>mutate</code> and <code>select</code>, but there also includes a range of functionality for other tasks, such as plotting and quality control.</p>
 <p>This package has been used in two published papers, in <a href="https://www.nature.com/articles/s43018-022-00415-9" class="external-link">Nature Cancer</a> and <a href="https://www.nature.com/articles/s41467-024-47195-7" class="external-link">Nature Communications</a>.</p>
 <p>Development was undertaken internally between September 2022 and March 2024; these commits are now incorporated into this repository. This has involved an extensive rewriting of the package functions, with many function names changing, see <a href="NEWS.html">the NEWS.md file for all the details</a>.</p>
-<p>The package is under active development with plans to submit to BioConductor, and a full vignette is under construction. If you are interested in using the package, we’re happy to hear from you.</p>
+<p>The package is under active development. It has been submitted to Bioconductor and is under review.</p>
 </div>
 <div class="section level2">
 <h2 id="install-the-package">Install the package<a class="anchor" aria-label="anchor" href="#install-the-package"></a>
@@ -127,6 +141,101 @@
 <p>⚠️ The development version may be unstable. Use the installer script above for a validated installation.</p>
 </blockquote>
 </div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p>mesa ships an example <code>qseaSet</code>, <code>exampleTumourNormal</code>: 10 samples (5 tumours and 5 matched adjacent normals) over a small part of chromosome 7. Everything below runs without any data of your own.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cruk-mi/mesa" class="external-link">mesa</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># A qseaSet holds the sample metadata, counts, windows, CNV and library</span></span>
+<span><span class="co"># information for an experiment in a single object.</span></span>
+<span><span class="va">exampleTumourNormal</span></span>
+<span></span>
+<span><span class="co"># The sample table is ordinary sample metadata, one row per sample.</span></span>
+<span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The distinguishing feature of mesa is that tidyverse verbs act on the <code>qseaSet</code> itself, filtering or annotating the sample table while reducing every other part of the object to match, behind the scenes:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lungOnly</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tissue</span> <span class="op">==</span> <span class="st">"Lung"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">type</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Methylation values come out as tables, either as normalised reads per million or as beta values scaled between 0 (unmethylated) and 1 (methylated):</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="reference/getNRPMTable.html">getNRPMTable</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="reference/getBetaTable.html">getBetaTable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Dimensionality reduction is two steps, calculate then plot:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="reference/getDimRed.html">getPCA</a></span><span class="op">(</span>nPC <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="reference/plotDimRed.html">plotDimRed</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span></code></pre></div>
+<p>See the articles below for generating a <code>qseaSet</code> from BAM files, quality control, and calling differentially methylated regions.</p>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>Full function reference and articles: <a href="https://cruk-mi.github.io/mesa/" class="external-link uri">https://cruk-mi.github.io/mesa/</a></p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Article</th>
+<th>Covers</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><a href="https://cruk-mi.github.io/mesa/articles/introduction.html" class="external-link">Introduction to Mesa</a></td>
+<td>The <code>qseaSet</code> object, its parts, and the tidyverse verbs that act on it</td>
+</tr>
+<tr>
+<td><a href="https://cruk-mi.github.io/mesa/articles/generation.html" class="external-link">Generating qseaSets</a></td>
+<td>Building a <code>qseaSet</code> from aligned, de-duplicated BAM files</td>
+</tr>
+<tr>
+<td><a href="https://cruk-mi.github.io/mesa/articles/data-and-qc.html" class="external-link">Data Tables and Quality Control</a></td>
+<td>Count, NRPM and beta tables, and assessing whether enrichment worked</td>
+</tr>
+<tr>
+<td><a href="https://cruk-mi.github.io/mesa/articles/pca.html" class="external-link">Dimensionality Reduction - PCAs and UMAPs</a></td>
+<td>
+<code><a href="reference/getDimRed.html">getPCA()</a></code>, <code><a href="reference/getDimRed.html">getUMAP()</a></code> and plotting the results</td>
+</tr>
+<tr>
+<td><a href="https://cruk-mi.github.io/mesa/articles/differentially-methylated-regions.html" class="external-link">Differentially Methylated Regions and Annotation</a></td>
+<td>Calling DMRs between groups and annotating them to genomic features</td>
+</tr>
+</tbody>
+</table>
+<p>The same articles are available from R once the package is installed, via <code>vignette(package = "mesa")</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>mesa underpins the analysis in two published papers. If you use it, please cite whichever is applicable to your work:</p>
+<blockquote>
+<p>Chemi F, Pearce SP, Clipson A, <em>et al.</em> (2022). cfDNA methylome profiling for detection and subtyping of small cell lung cancers. <em>Nature Cancer</em> <strong>3</strong>(10), 1260-1270. <a href="https://doi.org/10.1038/s43018-022-00415-9" class="external-link uri">https://doi.org/10.1038/s43018-022-00415-9</a></p>
+</blockquote>
+<blockquote>
+<p>Conway A-M, Pearce SP, Clipson A, <em>et al.</em> (2024). A cfDNA methylation-based tissue-of-origin classifier for cancers of unknown primary. <em>Nature Communications</em> <strong>15</strong>, 3292. <a href="https://doi.org/10.1038/s41467-024-47195-7" class="external-link uri">https://doi.org/10.1038/s41467-024-47195-7</a></p>
+</blockquote>
+</div>
+<div class="section level2">
+<h2 id="contributing-and-support">Contributing and support<a class="anchor" aria-label="anchor" href="#contributing-and-support"></a>
+</h2>
+<p>If you are interested in using the package, we’re happy to hear from you.</p>
+<ul>
+<li>Questions, bug reports and feature requests: <a href="https://github.com/cruk-mi/mesa/issues" class="external-link">open an issue</a>
+</li>
+<li>Contributors are expected to follow the <a href="CODE_OF_CONDUCT.html">Code of Conduct</a>
+</li>
+</ul>
+<p>mesa is developed at the <a href="https://cruknbc.org/" class="external-link">Cancer Research UK National Biomarker Centre</a>.</p>
+</div>
 </div>
   </div>
 
@@ -135,7 +244,7 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/cruk-mi/mesa/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/cruk-mi/mesa" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/cruk-mi/mesa/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -170,7 +279,15 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/cruk-mi/mesa/actions/workflows/check-bioc.yml" class="external-link"><img src="https://github.com/cruk-mi/mesa/actions/workflows/check-bioc.yml/badge.svg" alt="R-CMD-check-bioc"></a></li>
+<li><a href="https://app.codecov.io/gh/cruk-mi/mesa" class="external-link"><img src="https://codecov.io/gh/cruk-mi/mesa/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://www.gnu.org/licenses/gpl-2.0" class="external-link"><img src="https://img.shields.io/badge/license-GPL%20(%3E%3D%202)-blue.svg" alt="License: GPL (&gt;= 2)"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
