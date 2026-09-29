@@ -96,8 +96,9 @@ GH_API_OPTS_WITH_VALUE = {
     "--hostname",
 }
 # The shorthand among those, which pflag also takes with the value attached
-# (`-XDELETE`, `-X=DELETE`, `-fquery=...`).
-GH_API_SHORT_WITH_VALUE = {"-X", "-f", "-F", "-H", "-q", "-t", "-p"}
+# (`-XDELETE`, `-X=DELETE`, `-fquery=...`) and after -i, the one boolean
+# shorthand (`-iXDELETE`, `-iX DELETE`).
+GH_API_SHORT_BUNDLE = re.compile(r"-(i*)([XfFHqtp])(=?)(.*)", re.S)
 GH_API_MERGE = re.compile(r"/pulls/\d+/merge/?$")
 GH_API_PULL = re.compile(r"/pulls/\d+/?$")
 # Also the nested submit of a pending review: .../reviews/{id}/events.
@@ -494,11 +495,16 @@ def check_ref_write(endpoint, method, tokens):
 
 
 def split_attached(tokens):
-    """`-XDELETE`, `-X=DELETE`, `-fquery=...` as flag + value, as pflag reads them."""
+    """`-XDELETE`, `-X=DELETE`, `-fquery=...`, `-iXDELETE`, `-iX DELETE` as
+    flag + value, as pflag reads them: -i (the one boolean shorthand of gh api)
+    may lead the bundle."""
     out = []
     for t in tokens:
-        if len(t) > 2 and t[:2] in GH_API_SHORT_WITH_VALUE:
-            out += [t[:2], t[3:] if t[2] == "=" else t[2:]]
+        m = GH_API_SHORT_BUNDLE.fullmatch(t)
+        if m and (m.group(1) or m.group(3) or m.group(4)):
+            out += ["-i"] * bool(m.group(1)) + ["-" + m.group(2)]
+            if m.group(3) or m.group(4):
+                out.append(m.group(4))
         else:
             out.append(t)
     return out

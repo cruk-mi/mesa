@@ -167,6 +167,17 @@ ask_check "gh api graphql -fquery='mutation { mergePullRequest(input:{pullReques
 ask_check "gh api https://api.github.com/graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'"
 ask_check 'gh api -XPUT repos/cruk-mi/mesa/pulls/106/merge'
 check 0 'gh api -XPOST repos/cruk-mi/mesa/pulls/106/comments/1/replies -fbody=fixed'
+# -i (--include) may lead a bundle with the value flag after it.
+ask_check 'gh api -iX PUT repos/cruk-mi/mesa/pulls/1/merge'
+ask_check "gh api graphql -ifquery='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'"
+for cmd in \
+    'gh api -iXDELETE repos/cruk-mi/mesa/git/refs/tags/v0.99.6' \
+    'gh api -iX DELETE repos/cruk-mi/mesa/git/refs/heads/stacked-base' \
+    'gh api -iXDELETE repos/cruk-mi/mesa/git/refs/heads/main' \
+    "gh api graphql -if query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
+    'gh api repos/cruk-mi/mesa/pulls/1/reviews -iFevent=APPROVE'
+do check 2 "$cmd"; done
+check 0 'gh api -i repos/cruk-mi/mesa/pulls/106'
 
 # A mutation hidden in a query file must be read and caught, not waved through.
 qfile="$(mktemp)"
