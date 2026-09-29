@@ -1,0 +1,24 @@
+## Codecov configuration for mesa.
+##
+## Coverage is reported but never blocks a pull request: the package sits well
+## below the 80% target named in AGENTS.md, so a blocking status would fail
+## every PR for a pre-existing gap rather than for anything the PR did.
+## Revisit `informational` once coverage is near target.
+
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "data-raw"
+  - "vignettes"

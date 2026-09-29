@@ -1,6 +1,21 @@
 # mesa 0.99.7.9000
 
+## Documentation
+- Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
+  the pkgdown site and vignettes, and citations.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- Fixed the "Annotatation" typo in the DMR vignette title.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- `citation("mesa")` now returns the two published papers.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+
 ## Infrastructure
+- Coverage is now uploaded on pull requests as well as `main`; Codecov
+  statuses are informational.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- CI fails if Codecov rejects the upload after three attempts; fork pull
+  requests are exempt.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
 - The devcontainer image no longer installs `immunedeconv` (with its GitHub
   dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
   Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,

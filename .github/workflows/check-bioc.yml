@@ -316,7 +316,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Install covr
-        if: github.ref == 'refs/heads/main' && env.run_covr == 'true' && runner.os == 'Linux'
+        if: env.run_covr == 'true' && runner.os == 'Linux'
         run: |
           remotes::install_cran("covr")
         shell: Rscript {0}
@@ -392,12 +392,6 @@ jobs:
           )
         shell: Rscript {0}
 
-      - name: Test coverage
-        if: github.ref == 'refs/heads/main' && env.run_covr == 'true' && runner.os == 'Linux'
-        run: |
-          covr::codecov()
-        shell: Rscript {0}
-
       - name: Install package
         if: github.ref == 'refs/heads/main' && env.run_pkgdown == 'true' && runner.os == 'Linux'
         run: R CMD INSTALL .
@@ -414,6 +408,67 @@ jobs:
         ## at least one locally before this will work. This creates the gh-pages
         ## branch (erasing anything you haven't version controlled!) and
         ## makes the git history recognizable by pkgdown.
+
+      ## Coverage runs after the pkgdown deploy on purpose: this step fails
+      ## the job when Codecov rejects the upload, and a failing step skips
+      ## every step after it, which would otherwise stop the site updating.
+      - name: Test coverage
+        if: env.run_covr == 'true' && runner.os == 'Linux'
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          ## covr::codecov() returns the parsed HTTP response invisibly and
+          ## never inspects the status, so a rejected upload leaves this step
+          ## green. Uploads failed unnoticed from 2026-06-17 for exactly that
+          ## reason: first a 429 rate limit, then a 404 on a stale token.
+          ## Treat anything without a success marker as a failure, and print
+          ## the response so the cause is visible in the log.
+          ##
+          ## Success is the commit page Codecov links to. The host is anchored,
+          ## because error bodies link to docs.codecov.io and a bare
+          ## "codecov.io" match would score those as uploads.
+          commit_url <- paste0("^https://(app\\.)?codecov\\.io/",
+                               "(gh|github)/[^/]+/[^/]+/commit/[0-9a-f]{7,40}")
+          uploaded <- function(res) {
+              lines <- if (is.list(res)) {
+                  if (isTRUE(res$uploaded)) "uploaded" else as.character(res$url)
+              } else if (is.character(res)) {
+                  unlist(strsplit(res, "[[:space:]]+"))
+              } else {
+                  character(0)
+              }
+              ## length() first: as.character(character(0))[1] is NA, and
+              ## nzchar(NA) is TRUE, so an empty url used to score as success.
+              length(lines) > 0 &&
+                  (identical(lines, "uploaded") || any(grepl(commit_url, lines)))
+          }
+          ## Fork PRs get no secrets, so CODECOV_TOKEN is empty and a tokenless
+          ## upload is expected to be refused. Try once and report it, but do
+          ## not fail an external contributor's check for it.
+          has_token <- nzchar(Sys.getenv("CODECOV_TOKEN"))
+          attempts <- if (has_token) 3L else 1L
+          ## Measure once; only the upload is retried, to ride out a transient
+          ## 429 or 5xx from Codecov.
+          cov <- covr::package_coverage()
+          ok <- FALSE
+          for (i in seq_len(attempts)) {
+              res <- tryCatch(covr::codecov(coverage = cov),
+                              error = function(e) conditionMessage(e))
+              print(res)
+              ok <- uploaded(res)
+              if (ok || i == attempts) break
+              message("Codecov upload attempt ", i, " rejected; retrying.")
+              Sys.sleep(30 * i)
+          }
+          if (!has_token) {
+              message("No CODECOV_TOKEN (fork PR?): upload not verified.")
+              quit(save = "no", status = 0)
+          }
+          if (!ok) {
+              stop("Codecov upload failed after ", attempts,
+                   " attempts; see the responses printed above.")
+          }
+        shell: Rscript {0}
 
       - name: Upload check results
         if: failure()

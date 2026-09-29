@@ -10,4 +10,5 @@
 ^\.claude$
 ^AGENTS\.md$
 ^\.git$
+^codecov\.yml$
 ^STATUS\.md

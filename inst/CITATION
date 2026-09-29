@@ -1,0 +1,78 @@
+citHeader(
+    "mesa underpins the analysis in two published papers. ",
+    "Please cite whichever is applicable to your work."
+)
+
+bibentry(
+    bibtype = "Article",
+    key = "Chemi2022",
+    title = paste(
+        "cfDNA methylome profiling for detection and subtyping of",
+        "small cell lung cancers"
+    ),
+    author = c(
+        person("Francesca", "Chemi"),
+        person(c("Simon", "P."), "Pearce"),
+        person("Alexandra", "Clipson"),
+        person(c("Steven", "M."), "Hill"),
+        person("Alicia-Marie", "Conway"),
+        person(c("Sophie", "A."), "Richardson"),
+        person("Katarzyna", "Kamieniecka"),
+        person("Rebecca", "Caeser"),
+        person(c("Daniel", "J."), "White"),
+        person("Sumitra", "Mohan"),
+        person("Victoria", "Foy"),
+        person(c("Kathryn", "L."), "Simpson"),
+        person("Melanie", "Galvin"),
+        person(c("Kristopher", "K."), "Frese"),
+        person("Lynsey", "Priest"),
+        person("Jacklynn", "Egger"),
+        person("Alastair", "Kerr"),
+        person(c("Pierre", "P."), "Massion"),
+        person(c("John", "T."), "Poirier"),
+        person("Gerard", "Brady"),
+        person("Fiona", "Blackhall"),
+        person(c("Dominic", "G."), "Rothwell"),
+        person(c("Charles", "M."), "Rudin"),
+        person("Caroline", "Dive")
+    ),
+    journal = "Nature Cancer",
+    year = "2022",
+    volume = "3",
+    number = "10",
+    pages = "1260--1270",
+    doi = "10.1038/s43018-022-00415-9"
+)
+
+bibentry(
+    bibtype = "Article",
+    key = "Conway2024",
+    title = paste(
+        "A cfDNA methylation-based tissue-of-origin classifier for",
+        "cancers of unknown primary"
+    ),
+    author = c(
+        person("Alicia-Marie", "Conway"),
+        person(c("Simon", "P."), "Pearce"),
+        person("Alexandra", "Clipson"),
+        person(c("Steven", "M."), "Hill"),
+        person("Francesca", "Chemi"),
+        person("Dan", "Slane-Tan"),
+        person("Saba", "Ferdous"),
+        person(c("A.", "S.", "Md", "Mukarram"), "Hossain"),
+        person("Katarzyna", "Kamieniecka"),
+        person(c("Daniel", "J."), "White"),
+        person("Claire", "Mitchell"),
+        person("Alastair", "Kerr"),
+        person(c("Matthew", "G."), "Krebs"),
+        person("Gerard", "Brady"),
+        person("Caroline", "Dive"),
+        person("Natalie", "Cook"),
+        person(c("Dominic", "G."), "Rothwell")
+    ),
+    journal = "Nature Communications",
+    year = "2024",
+    volume = "15",
+    pages = "3292",
+    doi = "10.1038/s41467-024-47195-7"
+)
