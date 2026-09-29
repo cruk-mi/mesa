@@ -380,6 +380,8 @@ def push_options(args):
     out, i = [], 0
     while i < len(args):
         a = args[i]
+        if a == "--":
+            break  # the rest are the remote and refspecs
         if a in PUSH_OPTS_WITH_VALUE:
             i += 2
             continue
@@ -398,6 +400,8 @@ def push_positionals(args):
     """The remote and refspecs of a `git push`, skipping options and their values."""
     out, i = [], 0
     while i < len(args):
+        if args[i] == "--":
+            return out + args[i + 1:]  # even a refspec that starts with `-`
         if args[i] in PUSH_OPTS_WITH_VALUE:
             i += 2
             continue

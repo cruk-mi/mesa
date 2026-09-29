@@ -375,6 +375,10 @@ for cmd in \
     'git push -n --no-dry-run origin main' \
     'git push --dry --no-dry origin main'
 do check 2 "$cmd"; done
+# After `--` everything is the remote and refspecs, even `-n:main`.
+check 2 'git push origin -- -n:main'
+check 2 'git push origin -- -x:main'
+check 0 'git push origin -- chore/agent-setup'
 check 0 'git push -un origin main'
 check 0 'git push --no-dry-run --dry-run origin main'
 check 0 'git push -o ci.skip -n origin main'
