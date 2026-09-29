@@ -59,7 +59,7 @@ flowchart TD
     subgraph reference["Session setup &amp; packaged reference data"]
         direction LR
         setup["Genome, TxDb &amp; parallel setup<br/><code>utilityFunctions.R</code>, <code>genome.R</code>"]
-        genomemap["Genome mapping<br/><code>map_hg38.R</code>"]
+        genomemap["Mappability bins<br/><code>map_hg38.R</code>"]
         refregions["Reference regions<br/><code>ENCODEbadRegions.R</code>"]
     end
 
@@ -71,7 +71,7 @@ flowchart TD
     qc --> output
 
     reference -.->|annotation sources| output
-    reference -.->|excluded regions| stats
+    reference -.->|excluded regions &amp; mappability| stats
     reference -.->|genome &amp; window setup| input
 
     classDef entry fill:#dbeafe,stroke:#1e40af,color:#1e3a8a
