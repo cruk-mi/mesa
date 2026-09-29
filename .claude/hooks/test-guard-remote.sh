@@ -242,6 +242,18 @@ for cmd in \
 do check 2 "$cmd"; done
 ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/1/comments/../merge'
 check 0 'gh api https://api.github.com/repos/cruk-mi/mesa/pulls/106'
+# gh applies `gh api` flags placed before `api` too.
+for cmd in \
+    'gh -X DELETE api repos/cruk-mi/mesa/git/refs/heads/main' \
+    'gh -XDELETE api repos/cruk-mi/mesa/git/refs/tags/v0.99.6' \
+    'gh --method=DELETE api repos/cruk-mi/mesa/git/refs/heads/main' \
+    'gh --method DELETE api repos/cruk-mi/mesa/git/refs/heads/stacked-base' \
+    'gh -f event=APPROVE api repos/cruk-mi/mesa/pulls/135/reviews' \
+    "gh -f 'query=mutation { mergeBranch(input:{repositoryId:\"X\", base:\"main\", head:\"x\"}) { clientMutationId } }' api graphql"
+do check 2 "$cmd"; done
+ask_check 'gh -X PUT api repos/cruk-mi/mesa/pulls/135/merge'
+ask_check 'gh -X PATCH api repos/cruk-mi/mesa/issues/124 -f body=x' 'does not recognise'
+check 0 'gh --paginate api repos/cruk-mi/mesa/pulls/106/comments'
 # A mutation with variables is judged by its fields, not its header.
 check 0 "gh api graphql -f query='mutation(\$id:ID!){resolveReviewThread(input:{threadId:\$id}){thread{id}}}' -f id=X"
 check 0 "gh api graphql -f query='mutation Resolve(\$id: ID!) { resolveReviewThread(input:{threadId:\$id}) { thread { id } } }' -f id=X"

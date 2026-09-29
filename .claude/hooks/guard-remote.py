@@ -334,11 +334,19 @@ def command_tokens(tokens):
     return tokens
 
 
+def gh_opts_with_value():
+    """Every gh flag the hook knows to take a separate value. gh (cobra) reads a
+    subcommand's flags before the subcommand too (`gh -X DELETE api ...`), so
+    both walks skip these values wherever they sit."""
+    return GH_API_OPTS_WITH_VALUE | GH_PR_OPTS_WITH_VALUE
+
+
 def gh_positionals(tokens):
-    """gh's subcommand words, skipping `-R/--repo <repo>` wherever it sits."""
+    """gh's subcommand words, skipping flags and their values wherever they sit."""
     out, i = [], 1
+    with_value = gh_opts_with_value()
     while i < len(tokens):
-        if tokens[i] in ("-R", "--repo"):
+        if tokens[i] in with_value:
             i += 2
             continue
         if not tokens[i].startswith("-"):
@@ -436,19 +444,18 @@ def gh_api_args(tokens):
 
     One walk for every check, so a token that is the value of one flag (`-q
     --method=GET`, `-f -X`) is never also read as a flag of its own. Each
-    option is (name, value); a flag without a value has value None.
+    option is (name, value); a flag without a value has value None. The walk
+    starts right after `gh`, because gh also applies flags placed before
+    `api` (`gh -X DELETE api ...`); the first positional, `api`, is dropped.
     """
-    try:
-        i = tokens.index("api") + 1
-    except ValueError:
-        return [], []
-    opts, positional = [], []
+    opts, positional, i, subcommand = [], [], 1, None
+    with_value = gh_opts_with_value()
     while i < len(tokens):
         tok = tokens[i]
         if tok == "--":
             positional += tokens[i + 1:]
             break
-        if tok in GH_API_OPTS_WITH_VALUE:
+        if tok in with_value:
             opts.append((tok, tokens[i + 1] if i + 1 < len(tokens) else ""))
             i += 2
             continue
@@ -456,6 +463,8 @@ def gh_api_args(tokens):
             opts.append(tuple(tok.split("=", 1)))
         elif tok.startswith("-") and tok != "-":
             opts.append((tok, None))
+        elif subcommand is None:
+            subcommand = tok
         else:
             positional.append(tok)
         i += 1
