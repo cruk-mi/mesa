@@ -1,6 +1,6 @@
 Package: mesa
 Title: Methylation Enrichment Sequencing Analysis
-Version: 0.99.6.9000
+Version: 0.99.7.9000
 Authors@R: c(
     person(given = "Simon",
            family = "Pearce",
@@ -42,7 +42,6 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports:
     plyranges,
     magrittr,
@@ -97,7 +96,6 @@ Suggests:
     UpSetR,
     rtracklayer,
     ggrepel,
-    MEDIPS,
     workflows,
     MEDIPSData,
     uwot,
@@ -119,3 +117,4 @@ biocViews: Sequencing, DNAMethylation, CpGIsland,
 Config/testthat/edition: 3
 URL: https://github.com/cruk-mi/mesa
 BugReports: https://github.com/cruk-mi/mesa
+Config/roxygen2/version: 8.1.0

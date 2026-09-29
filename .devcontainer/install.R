@@ -9,7 +9,7 @@
 #      (DESCRIPTION is the single source of truth for *which*
 #      packages; already-present base packages are no-ops).
 #   2. A small set of genuine extras the base image / DESCRIPTION
-#      do not cover (dev versions + IDE tooling).
+#      do not cover (IDE tooling, pinned roxygen2).
 #
 # The slim/full split is one explicit list: `full_only` below.
 #
@@ -80,22 +80,34 @@ message(sprintf("── Installing %d declared dependencies ──", length(deps
 BiocManager::install(deps, ask = FALSE, update = FALSE)
 
 # --- Genuine extras (not in DESCRIPTION) --------------------
-# IDE tooling and dev-only / GitHub-only packages.
-for (pkg in c("languageserver", "imsig")) {
-  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
-}
-for (pkg in c("devtools", "roxygen2", "rcmdcheck")) {
+# IDE tooling and dev-only packages.
+for (pkg in c("languageserver", "devtools", "rcmdcheck")) {
   if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
 }
 
-# ggtree dev version (needs ggplot2 >= 4.0.0); no formal releases on GitHub,
-# pinned to a specific SHA for reproducibility.
-# immunedeconv is only available from GitHub; pinned to the SHA for v2.1.4.
-remotes::install_github("YuLab-SMU/ggtree",
-                        ref = "9f645a2b89e4150d9748547b3ea1b03906275c27",
-                        upgrade = "never")
-remotes::install_github("omnideconv/immunedeconv",
-                        ref = "e625e6c28ed14a30f9f40f159925cc9f0df4fa49",
-                        upgrade = "never")
+# roxygen2 is pinned, not merely present. DESCRIPTION's
+# `Config/roxygen2/version` records the roxygen2 that generated the committed
+# man/ and NAMESPACE; a different one rewrites every man page and produces a
+# huge spurious diff. Note the presence check used above is not enough here --
+# an image that already carries the wrong version would never be corrected --
+# so compare the version and reinstall on mismatch.
+roxygen_ver <- Sys.getenv("ROXYGEN_VERSION")
+if (!nzchar(roxygen_ver)) {
+  desc_path <- file.path(pkg_dir, "DESCRIPTION")
+  fields <- c("Config/roxygen2/version", "RoxygenNote")  # 8.x field, then 7.x
+  found <- fields[fields %in% colnames(read.dcf(desc_path))]
+  if (length(found)) roxygen_ver <- unname(read.dcf(desc_path, fields = found[1])[1, 1])
+}
+if (!nzchar(roxygen_ver)) {
+  stop("install.R: no roxygen2 version in DESCRIPTION or $ROXYGEN_VERSION. ",
+       "See .devcontainer/UPGRADE_GUIDE.md.")
+}
+have_roxygen <- requireNamespace("roxygen2", quietly = TRUE) &&
+  identical(as.character(packageVersion("roxygen2")), roxygen_ver)
+if (!have_roxygen) {
+  message(sprintf("── Installing pinned roxygen2 %s ──", roxygen_ver))
+  remotes::install_version("roxygen2", version = roxygen_ver,
+                           repos = getOption("repos"), upgrade = "never")
+}
 
 message("✅ mesa dependency stack ready")

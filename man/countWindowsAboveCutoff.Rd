@@ -67,8 +67,8 @@ countWindowsAboveCutoff(exampleTumourNormal,
 \seealso{
 \code{\link[=getDataTable]{getDataTable()}}, \code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
 
-Other window-summaries: 
-\code{\link{addSummaryAcrossWindows}()},
-\code{\link{summariseAcrossWindows}()}
+Other window-summaries:
+\code{\link[=addSummaryAcrossWindows]{addSummaryAcrossWindows()}},
+\code{\link[=summariseAcrossWindows]{summariseAcrossWindows()}}
 }
 \concept{window-summaries}

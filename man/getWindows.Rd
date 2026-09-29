@@ -12,10 +12,10 @@ Input object.
 \strong{Default:} none (must be supplied).}
 }
 \value{
-A \link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges} of windows.
+A \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} of windows.
 }
 \description{
-Convenience wrapper for \code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, returning the genomic windows.
+Convenience wrapper for \code{\link[qsea:getRegions]{qsea::getRegions()}}, returning the genomic windows.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
@@ -23,5 +23,5 @@ exampleTumourNormal \%>\% getWindows() \%>\% head()
 
 }
 \seealso{
-\code{\link[qsea:qseaSet-class]{qsea::getRegions()}}, \code{\link[=getWindowNames]{getWindowNames()}}
+\code{\link[qsea:getRegions]{qsea::getRegions()}}, \code{\link[=getWindowNames]{getWindowNames()}}
 }

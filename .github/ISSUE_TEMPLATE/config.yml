@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: mesa documentation
+    url: https://github.com/cruk-mi/mesa
+    about: Package README and vignettes.

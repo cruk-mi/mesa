@@ -1,0 +1,432 @@
+# AGENTS.md
+
+Canonical, tool-agnostic instructions for **any** AI agent working on **mesa**.
+
+> This file is the single source of truth for how agents work on this repo.
+> `CLAUDE.md`, the skills in `.claude/skills/*` and the agent definitions in
+> `.claude/agents/*` all defer to it. If they ever disagree, **AGENTS.md wins** — fix the
+> other file.
+>
+> Copilot-specific adapters are archived, inactive, in
+> [`.github/archive/copilot/`](.github/archive/copilot/) — see the README there to
+> reactivate them.
+
+---
+
+## Project overview
+
+**mesa** (Methylation Enrichment Sequencing Analysis) is an R/Bioconductor package for
+analysing methylation enrichment sequencing data (MBD-seq, MeDIP-seq). It targets
+Bioconductor submission and must conform to Bioconductor policies, coding standards, and
+review guidelines at all times. Current version: pre-submission `0.99.x` series.
+
+---
+
+## Workflow contract (read this first)
+
+Agents operate on a **dedicated branch as a sandbox**. The human owns when work becomes a
+pull request and when anything merges.
+
+- **Check the state of the repo first.** Run `git status` and `git log --oneline -5`
+  before making changes, and say so if the working tree is dirty or HEAD is not where you
+  expected — do not fold someone else's uncommitted work into your commit.
+- **Branch off `main`.** Never commit directly to `main`. (`dev` is no longer the working
+  branch — everything is cut from and PRs back to `main`.)
+- Make the **smallest** set of changes needed. Do not refactor unrelated code.
+- Commit in **atomic** steps, each a single logical change, using
+  [Conventional Commits](#conventional-commit-messages).
+- You **may push the feature branch** (with attribution — see below).
+- You **may open a pull request, but only as a draft.** Never mark it ready for review,
+  never request review, never merge.
+- You may **never** push or force-push to `main`, delete branches or tags, or rewrite
+  published history.
+- When in doubt about an irreversible or outward-facing action, ask first.
+- **Never push to Bioconductor** (`BiocStaging/mesa`) without the human's explicit
+  permission, asked every time. The human runs that push by default.
+
+These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
+as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
+approval through the raw API is blocked the same way. If the hook and this file ever
+disagree, that is a bug — fix both.
+
+---
+
+## Session scope and the parking lot
+
+**One issue = one session = one branch = one draft PR.** A session exists to close the
+issue it was opened for, and nothing else.
+
+- Start a fresh session (or `/clear`) for each issue. Do not carry context from one issue
+  into the next. Use a separate worktree per issue (`claude --worktree`, or
+  `git worktree add`) so sessions running in parallel never share a checkout.
+- Change only the files the issue needs. The PR references it with `Fixes #<n>`.
+- **Anything else you notice is parked, not fixed** — a second bug, a typo, a refactor, a
+  missing test, a "while I'm here". This holds even when the agent itself suggests the fix
+  and even when it looks like one line. Run `/park <finding>`, say `Parked: …`, and carry on.
+  Agents must not offer to fix out-of-scope findings; they park them.
+- Agents without `/park` (Copilot, Codex, …) run the same step directly. `<issue>` is the
+  session's issue number, or `-`:
+  `python3 .claude/scripts/mesa-status.py --park <issue> <<'EOF'`, then the note on its own
+  line, then `EOF`.
+- List what was parked in the PR description under **Parked**. That list is the durable
+  copy.
+
+The parking lot is `.claude/state/parking-lot.md` in the **main checkout**. The script
+resolves it through `git rev-parse --git-common-dir`, so every worktree writes to the same
+file. It is gitignored, so it never conflicts between branches and is never committed. It
+is also **per-machine**: a session in the devcontainer, a Codespace or on the web writes to
+a checkout that goes away, which is why the PR's **Parked** list matters.
+`/mesa-status` shows the count and the items, and they are inlined into the dashboard it
+publishes as a (private) claude.ai artifact, so don't park anything that must stay on this
+machine.
+
+**Triage (human, weekly):** promote each line to a GitHub issue labelled `parked` — per the
+issue workflow below, check for a duplicate first — or delete it. Then delete the line.
+Nothing stays parked for more than a week.
+
+---
+
+## Attribution (required)
+
+This repo is public and used for Bioconductor review, so **authorship must never be
+misrepresented**. Every change an AI makes must be attributed:
+
+- Add a co-author trailer to every commit the agent makes:
+  - Claude Code: `Co-Authored-By: Claude <noreply@anthropic.com>`
+  - Copilot coding agent: keep its default `Co-authored-by: Copilot` trailer.
+- Clearly note AI authorship in any PR description, issue, or comment an agent writes.
+- Never present AI-authored content as if written solely by the human.
+
+---
+
+## Branch strategy
+
+```
+main        ← primary branch. Branch all work off main; never commit directly.
+feat/*      ← new features.            fix/*       ← bug fixes.
+refactor/*  ← internal refactors.      docs/*      ← documentation only.
+chore/*     ← maintenance (CI, deps).  test/*      ← test additions/fixes.
+release/*   ← release stabilisation. Cut from main, merge to main + tag.
+```
+
+All branches are cut from `main` and PR back to `main`.
+
+---
+
+## Conventional Commit messages
+
+```
+<type>(<scope>): <short imperative description>
+
+[optional body — wrap at 72 chars]
+
+[optional footer: Fixes #<issue-number>]
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New user-visible function or argument |
+| `fix` | Bug fix |
+| `docs` | Documentation only (roxygen, vignettes, README, NEWS) |
+| `refactor` | Internal code change, no behaviour change |
+| `test` | Adding or fixing tests |
+| `chore` | CI, `data-raw` scripts, dependency bumps, tooling |
+| `perf` | Performance improvement |
+
+**Scope** (optional but recommended): the R file name without extension, e.g.
+`makeDMRs`, `plotting`, `buildQset`, `DESCRIPTION`.
+
+Reference issues in the footer with `Fixes #<n>` (closes on merge) or `Refs #<n>`.
+
+---
+
+## Release cycle
+
+Every change set runs through three phases. Work PRs sit **between** phases 1 and 3 —
+**never bundle a version bump into a work PR.**
+
+Bioconductor version convention: `0.99.z` pre-submission, then `1.0.0` on acceptance.
+Devel versions use an odd minor (e.g. `1.1.z`); release versions use an even minor
+(e.g. `1.0.z`).
+
+**Phase 1 — open the development section.** Branch `chore/bump-version-X.Y.Z.9000` off
+`main`. Two commits, in order (reference: PR #96 = `59f870b`):
+
+| commit message | change |
+|---|---|
+| `chore(DESCRIPTION): bump version to X.Y.Z.9000` | `DESCRIPTION` `Version:` only |
+| `docs(NEWS): open X.Y.Z.9000 development section` | insert `# mesa X.Y.Z.9000` plus a blank line at the very top of `NEWS.md` |
+
+**Phase 2 — the work.** Each feature/fix PR targets `main` and records its user-visible
+changes under the `# mesa X.Y.Z.9000` heading, in the same PR that makes the change.
+
+**Phase 3 — cut the release.** After the work PRs merge, branch
+`chore/bump-version-X.Y.(Z+1)` off `main`. One commit
+`chore(version): bump to X.Y.(Z+1)` (reference: PR #99 = `b5e80a0`): bump `DESCRIPTION`
+and rename the `NEWS.md` heading.
+
+**Stop after each phase.** Tell the human to push and open the PR. Tag format `vX.Y.Z`,
+applied by the human after merge to `main`.
+
+**After phase 3 merges**, the human tags the release and pushes it to Bioconductor
+(`BiocStaging/mesa`, branch `devel`) before phase 1 opens. The `bioc-release-cycle` skill
+has the checklist. A release that never reaches Bioconductor has not shipped.
+
+Full detail lives in the `bioc-release-cycle` skill.
+
+---
+
+## Project state
+
+`STATUS.md` answers "what landed, what is in flight, what is next". It is **generated** —
+every figure in it is read back from `git`, `gh`, `NEWS.md` and the `gh-pages` build commit
+by `.claude/scripts/mesa-status.py` — and therefore **gitignored**: a derived snapshot
+committed to the repo would go stale there, which is the whole failure this avoids. If you
+do not have it, run the script and you do.
+
+- **Never hand-edit it**, and never correct a number in it. A wrong figure means a wrong
+  probe: fix the script.
+- Refresh with `/mesa-status`, or `python3 .claude/scripts/mesa-status.py`. A `SessionStart`
+  hook refreshes it automatically once it is over four hours old.
+- The one hand-written part is `.claude/state/recommendation.md`, the "what to do next"
+  judgement. It is overwritten, never appended to, and rendered into `STATUS.md` by the
+  script.
+
+Because the state is derived, a change made by anyone — you, a co-maintainer on github.com,
+Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.
+
+`/mesa-status` also builds the **Next steps** page from the same data and publishes it as a
+private claude.ai artifact (its URL is per-clone: `mesa-status.py --artifact-url` prints it).
+The page is deterministic output, not something a model writes each time: the script inlines
+the state into a committed template. It is a snapshot, since a published artifact cannot
+reach GitHub. So hooks raise a flag whenever a session changes GitHub, and remind the human
+to run `/mesa-status` before that session ends. Hooks never run it themselves, and never
+edit #124: that public edit happens only when a human asks for it.
+
+**The roadmap** (what to do, in which order, for which release) is a TOML block in the
+pinned issue #124, edited on github.com. Every item's status (To do, Waiting, In review,
+Done, Later) is derived from the issues, PRs, branches and tags it names. Never tick or set a
+status by hand, and do not use the `status:` labels for this. Open a draft PR with
+`Fixes #N` and the roadmap picks it up.
+
+**Which file to edit:**
+
+| File | | Edit it? |
+|---|---|---|
+| `.claude/scripts/mesa-status.py` | the generator | **yes** — this is where a wrong figure gets fixed |
+| `.claude/scripts/dashboard-template.html` | the dashboard's design and markup | **yes** — this is the page |
+| `.claude/state/recommendation.md` | the "what next" judgement | **yes** — overwrite it |
+| #124's **Roadmap data** block | the plan: items, order, releases | **yes** — on github.com |
+| #124's generated checklist | derived from the block | no — `--sync-issue` rewrites it |
+| `STATUS.md` | generated, gitignored | no |
+| `.claude/state/status.json` | generated, gitignored | no |
+| `.claude/state/dashboard.html` | the Next steps page, generated, gitignored | no — edits here vanish on the next run |
+| `.claude/state/bioccheck-history.jsonl` | append-only record | no — the script appends |
+
+The `mesa-status` skill covers the probes, what is fragile about each, and how to add one.
+
+---
+
+## Issue workflow
+
+Before creating an issue, **check whether a matching one already exists**:
+
+```bash
+gh issue list --repo cruk-mi/mesa --state open
+```
+
+If one does, report its number and title rather than opening a duplicate. If none does,
+draft the title and body and show them to the human — say plainly that an agent wrote the
+text, per the attribution rule above.
+
+Reference issues from commits with `Fixes #<n>` (closes on merge) or `Refs #<n>`
+(cross-reference only).
+
+---
+
+## Toolchain versions — single source of truth
+
+**`DESCRIPTION` is the single source of truth; everything else derives from it.** If you
+pin or bump a tool version, change it in the source-of-truth file and nowhere else. If a
+value genuinely cannot be derived, it must appear in the inventory table in
+[`.devcontainer/UPGRADE_GUIDE.md`](.devcontainer/UPGRADE_GUIDE.md) listing **every** place
+it is duplicated.
+
+- R version comes from `DESCRIPTION`'s `R (>= X.Y.Z)` line; the Bioconductor version and
+  Docker base tag are derived from it by `.devcontainer/resolve_versions.sh`. CI and the
+  image build both call that resolver.
+- The dependency list comes from `DESCRIPTION`'s `Imports` / `Depends` / `Suggests`.
+- **Never hardcode an R or Bioconductor version** in a workflow, Dockerfile or install
+  script.
+
+Read `UPGRADE_GUIDE.md` before changing any version. Detail lives in the `mesa-ci` skill.
+
+---
+
+## R / Bioconductor coding standards
+
+Follow the [Bioconductor coding guidelines](https://contributions.bioconductor.org/r-code.html).
+
+- 4-space indentation. No tabs.
+- Line length ≤ 80 chars for R code; ≤ 100 chars for roxygen comments.
+- Use `<-` for assignment, never `=` at top level.
+- Never use `T` / `F` for `TRUE` / `FALSE`.
+- Avoid `1:n`; use `seq_len(n)` or `seq_along(x)`.
+- Avoid `:::` to reach unexported functions of other packages.
+- No `library()` / `require()` inside package code — declare in `DESCRIPTION` `Imports`
+  and call `pkg::fn()`.
+- **Never** call `install.packages()` or `BiocManager::install()` from package source. A
+  package must not install anything when it is loaded.
+- Prefer vectorised ops and Bioconductor structures (`GRanges`, `DataFrame`, …) over base
+  loops where natural.
+- Keep functions short and single-purpose; split rather than nest deeply.
+- No `<<-` (global assignment) without a documented reason.
+- **Do not add new package dependencies without asking** — Bioconductor reviewers flag
+  unnecessary imports.
+
+### roxygen2 / documentation
+
+- Every exported function needs a title, a description, `@param` for every argument,
+  `@return`, and at least one runnable `@examples` block. **This package writes the title
+  and description implicitly** — the first roxygen line is the title, the following
+  paragraph the description. There are no `@title` / `@description` tags anywhere in `R/`;
+  follow that convention rather than introducing them. Use `exampleMouse` / `exampleTumourNormal` data objects;
+  avoid `\dontrun{}` unless an example genuinely needs network/files.
+- Use `@seealso` to cross-reference related functions.
+- **`man/*.Rd` and `NAMESPACE` are roxygen-generated — never hand-edit them.** Both carry
+  roxygen2's `do not edit by hand` header. Regenerate with `roxygen2::roxygenise()`.
+- **The roxygen2 version is pinned.** `DESCRIPTION`'s `Config/roxygen2/version` records
+  which roxygen2 generated the committed docs, `.devcontainer/install.R` installs exactly
+  that version, and the `roxygen-drift` CI job regenerates and fails on any diff. If your
+  local roxygen2 differs, install the pinned version — do **not** regenerate with a
+  different one, which rewrites every man page. Upgrading roxygen2 is its own dedicated PR
+  (see `mesa-ci`).
+
+### Testing
+
+- Tests live in `tests/testthat/`; use `testthat` (≥ 3rd edition).
+- Every new function gets at least one test; every bug fix gets a regression test.
+- Reuse the shared fixtures in `tests/testthat/helper-fixtures.R` rather than rebuilding
+  example qsets. Guard heavy genome/annotation data with `skip_if_not_installed()`.
+- BiocCheck wants ≥ 80 % coverage (`covr::package_coverage()`).
+- Run `devtools::test()` before committing.
+
+Detail lives in the `mesa-tests` skill.
+
+---
+
+## File-change behaviour
+
+- Do not rename or move source files unless necessary.
+- Do not rewrite working code for style preference. Keep diffs small.
+- Preserve comments carrying biological/analytical context.
+- `data-raw/` scripts generate `.rda` files in `data/` — never hand-edit generated `.rda`;
+  re-run the script.
+- Record every user-visible change in `NEWS.md` under the current devel heading.
+
+---
+
+## Local verification (run before declaring done)
+
+```r
+devtools::test()                 # unit tests
+devtools::check()                # R CMD check
+BiocCheck::BiocCheck(".")        # Bioconductor checks
+covr::package_coverage()         # coverage (target ≥ 80%)
+```
+
+**Not every machine can run all of these.** `DESCRIPTION` requires a recent R, and
+`BiocCheck` / `covr` are not part of a default install. Check what is actually available
+before promising a result, and use the devcontainer or CI when it is not. The
+`bioc-check-ladder` skill covers where each check can really run.
+
+---
+
+## Skills and plugins
+
+Procedural detail lives in on-demand skills under `.claude/skills/`, so this file stays
+short. Generic R practice comes from the installed
+[`posit-dev/skills`](https://github.com/posit-dev/skills) plugins (`r-lib`, `github`,
+`open-source`, `posit-dev`).
+
+**Precedence: a mesa skill beats a plugin skill wherever they disagree.** The plugin
+skills encode CRAN and tidyverse conventions, which are not Bioconductor's — notably
+around release cadence, versioning and `BiocCheck`.
+
+| Task | Skill |
+|---|---|
+| Version bumps, opening/closing a devel cycle | `bioc-release-cycle` |
+| Running tests, `R CMD check`, `BiocCheck`, coverage | `bioc-check-ladder` |
+| Writing or fixing tests | `mesa-tests` |
+| Roxygen docs, `NEWS.md` entries | `mesa-docs-news` |
+| CI workflows, devcontainer, toolchain versions | `mesa-ci` |
+| Project state, `STATUS.md`, the status generator | `mesa-status` |
+| Capturing a new procedure as a skill | `capture-skill` |
+| Reviewing a PR, branch or diff | `pr-review` |
+
+### Pull request reviews
+
+Reviews are done locally with the `pr-review` skill (🔴 High / 🟠 Medium / 🟡 Low), not by
+GitHub Copilot, so they don't use Copilot quota.
+
+- **Large PRs are reviewed automatically.** After `gh pr create`,
+  `.claude/hooks/review-after-pr.py` reads the new PR's file list from GitHub with one
+  `gh pr view <N> --json baseRefName,files` call, so the size is the PR's, whichever
+  checkout the session is in. It leaves out generated files (`man/`, `NAMESPACE`) and
+  `DESCRIPTION`/`NEWS.md`. If the PR is over 150 lines, over 5 files, or over 30 lines under
+  `R/`, hooks or workflows, the session is asked to review it. If the call fails, it stays
+  silent.
+- **Small PRs** (version bumps, one-line docs) are reviewed only when a human asks:
+  `/pr-review <N>`.
+- A review is reported in the session. Posting it to the PR is outward-facing, so it
+  happens only when the human asks.
+- Turn Copilot's automatic review off in your own GitHub settings
+  (github.com/settings/copilot). No repo ruleset requests it.
+
+Agents without Claude Code hooks can follow the skill file by hand.
+
+---
+
+## Output format
+
+**Lead with the result.** No preamble, no plan-of-attack, no restating the task back.
+
+Answers use the same labelled parts every time, so the reader knows where to look. Each
+part is **one or two lines**. A part with nothing to say is **left out** — never write
+"N/A" or pad it.
+
+| Part | Content |
+|---|---|
+| **Result** | What now works, or what changed and why. Always first, always present. |
+| **Files** | One line per file: `path` — the reason it changed. |
+| **Verified** | What was actually run and what it said, and which checks could not run here and why (see `bioc-check-ladder`). Never imply a check that did not run. |
+| **Decide** | What the human has to choose, or what was deliberately left undone. Omit when there is nothing. |
+| **Notes** | A real trade-off or surprise only. Omit when the work was routine. |
+| **Commit** | The Conventional Commit subject, and the branch it landed on. |
+
+**Scale to the size of the change:**
+
+- **One-line fix, single file** — one sentence and the commit subject. Nothing else.
+- **A few files, no design decisions** — Result, Files, Verified, Commit.
+- **Multi-file or design-affecting** — the full set.
+
+**Leave out:**
+
+- Closing recaps and summary sections that repeat what was just said. The last part is
+  the last word.
+- Narration of what is about to happen ("Next I'll run the tests…"). Do it, then report it.
+- Tool output already on screen — diffs, file listings, full test logs. Quote only the
+  line that carries the verdict.
+
+A push or a draft PR is one line under **Result**, with the URL — not a section of its own.
+
+---
+
+## Preferred decision rule
+
+When multiple valid options exist, choose the one that:
+1. keeps the human in control of PRs/merges,
+2. keeps the diff smallest,
+3. passes `R CMD check` and `BiocCheck` cleanly,
+4. is easiest to maintain and review later.
