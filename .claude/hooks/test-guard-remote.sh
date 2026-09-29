@@ -269,6 +269,18 @@ check 0 "gh api graphql -f query='mutation(\$id: ID!) {${NL}  resolveReviewThrea
 check 0 "gh api graphql -f query='${NL}  query {${NL}    repository(owner: \"cruk-mi\", name: \"mesa\") { pullRequest(number: 1) { title } }${NL}  }'"
 check 0 "gh api repos/cruk-mi/mesa/pulls/106/comments --input - <<'EOF'${NL}{\"body\": \"don't merge yet; see #1 & #2 | ok\"}${NL}EOF"
 check 0 "git commit -m 'feat: x' -m \"it's fine; really\" && git push origin feat/x"
+# GraphQL ignores commas and `#` comments like whitespace, so either may sit
+# between a mutation and its `(`; a `# mutation` comment must not hide the
+# call after it; and a run of `#` must not hang the hook.
+ask_check "gh api graphql -f query='mutation{$R createCommitOnBranch #c${NL}(input:{branch:{branchName:\"main\"}}){commit{oid}}}'"
+ask_check "gh api graphql -f query='mutation{$R createCommitOnBranch,(input:{}){commit{oid}}}'"
+ask_check "gh api graphql -f query='mutation{$R closePullRequest , (input:{pullRequestId:\"X\"}){clientMutationId}}'"
+ask_check "gh api graphql -f query='mutation{$R # mutation${NL} closePullRequest(input:{pullRequestId:\"X\"}){clientMutationId}}'"
+ask_check "gh api graphql -f query='mutation{$R closePullRequest(#c${NL}input:{pullRequestId:\"X\"}){clientMutationId}}'"
+ask_check "gh api graphql -f query='mutation{$R ... on Mutation { closePullRequest(input:{pullRequestId:\"X\"}){clientMutationId} }}'"
+check 0 "gh api graphql -f query='mutation ( \$id : ID! ) { resolveReviewThread ( input : { threadId : \$id } ) { thread { id } } }' -f id=X"
+hashes='##################################################'
+check 0 "gh api graphql -f query='mutation{$R $hashes x}'"
 # A mutation with variables is judged by its fields, not its header.
 check 0 "gh api graphql -f query='mutation(\$id:ID!){resolveReviewThread(input:{threadId:\$id}){thread{id}}}' -f id=X"
 check 0 "gh api graphql -f query='mutation Resolve(\$id: ID!) { resolveReviewThread(input:{threadId:\$id}) { thread { id } } }' -f id=X"

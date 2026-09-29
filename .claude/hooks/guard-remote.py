@@ -139,6 +139,10 @@ GH_API_SAFE_WRITES = [
     ({"POST"}, re.compile(r"/issues/\d+/comments/?$")),             # PR/issue comment
     ({"PATCH", "DELETE"}, re.compile(r"/(issues|pulls)/comments/\d+/?$")),
 ]
+# GraphQL's ignored tokens: whitespace, commas, a byte-order mark, comments.
+# A comment runs to the end of its line and no further, so a run of `#` has
+# one parse, not exponentially many (a hook that hangs may fail open).
+GRAPHQL_IGNORED = r"(?:[\s,\ufeff]|#[^\n\r]*(?=[\n\r]|$))*"
 GH_GRAPHQL_SAFE_MUTATIONS = {
     "resolveReviewThread", "unresolveReviewThread", "addPullRequestReviewThreadReply",
     "addPullRequestReviewThread", "addPullRequestReviewComment", "addPullRequestReview",
@@ -649,12 +653,17 @@ def check_gh_graphql(tokens):
                 "cannot be checked. Use git push (or git push origin --delete <branch>).")
     if not re.search(r"\bmutation\b", text):
         return None  # a query only reads
-    # Every field called with arguments must be a known-safe mutation. The
-    # operation name and variable definitions (`mutation Name($t: ID!)`) are
-    # dropped first; a nested field with arguments only costs an ask.
-    body = re.sub(r"\bmutation\b\s*\w*\s*(\([^)]*\))?", "mutation", text)
-    unknown = set(re.findall(r"\b([A-Za-z_]\w*)\s*\(", body)) - GH_GRAPHQL_SAFE_MUTATIONS
-    if unknown or not re.search(r"\w\s*\(", body):
+    # Every field called with arguments must be a known-safe mutation. GraphQL
+    # ignores commas and `#` comments like whitespace, so either may sit
+    # between a field and its `(`. Nothing is stripped from the text and each
+    # name is tested in place (a lookahead, not a consuming match), so a fake
+    # comment or string can add matches but never hide one. A `(` followed by
+    # `$` opens variable definitions (`mutation Name($t: ID!)`), not a call.
+    ign = GRAPHQL_IGNORED
+    calls = {m.group(1) for m in re.finditer(
+        rf"\b([A-Za-z_]\w*)(?={ign}\({ign}(\$)?)", text) if not m.group(2)}
+    unknown = calls - GH_GRAPHQL_SAFE_MUTATIONS
+    if unknown or not calls:
         return Ask("run the GraphQL mutation " + ", ".join(sorted(unknown) or ["?"])
                    + ", which the hook does not recognise")
     return None
