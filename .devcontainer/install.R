@@ -9,8 +9,7 @@
 #      (DESCRIPTION is the single source of truth for *which*
 #      packages; already-present base packages are no-ops).
 #   2. A small set of genuine extras the base image / DESCRIPTION
-#      do not cover (IDE tooling, pinned roxygen2). GitHub-only
-#      packages are installed afterwards by install_github.R.
+#      do not cover (IDE tooling, pinned roxygen2).
 #
 # The slim/full split is one explicit list: `full_only` below.
 #
@@ -82,10 +81,7 @@ BiocManager::install(deps, ask = FALSE, update = FALSE)
 
 # --- Genuine extras (not in DESCRIPTION) --------------------
 # IDE tooling and dev-only packages.
-for (pkg in c("languageserver", "imsig")) {
-  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
-}
-for (pkg in c("devtools", "rcmdcheck")) {
+for (pkg in c("languageserver", "devtools", "rcmdcheck")) {
   if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
 }
 
@@ -113,8 +109,5 @@ if (!have_roxygen) {
   remotes::install_version("roxygen2", version = roxygen_ver,
                            repos = getOption("repos"), upgrade = "never")
 }
-
-# GitHub-only packages (ggtree, immunedeconv) are installed by
-# install_github.R, in a separate build step.
 
 message("✅ mesa dependency stack ready")

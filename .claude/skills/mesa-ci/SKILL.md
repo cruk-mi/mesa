@@ -63,15 +63,15 @@ the package list is never hand-maintained. The `slim`/`full` split is the single
 `full_only` list in that file; `slim` omits heavy genome/annotation packages, so
 data-dependent tests skip there (see `mesa-tests`).
 
-Genuine extras are installed separately. GitHub-only packages (`ggtree`, `immunedeconv`)
-live in `.devcontainer/install_github.R` and are **pinned to explicit SHAs** for
-reproducibility — keep that pattern for anything installed from GitHub, including
-immunedeconv's `Remotes:` (also pinned there; re-check them when bumping immunedeconv).
-The script fetches each pin as a `github.com/<repo>/archive/<sha>.tar.gz` archive and
-installs it with `dependencies = FALSE` after its CRAN/Bioc dependencies — **never through
-the GitHub API** (`install_github()`, or `Remotes:` resolution). Anonymous API calls are
-capped at 60/hour per IP and shared runners exhaust them, and a token would put the
-workflow's `packages: write` credential in reach of third-party install code.
+Genuine extras (IDE and dev tooling, pinned roxygen2) are installed after the declared
+dependencies. The image installs **nothing from GitHub**: `ggtree` (needed via ChIPseeker →
+enrichplot) comes from Bioconductor with the rest of the stack. If a GitHub-only package is
+ever genuinely needed, pin it to a SHA and fetch it as a
+`github.com/<repo>/archive/<sha>.tar.gz` archive — **never through the GitHub API**
+(`install_github()`, or `Remotes:` resolution). Anonymous API calls are capped at 60/hour
+per IP and shared runners exhaust them, and a token would put the workflow's
+`packages: write` credential in reach of third-party install code. #127 has a worked
+example (`install_github.R`, since removed).
 
 Note that the extras loop installs only when a package is **absent**
 (`if (!requireNamespace(pkg))`), so it will not correct an image that already carries a

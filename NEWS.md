@@ -1,5 +1,12 @@
 # mesa 0.99.7.9000
 
+## Infrastructure
+- The devcontainer image no longer installs `immunedeconv` (with its GitHub
+  dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
+  Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,
+  so it no longer needs the pinned archives and SHA check added in 0.99.7.
+  ([#132](https://github.com/cruk-mi/mesa/pull/132))
+
 # mesa 0.99.7
 
 ## Bug fixes
