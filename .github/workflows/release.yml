@@ -3,8 +3,8 @@
 ## Triggered by pushing a `vX.Y.Z` tag, which is the last step of phase 3 of
 ## the release cycle described in the contributor guide.
 ##
-## Tags have been cut up to v0.99.5 but the newest GitHub Release is v0.5.1
-## (March 2024), and v0.99.6 was never tagged at all - nothing built a release
+## Tags are cut for every release (v0.99.7 is the latest), but the newest
+## GitHub Release is v0.5.1 (March 2024) - nothing built a release
 ## tarball or published notes. This workflow closes that gap and, before
 ## publishing anything, gates the tag on the same multi-platform build
 ## Bioconductor itself uses.
