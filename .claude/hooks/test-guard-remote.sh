@@ -232,6 +232,16 @@ for cmd in \
     'gh api -X POST repos/cruk-mi/mesa/pulls/1/reviews -f event=APPROVE -H --method=GET'
 do check 2 "$cmd"; done
 check 0 "gh api repos/cruk-mi/mesa/pulls/106 -q '.title' --method GET"
+# GitHub resolves `..` in the path: heads/x/../main is main.
+for cmd in \
+    'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/x/../main -f sha=abc' \
+    'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/x/%2E%2E/dev -f sha=abc' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/x/../main' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/x/../../tags/v0.99.6' \
+    'gh api -X DELETE https://api.github.com/repos/cruk-mi/mesa/git/refs/heads/x/../main'
+do check 2 "$cmd"; done
+ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/1/comments/../merge'
+check 0 'gh api https://api.github.com/repos/cruk-mi/mesa/pulls/106'
 
 # gh api writes are allow-listed: the writes an agent is meant to make pass,
 # any other write is asked, whatever its spelling.

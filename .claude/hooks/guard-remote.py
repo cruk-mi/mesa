@@ -53,6 +53,7 @@ that is a bug: fix both.
 import functools
 import json
 import os
+import posixpath
 import re
 import shlex
 import subprocess
@@ -472,10 +473,15 @@ def gh_api_endpoint(tokens):
         return None
     # Drop any query string or fragment: the patterns below are anchored
     # at the end of the path, so `.../merge?` would otherwise slip past.
-    # GitHub decodes the path (`heads/%64ev` is dev) and reads `+1` as 1,
-    # so every check sees the path the way GitHub does.
-    path = urllib.parse.unquote(re.split(r"[?#]", positional[0], maxsplit=1)[0])
-    return re.sub(r"/\+(?=\d)", "/", path)
+    # GitHub decodes the path (`heads/%64ev` is dev), reads `+1` as 1 and
+    # resolves `..` (`heads/x/../main` is main), so every check sees the
+    # path the way GitHub does. A full URL keeps its scheme and host.
+    url = urllib.parse.urlsplit(re.split(r"[?#]", positional[0], maxsplit=1)[0])
+    path = urllib.parse.unquote(url.path)
+    if path:
+        path = posixpath.normpath(path)
+    path = re.sub(r"/\+(?=\d)", "/", path)
+    return url._replace(path=path).geturl()
 
 
 GH_API_BODY_OPTS = {"-f", "--field", "-F", "--raw-field", "--input"}
