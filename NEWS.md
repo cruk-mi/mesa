@@ -13,7 +13,12 @@
 ## Infrastructure
 - Test coverage is now measured and uploaded on pull requests, not only on
   pushes to `main`, so coverage no longer goes months out of date between
-  releases. Codecov is configured to report without blocking checks.
+  releases. Codecov's coverage statuses are informational, so a coverage drop
+  never blocks a pull request. ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- CI now fails when Codecov rejects the coverage upload, instead of passing
+  silently, after retrying it up to three times. Fork pull requests, which
+  have no upload token, are reported but not failed. The coverage step runs
+  after the pkgdown deploy, so a rejected upload cannot stop the site updating.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
 - The devcontainer image no longer installs `immunedeconv` (with its GitHub
   dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
