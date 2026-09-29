@@ -190,8 +190,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.verify.outputs.tag }}
+          SHA: ${{ needs.verify.outputs.sha }}
           VERSION: ${{ needs.verify.outputs.version }}
         run: |
+          current="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${TAG}" --jq .sha)"
+          if [ "${current}" != "${SHA}" ]; then
+            echo "::error::${TAG} moved from ${SHA} to ${current} during the run; the Release was not created. Push the tag again to release the new commit."
+            exit 1
+          fi
           gh release create "${TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
             --title "mesa ${TAG}" \
