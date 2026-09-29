@@ -290,9 +290,94 @@ def substitutions(command):
     return found
 
 
+SEPARATORS = "\n;&|"
+
+
+def quoted_segments(command):
+    """(start, text) of each segment, split only on separators outside quotes,
+    as the shell splits.
+
+    A quoted argument can span lines (`-f query='mutation {\n ... }'`), and
+    splitting it at the newline hides everything after the first line. A
+    heredoc body is data, so it is skipped: an apostrophe in it (`don't`)
+    must not pair with a quote in a later command. With unbalanced quotes the
+    shell runs nothing, so nothing is returned.
+    """
+    segments, begin, quote, i, heredocs = [], 0, None, 0, []
+    while i < len(command):
+        c = command[i]
+        if quote is None and command.startswith("<<", i) and not command.startswith("<<<", i):
+            m = re.match(r"<<(-?)\s*(['\"]?)([^\s'\";&|<>()]+)\2", command[i:])
+            if m:
+                heredocs.append((m.group(3), bool(m.group(1))))
+                i += m.end()
+                continue
+        if quote is None and c in SEPARATORS:
+            segments.append((begin, command[begin:i]))
+            begin = i + 1
+            if c == "\n" and heredocs:
+                # Skip each pending body, up to its delimiter line.
+                for delim, strip_tabs in heredocs:
+                    while begin < len(command):
+                        end = command.find("\n", begin)
+                        end = len(command) if end < 0 else end
+                        line = command[begin:end]
+                        begin = end + 1
+                        if (line.lstrip("\t") if strip_tabs else line) == delim:
+                            break
+                heredocs = []
+                i = begin
+                continue
+        elif c == "\\" and quote != "'":
+            i += 1
+        elif quote is None and c in "'\"":
+            quote = c
+        elif c == quote:
+            quote = None
+        i += 1
+    if quote is not None:
+        return []
+    segments.append((begin, command[begin:]))
+    return segments
+
+
+def naive_segments(command):
+    """(start, text) of each segment, split on every separator, even inside
+    quotes, so a heredoc body or a stray quote cannot hide the line after it."""
+    out, begin = [], 0
+    for m in re.finditer(r"\|\||&&|;|\n|\||&", command):
+        out.append((begin, command[begin:m.start()]))
+        begin = m.end()
+    out.append((begin, command[begin:]))
+    return out
+
+
+def unbalanced(segment):
+    try:
+        shlex.split(segment)
+        return False
+    except ValueError:
+        return True
+
+
 def split_segments(command):
-    """Split a shell command into separately-executed segments."""
-    return [s for s in re.split(r"\|\||&&|;|\n|\||&", command) if s.strip()]
+    """Split a shell command into separately-executed segments, both ways.
+
+    Every naive segment is judged, except a fragment with unbalanced quotes
+    that a quoted segment starting at the same place contains whole (the
+    first line of a multi-line argument): that segment is judged instead.
+    Checking both ways can only add refusals and asks, never remove one.
+    """
+    quoted = [(b, t) for b, t in quoted_segments(command) if t.strip()]
+    covered = {b + len(t) - len(t.lstrip()) for b, t in quoted}
+    out = []
+    for b, t in naive_segments(command):
+        if not t.strip():
+            continue
+        if unbalanced(t) and b + len(t) - len(t.lstrip()) in covered:
+            continue
+        out.append(t)
+    return list(dict.fromkeys(out + [t for _, t in quoted]))
 
 
 def tokenise(segment):

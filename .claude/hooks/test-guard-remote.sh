@@ -254,6 +254,21 @@ do check 2 "$cmd"; done
 ask_check 'gh -X PUT api repos/cruk-mi/mesa/pulls/135/merge'
 ask_check 'gh -X PATCH api repos/cruk-mi/mesa/issues/124 -f body=x' 'does not recognise'
 check 0 'gh --paginate api repos/cruk-mi/mesa/pulls/106/comments'
+# A quoted argument that spans lines is judged whole: splitting a GraphQL
+# query at its first newline hid every call after it. A heredoc body is data,
+# so an apostrophe in it cannot pair with a quote in a later command.
+R='resolveReviewThread(input:{threadId:"X"}){thread{id}}'
+NL='
+'
+check 2 "gh api graphql -f query='mutation{$R${NL} deleteRef(input:{refId:\"X\"}){clientMutationId}}'"
+ask_check "gh api graphql -f query='mutation{$R${NL} closePullRequest(input:{pullRequestId:\"X\"}){clientMutationId}}'"
+check 2 "cat <<'EOF'${NL}don't${NL}EOF${NL}gh api graphql -f query='mutation{$R${NL} deleteRef(input:{refId:\"X\"}){clientMutationId}}'"
+check 2 "cat <<'EOF'${NL}it's${NL}EOF${NL}git push origin main 'x'"
+check 2 "git commit -q -F - <<'EOF'${NL}fix: don't${NL}EOF${NL}git push origin main"
+check 0 "gh api graphql -f query='mutation(\$id: ID!) {${NL}  resolveReviewThread(input: {threadId: \$id}) {${NL}    thread { isResolved }${NL}  }${NL}}' -f id=X"
+check 0 "gh api graphql -f query='${NL}  query {${NL}    repository(owner: \"cruk-mi\", name: \"mesa\") { pullRequest(number: 1) { title } }${NL}  }'"
+check 0 "gh api repos/cruk-mi/mesa/pulls/106/comments --input - <<'EOF'${NL}{\"body\": \"don't merge yet; see #1 & #2 | ok\"}${NL}EOF"
+check 0 "git commit -m 'feat: x' -m \"it's fine; really\" && git push origin feat/x"
 # A mutation with variables is judged by its fields, not its header.
 check 0 "gh api graphql -f query='mutation(\$id:ID!){resolveReviewThread(input:{threadId:\$id}){thread{id}}}' -f id=X"
 check 0 "gh api graphql -f query='mutation Resolve(\$id: ID!) { resolveReviewThread(input:{threadId:\$id}) { thread { id } } }' -f id=X"
