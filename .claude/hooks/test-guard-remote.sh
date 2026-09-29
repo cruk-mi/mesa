@@ -222,12 +222,16 @@ check 2 'gh pr merge 108 -sd'
 check 2 'gh pr merge 108 -ds'
 check 2 'gh pr close 108 -d'
 check 2 'gh pr close 108 --delete-branch'
-check 2 'gh pr merge 999 -d'                # PR not found: cannot tell what goes
+check 2 'gh pr merge 108 -d=true'
+check 2 'gh pr merge 108 -sd=true'
+check 2 'gh pr close 108 -d=1'
+check 2 'gh pr merge 999 -d'              # PR not found: cannot tell what goes
 ask_check 'gh pr merge 102 --delete-branch=true' "PR #102 and delete its branch 'feat/clean'"
 ask_check 'gh pr merge 102 -sd' "merge PR #102 and delete its branch 'feat/clean'"
 ask_check 'gh pr merge 102 -ds' "delete its branch 'feat/clean'"
 ask_check 'gh pr merge 102 -d' "delete its branch 'feat/clean'"
 ask_check 'gh pr close 102 -d' "close PR #102 and delete its branch 'feat/clean'"
+ask_check 'gh pr merge 102 -d=true' "merge PR #102 and delete its branch 'feat/clean'"
 check 0 'gh pr close 102'
 
 # Deleting the head branch of an open PR closes that PR: refused, except for

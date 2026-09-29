@@ -533,12 +533,14 @@ def gh_pr_target(tokens):
 def deletes_branch(tokens):
     """True if `gh pr merge` / `gh pr close` also deletes the head branch.
 
-    gh (pflag) accepts `--delete-branch=true` and bundled shorthand such as
-    `-sd`, so matching the exact tokens is not enough. A `d` bundled with any
-    other letter counts; the cost of a false match is only an extra check.
+    gh (pflag) accepts `--delete-branch=true`, bundled shorthand such as `-sd`
+    and a shorthand value attached with `=` (`-d=true`, `-sd=1`), so matching
+    the exact tokens is not enough. A `d` bundled with any other letter counts;
+    the cost of a false match is only an extra check.
     """
     return any(t == "--delete-branch" or t.startswith("--delete-branch=")
-               or (re.fullmatch(r"-[A-Za-z]+", t) and "d" in t) for t in tokens)
+               or (re.fullmatch(r"-[A-Za-z]+(=.*)?", t) and "d" in t.split("=", 1)[0])
+               for t in tokens)
 
 
 def check_pr_branch_deletion(verb, tokens):
