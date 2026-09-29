@@ -1,30 +1,23 @@
 # mesa 0.99.7.9000
 
 ## Documentation
-- Rewrote the README: status badges for CI, coverage, licence and lifecycle; a
-  quick start built on the packaged `exampleTumourNormal` dataset; a table
-  linking the pkgdown site and the five vignettes; and full citations for the
-  two published papers that use the package.
+- Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
+  the pkgdown site and vignettes, and citations.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
-- Corrected the "Annotatation" typo in the title of the differentially
-  methylated regions vignette.
+- Fixed the "Annotatation" typo in the DMR vignette title.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
-- Added `inst/CITATION`, so `citation("mesa")` returns the two published
-  papers that use the package, with full author lists.
+- `citation("mesa")` now returns the two published papers.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
 - Added a package architecture diagram to the README; its Mermaid source is
   in `data-raw/figures/`.
   ([#110](https://github.com/cruk-mi/mesa/pull/110))
 
 ## Infrastructure
-- Test coverage is now measured and uploaded on pull requests, not only on
-  pushes to `main`, so coverage no longer goes months out of date between
-  releases. Codecov's coverage statuses are informational, so a coverage drop
-  never blocks a pull request. ([#108](https://github.com/cruk-mi/mesa/pull/108))
-- CI now fails when Codecov rejects the coverage upload, instead of passing
-  silently, after retrying it up to three times. Fork pull requests, which
-  have no upload token, are reported but not failed. The coverage step runs
-  after the pkgdown deploy, so a rejected upload cannot stop the site updating.
+- Coverage is now uploaded on pull requests as well as `main`; Codecov
+  statuses are informational.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- CI fails if Codecov rejects the upload after three attempts; fork pull
+  requests are exempt.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
 - The devcontainer image no longer installs `immunedeconv` (with its GitHub
   dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
