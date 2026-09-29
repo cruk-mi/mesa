@@ -306,6 +306,8 @@ for cmd in \
     'git push origin --mirr' \
     'git push origin --pru' \
     'git push origin --al' \
+    'git push --branches origin' \
+    'git push --b origin' \
     'git tag --del v0.99.6' \
     'git branch --del main'
 do check 2 "$cmd"; done

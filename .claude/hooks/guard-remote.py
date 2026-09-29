@@ -699,8 +699,8 @@ def check_segment(segment, depth=0):
             return "Force pushing via a '+refspec' is not allowed."
         if "--mirror" in args:
             return "`git push --mirror` can delete remote refs and is not allowed."
-        if "--all" in args:
-            return "`git push --all` would push protected branches too."
+        if "--all" in args or "--branches" in args:
+            return "`git push --all` (or `--branches`) would push protected branches too."
         if "--prune" in args:
             return "`git push --prune` deletes remote branches and is not allowed."
         if any("*" in a for a in positional[1:]):
