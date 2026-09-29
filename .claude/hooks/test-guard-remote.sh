@@ -125,6 +125,9 @@ for cmd in \
     'gh pr merge 102 --squash && git push origin main' \
     'gh pr edit 104 --ready' \
     'gh pr review 102 --approve' \
+    'gh pr review 102 -a' \
+    'gh pr review 102 --approve=true' \
+    'gh pr review 102 -ab ok' \
     'git tag -d v0.99.6' \
     'git -C /repo push origin main' \
     'git -c user.name=x push origin main' \
@@ -257,6 +260,7 @@ for cmd in \
     'git branch --show-current' \
     'gh pr create --draft --title "x" --body "y"' \
     'gh pr view 102' \
+    'gh pr review 102 --comment -b ok' \
     'gh pr list --state open' \
     'gh api repos/cruk-mi/mesa/pulls/106/comments' \
     'gh api repos/cruk-mi/mesa/git/refs/heads/main' \

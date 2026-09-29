@@ -656,6 +656,14 @@ def deletes_branch(tokens):
                for t in tokens)
 
 
+def approves(tokens):
+    """True if `gh pr review` approves: `--approve`, `--approve=...`, or `a` in a
+    shorthand bundle (`-a`, `-ab ok`, `-a=true`), read as deletes_branch() reads -d."""
+    return any(t == "--approve" or t.startswith("--approve=")
+               or (re.fullmatch(r"-[A-Za-z]+(=.*)?", t) and "a" in t.split("=", 1)[0])
+               for t in tokens)
+
+
 def check_pr_branch_deletion(verb, tokens):
     """`gh pr merge|close --delete-branch`: name the PR and the branch it deletes."""
     pr = pr_number_and_head(gh_pr_target(tokens))
@@ -716,7 +724,7 @@ def check_segment(segment, depth=0):
                     "ready for review.")
         if rest[:2] == ["pr", "edit"] and "--ready" in tokens:
             return "Only a human marks a pull request ready for review."
-        if rest[:2] == ["pr", "review"] and "--approve" in tokens:
+        if rest[:2] == ["pr", "review"] and approves(tokens):
             return "An agent does not approve pull requests on this repo."
         return None
 
