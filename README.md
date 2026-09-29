@@ -30,7 +30,8 @@ This package has been used in two published papers, in [Nature Cancer](https://w
 
 Development was undertaken internally between September 2022 and March 2024; these commits are now incorporated into this repository. This has involved an extensive rewriting of the package functions, with many function names changing, see [the NEWS.md file for all the details](NEWS.md).
 
-The package is under active development, with plans to submit to Bioconductor.
+The package is under active development. It has been submitted to Bioconductor
+and is under review.
 
 ## Install the package
 
