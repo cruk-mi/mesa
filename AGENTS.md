@@ -41,9 +41,48 @@ pull request and when anything merges.
 - You may **never** push or force-push to `main`, delete branches or tags, or rewrite
   published history.
 - When in doubt about an irreversible or outward-facing action, ask first.
+- **Never push to Bioconductor** (`BiocStaging/mesa`) without the human's explicit
+  permission, asked every time. The human runs that push by default.
 
-These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`. If the hook
-and this file ever disagree, that is a bug — fix both.
+These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
+as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
+approval through the raw API is blocked the same way. If the hook and this file ever
+disagree, that is a bug — fix both.
+
+---
+
+## Session scope and the parking lot
+
+**One issue = one session = one branch = one draft PR.** A session exists to close the
+issue it was opened for, and nothing else.
+
+- Start a fresh session (or `/clear`) for each issue. Do not carry context from one issue
+  into the next. Use a separate worktree per issue (`claude --worktree`, or
+  `git worktree add`) so sessions running in parallel never share a checkout.
+- Change only the files the issue needs. The PR references it with `Fixes #<n>`.
+- **Anything else you notice is parked, not fixed** — a second bug, a typo, a refactor, a
+  missing test, a "while I'm here". This holds even when the agent itself suggests the fix
+  and even when it looks like one line. Run `/park <finding>`, say `Parked: …`, and carry on.
+  Agents must not offer to fix out-of-scope findings; they park them.
+- Agents without `/park` (Copilot, Codex, …) run the same step directly. `<issue>` is the
+  session's issue number, or `-`:
+  `python3 .claude/scripts/mesa-status.py --park <issue> <<'EOF'`, then the note on its own
+  line, then `EOF`.
+- List what was parked in the PR description under **Parked**. That list is the durable
+  copy.
+
+The parking lot is `.claude/state/parking-lot.md` in the **main checkout**. The script
+resolves it through `git rev-parse --git-common-dir`, so every worktree writes to the same
+file. It is gitignored, so it never conflicts between branches and is never committed. It
+is also **per-machine**: a session in the devcontainer, a Codespace or on the web writes to
+a checkout that goes away, which is why the PR's **Parked** list matters.
+`/mesa-status` shows the count and the items, and they are inlined into the dashboard it
+publishes as a (private) claude.ai artifact, so don't park anything that must stay on this
+machine.
+
+**Triage (human, weekly):** promote each line to a GitHub issue labelled `parked` — per the
+issue workflow below, check for a duplicate first — or delete it. Then delete the line.
+Nothing stays parked for more than a week.
 
 ---
 
@@ -130,7 +169,62 @@ and rename the `NEWS.md` heading.
 **Stop after each phase.** Tell the human to push and open the PR. Tag format `vX.Y.Z`,
 applied by the human after merge to `main`.
 
+**After phase 3 merges**, the human tags the release and pushes it to Bioconductor
+(`BiocStaging/mesa`, branch `devel`) before phase 1 opens. The `bioc-release-cycle` skill
+has the checklist. A release that never reaches Bioconductor has not shipped.
+
 Full detail lives in the `bioc-release-cycle` skill.
+
+---
+
+## Project state
+
+`STATUS.md` answers "what landed, what is in flight, what is next". It is **generated** —
+every figure in it is read back from `git`, `gh`, `NEWS.md` and the `gh-pages` build commit
+by `.claude/scripts/mesa-status.py` — and therefore **gitignored**: a derived snapshot
+committed to the repo would go stale there, which is the whole failure this avoids. If you
+do not have it, run the script and you do.
+
+- **Never hand-edit it**, and never correct a number in it. A wrong figure means a wrong
+  probe: fix the script.
+- Refresh with `/mesa-status`, or `python3 .claude/scripts/mesa-status.py`. A `SessionStart`
+  hook refreshes it automatically once it is over four hours old.
+- The one hand-written part is `.claude/state/recommendation.md`, the "what to do next"
+  judgement. It is overwritten, never appended to, and rendered into `STATUS.md` by the
+  script.
+
+Because the state is derived, a change made by anyone — you, a co-maintainer on github.com,
+Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.
+
+`/mesa-status` also builds the **Next steps** page from the same data and publishes it as a
+private claude.ai artifact (its URL is per-clone: `mesa-status.py --artifact-url` prints it).
+The page is deterministic output, not something a model writes each time: the script inlines
+the state into a committed template. It is a snapshot, since a published artifact cannot
+reach GitHub. So hooks raise a flag whenever a session changes GitHub, and remind the human
+to run `/mesa-status` before that session ends. Hooks never run it themselves, and never
+edit #124: that public edit happens only when a human asks for it.
+
+**The roadmap** (what to do, in which order, for which release) is a TOML block in the
+pinned issue #124, edited on github.com. Every item's status (To do, Waiting, In review,
+Done, Later) is derived from the issues, PRs, branches and tags it names. Never tick or set a
+status by hand, and do not use the `status:` labels for this. Open a draft PR with
+`Fixes #N` and the roadmap picks it up.
+
+**Which file to edit:**
+
+| File | | Edit it? |
+|---|---|---|
+| `.claude/scripts/mesa-status.py` | the generator | **yes** — this is where a wrong figure gets fixed |
+| `.claude/scripts/dashboard-template.html` | the dashboard's design and markup | **yes** — this is the page |
+| `.claude/state/recommendation.md` | the "what next" judgement | **yes** — overwrite it |
+| #124's **Roadmap data** block | the plan: items, order, releases | **yes** — on github.com |
+| #124's generated checklist | derived from the block | no — `--sync-issue` rewrites it |
+| `STATUS.md` | generated, gitignored | no |
+| `.claude/state/status.json` | generated, gitignored | no |
+| `.claude/state/dashboard.html` | the Next steps page, generated, gitignored | no — edits here vanish on the next run |
+| `.claude/state/bioccheck-history.jsonl` | append-only record | no — the script appends |
+
+The `mesa-status` skill covers the probes, what is fragile about each, and how to add one.
 
 ---
 
@@ -202,10 +296,12 @@ Follow the [Bioconductor coding guidelines](https://contributions.bioconductor.o
 - Use `@seealso` to cross-reference related functions.
 - **`man/*.Rd` and `NAMESPACE` are roxygen-generated — never hand-edit them.** Both carry
   roxygen2's `do not edit by hand` header. Regenerate with `roxygen2::roxygenise()`.
-- **Before regenerating, check that your installed `roxygen2` matches `DESCRIPTION`'s
-  `RoxygenNote`.** If it does not, **stop and tell the human** — regenerating with a
-  different roxygen rewrites all 100+ man pages and bumps `RoxygenNote`, which must never
-  ride along in a work PR. A roxygen upgrade is its own dedicated PR.
+- **The roxygen2 version is pinned.** `DESCRIPTION`'s `Config/roxygen2/version` records
+  which roxygen2 generated the committed docs, `.devcontainer/install.R` installs exactly
+  that version, and the `roxygen-drift` CI job regenerates and fails on any diff. If your
+  local roxygen2 differs, install the pinned version — do **not** regenerate with a
+  different one, which rewrites every man page. Upgrading roxygen2 is its own dedicated PR
+  (see `mesa-ci`).
 
 ### Testing
 
@@ -265,7 +361,30 @@ around release cadence, versioning and `BiocCheck`.
 | Writing or fixing tests | `mesa-tests` |
 | Roxygen docs, `NEWS.md` entries | `mesa-docs-news` |
 | CI workflows, devcontainer, toolchain versions | `mesa-ci` |
+| Project state, `STATUS.md`, the status generator | `mesa-status` |
 | Capturing a new procedure as a skill | `capture-skill` |
+| Reviewing a PR, branch or diff | `pr-review` |
+
+### Pull request reviews
+
+Reviews are done locally with the `pr-review` skill (🔴 High / 🟠 Medium / 🟡 Low), not by
+GitHub Copilot, so they don't use Copilot quota.
+
+- **Large PRs are reviewed automatically.** After `gh pr create`,
+  `.claude/hooks/review-after-pr.py` reads the new PR's file list from GitHub with one
+  `gh pr view <N> --json baseRefName,files` call, so the size is the PR's, whichever
+  checkout the session is in. It leaves out generated files (`man/`, `NAMESPACE`) and
+  `DESCRIPTION`/`NEWS.md`. If the PR is over 150 lines, over 5 files, or over 30 lines under
+  `R/`, hooks or workflows, the session is asked to review it. If the call fails, it stays
+  silent.
+- **Small PRs** (version bumps, one-line docs) are reviewed only when a human asks:
+  `/pr-review <N>`.
+- A review is reported in the session. Posting it to the PR is outward-facing, so it
+  happens only when the human asks.
+- Turn Copilot's automatic review off in your own GitHub settings
+  (github.com/settings/copilot). No repo ruleset requests it.
+
+Agents without Claude Code hooks can follow the skill file by hand.
 
 ---
 

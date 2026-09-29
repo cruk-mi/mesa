@@ -1,6 +1,6 @@
 ---
 name: bioc-release-cycle
-description: mesa's three-phase version cadence — open a X.Y.Z.9000 devel section, land work PRs, cut X.Y.(Z+1). Use when bumping DESCRIPTION Version, opening or closing a development cycle, renaming a NEWS.md devel heading, or preparing a release or tag.
+description: mesa's three-phase version cadence — open a X.Y.Z.9000 devel section, land work PRs, cut X.Y.(Z+1) — and the post-merge tag and push to Bioconductor (BiocStaging). Use when bumping DESCRIPTION Version, opening or closing a development cycle, renaming a NEWS.md devel heading, or preparing a release, tag or Bioconductor push.
 ---
 
 # mesa release cycle
@@ -54,6 +54,53 @@ errors or warnings.
 
 **Stop.** Tell the human the branch is ready. Tags (`vX.Y.Z`) are applied by the human
 after merge to `main` — never by an agent.
+
+## After phase 3 merges — tag and push to Bioconductor
+
+A release is not out until Bioconductor has it. Once the phase-3 PR merges, hand the human
+this checklist, and do not open phase 1 until they confirm step 2 is done:
+
+1. **Tag on GitHub.** `origin/main` is now the phase-3 squash commit.
+
+   ```bash
+   git fetch origin
+   git tag -a vX.Y.(Z+1) origin/main -m "mesa X.Y.(Z+1)"
+   git push origin vX.Y.(Z+1)
+   ```
+
+2. **Push to Bioconductor.** During review, Bioconductor builds from the `devel` branch of
+   [`BiocStaging/mesa`](https://github.com/BiocStaging/mesa), not from
+   `git.bioconductor.org` (that copy lags behind and is not what the reviewers build). Its
+   `devel` is an ancestor of our `main`, so this is a plain fast-forward. There is no local
+   `devel` branch, so push `main`'s commit to it:
+
+   ```bash
+   # the remote persists in the clone; this adds it only if it is missing (fresh clone)
+   git remote get-url biocstaging >/dev/null 2>&1 ||
+     git remote add biocstaging https://github.com/BiocStaging/mesa.git
+   git fetch biocstaging
+   git merge-base --is-ancestor biocstaging/devel origin/main && echo fast-forward
+   git push biocstaging origin/main:devel
+   ```
+
+   HTTPS works with an existing `gh` login that has push access. The version bump triggers
+   a new build, and its report appears on the package's submission issue.
+
+3. **Then open the next cycle:** phase 1, `X.Y.(Z+1).9000`.
+
+4. **Refresh the roadmap:** `/mesa-status`. The release's `tag:vX.Y.(Z+1)` check turns its
+   "Cut …" item Done and marks the release as released on the Next steps page and in #124.
+
+**Pushing to Bioconductor is outward-facing and starts a public build. An agent never does
+it without asking.** Ask the human for explicit permission every time, even when an earlier
+push was approved, and show the exact command and the commits it will send
+(`git log --oneline biocstaging/devel..origin/main`). By default the human runs it.
+
+Before handing over the checklist, check that the previous release reached Bioconductor
+(`git ls-remote https://github.com/BiocStaging/mesa refs/heads/devel` should be at the
+last `vX.Y.Z` tag), and that the tag exists (`git ls-remote --tags origin`). If either is
+missing, say so first. 0.99.6 went out without its GitHub tag, which was only added when
+0.99.7 was cut.
 
 ## Precedence
 

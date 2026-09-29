@@ -52,10 +52,10 @@ exampleTumourNormal \%>\%
 \seealso{
 \code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 
-Other DMR-helpers: 
-\code{\link{pivotDMRsLonger}()},
-\code{\link{summariseDMRsByContrast}()},
-\code{\link{summariseDMRsByGene}()},
-\code{\link{writeDMRsToExcel}()}
+Other DMR-helpers:
+\code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}},
+\code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}},
+\code{\link[=summariseDMRsByGene]{summariseDMRsByGene()}},
+\code{\link[=writeDMRsToExcel]{writeDMRsToExcel()}}
 }
 \concept{DMR-helpers}

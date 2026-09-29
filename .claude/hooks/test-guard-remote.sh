@@ -47,8 +47,44 @@ for cmd in \
     'git push --mirror origin' \
     'git push --all origin' \
     'git push origin :main' \
-    'git push origin +main'
+    'git push origin +main' \
+    'gh api -X PUT repos/cruk-mi/mesa/pulls/106/merge' \
+    'gh api repos/cruk-mi/mesa/pulls/106/merge -X PUT' \
+    'gh api --method PATCH repos/cruk-mi/mesa/pulls/106 -f draft=false' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews -f event=APPROVE' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/heads/chore/status-tracking' \
+    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge?'" \
+    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge?merge_method=squash'" \
+    "gh api -X PUT 'repos/cruk-mi/mesa/pulls/106/merge#x'" \
+    "gh api -X PATCH 'repos/cruk-mi/mesa/pulls/106?' -f draft=false" \
+    "gh api graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { enablePullRequestAutoMerge(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { markPullRequestReadyForReview(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { addPullRequestReview(input:{pullRequestId:\"X\", event: APPROVE}) { clientMutationId } }'" \
+    "gh api graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
+    "gh api graphql --raw-field query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'" \
+    'gh api graphql --input -' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=APPROVE' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input -' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events --input -'
 do check 2 "$cmd"; done
+
+# A mutation hidden in a query file must be read and caught, not waved through.
+qfile="$(mktemp)"
+printf 'mutation { mergePullRequest(input:{pullRequestId:"X"}) { clientMutationId } }' >"$qfile"
+check 2 "gh api graphql -F query=@$qfile"
+check 2 "gh api graphql --input $qfile"
+rm -f "$qfile"
+
+# Same for a REST review payload: APPROVE in a file is caught, COMMENT is not.
+rfile="$(mktemp)"
+printf '{"event":"APPROVE"}' >"$rfile"
+check 2 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input $rfile"
+check 2 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events --input $rfile"
+printf '{"event":"COMMENT","body":"x"}' >"$rfile"
+check 0 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews --input $rfile"
+check 0 "gh api -X POST repos/cruk-mi/mesa/pulls/106/reviews/1/events -f event=COMMENT"
+rm -f "$rfile"
 
 # --- must be allowed -------------------------------------------------
 for cmd in \
@@ -66,6 +102,15 @@ for cmd in \
     'gh pr create --draft --title "x" --body "y"' \
     'gh pr view 102' \
     'gh pr list --state open' \
+    'gh api repos/cruk-mi/mesa/pulls/106/comments' \
+    'gh api repos/cruk-mi/mesa/pulls/106 --jq .state' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/comments/4063116787/replies -f body=fixed' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/106/comments/1/replies -f body="see /pulls/106/merge"' \
+    "gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:\"X\"}) { thread { isResolved } } }'" \
+    "gh api graphql -f query='query { repository(owner:\"cruk-mi\", name:\"mesa\") { pullRequest(number:106) { state } } }'" \
+    "gh api graphql -f query='mutation { addPullRequestReview(input:{pullRequestId:\"X\", event: COMMENT, body:\"x\"}) { clientMutationId } }'" \
+    "gh api 'repos/cruk-mi/mesa/pulls/106/comments?per_page=100'" \
+    "gh api repos/cruk-mi/mesa/pulls/106/reviews --jq '.[] | select(.state == \"APPROVED\")'" \
     'Rscript -e "devtools::test()"'
 do check 0 "$cmd"; done
 

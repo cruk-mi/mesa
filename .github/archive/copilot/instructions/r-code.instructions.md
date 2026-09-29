@@ -17,12 +17,15 @@ Follow [`AGENTS.md`](../../AGENTS.md). For files under `R/`:
 - **Do not add a new dependency without asking.**
 
 ## roxygen2 (every exported function)
-- Needs `@title`, `@description`, `@param`, `@return`, and ≥ 1 runnable `@examples`.
+- Needs a title, a description, `@param`, `@return`, and ≥ 1 runnable `@examples`.
+  Title and description are implicit — first line, then paragraph. `R/` uses no `@title` /
+  `@description` tags; do not add them.
 - Examples use `exampleMouse` / `exampleTumourNormal`; avoid `\dontrun{}` unless network/files
   are genuinely required.
 - Add `@seealso` cross-references.
 - **`man/` and `NAMESPACE` are roxygen-generated — never hand-edit them.** Regenerate with
-  `roxygen2::roxygenise()`, and only when your roxygen2 matches `DESCRIPTION`'s `RoxygenNote`.
+  `roxygen2::roxygenise()`, using the version pinned in `DESCRIPTION`'s
+  `Config/roxygen2/version`. CI fails the build if they drift.
 
 Any user-visible change must also be recorded in `NEWS.md` under the current devel heading
 `# mesa X.Y.Z.9000`, and needs a test (see `tests` instructions).
