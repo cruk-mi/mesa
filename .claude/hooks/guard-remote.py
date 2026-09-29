@@ -430,46 +430,68 @@ def targets_protected_ref(positional):
     return False
 
 
-def gh_api_endpoint(tokens):
-    """The endpoint argument of `gh api`, skipping flags and their values.
+def gh_api_args(tokens):
+    """(options, positionals) of a `gh api` call, read the way pflag reads them.
 
-    Parsed rather than grepped so a reply body that merely mentions a path
-    (`-f body='... /pulls/1/merge ...'`) is not mistaken for one.
+    One walk for every check, so a token that is the value of one flag (`-q
+    --method=GET`, `-f -X`) is never also read as a flag of its own. Each
+    option is (name, value); a flag without a value has value None.
     """
     try:
         i = tokens.index("api") + 1
     except ValueError:
-        return None
+        return [], []
+    opts, positional = [], []
     while i < len(tokens):
         tok = tokens[i]
+        if tok == "--":
+            positional += tokens[i + 1:]
+            break
         if tok in GH_API_OPTS_WITH_VALUE:
+            opts.append((tok, tokens[i + 1] if i + 1 < len(tokens) else ""))
             i += 2
             continue
-        if tok.startswith("-"):
-            i += 1
-            continue
-        # Drop any query string or fragment: the patterns below are anchored
-        # at the end of the path, so `.../merge?` would otherwise slip past.
-        # GitHub decodes the path (`heads/%64ev` is dev) and reads `+1` as 1,
-        # so every check sees the path the way GitHub does.
-        path = urllib.parse.unquote(re.split(r"[?#]", tok, maxsplit=1)[0])
-        return re.sub(r"/\+(?=\d)", "/", path)
-    return None
+        if tok.startswith("--") and "=" in tok:
+            opts.append(tuple(tok.split("=", 1)))
+        elif tok.startswith("-") and tok != "-":
+            opts.append((tok, None))
+        else:
+            positional.append(tok)
+        i += 1
+    return opts, positional
+
+
+def gh_api_endpoint(tokens):
+    """The endpoint argument of `gh api`, as GitHub will read it.
+
+    Parsed rather than grepped so a reply body that merely mentions a path
+    (`-f body='... /pulls/1/merge ...'`) is not mistaken for one.
+    """
+    positional = gh_api_args(tokens)[1]
+    if not positional:
+        return None
+    # Drop any query string or fragment: the patterns below are anchored
+    # at the end of the path, so `.../merge?` would otherwise slip past.
+    # GitHub decodes the path (`heads/%64ev` is dev) and reads `+1` as 1,
+    # so every check sees the path the way GitHub does.
+    path = urllib.parse.unquote(re.split(r"[?#]", positional[0], maxsplit=1)[0])
+    return re.sub(r"/\+(?=\d)", "/", path)
+
+
+GH_API_BODY_OPTS = {"-f", "--field", "-F", "--raw-field", "--input"}
 
 
 def gh_api_method(tokens):
     """The HTTP method a `gh api` call will use."""
     method = None
-    for i, tok in enumerate(tokens):
-        if tok in ("-X", "--method") and i + 1 < len(tokens):
-            method = tokens[i + 1].upper()  # pflag: the last one wins
-        elif tok.startswith("--method="):
-            method = tok.split("=", 1)[1].upper()
+    opts = gh_api_args(tokens)[0]
+    for name, value in opts:
+        if name in ("-X", "--method") and value is not None:
+            method = value.upper()  # pflag: the last one wins
     if method:
         return method
     # gh switches to POST as soon as a field or an --input body is supplied.
-    if any(t in ("-f", "--field", "-F", "--raw-field", "--input") or
-           t.startswith(("--field=", "--raw-field=", "--input=")) for t in tokens):
+    if any(name in GH_API_BODY_OPTS for name, _ in opts):
         return "POST"
     return "GET"
 
@@ -483,16 +505,11 @@ def payload_text(tokens):
     reported as None.
     """
     parts = []
-    for i, tok in enumerate(tokens):
-        value = None
-        if tok in ("-f", "--field", "-F", "--raw-field", "--input") and i + 1 < len(tokens):
-            value = tokens[i + 1]
-        elif tok.startswith(("--field=", "--raw-field=", "--input=")):
-            value = tok.split("=", 1)[1]
-        if value is None:
+    for tok, value in gh_api_args(tokens)[0]:
+        if tok not in GH_API_BODY_OPTS or value is None:
             continue
         path = None
-        if tok.startswith("--input"):
+        if tok == "--input":
             path = value
         elif "=@" in value:
             path = value.split("=@", 1)[1]

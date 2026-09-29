@@ -223,6 +223,15 @@ for cmd in \
     'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/%6Dain -f sha=abc'
 do check 2 "$cmd"; done
 ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/+138/merge'
+# A flag's value is never read as a flag of its own: `-q --method=GET` is a
+# jq expression, so the DELETE is still sent.
+for cmd in \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/tags/v0.99.6 -q --method=GET' \
+    'gh api -X DELETE repos/cruk-mi/mesa/git/refs/tags/v0.99.6 -p --method=GET' \
+    'gh api repos/cruk-mi/mesa/merges -f base=main -f head=x -f --method=GET' \
+    'gh api -X POST repos/cruk-mi/mesa/pulls/1/reviews -f event=APPROVE -H --method=GET'
+do check 2 "$cmd"; done
+check 0 "gh api repos/cruk-mi/mesa/pulls/106 -q '.title' --method GET"
 
 # gh api writes are allow-listed: the writes an agent is meant to make pass,
 # any other write is asked, whatever its spelling.
