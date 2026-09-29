@@ -91,7 +91,7 @@ jobs:
           echo "Version check passed for ${VERSION}."
 
   ## The exact pipeline r-universe runs for Bioconductor, called as a reusable
-  ## workflow: source + vignettes, Linux release/devel, macOS x86_64/arm64,
+  ## workflow: source + vignettes, Linux release/devel, macOS release/oldrel,
   ## Windows release/devel/oldrel, WASM, and BiocCheck.
   ##
   ## `organization: bioconductor` is what enables the Bioconductor Checks job.
