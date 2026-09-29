@@ -1,6 +1,20 @@
 # mesa 0.99.7.9000
 
+## Documentation
+- Rewrote the README: status badges for CI, coverage, licence and lifecycle; a
+  quick start built on the packaged `exampleTumourNormal` dataset; a table
+  linking the pkgdown site and the five vignettes; and full citations for the
+  two published papers that use the package.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+- Corrected the "Annotatation" typo in the title of the differentially
+  methylated regions vignette.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+
 ## Infrastructure
+- Test coverage is now measured and uploaded on pull requests, not only on
+  pushes to `main`, so coverage no longer goes months out of date between
+  releases. Codecov is configured to report without blocking checks.
+  ([#108](https://github.com/cruk-mi/mesa/pull/108))
 - The devcontainer image no longer installs `immunedeconv` (with its GitHub
   dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
   Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,
@@ -43,19 +57,6 @@
   failures, and fails if any of them does not install at its pinned SHA.
   Pull requests that change the devcontainer now build it (without pushing).
   ([#127](https://github.com/cruk-mi/mesa/pull/127))
-
-## Documentation
-- Rewrote the README: status badges for CI, coverage, licence and lifecycle; a
-  quick start built on the packaged `exampleTumourNormal` dataset; a table
-  linking the pkgdown site and the five vignettes; and full citations for the
-  two published papers that use the package.
-- Corrected the "Annotatation" typo in the title of the differentially
-  methylated regions vignette.
-
-## Infrastructure
-- Test coverage is now measured and uploaded on pull requests, not only on
-  pushes to `main`, so coverage no longer goes months out of date between
-  releases. Codecov is configured to report without blocking checks.
 
 # mesa 0.99.6
 
