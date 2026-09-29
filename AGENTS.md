@@ -169,7 +169,8 @@ and rename the `NEWS.md` heading.
 **Stop after each phase.** Tell the human to push and open the PR. Tag format `vX.Y.Z`,
 applied by the human after merge to `main`.
 
-**After phase 3 merges**, the human tags the release and pushes it to Bioconductor
+**After phase 3 merges**, the human tags the release, checks that the `release` workflow
+the tag starts has passed and published the GitHub Release, and pushes it to Bioconductor
 (`BiocStaging/mesa`, branch `devel`) before phase 1 opens. The `bioc-release-cycle` skill
 has the checklist. A release that never reaches Bioconductor has not shipped.
 

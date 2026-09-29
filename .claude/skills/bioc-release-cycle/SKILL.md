@@ -68,6 +68,25 @@ this checklist, and do not open phase 1 until they confirm step 2 is done:
    git push origin vX.Y.(Z+1)
    ```
 
+   Pushing the tag starts the `release` workflow (`.github/workflows/release.yml`, about
+   two hours). It checks the tag against `DESCRIPTION` and `NEWS.md`, runs the r-universe
+   Bioconductor build, and publishes the GitHub Release. **Check the run succeeded before
+   step 2**, because that build is the gate Bioconductor's own build would otherwise be:
+
+   ```bash
+   gh run list --repo cruk-mi/mesa --workflow release.yml --branch vX.Y.(Z+1) --limit 1   # note the run ID
+   gh run watch <run-id> --repo cruk-mi/mesa --exit-status
+   gh release view vX.Y.(Z+1) --repo cruk-mi/mesa                     # tarball attached
+   ```
+
+   A failed run has published nothing. If a job failed for a transient reason (a runner or
+   network error), re-run it: `gh run rerun <run-id> --repo cruk-mi/mesa --failed`.
+   Otherwise re-tag. If `verify` fails, the tag is on the wrong commit or the bump is
+   incomplete. If `runiverse` or `build` fails, fix it on `main` first. Then move the tag
+   to the right commit (`git tag -f -a vX.Y.(Z+1) <commit> -m …` and
+   `git push -f origin vX.Y.(Z+1)`), which starts a fresh run. Never move a tag while its
+   run is still going: that run refuses to publish, and only the new one releases.
+
 2. **Push to Bioconductor.** During review, Bioconductor builds from the `devel` branch of
    [`BiocStaging/mesa`](https://github.com/BiocStaging/mesa), not from
    `git.bioconductor.org` (that copy lags behind and is not what the reviewers build). Its
@@ -98,7 +117,9 @@ push was approved, and show the exact command and the commits it will send
 
 Before handing over the checklist, check that the previous release reached Bioconductor
 (`git ls-remote https://github.com/BiocStaging/mesa refs/heads/devel` should be at the
-last `vX.Y.Z` tag), and that the tag exists (`git ls-remote --tags origin`). If either is
+last `vX.Y.Z` tag), that the tag exists (`git ls-remote --tags origin`), and that it has a
+GitHub Release (`gh release view vX.Y.Z --repo cruk-mi/mesa`; only from v0.99.8 on, since
+earlier tags predate the `release` workflow). If any of these is
 missing, say so first. 0.99.6 went out without its GitHub tag, which was only added when
 0.99.7 was cut.
 

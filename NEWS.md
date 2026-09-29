@@ -24,6 +24,10 @@
   Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,
   so it no longer needs the pinned archives and SHA check added in 0.99.7.
   ([#132](https://github.com/cruk-mi/mesa/pull/132))
+- Pushing a `vX.Y.Z` tag now publishes a GitHub Release with the source
+  tarball and that version's `NEWS.md` notes, once the tag matches
+  `DESCRIPTION` and `NEWS.md` and passes the r-universe Bioconductor build.
+  ([#112](https://github.com/cruk-mi/mesa/pull/112))
 
 # mesa 0.99.7
 
