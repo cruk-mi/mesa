@@ -71,7 +71,8 @@ PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--ex
 # these are expanded before the checks read them. A missing entry costs at most
 # an extra block, never a missed one.
 PUSH_LONG = ("--delete", "--force", "--force-with-lease", "--force-if-includes",
-             "--mirror", "--all", "--branches", "--prune", "--dry-run", "--tags",
+             "--mirror", "--all", "--branches", "--prune", "--dry-run", "--no-dry-run",
+             "--tags",
              "--follow-tags", "--repo", "--receive-pack", "--exec", "--push-option",
              "--set-upstream", "--atomic", "--signed", "--thin", "--porcelain",
              "--progress", "--verbose", "--quiet", "--verify", "--no-verify",
@@ -350,6 +351,26 @@ def expand_long(args, known):
             if len(hits) == 1:
                 name = hits[0]
         out.append(name + eq + val)
+    return out
+
+
+def push_options(args):
+    """`git push` options in order, without their values: `-o x`, `--repo x`
+    and the `<v>` of `-o<v>` are skipped, and bundles are read letter by letter."""
+    out, i = [], 0
+    while i < len(args):
+        a = args[i]
+        if a in PUSH_OPTS_WITH_VALUE:
+            i += 2
+            continue
+        if a.startswith("--"):
+            out.append(a)
+        elif re.fullmatch(r"-[A-Za-z0-9].*", a, re.S):
+            for c in a[1:]:
+                if c == "o":
+                    break  # the rest of the bundle is -o's value
+                out.append("-" + c)
+        i += 1
     return out
 
 
@@ -659,11 +680,15 @@ def check_segment(segment, depth=0):
     # --- git push ---------------------------------------------------------
     if sub == "push":
         args = expand_long(args, PUSH_LONG)
-        # Short options bundle (`-uf`, `-dq`), so flags are read letter by letter.
-        flags = short_flags(args)
+        # Short options bundle (`-uf`, `-dq`), so flags are read letter by letter,
+        # stopping at -o, whose value follows it (`-onone` is not `-n`).
+        opts = push_options(args)
+        flags = {o[1] for o in opts if len(o) == 2}
         positional = push_positionals(args)
-        # A dry run mutates nothing, but only this segment is exempt.
-        if "--dry-run" in args or "n" in flags:
+        # A dry run mutates nothing, but only this segment is exempt, and git
+        # takes the last of --dry-run, -n and --no-dry-run.
+        dry = [o for o in opts if o in ("--dry-run", "-n", "--no-dry-run")]
+        if dry and dry[-1] != "--no-dry-run":
             return None
         if "f" in flags or any(a in ("--force", "--force-with-lease") or
                                a.startswith("--force-with-lease=") for a in args):

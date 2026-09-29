@@ -313,6 +313,19 @@ ask_check 'git push origin --del feat/merged' "'feat/merged'"
 ask_check 'git branch --del old-branch'
 check 0 'git push --dry origin main'
 check 0 'git push --set-up origin chore/agent-setup'
+# -o takes a value (`-onone` is -o none, not -n), and git takes the last of
+# --dry-run, -n and --no-dry-run, so none of these is a dry run.
+for cmd in \
+    'git push -onone origin main' \
+    'git push -onone origin --delete stacked-base' \
+    'git push -o -n origin main' \
+    'git push --repo -n origin main' \
+    'git push -n --no-dry-run origin main' \
+    'git push --dry --no-dry origin main'
+do check 2 "$cmd"; done
+check 0 'git push -un origin main'
+check 0 'git push --no-dry-run --dry-run origin main'
+check 0 'git push -o ci.skip -n origin main'
 ask_check 'git push -dq origin feat/merged' "'feat/merged'"
 ask_check 'git push -o ci.skip origin --delete feat/merged' "'feat/merged'"
 check 0 'git push -o ci.skip origin chore/agent-setup'
