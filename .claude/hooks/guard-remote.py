@@ -573,8 +573,13 @@ def gh_api_endpoint(tokens):
     # at the end of the path, so `.../merge?` would otherwise slip past.
     # GitHub decodes the path (`heads/%64ev` is dev), reads `+1` as 1 and
     # resolves `..` (`heads/x/../main` is main), so every check sees the
-    # path the way GitHub does. A full URL keeps its scheme and host.
-    url = urllib.parse.urlsplit(re.split(r"[?#]", positional[0], maxsplit=1)[0])
+    # path the way GitHub does. A full URL keeps its scheme and host; anything
+    # else is all path (`graphql:x` or `//git/...` is not a scheme or a host).
+    raw = re.split(r"[?#]", positional[0], maxsplit=1)[0]
+    if re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", raw):
+        url = urllib.parse.urlsplit(raw)
+    else:
+        url = urllib.parse.SplitResult("", "", raw, "", "")
     path = urllib.parse.unquote(url.path)
     if path:
         path = posixpath.normpath(path)
@@ -720,8 +725,11 @@ def check_gh_api(tokens):
     endpoint = gh_api_endpoint(tokens)
     if not endpoint:
         return None
-    # gh also takes a full URL (`https://api.github.com/graphql`).
-    if endpoint.strip("/") == "graphql" or endpoint.rstrip("/").endswith("/graphql"):
+    # gh also takes a full URL (`https://api.github.com/graphql`). Only that
+    # exact path is GraphQL; a REST write whose path merely ends in /graphql
+    # stays a REST write.
+    path = urllib.parse.urlsplit(endpoint).path if "://" in endpoint else endpoint
+    if path.strip("/") in ("graphql", "api/graphql"):
         return check_gh_graphql(tokens)
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):

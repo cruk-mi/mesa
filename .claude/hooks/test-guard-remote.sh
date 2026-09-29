@@ -281,6 +281,12 @@ ask_check "gh api graphql -f query='mutation{$R ... on Mutation { closePullReque
 check 0 "gh api graphql -f query='mutation ( \$id : ID! ) { resolveReviewThread ( input : { threadId : \$id } ) { thread { id } } }' -f id=X"
 hashes='##################################################'
 check 0 "gh api graphql -f query='mutation{$R $hashes x}'"
+# Only the graphql path itself is GraphQL: a REST write whose path merely
+# ends in /graphql stays a REST write. Only a real URL has a scheme and host.
+ask_check 'gh api -X PUT repos/cruk-mi/mesa/pulls/1/merge/x/../graphql -f merge_method=squash'
+ask_check "gh api %67raphql -f query='mutation { closePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'"
+check 2 'gh api -X DELETE graphql:x/git/refs/tags/v0.99.6'
+check 2 'gh api -X DELETE //repos/cruk-mi/mesa/git/refs/tags/v0.99.6'
 # A mutation with variables is judged by its fields, not its header.
 check 0 "gh api graphql -f query='mutation(\$id:ID!){resolveReviewThread(input:{threadId:\$id}){thread{id}}}' -f id=X"
 check 0 "gh api graphql -f query='mutation Resolve(\$id: ID!) { resolveReviewThread(input:{threadId:\$id}) { thread { id } } }' -f id=X"
