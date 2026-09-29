@@ -85,6 +85,9 @@ GH_API_OPTS_WITH_VALUE = {
     "-q", "--jq", "-t", "--template", "--input", "--cache", "-p", "--preview",
     "--hostname",
 }
+# The shorthand among those, which pflag also takes with the value attached
+# (`-XDELETE`, `-X=DELETE`, `-fquery=...`).
+GH_API_SHORT_WITH_VALUE = {"-X", "-f", "-F", "-H", "-q", "-t", "-p"}
 GH_API_MERGE = re.compile(r"/pulls/\d+/merge/?$")
 GH_API_PULL = re.compile(r"/pulls/\d+/?$")
 # Also the nested submit of a pending review: .../reviews/{id}/events.
@@ -467,6 +470,17 @@ def check_ref_write(endpoint, method, tokens):
     return None
 
 
+def split_attached(tokens):
+    """`-XDELETE`, `-X=DELETE`, `-fquery=...` as flag + value, as pflag reads them."""
+    out = []
+    for t in tokens:
+        if len(t) > 2 and t[:2] in GH_API_SHORT_WITH_VALUE:
+            out += [t[:2], t[3:] if t[2] == "=" else t[2:]]
+        else:
+            out.append(t)
+    return out
+
+
 def check_gh_api(tokens):
     """`gh api` is not a read-only escape hatch from the `gh pr` rules.
 
@@ -474,10 +488,12 @@ def check_gh_api(tokens):
     posting a review reply is `POST .../pulls/N/comments/ID/replies`, which
     none of these patterns match.
     """
+    tokens = split_attached(tokens)
     endpoint = gh_api_endpoint(tokens)
     if not endpoint:
         return None
-    if endpoint.strip("/") == "graphql":
+    # gh also takes a full URL (`https://api.github.com/graphql`).
+    if endpoint.strip("/") == "graphql" or endpoint.rstrip("/").endswith("/graphql"):
         return check_gh_graphql(tokens)
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):

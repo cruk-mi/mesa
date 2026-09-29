@@ -153,8 +153,20 @@ for cmd in \
     'gh api -X PATCH repos/cruk-mi/mesa/git/refs/heads/feat/x -f sha=abc -F force=true' \
     'gh api -X PATCH repos/cruk-mi/mesa/git/refs/tags/v0.99.6 -f sha=abc' \
     'gh api -X POST repos/cruk-mi/mesa/git/refs -f ref=refs/tags/v0.99.9 -f sha=abc' \
-    'gh api -X POST repos/cruk-mi/mesa/git/refs -f ref=refs/heads/main -f sha=abc'
+    'gh api -X POST repos/cruk-mi/mesa/git/refs -f ref=refs/heads/main -f sha=abc' \
+    'gh api -XDELETE repos/cruk-mi/mesa/git/refs/tags/v0.99.6' \
+    'gh api -X=DELETE repos/cruk-mi/mesa/git/refs/heads/main' \
+    'gh api -XPATCH repos/cruk-mi/mesa/git/refs/heads/feat/x -Fforce=true -fsha=abc' \
+    'gh api repos/cruk-mi/mesa/merges -fbase=main -fhead=feat/x' \
+    "gh api graphql -fquery='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'" \
+    'gh api repos/cruk-mi/mesa/pulls/106/reviews -fevent=APPROVE' \
+    "gh api https://api.github.com/graphql -f query='mutation { deleteRef(input:{refId:\"X\"}) { clientMutationId } }'"
 do check 2 "$cmd"; done
+# The same merge spelled with attached values or a full URL is still asked.
+ask_check "gh api graphql -fquery='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'"
+ask_check "gh api https://api.github.com/graphql -f query='mutation { mergePullRequest(input:{pullRequestId:\"X\"}) { clientMutationId } }'"
+ask_check 'gh api -XPUT repos/cruk-mi/mesa/pulls/106/merge'
+check 0 'gh api -XPOST repos/cruk-mi/mesa/pulls/106/comments/1/replies -fbody=fixed'
 
 # A mutation hidden in a query file must be read and caught, not waved through.
 qfile="$(mktemp)"
