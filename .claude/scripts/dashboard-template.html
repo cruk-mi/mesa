@@ -814,7 +814,7 @@
       if (remoteNames.length) cmds.push("git push origin --delete -- " + remoteNames.join(" "));
       if (cmds.length) {
         details.appendChild(el("pre", "sh", cmds.join("\n\n")));
-        details.appendChild(el("div", "muted", "Run these yourself — agents do not delete branches."));
+        details.appendChild(el("div", "muted", "Run these yourself, or ask an agent: it deletes only with your approval, and never a branch an open PR still uses."));
       }
       if (branches.unknown.length) {
         details.appendChild(el("div", "group-label", "No PR found — check before deleting"));

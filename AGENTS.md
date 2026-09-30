@@ -25,7 +25,7 @@ review guidelines at all times. Current version: pre-submission `0.99.x` series.
 ## Workflow contract (read this first)
 
 Agents operate on a **dedicated branch as a sandbox**. The human owns when work becomes a
-pull request and when anything merges.
+pull request and decides when anything merges.
 
 - **Check the state of the repo first.** Run `git status` and `git log --oneline -5`
   before making changes, and say so if the working tree is dirty or HEAD is not where you
@@ -36,18 +36,44 @@ pull request and when anything merges.
 - Commit in **atomic** steps, each a single logical change, using
   [Conventional Commits](#conventional-commit-messages).
 - You **may push the feature branch** (with attribution — see below).
-- You **may open a pull request, but only as a draft.** Never mark it ready for review,
-  never request review, never merge.
-- You may **never** push or force-push to `main`, delete branches or tags, or rewrite
-  published history.
+- You **may open a pull request, but only as a draft.** Never mark it ready for review or
+  request review.
+- You **may merge a pull request only when the human explicitly approves that merge or
+  asks for it** in the conversation. An approving review on GitHub is not, on its own,
+  that approval. Squash-merge (`gh pr merge --squash`) unless the human asks for a
+  merge commit on that PR: one commit per PR keeps `main` easy to read, revert and
+  bisect. The hook asks the human to confirm every merge.
+- You **may delete a branch only when it is safe and the human explicitly approves**.
+  Safe means:
+  - its PR is merged or closed;
+  - it is not `main` or `dev`;
+  - no open PR uses it as its base, or those PRs have been retargeted to `main` first
+    (`gh pr edit N --base main`). Otherwise deleting it closes those PRs instead of
+    retargeting them.
+  This covers `git branch -d/-D`, `git push --delete` and `gh pr merge|close
+  --delete-branch`. The hook asks the human to confirm each deletion. It refuses a
+  protected branch or a tag in any spelling, a remote branch that is the head or the base
+  of an open PR, and a remote branch it cannot check.
+- You may **never** push or force-push to `main`, delete tags, or rewrite published
+  history.
 - When in doubt about an irreversible or outward-facing action, ask first.
 - **Never push to Bioconductor** (`BiocStaging/mesa`) without the human's explicit
   permission, asked every time. The human runs that push by default.
 
 These rules are also enforced mechanically by `.claude/hooks/guard-remote.py`, on `gh api`
 as well as on `git` and `gh pr` — the endpoint names the action, so reaching a merge or an
-approval through the raw API is blocked the same way. If the hook and this file ever
-disagree, that is a bug — fix both.
+approval through the raw API is treated the same way. `gh api` writes are allow-listed:
+reads, comments, review replies, non-approving reviews, resolving threads and
+feature-branch refs pass, and any other write is asked. A merge or a safe branch deletion is
+not blocked but raised as a permission prompt, so the human confirms each one. In a
+permission mode that shows no prompt (`bypassPermissions`, `auto`, `dontAsk`), the hook
+blocks it instead: the human runs it. If the hook and this file ever disagree, that is a
+bug — fix both.
+
+The hook is a safety net, not a security boundary. It does not follow git or gh aliases,
+push behaviour set through config (`git -c remote.origin.mirror=true`,
+`push.default=matching`), `env -S`, or a command run by another interpreter
+(`python3 -c`). None of those are allowed ways around the rules above.
 
 ---
 

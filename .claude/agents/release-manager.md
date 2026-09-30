@@ -30,6 +30,7 @@ minor = devel, even minor = release.
 
 - **Never bundle a version bump into a work PR.**
 - Run the check ladder before phase 3 (see `bioc-check-ladder`).
-- Commit with the AI co-author trailer. Branch only; never merge.
+- Commit with the AI co-author trailer. Branch only; merge only when the human explicitly
+  approves or asks (see AGENTS.md).
 - **Never tag.** The human applies `vX.Y.Z` after merge to `main`.
 - **Stop after each phase** and tell the human the branch is ready.

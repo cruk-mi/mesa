@@ -7,35 +7,94 @@ mechanically so the contract does not depend on the model remembering it.
 
 Blocked:
   * any push that targets a protected branch (main / dev / master)
-  * force pushes, --mirror, --all, and remote ref deletion
+  * force pushes, --mirror, --all, --prune and wildcard refspecs
   * committing or merging while HEAD is on a protected branch
-  * gh pr merge / ready / review --approve
-  * the same four actions reached through `gh api`
-  * deleting branches or tags
+  * gh pr ready / review --approve
+  * the same actions reached through `gh api`, plus the ref and merge
+    endpoints whose target cannot be checked (deleteRef, updateRefs,
+    createRef, mergeBranch, POST .../merges)
+  * deleting a protected branch or any tag, however the ref is spelled
+  * deleting a remote branch that an open PR uses as its head or its base
+    (deleting it would close that PR), or one that cannot be checked
+  * any merge or deletion when the permission mode would not show the human
+    a prompt (bypassPermissions, auto, dontAsk, or no mode given)
+
+Asked, not blocked:
+  * any `gh api` write that is not on the allow-list (GH_API_SAFE_WRITES,
+    GH_GRAPHQL_SAFE_MUTATIONS, a non-approving review, a feature-branch ref).
+  * merging a pull request (`gh pr merge`, or the same through `gh api`).
+  * deleting any other branch (`git branch -d/-D`, `git push --delete`,
+    `gh pr merge|close --delete-branch`, or the same through `gh api`).
+  AGENTS.md allows these only when the human explicitly approves or asks, so
+  the hook returns a permission "ask": Claude Code shows the command and the
+  human confirms each one. The prompt names the PR and the branch.
 
 The command is split on shell separators and tokenised, so each segment is
 judged on its own. That matters: `git push --dry-run origin main && git push
 origin main` must not be waved through because the first half is harmless, and
 `git -C /repo push origin main` must not slip past because `git` and `push` are
-not adjacent.
+not adjacent. Each segment is judged from the command that actually runs, past
+`VAR=x`, `env`, `sudo` and similar wrappers, and the strings that `bash -c`,
+`eval`, `$( )` and backticks run are judged as commands of their own.
 
-Exit codes: 0 = allow, 2 = block (stderr is shown to the agent).
+Not covered (see AGENTS.md): git and gh aliases, push behaviour set through
+config (`-c remote.origin.mirror=true`, `push.default=matching`), `env -S`,
+and commands run by other interpreters.
+
+The remote checks ask `gh` (one `gh pr list`, a `gh pr view` and a tag lookup
+per branch); if any of them fails, the deletion is refused rather than asked.
+
+Exit codes: 0 = allow, 2 = block (stderr is shown to the agent). A merge or a
+safe branch deletion exits 0 with a PreToolUse "ask" decision on stdout.
 Read-only inspection is never blocked. When this hook and AGENTS.md disagree,
 that is a bug: fix both.
 """
 
+import functools
 import json
 import os
+import posixpath
 import re
 import shlex
 import subprocess
 import sys
+import urllib.parse
 
 PROTECTED = {"main", "dev", "master"}
 
+# Permission modes in which Claude Code shows a hook's "ask" to the human.
+# bypassPermissions approves it automatically, auto may (a hook ask forces a
+# prompt there only from v2.1.211), and dontAsk denies it without a word. In
+# those, or when the mode is missing, an ask would not reach a human, so a
+# merge or deletion is blocked outright instead.
+PROMPTING_MODES = {"default", "acceptEdits", "plan"}
+
 # Git's own options that swallow the following token, so the subcommand can be
 # located without mistaking an option's argument for it.
-GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path",
+                       "--config-env", "--attr-source"}
+# Same for `git push`, so an option's value is not read as the remote or a ref.
+PUSH_OPTS_WITH_VALUE = {"-o", "--push-option", "--repo", "--receive-pack", "--exec"}
+# git takes any unambiguous prefix of a long option (`--del` is `--delete`), so
+# these are expanded before the checks read them. A missing entry costs at most
+# an extra block, never a missed one.
+PUSH_LONG = ("--delete", "--force", "--force-with-lease", "--force-if-includes",
+             "--mirror", "--all", "--branches", "--prune", "--dry-run", "--no-dry-run",
+             "--tags",
+             "--follow-tags", "--repo", "--receive-pack", "--exec", "--push-option",
+             "--set-upstream", "--atomic", "--signed", "--thin", "--porcelain",
+             "--progress", "--verbose", "--quiet", "--verify", "--no-verify",
+             "--recurse-submodules", "--ipv4", "--ipv6")
+BRANCH_TAG_LONG = ("--delete", "--list", "--verify", "--force")
+
+# Commands that run the command after them. The rules follow gh or git behind
+# them (`env FOO=1 gh pr merge`, `sudo git push`, `xargs gh pr merge`), and
+# into the string a shell -c or eval runs.
+WRAPPERS = {"env", "command", "builtin", "exec", "nohup", "time", "nice", "timeout",
+            "sudo", "xargs", "stdbuf", "caffeinate"}
+SHELLS = {"bash", "sh", "zsh", "dash", "ksh"}
+# Beyond this many levels of bash -c / eval / $( ) the command is refused.
+MAX_DEPTH = 5
 
 # `gh api` reaches every endpoint `gh pr` does, so the same four rules have to
 # hold there or the contract is one flag away from being bypassed. Matched on
@@ -45,11 +104,17 @@ GH_API_OPTS_WITH_VALUE = {
     "-q", "--jq", "-t", "--template", "--input", "--cache", "-p", "--preview",
     "--hostname",
 }
+# The shorthand among those, which pflag also takes with the value attached
+# (`-XDELETE`, `-X=DELETE`, `-fquery=...`) and after -i, the one boolean
+# shorthand (`-iXDELETE`, `-iX DELETE`).
+GH_API_SHORT_BUNDLE = re.compile(r"-(i*)([XfFHqtp])(=?)(.*)", re.S)
 GH_API_MERGE = re.compile(r"/pulls/\d+/merge/?$")
 GH_API_PULL = re.compile(r"/pulls/\d+/?$")
 # Also the nested submit of a pending review: .../reviews/{id}/events.
 GH_API_REVIEWS = re.compile(r"/pulls/\d+/reviews(/\d+/events)?/?$")
 GH_API_REF = re.compile(r"/git/refs?(/|$)")
+# POST .../merges merges one branch into another, main included, with no PR.
+GH_API_MERGES = re.compile(r"/merges/?$")
 
 # `gh api graphql` carries the action in the query body, not the endpoint, so
 # the path patterns above never see it. These are the mutations that do what
@@ -58,12 +123,265 @@ GH_API_REF = re.compile(r"/git/refs?(/|$)")
 GH_GRAPHQL_MERGE = re.compile(r"\b(mergePullRequest|enablePullRequestAutoMerge)\b")
 GH_GRAPHQL_READY = re.compile(r"\bmarkPullRequestReadyForReview\b")
 GH_GRAPHQL_REVIEW = re.compile(r"\b(addPullRequestReview|submitPullRequestReview)\b")
-GH_GRAPHQL_DELETE_REF = re.compile(r"\bdeleteRef\b")
+# These take an opaque ref ID or a batch, so which ref they delete, move or
+# merge into cannot be checked: main or a tag looks the same as a feature
+# branch. git push covers every legitimate use.
+GH_GRAPHQL_REF_WRITE = re.compile(r"\b(deleteRef|updateRefs?|createRef|mergeBranch)\b")
+
+# `gh api` writes are allow-listed, not deny-listed: gh and GitHub accept too
+# many spellings of the same request to enumerate the bad ones. Reads pass, and
+# so do the writes an agent is meant to make; any other write is asked (and so
+# blocked where no prompt is shown). The checks above still refuse the writes
+# the contract forbids outright.
+GH_API_SAFE_WRITES = [
+    ({"POST"}, re.compile(r"/pulls/\d+/comments/?$")),              # inline comment
+    ({"POST"}, re.compile(r"/pulls/\d+/comments/\d+/replies/?$")),  # reply
+    ({"POST"}, re.compile(r"/issues/\d+/comments/?$")),             # PR/issue comment
+    ({"PATCH", "DELETE"}, re.compile(r"/(issues|pulls)/comments/\d+/?$")),
+]
+# GraphQL's ignored tokens: whitespace, commas, a byte-order mark, comments.
+# A comment runs to the end of its line and no further, so a run of `#` has
+# one parse, not exponentially many (a hook that hangs may fail open).
+GRAPHQL_IGNORED = r"(?:[\s,\ufeff]|#[^\n\r]*(?=[\n\r]|$))*"
+GH_GRAPHQL_SAFE_MUTATIONS = {
+    "resolveReviewThread", "unresolveReviewThread", "addPullRequestReviewThreadReply",
+    "addPullRequestReviewThread", "addPullRequestReviewComment", "addPullRequestReview",
+    "submitPullRequestReview", "deletePullRequestReview", "addComment",
+    "updateIssueComment", "deleteIssueComment", "updatePullRequestReviewComment",
+    "deletePullRequestReviewComment", "minimizeComment", "addReaction", "removeReaction",
+    "convertPullRequestToDraft",
+}
+
+
+
+class Ask:
+    """Not refused outright: needs the human's explicit approval, so main()
+    turns it into a permission prompt instead of a block."""
+
+    def __init__(self, what):
+        self.what = what
+
+
+MERGE = Ask("merge a pull request")
+
+def gh_json(args):
+    """Parsed JSON from a read-only `gh` call; None if it fails in any way.
+
+    The tests put a fake `gh` first on PATH, so the lookups run offline.
+    """
+    try:
+        out = subprocess.run(["gh", *args], capture_output=True, text=True, timeout=15)
+        return json.loads(out.stdout) if out.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return None
+
+
+@functools.lru_cache(maxsize=None)
+def open_prs():
+    """Every open PR as {number, baseRefName, headRefName}; None if unknown."""
+    prs = gh_json(["pr", "list", "--state", "open", "--limit", "500",
+                   "--json", "number,baseRefName,headRefName"])
+    if not isinstance(prs, list) or not all(isinstance(p, dict) for p in prs):
+        return None
+    return prs
+
+
+def pr_number_and_head(pr_args):
+    """(number, head branch) of the PR a `gh pr` command targets; None if unknown."""
+    pr = gh_json(["pr", "view", *pr_args, "--json", "number,headRefName"])
+    if not isinstance(pr, dict):
+        return None
+    number, head = pr.get("number"), pr.get("headRefName")
+    if not isinstance(number, int) or not isinstance(head, str) or not head:
+        return None
+    return number, head
+
+
+def branch_name(ref):
+    """The branch `ref` names, or None if it names a tag or any other ref.
+
+    The remote resolves `heads/main` and `refs/heads/main` alike to main, so
+    both prefixes are dropped; anything else under refs/ or tags/ is not a
+    branch.
+    """
+    ref = re.sub(r"^(refs/)?heads/", "", ref)
+    return None if ref.startswith(("refs/", "tags/")) else ref
+
+
+def is_remote_tag(name):
+    """True if `name` is a tag on GitHub; None if that cannot be checked.
+
+    A short name in `git push --delete` resolves to a tag when one exists.
+    """
+    refs = gh_json(["api", "repos/{owner}/{repo}/git/matching-refs/tags/"
+                    + urllib.parse.quote(name, safe="/")])
+    if not isinstance(refs, list):
+        return None
+    return any(isinstance(r, dict) and r.get("ref") == "refs/tags/" + name for r in refs)
+
+
+def check_branch_deletion(branches, remote, what="delete branch", exempt=None):
+    """Block unsafe deletions; ask for the rest.
+
+    A protected branch or a tag is never deleted, however it is spelled. A
+    remote branch is refused while an open PR uses it: as its head, because
+    deleting it closes that PR (AGENTS.md: "its PR is merged or closed"), or
+    as its base, because GitHub then closes the stacked PR rather than
+    retargeting it (#114 and #125 were closed that way). `exempt` is the PR
+    that `gh pr merge|close --delete-branch` acts on. If any of this cannot
+    be checked, the deletion is refused rather than asked.
+    """
+    names = []
+    for ref in branches:
+        if not ref:
+            continue
+        name = branch_name(ref)
+        if name is None:
+            return f"Deleting '{ref}' is not allowed: only branches may be deleted, never tags."
+        names.append(name)
+    if not names:
+        return None
+    for name in names:
+        if name in PROTECTED:
+            return f"Deleting the protected branch '{name}' is not allowed."
+    if remote:
+        prs = open_prs()
+        if prs is None:
+            return ("Could not list the open PRs to check that deleting "
+                    + ", ".join(f"'{n}'" for n in names)
+                    + " closes none of them, so it is refused. Ask the human to run it.")
+        for name in names:
+            tag = is_remote_tag(name)
+            if tag is None:
+                return (f"Could not check whether '{name}' is a tag on GitHub, so deleting "
+                        "it is refused. Ask the human to run it.")
+            if tag:
+                return f"'{name}' is a tag on GitHub. Deleting tags is not allowed."
+        for name in names:
+            heads = [p.get("number") for p in prs
+                     if p.get("headRefName") == name and p.get("number") != exempt]
+            if heads:
+                return (f"'{name}' is the head branch of open PR(s) "
+                        + ", ".join(f"#{n}" for n in heads)
+                        + "; deleting it would close them. Merge or close them first.")
+            stacked = [p.get("number") for p in prs if p.get("baseRefName") == name]
+            if stacked:
+                return (f"Open PR(s) " + ", ".join(f"#{n}" for n in stacked)
+                        + f" use '{name}' as their base; deleting it would close them. "
+                        "Retarget first: gh pr edit <N> --base main.")
+    what += " " + ", ".join(f"'{n}'" for n in names)
+    if remote:
+        what += " (checked: no open PR uses it as its head or base)"
+    return Ask(what)
+
+
+def substitutions(command):
+    """Commands run inside $( ), <( ), >( ) or backticks, at every depth.
+
+    Read on the raw text, even inside quotes: a false match costs only a
+    check of harmless text, a missed one lets a merge through unseen.
+    """
+    found = re.findall(r"`([^`]*)`", command)
+    for start in [m.end() for m in re.finditer(r"[$<>]\(", command)]:
+        depth = 1
+        for end in range(start, len(command)):
+            depth += {"(": 1, ")": -1}.get(command[end], 0)
+            if depth == 0:
+                found.append(command[start:end])
+                break
+        else:
+            found.append(command[start:])
+    return found
+
+
+SEPARATORS = "\n;&|"
+
+
+def quoted_segments(command):
+    """(start, text) of each segment, split only on separators outside quotes,
+    as the shell splits.
+
+    A quoted argument can span lines (`-f query='mutation {\n ... }'`), and
+    splitting it at the newline hides everything after the first line. A
+    heredoc body is data, so it is skipped: an apostrophe in it (`don't`)
+    must not pair with a quote in a later command. With unbalanced quotes the
+    shell runs nothing, so nothing is returned.
+    """
+    segments, begin, quote, i, heredocs = [], 0, None, 0, []
+    while i < len(command):
+        c = command[i]
+        if quote is None and command.startswith("<<", i) and not command.startswith("<<<", i):
+            m = re.match(r"<<(-?)\s*(['\"]?)([^\s'\";&|<>()]+)\2", command[i:])
+            if m:
+                heredocs.append((m.group(3), bool(m.group(1))))
+                i += m.end()
+                continue
+        if quote is None and c in SEPARATORS:
+            segments.append((begin, command[begin:i]))
+            begin = i + 1
+            if c == "\n" and heredocs:
+                # Skip each pending body, up to its delimiter line.
+                for delim, strip_tabs in heredocs:
+                    while begin < len(command):
+                        end = command.find("\n", begin)
+                        end = len(command) if end < 0 else end
+                        line = command[begin:end]
+                        begin = end + 1
+                        if (line.lstrip("\t") if strip_tabs else line) == delim:
+                            break
+                heredocs = []
+                i = begin
+                continue
+        elif c == "\\" and quote != "'":
+            i += 1
+        elif quote is None and c in "'\"":
+            quote = c
+        elif c == quote:
+            quote = None
+        i += 1
+    if quote is not None:
+        return []
+    segments.append((begin, command[begin:]))
+    return segments
+
+
+def naive_segments(command):
+    """(start, text) of each segment, split on every separator, even inside
+    quotes, so a heredoc body or a stray quote cannot hide the line after it."""
+    out, begin = [], 0
+    for m in re.finditer(r"\|\||&&|;|\n|\||&", command):
+        out.append((begin, command[begin:m.start()]))
+        begin = m.end()
+    out.append((begin, command[begin:]))
+    return out
+
+
+def unbalanced(segment):
+    try:
+        shlex.split(segment)
+        return False
+    except ValueError:
+        return True
 
 
 def split_segments(command):
-    """Split a shell command into separately-executed segments."""
-    return [s for s in re.split(r"\|\||&&|;|\n|\||&", command) if s.strip()]
+    """Split a shell command into separately-executed segments, both ways.
+
+    Every naive segment is judged, except a fragment with unbalanced quotes
+    that a quoted segment starting at the same place contains whole (the
+    first line of a multi-line argument): that segment is judged instead.
+    Checking both ways can only add refusals and asks, never remove one.
+    """
+    quoted = [(b, t) for b, t in quoted_segments(command) if t.strip()]
+    covered = {b + len(t) - len(t.lstrip()) for b, t in quoted}
+    out = []
+    for b, t in naive_segments(command):
+        if not t.strip():
+            continue
+        if unbalanced(t) and b + len(t) - len(t.lstrip()) in covered:
+            continue
+        out.append(t)
+    return list(dict.fromkeys(out + [t for _, t in quoted]))
 
 
 def tokenise(segment):
@@ -74,17 +392,63 @@ def tokenise(segment):
         return segment.split()
 
 
+def command_tokens(tokens):
+    """The tokens from the command that actually runs.
+
+    Drops `VAR=value` prefixes, a subshell's brackets, and wrappers such as
+    env, sudo, timeout or xargs (with their options), so `FOO=1 gh pr merge`
+    is judged as `gh pr merge`.
+    """
+    tokens = list(tokens)
+    if tokens and tokens[0][:1] in ("(", "{", "!"):
+        tokens[0] = tokens[0].lstrip("({! ")
+        if tokens[-1].endswith((")", "}")):
+            tokens[-1] = tokens[-1].rstrip(")} ;")
+        tokens = [t for t in tokens if t]
+    known = WRAPPERS | SHELLS | {"gh", "git", "eval"}
+    while tokens:
+        name = os.path.basename(tokens[0])
+        if re.match(r"[A-Za-z_][A-Za-z0-9_]*=", tokens[0]):
+            tokens = tokens[1:]
+        elif name in WRAPPERS:
+            # A wrapper's own options and values come first; the command is
+            # the first known program after it.
+            nxt = next((n for n, t in enumerate(tokens[1:], 1)
+                        if os.path.basename(t) in known), None)
+            if nxt is None:
+                return tokens
+            tokens = tokens[nxt:]
+        else:
+            return tokens
+    return tokens
+
+
+def gh_opts_with_value():
+    """Every gh flag the hook knows to take a separate value. gh (cobra) reads a
+    subcommand's flags before the subcommand too (`gh -X DELETE api ...`), so
+    both walks skip these values wherever they sit."""
+    return GH_API_OPTS_WITH_VALUE | GH_PR_OPTS_WITH_VALUE
+
+
+def gh_positionals(tokens):
+    """gh's subcommand words, skipping flags and their values wherever they sit."""
+    out, i = [], 1
+    with_value = gh_opts_with_value()
+    while i < len(tokens):
+        if tokens[i] in with_value:
+            i += 2
+            continue
+        if not tokens[i].startswith("-"):
+            out.append(tokens[i])
+        i += 1
+    return out
+
+
 def git_subcommand(tokens):
     """Return (subcommand, remaining_args) for a git invocation, else (None, [])."""
-    if not tokens:
+    if not tokens or os.path.basename(tokens[0]) != "git":
         return None, []
-    # Strip a leading `env FOO=bar` or absolute path to git.
-    i = 0
-    while i < len(tokens) and ("=" in tokens[i] and not tokens[i].startswith("-")):
-        i += 1
-    if i >= len(tokens) or os.path.basename(tokens[i]) != "git":
-        return None, []
-    i += 1
+    i = 1
     while i < len(tokens):
         tok = tokens[i]
         if tok in GIT_OPTS_WITH_VALUE:
@@ -97,56 +461,146 @@ def git_subcommand(tokens):
     return None, []
 
 
-def targets_protected_ref(args):
-    """True if any positional refspec of a push resolves to a protected branch."""
-    for arg in args:
-        if arg.startswith("-"):
+def short_flags(args):
+    """Letters of every bundled short option (`-uf` -> {"u", "f"})."""
+    return {c for a in args if re.fullmatch(r"-[A-Za-z0-9]+", a) for c in a[1:]}
+
+
+def expand_long(args, known):
+    """Expand a unique prefix of a long option to its full name, as git does."""
+    out = []
+    for a in args:
+        name, eq, val = a.partition("=")
+        if name.startswith("--") and name not in known:
+            hits = [k for k in known if k.startswith(name)]
+            if len(hits) == 1:
+                name = hits[0]
+        out.append(name + eq + val)
+    return out
+
+
+def push_options(args):
+    """`git push` options in order, without their values: `-o x`, `--repo x`
+    and the `<v>` of `-o<v>` are skipped, and bundles are read letter by letter."""
+    out, i = [], 0
+    while i < len(args):
+        a = args[i]
+        if a == "--":
+            break  # the rest are the remote and refspecs
+        if a in PUSH_OPTS_WITH_VALUE:
+            i += 2
             continue
+        if a.startswith("--"):
+            out.append(a)
+        elif re.fullmatch(r"-[A-Za-z0-9].*", a, re.S):
+            for c in a[1:]:
+                if c == "o":
+                    break  # the rest of the bundle is -o's value
+                out.append("-" + c)
+        i += 1
+    return out
+
+
+def push_positionals(args):
+    """The remote and refspecs of a `git push`, skipping options and their values."""
+    out, i = [], 0
+    while i < len(args):
+        if args[i] == "--":
+            return out + args[i + 1:]  # even a refspec that starts with `-`
+        if args[i] in PUSH_OPTS_WITH_VALUE:
+            i += 2
+            continue
+        if not args[i].startswith("-"):
+            out.append(args[i])
+        i += 1
+    return out
+
+
+def targets_protected_ref(positional):
+    """True if any refspec of a push resolves to a protected branch."""
+    for arg in positional[1:]:
         ref = arg.lstrip("+")
         # A refspec's destination is what matters: src:dst -> dst.
         if ":" in ref:
             ref = ref.split(":", 1)[1]
-        ref = re.sub(r"^refs/heads/", "", ref)
-        if ref in PROTECTED:
+        if branch_name(ref) in PROTECTED:
             return True
     return False
 
 
+def gh_api_args(tokens):
+    """(options, positionals) of a `gh api` call, read the way pflag reads them.
+
+    One walk for every check, so a token that is the value of one flag (`-q
+    --method=GET`, `-f -X`) is never also read as a flag of its own. Each
+    option is (name, value); a flag without a value has value None. The walk
+    starts right after `gh`, because gh also applies flags placed before
+    `api` (`gh -X DELETE api ...`); the first positional, `api`, is dropped.
+    """
+    opts, positional, i, subcommand = [], [], 1, None
+    with_value = gh_opts_with_value()
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok == "--":
+            positional += tokens[i + 1:]
+            break
+        if tok in with_value:
+            opts.append((tok, tokens[i + 1] if i + 1 < len(tokens) else ""))
+            i += 2
+            continue
+        if tok.startswith("--") and "=" in tok:
+            opts.append(tuple(tok.split("=", 1)))
+        elif tok.startswith("-") and tok != "-":
+            opts.append((tok, None))
+        elif subcommand is None:
+            subcommand = tok
+        else:
+            positional.append(tok)
+        i += 1
+    return opts, positional
+
+
 def gh_api_endpoint(tokens):
-    """The endpoint argument of `gh api`, skipping flags and their values.
+    """The endpoint argument of `gh api`, as GitHub will read it.
 
     Parsed rather than grepped so a reply body that merely mentions a path
     (`-f body='... /pulls/1/merge ...'`) is not mistaken for one.
     """
-    try:
-        i = next(n for n, t in enumerate(tokens) if not t.startswith("-")
-                 and os.path.basename(t) != "gh") + 1
-    except StopIteration:
+    positional = gh_api_args(tokens)[1]
+    if not positional:
         return None
-    while i < len(tokens):
-        tok = tokens[i]
-        if tok in GH_API_OPTS_WITH_VALUE:
-            i += 2
-            continue
-        if tok.startswith("-"):
-            i += 1
-            continue
-        # Drop any query string or fragment: the patterns below are anchored
-        # at the end of the path, so `.../merge?` would otherwise slip past.
-        return re.split(r"[?#]", tok, maxsplit=1)[0]
-    return None
+    # Drop any query string or fragment: the patterns below are anchored
+    # at the end of the path, so `.../merge?` would otherwise slip past.
+    # GitHub decodes the path (`heads/%64ev` is dev), reads `+1` as 1 and
+    # resolves `..` (`heads/x/../main` is main), so every check sees the
+    # path the way GitHub does. A full URL keeps its scheme and host; anything
+    # else is all path (`graphql:x` or `//git/...` is not a scheme or a host).
+    raw = re.split(r"[?#]", positional[0], maxsplit=1)[0]
+    if re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", raw):
+        url = urllib.parse.urlsplit(raw)
+    else:
+        url = urllib.parse.SplitResult("", "", raw, "", "")
+    path = urllib.parse.unquote(url.path)
+    if path:
+        path = posixpath.normpath(path)
+    path = re.sub(r"/\+(?=\d)", "/", path)
+    return url._replace(path=path).geturl()
+
+
+GH_API_BODY_OPTS = {"-f", "--field", "-F", "--raw-field", "--input"}
 
 
 def gh_api_method(tokens):
     """The HTTP method a `gh api` call will use."""
-    for i, tok in enumerate(tokens):
-        if tok in ("-X", "--method") and i + 1 < len(tokens):
-            return tokens[i + 1].upper()
-        if tok.startswith("--method="):
-            return tok.split("=", 1)[1].upper()
-    # gh switches to POST as soon as a field is supplied.
-    if any(t in ("-f", "--field", "-F", "--raw-field") or
-           t.startswith(("--field=", "--raw-field=")) for t in tokens):
+    method = None
+    opts = gh_api_args(tokens)[0]
+    for name, value in opts:
+        if name in ("-X", "--method") and value is not None:
+            method = value.upper()  # pflag: the last one wins
+    if method:
+        return method
+    # gh switches to POST as soon as a field or an --input body is supplied.
+    if any(name in GH_API_BODY_OPTS for name, _ in opts):
         return "POST"
     return "GET"
 
@@ -160,16 +614,11 @@ def payload_text(tokens):
     reported as None.
     """
     parts = []
-    for i, tok in enumerate(tokens):
-        value = None
-        if tok in ("-f", "--field", "-F", "--raw-field", "--input") and i + 1 < len(tokens):
-            value = tokens[i + 1]
-        elif tok.startswith(("--field=", "--raw-field=", "--input=")):
-            value = tok.split("=", 1)[1]
-        if value is None:
+    for tok, value in gh_api_args(tokens)[0]:
+        if tok not in GH_API_BODY_OPTS or value is None:
             continue
         path = None
-        if tok.startswith("--input"):
+        if tok == "--input":
             path = value
         elif "=@" in value:
             path = value.split("=@", 1)[1]
@@ -178,7 +627,12 @@ def payload_text(tokens):
         if path:
             try:
                 with open(os.path.expanduser(path), encoding="utf-8") as fh:
-                    parts.append(fh.read())
+                    text = fh.read()
+                parts.append(text)
+                try:  # a JSON escape (`\u0052`) would hide a mutation name
+                    parts.append(json.dumps(json.loads(text), ensure_ascii=False))
+                except ValueError:
+                    pass
             except OSError:
                 return None
         else:
@@ -192,46 +646,179 @@ def check_gh_graphql(tokens):
         return ("A `gh api graphql` query read from stdin or an unreadable file "
                 "cannot be checked, so it is refused. Pass it with -f query=...")
     if GH_GRAPHQL_MERGE.search(text):
-        return "Merging pull requests is the human's decision, not the agent's."
+        return MERGE
     if GH_GRAPHQL_READY.search(text):
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")
     if GH_GRAPHQL_REVIEW.search(text) and "APPROVE" in text.upper():
         return "An agent does not approve pull requests on this repo."
-    if GH_GRAPHQL_DELETE_REF.search(text):
-        return "Deleting branches is not allowed — they are the human's audit trail."
+    ref_write = GH_GRAPHQL_REF_WRITE.search(text)
+    if ref_write:
+        return (f"The {ref_write.group(1)} mutation is not allowed: which ref it changes "
+                "cannot be checked. Use git push (or git push origin --delete <branch>).")
+    if not re.search(r"\bmutation\b", text):
+        return None  # a query only reads
+    # Every field called with arguments must be a known-safe mutation. GraphQL
+    # ignores commas and `#` comments like whitespace, so either may sit
+    # between a field and its `(`. Nothing is stripped from the text and each
+    # name is tested in place (a lookahead, not a consuming match), so a fake
+    # comment or string can add matches but never hide one. A `(` followed by
+    # `$` opens variable definitions (`mutation Name($t: ID!)`), not a call.
+    ign = GRAPHQL_IGNORED
+    calls = {m.group(1) for m in re.finditer(
+        rf"\b([A-Za-z_]\w*)(?={ign}\({ign}(\$)?)", text) if not m.group(2)}
+    unknown = calls - GH_GRAPHQL_SAFE_MUTATIONS
+    if unknown or not calls:
+        return Ask("run the GraphQL mutation " + ", ".join(sorted(unknown) or ["?"])
+                   + ", which the hook does not recognise")
     return None
+
+
+def check_ref_write(endpoint, method, tokens):
+    """PATCH or POST on .../git/refs: moving or creating main or a tag, or
+    forcing any ref, is the push the rules forbid, made through the API."""
+    body = payload_text(tokens)
+    if body is None:
+        return ("A ref update read from stdin or an unreadable file cannot be checked, "
+                "so it is refused.")
+    if re.search(r'force"?\s*[=:]\s*"?true', body, re.IGNORECASE):
+        return ("Force-updating a ref is not allowed — it can destroy published history. "
+                "If a branch genuinely needs rewriting, ask the human to do it.")
+    if method == "PATCH":
+        ref = re.split(r"/git/refs?/", endpoint, maxsplit=1)[-1].strip("/")
+    else:
+        found = re.search(r'(?:^|[\s"{,])ref"?\s*[=:]\s*"?([^"\s,}]+)', body)
+        ref = found.group(1) if found else ""
+    name = branch_name(ref) if ref else None
+    if name is None:
+        return f"Writing the ref '{ref or '?'}' through the API is not allowed: only branches."
+    if name in PROTECTED:
+        return ("Pushing to a protected branch (main/dev) is not allowed. "
+                "Push your feature branch instead and open a pull request.")
+    return None
+
+
+def split_attached(tokens):
+    """`-XDELETE`, `-X=DELETE`, `-fquery=...`, `-iXDELETE`, `-iX DELETE` as
+    flag + value, as pflag reads them: -i (the one boolean shorthand of gh api)
+    may lead the bundle."""
+    out = []
+    for t in tokens:
+        m = GH_API_SHORT_BUNDLE.fullmatch(t)
+        if m and (m.group(1) or m.group(3) or m.group(4)):
+            out += ["-i"] * bool(m.group(1)) + ["-" + m.group(2)]
+            if m.group(3) or m.group(4):
+                out.append(m.group(4))
+        else:
+            out.append(t)
+    return out
 
 
 def check_gh_api(tokens):
     """`gh api` is not a read-only escape hatch from the `gh pr` rules.
 
-    Reads stay allowed, and so do the writes an agent is meant to make —
-    posting a review reply is `POST .../pulls/N/comments/ID/replies`, which
-    none of these patterns match.
+    Reads stay allowed, and so do the writes an agent is meant to make
+    (GH_API_SAFE_WRITES, a non-approving review, a feature-branch ref). Any
+    other write is asked.
     """
+    tokens = split_attached(tokens)
     endpoint = gh_api_endpoint(tokens)
     if not endpoint:
         return None
-    if endpoint.strip("/") == "graphql":
+    # gh also takes a full URL (`https://api.github.com/graphql`). Only that
+    # exact path is GraphQL; a REST write whose path merely ends in /graphql
+    # stays a REST write.
+    path = urllib.parse.urlsplit(endpoint).path if "://" in endpoint else endpoint
+    if path.strip("/") in ("graphql", "api/graphql"):
         return check_gh_graphql(tokens)
     method = gh_api_method(tokens)
     if GH_API_MERGE.search(endpoint):
-        return "Merging pull requests is the human's decision, not the agent's."
+        return MERGE
+    if method in ("GET", "HEAD"):
+        return None
     # Only a write can submit a review; a GET that filters on "APPROVED" is a read.
-    if GH_API_REVIEWS.search(endpoint) and method != "GET":
+    if GH_API_REVIEWS.search(endpoint):
         body = payload_text(tokens)
         if body is None:
             return ("A review payload read from stdin or an unreadable file cannot "
                     "be checked, so it is refused. Pass it with -f event=...")
         if "APPROVE" in (" ".join(tokens) + "\n" + body).upper():
             return "An agent does not approve pull requests on this repo."
-    if GH_API_PULL.search(endpoint) and method != "GET":
+        return None  # a comment or a request-changes review
+    if GH_API_PULL.search(endpoint):
         return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                 "ready for review.")
+    if GH_API_MERGES.search(endpoint):
+        return ("Merging branches through the merges endpoint is not allowed; "
+                "merge a pull request instead.")
+    if GH_API_REF.search(endpoint) and method in ("PATCH", "POST", "PUT"):
+        return check_ref_write(endpoint, method, tokens)
     if GH_API_REF.search(endpoint) and method == "DELETE":
-        return "Deleting branches is not allowed — they are the human's audit trail."
-    return None
+        ref = re.split(r"/git/refs?/", endpoint, maxsplit=1)[-1].strip("/")
+        if not ref.startswith("heads/"):
+            return "Deleting tags or other refs is not allowed."
+        return check_branch_deletion([ref[len("heads/"):]], remote=True)
+    if any(method in methods and pattern.search(endpoint)
+           for methods, pattern in GH_API_SAFE_WRITES):
+        return None
+    return Ask(f"send {method} {endpoint} through gh api, a write the hook "
+               "does not recognise")
+
+
+GH_PR_OPTS_WITH_VALUE = {"-R", "--repo", "-t", "--subject", "-b", "--body",
+                         "-F", "--body-file", "--match-head-commit", "-A",
+                         "--author-email"}
+
+
+def gh_pr_target(tokens):
+    """Arguments that make `gh pr view` look at the PR `gh pr merge` targets."""
+    args, i, seen = [], 0, []
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok in GH_PR_OPTS_WITH_VALUE and i + 1 < len(tokens):
+            if tok in ("-R", "--repo"):
+                args += [tok, tokens[i + 1]]
+            i += 2
+            continue
+        if tok.startswith("--repo="):
+            args.append(tok)
+        if not tok.startswith("-"):
+            seen.append(tok)
+        i += 1
+    # seen: gh, pr, merge|close, [number | url | branch]
+    return (seen[3:4] if len(seen) > 3 else []) + args
+
+
+def deletes_branch(tokens):
+    """True if `gh pr merge` / `gh pr close` also deletes the head branch.
+
+    gh (pflag) accepts `--delete-branch=true`, bundled shorthand such as `-sd`
+    and a shorthand value attached with `=` (`-d=true`, `-sd=1`), so matching
+    the exact tokens is not enough. A `d` bundled with any other letter counts;
+    the cost of a false match is only an extra check.
+    """
+    return any(t == "--delete-branch" or t.startswith("--delete-branch=")
+               or (re.fullmatch(r"-[A-Za-z]+(=.*)?", t) and "d" in t.split("=", 1)[0])
+               for t in tokens)
+
+
+def approves(tokens):
+    """True if `gh pr review` approves: `--approve`, `--approve=...`, or `a` in a
+    shorthand bundle (`-a`, `-ab ok`, `-a=true`), read as deletes_branch() reads -d."""
+    return any(t == "--approve" or t.startswith("--approve=")
+               or (re.fullmatch(r"-[A-Za-z]+(=.*)?", t) and "a" in t.split("=", 1)[0])
+               for t in tokens)
+
+
+def check_pr_branch_deletion(verb, tokens):
+    """`gh pr merge|close --delete-branch`: name the PR and the branch it deletes."""
+    pr = pr_number_and_head(gh_pr_target(tokens))
+    if pr is None:
+        return (f"Cannot tell which branch `gh pr {verb} --delete-branch` would delete, "
+                "so it is refused. Ask the human to run it.")
+    number, head = pr
+    return check_branch_deletion([head], remote=True, exempt=number,
+                                 what=f"{verb} PR #{number} and delete its branch")
 
 
 def current_branch():
@@ -245,25 +832,45 @@ def current_branch():
         return None
 
 
-def check_segment(segment):
-    """Return a refusal message for this segment, or None to allow it."""
-    tokens = tokenise(segment)
+def check_nested(command, depth):
+    """Judge a command that bash -c or eval runs, as one segment's verdict."""
+    block, asks = evaluate(command, depth + 1)
+    if block:
+        return block
+    return Ask("; ".join(dict.fromkeys(asks))) if asks else None
+
+
+def check_segment(segment, depth=0):
+    """Return a refusal message for this segment, an Ask, or None to allow it."""
+    tokens = command_tokens(tokenise(segment))
     if not tokens:
+        return None
+    program = os.path.basename(tokens[0])
+
+    # --- a shell running a string: judge the string ------------------------
+    if program == "eval":
+        return check_nested(" ".join(tokens[1:]), depth)
+    if program in SHELLS:
+        for n, tok in enumerate(tokens[1:-1], 1):
+            if re.fullmatch(r"-[A-Za-z]*c[A-Za-z]*", tok):
+                return check_nested(tokens[n + 1], depth)
         return None
 
     # --- gh ---------------------------------------------------------------
-    if os.path.basename(tokens[0]) == "gh":
-        rest = [t for t in tokens[1:] if not t.startswith("-")]
+    if program == "gh":
+        rest = gh_positionals(tokens)
         if rest[:1] == ["api"]:
             return check_gh_api(tokens)
-        if rest[:2] == ["pr", "merge"]:
-            return "Merging pull requests is the human's decision, not the agent's."
+        if rest[:2] in (["pr", "merge"], ["pr", "close"]):
+            if deletes_branch(tokens):
+                return check_pr_branch_deletion(rest[1], tokens)
+            return MERGE if rest[1] == "merge" else None
         if rest[:2] == ["pr", "ready"]:
             return ("PRs opened by an agent stay in DRAFT. Only a human marks one "
                     "ready for review.")
         if rest[:2] == ["pr", "edit"] and "--ready" in tokens:
             return "Only a human marks a pull request ready for review."
-        if rest[:2] == ["pr", "review"] and "--approve" in tokens:
+        if rest[:2] == ["pr", "review"] and approves(tokens):
             return "An agent does not approve pull requests on this repo."
         return None
 
@@ -273,11 +880,19 @@ def check_segment(segment):
 
     # --- git push ---------------------------------------------------------
     if sub == "push":
-        # A dry run mutates nothing, but only this segment is exempt.
-        if "--dry-run" in args or "-n" in args:
+        args = expand_long(args, PUSH_LONG)
+        # Short options bundle (`-uf`, `-dq`), so flags are read letter by letter,
+        # stopping at -o, whose value follows it (`-onone` is not `-n`).
+        opts = push_options(args)
+        flags = {o[1] for o in opts if len(o) == 2}
+        positional = push_positionals(args)
+        # A dry run mutates nothing, but only this segment is exempt, and git
+        # takes the last of --dry-run, -n and --no-dry-run.
+        dry = [o for o in opts if o in ("--dry-run", "-n", "--no-dry-run")]
+        if dry and dry[-1] != "--no-dry-run":
             return None
-        if any(a in ("--force", "-f", "--force-with-lease") or
-               a.startswith("--force-with-lease=") for a in args):
+        if "f" in flags or any(a in ("--force", "--force-with-lease") or
+                               a.startswith("--force-with-lease=") for a in args):
             return ("Force pushing is not allowed — it can destroy published history. "
                     "If a branch genuinely needs rewriting, ask the human to do it.")
         if any(a.lstrip("+").startswith("+") or a.startswith("+") for a in args
@@ -285,17 +900,25 @@ def check_segment(segment):
             return "Force pushing via a '+refspec' is not allowed."
         if "--mirror" in args:
             return "`git push --mirror` can delete remote refs and is not allowed."
-        if "--all" in args:
-            return "`git push --all` would push protected branches too."
-        if "--delete" in args or "-d" in args:
-            return "Deleting remote refs is not allowed."
-        if any(a.startswith(":") for a in args if not a.startswith("-")):
-            return "Deleting a remote ref via ':ref' is not allowed."
-        if targets_protected_ref(args):
+        if "--all" in args or "--branches" in args:
+            return "`git push --all` (or `--branches`) would push protected branches too."
+        if "--prune" in args:
+            return "`git push --prune` deletes remote branches and is not allowed."
+        if any("*" in a for a in positional[1:]):
+            return "A wildcard refspec can reach protected branches and is not allowed."
+        deleting = []
+        if "--delete" in args or "d" in flags:
+            if "tag" in positional[1:]:
+                return "Deleting tags is not allowed. Tags are applied by the human after merge."
+            deleting = positional[1:]
+        deleting += [a[1:] for a in positional[1:] if a.startswith(":")]
+        if deleting:
+            return check_branch_deletion(deleting, remote=True)
+        if targets_protected_ref(positional):
             return ("Pushing to a protected branch (main/dev) is not allowed. "
-                    "Push your feature branch instead and let a human merge.")
+                    "Push your feature branch instead and open a pull request.")
         # No refspec: git pushes the current branch to its upstream.
-        if not [a for a in args if not a.startswith("-")][1:]:
+        if not positional[1:]:
             branch = current_branch()
             if branch in PROTECTED:
                 return (f"HEAD is on '{branch}', so a bare `git push` would publish a "
@@ -313,12 +936,36 @@ def check_segment(segment):
         return None
 
     # --- deletions --------------------------------------------------------
-    if sub == "branch" and any(a in ("-D", "-d", "--delete") for a in args):
-        return "Deleting branches is not allowed — they are the human's audit trail."
-    if sub == "tag" and any(a in ("-d", "--delete") for a in args):
+    if sub in ("branch", "tag"):
+        args = expand_long(args, BRANCH_TAG_LONG)
+    if sub == "branch" and ("--delete" in args or {"d", "D"} & short_flags(args)):
+        return check_branch_deletion([a for a in args if not a.startswith("-")],
+                                     remote=False)
+    if sub == "tag" and ("--delete" in args or "d" in short_flags(args)):
+        return "Deleting tags is not allowed. Tags are applied by the human after merge."
+    if sub == "update-ref" and "-d" in args and any("tags/" in a for a in args):
         return "Deleting tags is not allowed. Tags are applied by the human after merge."
 
     return None
+
+
+def evaluate(command, depth=0):
+    """(refusal, asks) for a whole command line, nested commands included."""
+    if depth > MAX_DEPTH:
+        return "Commands nested this deeply cannot be checked, so this is refused.", []
+    asks = []
+    for segment in split_segments(command):
+        message = check_segment(segment, depth)
+        if isinstance(message, Ask):
+            asks.append(message.what)
+        elif message:
+            return message, []
+    for inner in substitutions(command):
+        message, more = evaluate(inner, depth + 1)
+        if message:
+            return message, []
+        asks += more
+    return None, asks
 
 
 def main():
@@ -337,16 +984,36 @@ def main():
     if not command:
         return 0
 
-    for segment in split_segments(command):
-        message = check_segment(segment)
-        if message:
-            print(
-                f"Blocked by mesa's workflow contract (AGENTS.md):\n  {message}\n\n"
-                f"Command: {command.strip()[:300]}\n\n"
-                "Do not work around this — report it to the human instead.",
-                file=sys.stderr,
-            )
-            return 2
+    message, asks = evaluate(command)
+    if message:
+        print(
+            f"Blocked by mesa's workflow contract (AGENTS.md):\n  {message}\n\n"
+            f"Command: {command.strip()[:300]}\n\n"
+            "Do not work around this — report it to the human instead.",
+            file=sys.stderr,
+        )
+        return 2
+    if asks and payload.get("permission_mode") not in PROMPTING_MODES:
+        mode = payload.get("permission_mode") or "unknown"
+        print(
+            "Blocked by mesa's workflow contract (AGENTS.md):\n  This needs the human's "
+            "explicit approval to " + "; ".join(dict.fromkeys(asks)) + f", but the "
+            f"'{mode}' permission mode would not show them a confirmation.\n\n"
+            f"Command: {command.strip()[:300]}\n\n"
+            "Do not work around this. Tell the human to run it themselves, or to "
+            "switch to a permission mode that prompts and ask again.",
+            file=sys.stderr,
+        )
+        return 2
+    if asks:
+        print(json.dumps({"hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "ask",
+            "permissionDecisionReason": (
+                "mesa (AGENTS.md) needs your explicit approval to "
+                + "; ".join(dict.fromkeys(asks))
+                + ". Allow only if you asked for it."),
+        }}))
     return 0
 
 
