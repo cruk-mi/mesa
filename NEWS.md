@@ -28,7 +28,7 @@
   tarball and that version's `NEWS.md` notes, once the tag matches
   `DESCRIPTION` and `NEWS.md` and passes the r-universe Bioconductor build.
   ([#112](https://github.com/cruk-mi/mesa/pull/112))
-- The Bioconductor check on pull requests now takes about 20 minutes instead
+- The Bioconductor check on pull requests now takes about 22 minutes instead
   of 37, and runs every check it ran before. The vignettes run twice per run
   instead of four times, and "re-building of vignette outputs", which
   Bioconductor requires, is now checked instead of skipped. The long checks,
