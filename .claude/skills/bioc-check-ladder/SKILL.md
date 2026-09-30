@@ -66,7 +66,7 @@ bash .devcontainer/resolve_versions.sh
 ```bash
 brew install r-rig                       # a formula; `--cask r-rig` does not exist (that is r-rig-app, the GUI)
 rig add 4.6.0 && rig default 4.6.0       # use the resolved R_VERSION_FULL; needs sudo, so an agent cannot do this step
-Rscript .claude/scripts/setup-r-toolchain.R
+Rscript .claude/skills/bioc-check-ladder/setup-r-toolchain.R
 ```
 
 `setup-r-toolchain.R` calls the resolver itself, so nothing is passed to it and nothing is
