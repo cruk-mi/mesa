@@ -106,9 +106,14 @@ a checkout that goes away, which is why the PR's **Parked** list matters.
 publishes as a (private) claude.ai artifact, so don't park anything that must stay on this
 machine.
 
-**Triage (human, weekly):** promote each line to a GitHub issue labelled `parked` — per the
-issue workflow below, check for a duplicate first — or delete it. Then delete the line.
-Nothing stays parked for more than a week.
+**Triage (weekly, and before every release cut):** ask Claude to promote the lot. For each
+line it searches open and closed issues for a duplicate, then shows one plan (file, or drop
+as a duplicate of #N) and waits for a yes, because the repo is public. It files each
+approved line with `gh issue create --label parked`, with the full note plus its date,
+branch and issue in the body, and adds the new number to the **Parked findings** item in
+#124's wave 4, creating the item if it is missing. It deletes a line only after its issue
+exists. Nothing stays parked for more than a week, and the lot must be empty before phase 3
+of the release cycle.
 
 ---
 
@@ -187,8 +192,8 @@ Devel versions use an odd minor (e.g. `1.1.z`); release versions use an even min
 **Phase 2 — the work.** Each feature/fix PR targets `main` and records its user-visible
 changes under the `# mesa X.Y.Z.9000` heading, in the same PR that makes the change.
 
-**Phase 3 — cut the release.** After the work PRs merge, branch
-`chore/bump-version-X.Y.(Z+1)` off `main`. One commit
+**Phase 3 — cut the release.** After the work PRs merge and the parking lot is empty (see
+"Triage" above), branch `chore/bump-version-X.Y.(Z+1)` off `main`. One commit
 `chore(version): bump to X.Y.(Z+1)` (reference: PR #99 = `b5e80a0`): bump `DESCRIPTION`
 and rename the `NEWS.md` heading.
 
