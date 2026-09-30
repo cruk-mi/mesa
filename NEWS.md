@@ -12,8 +12,9 @@
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
   `mesaDimRed()` no longer takes a `samples` argument. The sample IDs are the
   row names of each result in `res` (sample group names with
-  `useGroupMeans = TRUE`). Objects saved with an earlier version must be
-  recreated with `getPCA()` or `getUMAP()`.
+  `useGroupMeans = TRUE`). Code that reads `@samples` or passes `samples =` to
+  `mesaDimRed()` must use those row names instead; objects saved with an
+  earlier version still load and work.
   ([#10](https://github.com/cruk-mi/mesa/issues/10))
 
 ## Testing
