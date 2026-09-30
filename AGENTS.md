@@ -113,7 +113,9 @@ approved line with `gh issue create --label parked`, with the full note plus its
 branch and issue in the body, and adds the new number to the **Parked findings** item in
 #124's wave 4, creating the item if it is missing. It deletes a line only after its issue
 exists. Nothing stays parked for more than a week, and the lot must be empty before phase 3
-of the release cycle.
+of the release cycle. `/mesa-sweep` runs this triage as one step of the weekly sweep.
+Agents without slash commands follow `.claude/commands/mesa-sweep.md` by hand. The
+[user guide](.claude/README.md) explains the commands and hooks the sweep relies on.
 
 ---
 
