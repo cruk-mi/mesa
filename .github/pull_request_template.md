@@ -1,11 +1,9 @@
-<!-- Under ~40 lines. Why, What changes and Verified are required. Delete any other
-section with nothing in it, and add one when evidence doesn't fit (e.g. a Timings
-table). Link review threads and CI logs; don't paste them. If an AI agent wrote
-this, say so on the first line. -->
+<!-- Under ~40 lines. Why, What changes and Verified are required; add a section when
+evidence doesn't fit (e.g. Timings), delete one with nothing in it. Link review
+threads and CI logs, don't paste them. An AI agent says so on the first line. -->
 
 ## NEWS
-<!-- The lines this PR adds under the open `# mesa X.Y.Z.9000` heading, verbatim.
-No user-visible change: replace the block with one line saying so. -->
+<!-- The lines this PR adds to NEWS.md, verbatim, or one line: no user-visible change. -->
 ```markdown
 
 ```
