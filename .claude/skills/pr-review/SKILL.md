@@ -41,6 +41,12 @@ Check the base **before** reading the diff. Copilot misses this, and it matters 
 - **Correctness.** Wrong logic, off-by-one, unhandled `NULL`/`NA`/empty input, a
   `tryCatch` that swallows the error it should raise, a claim in the PR body that the
   code doesn't do.
+- **PR description** (see *Pull request descriptions* in `AGENTS.md`). Compare the body
+  with the diff and with `.github/pull_request_template.md`:
+  - 🟠 A **What changes** bullet the diff doesn't make, a user-visible change it doesn't
+    list, no `Fixes #N`/`Refs #N`, or a NEWS/`Version:` checkbox the diff contradicts.
+  - 🟡 A template section missing, over about 40 lines, pasted review history or logs, or
+    an agent-written body with no AI note on its first line.
 - **Bioconductor and mesa R rules.** Apply the checklist in
   [`.claude/agents/bioc-reviewer.md`](../../agents/bioc-reviewer.md): coding standards,
   no `library()` in `R/`, roxygen completeness, hand-edited `man/`/`NAMESPACE`, missing
