@@ -23,6 +23,5 @@ Fixes #
 
 - [ ] `NEWS.md` entry under the open `# mesa X.Y.Z.9000` heading (user-visible changes)
 - [ ] No `Version:` bump (a version bump is its own PR)
-- [ ] `man/` and `NAMESPACE` regenerated with the pinned roxygen2, if roxygen changed
 - [ ] Tests added or updated (a fix gets a regression test)
 - [ ] AI use disclosed, or none was used
