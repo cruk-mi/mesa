@@ -38,6 +38,9 @@ for the entry format. `DESCRIPTION` `Version:` is not touched during this phase.
 
 ## Phase 3 — cut the release
 
+**The parking lot must be empty first.** If `/mesa-status` lists anything under Parked,
+promote it as "Triage" in `AGENTS.md` describes, and cut only when nothing is left.
+
 After the work PRs merge, branch `chore/bump-version-X.Y.(Z+1)` off `main`. **One commit**,
 `chore(version): bump to X.Y.(Z+1)`. Reference: PR #99 = `b5e80a0` (also `d13bbeb`,
 `61c890a`).
