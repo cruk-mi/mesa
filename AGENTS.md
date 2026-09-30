@@ -88,7 +88,8 @@ version.
   `type(scope): imperative summary`, with type `feat`, `fix`, `docs`, `test`, `refactor`,
   `perf` or `chore` and the R file name as the scope. Put `Fixes #n`/`Refs #n` in the
   footer. Keep each commit to one logical change.
-- Open PRs as **drafts**. Only a human marks them ready or merges them. Fill in
+- Open PRs as **drafts**. Only a human marks them ready. Merge (squash) only when a human
+  explicitly asks for that merge; an approving review is not enough. Fill in
   [`.github/pull_request_template.md`](.github/pull_request_template.md), because
   `gh pr create --body-file` skips it. When the scope changes, rewrite the body to match
   the diff instead of appending an "Update:" note.
