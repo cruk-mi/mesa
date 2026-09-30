@@ -20,6 +20,8 @@ Say plainly what was verified and what could not run here.
 Branch off `main`, commit atomically, push the feature branch, open a **draft** PR if asked
 — never mark ready, never merge, never touch `main`. `.claude/hooks/guard-remote.py`
 enforces this; a blocked command means the contract said no, so do not work around it.
+PR descriptions follow the template: see
+[`AGENTS.md`](AGENTS.md#pull-request-descriptions).
 
 ## Attribution
 
