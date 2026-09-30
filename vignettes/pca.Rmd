@@ -294,8 +294,6 @@ components: -->
 <!-- -   **pcas** A named list of objects of class prcomp. List names
 correspond to entries in the `params$topVar` component of the output. -->
 
-<!-- -   **samples** Names of the samples analysed. -->
-
 <!-- -   **windows** A list of names of the windows analysed. List names
 correspond to entries in the `params$topVar` component of the output. -->
 

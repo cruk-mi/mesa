@@ -1,5 +1,15 @@
 methods::setOldClass("prcomp")
 
+# Sample (or sample group) IDs of one mesaPCA/mesaUMAP result: the row names
+# of its coordinates.
+.dimRedIds <- function(x) {
+    if (methods::is(x, "mesaPCA")) {
+        rownames(x@prcomp$x)
+    } else {
+        rownames(x@points)
+    }
+}
+
 # ==============================
 # mesaDimRed
 # ==============================
@@ -12,11 +22,12 @@ methods::setOldClass("prcomp")
 #' @slot res `list`
 #'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
 #'
+#' The sample IDs of the results are the row names of each element of `res`
+#' (`prcomp$x` for [mesaPCA-class], `points` for [mesaUMAP-class]). With
+#' `useGroupMeans = TRUE` they are sample group names.
+#'
 #' @slot sampleTable `data.frame`
 #'   Sample annotations; row names are sample IDs.
-#'
-#' @slot samples `character()`
-#'   Vector of sample IDs used.
 #'
 #' @slot params `list`
 #'   Parameters used to generate results in `res`.
@@ -33,7 +44,6 @@ setClass("mesaDimRed",
     slots = c(
         res = "list",
         sampleTable = "data.frame",
-        samples = "character",
         params = "list",
         dataTable = "data.frame"
     )
@@ -48,9 +58,6 @@ setClass("mesaDimRed",
 #' @param sampleTable `data.frame`
 #'   Sample annotations; row names must be sample IDs. **Default:** none.
 #'
-#' @param samples `character()`
-#'   Sample IDs included. **Default:** none.
-#'
 #' @param params `list`
 #'   Parameters used to compute `res`. **Default:** none.
 #'
@@ -61,26 +68,25 @@ setClass("mesaDimRed",
 #' @return A [mesaDimRed-class] object:
 #' * stores DR results in `res`,
 #' * carries sample metadata in `sampleTable`,
-#' * records the samples in `samples`,
 #' * and persists parameters/data in `params` / `dataTable`.
 #'
 #' @examples
-#' st <- data.frame(sample_name = c("S1", "S2"),
-#'     group = c("A", "B"),
-#'     row.names = "sample_name")
-#' md <- mesaDimRed(res = list(), sampleTable = st,
-#'     samples = rownames(st), params = list(),
-#'     dataTable = data.frame())
+#' set.seed(1)
+#' x <- matrix(rnorm(20), nrow = 5, ncol = 4,
+#'     dimnames = list(paste0("S", 1:5), paste0("W", 1:4)))
+#' st <- data.frame(sample_name = rownames(x),
+#'     group = rep(c("A", "B"), c(3, 2)), row.names = rownames(x))
+#' mp <- mesaPCA(prcomp = stats::prcomp(x), windows = colnames(x))
+#' md <- mesaDimRed(res = list(pca1 = mp), sampleTable = st,
+#'     params = list(method = "PCA"))
 #' md
 #'
 #' @rdname mesaDimRed-class
 #' @export
-mesaDimRed <- function(
-    res, sampleTable, samples, params, dataTable = data.frame()
-) {
+mesaDimRed <- function(res, sampleTable, params, dataTable = data.frame()) {
     methods::new(
         "mesaDimRed",
-        res = res, sampleTable = sampleTable, samples = samples,
+        res = res, sampleTable = sampleTable,
         params = params, dataTable = dataTable
     )
 }
@@ -89,9 +95,14 @@ mesaDimRed <- function(
 #' @rdname mesaDimRed-class
 #' @param object `mesaDimRed`
 setMethod("show", "mesaDimRed", function(object) {
+    nSamples <- if (length(object@res) > 0) {
+        length(.dimRedIds(object@res[[1]]))
+    } else {
+        0L
+    }
     cat("Object containing ", length(object@res),
         " dimensionality reduction objects for ",
-        length(object@samples), " samples", sep = "")
+        nSamples, " samples", sep = "")
     cat("\n")
 })
 
@@ -100,7 +111,6 @@ setValidity("mesaDimRed", function(object) {
     if (!is.data.frame(object@sampleTable)) {
         return("`sampleTable` must be a data.frame")
     }
-    if (!is.character(object@samples)) return("`samples` must be character")
     TRUE
 })
 

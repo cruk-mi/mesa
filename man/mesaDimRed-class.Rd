@@ -7,7 +7,7 @@
 \alias{show,mesaDimRed-method}
 \title{Dimensionality reduction results container}
 \usage{
-mesaDimRed(res, sampleTable, samples, params, dataTable = data.frame())
+mesaDimRed(res, sampleTable, params, dataTable = data.frame())
 
 \S4method{show}{mesaDimRed}(object)
 }
@@ -17,9 +17,6 @@ DR result objects. \strong{Default:} none. \code{res} must be supplied.}
 
 \item{sampleTable}{\code{data.frame}
 Sample annotations; row names must be sample IDs. \strong{Default:} none.}
-
-\item{samples}{\code{character()}
-Sample IDs included. \strong{Default:} none.}
 
 \item{params}{\code{list}
 Parameters used to compute \code{res}. \strong{Default:} none.}
@@ -35,7 +32,6 @@ A \link[=mesaDimRed-class]{mesaDimRed} object:
 \itemize{
 \item stores DR results in \code{res},
 \item carries sample metadata in \code{sampleTable},
-\item records the samples in \code{samples},
 \item and persists parameters/data in \code{params} / \code{dataTable}.
 }
 }
@@ -47,13 +43,14 @@ computed on a common set of samples.
 
 \describe{
 \item{\code{res}}{\code{list}
-Individual DR result objects (e.g., \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}).}
+Individual DR result objects (e.g., \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}).
+
+The sample IDs of the results are the row names of each element of \code{res}
+(\code{prcomp$x} for \link[=mesaPCA-class]{mesaPCA}, \code{points} for \link[=mesaUMAP-class]{mesaUMAP}). With
+\code{useGroupMeans = TRUE} they are sample group names.}
 
 \item{\code{sampleTable}}{\code{data.frame}
 Sample annotations; row names are sample IDs.}
-
-\item{\code{samples}}{\code{character()}
-Vector of sample IDs used.}
 
 \item{\code{params}}{\code{list}
 Parameters used to generate results in \code{res}.}
@@ -63,12 +60,14 @@ Optional matrix/data used to compute DR (for reproducibility).}
 }}
 
 \examples{
-st <- data.frame(sample_name = c("S1", "S2"),
-    group = c("A", "B"),
-    row.names = "sample_name")
-md <- mesaDimRed(res = list(), sampleTable = st,
-    samples = rownames(st), params = list(),
-    dataTable = data.frame())
+set.seed(1)
+x <- matrix(rnorm(20), nrow = 5, ncol = 4,
+    dimnames = list(paste0("S", 1:5), paste0("W", 1:4)))
+st <- data.frame(sample_name = rownames(x),
+    group = rep(c("A", "B"), c(3, 2)), row.names = rownames(x))
+mp <- mesaPCA(prcomp = stats::prcomp(x), windows = colnames(x))
+md <- mesaDimRed(res = list(pca1 = mp), sampleTable = st,
+    params = list(method = "PCA"))
 md
 
 }

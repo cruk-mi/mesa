@@ -136,7 +136,8 @@ A \code{\link{mesaDimRed}} object with:
 \itemize{
 \item \strong{res}: Named list of DR results; each element is a \code{\link{mesaPCA}} (for PCA)
 or \code{\link{mesaUMAP}} (for UMAP). Names correspond to entries in \code{params$topVar}.
-\item \strong{samples}: Character vector of sample IDs used.
+The sample IDs are the row names of each result (sample group names when
+\code{useGroupMeans = TRUE}).
 \item \strong{dataTable} (optional): The numeric matrix used for DR when
 \code{returnDataTable = TRUE}. It reflects filtering by \code{regionsToOverlap} and
 \code{minDensity}, removal of rows with missing values, and may include columns of
