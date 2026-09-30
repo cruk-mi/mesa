@@ -49,6 +49,9 @@ Check the base **before** reading the diff. Copilot misses this, and it matters 
   - 🟡 No NEWS section, a missing Why/What changes/Verified, over about 40 lines, pasted
     review history or logs, or an agent-written body with no AI note on its first line.
     An extra section (e.g. Timings) is fine.
+  - A release-cycle PR (`chore/bump-version-*`) bumps `Version:` and usually has no
+    issue: skip the `Fixes`/`Version:` checks. Its NEWS block is the heading it adds or
+    renames.
 - **Bioconductor and mesa R rules.** Apply the checklist in
   [`.claude/agents/bioc-reviewer.md`](../../agents/bioc-reviewer.md): coding standards,
   no `library()` in `R/`, roxygen completeness, hand-edited `man/`/`NAMESPACE`, missing

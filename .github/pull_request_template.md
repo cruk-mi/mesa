@@ -28,6 +28,6 @@ Fixes #
 ## Parked
 <!-- Out-of-scope findings noticed but not fixed (see AGENTS.md). -->
 
-- [ ] No `Version:` bump (a version bump is its own PR)
+- [ ] No `Version:` bump, unless this is a release-cycle bump PR
 - [ ] Tests added or updated (a fix gets a regression test)
 - [ ] AI use disclosed, or none was used
