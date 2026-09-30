@@ -1,11 +1,11 @@
-**Decide #34 (keep or remove `mesaPCA`/`mesaUMAP`) by ~1 Oct.** It starts the longest chain
-in Wave 2: #34 → #115/#116 → #117 → the 0.99.8 cut, due ~9 Oct. Until it is decided, a Claude
-session can start #129, #118 or #120, which depend on nothing.
+**Start #115 now (with #116 and #10 in the same PR).** #34 is decided (keep), so #115 is
+the head of the only serial chain to 0.99.8: #115 → #117 → the cut, due ~9 Oct. That leaves
+about a week for two PRs. #118 and #120 depend on nothing: run them in parallel sessions.
 
 Two standing signals:
 
-- **Land #114 (tiered CI) before the Wave 2 PRs open.** It cuts a PR check from about 58 to
-  about 15 minutes, and Wave 2 holds eight PRs. It is a draft that has to be updated from
-  `main` first.
-- **#108 → #110 also blocks 0.99.8.** Both wait on a fresh review, and their failing checks
-  are Codecov upload errors, not test failures.
+- **Large PRs get no automatic review right now.** `.claude/settings.json` defines
+  `PostToolUse` twice, so `review-after-pr.py` is dropped. Run `/pr-review <N>` by hand on
+  Wave 2 PRs until that is fixed (parked).
+- **The parking lot must be empty before the 0.99.8 cut (#143).** Triage it in the next
+  `/mesa-sweep`.
