@@ -1,5 +1,27 @@
 # mesa 0.99.7.9000
 
+## New features
+- `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects are now checked for internal
+  consistency, and `validObject()` rejects an inconsistent one with a message
+  naming the problem: duplicate or missing windows, results without sample IDs,
+  mixed PCA and UMAP results, results covering different samples, or samples
+  absent from `sampleTable` or `dataTable`.
+  ([#115](https://github.com/cruk-mi/mesa/issues/115))
+
+## Other changes
+- **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
+  `mesaDimRed()` no longer takes a `samples` argument. The sample IDs are the
+  row names of each result in `res` (sample group names with
+  `useGroupMeans = TRUE`). Code that reads `@samples` or passes `samples =` to
+  `mesaDimRed()` must use those row names instead; objects saved with an
+  earlier version still load and work.
+  ([#10](https://github.com/cruk-mi/mesa/issues/10))
+
+## Testing
+- Added tests for the `mesaDimRed`, `mesaPCA` and `mesaUMAP` constructors and
+  for each validity check.
+  ([#116](https://github.com/cruk-mi/mesa/issues/116))
+
 ## Documentation
 - Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
   the pkgdown site and vignettes, and citations.

@@ -28,6 +28,11 @@ A \link[=mesaUMAP-class]{mesaUMAP} object containing UMAP coordinates and window
 Stores per-sample coordinates from a UMAP embedding computed over methylation
 windows.
 }
+\details{
+A valid object has non-empty \code{windows} with no \code{NA} or duplicates,
+and at least one row of numeric \code{points} with the sample IDs as row
+names.
+}
 \section{Slots}{
 
 \describe{
