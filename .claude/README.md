@@ -36,7 +36,7 @@ Hooks run automatically. They are registered in [`settings.json`](settings.json)
 |---|---|---|---|
 | [`guard-remote.py`](hooks/guard-remote.py) | every Bash command | Enforces the workflow contract. It blocks pushes to `main`, tag deletion and history rewrites. It **asks** before a merge or a branch deletion, and refuses to delete a branch an open PR uses. | A block message, or a permission prompt |
 | [`refresh-flag.py`](hooks/refresh-flag.py) | after Bash, at the end of a turn, at session start | Notices commands that changed GitHub and suggests `/mesa-status` once | A one-line reminder |
-| [`review-after-pr.py`](hooks/review-after-pr.py) | after `gh pr create` | Asks for a `pr-review` when the new PR is large (over 150 lines, over 5 files, or over 30 lines in `R/`, hooks or workflows) | The review, in the session |
+| [`review-after-pr.py`](hooks/review-after-pr.py) | after `gh pr create` | Asks for a `pr-review` when the new PR is large (over 150 lines, over 5 files, or over 30 lines in `R/`, hooks or workflows). **Not running yet:** a duplicate key in `settings.json` drops it ([#148](https://github.com/cruk-mi/mesa/issues/148)), so run `/pr-review <N>` by hand for now. | The review, in the session |
 | `mesa-status.py --max-age 14400` | session start | Refreshes `STATUS.md` when it is more than 4 hours old | Nothing, unless it fails |
 
 A hook is a safety net, not a security boundary. See the limits in

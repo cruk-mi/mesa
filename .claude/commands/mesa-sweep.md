@@ -1,6 +1,6 @@
 ---
 description: Weekly repo sweep - roadmap, release readiness, parking lot, fixed issues, stale branches
-allowed-tools: Bash(git status:*), Bash(git fetch:*), Bash(git worktree list), Bash(git cherry:*), Bash(git log:*), Bash(gh issue list:*), Bash(gh issue view:*), Bash(gh pr list:*), Bash(gh pr view:*), Bash(python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run), Bash(python3 .claude/scripts/mesa-status.py --html --no-log), Bash(python3 .claude/scripts/mesa-status.py --artifact-url), Bash(python3 .claude/scripts/mesa-status.py --mark-published), Read, Write, Edit, Artifact
+allowed-tools: Bash(git status:*), Bash(git fetch:*), Bash(git worktree list), Bash(git cherry:*), Bash(git log:*), Bash(gh issue list:*), Bash(gh issue view:*), Bash(gh pr list:*), Bash(gh pr view:*), Bash(python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run), Bash(python3 .claude/scripts/mesa-status.py --html --no-log), Bash(python3 .claude/scripts/mesa-status.py --roadmap-file:*), Bash(python3 .claude/scripts/mesa-status.py --artifact-url), Bash(python3 .claude/scripts/mesa-status.py --mark-published), Read, Write, Edit, Artifact
 ---
 
 Run mesa's weekly sweep, once a week and before every release cut. The steps are listed
@@ -13,7 +13,10 @@ prompts.
 
 ## 0. Start clean
 
-Run `git status` and `git fetch --prune origin`. Stop and say so if the tree is dirty.
+Run `git status` and `git fetch --prune origin`. Changes to
+`.claude/state/recommendation.md` and `.claude/state/bioccheck-history.jsonl` are expected:
+they are left over from the last refresh and step 7 commits them. Stop and say so if
+anything else is dirty.
 
 ## 1. Refresh the facts
 
@@ -38,13 +41,16 @@ Answer from `STATUS.md`, in at most five lines:
 
 ## 3. Empty the parking lot
 
-Follow **Triage** in `AGENTS.md`:
+Follow **Triage** in `AGENTS.md`, which wins if the two ever differ:
 
-1. Look for a duplicate of each item.
-2. Propose one plan per item: file it, fold it into an existing issue, or drop it.
+1. Search open and closed issues for a duplicate of each item.
+2. Propose one plan per item: file it, or drop it as a duplicate of #N.
 3. Wait for a yes.
-4. File each approved item with `gh issue create --label parked`.
-5. Delete the item's line only once its issue exists.
+4. File each approved item with `gh issue create --label parked`. Include the full note,
+   its date, branch and issue in the body.
+5. Add the new number to the **Parked findings** item in #124's wave 4, through step 5.
+   Create the item if it is missing.
+6. Delete the item's line only once its issue exists.
 
 Park anything new you find during the sweep in the same way.
 
@@ -72,8 +78,8 @@ Do this when the plan in #124 has changed: new issues from step 3, or stale `wai
 and notes.
 
 1. Save the issue body with `gh issue view 124 --json body -q .body > FILE`.
-2. Edit only the TOML between the `roadmap:data` markers. Write the TOML to its own file
-   too, as the dry run in step 3 reads it.
+2. Edit only the TOML between the `roadmap:data` markers. Also write the TOML to its own
+   file, because the dry run below reads it.
 3. Dry-run it with
    `python3 .claude/scripts/mesa-status.py --roadmap-file TOML --sync-issue --dry-run`.
 4. Show the diff and wait for a yes.
@@ -103,7 +109,14 @@ the human to run.
 
 Do steps 2 and 3 of `/mesa-status`: overwrite `.claude/state/recommendation.md`,
 regenerate with `--html --no-log`, publish the page and run `--mark-published`.
-`recommendation.md` is committed, so the change goes on a branch, never on `main`.
+`recommendation.md` and `bioccheck-history.jsonl` are committed, and the change never goes on
+`main`:
+
+1. Branch `chore/status-YYYY-MM-DD` off `main`.
+2. Commit both files as
+   `chore(status): refresh the recommendation and BiocCheck history`, with `Refs #124`.
+   This routine refresh needs no issue of its own.
+3. Push it and open a draft PR, which the human merges.
 
 ## 8. Report
 
