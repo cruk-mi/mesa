@@ -26,7 +26,7 @@ Fixes #
 -
 
 ## Parked
-<!-- Out-of-scope findings noticed but not fixed (see AGENTS.md). -->
+<!-- Out-of-scope findings noticed but not fixed. Each one becomes an issue before the next release. -->
 
 - [ ] No `Version:` bump, unless this is a release-cycle bump PR
 - [ ] Tests added or updated (a fix gets a regression test)

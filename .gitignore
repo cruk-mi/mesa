@@ -6,14 +6,6 @@ inst/doc
 /Meta/
 .RData
 Rplots.pdf
-.claude/settings.local.json
-STATUS.md
-.claude/state/status.json
-.claude/state/parking-lot.md
-.claude/state/artifact-url.txt
-.claude/state/dashboard.html
-.claude/state/roadmap-issue.md
-# retired: the roadmap is now generated from #124 into dashboard.html
-.claude/state/roadmap.html
-.claude/state/roadmap-url.txt
 __pycache__/
+# Written at the repo root before #139; kept ignored for the 0.99.8 cycle.
+/STATUS.md

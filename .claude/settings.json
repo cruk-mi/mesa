@@ -13,108 +13,17 @@
       "Bash(gh pr view:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr diff:*)",
+      "Bash(gh pr checks:*)",
       "Bash(gh issue view:*)",
       "Bash(gh issue list:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(Rscript -e:*)",
-      "Bash(bash .devcontainer/resolve_versions.sh)",
-      "Bash(bash .claude/hooks/test-guard-remote.sh)",
-      "Bash(bash .claude/hooks/test-refresh-flag.sh)",
-      "Bash(bash .claude/hooks/test-review-after-pr.sh)",
-      "Skill(pr-review)",
-      "Bash(gh pr checks:*)",
-      "Bash(python3 .claude/scripts/mesa-status.py)",
-      "Bash(python3 .claude/scripts/mesa-status.py --no-log)",
-      "Bash(python3 .claude/scripts/mesa-status.py --html --no-log)",
-      "Bash(python3 .claude/scripts/mesa-status.py --html --sync-issue --dry-run)",
-      "Bash(python3 .claude/scripts/mesa-status.py --artifact-url)",
-      "Bash(python3 .claude/scripts/mesa-status.py --set-artifact-url:*)",
-      "Bash(python3 .claude/scripts/mesa-status.py --mark-published)",
-      "Bash(python3 .claude/scripts/mesa-status.py --park:*)"
+      "Bash(bash .devcontainer/resolve_versions.sh)"
     ],
     "deny": [
       "Read(./.Renviron)",
       "Read(./**/.Renviron)"
     ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-remote.py\""
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/review-after-pr.py\"",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "perl -e 'alarm shift; exec @ARGV' 110 python3 \"$CLAUDE_PROJECT_DIR/.claude/scripts/mesa-status.py\" --max-age 14400 --no-log --quiet || echo 'mesa-status: STATUS.md refresh failed or ran past 110 s, so it may be stale. Run /mesa-status before relying on it.'",
-            "timeout": 120
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/refresh-flag.py\" session",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/refresh-flag.py\" post",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/refresh-flag.py\" stop",
-            "timeout": 15
-          }
-        ]
-      }
-    ]
-  },
-  "extraKnownMarketplaces": {
-    "posit-dev-skills": {
-      "source": {
-        "source": "github",
-        "repo": "posit-dev/skills"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "r-lib@posit-dev-skills": true,
-    "github@posit-dev-skills": true,
-    "open-source@posit-dev-skills": true,
-    "posit-dev@posit-dev-skills": true
-  },
-  "outputStyle": "Concise"
+  }
 }

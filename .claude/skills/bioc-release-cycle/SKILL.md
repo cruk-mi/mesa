@@ -33,13 +33,13 @@ The new `NEWS.md` section starts empty. Work PRs fill it.
 ## Phase 2 — the work
 
 Each feature/fix PR targets `main` and records its user-visible changes under the
-`# mesa X.Y.Z.9000` heading, **in the same PR that makes the change**. See `mesa-docs-news`
-for the entry format. `DESCRIPTION` `Version:` is not touched during this phase.
+`# mesa X.Y.Z.9000` heading, **in the same PR that makes the change**. See the NEWS.md section
+of `AGENTS.md` for the entry format. `DESCRIPTION` `Version:` is not touched during this phase.
 
 ## Phase 3 — cut the release
 
-**The parking lot must be empty first.** If `/mesa-status` lists anything under Parked,
-promote it as "Triage" in `AGENTS.md` describes, and cut only when nothing is left.
+**Parked findings are filed first.** Every finding listed under **Parked** in the cycle's
+merged PRs has an issue (or is dropped as a duplicate) before the cut.
 
 After the work PRs merge, branch `chore/bump-version-X.Y.(Z+1)` off `main`. **One commit**,
 `chore(version): bump to X.Y.(Z+1)`. Reference: PR #99 = `b5e80a0` (also `d13bbeb`,
@@ -110,7 +110,7 @@ this checklist, and do not open phase 1 until they confirm step 2 is done:
 
 3. **Then open the next cycle:** phase 1, `X.Y.(Z+1).9000`.
 
-4. **Refresh the roadmap:** `/mesa-status`. The release's `tag:vX.Y.(Z+1)` check turns its
+4. **Refresh the roadmap** in #124 (the maintainer's `/mesa-status`). The release's `tag:vX.Y.(Z+1)` check turns its
    "Cut …" item Done and marks the release as released on the Next steps page and in #124.
 
 **Pushing to Bioconductor is outward-facing and starts a public build. An agent never does

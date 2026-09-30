@@ -13,7 +13,7 @@
 #
 # Everything installs as binaries into the user library, so nothing here needs
 # a compiler. Run from the repo root:
-#   Rscript .claude/scripts/setup-r-toolchain.R
+#   Rscript .claude/skills/bioc-check-ladder/setup-r-toolchain.R
 
 say <- function(...) cat("==>", ..., "\n")
 

@@ -1,76 +1,57 @@
-# Maintaining mesa with Claude: a user guide
+# AI agent files in mesa
 
-This folder holds the AI tooling that helps maintain mesa. This page explains what each
-piece does and when it runs. The rules themselves live in [`AGENTS.md`](../AGENTS.md),
-which is canonical, and in the skills. This page links to them rather than repeating them.
+mesa keeps only a few AI agent files, and none of them reach the Bioconductor tarball
+(`.Rbuildignore` excludes `.claude`, `AGENTS.md` and `CLAUDE.md`). The rule is simple: **the
+repo holds what describes the project, and each person's setup stays on their machine.**
+You don't need any of this to contribute to mesa.
 
-## The routine
+## What loads when
 
-| When | You run | What happens |
-|---|---|---|
-| Start of work on an issue | `claude --worktree`, then describe the issue | One issue per session, per branch and per draft PR (see [`AGENTS.md`](../AGENTS.md#session-scope-and-the-parking-lot)) |
-| You spot something out of scope | `/park <finding>` | The finding goes to the parking lot, so the session stays on its issue |
-| A PR is open | `/pr-review <N>` | A local review, with findings ranked 🔴 High, 🟠 Medium and 🟡 Low |
-| After changes on GitHub | `/mesa-status` | Refreshes `STATUS.md`, syncs the #124 checklist and republishes the Next steps page |
-| **Weekly, and before a release cut** | `/mesa-sweep` | Updates the roadmap, reports what blocks the next release, promotes parked items to issues, closes fixed issues and prunes stale branches |
+```mermaid
+flowchart LR
+    S([Agent session starts]) --> C[CLAUDE.md]
+    C -- "@import" --> A[AGENTS.md<br/>commands, style, git and PR rules]
+    X([Codex, Copilot and other agents]) --> A
+    S --> P[.claude/settings.json<br/>read-only permissions]
+    T([Task matches a skill]) --> K[.claude/skills/*/SKILL.md]
+    L([Your own setup]) -.-> U[settings.local.json, ~/.claude/,<br/>plugins: never committed]
+```
 
-`/mesa-sweep` asks before every GitHub write. Run it in the default permission mode, not
-`auto`: in `auto` mode the hook blocks branch deletions and merges instead of asking, and
-you run those commands yourself.
+## Every file
 
-## Commands
-
-The command files live in [`commands/`](commands/).
-
-| Command | Purpose |
-|---|---|
-| `/mesa-status` | Regenerate the project state and republish the page ([mesa-status.md](commands/mesa-status.md)) |
-| `/mesa-sweep` | The weekly sweep ([mesa-sweep.md](commands/mesa-sweep.md)) |
-| `/park` | Record an out-of-scope finding ([park.md](commands/park.md)) |
-
-## Hooks
-
-Hooks run automatically. They are registered in [`settings.json`](settings.json).
-
-| Hook | Runs on | What it does | What you see |
+| File | Read by | When | What it does |
 |---|---|---|---|
-| [`guard-remote.py`](hooks/guard-remote.py) | every Bash command | Enforces the workflow contract. It blocks pushes to `main`, tag deletion and history rewrites. It **asks** before a merge or a branch deletion, and refuses to delete a branch an open PR uses. | A block message, or a permission prompt |
-| [`refresh-flag.py`](hooks/refresh-flag.py) | after Bash, at the end of a turn, at session start | Notices commands that changed GitHub and suggests `/mesa-status` once | A one-line reminder |
-| [`review-after-pr.py`](hooks/review-after-pr.py) | after `gh pr create` | Asks for a `pr-review` when the new PR is large (over 150 lines, over 5 files, or over 30 lines in `R/`, hooks or workflows). **Not running yet:** a duplicate key in `settings.json` drops it ([#148](https://github.com/cruk-mi/mesa/issues/148)), so run `/pr-review <N>` by hand for now. | The review, in the session |
-| `mesa-status.py --max-age 14400` | session start | Refreshes `STATUS.md` when it is more than 4 hours old | Nothing, unless it fails |
+| [`AGENTS.md`](../AGENTS.md) | every agent | each session | Package commands, Bioconductor style, tests, roxygen, NEWS, toolchain rule, git and PR rules, attribution |
+| [`CLAUDE.md`](../CLAUDE.md) | Claude Code | each session | One line, `@AGENTS.md`, so Claude reads the same file as every other agent |
+| [`.claude/settings.json`](settings.json) | Claude Code | each session | Pre-approves read-only `git`, `gh` and `Rscript -e` commands and blocks reading `.Renviron`. Nothing else |
+| [`.claude/.gitignore`](.gitignore) | git | always | Keeps personal files out of the repo: `settings.local.json`, `state/`, `worktrees/` |
+| [`.claude/skills/bioc-check-ladder/`](skills/bioc-check-ladder/SKILL.md) | Claude Code | when verifying work | Where `devtools::test`, `R CMD check`, BiocCheck and coverage can run, and how to set up a Mac for them |
+| [`…/setup-r-toolchain.R`](skills/bioc-check-ladder/setup-r-toolchain.R) | you or the agent | once per machine | Installs the resolved Bioconductor release, mesa's dependencies, the check tools and the pinned roxygen2 |
+| [`.claude/skills/bioc-release-cycle/`](skills/bioc-release-cycle/SKILL.md) | Claude Code | version bumps, releases | The three-phase `X.Y.Z.9000` → `X.Y.(Z+1)` cycle, tagging and the Bioconductor push |
+| [`.claude/skills/mesa-tests/`](skills/mesa-tests/SKILL.md) | Claude Code | writing or fixing tests | The cached qseaSet fixtures, the long-check gate and skip guards |
+| [`.claude/README.md`](README.md) | people | any time | This page |
 
-A hook is a safety net, not a security boundary. See the limits in
-[`AGENTS.md`](../AGENTS.md#workflow-contract-read-this-first).
+Other agents can read the skills as plain Markdown.
 
-## Subagents and skills
+## Project vs personal
 
-- **Subagents** ([`agents/`](agents/)): `bioc-reviewer` does a read-only Bioconductor review,
-  `test-author` writes tests, and `release-manager` handles version bumps. Ask for one by
-  name when a job is large or read-only.
-- **Skills** ([`skills/`](skills/)): procedures that load when a task matches, such as
-  release cycle, checks, tests, docs, CI and status. [`CLAUDE.md`](../CLAUDE.md) has the
-  table of which skill covers which task.
+| Commit it (describes mesa) | Keep it local (describes you) |
+|---|---|
+| `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json` (permissions only), `.claude/skills/` | `.claude/settings.local.json`, `CLAUDE.local.md`, `~/.claude/`, plugins, output style, hooks that enforce your own workflow |
 
-## Where state lives
+If you add a file here, add a row to the table above in the same PR.
 
-| What | Where | Committed? |
-|---|---|---|
-| `STATUS.md`, `state/status.json`, `state/dashboard.html` | generated by `scripts/mesa-status.py` | no |
-| `state/recommendation.md` (the "what next" judgement) | written by `/mesa-status` | yes |
-| `state/bioccheck-history.jsonl` | appended by the script | yes |
-| `state/parking-lot.md` | written by `/park`, per machine | no |
-| The roadmap plan | the TOML block in issue #124 | on GitHub |
+## Maintainer tooling (optional)
 
-## What an agent never does
-
-It never pushes to `main`, merges without your yes, marks a PR ready, deletes tags or
-pushes to Bioconductor. The full contract is in
-[`AGENTS.md`](../AGENTS.md#workflow-contract-read-this-first).
-
-## Checking the tooling
+The maintainer's own tooling lives in the private
+[`mesa-maintainer`](https://github.com/fpmartinez10/mesa-maintainer) Claude Code plugin. It
+has the guardrail hooks, the parking lot, `/mesa-status` (which keeps the #124 roadmap
+checklist up to date), `/mesa-sweep`, `pr-review` and three subagents. Maintainers who want
+it can ask @fpmartinez10 for access, then run:
 
 ```bash
-bash .claude/hooks/test-guard-remote.sh
-bash .claude/hooks/test-refresh-flag.sh
-bash .claude/hooks/test-review-after-pr.sh
+claude plugin marketplace add fpmartinez10/mesa-maintainer
+claude plugin install mesa-maintainer@mesa-maintainer
 ```
+
+The plugin's README lists each of its files and the user settings to add.
