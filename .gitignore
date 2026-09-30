@@ -7,3 +7,5 @@ inst/doc
 .RData
 Rplots.pdf
 __pycache__/
+# Written at the repo root before #139; kept ignored for the 0.99.8 cycle.
+/STATUS.md
