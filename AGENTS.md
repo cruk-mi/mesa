@@ -40,7 +40,9 @@ pull request and decides when anything merges.
   request review.
 - You **may merge a pull request only when the human explicitly approves that merge or
   asks for it** in the conversation. An approving review on GitHub is not, on its own,
-  that approval. Squash-merge. The hook asks the human to confirm every merge.
+  that approval. Squash-merge (`gh pr merge --squash`) unless the human asks for a
+  merge commit on that PR: one commit per PR keeps `main` easy to read, revert and
+  bisect. The hook asks the human to confirm every merge.
 - You **may delete a branch only when it is safe and the human explicitly approves**.
   Safe means:
   - its PR is merged or closed;

@@ -95,8 +95,8 @@ past the last run `main` is, so this reads as expected rather than as a failure.
 
 ## Branch hygiene never deletes
 
-mesa squash-merges, so a landed branch's commits never appear on `main` and
-`git branch --merged` cannot see that it landed. Classification therefore comes from PR
+mesa squash-merges by default, so a landed branch's commits usually never appear on
+`main` and `git branch --merged` cannot see that it landed. Classification therefore comes from PR
 state, not from git — and a finished PR only vouches for the commit it ended on, so a
 branch whose tip has moved past its PR's head is listed as unknown, not prunable. The output is a ready-to-paste `git branch -D` / `git push --delete`
 block for the human to run. Per `AGENTS.md`, an agent deletes a branch only with the
