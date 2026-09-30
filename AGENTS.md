@@ -250,7 +250,11 @@ Reference issues from commits with `Fixes #<n>` (closes on merge) or `Refs #<n>`
 
 - **Fill in [`.github/pull_request_template.md`](.github/pull_request_template.md).**
   `gh pr create --body-file` skips it, so start the body from that file.
-- Keep it under about 40 lines. Delete a section with nothing in it; never write "N/A".
+- **Open with NEWS:** the lines the PR adds to `NEWS.md`, pasted verbatim, or one line
+  saying there is no user-visible change.
+- **Why**, **What changes** and **Verified** are required. Delete any other section with
+  nothing in it (never write "N/A"), and add one when evidence doesn't fit, like #114's
+  **Timings** table. Keep the whole body under about 40 lines.
 - Link review threads, CI runs and logs; don't paste them. Review history lives in the PR
   comments, and **Verified** may link the review summary in one line.
 - When the scope changes, rewrite the body (`gh pr edit <N> --body-file <file>`) so it
