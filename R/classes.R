@@ -10,6 +10,14 @@ methods::setOldClass("prcomp")
     }
 }
 
+# Shared `windows` rules for mesaPCA and mesaUMAP; a message, or NULL if valid.
+.checkWindows <- function(windows) {
+    if (length(windows) == 0) return("`windows` must not be empty")
+    if (anyNA(windows)) return("`windows` must not contain NA")
+    if (anyDuplicated(windows)) return("`windows` must not contain duplicates")
+    NULL
+}
+
 # ==============================
 # mesaDimRed
 # ==============================
@@ -19,11 +27,22 @@ methods::setOldClass("prcomp")
 #' Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
 #' computed on a common set of samples.
 #'
+#' A valid object has `res` empty, or:
+#' * `res` is a named list with unique names;
+#' * its elements are all [mesaPCA-class] or all
+#'   [mesaUMAP-class] objects, matching `params$method` if set;
+#' * every element covers the same sample IDs, in the same order,
+#'   with no duplicates;
+#' * each sample ID is a row name of `sampleTable` (a value of
+#'   `sampleTable$group` when `params$useGroupMeans` is `TRUE`);
+#' * each sample ID is a column of `dataTable`, when it has columns.
+#'
 #' @slot res `list`
 #'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
 #'
-#' The sample IDs of the results are the row names of each element of `res`
-#' (`prcomp$x` for [mesaPCA-class], `points` for [mesaUMAP-class]). With
+#' The sample IDs of the results are the row names of each element of
+#' `res` (`prcomp$x` for [mesaPCA-class],
+#' `points` for [mesaUMAP-class]). With
 #' `useGroupMeans = TRUE` they are sample group names.
 #'
 #' @slot sampleTable `data.frame`
@@ -106,11 +125,67 @@ setMethod("show", "mesaDimRed", function(object) {
     cat("\n")
 })
 
+# Checks the sample IDs shared by every element of `res` against the other
+# slots; a message, or NULL if valid.
+.checkDimRedIds <- function(object, ids) {
+    if (anyDuplicated(ids)) return("sample IDs in `res` must be unique")
+
+    known <- if (isTRUE(object@params$useGroupMeans)) {
+        object@sampleTable$group
+    } else {
+        rownames(object@sampleTable)
+    }
+    missing <- setdiff(ids, known)
+    if (length(missing) > 0) {
+        return(paste0("sample IDs in `res` are missing from `sampleTable`: ",
+            paste(missing, collapse = ", ")))
+    }
+
+    if (ncol(object@dataTable) > 0) {
+        missing <- setdiff(ids, colnames(object@dataTable))
+        if (length(missing) > 0) {
+            return(paste0("`dataTable` has no column for samples: ",
+                paste(missing, collapse = ", ")))
+        }
+    }
+    NULL
+}
+
 # Validity check
 setValidity("mesaDimRed", function(object) {
-    if (!is.data.frame(object@sampleTable)) {
-        return("`sampleTable` must be a data.frame")
+    res <- object@res
+    if (length(res) == 0) return(TRUE)
+
+    isPCA <- vapply(res, methods::is, logical(1), "mesaPCA")
+    isUMAP <- vapply(res, methods::is, logical(1), "mesaUMAP")
+    if (!all(isPCA | isUMAP)) {
+        return("every element of `res` must be a mesaPCA or mesaUMAP object")
     }
+    if (!all(isPCA) && !all(isUMAP)) {
+        return("`res` must not mix mesaPCA and mesaUMAP objects")
+    }
+
+    resNames <- names(res)
+    if (is.null(resNames) || any(resNames == "") || anyDuplicated(resNames)) {
+        return("`res` must be a named list with unique names")
+    }
+
+    method <- if (all(isPCA)) "PCA" else "UMAP"
+    if (!is.null(object@params$method) &&
+        !identical(object@params$method, method)) {
+        return(paste0("`params$method` is \"", object@params$method,
+            "\" but `res` holds ", method, " results"))
+    }
+
+    ids <- .dimRedIds(res[[1]])
+    sameIds <- vapply(res, function(x) identical(.dimRedIds(x), ids),
+        logical(1))
+    if (!all(sameIds)) {
+        return(paste("every element of `res` must cover the same samples,",
+            "in the same order"))
+    }
+    msg <- .checkDimRedIds(object, ids)
+    if (!is.null(msg)) return(msg)
     TRUE
 })
 
@@ -127,6 +202,10 @@ setMethod("getSampleTable", "mesaDimRed", function(object) {
 #' PCA results container
 #'
 #' Stores a PCA fit (from [stats::prcomp()]) computed over methylation windows.
+#'
+#' A valid object has non-empty `windows` with no `NA` or duplicates,
+#' one per row of `prcomp$rotation`, and a `prcomp$x` matrix whose row
+#' names are the sample IDs.
 #'
 #' @slot prcomp `prcomp`
 #'   A PCA fit returned by [stats::prcomp()].
@@ -184,10 +263,16 @@ setMethod("show", "mesaPCA", function(object) {
 
 # Validity check
 setValidity("mesaPCA", function(object) {
-    if (!inherits(object@prcomp, "prcomp")) {
-        return("`prcomp` must be a stats::prcomp object")
+    msg <- .checkWindows(object@windows)
+    if (!is.null(msg)) return(msg)
+
+    x <- object@prcomp$x
+    if (!is.matrix(x) || is.null(rownames(x))) {
+        return("`prcomp$x` must be a matrix with sample IDs as row names")
     }
-    if (!is.character(object@windows)) return("`windows` must be character")
+    if (length(object@windows) != NROW(object@prcomp$rotation)) {
+        return("`windows` must have one entry per row of `prcomp$rotation`")
+    }
     TRUE
 })
 
@@ -201,6 +286,10 @@ setValidity("mesaPCA", function(object) {
 #'
 #' Stores per-sample coordinates from a UMAP embedding computed over methylation
 #' windows.
+#'
+#' A valid object has non-empty `windows` with no `NA` or duplicates,
+#' and at least one row of numeric `points` with the sample IDs as row
+#' names.
 #'
 #' @slot points `data.frame`
 #'   One row per sample with UMAP coordinates (e.g., `UMAP1`, `UMAP2`).
@@ -259,8 +348,16 @@ setMethod("show", "mesaUMAP", function(object) {
 
 # Validity check
 setValidity("mesaUMAP", function(object) {
-    if (!is.data.frame(object@points)) return("`points` must be a data.frame")
-    if (!is.character(object@windows)) return("`windows` must be character")
+    msg <- .checkWindows(object@windows)
+    if (!is.null(msg)) return(msg)
+
+    if (nrow(object@points) == 0) return("`points` must have at least one row")
+    if (!tibble::has_rownames(object@points)) {
+        return("`points` must have sample IDs as row names")
+    }
+    if (!all(vapply(object@points, is.numeric, logical(1)))) {
+        return("`points` columns must all be numeric")
+    }
     TRUE
 })
 

@@ -39,14 +39,28 @@ A \link[=mesaDimRed-class]{mesaDimRed} object:
 Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
 computed on a common set of samples.
 }
+\details{
+A valid object has \code{res} empty, or:
+\itemize{
+\item \code{res} is a named list with unique names;
+\item its elements are all \link[=mesaPCA-class]{mesaPCA} or all
+\link[=mesaUMAP-class]{mesaUMAP} objects, matching \code{params$method} if set;
+\item every element covers the same sample IDs, in the same order,
+with no duplicates;
+\item each sample ID is a row name of \code{sampleTable} (a value of
+\code{sampleTable$group} when \code{params$useGroupMeans} is \code{TRUE});
+\item each sample ID is a column of \code{dataTable}, when it has columns.
+}
+}
 \section{Slots}{
 
 \describe{
 \item{\code{res}}{\code{list}
 Individual DR result objects (e.g., \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}).
 
-The sample IDs of the results are the row names of each element of \code{res}
-(\code{prcomp$x} for \link[=mesaPCA-class]{mesaPCA}, \code{points} for \link[=mesaUMAP-class]{mesaUMAP}). With
+The sample IDs of the results are the row names of each element of
+\code{res} (\code{prcomp$x} for \link[=mesaPCA-class]{mesaPCA},
+\code{points} for \link[=mesaUMAP-class]{mesaUMAP}). With
 \code{useGroupMeans = TRUE} they are sample group names.}
 
 \item{\code{sampleTable}}{\code{data.frame}
