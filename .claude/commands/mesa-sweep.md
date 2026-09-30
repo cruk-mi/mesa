@@ -48,7 +48,8 @@ Follow **Triage** in `AGENTS.md`, which wins if the two ever differ:
 3. Wait for a yes.
 4. File each approved item with `gh issue create --label parked`. Include the full note,
    its date, branch and issue in the body.
-5. Add the new number to the **Parked findings** item in #124's wave 4, through step 5.
+5. Add the new number to the **Parked findings** item in #124's wave 4, using section 5
+   (Update the roadmap data).
    Create the item if it is missing.
 6. Delete the item's line only once its issue exists.
 
@@ -112,7 +113,9 @@ regenerate with `--html --no-log`, publish the page and run `--mark-published`.
 `recommendation.md` and `bioccheck-history.jsonl` are committed, and the change never goes on
 `main`:
 
-1. Branch `chore/status-YYYY-MM-DD` off `main`.
+1. Branch `chore/status-YYYY-MM-DD` off `main`. If an earlier `chore/status-*` PR is
+   still open, commit to that branch instead. Two open status PRs both append to
+   `bioccheck-history.jsonl`, so the second one to merge would conflict.
 2. Commit both files as
    `chore(status): refresh the recommendation and BiocCheck history`, with `Refs #124`.
    This routine refresh needs no issue of its own.
