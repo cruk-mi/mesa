@@ -94,8 +94,8 @@ issue it was opened for, and nothing else.
   session's issue number, or `-`:
   `python3 .claude/scripts/mesa-status.py --park <issue> <<'EOF'`, then the note on its own
   line, then `EOF`.
-- List what was parked in the PR description under **Parked**. That list is the durable
-  copy.
+- List what was parked in the PR description's **Parked** section (see
+  [Pull request descriptions](#pull-request-descriptions)). That list is the durable copy.
 
 The parking lot is `.claude/state/parking-lot.md` in the **main checkout**. The script
 resolves it through `git rev-parse --git-common-dir`, so every worktree writes to the same
@@ -269,6 +269,24 @@ text, per the attribution rule above.
 
 Reference issues from commits with `Fixes #<n>` (closes on merge) or `Refs #<n>`
 (cross-reference only).
+
+---
+
+## Pull request descriptions
+
+- **Fill in [`.github/pull_request_template.md`](.github/pull_request_template.md).**
+  `gh pr create --body-file` skips it, so start the body from that file.
+- **Open with NEWS:** the lines the PR adds to `NEWS.md`, pasted verbatim, or one line
+  saying there is no user-visible change.
+- **Why**, **What changes** and **Verified** are required. Delete any other section with
+  nothing in it (never write "N/A"), and add one when evidence doesn't fit, like #114's
+  **Timings** table. Keep the whole body under about 40 lines.
+- Link review threads, CI runs and logs; don't paste them. Review history lives in the PR
+  comments, and **Verified** may link the review summary in one line.
+- When the scope changes, rewrite the body (`gh pr edit <N> --body-file <file>`) so it
+  matches the diff. No "Update:" log.
+- An agent says so on the first line, e.g.
+  `> Written by Claude (Claude Code) at the maintainer's request.`
 
 ---
 

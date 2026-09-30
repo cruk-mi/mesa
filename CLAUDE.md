@@ -21,6 +21,8 @@ Branch off `main`, commit atomically, push the feature branch, open a **draft** 
 — never mark ready; merge, or delete a safe branch, only when the human explicitly
 approves or asks (the hook makes them confirm); never touch `main`. `.claude/hooks/guard-remote.py`
 enforces this; a blocked command means the contract said no, so do not work around it.
+PR descriptions follow the template: see
+[`AGENTS.md`](AGENTS.md#pull-request-descriptions).
 
 ## Attribution
 
