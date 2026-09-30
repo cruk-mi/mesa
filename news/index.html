@@ -84,6 +84,8 @@
 <ul><li>Coverage is now uploaded on pull requests as well as <code>main</code>; Codecov statuses are informational. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
 <li>CI fails if Codecov rejects the upload after three attempts; fork pull requests are exempt. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
 <li>The devcontainer image no longer installs <code>immunedeconv</code> (with its GitHub dependencies) or <code>imsig</code>, which mesa does not use, and takes <code>ggtree</code> from Bioconductor instead of a GitHub pin. It now installs nothing from GitHub, so it no longer needs the pinned archives and SHA check added in 0.99.7. (<a href="https://github.com/cruk-mi/mesa/pull/132" class="external-link">#132</a>)</li>
+<li>Pushing a <code>vX.Y.Z</code> tag now publishes a GitHub Release with the source tarball and that version’s <code>NEWS.md</code> notes, once the tag matches <code>DESCRIPTION</code> and <code>NEWS.md</code> and passes the r-universe Bioconductor build. (<a href="https://github.com/cruk-mi/mesa/pull/112" class="external-link">#112</a>)</li>
+<li>The Bioconductor check on pull requests now takes about 22 minutes instead of 37, and runs every check it ran before. The vignettes run twice per run instead of four times, and “re-building of vignette outputs”, which Bioconductor requires, is now checked instead of skipped. The long checks, coverage and the pkgdown site run in parallel with <code>R CMD check</code>. A push to an open pull request no longer starts a second run, and cancels the superseded one. (<a href="https://github.com/cruk-mi/mesa/pull/114" class="external-link">#114</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">

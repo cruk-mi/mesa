@@ -78,7 +78,7 @@
 </div>
 <div class="section level2">
 <h2 id="the-contract-in-one-line">The contract, in one line<a class="anchor" aria-label="anchor" href="#the-contract-in-one-line"></a></h2>
-<p>Branch off <code>main</code>, commit atomically, push the feature branch, open a <strong>draft</strong> PR if asked — never mark ready, never merge, never touch <code>main</code>. <code>.claude/hooks/guard-remote.py</code> enforces this; a blocked command means the contract said no, so do not work around it.</p>
+<p>Branch off <code>main</code>, commit atomically, push the feature branch, open a <strong>draft</strong> PR if asked — never mark ready; merge, or delete a safe branch, only when the human explicitly approves or asks (the hook makes them confirm); never touch <code>main</code>. <code>.claude/hooks/guard-remote.py</code> enforces this; a blocked command means the contract said no, so do not work around it.</p>
 </div>
 <div class="section level2">
 <h2 id="attribution">Attribution<a class="anchor" aria-label="anchor" href="#attribution"></a></h2>

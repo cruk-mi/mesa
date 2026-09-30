@@ -81,7 +81,7 @@
 <hr></div>
 <div class="section level2">
 <h2 id="workflow-contract-read-this-first">Workflow contract (read this first)<a class="anchor" aria-label="anchor" href="#workflow-contract-read-this-first"></a></h2>
-<p>Agents operate on a <strong>dedicated branch as a sandbox</strong>. The human owns when work becomes a pull request and when anything merges.</p>
+<p>Agents operate on a <strong>dedicated branch as a sandbox</strong>. The human owns when work becomes a pull request and decides when anything merges.</p>
 <ul><li>
 <strong>Check the state of the repo first.</strong> Run <code>git status</code> and <code>git log --oneline -5</code> before making changes, and say so if the working tree is dirty or HEAD is not where you expected — do not fold someone else’s uncommitted work into your commit.</li>
 <li>
@@ -89,12 +89,19 @@
 <li>Make the <strong>smallest</strong> set of changes needed. Do not refactor unrelated code.</li>
 <li>Commit in <strong>atomic</strong> steps, each a single logical change, using <a href="#conventional-commit-messages">Conventional Commits</a>.</li>
 <li>You <strong>may push the feature branch</strong> (with attribution — see below).</li>
-<li>You <strong>may open a pull request, but only as a draft.</strong> Never mark it ready for review, never request review, never merge.</li>
-<li>You may <strong>never</strong> push or force-push to <code>main</code>, delete branches or tags, or rewrite published history.</li>
+<li>You <strong>may open a pull request, but only as a draft.</strong> Never mark it ready for review or request review.</li>
+<li>You <strong>may merge a pull request only when the human explicitly approves that merge or asks for it</strong> in the conversation. An approving review on GitHub is not, on its own, that approval. Squash-merge (<code>gh pr merge --squash</code>) unless the human asks for a merge commit on that PR: one commit per PR keeps <code>main</code> easy to read, revert and bisect. The hook asks the human to confirm every merge.</li>
+<li>You <strong>may delete a branch only when it is safe and the human explicitly approves</strong>. Safe means:
+<ul><li>its PR is merged or closed;</li>
+<li>it is not <code>main</code> or <code>dev</code>;</li>
+<li>no open PR uses it as its base, or those PRs have been retargeted to <code>main</code> first (<code>gh pr edit N --base main</code>). Otherwise deleting it closes those PRs instead of retargeting them. This covers <code>git branch -d/-D</code>, <code>git push --delete</code> and <code>gh pr merge|close --delete-branch</code>. The hook asks the human to confirm each deletion. It refuses a protected branch or a tag in any spelling, a remote branch that is the head or the base of an open PR, and a remote branch it cannot check.</li>
+</ul></li>
+<li>You may <strong>never</strong> push or force-push to <code>main</code>, delete tags, or rewrite published history.</li>
 <li>When in doubt about an irreversible or outward-facing action, ask first.</li>
 <li>
 <strong>Never push to Bioconductor</strong> (<code>BiocStaging/mesa</code>) without the human’s explicit permission, asked every time. The human runs that push by default.</li>
-</ul><p>These rules are also enforced mechanically by <code>.claude/hooks/guard-remote.py</code>, on <code>gh api</code> as well as on <code>git</code> and <code>gh pr</code> — the endpoint names the action, so reaching a merge or an approval through the raw API is blocked the same way. If the hook and this file ever disagree, that is a bug — fix both.</p>
+</ul><p>These rules are also enforced mechanically by <code>.claude/hooks/guard-remote.py</code>, on <code>gh api</code> as well as on <code>git</code> and <code>gh pr</code> — the endpoint names the action, so reaching a merge or an approval through the raw API is treated the same way. <code>gh api</code> writes are allow-listed: reads, comments, review replies, non-approving reviews, resolving threads and feature-branch refs pass, and any other write is asked. A merge or a safe branch deletion is not blocked but raised as a permission prompt, so the human confirms each one. In a permission mode that shows no prompt (<code>bypassPermissions</code>, <code>auto</code>, <code>dontAsk</code>), the hook blocks it instead: the human runs it. If the hook and this file ever disagree, that is a bug — fix both.</p>
+<p>The hook is a safety net, not a security boundary. It does not follow git or gh aliases, push behaviour set through config (<code>git -c remote.origin.mirror=true</code>, <code>push.default=matching</code>), <code>env -S</code>, or a command run by another interpreter (<code>python3 -c</code>). None of those are allowed ways around the rules above.</p>
 <hr></div>
 <div class="section level2">
 <h2 id="session-scope-and-the-parking-lot">Session scope and the parking lot<a class="anchor" aria-label="anchor" href="#session-scope-and-the-parking-lot"></a></h2>
@@ -171,7 +178,7 @@ Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
 </tr></tbody></table><p><strong>Phase 2 — the work.</strong> Each feature/fix PR targets <code>main</code> and records its user-visible changes under the <code># mesa X.Y.Z.9000</code> heading, in the same PR that makes the change.</p>
 <p><strong>Phase 3 — cut the release.</strong> After the work PRs merge, branch <code>chore/bump-version-X.Y.(Z+1)</code> off <code>main</code>. One commit <code>chore(version): bump to X.Y.(Z+1)</code> (reference: PR #99 = <code>b5e80a0</code>): bump <code>DESCRIPTION</code> and rename the <code>NEWS.md</code> heading.</p>
 <p><strong>Stop after each phase.</strong> Tell the human to push and open the PR. Tag format <code>vX.Y.Z</code>, applied by the human after merge to <code>main</code>.</p>
-<p><strong>After phase 3 merges</strong>, the human tags the release and pushes it to Bioconductor (<code>BiocStaging/mesa</code>, branch <code>devel</code>) before phase 1 opens. The <code>bioc-release-cycle</code> skill has the checklist. A release that never reaches Bioconductor has not shipped.</p>
+<p><strong>After phase 3 merges</strong>, the human tags the release, checks that the <code>release</code> workflow the tag starts has passed and published the GitHub Release, and pushes it to Bioconductor (<code>BiocStaging/mesa</code>, branch <code>devel</code>) before phase 1 opens. The <code>bioc-release-cycle</code> skill has the checklist. A release that never reaches Bioconductor has not shipped.</p>
 <p>Full detail lives in the <code>bioc-release-cycle</code> skill.</p>
 <hr></div>
 <div class="section level2">
