@@ -1317,7 +1317,8 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #' @family annotation-summaries
 #'
 #' @examples
-#' # Recommended workflow: set genome globally
+#' # Recommended workflow: set genome globally (saving the current setting)
+#' oldGenome <- getOption("mesa_genome")
 #' setMesaGenome("hg38")
 #' data(exampleTumourNormal, package = "mesa")
 #'
@@ -1345,6 +1346,9 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'         annoDb = "org.Mm.eg.db"
 #'     )
 #' }
+#'
+#' # Restore the previous genome setting
+#' options(mesa_genome = oldGenome)
 #'
 #' @export
 plotGenomicFeatureDistribution <- function(

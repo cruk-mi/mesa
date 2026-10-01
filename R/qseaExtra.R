@@ -1789,7 +1789,9 @@ addSummaryAcrossWindows <- function(qseaSet,
 #' @family annotation-summaries
 #'
 #' @examples
-#' # Ensure annotation defaults are available (GRCh38/hg38)
+#' # Ensure annotation defaults are available (GRCh38/hg38), saving the
+#' # current setting
+#' oldGenome <- getOption("mesa_genome")
 #' setMesaGenome("hg38")
 #'
 #' data(exampleTumourNormal, package = "mesa")
@@ -1812,6 +1814,9 @@ addSummaryAcrossWindows <- function(qseaSet,
 #'   ) %>%
 #'   head()
 #' }
+#'
+#' # Restore the previous genome setting
+#' options(mesa_genome = oldGenome)
 #'
 #' @export
 getGenomicFeatureDistribution <- function(

@@ -60,7 +60,9 @@ This function requires a transcript database and OrgDb to annotate windows
 }
 }
 \examples{
-# Ensure annotation defaults are available (GRCh38/hg38)
+# Ensure annotation defaults are available (GRCh38/hg38), saving the
+# current setting
+oldGenome <- getOption("mesa_genome")
 setMesaGenome("hg38")
 
 data(exampleTumourNormal, package = "mesa")
@@ -83,6 +85,9 @@ exampleTumourNormal \%>\%
   ) \%>\%
   head()
 }
+
+# Restore the previous genome setting
+options(mesa_genome = oldGenome)
 
 }
 \seealso{

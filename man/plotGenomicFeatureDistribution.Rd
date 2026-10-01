@@ -60,7 +60,8 @@ if present). Bars are positioned according to \code{barType}
 (\code{stack}/\code{dodge}/\code{fill}).
 }
 \examples{
-# Recommended workflow: set genome globally
+# Recommended workflow: set genome globally (saving the current setting)
+oldGenome <- getOption("mesa_genome")
 setMesaGenome("hg38")
 data(exampleTumourNormal, package = "mesa")
 
@@ -88,6 +89,9 @@ exampleTumourNormal \%>\%
         annoDb = "org.Mm.eg.db"
     )
 }
+
+# Restore the previous genome setting
+options(mesa_genome = oldGenome)
 
 }
 \seealso{
