@@ -163,7 +163,8 @@ exampleTumourNormal %>%
                 values_to = "relH") %>%
     ggplot(aes(x = sample_name, y = relH, col = enrichment)) +
     geom_point() +
-    theme_bw()
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 There is a second relative enrichment metric defined by the `MEDIPS` package,
