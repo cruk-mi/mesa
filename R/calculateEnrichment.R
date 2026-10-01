@@ -871,9 +871,7 @@ calculateCGEnrichmentGRanges <- function(
 #' [calculateCGEnrichment()], [calculateCGEnrichmentGRanges()]
 #'
 #' @examples
-#' # Requires BAM files from MEDIPSData; see \dontrun{} for a full
-#' # usage example.
-#' \dontrun{
+#' # A single-end MeDIP-seq input BAM on chr22 (hg19), from MEDIPSData
 #' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
 #'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
 #'     bam <- system.file(
@@ -882,25 +880,24 @@ calculateCGEnrichmentGRanges <- function(
 #'         package = "MEDIPSData"
 #'     )
 #'
-#'     data.frame(
+#'     # The enrichment factors are stored next to the coverage, so add
+#'     # coverage first
+#'     qs <- data.frame(
 #'         sample_name = "hESC_Input_chr22",
 #'         file_name = bam,
-#'         group = "Input",
-#'         input_file = bam,
-#'         stringsAsFactors = FALSE
+#'         group = "Input"
 #'     ) %>%
-#'         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19") %>%
-#'         addMedipsEnrichmentFactors(
-#'             exportPath = tempdir(),
-#'             chr.select = paste0("chr22"),
-#'             paired     = FALSE
-#'             # If your qsea returns a BSgenome object and as.character()
-#'             # doesn't help, uncomment:
-#'             # , BSgenome_pkg = "BSgenome.Hsapiens.UCSC.hg19"
-#'         ) %>%
-#'         qsea::getSampleTable() %>%
-#'         print()
-#' }
+#'         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19",
+#'             chr.select = "chr22", window_size = 5000) %>%
+#'         qsea::addCoverage(fragment_length = 300, uniquePos = FALSE,
+#'             paired = FALSE) %>%
+#'         addMedipsEnrichmentFactors(chr.select = "chr22", paired = FALSE)
+#'
+#'     # Copy the factors into the sample table to inspect them
+#'     qs %>%
+#'         addLibraryInformation() %>%
+#'         getSampleTable() %>%
+#'         dplyr::select(sample_name, relH, GoGe, nReads, nReadsWithoutPattern)
 #' }
 #' @export
 addMedipsEnrichmentFactors <- function(
