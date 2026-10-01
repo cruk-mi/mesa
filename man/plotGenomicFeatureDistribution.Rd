@@ -60,15 +60,18 @@ if present). Bars are positioned according to \code{barType}
 (\code{stack}/\code{dodge}/\code{fill}).
 }
 \examples{
-\donttest{
 # Recommended workflow: set genome globally
 setMesaGenome("hg38")
 data(exampleTumourNormal, package = "mesa")
 
 # Uses global hg38 setting
-exampleTumourNormal \%>\%
-    plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+    requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+    exampleTumourNormal \%>\%
+        plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+}
 
+\donttest{
 # Override for specific analysis
 exampleTumourNormal \%>\%
     plotGenomicFeatureDistribution(

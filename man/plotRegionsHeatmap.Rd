@@ -132,7 +132,6 @@ For \code{"nrpm"},
 samples are aggregated by \code{group} before plotting.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Compute regions (DMRs) to plot
@@ -159,7 +158,6 @@ exampleTumourNormal \%>\%
             tumour = c("Tumour" = "firebrick4", "Normal" = "blue")
         )
     )
-}
 }
 \seealso{
 \code{\link[qsea:makeTable]{qsea::makeTable()}}, \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}},
