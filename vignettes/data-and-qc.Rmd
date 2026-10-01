@@ -180,7 +180,7 @@ all. This can be a measure of background noise.
 The other metric that we typically use for quality control is to consider
 windows that are known to be commonly methylated across a range of tissues and
 diseases. For instance, for the human genome, [Edgar et al.
-(2014)](https://pubmed.ncbi.nlm.nih.gov/25493099/) identified probes from the
+(2014)](https://doi.org/10.1186/1756-8935-7-28) identified probes from the
 Illumina 450k methylation array that were consistently methylated in over 1000
 samples. We therefore take the windows covered by these probes, calculate
 beta values for them, and then determine how many of these windows have a
