@@ -78,6 +78,24 @@ registered backend (see \code{\link[BiocParallel:register]{BiocParallel::registe
 and set a multi-core/cluster backend for speed.
 }
 
+\examples{
+# A single-end MeDIP-seq input BAM on chr22 (hg19), from MEDIPSData
+if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+    bam <- system.file("extdata", "hESCs.Input.chr22.bam",
+        package = "MEDIPSData")
+
+    qs <- data.frame(sample_name = "hESC", file_name = bam,
+        group = "Input") \%>\%
+        qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19",
+            chr.select = "chr22", window_size = 5000) \%>\%
+        addBamCoveragePairedAndUnpaired(fragmentLength = 300)
+
+    # Fragments counted over all windows, and the per-sample QC summary
+    colSums(qsea::getCounts(qs))
+    getSampleQCSummary(qs)
+}
+}
 \seealso{
 \code{getBamCoveragePairedAndUnpairedR1()} (internal low-level worker),
 \code{\link[qsea:getRegions]{qsea::getRegions()}},

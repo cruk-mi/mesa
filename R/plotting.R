@@ -110,7 +110,6 @@
 #' [calculateDMRs()], [getSampleTable()], [getWindows()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Compute regions (DMRs) to plot
@@ -137,7 +136,6 @@
 #'             tumour = c("Tumour" = "firebrick4", "Normal" = "blue")
 #'         )
 #'     )
-#' }
 #' @export
 plotRegionsHeatmap <- function(qseaSet, regionsToOverlap = NULL,
                                 normMethod = "beta",
@@ -1319,15 +1317,19 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #' @family annotation-summaries
 #'
 #' @examples
-#' \donttest{
-#' # Recommended workflow: set genome globally
+#' # Recommended workflow: set genome globally (saving the current setting)
+#' oldGenome <- getOption("mesa_genome")
 #' setMesaGenome("hg38")
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Uses global hg38 setting
-#' exampleTumourNormal %>%
-#'     plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+#' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+#'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+#'     exampleTumourNormal %>%
+#'         plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
+#' }
 #'
+#' \donttest{
 #' # Override for specific analysis
 #' exampleTumourNormal %>%
 #'     plotGenomicFeatureDistribution(
@@ -1344,6 +1346,9 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'         annoDb = "org.Mm.eg.db"
 #'     )
 #' }
+#'
+#' # Restore the previous genome setting
+#' options(mesa_genome = oldGenome)
 #'
 #' @export
 plotGenomicFeatureDistribution <- function(
