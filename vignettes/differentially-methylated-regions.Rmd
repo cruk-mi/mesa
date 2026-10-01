@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     fig.width = 7,
     fig.height = 5,
+    out.width = "100%",
     comment = "#>",
     dev = "ragg_png"
 )
@@ -421,7 +422,7 @@ We also provide a function to draw an [UpSet plot](https://upset.app/). These
 are useful for showing the intersections between sets of data, in a
 more generalisable form than a Venn diagram.
 
-```{r chunk-22, fig.height = 8}
+```{r chunk-22, fig.width = 10, fig.height = 8}
 allContrasts |>
     plotDMRUpset()
 ```
