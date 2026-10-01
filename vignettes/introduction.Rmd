@@ -11,6 +11,9 @@ vignette: >
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
+    fig.width = 7,
+    fig.height = 5,
+    out.width = "100%",
     dev = "ragg_png"
 )
 ```
@@ -322,7 +325,7 @@ The copy number variation can be plotted using the function `plotCNVheatmap`
 (note that this is different to the qsea function `plotCNV`, which uses bright
 shades of red and blue):
 
-```{r chunk-13, fig.height = 5, fig.width = 6}
+```{r chunk-13}
 qseaSet |>
     plotCNVheatmap()
 ```
