@@ -492,6 +492,23 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
 #'   [BiocParallel::register()]
 #'
 #' @family coverage
+#' @examples
+#' # A single-end MeDIP-seq input BAM on chr22 (hg19), from MEDIPSData
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#'     bam <- system.file("extdata", "hESCs.Input.chr22.bam",
+#'         package = "MEDIPSData")
+#'
+#'     qs <- data.frame(sample_name = "hESC", file_name = bam,
+#'         group = "Input") %>%
+#'         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19",
+#'             chr.select = "chr22", window_size = 5000) %>%
+#'         addBamCoveragePairedAndUnpaired(fragmentLength = 300)
+#'
+#'     # Fragments counted over all windows, and the per-sample QC summary
+#'     colSums(qsea::getCounts(qs))
+#'     getSampleQCSummary(qs)
+#' }
 #' @export
 addBamCoveragePairedAndUnpaired <- function(qs,
                                             fragmentLength = NULL,
@@ -642,7 +659,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #' # addNormalisation requires windows spanning a range of CpG densities for
 #' # background estimation; the pre-filtered example datasets lack these, so
 #' # a synthetic qseaSet is used here.
-#' \donttest{
+#'
 #' # Run normalisation on a toy qseaSet with ~100k reads
 #' qsea::getExampleQseaSet(expSamplingDepth = 100000) %>%
 #'     addNormalisation(maxPatternDensity = 0.5)
@@ -656,7 +673,6 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'     addNormalisation(maxPatternDensity = 0.5) %>%
 #'     getParameters() %>%
 #'     purrr::pluck("enrichmentMethod")
-#' }
 #'
 #' @export
 addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15",

@@ -62,7 +62,7 @@ methylation levels from ~76\% at CpG density = 1 to ~25\% at CpG density = 15.
 # addNormalisation requires windows spanning a range of CpG densities for
 # background estimation; the pre-filtered example datasets lack these, so
 # a synthetic qseaSet is used here.
-\donttest{
+
 # Run normalisation on a toy qseaSet with ~100k reads
 qsea::getExampleQseaSet(expSamplingDepth = 100000) \%>\%
     addNormalisation(maxPatternDensity = 0.5)
@@ -76,7 +76,6 @@ qsea::getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
     addNormalisation(maxPatternDensity = 0.5) \%>\%
     getParameters() \%>\%
     purrr::pluck("enrichmentMethod")
-}
 
 }
 \seealso{
