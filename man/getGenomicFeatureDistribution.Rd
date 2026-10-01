@@ -60,17 +60,20 @@ This function requires a transcript database and OrgDb to annotate windows
 }
 }
 \examples{
-\donttest{
 # Ensure annotation defaults are available (GRCh38/hg38)
 setMesaGenome("hg38")
 
 data(exampleTumourNormal, package = "mesa")
 
 # NRPM-based context summary
-exampleTumourNormal \%>\%
-  getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
-  head()
+if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+    requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+  exampleTumourNormal \%>\%
+    getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
+    head()
+}
 
+\donttest{
 # Beta-based summary (apply a minimum enrichment for non-NA betas)
 exampleTumourNormal \%>\%
   getGenomicFeatureDistribution(

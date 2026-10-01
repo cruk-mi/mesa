@@ -76,14 +76,17 @@ trailing parenthetical), and—when contexts are provided—\code{landscape}
 }
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
 # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
-exampleTumourNormal \%>\%
-  calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
-  annotateWindows(genome = "hg38")
+if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+    requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+  exampleTumourNormal \%>\%
+    calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+    annotateWindows(genome = "hg38")
+}
 
+\donttest{
 # Or specify TxDb/annoDb explicitly
 exampleTumourNormal \%>\%
   calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
