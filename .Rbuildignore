@@ -1,5 +1,6 @@
 ^\.github$
 ^\.devcontainer$
+^\.lintr\.R$
 ^Dockerfile$
 ^Dockerfile_dependencies_only$
 ^data-raw$
