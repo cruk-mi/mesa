@@ -182,9 +182,10 @@
 #' [addHMMcopyCNV()], [setMesaParallel()], [BSgenome::available.genomes()]
 #'
 #' @examples
-#' \donttest{
-#' # Minimal runnable sketch if MEDIPSData is installed
-#' if (requireNamespace("MEDIPSData", quietly = TRUE)) {
+#' # A tumour/normal pair of MeDIP-seq BAMs from MEDIPSData, restricted to
+#' # chr22 to keep the example short
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
 #'     sampleTable <- data.frame(
 #'         sample_name = c("Normal1", "Tumour1"),
 #'         group = c("Normal", "Tumour"),
@@ -199,7 +200,7 @@
 #'     sampleTable %>%
 #'         makeQset(
 #'             BSgenome          = "BSgenome.Hsapiens.UCSC.hg19",
-#'             chrSelect         = paste0("chr", 20:22),
+#'             chrSelect         = "chr22",
 #'             windowSize        = 300,
 #'             fragmentLength    = 200,
 #'             fragmentSD        = 50,
@@ -208,7 +209,6 @@
 #'             properPairsOnly   = FALSE,
 #'             minMapQual        = 10
 #'         )
-#' }
 #' }
 #' @export
 makeQset <- function(sampleTable,

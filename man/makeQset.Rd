@@ -224,9 +224,10 @@ enrichment parameters, allowing for estimation of beta values.
 }
 }
 \examples{
-\donttest{
-# Minimal runnable sketch if MEDIPSData is installed
-if (requireNamespace("MEDIPSData", quietly = TRUE)) {
+# A tumour/normal pair of MeDIP-seq BAMs from MEDIPSData, restricted to
+# chr22 to keep the example short
+if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
     sampleTable <- data.frame(
         sample_name = c("Normal1", "Tumour1"),
         group = c("Normal", "Tumour"),
@@ -241,7 +242,7 @@ if (requireNamespace("MEDIPSData", quietly = TRUE)) {
     sampleTable \%>\%
         makeQset(
             BSgenome          = "BSgenome.Hsapiens.UCSC.hg19",
-            chrSelect         = paste0("chr", 20:22),
+            chrSelect         = "chr22",
             windowSize        = 300,
             fragmentLength    = 200,
             fragmentSD        = 50,
@@ -250,7 +251,6 @@ if (requireNamespace("MEDIPSData", quietly = TRUE)) {
             properPairsOnly   = FALSE,
             minMapQual        = 10
         )
-}
 }
 }
 \seealso{
