@@ -349,7 +349,7 @@ issue if using a targeted enrichment step in your library preparation method.
 Finally, the `qsea` beta value calculation is applied. This requires the
 `CpG_density` and the coverage, as well as some assumption about which regions
 are methylated, or at least how many of them are. The [qsea
-manuscript](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5389680/) details three
+manuscript](https://doi.org/10.1093/nar/gkw1193) details three
 methods for this assumption, two of which require external data in the form of
 methylation arrays or bisulphite/enzymatic sequencing. The third method, known
 as "blind calibration" in the qsea manuscript, is the only one implemented here.
