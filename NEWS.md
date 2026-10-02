@@ -11,6 +11,18 @@
 - Added a package architecture diagram to the README; its Mermaid source is
   in `data-raw/figures/`.
   ([#110](https://github.com/cruk-mi/mesa/pull/110))
+- Proofread all five vignettes. Their examples and text now use the real
+  `makeQset()` argument `properPairsOnly` and `CNVmethod = "None"`, the
+  `group1`/`group2` contrast columns of `calculateDMRs()`, and describe the
+  blind calibration and `getBetaTable(useGroupMeans = TRUE)` output correctly.
+  ([#120](https://github.com/cruk-mi/mesa/issues/120))
+- Vignette plots now fill the page width. The relH plot in the data and QC
+  vignette is no longer drawn at 3 x 3 inches, and its sample names and the
+  UpSet plot's counts no longer overlap.
+  ([#78](https://github.com/cruk-mi/mesa/issues/78))
+- The Edgar et al. (2014) reference in `?addHyperStableFraction` and
+  `?hg38UltraStableProbes` now links to its DOI instead of PubMed.
+  ([#155](https://github.com/cruk-mi/mesa/pull/155))
 
 ## Infrastructure
 - Coverage is now uploaded on pull requests as well as `main`; Codecov

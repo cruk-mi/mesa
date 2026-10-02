@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
     collapse  = TRUE,
     fig.height= 5.5,
     fig.width = 7,
+    out.width = "100%",
     comment   = "#>",
     dev       = "ragg_png"
 )
@@ -22,10 +23,10 @@ library(ggplot2)
 library(mesa)
 ```
 
-One essential functionality in the analysis of large scale datasets is the
-ability to perform dimensionality reduction techniques and plot the outputs,
+One essential part of the analysis of large-scale datasets is the
+ability to perform dimensionality reduction and plot the outputs,
 such as Principal Component Analysis (PCA), t-distributed Stochastic Neighbor
-Embedding (t-SNE) or Uniform Manifold Approximation and Projection (UMAPs). The
+Embedding (t-SNE) or Uniform Manifold Approximation and Projection (UMAP). The
 mesa package currently supports functionality for PCAs and UMAPs.
 
 We will use the `exampleTumourNormal` data object for these examples.
@@ -35,7 +36,7 @@ We will use the `exampleTumourNormal` data object for these examples.
 First we will show the functionality for PCA, which is a linear dimensionality
 reduction technique. PCA is performed with mesa using a two-step approach:
 
-1. Running PCA with the `getPCA()` function to generate the PCA results
+1. Running PCA with the `getPCA()` function to generate the PCA results.
 2. Plotting the PCA results using the `plotPCA()` function.
 
 Please note that the `qsea` package also has functions with the same names; the
@@ -50,8 +51,8 @@ pca0 <- getPCA(exampleTumourNormal)
 ```
 
 By default, this will perform the PCA using beta values, and consider the 1000
-most variable windows across all samples (or all windows if there are less than
-1000).
+most variable windows across all samples (or all windows if there are fewer
+than 1000).
 
 We then can use the `plotPCA()` function to plot the result.
 
@@ -69,20 +70,20 @@ vs PC2 and another for PC2 vs PC3.
 ## Editing the sampleTable
 
 In the same way as for a `qseaSet`, the sampleTable may be updated directly,
-using `mutate` or `left_join`.
+using `mutate` or `left_join`:
 
 ```{r editing-the-sampletable}
 pca1 <- pca0 |> 
     mutate(transformed_age = scale(age) + 0.5)
 ```
 
-## `PlotPCA` function arguments
+## `plotPCA()` function arguments
 
-### Anotating samples by colour and/or shape
+### Annotating samples by colour and/or shape
 
 The `colour` and `shape` arguments to `plotPCA()` specify variables to use to
 set the colour and/or shape of the points (samples) on the PCA plot. These
-variables need to be in the qseaSet sample table.\ Multiple variables can be
+variables need to be in the sample table.\ Multiple variables can be
 specified for `colour` and a PCA plot will be produced for each variable.\ Only
 one variable can be specified for `shape`.
 
@@ -92,10 +93,10 @@ plotPCA(pca1,
         shape = "tumour") 
 ```
 
-Here, many PCA plots have been produced and displayed (PC1 vs PC2 and PC2 vs PC2
-for three different colour variable annotations. To have more control over which
-plots are displayed you can save the plots to a variable and then choose which
-ones to display.
+Here, many PCA plots have been produced and displayed (PC1 vs PC2 and PC2 vs PC3
+for three different colour variable annotations). To have more control over
+which plots are displayed, you can save the plots to a variable and then choose
+which ones to display.
 
 ```{r chunk-3}
 PCAplots1 <- plotPCA(pca1, 
@@ -116,11 +117,11 @@ properties of the variable being used.
 
 For the `transformed_age` variable (that was generated in the `mutate` example
 above), a diverging colour palette is used, but it is not symmetric around zero.
-That is, the darkest blue maps to approx -0.5 whereas the darkest red maps to
-approx 2.\ Depending on the variable, it may be appropriate that the darkest
-blue maps to -2 (i.e. equivalent to the darkest red mapping to 2), and for this
-the `symDivColourScale` argument can be set to TRUE, as seen below (and we also
-replot the above version for comparison).
+That is, the darkest blue maps to approximately -0.5 whereas the darkest red
+maps to approximately 2.\ Depending on the variable, it may be appropriate for
+the darkest blue to map to -2 (i.e. equivalent to the darkest red mapping to 2),
+and for this the `symDivColourScale` argument can be set to TRUE, as seen below
+(and we also replot the above version for comparison).
 
 ```{r colour-and-shape-palettes}
 PCAplots2 <- plotPCA(
@@ -136,8 +137,8 @@ PCAplots2$pca1$transformed_age$PC1vsPC2
 ```
 
 By default, filled shapes (21-25) with a black outline are used for points
-unless a categorical variable with more than 5 categories (including NA) is set
-to the shape, in which case the unfilled shapes are used (0-20)\*. Filled shapes
+unless a categorical variable with more than 5 categories (including NA) is
+mapped to shape, in which case unfilled shapes are used (0-20)\*. Filled shapes
 are generally preferred, as they remain more distinguishable when many points
 overlap.
 
@@ -186,7 +187,7 @@ plotPCA(pca1,
 ### NA values
 
 If a variable used for colour annotation contains NA values then these are
-displayed with a dark grey colour by default (this can be changed using the
+displayed in dark grey by default (this can be changed using the
 `NAcolour` argument).
 
 If a variable used for shape annotation contains NA values then these are
@@ -240,10 +241,10 @@ plotPCA(pca1,
 ```
 
 Alternatively, `plotly::ggplotly()` can be used to generate an interactive
-version of the plot which gives information for each point when you rollover the
-point with the mouse. The `plotlyAnnotations` argument can be used to specify
+version of the plot which gives information for each point when you hover over
+it with the mouse. The `plotlyAnnotations` argument can be used to specify
 which variables to display in the pop-up boxes. The sample name will always be
-displayed, as will any variables being used colour and shape annotations.
+displayed, as will any variables used for the colour and shape annotations.
 
 ```{r chunk-8}
 PCAplots3 <- plotPCA(pca1, 
@@ -263,17 +264,16 @@ if (knitr::is_html_output() && interactive()) {
 ```
 
 
-Plotly plots are great for interactive use in html reports.\ The downside of
+Plotly plots are great for interactive use in HTML reports.\ The downside of
 using them is that the legend often gets displayed in a complicated, unhelpful
-way and the formatting of the plot is often not as good and hard to control.\
-Sometimes it makes sense to plot a non-plotly and plotly version of the same
-plot.
+way and the formatting of the plot is often worse and hard to control.\
+Sometimes it makes sense to make both a static and a plotly version of the
+same plot.
 
 ## Output of `getPCA()`
 
-When you run `getPCA()` some messages are printed and will appear in the console
-window and also below the code chunk in the source window. This gives the
-following information:
+When you run `getPCA()`, it prints some messages (in the console, or below the
+code chunk in an R Markdown document). These give the following information:
 
 - Initial number of windows
 - Messages from `makeDataTable()` (if applicable), the `mesa` function that
@@ -316,9 +316,9 @@ number filtered out at each filtering step (not including filtering based on
 ## `getPCA()` function arguments
 
 By default, the `getPCA` function will only consider a subset of the most
-variable windows across the qseaSet. This has two benefits, the first being
-computational efficiency, but the second is to prevent the effects of minor
-batch effects from appearing when they are summed over many windows (although
+variable windows across the qseaSet. This has two benefits: the first is
+computational efficiency, and the second is to prevent minor batch effects from
+dominating when they are summed over many windows (although
 that is also worth investigating separately). This is seen particularly when
 using `beta` values, as how close a beta value can get to 0 or 1 is determined
 by the enrichment and number of fragments sequenced; a sample with 5 million
@@ -327,7 +327,7 @@ same window if it had 10 million fragments.
 
 ### Setting number of top variable windows to use
 
-This selection of the number of windows can be set using the `topVarNum`
+The number of windows can be set using the `topVarNum`
 argument of `getPCA()`. If not explicitly set, the default value is the top 1000
 most variable windows.
 
@@ -345,8 +345,8 @@ pca2 <- getPCA(exampleTumourNormal, topVarNum = c(100, 250, 500, NA))
 Here, four different values have been used and the messages output tell you the
 name assigned to each PCA result.
 
-When plugging this output into `plotPCA`, plots are produced for all four PCA
-versions, with all options for the `colour` parameter:
+When this output is passed to `plotPCA`, plots are produced for all four PCA
+results, for each value of the `colour` argument:
 
 ```{r chunk-10}
 PCAplots4 <- plotPCA(pca2, colour = c("patient", "age"), shape = "tumour") 
@@ -372,7 +372,7 @@ pca <- getPCA(exampleTumourNormal, topVarNum = c(250, 500, 750, 1000, NA))
 
 It is possible to select which samples are used to calculate the standard
 deviation for each window using the `topVarSamples` argument. This may be either
-an explicit vector of sample names,
+an explicit vector of sample names:
 
 ```{r samples-used-to-calculate-vari}
 tumourNames <- exampleTumourNormal |>
@@ -381,7 +381,7 @@ tumourNames <- exampleTumourNormal |>
 getPCA(exampleTumourNormal, topVarNum = c(50), topVarSamples = tumourNames)
 ```
 
-Or a string to apply (as a regular expression):
+or a string to match (as a regular expression):
 
 ```{r chunk-12}
 getPCA(exampleTumourNormal, topVarNum = c(50), topVarSamples = "_T")
@@ -404,7 +404,7 @@ multiple times with the `dataTable` generated only once.
 pca1 <- getPCA(exampleTumourNormal) # dataTable generated within getPCA
 ```
 
-For example, we can use `getBetaTable` to generate the table to use:
+For example, we can use `getBetaTable` to generate the table:
 
 ```{r chunk-13}
 dataTable <- getBetaTable(exampleTumourNormal)
@@ -442,8 +442,8 @@ methods::slot(pca1,"dataTable") # NULL
 methods::slot(pca3, "dataTable") # dataTable has been stored in output
 ```
 
-We can then use the dataTable calculated in a previous `getPCA` call, but ask
-`getPCA` to return a different number of top windows:
+We can then reuse the `dataTable` calculated in a previous `getPCA` call, but
+ask `getPCA` to use a different number of top windows:
 
 ```{r chunk-17}
 pca4 <- getPCA(exampleTumourNormal, 
@@ -494,12 +494,12 @@ For a full list of arguments, see the documentation (`?getPCA`).
 
 ## UMAPs
 
-Uniform Manifold and Projection (UMAP) is another method for performing
-dimensionality reduction. This is a nonlinear technique, attempting to reduce
-the N-dimensional space onto a 2 or 3 dimensional projection, attempting to
-preserve both local distances between points as well as the global topology.
-This is more appropriate for large datasets so we use the
-[qsea::getExampleQseaSet()] function to create an example dataset with two types
+Uniform Manifold Approximation and Projection (UMAP) is another method for
+performing dimensionality reduction. This is a nonlinear technique, which
+projects the N-dimensional space onto 2 or 3 dimensions while attempting to
+preserve both local distances between points and the global topology.
+This is more appropriate for large datasets, so we use the
+`qsea::getExampleQseaSet()` function to create an example dataset with two types
 of samples, before calculating and plotting a UMAP using the `getUMAP` and
 `plotUMAP` functions:
 
@@ -516,15 +516,15 @@ plotUMAP(umap1, colour = "group")
 The vast majority of the options for `getUMAP` are the same as for `getPCA`, but
 while the PCA algorithm has no further options, the UMAP algorithm has a number
 of options which can affect the output. The underlying implementation is via the
-[uwot::umap()] function, and any additional parameters provided to `getUMAP` are
-passed to this function. Of particular note are the two options, `n_neighbors`
+`uwot::umap()` function, and any additional parameters provided to `getUMAP` are
+passed to this function. Of particular note are two options, `n_neighbors`
 and `min_dist`. `n_neighbors` controls how many neighbouring samples are
 considered to build the local structure, while `min_dist` controls how far apart
 the resulting embedded points must be. There is an [excellent interactive
 example](https://pair-code.github.io/understanding-umap/) available to see how
-these two parameters influence the output, for a range of different datatypes.
+these two parameters influence the output, for a range of different data types.
 
-Here we show two UMAPs built off the same dataset with different values of
+Here we show two UMAPs built from the same dataset with different values of
 `min_dist` and `n_neighbors`:
 
 ```{r chunk-18}
@@ -537,8 +537,8 @@ qseaSetRandom |>
     plotUMAP(colour = "group")
 ```
 
-As a final note, we state that UMAPs should be used with care, as they are easy
-to misinterpret.
+As a final note, UMAPs should be used with care, as they are easy to
+misinterpret.
 
 ## Session info
 ```{r session-info, echo=FALSE}

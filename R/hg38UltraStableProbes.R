@@ -36,7 +36,7 @@
 #' Edgar R, Tan PPC, Portales-Casamar E, Pavlidis P (2014).
 #' *Meta-analysis of human methylomes reveals stably methylated sequences
 #' surrounding CpG islands associated with high gene expression*.
-#' <https://pubmed.ncbi.nlm.nih.gov/25493099/>
+#' \doi{10.1186/1756-8935-7-28}
 #'
 #' @seealso
 #' [addHyperStableFraction()]
