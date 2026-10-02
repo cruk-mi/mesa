@@ -19,6 +19,9 @@
 - Vignette plots now fill the page width instead of being drawn at
   3 x 3 inches, so axis labels no longer overlap.
   ([#78](https://github.com/cruk-mi/mesa/issues/78))
+- The Edgar et al. (2014) reference in `?addHyperStableFraction` and
+  `?hg38UltraStableProbes` now links to its DOI instead of PubMed.
+  ([#155](https://github.com/cruk-mi/mesa/pull/155))
 
 ## Infrastructure
 - Coverage is now uploaded on pull requests as well as `main`; Codecov
