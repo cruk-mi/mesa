@@ -7,9 +7,12 @@
 #' "mm10")
 #'
 #' @examples
-#' old <- options(mesa_genome = "hg19")
+#' oldGenome <- getOption("mesa_genome")
+#' options(mesa_genome = "hg19")
 #' getMesaGenome()
-#' options(old)
+#'
+#' # Restore the previous genome setting
+#' options(mesa_genome = oldGenome)
 #' @export
 getMesaGenome <- function() {
     getOption("mesa_genome", "hg38")
