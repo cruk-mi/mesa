@@ -99,6 +99,7 @@ setClass("mesaDimRed",
 #' md <- mesaDimRed(res = list(pca1 = mp), sampleTable = st,
 #'     params = list(method = "PCA"))
 #' md
+#' getSampleNames(md)
 #'
 #' @rdname mesaDimRed-class
 #' @export
@@ -114,14 +115,9 @@ mesaDimRed <- function(res, sampleTable, params, dataTable = data.frame()) {
 #' @rdname mesaDimRed-class
 #' @param object `mesaDimRed`
 setMethod("show", "mesaDimRed", function(object) {
-    nSamples <- if (length(object@res) > 0) {
-        length(.dimRedIds(object@res[[1]]))
-    } else {
-        0L
-    }
     cat("Object containing ", length(object@res),
         " dimensionality reduction objects for ",
-        nSamples, " samples", sep = "")
+        length(getSampleNames(object)), " samples", sep = "")
     cat("\n")
 })
 
@@ -193,6 +189,15 @@ setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
 
 setMethod("getSampleTable", "mesaDimRed", function(object) {
     object@sampleTable
+})
+
+#' @rdname mesaDimRed-class
+#' @details `getSampleNames()` returns the sample IDs that the results in `res`
+#'   cover (the row names of each result), or `character()` when `res` is
+#'   empty. With `params$useGroupMeans = TRUE` they are sample group names.
+setMethod("getSampleNames", "mesaDimRed", function(object) {
+    if (length(object@res) == 0) return(character())
+    .dimRedIds(object@res[[1]])
 })
 
 # ==============================

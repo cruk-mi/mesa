@@ -87,6 +87,7 @@ test_that("mesaDimRed: a valid object constructs, validates and shows", {
     expect_output(show(md),
         "1 dimensionality reduction objects for 5 samples")
     expect_identical(getSampleTable(md), makeSampleTable())
+    expect_identical(getSampleNames(md), paste0("S", 1:5))
 
     # An empty container is valid.
     empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
@@ -94,6 +95,7 @@ test_that("mesaDimRed: a valid object constructs, validates and shows", {
     expect_true(validObject(empty))
     expect_output(show(empty),
         "0 dimensionality reduction objects for 0 samples")
+    expect_identical(getSampleNames(empty), character())
 })
 
 test_that("mesaDimRed: each validity rule rejects an inconsistent object", {
@@ -136,8 +138,10 @@ test_that("mesaDimRed: each validity rule rejects an inconsistent object", {
 
     # With group means the IDs are groups, checked against sampleTable$group.
     groups <- mesaUMAP(makePoints(c("A", "B")), "W1")
-    expect_true(validObject(build(list(umap1 = groups),
-        params = list(method = "UMAP", useGroupMeans = TRUE))))
+    grouped <- build(list(umap1 = groups),
+        params = list(method = "UMAP", useGroupMeans = TRUE))
+    expect_true(validObject(grouped))
+    expect_identical(getSampleNames(grouped), c("A", "B"))
     expect_error(build(list(umap1 = groups), params = list(method = "UMAP")),
         "sample IDs in `res` are missing from `sampleTable`: A, B")
 
@@ -152,6 +156,10 @@ test_that("mesaDimRed: each validity rule rejects an inconsistent object", {
 test_that("getPCA() and getUMAP() output passes validObject()", {
     qs <- cachedExampleQset()
     expect_true(validObject(getPCA(qs, normMethod = "nrpm", verbose = FALSE)))
+    expect_identical(
+        getSampleNames(getPCA(exampleTumourNormal, verbose = FALSE)),
+        qsea::getSampleNames(exampleTumourNormal)
+    )
 
     expect_true(validObject(getPCA(exampleTumourNormal,
         topVarNum = c(10, 100), returnDataTable = TRUE, verbose = FALSE)))

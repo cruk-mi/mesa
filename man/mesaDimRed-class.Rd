@@ -5,11 +5,14 @@
 \alias{mesaDimRed-class}
 \alias{mesaDimRed}
 \alias{show,mesaDimRed-method}
+\alias{getSampleNames,mesaDimRed-method}
 \title{Dimensionality reduction results container}
 \usage{
 mesaDimRed(res, sampleTable, params, dataTable = data.frame())
 
 \S4method{show}{mesaDimRed}(object)
+
+\S4method{getSampleNames}{mesaDimRed}(object)
 }
 \arguments{
 \item{res}{\code{list}
@@ -51,6 +54,10 @@ with no duplicates;
 \code{sampleTable$group} when \code{params$useGroupMeans} is \code{TRUE});
 \item each sample ID is a column of \code{dataTable}, when it has columns.
 }
+
+\code{getSampleNames()} returns the sample IDs that the results in \code{res}
+cover (the row names of each result), or \code{character()} when \code{res} is
+empty. With \code{params$useGroupMeans = TRUE} they are sample group names.
 }
 \section{Slots}{
 
@@ -83,6 +90,7 @@ mp <- mesaPCA(prcomp = stats::prcomp(x), windows = colnames(x))
 md <- mesaDimRed(res = list(pca1 = mp), sampleTable = st,
     params = list(method = "PCA"))
 md
+getSampleNames(md)
 
 }
 \seealso{
