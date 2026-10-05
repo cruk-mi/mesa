@@ -36,23 +36,26 @@ and returned as a \code{GRanges}. Ensure that the binning (\code{width}) and cov
 columns (\code{gc}, \code{map}) are consistent across the table.
 }
 \examples{
-\dontrun{
-# Minimal synthetic example: build a table and pipe into runHMMCopy()
+# Minimal synthetic example: build a table and pipe into runHMMCopy().
+# Read depth doubles over 300 windows of chr2 (a copy-number gain).
 set.seed(1)
 n <- 2000L; w <- 5e4
-tibble::tibble(
-    chr = factor(rep(c("chr1", "chr2"),
-        each = n / 2),
-    levels = c("chr1", "chr2")),
+cnv <- tibble::tibble(
+    chr = factor(
+        rep(c("chr1", "chr2"), each = n / 2),
+        levels = c("chr1", "chr2")
+    ),
     start = rep(seq(1, by = w, length.out = n / 2), 2),
     end = start + w - 1L,
     width = w, strand = "*",
-    gc = runif(n, 0.05, 0.95), #' wide spread => stable LOESS
-    map = runif(n, 0.60, 0.98), #' avoid extremes / exact 1.0
-    sampleA = rpois(n, 500)
+    gc = runif(n, 0.05, 0.95), # wide spread => stable LOESS
+    map = runif(n, 0.60, 0.98), # avoid extremes / exact 1.0
+    sampleA = rpois(n, rep(c(500, 1000, 500), c(1500, 300, 200)))
 ) \%>\%
     runHMMCopy(colname = "sampleA", plotDir = NULL)
-}
+
+# log2 copy-number estimate per window: about 1 over the gain, 0 elsewhere
+table(round(cnv$sampleA))
 
 }
 \seealso{

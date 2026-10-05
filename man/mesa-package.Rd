@@ -6,7 +6,71 @@
 \alias{mesa-package}
 \title{mesa: Methylation Enrichment Sequencing Analysis}
 \description{
-A package for the analysis of methylation enrichment sequencing data (e.g. MBD-seq or MEDIP-seq). This allows for the window-based evaluation of methylation levels (using the 'qsea' package), including functions for determining differentially methylated regions. Many functions are provided for tidyverse style modification of the qseaSet objects originally defined in 'qsea'.
+mesa analyses DNA methylation measured by enrichment sequencing, such as
+MeDIP-seq (methylated DNA immunoprecipitation) and MBD-seq (methyl-CpG
+binding domain capture), including low-input samples such as cell-free DNA.
+These assays pull down methylated fragments instead of converting
+unmethylated cytosines, so the signal is a read count per genomic window
+whose relation to methylation depends on the local CpG density. mesa builds
+on the \code{qseaSet} class from \pkg{qsea}, which models that relation, and adds
+functions to build, quality-control, explore and compare \code{qseaSet} objects
+in a tidyverse style.
+}
+\section{Workflow}{
+
+A typical analysis follows these steps:
+\enumerate{
+\item \strong{Build} a \code{qseaSet} from BAM files with \code{\link[=makeQset]{makeQset()}}, which tiles the
+genome into windows, counts fragments and estimates copy number (see
+\code{\link[=addHMMcopyCNV]{addHMMcopyCNV()}}). \code{\link[=addNormalisation]{addNormalisation()}} fits the CpG-density-dependent
+enrichment used to estimate beta values.
+\item \strong{Check quality} with \code{\link[=getSampleQCSummary]{getSampleQCSummary()}} and
+\code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}, and subset samples or windows with
+\link[dplyr:filter]{filter()}, \code{\link[=filterWindows]{filterWindows()}} or \code{\link[=subsetQset]{subsetQset()}}.
+\item \strong{Explore} sample structure with principal components (\code{\link[=getPCA]{getPCA()}}) or
+UMAP (\code{\link[=getUMAP]{getUMAP()}}).
+\item \strong{Compare} groups of samples with \code{\link[=calculateDMRs]{calculateDMRs()}}, which fits a
+negative binomial model per window and returns differentially methylated
+regions (DMRs), and summarise them with \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}.
+\item \strong{Extract} counts, normalised reads per million (nrpm) or beta values
+per window with \code{\link[=getDataTable]{getDataTable()}}, for example over the DMRs after
+\code{\link[=filterByOverlaps]{filterByOverlaps()}}.
+\item \strong{Annotate} windows or DMRs with nearby genes and genomic features with
+\code{\link[=annotateWindows]{annotateWindows()}} and \code{\link[=plotGenomicFeatureDistribution]{plotGenomicFeatureDistribution()}}.
+}
+
+Two small \code{qseaSet} objects are shipped for examples:
+\link{exampleTumourNormal} (human, paired tumour/normal samples) and
+\link{exampleMouse} (mouse cell line).
+}
+
+\section{Vignettes}{
+
+\itemize{
+\item \code{vignette("introduction", package = "mesa")}: overview and quick start.
+\item \code{vignette("generation", package = "mesa")}: building \code{qseaSet} objects.
+\item \code{vignette("data-and-qc", package = "mesa")}: data tables and quality
+control.
+\item \code{vignette("pca", package = "mesa")}: PCA and UMAP.
+\item \code{vignette("differentially-methylated-regions", package = "mesa")}: DMRs
+and their annotation.
+}
+}
+
+\examples{
+# A qseaSet of 10 samples (5 tumour/normal pairs) over windows on chr7
+exampleTumourNormal
+getSampleTable(exampleTumourNormal)
+
+# Beta values (methylation estimates) per window and sample
+exampleTumourNormal \%>\%
+    getDataTable(normMethod = "beta") \%>\%
+    head()
+
+# Differentially methylated regions between tumour and normal samples
+exampleTumourNormal \%>\%
+    calculateDMRs(variable = "tumour", contrasts = "first") \%>\%
+    head()
 }
 \seealso{
 Useful links:
@@ -36,4 +100,3 @@ Other contributors:
 }
 
 }
-\keyword{internal}

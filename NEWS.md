@@ -11,6 +11,22 @@
 - Added a package architecture diagram to the README; its Mermaid source is
   in `data-raw/figures/`.
   ([#110](https://github.com/cruk-mi/mesa/pull/110))
+- `?mesa` is now a user-facing overview listed in the reference index: what
+  enrichment sequencing measures, the workflow from `makeQset()` to
+  `annotateWindows()`, the example datasets and the vignettes.
+  ([#118](https://github.com/cruk-mi/mesa/issues/118))
+- These help pages now have examples that run:
+  `addBamCoveragePairedAndUnpaired()`, `addMedipsEnrichmentFactors()`,
+  `addNormalisation()`, `annotateWindows()`,
+  `getGenomicFeatureDistribution()`, `getMesaAnnoDb()`, `getMesaGenome()`,
+  `getMesaTxDb()`, `makeQset()`, `plotGenomicFeatureDistribution()`,
+  `plotRegionsHeatmap()`, `runHMMCopy()`, `summariseDMRsByGene()`,
+  `exampleMouse` and `exampleTumourNormal`. Examples that need MEDIPSData or
+  the annotation packages are skipped when those are not installed.
+  ([#118](https://github.com/cruk-mi/mesa/issues/118))
+- The `addMedipsEnrichmentFactors()` example works: it adds coverage before
+  calculating the enrichment factors, instead of failing.
+  ([#118](https://github.com/cruk-mi/mesa/issues/118))
 
 ## Infrastructure
 - Coverage is now uploaded on pull requests as well as `main`; Codecov
