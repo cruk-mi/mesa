@@ -20,13 +20,14 @@
 #' 2. **Check quality** with [getSampleQCSummary()] and
 #'    [plotCorrelationMatrix()], and subset samples or windows with
 #'    [filter()][dplyr::filter], [filterWindows()] or [subsetQset()].
-#' 3. **Extract** counts, normalised reads per million (nrpm) or beta values
-#'    per window with [getDataTable()].
-#' 4. **Explore** sample structure with principal components ([getPCA()]) or
+#' 3. **Explore** sample structure with principal components ([getPCA()]) or
 #'    UMAP ([getUMAP()]).
-#' 5. **Compare** groups of samples with [calculateDMRs()], which fits a
+#' 4. **Compare** groups of samples with [calculateDMRs()], which fits a
 #'    negative binomial model per window and returns differentially methylated
 #'    regions (DMRs), and summarise them with [summariseDMRsByContrast()].
+#' 5. **Extract** counts, normalised reads per million (nrpm) or beta values
+#'    per window with [getDataTable()], for example over the DMRs after
+#'    [filterByOverlaps()].
 #' 6. **Annotate** windows or DMRs with nearby genes and genomic features with
 #'    [annotateWindows()] and [plotGenomicFeatureDistribution()].
 #'

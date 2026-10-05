@@ -27,13 +27,14 @@ enrichment used to estimate beta values.
 \item \strong{Check quality} with \code{\link[=getSampleQCSummary]{getSampleQCSummary()}} and
 \code{\link[=plotCorrelationMatrix]{plotCorrelationMatrix()}}, and subset samples or windows with
 \link[dplyr:filter]{filter()}, \code{\link[=filterWindows]{filterWindows()}} or \code{\link[=subsetQset]{subsetQset()}}.
-\item \strong{Extract} counts, normalised reads per million (nrpm) or beta values
-per window with \code{\link[=getDataTable]{getDataTable()}}.
 \item \strong{Explore} sample structure with principal components (\code{\link[=getPCA]{getPCA()}}) or
 UMAP (\code{\link[=getUMAP]{getUMAP()}}).
 \item \strong{Compare} groups of samples with \code{\link[=calculateDMRs]{calculateDMRs()}}, which fits a
 negative binomial model per window and returns differentially methylated
 regions (DMRs), and summarise them with \code{\link[=summariseDMRsByContrast]{summariseDMRsByContrast()}}.
+\item \strong{Extract} counts, normalised reads per million (nrpm) or beta values
+per window with \code{\link[=getDataTable]{getDataTable()}}, for example over the DMRs after
+\code{\link[=filterByOverlaps]{filterByOverlaps()}}.
 \item \strong{Annotate} windows or DMRs with nearby genes and genomic features with
 \code{\link[=annotateWindows]{annotateWindows()}} and \code{\link[=plotGenomicFeatureDistribution]{plotGenomicFeatureDistribution()}}.
 }
