@@ -257,18 +257,21 @@ chromosome. However, it should be noted that how near is near enough to be
 called as proper pairs is calculated within `bwa mem` on an individual sample
 basis. This allowable distance is calculated by determining the mean and
 standard deviation of the fragment length amongst the mapped reads in that
-sample, with a cutoff of X standard deviations away from the mean. In general,
-for sheared genomic DNA this is not a big issue, because the distribution is
-sufficiently broad that the standard deviation is large enough. However, for
-circulating cell-free DNA, the distribution of fragment sizes has a very sharp
-peak at ~167bp, and hence the global fragment standard deviation is quite low.
+sample, with a cutoff of 4 standard deviations away from the mean by default.
+In general, for sheared genomic DNA this is not a big issue, because the
+distribution is sufficiently broad that the standard deviation is large enough.
+However, for circulating cell-free DNA, the distribution of fragment sizes has a
+very sharp peak at ~167bp, and hence the global fragment standard deviation is
+quite low.
 This can lead to read pairs of length ~400bp which otherwise look like they
 should be "proper pairs" not being called as such by the aligner. We therefore
 perform a rescuing process, to ensure that we keep these read pairs by finding
 any read pairs that meet the orientation conditions for being proper pairs and
 are within `minInsertSize` to `maxInsertSize` in length. This process is
 computationally expensive, so we only perform it when
-`properPairsOnly = TRUE`.
+`properPairsOnly = TRUE`. Note that `bwa mem` has an option, `-I`, which allows
+you to specify the insert size distribution yourself. This is highly
+recommended when working with cell-free DNA.
 
 ## Copy Number Variation
 
@@ -330,7 +333,9 @@ way. We also provide a `fragmentType` option, which hardcodes these two
 parameters to values derived from our initial sheared or cfDNA datasets. When
 `fragmentType = "Sheared"` is used this sets `fragmentLength = 213, fragmentSD =
 60`, while `fragmentType = "cfDNA"` sets `fragmentLength = 167, fragmentSD =
-38`, but we do emphasise that you should check your own data.
+38`, but we do emphasise that you should check your own data. Ideally the
+`CpG_density` would be a property of the fragment distribution of each
+individual sample, but `mesa` does not support this at this time.
 
 Please note that these `fragmentLength` and `fragmentSD` parameters are only
 used for calculating this CG density metric; they are not used to control what
