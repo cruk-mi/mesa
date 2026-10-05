@@ -85,6 +85,19 @@ line, 2 replicates of 2 conditions (processed within CRUK-MI CBC).</p>
     <p>A qseaSet object with 153 regions and 4 samples:</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exampleMouse"</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exampleMouse</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 4 Samples: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A_Rep1, A_Rep2, B_Rep1, B_Rep2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 153 Regions in 19 chromosomes of BSgenome.Mmusculus.UCSC.mm10</span>
+<span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames</a></span><span class="op">(</span><span class="va">exampleMouse</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "A_Rep1" "A_Rep2" "B_Rep1" "B_Rep2"</span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

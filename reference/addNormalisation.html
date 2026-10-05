@@ -146,7 +146,7 @@ methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># addNormalisation requires windows spanning a range of CpG densities for</span></span></span>
 <span class="r-in"><span><span class="co"># background estimation; the pre-filtered example datasets lack these, so</span></span></span>
 <span class="r-in"><span><span class="co"># a synthetic qseaSet is used here.</span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run normalisation on a toy qseaSet with ~100k reads</span></span></span>
 <span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>expSamplingDepth <span class="op">=</span> <span class="fl">100000</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">addNormalisation</span><span class="op">(</span>maxPatternDensity <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
@@ -189,7 +189,6 @@ methylation levels from ~76% at CpG density = 1 to ~25% at CpG density = 15.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "blind1-15"</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

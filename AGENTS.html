@@ -70,303 +70,84 @@
 
 <div id="agentsmd" class="section level1">
 
-<p>Canonical, tool-agnostic instructions for <strong>any</strong> AI agent working on <strong>mesa</strong>.</p>
-<blockquote>
-<p>This file is the single source of truth for how agents work on this repo. <code>CLAUDE.md</code>, the skills in <code>.claude/skills/*</code> and the agent definitions in <code>.claude/agents/*</code> all defer to it. If they ever disagree, <strong>AGENTS.md wins</strong> — fix the other file.</p>
-<p>Copilot-specific adapters are archived, inactive, in <a href=".github/archive/copilot/"><code>.github/archive/copilot/</code></a> — see the README there to reactivate them.</p>
-</blockquote>
-<hr><div class="section level2">
-<h2 id="project-overview">Project overview<a class="anchor" aria-label="anchor" href="#project-overview"></a></h2>
-<p><strong>mesa</strong> (Methylation Enrichment Sequencing Analysis) is an R/Bioconductor package for analysing methylation enrichment sequencing data (MBD-seq, MeDIP-seq). It targets Bioconductor submission and must conform to Bioconductor policies, coding standards, and review guidelines at all times. Current version: pre-submission <code>0.99.x</code> series.</p>
-<hr></div>
+<p>Instructions for any AI agent working on <strong>mesa</strong>. <code>CLAUDE.md</code> imports this file, and <a href=".claude/README.html"><code>.claude/README.md</code></a> explains every AI file in the repo.</p>
 <div class="section level2">
-<h2 id="workflow-contract-read-this-first">Workflow contract (read this first)<a class="anchor" aria-label="anchor" href="#workflow-contract-read-this-first"></a></h2>
-<p>Agents operate on a <strong>dedicated branch as a sandbox</strong>. The human owns when work becomes a pull request and decides when anything merges.</p>
-<ul><li>
-<strong>Check the state of the repo first.</strong> Run <code>git status</code> and <code>git log --oneline -5</code> before making changes, and say so if the working tree is dirty or HEAD is not where you expected — do not fold someone else’s uncommitted work into your commit.</li>
-<li>
-<strong>Branch off <code>main</code>.</strong> Never commit directly to <code>main</code>. (<code>dev</code> is no longer the working branch — everything is cut from and PRs back to <code>main</code>.)</li>
-<li>Make the <strong>smallest</strong> set of changes needed. Do not refactor unrelated code.</li>
-<li>Commit in <strong>atomic</strong> steps, each a single logical change, using <a href="#conventional-commit-messages">Conventional Commits</a>.</li>
-<li>You <strong>may push the feature branch</strong> (with attribution — see below).</li>
-<li>You <strong>may open a pull request, but only as a draft.</strong> Never mark it ready for review or request review.</li>
-<li>You <strong>may merge a pull request only when the human explicitly approves that merge or asks for it</strong> in the conversation. An approving review on GitHub is not, on its own, that approval. Squash-merge (<code>gh pr merge --squash</code>) unless the human asks for a merge commit on that PR: one commit per PR keeps <code>main</code> easy to read, revert and bisect. The hook asks the human to confirm every merge.</li>
-<li>You <strong>may delete a branch only when it is safe and the human explicitly approves</strong>. Safe means:
-<ul><li>its PR is merged or closed;</li>
-<li>it is not <code>main</code> or <code>dev</code>;</li>
-<li>no open PR uses it as its base, or those PRs have been retargeted to <code>main</code> first (<code>gh pr edit N --base main</code>). Otherwise deleting it closes those PRs instead of retargeting them. This covers <code>git branch -d/-D</code>, <code>git push --delete</code> and <code>gh pr merge|close --delete-branch</code>. The hook asks the human to confirm each deletion. It refuses a protected branch or a tag in any spelling, a remote branch that is the head or the base of an open PR, and a remote branch it cannot check.</li>
-</ul></li>
-<li>You may <strong>never</strong> push or force-push to <code>main</code>, delete tags, or rewrite published history.</li>
-<li>When in doubt about an irreversible or outward-facing action, ask first.</li>
-<li>
-<strong>Never push to Bioconductor</strong> (<code>BiocStaging/mesa</code>) without the human’s explicit permission, asked every time. The human runs that push by default.</li>
-</ul><p>These rules are also enforced mechanically by <code>.claude/hooks/guard-remote.py</code>, on <code>gh api</code> as well as on <code>git</code> and <code>gh pr</code> — the endpoint names the action, so reaching a merge or an approval through the raw API is treated the same way. <code>gh api</code> writes are allow-listed: reads, comments, review replies, non-approving reviews, resolving threads and feature-branch refs pass, and any other write is asked. A merge or a safe branch deletion is not blocked but raised as a permission prompt, so the human confirms each one. In a permission mode that shows no prompt (<code>bypassPermissions</code>, <code>auto</code>, <code>dontAsk</code>), the hook blocks it instead: the human runs it. If the hook and this file ever disagree, that is a bug — fix both.</p>
-<p>The hook is a safety net, not a security boundary. It does not follow git or gh aliases, push behaviour set through config (<code>git -c remote.origin.mirror=true</code>, <code>push.default=matching</code>), <code>env -S</code>, or a command run by another interpreter (<code>python3 -c</code>). None of those are allowed ways around the rules above.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="session-scope-and-the-parking-lot">Session scope and the parking lot<a class="anchor" aria-label="anchor" href="#session-scope-and-the-parking-lot"></a></h2>
-<p><strong>One issue = one session = one branch = one draft PR.</strong> A session exists to close the issue it was opened for, and nothing else.</p>
-<ul><li>Start a fresh session (or <code>/clear</code>) for each issue. Do not carry context from one issue into the next. Use a separate worktree per issue (<code>claude --worktree</code>, or <code>git worktree add</code>) so sessions running in parallel never share a checkout.</li>
-<li>Change only the files the issue needs. The PR references it with <code>Fixes #&lt;n&gt;</code>.</li>
-<li>
-<strong>Anything else you notice is parked, not fixed</strong> — a second bug, a typo, a refactor, a missing test, a “while I’m here”. This holds even when the agent itself suggests the fix and even when it looks like one line. Run <code>/park &lt;finding&gt;</code>, say <code>Parked: …</code>, and carry on. Agents must not offer to fix out-of-scope findings; they park them.</li>
-<li>Agents without <code>/park</code> (Copilot, Codex, …) run the same step directly. <code>&lt;issue&gt;</code> is the session’s issue number, or <code>-</code>: <code>python3 .claude/scripts/mesa-status.py --park &lt;issue&gt; &lt;&lt;'EOF'</code>, then the note on its own line, then <code>EOF</code>.</li>
-<li>List what was parked in the PR description under <strong>Parked</strong>. That list is the durable copy.</li>
-</ul><p>The parking lot is <code>.claude/state/parking-lot.md</code> in the <strong>main checkout</strong>. The script resolves it through <code>git rev-parse --git-common-dir</code>, so every worktree writes to the same file. It is gitignored, so it never conflicts between branches and is never committed. It is also <strong>per-machine</strong>: a session in the devcontainer, a Codespace or on the web writes to a checkout that goes away, which is why the PR’s <strong>Parked</strong> list matters. <code>/mesa-status</code> shows the count and the items, and they are inlined into the dashboard it publishes as a (private) claude.ai artifact, so don’t park anything that must stay on this machine.</p>
-<p><strong>Triage (human, weekly):</strong> promote each line to a GitHub issue labelled <code>parked</code> — per the issue workflow below, check for a duplicate first — or delete it. Then delete the line. Nothing stays parked for more than a week.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="attribution-required">Attribution (required)<a class="anchor" aria-label="anchor" href="#attribution-required"></a></h2>
-<p>This repo is public and used for Bioconductor review, so <strong>authorship must never be misrepresented</strong>. Every change an AI makes must be attributed:</p>
-<ul><li>Add a co-author trailer to every commit the agent makes:
-<ul><li>Claude Code: <code>Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code>
-</li>
-<li>Copilot coding agent: keep its default <code>Co-authored-by: Copilot</code> trailer.</li>
-</ul></li>
-<li>Clearly note AI authorship in any PR description, issue, or comment an agent writes.</li>
-<li>Never present AI-authored content as if written solely by the human.</li>
-</ul><hr></div>
-<div class="section level2">
-<h2 id="branch-strategy">Branch strategy<a class="anchor" aria-label="anchor" href="#branch-strategy"></a></h2>
-<pre><code>main        ← primary branch. Branch all work off main; never commit directly.
-feat/*      ← new features.            fix/*       ← bug fixes.
-refactor/*  ← internal refactors.      docs/*      ← documentation only.
-chore/*     ← maintenance (CI, deps).  test/*      ← test additions/fixes.
-release/*   ← release stabilisation. Cut from main, merge to main + tag.</code></pre>
-<p>All branches are cut from <code>main</code> and PR back to <code>main</code>.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="conventional-commit-messages">Conventional Commit messages<a class="anchor" aria-label="anchor" href="#conventional-commit-messages"></a></h2>
-<pre><code>&lt;type&gt;(&lt;scope&gt;): &lt;short imperative description&gt;
-
-[optional body — wrap at 72 chars]
-
-[optional footer: Fixes #&lt;issue-number&gt;]
-Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code></pre>
-<table class="table"><thead><tr><th>Type</th>
-<th>When to use</th>
-</tr></thead><tbody><tr><td><code>feat</code></td>
-<td>New user-visible function or argument</td>
-</tr><tr><td><code>fix</code></td>
-<td>Bug fix</td>
-</tr><tr><td><code>docs</code></td>
-<td>Documentation only (roxygen, vignettes, README, NEWS)</td>
-</tr><tr><td><code>refactor</code></td>
-<td>Internal code change, no behaviour change</td>
-</tr><tr><td><code>test</code></td>
-<td>Adding or fixing tests</td>
-</tr><tr><td><code>chore</code></td>
-<td>CI, <code>data-raw</code> scripts, dependency bumps, tooling</td>
-</tr><tr><td><code>perf</code></td>
-<td>Performance improvement</td>
-</tr></tbody></table><p><strong>Scope</strong> (optional but recommended): the R file name without extension, e.g. <code>makeDMRs</code>, <code>plotting</code>, <code>buildQset</code>, <code>DESCRIPTION</code>.</p>
-<p>Reference issues in the footer with <code>Fixes #&lt;n&gt;</code> (closes on merge) or <code>Refs #&lt;n&gt;</code>.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="release-cycle">Release cycle<a class="anchor" aria-label="anchor" href="#release-cycle"></a></h2>
-<p>Every change set runs through three phases. Work PRs sit <strong>between</strong> phases 1 and 3 — <strong>never bundle a version bump into a work PR.</strong></p>
-<p>Bioconductor version convention: <code>0.99.z</code> pre-submission, then <code>1.0.0</code> on acceptance. Devel versions use an odd minor (e.g. <code>1.1.z</code>); release versions use an even minor (e.g. <code>1.0.z</code>).</p>
-<p><strong>Phase 1 — open the development section.</strong> Branch <code>chore/bump-version-X.Y.Z.9000</code> off <code>main</code>. Two commits, in order (reference: PR #96 = <code>59f870b</code>):</p>
-<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>commit message</th>
-<th>change</th>
-</tr></thead><tbody><tr><td><code>chore(DESCRIPTION): bump version to X.Y.Z.9000</code></td>
-<td>
-<code>DESCRIPTION</code> <code>Version:</code> only</td>
-</tr><tr><td><code>docs(NEWS): open X.Y.Z.9000 development section</code></td>
-<td>insert <code># mesa X.Y.Z.9000</code> plus a blank line at the very top of <code>NEWS.md</code>
-</td>
-</tr></tbody></table><p><strong>Phase 2 — the work.</strong> Each feature/fix PR targets <code>main</code> and records its user-visible changes under the <code># mesa X.Y.Z.9000</code> heading, in the same PR that makes the change.</p>
-<p><strong>Phase 3 — cut the release.</strong> After the work PRs merge, branch <code>chore/bump-version-X.Y.(Z+1)</code> off <code>main</code>. One commit <code>chore(version): bump to X.Y.(Z+1)</code> (reference: PR #99 = <code>b5e80a0</code>): bump <code>DESCRIPTION</code> and rename the <code>NEWS.md</code> heading.</p>
-<p><strong>Stop after each phase.</strong> Tell the human to push and open the PR. Tag format <code>vX.Y.Z</code>, applied by the human after merge to <code>main</code>.</p>
-<p><strong>After phase 3 merges</strong>, the human tags the release, checks that the <code>release</code> workflow the tag starts has passed and published the GitHub Release, and pushes it to Bioconductor (<code>BiocStaging/mesa</code>, branch <code>devel</code>) before phase 1 opens. The <code>bioc-release-cycle</code> skill has the checklist. A release that never reaches Bioconductor has not shipped.</p>
-<p>Full detail lives in the <code>bioc-release-cycle</code> skill.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="project-state">Project state<a class="anchor" aria-label="anchor" href="#project-state"></a></h2>
-<p><code>STATUS.md</code> answers “what landed, what is in flight, what is next”. It is <strong>generated</strong> — every figure in it is read back from <code>git</code>, <code>gh</code>, <code>NEWS.md</code> and the <code>gh-pages</code> build commit by <code>.claude/scripts/mesa-status.py</code> — and therefore <strong>gitignored</strong>: a derived snapshot committed to the repo would go stale there, which is the whole failure this avoids. If you do not have it, run the script and you do.</p>
-<ul><li>
-<strong>Never hand-edit it</strong>, and never correct a number in it. A wrong figure means a wrong probe: fix the script.</li>
-<li>Refresh with <code>/mesa-status</code>, or <code>python3 .claude/scripts/mesa-status.py</code>. A <code>SessionStart</code> hook refreshes it automatically once it is over four hours old.</li>
-<li>The one hand-written part is <code>.claude/state/recommendation.md</code>, the “what to do next” judgement. It is overwritten, never appended to, and rendered into <code>STATUS.md</code> by the script.</li>
-</ul><p>Because the state is derived, a change made by anyone — you, a co-maintainer on github.com, Copilot, Claude — shows up on the next refresh. There is nothing to keep in sync.</p>
-<p><code>/mesa-status</code> also builds the <strong>Next steps</strong> page from the same data and publishes it as a private claude.ai artifact (its URL is per-clone: <code>mesa-status.py --artifact-url</code> prints it). The page is deterministic output, not something a model writes each time: the script inlines the state into a committed template. It is a snapshot, since a published artifact cannot reach GitHub. So hooks raise a flag whenever a session changes GitHub, and remind the human to run <code>/mesa-status</code> before that session ends. Hooks never run it themselves, and never edit #124: that public edit happens only when a human asks for it.</p>
-<p><strong>The roadmap</strong> (what to do, in which order, for which release) is a TOML block in the pinned issue #124, edited on github.com. Every item’s status (To do, Waiting, In review, Done, Later) is derived from the issues, PRs, branches and tags it names. Never tick or set a status by hand, and do not use the <code>status:</code> labels for this. Open a draft PR with <code>Fixes #N</code> and the roadmap picks it up.</p>
-<p><strong>Which file to edit:</strong></p>
-<table class="table"><colgroup><col width="33%"><col width="33%"><col width="33%"></colgroup><thead><tr><th>File</th>
-<th></th>
-<th>Edit it?</th>
-</tr></thead><tbody><tr><td><code>.claude/scripts/mesa-status.py</code></td>
-<td>the generator</td>
-<td>
-<strong>yes</strong> — this is where a wrong figure gets fixed</td>
-</tr><tr><td><code>.claude/scripts/dashboard-template.html</code></td>
-<td>the dashboard’s design and markup</td>
-<td>
-<strong>yes</strong> — this is the page</td>
-</tr><tr><td><code>.claude/state/recommendation.md</code></td>
-<td>the “what next” judgement</td>
-<td>
-<strong>yes</strong> — overwrite it</td>
-</tr><tr><td>#124’s <strong>Roadmap data</strong> block</td>
-<td>the plan: items, order, releases</td>
-<td>
-<strong>yes</strong> — on github.com</td>
-</tr><tr><td>#124’s generated checklist</td>
-<td>derived from the block</td>
-<td>no — <code>--sync-issue</code> rewrites it</td>
-</tr><tr><td><code>STATUS.md</code></td>
-<td>generated, gitignored</td>
-<td>no</td>
-</tr><tr><td><code>.claude/state/status.json</code></td>
-<td>generated, gitignored</td>
-<td>no</td>
-</tr><tr><td><code>.claude/state/dashboard.html</code></td>
-<td>the Next steps page, generated, gitignored</td>
-<td>no — edits here vanish on the next run</td>
-</tr><tr><td><code>.claude/state/bioccheck-history.jsonl</code></td>
-<td>append-only record</td>
-<td>no — the script appends</td>
-</tr></tbody></table><p>The <code>mesa-status</code> skill covers the probes, what is fragile about each, and how to add one.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="issue-workflow">Issue workflow<a class="anchor" aria-label="anchor" href="#issue-workflow"></a></h2>
-<p>Before creating an issue, <strong>check whether a matching one already exists</strong>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">gh</span> issue list <span class="at">--repo</span> cruk-mi/mesa <span class="at">--state</span> open</span></code></pre></div>
-<p>If one does, report its number and title rather than opening a duplicate. If none does, draft the title and body and show them to the human — say plainly that an agent wrote the text, per the attribution rule above.</p>
-<p>Reference issues from commits with <code>Fixes #&lt;n&gt;</code> (closes on merge) or <code>Refs #&lt;n&gt;</code> (cross-reference only).</p>
-<hr></div>
-<div class="section level2">
-<h2 id="toolchain-versions--single-source-of-truth">Toolchain versions — single source of truth<a class="anchor" aria-label="anchor" href="#toolchain-versions--single-source-of-truth"></a></h2>
-<p><strong><code>DESCRIPTION</code> is the single source of truth; everything else derives from it.</strong> If you pin or bump a tool version, change it in the source-of-truth file and nowhere else. If a value genuinely cannot be derived, it must appear in the inventory table in <a href=".devcontainer/UPGRADE_GUIDE.html"><code>.devcontainer/UPGRADE_GUIDE.md</code></a> listing <strong>every</strong> place it is duplicated.</p>
-<ul><li>R version comes from <code>DESCRIPTION</code>’s <code>R (&gt;= X.Y.Z)</code> line; the Bioconductor version and Docker base tag are derived from it by <code>.devcontainer/resolve_versions.sh</code>. CI and the image build both call that resolver.</li>
-<li>The dependency list comes from <code>DESCRIPTION</code>’s <code>Imports</code> / <code>Depends</code> / <code>Suggests</code>.</li>
-<li>
-<strong>Never hardcode an R or Bioconductor version</strong> in a workflow, Dockerfile or install script.</li>
-</ul><p>Read <code>UPGRADE_GUIDE.md</code> before changing any version. Detail lives in the <code>mesa-ci</code> skill.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="r--bioconductor-coding-standards">R / Bioconductor coding standards<a class="anchor" aria-label="anchor" href="#r--bioconductor-coding-standards"></a></h2>
-<p>Follow the <a href="https://contributions.bioconductor.org/r-code.html" class="external-link">Bioconductor coding guidelines</a>.</p>
-<ul><li>4-space indentation. No tabs.</li>
-<li>Line length ≤ 80 chars for R code; ≤ 100 chars for roxygen comments.</li>
-<li>Use <code>&lt;-</code> for assignment, never <code>=</code> at top level.</li>
-<li>Never use <code>T</code> / <code>F</code> for <code>TRUE</code> / <code>FALSE</code>.</li>
-<li>Avoid <code>1:n</code>; use <code>seq_len(n)</code> or <code>seq_along(x)</code>.</li>
-<li>Avoid <code>:::</code> to reach unexported functions of other packages.</li>
-<li>No <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code> / <code><a href="https://rdrr.io/r/base/library.html" class="external-link">require()</a></code> inside package code — declare in <code>DESCRIPTION</code> <code>Imports</code> and call <code>pkg::fn()</code>.</li>
-<li>
-<strong>Never</strong> call <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code> or <code><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">BiocManager::install()</a></code> from package source. A package must not install anything when it is loaded.</li>
-<li>Prefer vectorised ops and Bioconductor structures (<code>GRanges</code>, <code>DataFrame</code>, …) over base loops where natural.</li>
-<li>Keep functions short and single-purpose; split rather than nest deeply.</li>
-<li>No <code>&lt;&lt;-</code> (global assignment) without a documented reason.</li>
-<li>
-<strong>Do not add new package dependencies without asking</strong> — Bioconductor reviewers flag unnecessary imports.</li>
-</ul><div class="section level3">
-<h3 id="roxygen2--documentation">roxygen2 / documentation<a class="anchor" aria-label="anchor" href="#roxygen2--documentation"></a></h3>
-<ul><li>Every exported function needs a title, a description, <code>@param</code> for every argument, <code>@return</code>, and at least one runnable <code>@examples</code> block. <strong>This package writes the title and description implicitly</strong> — the first roxygen line is the title, the following paragraph the description. There are no <code>@title</code> / <code>@description</code> tags anywhere in <code>R/</code>; follow that convention rather than introducing them. Use <code>exampleMouse</code> / <code>exampleTumourNormal</code> data objects; avoid <code>\dontrun{}</code> unless an example genuinely needs network/files.</li>
-<li>Use <code>@seealso</code> to cross-reference related functions.</li>
-<li>
-<strong><code>man/*.Rd</code> and <code>NAMESPACE</code> are roxygen-generated — never hand-edit them.</strong> Both carry roxygen2’s <code>do not edit by hand</code> header. Regenerate with <code><a href="https://roxygen2.r-lib.org/reference/roxygenize.html" class="external-link">roxygen2::roxygenise()</a></code>.</li>
-<li>
-<strong>The roxygen2 version is pinned.</strong> <code>DESCRIPTION</code>’s <code>Config/roxygen2/version</code> records which roxygen2 generated the committed docs, <code>.devcontainer/install.R</code> installs exactly that version, and the <code>roxygen-drift</code> CI job regenerates and fails on any diff. If your local roxygen2 differs, install the pinned version — do <strong>not</strong> regenerate with a different one, which rewrites every man page. Upgrading roxygen2 is its own dedicated PR (see <code>mesa-ci</code>).</li>
-</ul></div>
-<div class="section level3">
-<h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h3>
-<ul><li>Tests live in <code>tests/testthat/</code>; use <code>testthat</code> (≥ 3rd edition).</li>
-<li>Every new function gets at least one test; every bug fix gets a regression test.</li>
-<li>Reuse the shared fixtures in <code>tests/testthat/helper-fixtures.R</code> rather than rebuilding example qsets. Guard heavy genome/annotation data with <code>skip_if_not_installed()</code>.</li>
-<li>BiocCheck wants ≥ 80 % coverage (<code><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">covr::package_coverage()</a></code>).</li>
-<li>Run <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code> before committing.</li>
-</ul><p>Detail lives in the <code>mesa-tests</code> skill.</p>
-<hr></div>
+<h2 id="this-package">This package<a class="anchor" aria-label="anchor" href="#this-package"></a></h2>
+<p>mesa (Methylation Enrichment Sequencing Analysis) is an R/Bioconductor package for MBD-seq and MeDIP-seq data. It is in Bioconductor pre-submission (<code>0.99.z</code>), so it must pass <code>R CMD check</code> and <code>BiocCheck</code> and follow the <a href="https://contributions.bioconductor.org/r-code.html" class="external-link">Bioconductor guidelines</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="file-change-behaviour">File-change behaviour<a class="anchor" aria-label="anchor" href="#file-change-behaviour"></a></h2>
-<ul><li>Do not rename or move source files unless necessary.</li>
-<li>Do not rewrite working code for style preference. Keep diffs small.</li>
-<li>Preserve comments carrying biological/analytical context.</li>
+<h2 id="key-commands">Key commands<a class="anchor" aria-label="anchor" href="#key-commands"></a></h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="op">)</span>                 <span class="co"># run code against the working tree</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span>                     <span class="co"># all tests</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"^{name}"</span><span class="op">)</span>   <span class="co"># tests/testthat/test-{name}.R</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">document</a></span><span class="op">(</span><span class="op">)</span>                 <span class="co"># regenerate man/ and NAMESPACE</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span><span class="op">)</span>                    <span class="co"># R CMD check</span></span>
+<span><span class="fu">BiocCheck</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocCheck/man/BiocCheck.html" class="external-link">BiocCheck</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span>            <span class="co"># Bioconductor checks</span></span>
+<span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span><span class="op">)</span>             <span class="co"># coverage, target &gt;= 80 %</span></span></code></pre></div>
+<p>Run R with <code>Rscript -e "..."</code>. Not every machine can run the whole list, because <code>DESCRIPTION</code> needs a recent R. Use the devcontainer or CI when a check can’t run here, and say which checks did not run. The <code>bioc-check-ladder</code> skill says where each one works.</p>
+</div>
+<div class="section level2">
+<h2 id="code-style">Code style<a class="anchor" aria-label="anchor" href="#code-style"></a></h2>
+<ul><li>4-space indent, no tabs. At most 80 characters per line of R, 100 per line of roxygen.</li>
 <li>
-<code>data-raw/</code> scripts generate <code>.rda</code> files in <code>data/</code> — never hand-edit generated <code>.rda</code>; re-run the script.</li>
-<li>Record every user-visible change in <code>NEWS.md</code> under the current devel heading.</li>
-</ul><hr></div>
+<code>&lt;-</code> for assignment. <code>TRUE</code>/<code>FALSE</code>, never <code>T</code>/<code>F</code>. <code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len()</a></code>/<code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along()</a></code>, never <code>1:n</code>.</li>
+<li>No <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>/<code><a href="https://rdrr.io/r/base/library.html" class="external-link">require()</a></code> in <code>R/</code>: declare the package in <code>DESCRIPTION</code> and call <code>pkg::fn()</code>. No <code>:::</code> into other packages. Never install packages from package code.</li>
+<li>Prefer Bioconductor classes (<code>GRanges</code>, <code>DataFrame</code>) and vectorised code. Keep functions short.</li>
+<li>
+<strong>Ask before adding a dependency.</strong> Bioconductor reviewers flag unneeded imports.</li>
+<li>Keep diffs small. Don’t restyle working code, and keep comments that explain the biology.</li>
+</ul></div>
 <div class="section level2">
-<h2 id="local-verification-run-before-declaring-done">Local verification (run before declaring done)<a class="anchor" aria-label="anchor" href="#local-verification-run-before-declaring-done"></a></h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span>                 <span class="co"># unit tests</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span><span class="op">)</span>                <span class="co"># R CMD check</span></span>
-<span><span class="fu">BiocCheck</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocCheck/man/BiocCheck.html" class="external-link">BiocCheck</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span>        <span class="co"># Bioconductor checks</span></span>
-<span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span><span class="op">)</span>         <span class="co"># coverage (target ≥ 80%)</span></span></code></pre></div>
-<p><strong>Not every machine can run all of these.</strong> <code>DESCRIPTION</code> requires a recent R, and <code>BiocCheck</code> / <code>covr</code> are not part of a default install. Check what is actually available before promising a result, and use the devcontainer or CI when it is not. The <code>bioc-check-ladder</code> skill covers where each check can really run.</p>
-<hr></div>
+<h2 id="tests">Tests<a class="anchor" aria-label="anchor" href="#tests"></a></h2>
+<ul><li>
+<code>testthat</code> 3rd edition, in <code>tests/testthat/</code>. Every new function gets a test, and every bug fix gets a regression test.</li>
+<li>Reuse the fixtures in <code>tests/testthat/helper-fixtures.R</code>. Guard heavy annotation packages with <code>skip_if_not_installed()</code>. The <code>mesa-tests</code> skill has the details.</li>
+</ul></div>
 <div class="section level2">
-<h2 id="skills-and-plugins">Skills and plugins<a class="anchor" aria-label="anchor" href="#skills-and-plugins"></a></h2>
-<p>Procedural detail lives in on-demand skills under <code>.claude/skills/</code>, so this file stays short. Generic R practice comes from the installed <a href="https://github.com/posit-dev/skills" class="external-link"><code>posit-dev/skills</code></a> plugins (<code>r-lib</code>, <code>github</code>, <code>open-source</code>, <code>posit-dev</code>).</p>
-<p><strong>Precedence: a mesa skill beats a plugin skill wherever they disagree.</strong> The plugin skills encode CRAN and tidyverse conventions, which are not Bioconductor’s — notably around release cadence, versioning and <code>BiocCheck</code>.</p>
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
+<ul><li>Every exported function needs a title, a description, <code>@param</code> for each argument, <code>@return</code> and a runnable <code>@examples</code> that uses <code>exampleMouse</code> or <code>exampleTumourNormal</code>. The title and description are implicit (the first line and the paragraph after it), so don’t add <code>@title</code>/<code>@description</code>. Add <code>@seealso</code> for related functions, and use <code>\dontrun{}</code> only when an example needs the network or files that aren’t shipped.</li>
+<li>
+<code>man/*.Rd</code> and <code>NAMESPACE</code> are generated: never edit them by hand. Regenerate them with the roxygen2 version pinned in <code>DESCRIPTION</code> (<code>Config/roxygen2/version</code>). Another version rewrites every page, and CI fails on the drift.</li>
+<li>
+<code>data/*.rda</code> comes from <code>data-raw/</code>: re-run the script, never edit the file.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="newsmd">NEWS.md<a class="anchor" aria-label="anchor" href="#newsmd"></a></h2>
+<p>Every user-visible change gets a bullet under the top <code># mesa X.Y.Z.9000</code> heading, in the same PR as the change.</p>
+<ul><li>File each bullet under a category heading (<code>## Bug fixes</code>, <code>## New features</code>, <code>## Documentation</code>, <code>## Testing</code>, <code>## Infrastructure</code>, <code>## Style</code>).</li>
+<li>Describe what changed for someone calling the function, not how it was done. Write function names as <code>`makeQset()`</code> and end the bullet with <code>([#NN](https://github.com/cruk-mi/mesa/issues/NN))</code>.</li>
+<li>Never bump <code>Version:</code> in a work PR. Version bumps have their own PRs, described in the <code>bioc-release-cycle</code> skill.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="toolchain-versions">Toolchain versions<a class="anchor" aria-label="anchor" href="#toolchain-versions"></a></h2>
+<p><code>DESCRIPTION</code> is the single source of truth. The R version comes from its <code>R (&gt;= …)</code> line, and <code>.devcontainer/resolve_versions.sh</code> derives the Bioconductor version from it. Never hardcode an R or Bioconductor version in a workflow, Dockerfile or script. Read <a href=".devcontainer/UPGRADE_GUIDE.html"><code>.devcontainer/UPGRADE_GUIDE.md</code></a> before changing a version.</p>
+</div>
+<div class="section level2">
+<h2 id="git-and-pull-requests">Git and pull requests<a class="anchor" aria-label="anchor" href="#git-and-pull-requests"></a></h2>
+<ul><li>Branch off <code>main</code> (<code>feat/</code>, <code>fix/</code>, <code>docs/</code>, <code>test/</code>, <code>refactor/</code>, <code>chore/</code>). Never commit or push to <code>main</code>, delete tags or rewrite published history. Never push to Bioconductor (<code>BiocStaging/mesa</code>): the maintainer does that.</li>
+<li>One issue per branch and PR. Put anything else you notice in the PR’s <strong>Parked</strong> section instead of fixing it.</li>
+<li>
+<a href="https://www.conventionalcommits.org" class="external-link">Conventional Commits</a>: <code>type(scope): imperative summary</code>, with type <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>test</code>, <code>refactor</code>, <code>perf</code> or <code>chore</code> and the R file name as the scope. Put <code>Fixes #n</code>/<code>Refs #n</code> in the footer. Keep each commit to one logical change.</li>
+<li>Open PRs as <strong>drafts</strong>. Only a human marks them ready. Merge (squash) only when a human explicitly asks for that merge; an approving review is not enough. Fill in <a href="pull_request_template.html"><code>.github/pull_request_template.md</code></a>, because <code>gh pr create --body-file</code> skips it. When the scope changes, rewrite the body to match the diff instead of appending an “Update:” note.</li>
+<li>Before opening an issue, search for one that already exists (<code>gh issue list --repo cruk-mi/mesa</code>).</li>
+</ul></div>
+<div class="section level2">
+<h2 id="attribution">Attribution<a class="anchor" aria-label="anchor" href="#attribution"></a></h2>
+<p>This repo is public and under Bioconductor review, so authorship is never misrepresented. Every AI-made commit carries a co-author trailer (Claude Code: <code>Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</code>). Every PR, issue or comment an agent writes says so on its first line.</p>
+</div>
+<div class="section level2">
+<h2 id="skills">Skills<a class="anchor" aria-label="anchor" href="#skills"></a></h2>
+<p>Claude Code loads these from <code>.claude/skills/</code> when the task matches. Other agents can read them as plain Markdown.</p>
 <table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>Task</th>
 <th>Skill</th>
-</tr></thead><tbody><tr><td>Version bumps, opening/closing a devel cycle</td>
-<td><code>bioc-release-cycle</code></td>
-</tr><tr><td>Running tests, <code>R CMD check</code>, <code>BiocCheck</code>, coverage</td>
+</tr></thead><tbody><tr><td>Tests, <code>R CMD check</code>, <code>BiocCheck</code>, coverage, local R setup</td>
 <td><code>bioc-check-ladder</code></td>
+</tr><tr><td>Version bumps, devel cycles, releases, the Bioconductor push</td>
+<td><code>bioc-release-cycle</code></td>
 </tr><tr><td>Writing or fixing tests</td>
 <td><code>mesa-tests</code></td>
-</tr><tr><td>Roxygen docs, <code>NEWS.md</code> entries</td>
-<td><code>mesa-docs-news</code></td>
-</tr><tr><td>CI workflows, devcontainer, toolchain versions</td>
-<td><code>mesa-ci</code></td>
-</tr><tr><td>Project state, <code>STATUS.md</code>, the status generator</td>
-<td><code>mesa-status</code></td>
-</tr><tr><td>Capturing a new procedure as a skill</td>
-<td><code>capture-skill</code></td>
-</tr><tr><td>Reviewing a PR, branch or diff</td>
-<td><code>pr-review</code></td>
-</tr></tbody></table><div class="section level3">
-<h3 id="pull-request-reviews">Pull request reviews<a class="anchor" aria-label="anchor" href="#pull-request-reviews"></a></h3>
-<p>Reviews are done locally with the <code>pr-review</code> skill (🔴 High / 🟠 Medium / 🟡 Low), not by GitHub Copilot, so they don’t use Copilot quota.</p>
-<ul><li>
-<strong>Large PRs are reviewed automatically.</strong> After <code>gh pr create</code>, <code>.claude/hooks/review-after-pr.py</code> reads the new PR’s file list from GitHub with one <code>gh pr view &lt;N&gt; --json baseRefName,files</code> call, so the size is the PR’s, whichever checkout the session is in. It leaves out generated files (<code>man/</code>, <code>NAMESPACE</code>) and <code>DESCRIPTION</code>/<code>NEWS.md</code>. If the PR is over 150 lines, over 5 files, or over 30 lines under <code>R/</code>, hooks or workflows, the session is asked to review it. If the call fails, it stays silent.</li>
-<li>
-<strong>Small PRs</strong> (version bumps, one-line docs) are reviewed only when a human asks: <code>/pr-review &lt;N&gt;</code>.</li>
-<li>A review is reported in the session. Posting it to the PR is outward-facing, so it happens only when the human asks.</li>
-<li>Turn Copilot’s automatic review off in your own GitHub settings (github.com/settings/copilot). No repo ruleset requests it.</li>
-</ul><p>Agents without Claude Code hooks can follow the skill file by hand.</p>
-<hr></div>
-</div>
-<div class="section level2">
-<h2 id="output-format">Output format<a class="anchor" aria-label="anchor" href="#output-format"></a></h2>
-<p><strong>Lead with the result.</strong> No preamble, no plan-of-attack, no restating the task back.</p>
-<p>Answers use the same labelled parts every time, so the reader knows where to look. Each part is <strong>one or two lines</strong>. A part with nothing to say is <strong>left out</strong> — never write “N/A” or pad it.</p>
-<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>Part</th>
-<th>Content</th>
-</tr></thead><tbody><tr><td><strong>Result</strong></td>
-<td>What now works, or what changed and why. Always first, always present.</td>
-</tr><tr><td><strong>Files</strong></td>
-<td>One line per file: <code>path</code> — the reason it changed.</td>
-</tr><tr><td><strong>Verified</strong></td>
-<td>What was actually run and what it said, and which checks could not run here and why (see <code>bioc-check-ladder</code>). Never imply a check that did not run.</td>
-</tr><tr><td><strong>Decide</strong></td>
-<td>What the human has to choose, or what was deliberately left undone. Omit when there is nothing.</td>
-</tr><tr><td><strong>Notes</strong></td>
-<td>A real trade-off or surprise only. Omit when the work was routine.</td>
-</tr><tr><td><strong>Commit</strong></td>
-<td>The Conventional Commit subject, and the branch it landed on.</td>
-</tr></tbody></table><p><strong>Scale to the size of the change:</strong></p>
-<ul><li>
-<strong>One-line fix, single file</strong> — one sentence and the commit subject. Nothing else.</li>
-<li>
-<strong>A few files, no design decisions</strong> — Result, Files, Verified, Commit.</li>
-<li>
-<strong>Multi-file or design-affecting</strong> — the full set.</li>
-</ul><p><strong>Leave out:</strong></p>
-<ul><li>Closing recaps and summary sections that repeat what was just said. The last part is the last word.</li>
-<li>Narration of what is about to happen (“Next I’ll run the tests…”). Do it, then report it.</li>
-<li>Tool output already on screen — diffs, file listings, full test logs. Quote only the line that carries the verdict.</li>
-</ul><p>A push or a draft PR is one line under <strong>Result</strong>, with the URL — not a section of its own.</p>
-<hr></div>
-<div class="section level2">
-<h2 id="preferred-decision-rule">Preferred decision rule<a class="anchor" aria-label="anchor" href="#preferred-decision-rule"></a></h2>
-<p>When multiple valid options exist, choose the one that: 1. keeps the human in control of PRs/merges, 2. keeps the diff smallest, 3. passes <code>R CMD check</code> and <code>BiocCheck</code> cleanly, 4. is easiest to maintain and review later.</p>
-</div>
+</tr></tbody></table></div>
 </div>
 
   </div>

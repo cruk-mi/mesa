@@ -322,9 +322,10 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Minimal runnable sketch if MEDIPSData is installed</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPSData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># A tumour/normal pair of MeDIP-seq BAMs from MEDIPSData, restricted to</span></span></span>
+<span class="r-in"><span><span class="co"># chr22 to keep the example short</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MEDIPSData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">sampleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>        sample_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal1"</span>, <span class="st">"Tumour1"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span>, <span class="st">"Tumour"</span><span class="op">)</span>,</span></span>
@@ -339,7 +340,7 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 <span class="r-in"><span>    <span class="va">sampleTable</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>        <span class="fu">makeQset</span><span class="op">(</span></span></span>
 <span class="r-in"><span>            BSgenome          <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span></span>
-<span class="r-in"><span>            chrSelect         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"chr"</span>, <span class="fl">20</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            chrSelect         <span class="op">=</span> <span class="st">"chr22"</span>,</span></span>
 <span class="r-in"><span>            windowSize        <span class="op">=</span> <span class="fl">300</span>,</span></span>
 <span class="r-in"><span>            fragmentLength    <span class="op">=</span> <span class="fl">200</span>,</span></span>
 <span class="r-in"><span>            fragmentSD        <span class="op">=</span> <span class="fl">50</span>,</span></span>
@@ -349,14 +350,9 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 <span class="r-in"><span>            minMapQual        <span class="op">=</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span>        <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘BSgenome.Hsapiens.UCSC.hg19’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:BSgenome.Hsapiens.NCBI.GRCh38’:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     Hsapiens</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Considering 541532 regions with total size 162459600</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Considering 171015 regions with total size 51304500</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ==== Creating qsea set ====</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> restricting analysis on chr20, chr21, chr22</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> restricting analysis on chr22</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Dividing provided regions in 300nt windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Scanning one file at a time. Use e.g. setMesaParallel(nCores = 4) to parallelise this process.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading NSCLC_MeDIP_1N_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span>
@@ -375,28 +371,19 @@ enrichment parameters, allowing for estimation of beta values.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculated coverage</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No CNV being calculated</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Get genomic positions of "CG" ...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> searching chr20 for "CG"...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> found 717722 occurances of CG in chr20</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> estimating expected number of CGs per fragment for windows of chr20...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  ...done</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> searching chr21 for "CG"...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> found 380444 occurances of CG in chr21</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> estimating expected number of CGs per fragment for windows of chr21...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  ...done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> searching chr22 for "CG"...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> found 578097 occurances of CG in chr22</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> estimating expected number of CGs per fragment for windows of chr22...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  ...done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 4.396% of the windows have enrichment pattern density of at most 0.05 per fragment </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2.143% of the windows have enrichment pattern density of at most 0.05 per fragment </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet object generated successfully</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 2 Samples: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Normal1, Tumour1</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 541532 Regions in 3 chromosomes of BSgenome.Hsapiens.UCSC.hg19</span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 171015 Regions in 1 chromosomes of BSgenome.Hsapiens.UCSC.hg19</span>
 </code></pre></div>
     </div>
   </div>
