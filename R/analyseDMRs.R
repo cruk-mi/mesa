@@ -192,17 +192,18 @@ summariseDMRsByContrast <- function(
 #' @family DMR-helpers
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Summarise DMRs with explicit annotation databases
-#' exampleTumourNormal %>%
-#'     calculateDMRs(variable = "tumour", contrasts = "all") %>%
-#'     annotateWindows(
-#'         TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-#'         annoDb = "org.Hs.eg.db"
-#'     ) %>%
-#'     summariseDMRsByGene()
+#' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+#'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+#'     exampleTumourNormal %>%
+#'         calculateDMRs(variable = "tumour", contrasts = "all") %>%
+#'         annotateWindows(
+#'             TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+#'             annoDb = "org.Hs.eg.db"
+#'         ) %>%
+#'         summariseDMRsByGene()
 #' }
 #' @export
 summariseDMRsByGene <- function(DMRtable) {

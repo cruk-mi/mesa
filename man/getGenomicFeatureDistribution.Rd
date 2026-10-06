@@ -60,17 +60,22 @@ This function requires a transcript database and OrgDb to annotate windows
 }
 }
 \examples{
-\donttest{
-# Ensure annotation defaults are available (GRCh38/hg38)
+# Ensure annotation defaults are available (GRCh38/hg38), saving the
+# current setting
+oldGenome <- getOption("mesa_genome")
 setMesaGenome("hg38")
 
 data(exampleTumourNormal, package = "mesa")
 
 # NRPM-based context summary
-exampleTumourNormal \%>\%
-  getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
-  head()
+if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
+    requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+  exampleTumourNormal \%>\%
+    getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
+    head()
+}
 
+\donttest{
 # Beta-based summary (apply a minimum enrichment for non-NA betas)
 exampleTumourNormal \%>\%
   getGenomicFeatureDistribution(
@@ -80,6 +85,9 @@ exampleTumourNormal \%>\%
   ) \%>\%
   head()
 }
+
+# Restore the previous genome setting
+options(mesa_genome = oldGenome)
 
 }
 \seealso{
