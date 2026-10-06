@@ -14,14 +14,14 @@ linters: linters_with_defaults(
         require = "declare the package in DESCRIPTION and call pkg::fn()"
     ))
     )
-exclusions: list(
-    "data-raw",
-    "tests/testthat.R" = list(undesirable_function_linter = Inf),
-    "vignettes/data-and-qc.Rmd" = list(undesirable_function_linter = Inf),
-    "vignettes/differentially-methylated-regions.Rmd" =
-        list(undesirable_function_linter = Inf),
-    "vignettes/generation.Rmd" = list(undesirable_function_linter = Inf),
-    "vignettes/introduction.Rmd" = list(undesirable_function_linter = Inf),
-    "vignettes/pca.Rmd" = list(undesirable_function_linter = Inf)
+exclusions: c(
+    list(
+        "data-raw",
+        "tests/testthat.R" = list(undesirable_function_linter = Inf)
+    ),
+    Map(
+        function(f) list(undesirable_function_linter = Inf),
+        list.files("vignettes", pattern = "[.][Rq]md$", full.names = TRUE)
+    )
     )
 encoding: "UTF-8"
