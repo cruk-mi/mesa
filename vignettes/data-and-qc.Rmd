@@ -118,8 +118,8 @@ covered within the bam file, compared to the reference genome.
 
 Within `mesa`, this metric is calculated through `makeQset`, as part of the
 information added to the `libraries` table on the `qseaSet`. For the MBD-seq
-data that we have studied, we apply a minimum `relH` of 2.5, with 3 as a
-stricter cutoff. This value is typically around 4-5 in many of our studies.
+data that we have studied, we typically use a minimum `relH` of 2.5, with 3 as
+a stricter cutoff. This value is typically around 4-5 in many of our studies.
 
 We can use the `addLibraryInformation` function to add the information in the
 `libraries` table directly onto the `sampleTable`:
@@ -189,10 +189,10 @@ calculated beta value above a threshold (e.g. 0.8). As noted above, beta values
 will not be calculated if a sample does not have sufficient coverage and/or
 enrichment, meaning this metric incorporates both the coverage depth as well as
 how well the enrichment has worked. For our samples within the National
-Biomarker Centre, we currently require at least 40% of the hyper-stable windows
-with a `CpG_density` above 5 to have a beta value above 0.8. Samples with lower
-enrichment scores (as described by the `relH` score) require a greater coverage
-depth to reach this threshold.
+Biomarker Centre, we typically look for at least 40% of the hyper-stable
+windows with a `CpG_density` above 5 to have a beta value above 0.8. Samples
+with lower enrichment scores (as described by the `relH` score) require a
+greater coverage depth to reach this threshold.
 
 For hg38, these hyper-stable methylated probes are provided in a data object,
 `hg38UltraStableProbes`, and the function `addHyperStableFraction` calculates
@@ -203,11 +203,14 @@ there is no overlap with the windows in the example dataset (i.e.
 
 ## Summary
 We find that these three metrics, `valid_fragments`, `relH` and
-`hyperStableEdgar` are the most important considerations. For 300bp windows on
-the human genome, with T7-MBD-seq, we require a `relH` of at least 2.5 and
-a `hyperStableEdgar` value of at least 0.4 (40%). We may also apply a
-`valid_fragments` cutoff of 3,000,000, although most samples which pass the
-other two metrics will achieve this anyway.
+`hyperStableEdgar` are the most useful for quality control. As a rough guide,
+for 300bp windows on the human genome with T7-MBD-seq, we typically look for a
+`relH` of at least 2.5, a `hyperStableEdgar` value of at least 0.4 (40%) and
+around 3,000,000 `valid_fragments`, although most samples that pass the first
+two will reach this anyway. We apply these as guidelines rather than strict
+cutoffs, and suitable values will depend on the enrichment protocol (MBD-seq or
+MeDIP-seq), the sample type and the sequencing depth, so we recommend choosing
+thresholds from the distribution of these metrics in your own data.
 
 
 ## Session info
