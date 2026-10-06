@@ -187,7 +187,8 @@ getUMAP <- function(qseaSet,
 #' @return A [`mesaDimRed`] object with:
 #' * **res**: Named list of DR results; each element is a [`mesaPCA`] (for PCA)
 #' or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
-#' * **samples**: Character vector of sample IDs used.
+#' The sample IDs are the row names of each result (sample group names when
+#' `useGroupMeans = TRUE`).
 #' * **dataTable** (optional): The numeric matrix used for DR when
 #' `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
 #' `minDensity`, removal of rows with missing values, and may include columns of
@@ -845,7 +846,6 @@ No filtering of windows based on window standard deviation."))
     )
 
     out <- methods::new("mesaDimRed",
-        samples = samples,
         sampleTable = qseaSet %>% qsea::getSampleTable(),
         params = c(paramList, windowFilteringList),
         dataTable = if (returnDataTable) {
@@ -1776,7 +1776,7 @@ plotDimRed <- function(object,
                     "top {numWindows} most variable windows"
                 )
                 if (length(topVarInfo$topVarSamples[[1]]) ==
-                    length(object@samples)) {
+                    length(.dimRedIds(single))) {
                     titleSubstring <- "all "
                 } else {
                     titleSubstring <- ""
@@ -1810,7 +1810,8 @@ plotDimRed <- function(object,
                 my_legend_params +
                 ggplot2::ggtitle(
                     glue::glue(
-                        "{object@params$method} for {length(object@samples)}",
+                        "{object@params$method} for",
+                        " {length(.dimRedIds(single))}",
                         " samples using {titleString}."
                     ),
                     subtitle = subtitleString

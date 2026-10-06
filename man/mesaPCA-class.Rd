@@ -26,6 +26,11 @@ A \link[=mesaPCA-class]{mesaPCA} object containing the PCA fit and window IDs.
 \description{
 Stores a PCA fit (from \code{\link[stats:prcomp]{stats::prcomp()}}) computed over methylation windows.
 }
+\details{
+A valid object has non-empty \code{windows} with no \code{NA} or duplicates,
+one per row of \code{prcomp$rotation}, and a \code{prcomp$x} matrix whose row
+names are the sample IDs.
+}
 \section{Slots}{
 
 \describe{

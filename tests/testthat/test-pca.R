@@ -144,3 +144,50 @@ test_that("UMAPs", {
 }
 
 )
+
+test_that("show() and plot labels report the samples in each result", {
+
+    plotLabels <- function(obj) {
+        p <- plotDimRed(obj)[[1]][[1]]
+        c(p$labels$title, p$labels$subtitle)
+    }
+
+    pcaAll <- getPCA(exampleTumourNormal, verbose = FALSE)
+    expect_output(show(pcaAll),
+        "1 dimensionality reduction objects for 10 samples")
+    expect_output(show(pcaAll@res$pca1),
+        "PCA result for 10 samples calculated over 599 windows")
+    expect_equal(plotLabels(pcaAll),
+        c("PCA for 10 samples using all 599 windows.", "Using beta values."))
+
+    pcaTop <- getPCA(exampleTumourNormal, topVarNum = 10, verbose = FALSE)
+    expect_equal(plotLabels(pcaTop), c(
+        "PCA for 10 samples using top 10 most variable windows.",
+        "Using beta values and all 10 samples to calculate std dev."
+    ))
+
+    pcaSub <- getPCA(exampleTumourNormal, topVarNum = 10,
+        topVarSamples = "_T", verbose = FALSE)
+    expect_equal(plotLabels(pcaSub)[2],
+        "Using beta values and 5 samples to calculate std dev.")
+
+    grouped <- exampleTumourNormal %>%
+        mutate(group = stringr::str_remove(sample_name, "_[NT]$"))
+    pcaGroup <- getPCA(grouped, useGroupMeans = TRUE, topVarNum = 10,
+        verbose = FALSE)
+    expect_output(show(pcaGroup),
+        "1 dimensionality reduction objects for 5 samples")
+    expect_equal(plotLabels(pcaGroup), c(
+        "PCA for 5 samples using top 10 most variable windows.",
+        "Using beta values and all 5 samples to calculate std dev."
+    ))
+
+    set.seed(1)
+    umap <- getUMAP(exampleTumourNormal, n_neighbors = 5, verbose = FALSE)
+    expect_output(show(umap),
+        "1 dimensionality reduction objects for 10 samples")
+    expect_output(show(umap@res$umap1),
+        "UMAP result for 10 samples calculated over 599 windows")
+    expect_equal(plotLabels(umap)[1],
+        "UMAP for 10 samples using all 599 windows.")
+})
