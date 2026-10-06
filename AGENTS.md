@@ -30,7 +30,7 @@ say which checks did not run. The `bioc-check-ladder` skill says where each one 
 
 - 4-space indent, no tabs. At most 80 characters per line, roxygen included.
 - `<-` for assignment. `TRUE`/`FALSE`, never `T`/`F`. `seq_len()`/`seq_along()`, never `1:n`.
-  `vapply()`, never `sapply()`. camelCase names.
+  `vapply()`, never `sapply()`. camelCase names (no underscores).
 - [`.lintr`](.lintr) is the source of truth for these rules. `BiocCheck` in CI is the final check.
 - No `library()`/`require()` in `R/`: declare the package in `DESCRIPTION` and call `pkg::fn()`.
   No `:::` into other packages. Never install packages from package code.
