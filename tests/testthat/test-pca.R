@@ -16,45 +16,49 @@ test_that("PCAs", {
     expect_error(exampleTumourNormal %>% filterWindows(seqnames == 1) %>% getPCA()) #no windows left
 
     # Test that the x matrices in the res components are not empty
-    expect_false(is_empty(obj1@res$pca1@prcomp$x))
-    expect_false(is_empty(obj2@res$pca1@prcomp$x))
-    expect_false(is_empty(obj3@res$pca1@prcomp$x))
-    expect_false(is_empty(obj4@res$pca1@prcomp$x))
-    expect_false(is_empty(obj5@res$pca1@prcomp$x))
-    expect_false(is_empty(obj6@res$pca1@prcomp$x))
-    expect_false(is_empty(obj7@res$pca1@prcomp$x))
+    expect_false(is_empty(getCoordinates(obj1)$pca1))
+    expect_false(is_empty(getCoordinates(obj2)$pca1))
+    expect_false(is_empty(getCoordinates(obj3)$pca1))
+    expect_false(is_empty(getCoordinates(obj4)$pca1))
+    expect_false(is_empty(getCoordinates(obj5)$pca1))
+    expect_false(is_empty(getCoordinates(obj6)$pca1))
+    expect_false(is_empty(getCoordinates(obj7)$pca1))
 
     # Test that the dimensions of the x matrices are consistent
-    expect_equal(dim(obj1@res$pca1@prcomp$x), dim(obj2@res$pca1@prcomp$x))
-    expect_equal(dim(obj1@res$pca1@prcomp$x), dim(obj3@res$pca1@prcomp$x))
-    expect_equal(dim(obj1@res$pca1@prcomp$x), dim(obj4@res$pca1@prcomp$x))
-    expect_equal(dim(obj1@res$pca1@prcomp$x), dim(obj5@res$pca1@prcomp$x))
-    expect_equal(dim(obj1@res$pca1@prcomp$x), dim(obj6@res$pca1@prcomp$x))
-    expect_equal(dim(obj1@res$pca1@prcomp$x), dim(obj7@res$pca1@prcomp$x))
+    expect_equal(dim(getCoordinates(obj1)$pca1), dim(getCoordinates(obj2)$pca1))
+    expect_equal(dim(getCoordinates(obj1)$pca1), dim(getCoordinates(obj3)$pca1))
+    expect_equal(dim(getCoordinates(obj1)$pca1), dim(getCoordinates(obj4)$pca1))
+    expect_equal(dim(getCoordinates(obj1)$pca1), dim(getCoordinates(obj5)$pca1))
+    expect_equal(dim(getCoordinates(obj1)$pca1), dim(getCoordinates(obj6)$pca1))
+    expect_equal(dim(getCoordinates(obj1)$pca1), dim(getCoordinates(obj7)$pca1))
 
     # Test that the variance_explained component is a numeric vector
-    expect_true(is.numeric(obj1@res$pca1@prcomp$sdev))
+    expect_true(is.numeric(getPrcomp(getResults(obj1)$pca1)$sdev))
 
     # Test that getPCA() returns an error when called with invalid arguments
     expect_error(exampleTumourNormal %>% getPCA("invalid_argument"))
 
     # Check res components are of correct length
-    expect_equal(length(obj1@res), 1)
-    expect_equal(length(obj6@res), 3)
+    expect_equal(length(getResults(obj1)), 1)
+    expect_equal(length(getResults(obj6)), 3)
 
     # Check PCA results are different for different numbers of windows
-    expect_false(isTRUE(all.equal(obj6@res$pca1@prcomp$x,obj6@res$pca2@prcomp$x)))
-    expect_false(isTRUE(all.equal(obj6@res$pca1@prcomp$x,obj6@res$pca3@prcomp$x)))
+    expect_false(isTRUE(all.equal(
+        getCoordinates(obj6)$pca1,
+        getCoordinates(obj6)$pca2)))
+    expect_false(isTRUE(all.equal(
+        getCoordinates(obj6)$pca1,
+        getCoordinates(obj6)$pca3)))
 
     # Check dimensions of x are correct
-    expect_equal(dim(obj6@res$pca1@prcomp$x), c(10, 5))
-    expect_equal(dim(obj6@res$pca2@prcomp$x), c(10, 5))
-    expect_equal(dim(obj6@res$pca3@prcomp$x), c(10, 5))
+    expect_equal(dim(getCoordinates(obj6)$pca1), c(10, 5))
+    expect_equal(dim(getCoordinates(obj6)$pca2), c(10, 5))
+    expect_equal(dim(getCoordinates(obj6)$pca3), c(10, 5))
 
     # Check dimensions of rotation are correct
-    expect_equal(dim(obj6@res$pca1@prcomp$rotation), c(10, 5))
-    expect_equal(dim(obj6@res$pca2@prcomp$rotation), c(100, 5))
-    expect_equal(dim(obj6@res$pca3@prcomp$rotation), c(200, 5))
+    expect_equal(dim(getPrcomp(getResults(obj6)$pca1)$rotation), c(10, 5))
+    expect_equal(dim(getPrcomp(getResults(obj6)$pca2)$rotation), c(100, 5))
+    expect_equal(dim(getPrcomp(getResults(obj6)$pca3)$rotation), c(200, 5))
 
     ##### plotting tests
 
@@ -112,17 +116,31 @@ test_that("UMAPs", {
   expect_error(exampleTumourNormal %>% filter(str_detect(sample_name, "Colon1")) %>% getUMAP())
   expect_error(exampleTumourNormal %>% filterWindows(seqnames == 1) %>% getUMAP()) #no windows left
 
-  expect_true(isTRUE(all.equal(obj1@res$umap1@points,obj2@res$umap1@points)))
-  expect_false(isTRUE(all.equal(obj3@res$umap1@points,obj4@res$umap1@points)))
-  expect_false(isTRUE(all.equal(obj1@res$umap1@points,obj5@res$umap1@points)))
-  expect_false(isTRUE(all.equal(obj1@res$umap1@points,obj6@res$umap1@points)))
-  expect_true(isTRUE(all.equal(obj1@res$umap1@points,obj7@res$umap1@points)))
+  expect_true(isTRUE(all.equal(
+      getCoordinates(obj1)$umap1,
+      getCoordinates(obj2)$umap1)))
+  expect_false(isTRUE(all.equal(
+      getCoordinates(obj3)$umap1,
+      getCoordinates(obj4)$umap1)))
+  expect_false(isTRUE(all.equal(
+      getCoordinates(obj1)$umap1,
+      getCoordinates(obj5)$umap1)))
+  expect_false(isTRUE(all.equal(
+      getCoordinates(obj1)$umap1,
+      getCoordinates(obj6)$umap1)))
+  expect_true(isTRUE(all.equal(
+      getCoordinates(obj1)$umap1,
+      getCoordinates(obj7)$umap1)))
 
-  expect_equal(length(obj1@res), 1)
+  expect_equal(length(getResults(obj1)), 1)
 
-  expect_equal(length(obj6@res), 3)
-  expect_false(isTRUE(all.equal(obj6@res$umap1@points,obj6@res$umap2@points)))
-  expect_false(isTRUE(all.equal(obj6@res$umap1@points,obj6@res$umap3@points)))
+  expect_equal(length(getResults(obj6)), 3)
+  expect_false(isTRUE(all.equal(
+      getCoordinates(obj6)$umap1,
+      getCoordinates(obj6)$umap2)))
+  expect_false(isTRUE(all.equal(
+      getCoordinates(obj6)$umap1,
+      getCoordinates(obj6)$umap3)))
 
   expect_no_error(plots1 <- plotUMAP(obj1))
   expect_no_error(plots6 <- plotUMAP(obj6))
@@ -155,7 +173,7 @@ test_that("show() and plot labels report the samples in each result", {
     pcaAll <- getPCA(exampleTumourNormal, verbose = FALSE)
     expect_output(show(pcaAll),
         "1 dimensionality reduction objects for 10 samples")
-    expect_output(show(pcaAll@res$pca1),
+    expect_output(show(getResults(pcaAll)$pca1),
         "PCA result for 10 samples calculated over 599 windows")
     expect_equal(plotLabels(pcaAll),
         c("PCA for 10 samples using all 599 windows.", "Using beta values."))
@@ -186,7 +204,7 @@ test_that("show() and plot labels report the samples in each result", {
     umap <- getUMAP(exampleTumourNormal, n_neighbors = 5, verbose = FALSE)
     expect_output(show(umap),
         "1 dimensionality reduction objects for 10 samples")
-    expect_output(show(umap@res$umap1),
+    expect_output(show(getResults(umap)$umap1),
         "UMAP result for 10 samples calculated over 599 windows")
     expect_equal(plotLabels(umap)[1],
         "UMAP for 10 samples using all 599 windows.")

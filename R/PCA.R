@@ -1660,7 +1660,8 @@ plotDimRed <- function(object,
         )
     }
 
-    sampleTable <- object@sampleTable
+    sampleTable <- getSampleTable(object)
+    params <- getParameters(object)
 
     if (!is.null(colour)) {
         colDiff <- setdiff(colour, colnames(sampleTable))
@@ -1686,12 +1687,12 @@ plotDimRed <- function(object,
         components <- list(components)
     }
 
-    if (object@params$method == "PCA") {
+    if (params$method == "PCA") {
         columnPrefix <- "PC"
-    } else if (object@params$method == "UMAP") {
+    } else if (params$method == "UMAP") {
         columnPrefix <- "UMAP"
     } else {
-        stop("Method {object@params$method} not known")
+        stop("Method {params$method} not known")
     }
 
     if (length(plotlyAnnotations) > 1) {
@@ -1708,17 +1709,16 @@ plotDimRed <- function(object,
         )
     )
 
-    ggp <- purrr::imap(object@res, function(single, resName) {
-        numWindows <- length(single@windows)
+    ggp <- purrr::imap(getResults(object), function(single, resName) {
+        numWindows <- length(getWindowNames(single))
 
         if (columnPrefix == "PC") {
-            propVar <- single@prcomp$sdev^2 / sum(single@prcomp$sdev^2)
-            propVar <- round(propVar * 100, 2)
-            plotData <- single@prcomp$x
+            sdev <- getPrcomp(single)$sdev
+            propVar <- round(sdev^2 / sum(sdev^2) * 100, 2)
         } else {
             propVar <- NULL
-            plotData <- single@points
         }
+        plotData <- getCoordinates(single)
 
         plotData <- plotData %>%
             tibble::as_tibble(rownames = "sample_name") %>%
@@ -1764,12 +1764,12 @@ plotDimRed <- function(object,
             env$components <- components
             env$plotlyAnnotations <- plotlyAnnotations
 
-            topVarInfo <- object@params$topVar %>% filter(resName == !!resName)
+            topVarInfo <- params$topVar %>% filter(resName == !!resName)
 
             if (is.na(topVarInfo$topVarNum)) {
                 titleString <- glue::glue("all {numWindows} windows")
                 subtitleString <- glue::glue(
-                    "Using {object@params$normMethod} values."
+                    "Using {params$normMethod} values."
                 )
             } else {
                 titleString <- glue::glue(
@@ -1782,7 +1782,7 @@ plotDimRed <- function(object,
                     titleSubstring <- ""
                 }
                 subtitleString <- glue::glue(
-                    "Using {object@params$normMethod} values and",
+                    "Using {params$normMethod} values and",
                     " {titleSubstring}",
                     "{length(topVarInfo$topVarSamples[[1]])} samples",
                     " to calculate std dev."
@@ -1810,7 +1810,7 @@ plotDimRed <- function(object,
                 my_legend_params +
                 ggplot2::ggtitle(
                     glue::glue(
-                        "{object@params$method} for",
+                        "{params$method} for",
                         " {length(.dimRedIds(single))}",
                         " samples using {titleString}."
                     ),
@@ -1819,7 +1819,7 @@ plotDimRed <- function(object,
                 ggplot2::theme_bw() +
                 ggplot2::theme(plot.title = ggplot2::element_text(size = 12.5))
 
-            if (object@params$method == "PCA") {
+            if (params$method == "PCA") {
                 ggp <- ggp +
                     ggplot2::xlab(glue::glue(
                         "PC{components[1]} ({propVar[components[1]]}%)"
