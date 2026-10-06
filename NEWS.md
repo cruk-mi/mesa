@@ -30,6 +30,9 @@
   ([#116](https://github.com/cruk-mi/mesa/issues/116))
 
 ## Documentation
+- The `mesaDimRed`, `mesaPCA` and `mesaUMAP` help pages list their accessors,
+  `?dimRedAccessors` documents them, and the PCA vignette shows how to read a
+  `getPCA()` result. ([#7](https://github.com/cruk-mi/mesa/issues/7))
 - Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
   the pkgdown site and vignettes, and citations.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
