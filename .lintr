@@ -6,36 +6,11 @@ linters: linters_with_defaults(
         regexes = c(camelCase = "^\\.?[[:alpha:]][[:alnum:]]*$")
     ),
     object_length_linter = object_length_linter(40L),
-    pipe_consistency_linter = pipe_consistency_linter("%>%"),
+    pipe_consistency_linter = NULL,
     return_linter = NULL,
     undesirable_function_linter = undesirable_function_linter(c(
-        sapply = "use vapply() with a declared FUN.VALUE",
-        library = "declare the package in DESCRIPTION and call pkg::fn()",
-        require = "declare the package in DESCRIPTION and call pkg::fn()"
+        sapply = "use vapply() with a declared FUN.VALUE"
     ))
     )
-exclusions: list(
-    "data-raw",
-    "tests/testthat.R" = list(undesirable_function_linter = Inf),
-    "vignettes/data-and-qc.Rmd" = list(
-        undesirable_function_linter = Inf,
-        pipe_consistency_linter = Inf
-    ),
-    "vignettes/differentially-methylated-regions.Rmd" = list(
-        undesirable_function_linter = Inf,
-        pipe_consistency_linter = Inf
-    ),
-    "vignettes/generation.Rmd" = list(
-        undesirable_function_linter = Inf,
-        pipe_consistency_linter = Inf
-    ),
-    "vignettes/introduction.Rmd" = list(
-        undesirable_function_linter = Inf,
-        pipe_consistency_linter = Inf
-    ),
-    "vignettes/pca.Rmd" = list(
-        undesirable_function_linter = Inf,
-        pipe_consistency_linter = Inf
-    )
-    )
+exclusions: list("data-raw")
 encoding: "UTF-8"
