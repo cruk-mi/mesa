@@ -1,0 +1,27 @@
+linters: linters_with_defaults(
+    indentation_linter = indentation_linter(4L, hanging_indent_style = "never"),
+    line_length_linter = line_length_linter(80L),
+    object_name_linter = object_name_linter(
+        styles = c("dotted.case", "symbols"),
+        regexes = c(camelCase = "^\\.?[[:alpha:]][[:alnum:]]*$")
+    ),
+    object_length_linter = object_length_linter(40L),
+    pipe_consistency_linter = NULL,
+    return_linter = NULL,
+    undesirable_function_linter = undesirable_function_linter(c(
+        sapply = "use vapply() with a declared FUN.VALUE",
+        library = "declare the package in DESCRIPTION and call pkg::fn()",
+        require = "declare the package in DESCRIPTION and call pkg::fn()"
+    ))
+    )
+exclusions: c(
+    list(
+        "data-raw",
+        "tests/testthat.R" = list(undesirable_function_linter = Inf)
+    ),
+    Map(
+        function(f) list(undesirable_function_linter = Inf),
+        list.files("vignettes", pattern = "[.][Rq]md$", full.names = TRUE)
+    )
+    )
+encoding: "UTF-8"
