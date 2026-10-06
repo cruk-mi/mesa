@@ -153,6 +153,64 @@ test_that("mesaDimRed: each validity rule rejects an inconsistent object", {
         dataTable = cbind(dt, S5 = 0))))
 })
 
+test_that("mesaPCA and mesaUMAP accessors return their slots", {
+    mp <- validPCA()
+    expect_identical(getPrcomp(mp), makePrcomp())
+    expect_identical(getCoordinates(mp), as.data.frame(makePrcomp()$x))
+    expect_identical(getWindowNames(mp), paste0("W", 1:4))
+
+    mu <- validUMAP()
+    expect_identical(getCoordinates(mu), makePoints())
+    expect_identical(getWindowNames(mu), paste0("W", 1:4))
+})
+
+test_that("mesaDimRed accessors return their slots", {
+    res <- list(pca1 = validPCA(), pca2 = validPCA())
+    dt <- data.frame(S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0)
+    params <- list(method = "PCA", normMethod = "nrpm")
+    md <- mesaDimRed(res = res, sampleTable = makeSampleTable(),
+        params = params, dataTable = dt)
+
+    expect_identical(getResults(md), res)
+    expect_identical(getParameters(md), params)
+    expect_identical(getDimRedData(md), dt)
+    expect_identical(getCoordinates(md),
+        list(pca1 = getCoordinates(res$pca1),
+            pca2 = getCoordinates(res$pca2)))
+    expect_identical(getWindowNames(md),
+        list(pca1 = paste0("W", 1:4), pca2 = paste0("W", 1:4)))
+
+    # An empty container gives empty results.
+    empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
+        params = list())
+    expect_identical(getResults(empty), list())
+    expect_identical(getDimRedData(empty), data.frame())
+    expect_length(getCoordinates(empty), 0)
+    expect_length(getWindowNames(empty), 0)
+})
+
+test_that("getWindowNames() still labels qseaSet, GRanges and data.frame", {
+    gr <- GenomicRanges::GRanges(c("chr1", "chr2"),
+        IRanges::IRanges(c(10, 20), c(15, 30)))
+    expect_identical(getWindowNames(gr), c("chr1:10-15", "chr2:20-30"))
+    df <- data.frame(seqnames = c("chr1", "chr2"), start = c(10, 20),
+        end = c(15, 30))
+    expect_identical(getWindowNames(df), c("chr1:10-15", "chr2:20-30"))
+    expect_length(getWindowNames(exampleTumourNormal),
+        length(qsea::getRegions(exampleTumourNormal)))
+})
+
+test_that("getPCA() accessors agree with the PCA it ran", {
+    pca <- getPCA(exampleTumourNormal, topVarNum = c(10, 100),
+        verbose = FALSE)
+    expect_named(getResults(pca), names(getCoordinates(pca)))
+    expect_identical(getParameters(pca)$method, "PCA")
+    expect_identical(lengths(getWindowNames(pca), use.names = FALSE),
+        c(10L, 100L))
+    expect_identical(rownames(getCoordinates(pca)[[1]]),
+        getSampleNames(pca))
+})
+
 test_that("getPCA() and getUMAP() output passes validObject()", {
     qs <- cachedExampleQset()
     expect_true(validObject(getPCA(qs, normMethod = "nrpm", verbose = FALSE)))

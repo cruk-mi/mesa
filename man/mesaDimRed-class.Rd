@@ -5,14 +5,11 @@
 \alias{mesaDimRed-class}
 \alias{mesaDimRed}
 \alias{show,mesaDimRed-method}
-\alias{getSampleNames,mesaDimRed-method}
 \title{Dimensionality reduction results container}
 \usage{
 mesaDimRed(res, sampleTable, params, dataTable = data.frame())
 
 \S4method{show}{mesaDimRed}(object)
-
-\S4method{getSampleNames}{mesaDimRed}(object)
 }
 \arguments{
 \item{res}{\code{list}
@@ -54,10 +51,6 @@ with no duplicates;
 \code{sampleTable$group} when \code{params$useGroupMeans} is \code{TRUE});
 \item each sample ID is a column of \code{dataTable}, when it has columns.
 }
-
-\code{getSampleNames()} returns the sample IDs that the results in \code{res}
-cover (the row names of each result), or \code{character()} when \code{res} is
-empty. With \code{params$useGroupMeans = TRUE} they are sample group names.
 }
 \section{Slots}{
 
@@ -80,6 +73,20 @@ Parameters used to generate results in \code{res}.}
 Optional matrix/data used to compute DR (for reproducibility).}
 }}
 
+\section{Accessors}{
+
+Read the slots with these functions rather than \code{@}:
+\itemize{
+\item \code{\link[=getResults]{getResults()}}: the list of results (\code{res});
+\item \code{\link[qsea:getSampleTable]{getSampleTable()}} and \code{\link[qsea:getSampleNames]{getSampleNames()}}: the sample annotations and the
+sample IDs the results cover;
+\item \code{\link[qsea:getParameters]{getParameters()}}: the parameters (\code{params});
+\item \code{\link[=getDimRedData]{getDimRedData()}}: the data used to compute the results (\code{dataTable});
+\item \code{\link[=getCoordinates]{getCoordinates()}} and \code{\link[=getWindowNames]{getWindowNames()}}: per-result coordinates and
+window IDs, as named lists.
+}
+}
+
 \examples{
 set.seed(1)
 x <- matrix(rnorm(20), nrow = 5, ncol = 4,
@@ -94,5 +101,6 @@ getSampleNames(md)
 
 }
 \seealso{
-\link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}
+\link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}, \link{dimRedAccessors},
+\code{\link[=getPCA]{getPCA()}}, \code{\link[=getUMAP]{getUMAP()}}
 }

@@ -44,6 +44,14 @@ Row names are sample IDs.}
 Window IDs used to compute the embedding.}
 }}
 
+\section{Accessors}{
+
+\itemize{
+\item \code{\link[=getCoordinates]{getCoordinates()}}: the sample coordinates (\code{points});
+\item \code{\link[=getWindowNames]{getWindowNames()}}: the window IDs (\code{windows}).
+}
+}
+
 \examples{
 pts <- data.frame(UMAP1 = c(0.1, -0.2, 0.0),
     UMAP2 = c(0.3, 0.1, -0.1))
@@ -53,5 +61,5 @@ mu
 
 }
 \seealso{
-\link[=mesaDimRed-class]{mesaDimRed}
+\link[=mesaDimRed-class]{mesaDimRed}, \link{dimRedAccessors}
 }

@@ -10,6 +10,11 @@
 - `getSampleNames()` now works on `mesaDimRed` objects and returns the sample
   IDs their results cover (sample group names with `useGroupMeans = TRUE`).
   ([#10](https://github.com/cruk-mi/mesa/issues/10))
+- New accessors read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects without
+  `@`: `getResults()`, `getParameters()`, `getDimRedData()`,
+  `getCoordinates()` and `getPrcomp()`. `getWindowNames()` now also returns
+  the windows of a PCA or UMAP result.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and

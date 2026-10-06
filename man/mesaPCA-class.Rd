@@ -41,6 +41,16 @@ A PCA fit returned by \code{\link[stats:prcomp]{stats::prcomp()}}.}
 Window IDs used in the PCA.}
 }}
 
+\section{Accessors}{
+
+\itemize{
+\item \code{\link[=getPrcomp]{getPrcomp()}}: the \code{prcomp} fit, e.g. for \code{sdev} or \code{rotation};
+\item \code{\link[=getCoordinates]{getCoordinates()}}: the sample coordinates (\code{prcomp$x}), as a
+\code{data.frame};
+\item \code{\link[=getWindowNames]{getWindowNames()}}: the window IDs (\code{windows}).
+}
+}
+
 \examples{
 set.seed(1)
 x <- matrix(rnorm(20), nrow = 5, ncol = 4,
@@ -51,5 +61,5 @@ mp
 
 }
 \seealso{
-\link[=mesaDimRed-class]{mesaDimRed}
+\link[=mesaDimRed-class]{mesaDimRed}, \link{dimRedAccessors}
 }

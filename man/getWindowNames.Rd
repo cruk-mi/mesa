@@ -2,25 +2,41 @@
 % Please edit documentation in R/utils.R
 \name{getWindowNames}
 \alias{getWindowNames}
-\title{Get window names from a qseaSet or ranges/table}
+\alias{getWindowNames,ANY-method}
+\alias{getWindowNames,mesaPCA-method}
+\alias{getWindowNames,mesaUMAP-method}
+\alias{getWindowNames,mesaDimRed-method}
+\title{Get window names from a qseaSet, ranges/table or dimension reduction}
 \usage{
 getWindowNames(x)
+
+\S4method{getWindowNames}{ANY}(x)
+
+\S4method{getWindowNames}{mesaPCA}(x)
+
+\S4method{getWindowNames}{mesaUMAP}(x)
+
+\S4method{getWindowNames}{mesaDimRed}(x)
 }
 \arguments{
-\item{x}{\code{qseaSet} \strong{or} \code{GRanges} \strong{or} \code{data.frame}.
+\item{x}{\code{qseaSet} \strong{or} \code{GRanges} \strong{or} \code{data.frame}, \strong{or} a
+\link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP} or \link[=mesaDimRed-class]{mesaDimRed} object.
 If a data frame, it must be coercible to \code{GRanges} (accepted columns include
 \code{seqnames/start/end}, or \code{chr/start/end}, or \code{chr/window_start/window_end}).
 \strong{Default:} none (must be supplied).}
 }
 \value{
-\code{character()} vector of window labels, one per region.
+\code{character()} vector of window labels, one per region. For a
+\link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per result.
 }
 \description{
 Return character labels of the form \code{"seqnames:start-end"} for each genomic
-window/region.
+window/region, or the windows a dimensionality reduction was computed over.
 }
 \details{
 If \code{x} is a \code{qseaSet}, regions are taken from \code{qsea::getRegions(x)}.
+If \code{x} is a \link[=mesaPCA-class]{mesaPCA} or \link[=mesaUMAP-class]{mesaUMAP}, the window IDs it was
+computed over are returned.
 Otherwise
 the input is coerced to \code{GRanges} (see \code{\link[=asValidGranges]{asValidGranges()}}) and labels are
 constructed as \code{"seqnames:start-end"}.
@@ -41,7 +57,13 @@ data.frame(seqnames = c("chr1", "chr2"),
 data(exampleTumourNormal, package = "mesa")
 exampleTumourNormal \%>\% getWindowNames() \%>\% head()
 
+# The windows each PCA result was computed over
+exampleTumourNormal \%>\%
+    getPCA(topVarNum = c(100, 500), verbose = FALSE) \%>\%
+    getWindowNames() \%>\%
+    lengths()
+
 }
 \seealso{
-\code{\link[qsea:getRegions]{qsea::getRegions()}}, \code{\link[=asValidGranges]{asValidGranges()}}
+\code{\link[qsea:getRegions]{qsea::getRegions()}}, \code{\link[=asValidGranges]{asValidGranges()}}, \link{dimRedAccessors}
 }

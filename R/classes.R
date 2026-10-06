@@ -37,6 +37,16 @@ methods::setOldClass("prcomp")
 #'   `sampleTable$group` when `params$useGroupMeans` is `TRUE`);
 #' * each sample ID is a column of `dataTable`, when it has columns.
 #'
+#' @section Accessors:
+#' Read the slots with these functions rather than `@`:
+#' * [getResults()]: the list of results (`res`);
+#' * [getSampleTable()] and [getSampleNames()]: the sample annotations and the
+#'   sample IDs the results cover;
+#' * [getParameters()]: the parameters (`params`);
+#' * [getDimRedData()]: the data used to compute the results (`dataTable`);
+#' * [getCoordinates()] and [getWindowNames()]: per-result coordinates and
+#'   window IDs, as named lists.
+#'
 #' @slot res `list`
 #'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
 #'
@@ -57,7 +67,8 @@ methods::setOldClass("prcomp")
 #' @name mesaDimRed-class
 #' @aliases mesaDimRed-class
 #' @rdname mesaDimRed-class
-#' @seealso [mesaPCA-class], [mesaUMAP-class]
+#' @seealso [mesaPCA-class], [mesaUMAP-class], [dimRedAccessors],
+#'   [getPCA()], [getUMAP()]
 #' @exportClass mesaDimRed
 setClass("mesaDimRed",
     slots = c(
@@ -187,14 +198,13 @@ setValidity("mesaDimRed", function(object) {
 
 setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
 
+#' @rdname dimRedAccessors
+#' @export
 setMethod("getSampleTable", "mesaDimRed", function(object) {
     object@sampleTable
 })
 
-#' @rdname mesaDimRed-class
-#' @details `getSampleNames()` returns the sample IDs that the results in `res`
-#'   cover (the row names of each result), or `character()` when `res` is
-#'   empty. With `params$useGroupMeans = TRUE` they are sample group names.
+#' @rdname dimRedAccessors
 setMethod("getSampleNames", "mesaDimRed", function(object) {
     if (length(object@res) == 0) return(character())
     .dimRedIds(object@res[[1]])
@@ -212,6 +222,12 @@ setMethod("getSampleNames", "mesaDimRed", function(object) {
 #' one per row of `prcomp$rotation`, and a `prcomp$x` matrix whose row
 #' names are the sample IDs.
 #'
+#' @section Accessors:
+#' * [getPrcomp()]: the `prcomp` fit, e.g. for `sdev` or `rotation`;
+#' * [getCoordinates()]: the sample coordinates (`prcomp$x`), as a
+#'   `data.frame`;
+#' * [getWindowNames()]: the window IDs (`windows`).
+#'
 #' @slot prcomp `prcomp`
 #'   A PCA fit returned by [stats::prcomp()].
 #'
@@ -221,7 +237,7 @@ setMethod("getSampleNames", "mesaDimRed", function(object) {
 #' @name mesaPCA-class
 #' @aliases mesaPCA-class
 #' @rdname mesaPCA-class
-#' @seealso [mesaDimRed-class]
+#' @seealso [mesaDimRed-class], [dimRedAccessors]
 #' @exportClass mesaPCA
 setClass("mesaPCA",
     slots = c(
@@ -296,6 +312,10 @@ setValidity("mesaPCA", function(object) {
 #' and at least one row of numeric `points` with the sample IDs as row
 #' names.
 #'
+#' @section Accessors:
+#' * [getCoordinates()]: the sample coordinates (`points`);
+#' * [getWindowNames()]: the window IDs (`windows`).
+#'
 #' @slot points `data.frame`
 #'   One row per sample with UMAP coordinates (e.g., `UMAP1`, `UMAP2`).
 #'   Row names are sample IDs.
@@ -306,7 +326,7 @@ setValidity("mesaPCA", function(object) {
 #' @name mesaUMAP-class
 #' @aliases mesaUMAP-class
 #' @rdname mesaUMAP-class
-#' @seealso [mesaDimRed-class]
+#' @seealso [mesaDimRed-class], [dimRedAccessors]
 #' @exportClass mesaUMAP
 
 setClass("mesaUMAP",
@@ -365,6 +385,121 @@ setValidity("mesaUMAP", function(object) {
     }
     TRUE
 })
+
+
+# ==============================
+# Accessors
+# ==============================
+
+#' Accessors for dimensionality reduction results
+#'
+#' Read the contents of [mesaDimRed-class], [mesaPCA-class] and
+#' [mesaUMAP-class] objects, as returned by [getPCA()] and [getUMAP()].
+#'
+#' @param object A [mesaDimRed-class] object, or a [mesaPCA-class] or
+#'   [mesaUMAP-class] object where stated.
+#'
+#' @param ... Not used.
+#'
+#' @return
+#' * `getResults()`: a named list of [mesaPCA-class] or [mesaUMAP-class]
+#'   objects, one per result (e.g. per `topVarNum` value); empty when there
+#'   are no results.
+#' * `getSampleTable()`: the sample annotations, a `data.frame` with sample
+#'   IDs as row names.
+#' * `getSampleNames()`: the sample IDs the results cover (the row names of
+#'   each result), or `character()` when there are no results. With
+#'   `useGroupMeans = TRUE` they are sample group names.
+#' * `getParameters()`: the list of parameters used to compute the results,
+#'   including `method` (`"PCA"` or `"UMAP"`).
+#' * `getDimRedData()`: the data used to compute the results (a
+#'   `data.frame` of windows by samples), or an empty `data.frame` unless
+#'   the results were made with `returnDataTable = TRUE`.
+#' * `getCoordinates()`: for a [mesaPCA-class], its principal component
+#'   scores (`prcomp$x`); for a [mesaUMAP-class], its UMAP coordinates. Each
+#'   is a `data.frame` with one row per sample and sample IDs as row names.
+#'   For a [mesaDimRed-class], a named list of these, one per result.
+#' * `getPrcomp()`: the [stats::prcomp()] fit of a [mesaPCA-class].
+#'
+#' @seealso [getWindowNames()] for the window IDs of each result,
+#'   [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class], [getPCA()],
+#'   [getUMAP()], [plotDimRed()]
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' pca <- getPCA(exampleTumourNormal, topVarNum = c(100, 500),
+#'     verbose = FALSE)
+#'
+#' names(getResults(pca))
+#' head(getSampleTable(pca))
+#' getSampleNames(pca)
+#' getParameters(pca)$method
+#'
+#' first <- getResults(pca)[[1]]
+#' head(getCoordinates(first))
+#' summary(getPrcomp(first))$importance[, 1:3]
+#'
+#' # Coordinates of every result at once
+#' lapply(getCoordinates(pca), dim)
+#'
+#' @name dimRedAccessors
+NULL
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getResults", function(object, ...) {
+    standardGeneric("getResults")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getResults", "mesaDimRed", function(object) object@res)
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getParameters", "mesaDimRed", function(object) object@params)
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getDimRedData", function(object, ...) {
+    standardGeneric("getDimRedData")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getDimRedData", "mesaDimRed", function(object) object@dataTable)
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getCoordinates", function(object, ...) {
+    standardGeneric("getCoordinates")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getCoordinates", "mesaPCA", function(object) {
+    as.data.frame(object@prcomp$x)
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getCoordinates", "mesaUMAP", function(object) object@points)
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getCoordinates", "mesaDimRed", function(object) {
+    lapply(object@res, getCoordinates)
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getPrcomp", function(object, ...) {
+    standardGeneric("getPrcomp")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getPrcomp", "mesaPCA", function(object) object@prcomp)
 
 
 
