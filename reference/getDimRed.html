@@ -247,8 +247,9 @@ e.g. <code>n_neighbors</code>, <code>min_dist</code>, <code>metric</code>.</p></
     <div id="value">
     <h2>Value</h2>
     <p>A <code><a href="mesaDimRed-class.html">mesaDimRed</a></code> object with:</p><ul><li><p><strong>res</strong>: Named list of DR results; each element is a <code><a href="mesaPCA-class.html">mesaPCA</a></code> (for PCA)
-or <code><a href="mesaUMAP-class.html">mesaUMAP</a></code> (for UMAP). Names correspond to entries in <code>params$topVar</code>.</p></li>
-<li><p><strong>samples</strong>: Character vector of sample IDs used.</p></li>
+or <code><a href="mesaUMAP-class.html">mesaUMAP</a></code> (for UMAP). Names correspond to entries in <code>params$topVar</code>.
+The sample IDs are the row names of each result (sample group names when
+<code>useGroupMeans = TRUE</code>).</p></li>
 <li><p><strong>dataTable</strong> (optional): The numeric matrix used for DR when
 <code>returnDataTable = TRUE</code>. It reflects filtering by <code>regionsToOverlap</code> and
 <code>minDensity</code>, removal of rows with missing values, and may include columns of

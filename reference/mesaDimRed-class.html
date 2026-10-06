@@ -77,10 +77,13 @@ computed on a common set of samples.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mesaDimRed</span><span class="op">(</span><span class="va">res</span>, <span class="va">sampleTable</span>, <span class="va">samples</span>, <span class="va">params</span>, dataTable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mesaDimRed</span><span class="op">(</span><span class="va">res</span>, <span class="va">sampleTable</span>, <span class="va">params</span>, dataTable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mesaDimRed'</span></span>
-<span><span class="fu">show</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">show</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'mesaDimRed'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -95,11 +98,6 @@ DR result objects. <strong>Default:</strong> none. <code>res</code> must be supp
 <dt id="arg-sampletable">sampleTable<a class="anchor" aria-label="anchor" href="#arg-sampletable"></a></dt>
 <dd><p><code>data.frame</code>
 Sample annotations; row names must be sample IDs. <strong>Default:</strong> none.</p></dd>
-
-
-<dt id="arg-samples">samples<a class="anchor" aria-label="anchor" href="#arg-samples"></a></dt>
-<dd><p><code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>
-Sample IDs included. <strong>Default:</strong> none.</p></dd>
 
 
 <dt id="arg-params">params<a class="anchor" aria-label="anchor" href="#arg-params"></a></dt>
@@ -121,26 +119,38 @@ Optional numeric matrix/data used for DR.
     <h2>Value</h2>
     <p>A mesaDimRed object:</p><ul><li><p>stores DR results in <code>res</code>,</p></li>
 <li><p>carries sample metadata in <code>sampleTable</code>,</p></li>
-<li><p>records the samples in <code>samples</code>,</p></li>
 <li><p>and persists parameters/data in <code>params</code> / <code>dataTable</code>.</p></li>
 </ul></div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>A valid object has <code>res</code> empty, or:</p><ul><li><p><code>res</code> is a named list with unique names;</p></li>
+<li><p>its elements are all <a href="mesaPCA-class.html">mesaPCA</a> or all
+<a href="mesaUMAP-class.html">mesaUMAP</a> objects, matching <code>params$method</code> if set;</p></li>
+<li><p>every element covers the same sample IDs, in the same order,
+with no duplicates;</p></li>
+<li><p>each sample ID is a row name of <code>sampleTable</code> (a value of
+<code>sampleTable$group</code> when <code>params$useGroupMeans</code> is <code>TRUE</code>);</p></li>
+<li><p>each sample ID is a column of <code>dataTable</code>, when it has columns.</p></li>
+</ul><p><code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames()</a></code> returns the sample IDs that the results in <code>res</code>
+cover (the row names of each result), or <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> when <code>res</code> is
+empty. With <code>params$useGroupMeans = TRUE</code> they are sample group names.</p>
+    </div>
     <div id="slots">
     <h2>Slots</h2>
 
 
 <dl><dt><code>res</code></dt>
 <dd><p><code>list</code>
-Individual DR result objects (e.g., <a href="mesaPCA-class.html">mesaPCA</a>, <a href="mesaUMAP-class.html">mesaUMAP</a>).</p></dd>
+Individual DR result objects (e.g., <a href="mesaPCA-class.html">mesaPCA</a>, <a href="mesaUMAP-class.html">mesaUMAP</a>).</p>
+<p>The sample IDs of the results are the row names of each element of
+<code>res</code> (<code>prcomp$x</code> for <a href="mesaPCA-class.html">mesaPCA</a>,
+<code>points</code> for <a href="mesaUMAP-class.html">mesaUMAP</a>). With
+<code>useGroupMeans = TRUE</code> they are sample group names.</p></dd>
 
 
 <dt><code>sampleTable</code></dt>
 <dd><p><code>data.frame</code>
 Sample annotations; row names are sample IDs.</p></dd>
-
-
-<dt><code>samples</code></dt>
-<dd><p><code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>
-Vector of sample IDs used.</p></dd>
 
 
 <dt><code>params</code></dt>
@@ -161,14 +171,18 @@ Optional matrix/data used to compute DR (for reproducibility).</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sample_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"S1"</span>, <span class="st">"S2"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    row.names <span class="op">=</span> <span class="st">"sample_name"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu">mesaDimRed</span><span class="op">(</span>res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, sampleTable <span class="op">=</span> <span class="va">st</span>,</span></span>
-<span class="r-in"><span>    samples <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">st</span><span class="op">)</span>, params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    dataTable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">5</span>, ncol <span class="op">=</span> <span class="fl">4</span>,</span></span>
+<span class="r-in"><span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"S"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"W"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sample_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mp</span> <span class="op">&lt;-</span> <span class="fu"><a href="mesaPCA-class.html">mesaPCA</a></span><span class="op">(</span>prcomp <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, windows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu">mesaDimRed</span><span class="op">(</span>res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pca1 <span class="op">=</span> <span class="va">mp</span><span class="op">)</span>, sampleTable <span class="op">=</span> <span class="va">st</span>,</span></span>
+<span class="r-in"><span>    params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"PCA"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">md</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 0 dimensionality reduction objects for 2 samples</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 5 samples</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames</a></span><span class="op">(</span><span class="va">md</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "S1" "S2" "S3" "S4" "S5"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

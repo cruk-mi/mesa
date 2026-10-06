@@ -72,6 +72,22 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.7.9000" id="mesa-09979000">mesa 0.99.7.9000<a class="anchor" aria-label="anchor" href="#mesa-09979000"></a></h2>
 <div class="section level3">
+<h3 id="new-features-0-99-7-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-99-7-9000"></a></h3>
+<ul><li>
+<code>mesaDimRed</code>, <code>mesaPCA</code> and <code>mesaUMAP</code> objects are now checked for internal consistency, and <code>validObject()</code> rejects an inconsistent one with a message naming the problem: duplicate or missing windows, results without sample IDs, mixed PCA and UMAP results, results covering different samples, or samples absent from <code>sampleTable</code> or <code>dataTable</code>. (<a href="https://github.com/cruk-mi/mesa/issues/115" class="external-link">#115</a>)</li>
+<li>
+<code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames()</a></code> now works on <code>mesaDimRed</code> objects and returns the sample IDs their results cover (sample group names with <code>useGroupMeans = TRUE</code>). (<a href="https://github.com/cruk-mi/mesa/issues/10" class="external-link">#10</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-changes-0-99-7-9000">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-99-7-9000"></a></h3>
+<ul><li>
+<strong>Breaking:</strong> <code>mesaDimRed</code> objects no longer have a <code>samples</code> slot, and <code><a href="../reference/mesaDimRed-class.html">mesaDimRed()</a></code> no longer takes a <code>samples</code> argument. Code that reads <code>@samples</code> should call <code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames()</a></code> instead, and code that passes <code>samples =</code> to <code><a href="../reference/mesaDimRed-class.html">mesaDimRed()</a></code> should drop it; objects saved with an earlier version still load and work. (<a href="https://github.com/cruk-mi/mesa/issues/10" class="external-link">#10</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-0-99-7-9000">Testing<a class="anchor" aria-label="anchor" href="#testing-0-99-7-9000"></a></h3>
+<ul><li>Added tests for the <code>mesaDimRed</code>, <code>mesaPCA</code> and <code>mesaUMAP</code> constructors and for each validity check. (<a href="https://github.com/cruk-mi/mesa/issues/116" class="external-link">#116</a>)</li>
+</ul></div>
+<div class="section level3">
 <h3 id="documentation-0-99-7-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-7-9000"></a></h3>
 <ul><li>Rewrote the README: badges, a quick start on <code>exampleTumourNormal</code>, links to the pkgdown site and vignettes, and citations. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>
 <li>Fixed the “Annotatation” typo in the DMR vignette title. (<a href="https://github.com/cruk-mi/mesa/pull/108" class="external-link">#108</a>)</li>

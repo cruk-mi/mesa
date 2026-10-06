@@ -103,6 +103,12 @@ Window IDs used. <strong>Default:</strong> none.</p></dd>
     <h2>Value</h2>
     <p>A mesaPCA object containing the PCA fit and window IDs.</p>
     </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>A valid object has non-empty <code>windows</code> with no <code>NA</code> or duplicates,
+one per row of <code>prcomp$rotation</code>, and a <code>prcomp$x</code> matrix whose row
+names are the sample IDs.</p>
+    </div>
     <div id="slots">
     <h2>Slots</h2>
 
