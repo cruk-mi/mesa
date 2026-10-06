@@ -1,0 +1,41 @@
+linters: linters_with_defaults(
+    indentation_linter = indentation_linter(4L, hanging_indent_style = "never"),
+    line_length_linter = line_length_linter(80L),
+    object_name_linter = object_name_linter(
+        styles = c("dotted.case", "symbols"),
+        regexes = c(camelCase = "^\\.?[[:alpha:]][[:alnum:]]*$")
+    ),
+    object_length_linter = object_length_linter(40L),
+    pipe_consistency_linter = pipe_consistency_linter("%>%"),
+    return_linter = NULL,
+    undesirable_function_linter = undesirable_function_linter(c(
+        sapply = "use vapply() with a declared FUN.VALUE",
+        library = "declare the package in DESCRIPTION and call pkg::fn()",
+        require = "declare the package in DESCRIPTION and call pkg::fn()"
+    ))
+    )
+exclusions: list(
+    "data-raw",
+    "tests/testthat.R" = list(undesirable_function_linter = Inf),
+    "vignettes/data-and-qc.Rmd" = list(
+        undesirable_function_linter = Inf,
+        pipe_consistency_linter = Inf
+    ),
+    "vignettes/differentially-methylated-regions.Rmd" = list(
+        undesirable_function_linter = Inf,
+        pipe_consistency_linter = Inf
+    ),
+    "vignettes/generation.Rmd" = list(
+        undesirable_function_linter = Inf,
+        pipe_consistency_linter = Inf
+    ),
+    "vignettes/introduction.Rmd" = list(
+        undesirable_function_linter = Inf,
+        pipe_consistency_linter = Inf
+    ),
+    "vignettes/pca.Rmd" = list(
+        undesirable_function_linter = Inf,
+        pipe_consistency_linter = Inf
+    )
+    )
+encoding: "UTF-8"

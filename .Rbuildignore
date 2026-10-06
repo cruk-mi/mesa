@@ -12,3 +12,4 @@
 ^\.git$
 ^codecov\.yml$
 ^STATUS\.md
+^\.lintr$
