@@ -27,6 +27,10 @@
   `"UMAP"` when a `mesaDimRed` has none, instead of failing with "argument is
   of length zero".
   ([#117](https://github.com/cruk-mi/mesa/issues/117))
+- `plotPCA()` and `plotUMAP()` match samples to the `sampleTable` by its row
+  names, the sample IDs, so they no longer fail when the table has no
+  `sample_name` column.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
