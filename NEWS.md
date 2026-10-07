@@ -27,6 +27,10 @@
   `"UMAP"` when a `mesaDimRed` has none, instead of failing with "argument is
   of length zero".
   ([#117](https://github.com/cruk-mi/mesa/issues/117))
+- `mesaDimRed` validity now checks sample IDs against the
+  `sampleTable$sample_name` column, as qsea does, rather than its row names,
+  and says so when the column is missing.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and

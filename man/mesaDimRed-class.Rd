@@ -16,7 +16,8 @@ mesaDimRed(res, sampleTable, params, dataTable = data.frame())
 DR result objects. \strong{Default:} none. \code{res} must be supplied.}
 
 \item{sampleTable}{\code{data.frame}
-Sample annotations; row names must be sample IDs. \strong{Default:} none.}
+Sample annotations, with the sample IDs in a \code{sample_name} column.
+\strong{Default:} none.}
 
 \item{params}{\code{list}
 Parameters used to compute \code{res}. \strong{Default:} none.}
@@ -47,7 +48,7 @@ A valid object has \code{res} empty, or:
 \link[=mesaUMAP-class]{mesaUMAP} objects, matching \code{params$method} if set;
 \item every element covers the same sample IDs, in the same order,
 with no duplicates;
-\item each sample ID is a row name of \code{sampleTable} (a value of
+\item each sample ID is a value of \code{sampleTable$sample_name} (of
 \code{sampleTable$group} when \code{params$useGroupMeans} is \code{TRUE});
 \item each sample ID is a column of \code{dataTable}, when it has columns.
 }
@@ -64,7 +65,8 @@ The sample IDs of the results are the row names of each element of
 \code{useGroupMeans = TRUE} they are sample group names.}
 
 \item{\code{sampleTable}}{\code{data.frame}
-Sample annotations; row names are sample IDs.}
+Sample annotations; the \code{sample_name} column holds the sample IDs
+(the row names mirror it, as in a \code{qseaSet}).}
 
 \item{\code{params}}{\code{list}
 Parameters used to generate results in \code{res}.}

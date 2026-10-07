@@ -61,8 +61,8 @@ getPrcomp(object, ...)
 \item \code{getResults()}: a named list of \link[=mesaPCA-class]{mesaPCA} or \link[=mesaUMAP-class]{mesaUMAP}
 objects, one per result (e.g. per \code{topVarNum} value); empty when there
 are no results.
-\item \code{getSampleTable()}: the sample annotations, a \code{data.frame} with sample
-IDs as row names.
+\item \code{getSampleTable()}: the sample annotations, a \code{data.frame} with the
+sample IDs in its \code{sample_name} column.
 \item \code{getSampleNames()}: the sample IDs the results cover (the row names of
 each result), or \code{character()} when there are no results. With
 \code{useGroupMeans = TRUE} they are sample group names.

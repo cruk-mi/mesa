@@ -224,6 +224,25 @@ test_that("as.data.frame() keeps coordinate names on a sampleTable clash", {
     expect_identical(df$resName.sampleTable, rep("x", 5))
 })
 
+test_that("mesaDimRed sample IDs come from sampleTable$sample_name", {
+    st <- makeSampleTable()
+    build <- function(sampleTable) {
+        mesaDimRed(res = list(pca1 = validPCA()), sampleTable = sampleTable,
+            params = list(method = "PCA"))
+    }
+
+    noName <- st
+    noName$sample_name <- NULL
+    expect_error(build(noName),
+        "`sampleTable` must have a `sample_name` column")
+
+    # Row names that disagree with sample_name don't matter.
+    rownames(st) <- paste0("row", 1:5)
+    md <- build(st)
+    expect_true(validObject(md))
+    expect_identical(as.data.frame(md)$group, st$group)
+})
+
 test_that("as.data.frame() handles group means and empty containers", {
     groups <- mesaUMAP(makePoints(c("A", "B")), "W1")
     grouped <- mesaDimRed(res = list(umap1 = groups),

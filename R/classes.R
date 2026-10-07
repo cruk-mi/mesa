@@ -33,7 +33,7 @@ methods::setOldClass("prcomp")
 #'   [mesaUMAP-class] objects, matching `params$method` if set;
 #' * every element covers the same sample IDs, in the same order,
 #'   with no duplicates;
-#' * each sample ID is a row name of `sampleTable` (a value of
+#' * each sample ID is a value of `sampleTable$sample_name` (of
 #'   `sampleTable$group` when `params$useGroupMeans` is `TRUE`);
 #' * each sample ID is a column of `dataTable`, when it has columns.
 #'
@@ -58,7 +58,8 @@ methods::setOldClass("prcomp")
 #' `useGroupMeans = TRUE` they are sample group names.
 #'
 #' @slot sampleTable `data.frame`
-#'   Sample annotations; row names are sample IDs.
+#'   Sample annotations; the `sample_name` column holds the sample IDs
+#'   (the row names mirror it, as in a `qseaSet`).
 #'
 #' @slot params `list`
 #'   Parameters used to generate results in `res`.
@@ -88,7 +89,8 @@ setClass("mesaDimRed",
 #'   DR result objects. **Default:** none. `res` must be supplied.
 #'
 #' @param sampleTable `data.frame`
-#'   Sample annotations; row names must be sample IDs. **Default:** none.
+#'   Sample annotations, with the sample IDs in a `sample_name` column.
+#'   **Default:** none.
 #'
 #' @param params `list`
 #'   Parameters used to compute `res`. **Default:** none.
@@ -139,10 +141,12 @@ setMethod("show", "mesaDimRed", function(object) {
 .checkDimRedIds <- function(object, ids) {
     if (anyDuplicated(ids)) return("sample IDs in `res` must be unique")
 
-    known <- if (isTRUE(object@params$useGroupMeans)) {
-        object@sampleTable$group
+    if (isTRUE(object@params$useGroupMeans)) {
+        known <- object@sampleTable$group
+    } else if ("sample_name" %in% colnames(object@sampleTable)) {
+        known <- object@sampleTable$sample_name
     } else {
-        rownames(object@sampleTable)
+        return("`sampleTable` must have a `sample_name` column")
     }
     missing <- setdiff(ids, known)
     if (length(missing) > 0) {
@@ -411,8 +415,8 @@ setValidity("mesaUMAP", function(object) {
 #' * `getResults()`: a named list of [mesaPCA-class] or [mesaUMAP-class]
 #'   objects, one per result (e.g. per `topVarNum` value); empty when there
 #'   are no results.
-#' * `getSampleTable()`: the sample annotations, a `data.frame` with sample
-#'   IDs as row names.
+#' * `getSampleTable()`: the sample annotations, a `data.frame` with the
+#'   sample IDs in its `sample_name` column.
 #' * `getSampleNames()`: the sample IDs the results cover (the row names of
 #'   each result), or `character()` when there are no results. With
 #'   `useGroupMeans = TRUE` they are sample group names.
