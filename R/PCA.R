@@ -1722,7 +1722,8 @@ plotDimRed <- function(object,
 
         plotData <- plotData %>%
             tibble::as_tibble(rownames = "sample_name") %>%
-            dplyr::left_join(sampleTable, by = "sample_name")
+            dplyr::left_join(sampleTable, by = "sample_name",
+                suffix = c("", ".sampleTable"))
 
         if (!is.null(colourPalette) & is.null(colour)) {
             stop(

@@ -18,6 +18,12 @@
   annotations.
   ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
+## Bug fixes
+- `plotPCA()` and `plotUMAP()` no longer fail when the `sampleTable` has a
+  column named like a component (for example `PC1`); the plot uses the
+  computed coordinates.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
   `mesaDimRed()` no longer takes a `samples` argument. Code that reads

@@ -79,6 +79,8 @@ test_that("PCAs", {
     expect_no_error(plotPCA(obj1, colour = "age"))
     expect_no_error(plotPCA(obj1, colour = "gender"))
     expect_no_error(plotPCA(obj1 %>% mutate(diver = seq(-4,5)), colour = "diver"))
+    # A sampleTable column named like a component must not break the plot
+    expect_no_error(print(plotPCA(obj1 %>% mutate(PC1 = 0))))
     expect_no_error(plotPCA(obj1, shape = "type"))
 
     expect_no_error(plotPCA(obj1, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))

@@ -531,7 +531,9 @@ setMethod("as.data.frame", "mesaDimRed",
             lapply(tibble::rownames_to_column, var = idCol) %>%
             dplyr::bind_rows(.id = "resName")
         if (!byGroup) {
-            out <- dplyr::left_join(out, getSampleTable(x), by = idCol)
+            # Coordinate columns keep their names if sampleTable reuses one.
+            out <- dplyr::left_join(out, getSampleTable(x), by = idCol,
+                suffix = c("", ".sampleTable"))
         }
         as.data.frame(out)
     }

@@ -211,6 +211,19 @@ test_that("as.data.frame() gives one long table of every result", {
         c("resName", "sample_name", "UMAP1", "UMAP2", "group"))
 })
 
+test_that("as.data.frame() keeps coordinate names on a sampleTable clash", {
+    st <- makeSampleTable()
+    st$PC1 <- 0
+    st$resName <- "x"
+    md <- mesaDimRed(res = list(pca1 = validPCA()), sampleTable = st,
+        params = list(method = "PCA"))
+    df <- as.data.frame(md)
+    expect_identical(df$PC1, makePrcomp()$x[, "PC1"], ignore_attr = TRUE)
+    expect_identical(df$resName, rep("pca1", 5))
+    expect_identical(df$PC1.sampleTable, rep(0, 5))
+    expect_identical(df$resName.sampleTable, rep("x", 5))
+})
+
 test_that("as.data.frame() handles group means and empty containers", {
     groups <- mesaUMAP(makePoints(c("A", "B")), "W1")
     grouped <- mesaDimRed(res = list(umap1 = groups),
