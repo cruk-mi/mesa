@@ -13,7 +13,9 @@
 - New accessors read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects without
   `@`: `getResults()`, `getParameters()`, `getDimRedData()`,
   `getCoordinates()` and `getPrcomp()`. `getWindowNames()` now also returns
-  the windows of a PCA or UMAP result.
+  the windows of a PCA or UMAP result, and `as.data.frame()` turns a
+  `getPCA()` or `getUMAP()` result into one table of coordinates and sample
+  annotations.
   ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
 ## Other changes

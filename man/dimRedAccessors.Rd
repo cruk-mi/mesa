@@ -15,6 +15,7 @@
 \alias{getCoordinates,mesaDimRed-method}
 \alias{getPrcomp}
 \alias{getPrcomp,mesaPCA-method}
+\alias{as.data.frame,mesaDimRed-method}
 \title{Accessors for dimensionality reduction results}
 \usage{
 \S4method{getSampleTable}{mesaDimRed}(object)
@@ -42,12 +43,18 @@ getCoordinates(object, ...)
 getPrcomp(object, ...)
 
 \S4method{getPrcomp}{mesaPCA}(object)
+
+\S4method{as.data.frame}{mesaDimRed}(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
 \item{object}{A \link[=mesaDimRed-class]{mesaDimRed} object, or a \link[=mesaPCA-class]{mesaPCA} or
 \link[=mesaUMAP-class]{mesaUMAP} object where stated.}
 
 \item{...}{Not used.}
+
+\item{x}{A \link[=mesaDimRed-class]{mesaDimRed} object.}
+
+\item{row.names, optional}{Not used.}
 }
 \value{
 \itemize{
@@ -69,6 +76,11 @@ scores (\code{prcomp$x}); for a \link[=mesaUMAP-class]{mesaUMAP}, its UMAP coord
 is a \code{data.frame} with one row per sample and sample IDs as row names.
 For a \link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per result.
 \item \code{getPrcomp()}: the \code{\link[stats:prcomp]{stats::prcomp()}} fit of a \link[=mesaPCA-class]{mesaPCA}.
+\item \code{as.data.frame()}: one \code{data.frame} with a row per result and sample:
+\code{resName} (the result's name, as in \code{getResults()}), \code{sample_name}, the
+coordinate columns (\code{PC1}, \code{PC2}, ... or \code{UMAP1}, \code{UMAP2}), then the
+\code{sampleTable} columns. With \code{useGroupMeans = TRUE} the ID column is
+\code{group} and no sample annotations are added.
 }
 }
 \description{
@@ -91,6 +103,9 @@ summary(getPrcomp(first))$importance[, 1:3]
 
 # Coordinates of every result at once
 lapply(getCoordinates(pca), dim)
+
+# Everything in one table, e.g. for a custom plot
+head(as.data.frame(pca)[, 1:6])
 
 }
 \seealso{

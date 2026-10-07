@@ -101,6 +101,7 @@ export(writeDMRsToExcel)
 exportClasses(mesaDimRed)
 exportClasses(mesaPCA)
 exportClasses(mesaUMAP)
+exportMethods(as.data.frame)
 exportMethods(colnames)
 exportMethods(getCoordinates)
 exportMethods(getDimRedData)
@@ -112,7 +113,10 @@ exportMethods(getSampleTable)
 exportMethods(getWindowNames)
 exportMethods(setMart)
 import(qsea)
-importFrom(BiocGenerics,colnames)
+importFrom(BiocGenerics,
+  as.data.frame,
+  colnames
+)
 importFrom(dplyr,
   arrange,
   filter,

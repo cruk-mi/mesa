@@ -189,6 +189,43 @@ test_that("mesaDimRed accessors return their slots", {
     expect_length(getWindowNames(empty), 0)
 })
 
+test_that("as.data.frame() gives one long table of every result", {
+    st <- makeSampleTable()
+    md <- mesaDimRed(res = list(pca1 = validPCA(), pca2 = validPCA()),
+        sampleTable = st, params = list(method = "PCA"))
+    df <- as.data.frame(md)
+
+    expect_s3_class(df, "data.frame")
+    expect_identical(nrow(df), 10L)
+    expect_identical(df$resName, rep(c("pca1", "pca2"), each = 5))
+    expect_identical(df$sample_name, rep(paste0("S", 1:5), 2))
+    pcs <- colnames(getCoordinates(validPCA()))
+    expect_identical(colnames(df), c("resName", "sample_name", pcs, "group"))
+    expect_equal(as.matrix(df[1:5, pcs]), makePrcomp()$x,
+        ignore_attr = TRUE)
+    expect_identical(df$group, rep(st$group, 2))
+
+    umap <- mesaDimRed(res = list(umap1 = validUMAP()), sampleTable = st,
+        params = list(method = "UMAP"))
+    expect_identical(colnames(as.data.frame(umap)),
+        c("resName", "sample_name", "UMAP1", "UMAP2", "group"))
+})
+
+test_that("as.data.frame() handles group means and empty containers", {
+    groups <- mesaUMAP(makePoints(c("A", "B")), "W1")
+    grouped <- mesaDimRed(res = list(umap1 = groups),
+        sampleTable = makeSampleTable(),
+        params = list(method = "UMAP", useGroupMeans = TRUE))
+    df <- as.data.frame(grouped)
+    expect_identical(colnames(df), c("resName", "group", "UMAP1", "UMAP2"))
+    expect_identical(df$group, c("A", "B"))
+
+    empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
+        params = list())
+    expect_identical(as.data.frame(empty),
+        data.frame(resName = character(), sample_name = character()))
+})
+
 test_that("getWindowNames() still labels qseaSet, GRanges and data.frame", {
     gr <- GenomicRanges::GRanges(c("chr1", "chr2"),
         IRanges::IRanges(c(10, 20), c(15, 30)))
@@ -209,6 +246,10 @@ test_that("getPCA() accessors agree with the PCA it ran", {
         c(10L, 100L))
     expect_identical(rownames(getCoordinates(pca)[[1]]),
         getSampleNames(pca))
+
+    df <- as.data.frame(pca)
+    expect_identical(nrow(df), 2L * length(getSampleNames(pca)))
+    expect_true(all(colnames(getSampleTable(pca)) %in% colnames(df)))
 })
 
 test_that("getPCA() and getUMAP() output passes validObject()", {

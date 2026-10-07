@@ -45,7 +45,9 @@ methods::setOldClass("prcomp")
 #' * [getParameters()]: the parameters (`params`);
 #' * [getDimRedData()]: the data used to compute the results (`dataTable`);
 #' * [getCoordinates()] and [getWindowNames()]: per-result coordinates and
-#'   window IDs, as named lists.
+#'   window IDs, as named lists;
+#' * [as.data.frame()][dimRedAccessors]: the coordinates of every result in
+#'   one long table, with the sample annotations.
 #'
 #' @slot res `list`
 #'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
@@ -399,6 +401,10 @@ setValidity("mesaUMAP", function(object) {
 #' @param object A [mesaDimRed-class] object, or a [mesaPCA-class] or
 #'   [mesaUMAP-class] object where stated.
 #'
+#' @param x A [mesaDimRed-class] object.
+#'
+#' @param row.names,optional Not used.
+#'
 #' @param ... Not used.
 #'
 #' @return
@@ -420,6 +426,11 @@ setValidity("mesaUMAP", function(object) {
 #'   is a `data.frame` with one row per sample and sample IDs as row names.
 #'   For a [mesaDimRed-class], a named list of these, one per result.
 #' * `getPrcomp()`: the [stats::prcomp()] fit of a [mesaPCA-class].
+#' * `as.data.frame()`: one `data.frame` with a row per result and sample:
+#'   `resName` (the result's name, as in `getResults()`), `sample_name`, the
+#'   coordinate columns (`PC1`, `PC2`, ... or `UMAP1`, `UMAP2`), then the
+#'   `sampleTable` columns. With `useGroupMeans = TRUE` the ID column is
+#'   `group` and no sample annotations are added.
 #'
 #' @seealso [getWindowNames()] for the window IDs of each result,
 #'   [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class], [getPCA()],
@@ -441,6 +452,9 @@ setValidity("mesaUMAP", function(object) {
 #'
 #' # Coordinates of every result at once
 #' lapply(getCoordinates(pca), dim)
+#'
+#' # Everything in one table, e.g. for a custom plot
+#' head(as.data.frame(pca)[, 1:6])
 #'
 #' @name dimRedAccessors
 NULL
@@ -500,6 +514,28 @@ setGeneric("getPrcomp", function(object, ...) {
 #' @rdname dimRedAccessors
 #' @export
 setMethod("getPrcomp", "mesaPCA", function(object) object@prcomp)
+
+#' @rdname dimRedAccessors
+#' @importFrom BiocGenerics as.data.frame
+#' @export
+setMethod("as.data.frame", "mesaDimRed",
+    function(x, row.names = NULL, optional = FALSE, ...) {
+        byGroup <- isTRUE(getParameters(x)$useGroupMeans)
+        idCol <- if (byGroup) "group" else "sample_name"
+        if (length(getResults(x)) == 0) {
+            out <- data.frame(resName = character(), id = character())
+            return(rlang::set_names(out, c("resName", idCol)))
+        }
+
+        out <- getCoordinates(x) %>%
+            lapply(tibble::rownames_to_column, var = idCol) %>%
+            dplyr::bind_rows(.id = "resName")
+        if (!byGroup) {
+            out <- dplyr::left_join(out, getSampleTable(x), by = idCol)
+        }
+        as.data.frame(out)
+    }
+)
 
 
 

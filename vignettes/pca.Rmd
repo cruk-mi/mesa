@@ -320,6 +320,16 @@ pc <- getPrcomp(getResults(pca)$pca1)
 round(pc$sdev^2 / sum(pc$sdev^2), 3)[1:5]
 ```
 
+For a custom plot, `as.data.frame()` gives the coordinates of every result in
+one long table, with a `resName` column naming the result and the
+`sampleTable` columns alongside:
+
+```{r dimred-data-frame}
+pcaTable <- as.data.frame(pca)
+ggplot(pcaTable, aes(x = PC1, y = PC2, colour = group)) +
+    geom_point()
+```
+
 ## `getPCA()` function arguments
 
 By default, the `getPCA` function will only consider a subset of the most
