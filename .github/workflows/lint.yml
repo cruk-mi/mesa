@@ -1,0 +1,94 @@
+## Fast style gate for mesa.
+##
+## This workflow deliberately does NOT use the Bioconductor container and does
+## NOT install mesa's dependencies: lintr parses source, it never loads the
+## package. That keeps the whole thing under a minute, so a style slip or a
+## workflow typo surfaces immediately instead of at minute 27 of
+## R-CMD-check-bioc, where BiocCheck reports the same class of problem.
+##
+## Scope and rationale for the linter selection live in .lintr.R.
+
+name: lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lintr:
+    name: lintr (R/)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      ## Installed directly rather than via setup-r-dependencies, which would
+      ## resolve DESCRIPTION and pull in the whole Bioconductor tree.
+      - name: Install lintr
+        run: install.packages("lintr")
+        shell: Rscript {0}
+
+      - name: Lint
+        run: |
+          lints <- lintr::lint_package()
+          print(lints)
+          if (length(lints) > 0L) {
+            stop(sprintf("%d lint(s) found; see .lintr.R for the rules.",
+                         length(lints)))
+          }
+        shell: Rscript {0}
+
+  actionlint:
+    name: actionlint (workflows)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run actionlint
+        env:
+          ACTIONLINT_VERSION: 1.7.7
+        run: |
+          set -euo pipefail
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          tar xzf actionlint.tar.gz actionlint
+          ./actionlint -color
+
+  spelling:
+    name: spelling (docs)
+    runs-on: ubuntu-latest
+    ## inst/WORDLIST holds the genomics vocabulary and mesa function names
+    ## (224 entries). It deliberately does NOT hold real misspellings -- the
+    ## six this check first surfaced were fixed rather than whitelisted.
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install spelling
+        run: install.packages("spelling")
+        shell: Rscript {0}
+
+      - name: Spell check
+        run: |
+          results <- spelling::spell_check_package(".")
+          if (nrow(results) > 0L) {
+            print(results)
+            stop(sprintf("%d misspelled word(s); add real words to inst/WORDLIST.",
+                         nrow(results)))
+          }
+        shell: Rscript {0}
