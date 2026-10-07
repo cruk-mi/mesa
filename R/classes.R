@@ -10,17 +10,6 @@ methods::setOldClass("prcomp")
     }
 }
 
-# Joins the sample annotations onto per-sample coordinates (a `sample_name`
-# column). Matches on the sampleTable row names, the sample IDs the class
-# checks, so a missing or stale `sample_name` column doesn't matter. Columns
-# named like a coordinate get a `.sampleTable` suffix.
-.joinSampleTable <- function(coords, sampleTable) {
-    annot <- sampleTable[setdiff(colnames(sampleTable), "sample_name")]
-    annot <- tibble::rownames_to_column(annot, "sample_name")
-    dplyr::left_join(coords, annot, by = "sample_name",
-        suffix = c("", ".sampleTable"))
-}
-
 # Shared `windows` rules for mesaPCA and mesaUMAP; a message, or NULL if valid.
 .checkWindows <- function(windows) {
     if (length(windows) == 0) return("`windows` must not be empty")
@@ -541,7 +530,11 @@ setMethod("as.data.frame", "mesaDimRed",
         out <- getCoordinates(x) %>%
             lapply(tibble::rownames_to_column, var = idCol) %>%
             dplyr::bind_rows(.id = "resName")
-        if (!byGroup) out <- .joinSampleTable(out, getSampleTable(x))
+        if (!byGroup) {
+            # Coordinate columns keep their names if sampleTable reuses one.
+            out <- dplyr::left_join(out, getSampleTable(x), by = idCol,
+                suffix = c("", ".sampleTable"))
+        }
         as.data.frame(out)
     }
 )

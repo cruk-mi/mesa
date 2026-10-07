@@ -224,32 +224,6 @@ test_that("as.data.frame() keeps coordinate names on a sampleTable clash", {
     expect_identical(df$resName.sampleTable, rep("x", 5))
 })
 
-test_that("as.data.frame() and plotPCA() match samples on row names", {
-    # Valid without a sample_name column: the IDs are the row names.
-    st <- makeSampleTable()
-    st$sample_name <- NULL
-    md <- mesaDimRed(res = list(pca1 = validPCA()), sampleTable = st,
-        params = list(method = "PCA"))
-    df <- as.data.frame(md)
-    expect_identical(df$sample_name, paste0("S", 1:5))
-    expect_identical(df$group, st$group)
-
-    # A sample_name column that disagrees with the row names is ignored.
-    st$sample_name <- paste0("old", 1:5)
-    md <- mesaDimRed(res = list(pca1 = validPCA()), sampleTable = st,
-        params = list(method = "PCA"))
-    expect_identical(as.data.frame(md)$group, st$group)
-
-    # plotPCA() on a getPCA() result rebuilt without the column.
-    pca <- getPCA(exampleTumourNormal, verbose = FALSE)
-    noName <- getSampleTable(pca)
-    noName$sample_name <- NULL
-    rebuilt <- mesaDimRed(res = getResults(pca), sampleTable = noName,
-        params = getParameters(pca))
-    plots <- plotPCA(rebuilt, colour = "type")
-    expect_no_error(ggplot2::ggplot_build(plots[[1]][[1]][[1]]))
-})
-
 test_that("as.data.frame() handles group means and empty containers", {
     groups <- mesaUMAP(makePoints(c("A", "B")), "W1")
     grouped <- mesaDimRed(res = list(umap1 = groups),
