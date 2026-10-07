@@ -1687,12 +1687,15 @@ plotDimRed <- function(object,
         components <- list(components)
     }
 
-    if (params$method == "PCA") {
+    if (identical(params$method, "PCA")) {
         columnPrefix <- "PC"
-    } else if (params$method == "UMAP") {
+    } else if (identical(params$method, "UMAP")) {
         columnPrefix <- "UMAP"
     } else {
-        stop("Method {params$method} not known")
+        stop(glue::glue(
+            "`params$method` must be \"PCA\" or \"UMAP\",",
+            " not {deparse(params$method)}."
+        ))
     }
 
     if (length(plotlyAnnotations) > 1) {

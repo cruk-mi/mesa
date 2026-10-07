@@ -239,6 +239,13 @@ test_that("as.data.frame() handles group means and empty containers", {
         data.frame(resName = character(), sample_name = character()))
 })
 
+test_that("plotPCA() explains a missing or unknown params$method", {
+    noMethod <- mesaDimRed(res = list(pca1 = validPCA()),
+        sampleTable = makeSampleTable(), params = list())
+    expect_error(plotPCA(noMethod),
+        "`params\\$method` must be \"PCA\" or \"UMAP\", not NULL")
+})
+
 test_that("getWindowNames() still labels qseaSet, GRanges and data.frame", {
     gr <- GenomicRanges::GRanges(c("chr1", "chr2"),
         IRanges::IRanges(c(10, 20), c(15, 30)))
