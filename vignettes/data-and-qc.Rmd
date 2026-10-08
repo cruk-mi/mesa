@@ -99,7 +99,7 @@ files themselves (although a raised CG content should obviously be expected
 following enrichment), there are several methylation-specific steps to consider.
 
 ## Relative Enrichment 
-The first metric that we use is a relative enrichment metric, known as `relH`.
+The first metric used for QC is a relative enrichment metric, known as `relH`.
 This was first introduced in the `MEDIPS` package, via the `MEDIPS.CpGenrich()`
 function, and is a metric to express the proportion of CG dinucleotides,
 compared to the reference genome. The relative enrichment `relH` is calculated
@@ -117,9 +117,10 @@ This is therefore a measure of how many more CGs are present in the fragments
 covered within the bam file, compared to the reference genome.
 
 Within `mesa`, this metric is calculated through `makeQset`, as part of the
-information added to the `libraries` table on the `qseaSet`. For the MBD-seq
-data that we have studied, we typically use a minimum `relH` of 2.5, with 3 as
-a stricter cutoff. This value is typically around 4-5 in many of our studies.
+information added to the `libraries` table on the `qseaSet`. As a rough guideline, 
+for the T7-MBD-seq data studied by the package authors, `relH` values of 4-5 were 
+typical, with a minimum of 2.5-3 regarded as acceptable. Typical values may depend 
+on enrichment method and sample type.
 
 We can use the `addLibraryInformation` function to add the information in the
 `libraries` table directly onto the `sampleTable`:
@@ -143,14 +144,16 @@ exampleTumourNormal %>%
     dplyr::select(sample_name, input_relH)
 ```
 
-We typically see values of `input_relH` between 1.3 and 1.6, suggesting that
-there are more CGs seen in the sequenced fragments than would be expected from
-the genomic sequence. This is possibly due to the evolutionary suppression of
-`CG` dinucleotides outside of specific contexts, meaning they are less common in
-those areas of the genome that are repetitive and hence less easy to map. This
-is likely to depend on the particular sequencing methods and the sample
-type under consideration. We therefore need to see an increase between the
-enriched and non-enriched data:
+Values of `input_relH` between 1.3 and 1.6 were observed in non-enriched data 
+studied by the package authors. These values above 1 indicate that more CGs are
+seen in the sequenced fragments than would be expected from the genomic sequence. 
+This is possibly due to the evolutionary suppression of `CG` dinucleotides 
+outside of specific contexts, meaning they are less common in those areas of the
+genome that are repetitive and hence less easy to map. This is likely to depend
+on the particular sequencing methods and the sample type under consideration. 
+
+We expect to see an increase in the enrichment metric between the enriched and 
+non-enriched data:
 
 ```{r chunk-7}
 exampleTumourNormal %>% 
@@ -178,40 +181,48 @@ The `libraries` table also records how many fragments do not contain a CG at
 all. This can be a measure of background noise.
 
 ## Hyper-stably methylated regions
-The other metric that we typically use for quality control is to consider
-windows that are known to be commonly methylated across a range of tissues and
-diseases. For instance, for the human genome, [Edgar et al.
-(2014)](https://doi.org/10.1186/1756-8935-7-28) identified probes from the
-Illumina 450k methylation array that were consistently methylated in over 1000
-samples. We therefore take the windows covered by these probes, calculate
-beta values for them, and then determine how many of these windows have a
-calculated beta value above a threshold (e.g. 0.8). As noted above, beta values
-will not be calculated if a sample does not have sufficient coverage and/or
-enrichment, meaning this metric incorporates both the coverage depth as well as
-how well the enrichment has worked. For our samples within the National
-Biomarker Centre, we typically look for at least 40% of the hyper-stable
-windows with a `CpG_density` above 5 to have a beta value above 0.8. Samples
-with lower enrichment scores (as described by the `relH` score) require a
-greater coverage depth to reach this threshold.
+Another metric used for quality control is based on windows that are known to be
+commonly methylated across a range of tissues anddiseases. For instance, for the 
+human genome, [Edgar et al.(2014)](https://doi.org/10.1186/1756-8935-7-28) 
+identified probes from the Illumina 450k methylation array that were consistently
+methylated in over 1700 samples. We take windows covered by these probes, 
+calculate beta values for them, and then determine the proportion of these 
+windows that have a beta value above a threshold of 0.8; we call this metric 
+`hyperStableEdgar`. Samples with lower enrichment scores (`relH`) require a
+greater coverage depth for beta values to reach a given threshold. The metric 
+therefore incorporates both the coverage depth and how well the enrichment has 
+worked. 
+
+As noted above, windows with low `CpG_density` are more likely to have an NA 
+beta value. To avoid considering windows that typically have a missing beta value
+across most samples, the calculation of `hyperStableEdgar` is restricted to 
+windows that have a `CpG_density` of at least 5. Samples with insufficient 
+coverage and/or enrichment will still have missing beta values for some windows 
+with `CpG_density` above this minimum value. These missing beta values are 
+treated as zero when calculating `hyperStableEdgar`. 
 
 For hg38, these hyper-stable methylated probes are provided in a data object,
-`hg38UltraStableProbes`, and the function `addHyperStableFraction` calculates
-this fraction and adds it as a column, `hyperStableEdgar`, to the sampleTable
-for filtering. Note that this will not work with the provided example data, as
-there is no overlap with the windows in the example dataset (i.e.
+`hg38UltraStableProbes`, and the function `addHyperStableFraction` calculates the
+`hyperStableEdgar` metric and adds it as a column to the sampleTable. Note that 
+the function will not work with the provided example data, as there is no 
+overlap of the probes with the windows in the example dataset (i.e.
 `filterByOverlaps(exampleTumourNormal, hg38UltraStableProbes)` has no windows).
 
-## Summary
-We find that these three metrics, `valid_fragments`, `relH` and
-`hyperStableEdgar` are the most useful for quality control. As a rough guide,
-for 300bp windows on the human genome with T7-MBD-seq, we typically look for a
-`relH` of at least 2.5, a `hyperStableEdgar` value of at least 0.4 (40%) and
-around 3,000,000 `valid_fragments`, although most samples that pass the first
-two will reach this anyway. We apply these as guidelines rather than strict
-cutoffs, and suitable values will depend on the enrichment protocol (MBD-seq or
-MeDIP-seq), the sample type and the sequencing depth, so we recommend choosing
-thresholds from the distribution of these metrics in your own data.
+As a rough guideline, for the T7-MBD-seq data studied by the package authors, a 
+`hyperStableEdgar` value of at least 0.4 was considered acceptable. Again, 
+suitable values may depend on enrichment method and sample type.
 
+## Summary
+Based on the package authors' experience, the three metrics `valid_fragments`, 
+`relH` and `hyperStableEdgar` are the most useful for quality control. As a 
+rough guide, for 300bp windows on the human genome with T7-MBD-seq data, a
+`relH` of at least 2.5-3, a `hyperStableEdgar` value of at least 0.4 (40%) and
+around 3,000,000 `valid_fragments` were considered acceptable. Most samples that 
+passed the first two metrics also met the `valid_fragments` threshold. These 
+values are provided as guidelines rather than strict thresholds; suitable values 
+will depend on the enrichment protocol (MBD-seq or MeDIP-seq), the sample type 
+and the sequencing depth, so we recommend choosing thresholds from the 
+distribution of these metrics in your own data.
 
 ## Session info
 ```{r session-info, echo=FALSE}
