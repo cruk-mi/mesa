@@ -89,9 +89,11 @@
 </div>
 <div class="section level2">
 <h2 id="code-style">Code style<a class="anchor" aria-label="anchor" href="#code-style"></a></h2>
-<ul><li>4-space indent, no tabs. At most 80 characters per line of R, 100 per line of roxygen.</li>
+<ul><li>4-space indent, no tabs. At most 80 characters per line, roxygen included.</li>
 <li>
-<code>&lt;-</code> for assignment. <code>TRUE</code>/<code>FALSE</code>, never <code>T</code>/<code>F</code>. <code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len()</a></code>/<code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along()</a></code>, never <code>1:n</code>.</li>
+<code>&lt;-</code> for assignment. <code>TRUE</code>/<code>FALSE</code>, never <code>T</code>/<code>F</code>. <code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len()</a></code>/<code><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along()</a></code>, never <code>1:n</code>. <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>, never <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply()</a></code>. camelCase names (no underscores).</li>
+<li>
+<a href=".lintr"><code>.lintr</code></a> is the source of truth for these rules. <code>BiocCheck</code> in CI is the final check.</li>
 <li>No <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>/<code><a href="https://rdrr.io/r/base/library.html" class="external-link">require()</a></code> in <code>R/</code>: declare the package in <code>DESCRIPTION</code> and call <code>pkg::fn()</code>. No <code>:::</code> into other packages. Never install packages from package code.</li>
 <li>Prefer Bioconductor classes (<code>GRanges</code>, <code>DataFrame</code>) and vectorised code. Keep functions short.</li>
 <li>

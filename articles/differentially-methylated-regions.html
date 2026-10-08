@@ -124,15 +124,15 @@ Annotation</h1>
 <div class="section level3">
 <h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h3>
-<p>One very important question in analysis of ME-Seq is the calculation
-of differentially methylated regions. This is the statistical
-determination of whether there is a change in the amount of methylation
-between certain conditions. It should be noted that technically these
-are differentially methylated windows, but we use the more common term
-here.</p>
+<p>One very important step in the analysis of ME-seq data is the
+calculation of differentially methylated regions (DMRs). This is the
+statistical determination of whether there is a change in the amount of
+methylation between certain conditions. It should be noted that
+technically these are differentially methylated windows, but we use the
+more common term here.</p>
 <p>This is a computationally expensive process, so we recommend using
-paralellisation where possible, as detailed at the end of the
-introduction: <code><a href="../articles/introduction.html">vignette("introduction")</a></code>. Here we enable the
+parallelisation where possible, as detailed at the end of the
+introduction: <code><a href="../articles/introduction.html">vignette("introduction")</a></code>. Here we enable
 global parallelisation, with two cores:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/setMesaParallel.html">setMesaParallel</a></span><span class="op">(</span>nCores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -140,15 +140,15 @@ global parallelisation, with two cores:</p>
 <span><span class="co">#&gt; Control the number of cores by calling BiocParallel::register.</span></span></code></pre></div>
 <p>To calculate DMRs, <code>mesa</code> wraps several functions from
 <code>qsea</code> into a single function, called
-<code>calculateDMRs</code>. The mandatory arguments for this are which
-<code>variable</code> to make comparisons on (as a string), and what
+<code>calculateDMRs</code>. The mandatory arguments for this are the
+<code>variable</code> to make comparisons on (as a string), and the
 <code>contrasts</code> (comparisons) to perform.</p>
 <p>For instance, taking the <code>exampleTumourNormal</code> data, we
 can ask which windows are differentially methylated between the
 different states of the <code>tumour</code> column in the sampleTable.
-Here you can see that this contains two options, “Tumour” and “Normal” -
-here the “Normal” samples represent adjacent non-cancerous tissue from
-the same patients.</p>
+Here you can see that this contains two values, “Tumour” and “Normal”;
+the “Normal” samples represent adjacent non-cancerous tissue from the
+same patients.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -165,11 +165,10 @@ the same patients.</p>
 <span><span class="co">#&gt; Lung3_N      Lung3_N Normal</span></span>
 <span><span class="co">#&gt; Lung3_T      Lung3_T Tumour</span></span></code></pre></div>
 <p>We therefore set <code>variable = "tumour"</code>, to select this
-column. There are several options we can pass to the
-<code>contrasts</code> option (i.e. the comparisons), in order to
-specify exactly which comparisons we want to calculate.</p>
-<p>The <code>contrasts</code> option can be a few string settings, such
-as <code>"all"</code> or <code>"first"</code>:</p>
+column. There are several ways to set the <code>contrasts</code>
+argument, to specify exactly which comparisons we want to calculate.</p>
+<p>The <code>contrasts</code> argument can be one of a few fixed
+strings, such as <code>"all"</code> or <code>"first"</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>,</span>
@@ -230,7 +229,7 @@ i.e.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: Tumour_vs_Normal_adjPval &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Tumour_vs_Normal_deltaBeta &lt;dbl&gt;, Normal_beta_means &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Tumour_beta_means &lt;dbl&gt;, Normal_nrpm_means &lt;dbl&gt;, Tumour_nrpm_means &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>Or we can provide a dataframe containing the contrasts that we wish
+<p>Or we can provide a data frame containing the contrasts that we wish
 to perform (in columns <code>group1</code> and <code>group2</code>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DMRs</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
@@ -243,10 +242,11 @@ to perform (in columns <code>group1</code> and <code>group2</code>):</p>
 <span><span class="co">#&gt; selecting regions from contrast Tumour_vs_Normal</span></span>
 <span><span class="co">#&gt; selected 23/309 windows</span></span>
 <span><span class="co">#&gt; adding test results from Tumour_vs_Normal</span></span></code></pre></div>
-<p>One final option is that we can use a string such as “all_vs_X” or
-“X_vs_all” to create all contrasts against a specific value of the
-variable, for instance this will generate contrasts of the other values
-of <code>type</code> compared with <code>type = NormalLung</code>:</p>
+<p>Finally, we can use a string such as <code>"all_vs_X"</code> or
+<code>"X_vs_all"</code> to create all contrasts against a specific value
+of the variable; for instance, this will generate contrasts of the other
+values of <code>type</code> compared with
+<code>type = NormalLung</code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"type"</span>,</span>
@@ -295,19 +295,19 @@ of <code>type</code> compared with <code>type = NormalLung</code>:</p>
 <div class="section level3">
 <h3 id="output">Output<a class="anchor" aria-label="anchor" href="#output"></a>
 </h3>
-<p>The output of <code>calculateDMRs</code> is a dataframe, where each
+<p>The output of <code>calculateDMRs</code> is a data frame, where each
 row corresponds to a window which was considered to be differentially
 methylated at the False Discovery Rate (FDR) threshold applied to the
 adjusted p-values. The first four columns include the window
 information: <code>seqnames</code> (chromosome), <code>start</code> and
 <code>end</code> of the window and the <code>CpG_density</code>. The
-next columns are related to the contrasts undertaken, giving the log2
-fold change, <code>Tumour_vs_Normal_log2FC</code>, the adjusted p-value,
+next columns relate to the contrasts undertaken, giving the log2 fold
+change, <code>Tumour_vs_Normal_log2FC</code>, the adjusted p-value,
 <code>Tumour_vs_Normal_adjPval</code>, and the difference in average
 beta values for the samples with each different type,
 <code>Tumour_vs_Normal_deltaBeta</code>. These additional columns are
 repeated if multiple contrasts are calculated in one call to
-<code>calculateDMRs</code>. Following these contrast specific columns
+<code>calculateDMRs</code>. Following these contrast-specific columns
 there is a block of columns that includes the average beta and nrpm
 values for the values of the variable under consideration, e.g.
 <code>Tumour_nrpm_means</code>.</p>
@@ -332,9 +332,9 @@ values for the values of the variable under consideration, e.g.
 <p>We can also get the individual data values for each differentially
 methylated window, by setting <code>keepData = TRUE</code> inside
 <code>calculateDMRs</code>, but this is often unnecessary (and makes
-massive objects when there are a lot of contrasts), so is switched off
-by default. Additionally, you can return the average values in the group
-variable of the qseaSet by setting setting
+massive objects when there are a lot of contrasts), so it is switched
+off by default. Additionally, you can return the average values for each
+level of the <code>group</code> column of the qseaSet by setting
 <code>keepGroupMeans = TRUE</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
@@ -378,9 +378,8 @@ with more power in situations where there is a connection between the
 samples across the contrast. For instance, as the samples in this
 example dataset come from two types of tissue (Lung and Colon), we can
 incorporate this information into our comparison. This will enable the
-identification of regions which have their methylation levels increasing
-in cancer in both tissue types, but starting at a higher level in the
-e.g. colon.</p>
+identification of regions whose methylation levels increase in cancer in
+both tissue types, but start at a higher level in, e.g., the colon.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DMRsCovariateTissue</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>,</span>
@@ -413,22 +412,22 @@ e.g. colon.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: Tumour_vs_Normal_adjPval &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Tumour_vs_Normal_deltaBeta &lt;dbl&gt;, Normal_beta_means &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Tumour_beta_means &lt;dbl&gt;, Normal_nrpm_means &lt;dbl&gt;, Tumour_nrpm_means &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>We can see that having included the tissue covariate we now have
-<code>r</code>DMRsCovariateTissue |&gt; nrow()` DMRs, rather than the 23
-we had before. This is because we are now looking at which regions have
-changed, taking into account that some samples are from the lung and
-some are from the colon. We can go further, and incorporate the
-individual patient levels, as for each patient the baseline value in
-each window might be different (more than just the tissue type). This
-will for instance highlight windows that were initially high in one
-patient but are now even higher in their cancer. This is directly
-analogous to using a paired t-test for multiple samples taken from the
-same individual, and increases statistical power.</p>
+<p>We can see that having included the tissue covariate we now have 29
+DMRs, rather than the 23 we had before. This is because we are now
+looking at which regions have changed, taking into account that some
+samples are from the lung and some are from the colon. We can go
+further, and incorporate the individual patient levels, as for each
+patient the baseline value in each window might be different (more than
+just the tissue type). This will for instance highlight windows that
+were initially high in one patient but are now even higher in their
+cancer. This is directly analogous to using a paired t-test for multiple
+samples taken from the same individual, and increases statistical
+power.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DMRsCovariatePatient</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>,</span>
 <span>                covariates <span class="op">=</span> <span class="st">"patient"</span>, </span>
-<span>                contrasts <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>sample1 <span class="op">=</span> <span class="st">"Tumour"</span>, sample2 <span class="op">=</span> <span class="st">"Normal"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>                contrasts <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>group1 <span class="op">=</span> <span class="st">"Tumour"</span>, group2 <span class="op">=</span> <span class="st">"Normal"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of nrpm values for 819 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; Fitting initial GLM on 309 windows, using 2 cores</span></span>
@@ -456,10 +455,10 @@ same individual, and increases statistical power.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: Tumour_vs_Normal_adjPval &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Tumour_vs_Normal_deltaBeta &lt;dbl&gt;, Normal_beta_means &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Tumour_beta_means &lt;dbl&gt;, Normal_nrpm_means &lt;dbl&gt;, Tumour_nrpm_means &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>Having done this there are now 32 DMRs instead of the 29 we had with
+<p>Having done this there are now 32 DMRs instead of the 29 we had when
 incorporating the tissue effect.</p>
-<p>Note that if you try to specify covariates which are entirely
-correlated with the variable, then you will get an error:</p>
+<p>Note that if you specify covariates which are entirely confounded
+with the variable, then you will get an error:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># There are no levels of `type` in common between the levels of `tumour`:</span></span>
 <span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">tumour</span>,<span class="va">type</span><span class="op">)</span></span>
@@ -474,12 +473,12 @@ correlated with the variable, then you will get an error:</p>
 <h3 id="additional-options">Additional Options<a class="anchor" aria-label="anchor" href="#additional-options"></a>
 </h3>
 <p>For finer control of the calculation, you can specify the false
-discovery rate (FDR) that is being applied, using <code>FDRthres</code>.
-The default is rather lenient at 0.05, and will often return many
-windows that are only marginally differentially methylated. We can also
-return all windows without applying a threshold by setting
-<code>FDRthres = 1</code>. This can be useful, for instance when
-plotting a volcano plot:</p>
+discovery rate (FDR) threshold that is applied, using
+<code>FDRthres</code>. The default is rather lenient at 0.05, and will
+often return many windows that are only marginally differentially
+methylated. We can also return all windows without applying a threshold
+by setting <code>FDRthres = 1</code>. This can be useful, for instance
+when plotting a volcano plot:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allWindows</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>,</span>
@@ -499,7 +498,7 @@ plotting a volcano plot:</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>            x <span class="op">=</span> <span class="va">Tumour_vs_Normal_log2FC</span>,</span>
-<span>            y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>,</span>
+<span>            y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>,</span>
 <span>            col <span class="op">=</span> <span class="va">significant</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
@@ -507,10 +506,10 @@ plotting a volcano plot:</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Log2 Fold Change"</span>,</span>
 <span>        y <span class="op">=</span> <span class="st">"-Log10 Adjusted P Value"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/additional-options-1.png" class="r-plt" alt="" width="672"></p>
-<p>We can also use the
+<p><img src="differentially-methylated-regions_files/figure-html/additional-options-1.png" class="r-plt" alt="" width="100%"></p>
+<p>We can also use
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>β</mi></mrow><annotation encoding="application/x-tex">\Delta \beta</annotation></semantics></math>,
-the difference between the average beta values between the two sets of
+the difference between the average beta values of the two sets of
 samples. This can be a more useful metric, as it characterises windows
 that have clearly changed in levels of methylation.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -519,7 +518,7 @@ that have clearly changed in levels of methylation.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>            x <span class="op">=</span> <span class="va">Tumour_vs_Normal_deltaBeta</span>,</span>
-<span>            y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>,</span>
+<span>            y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span><span class="op">)</span>,</span>
 <span>            col <span class="op">=</span> <span class="va">significant</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
@@ -527,7 +526,7 @@ that have clearly changed in levels of methylation.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Difference in average Beta Values"</span>,</span>
 <span>        y <span class="op">=</span> <span class="st">"-Log10 Adjusted P Value"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-10-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
 <p>These two metrics are correlated, but do sometimes differ,
 particularly in regions that have beta values close to 1 in one or both
 samples. This is not particularly noticeable in this small subset of the
@@ -539,20 +538,21 @@ data though.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Log2 Fold Change"</span>,</span>
 <span>        y <span class="op">=</span> <span class="st">"Difference in average Beta Values"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-11-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-11-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="annotation">Annotation<a class="anchor" aria-label="anchor" href="#annotation"></a>
 </h2>
-<p>We can then annotate these regions (or any other set of regions), by
-using the function <code>annotateWindows</code>, annotating each window
-with its nearest gene, and returning information about this gene. The
-result is a data frame with all the previous columns, augmented with
+<p>We can then annotate these regions (or any other set of regions) by
+using the function <code>annotateWindows</code>, which annotates each
+window with its nearest gene, and returns information about this gene.
+The result is a data frame with all the previous columns, augmented with
 some columns generated by the <code>ChIPseeker</code> package and some
-custom columns. This requires specifying what genome annotation to use,
-one way of which is to use the default hg38 annotation by specifying
-<code>genome = "hg38"</code> (or the equivalent “GRCh38”):</p>
+custom columns. This requires specifying which genome annotation to use;
+one way is to use the default hg38 annotation by specifying
+<code>genome = "hg38"</code> (or the equivalent
+<code>"GRCh38"</code>):</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">&lt;-</span> <span class="va">DMRsCovariatePatient</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/annotateWindows.html">annotateWindows</a></span><span class="op">(</span>genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
@@ -644,7 +644,7 @@ one way of which is to use the default hg38 annotation by specifying
 associated with that gene, and a (somewhat confusingly named)
 <code>GENENAME</code> column with a long-form expansion of that name.
 The <code>distanceToTSS</code> column gives how far the query window is
-away from the Transcriptional Start Site of the gene. It is worth noting
+from the transcription start site (TSS) of the gene. It is worth noting
 this can be positive or negative, depending on which strand the gene is
 on, and that some genes are very large.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -668,8 +668,8 @@ on, and that some genes are very large.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more rows</span></span></span></code></pre></div>
 <p>The <code>annotation</code> column gives a long-form explanation of
 the annotation for that window, including which exon of which transcript
-is assigned, while <code>shortAnno</code> abbreviates this just
-e.g. Intron/Exon/Promoter.</p>
+is assigned, while <code>shortAnno</code> abbreviates this to, e.g.,
+Intron/Exon/Promoter.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">start</span>, <span class="va">SYMBOL</span>, <span class="va">shortAnno</span>, <span class="va">annotation</span><span class="op">)</span></span>
@@ -688,7 +688,7 @@ e.g. Intron/Exon/Promoter.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 27<span style="text-decoration: underline;">124</span>201 HOXA-AS2 Exon              Exon (ENST00000517550.1/285943, exon 3 o…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more rows</span></span></span></code></pre></div>
 <p>Details of the full location of the gene are provided, including how
-long the gene is, and which transcript is being used in the
+long the gene is and which transcript is being used in the
 annotations.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
@@ -711,12 +711,12 @@ annotations.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>       7  27<span style="text-decoration: underline;">121</span>917 27<span style="text-decoration: underline;">128</span>760       <span style="text-decoration: underline;">6</span>844          1 285943    ENST00000517550.1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more rows</span></span></span></code></pre></div>
 <p>Finally, for hg38, the function also returns several columns
-regarding whether the region lies within a CpG “island” (characterised
+indicating whether the region lies within a CpG “island” (characterised
 regions of the genome with high numbers of CGs), as well as the “shores”
 that are 2000bp each side of the “island”, and “shelves” (a further
 2000bp around these). It is possible for a region to be in multiple
 islands/shores/shelves simultaneously, so these columns give how many of
-these that they overlap.</p>
+each the region overlaps.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
@@ -748,8 +748,8 @@ so the annotation may not be 100% reliable.</p>
 </h3>
 <p>The underlying function being used here is <code>annotatePeak</code>
 from the <code>ChIPseeker</code> package. This requires two databases, a
-<code>TxDb</code> and an <code>annoDb</code> datbase. These may be given
-explicitly using the arguments to <code>annotateWindows</code>, as for
+<code>TxDb</code> and an <code>annoDb</code> database. These may be
+given explicitly as arguments to <code>annotateWindows</code>, for
 instance for this example mouse dataset:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleMouse</span> <span class="op">|&gt;</span></span>
@@ -817,9 +817,8 @@ appropriately:</p>
 <div class="section level2">
 <h2 id="analysing-dmrs">Analysing DMRs<a class="anchor" aria-label="anchor" href="#analysing-dmrs"></a>
 </h2>
-<p>There are also a set of functions to manipulate the output of the
-DMRs. First, we will calculate a set of DMRs with the output from 10
-contrasts.</p>
+<p>There is also a set of functions to manipulate the DMR output. First,
+we will calculate a set of DMRs with the output from 10 contrasts.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"type"</span>,</span>
@@ -871,8 +870,8 @@ contrasts.</p>
 <p>This is a very wide data frame, with three columns corresponding to
 each contrast. Note that each row represents a genomic window, but it
 may be differentially methylated in only a subset of the contrasts.</p>
-<p>We therefore provide a function to pivot this wider (analogous to
-[dplyr::pivot_longer()]):</p>
+<p>We therefore provide a function to pivot this longer (analogous to
+<code><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">tidyr::pivot_longer()</a></code>):</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/pivotDMRsLonger.html">pivotDMRsLonger</a></span><span class="op">(</span><span class="op">)</span> </span>
@@ -894,14 +893,15 @@ may be differentially methylated in only a subset of the contrasts.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   LUSC_beta_means &lt;dbl&gt;, NormalColon_nrpm_means &lt;dbl&gt;, CRC_nrpm_means &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   NormalLung_nrpm_means &lt;dbl&gt;, LUAD_nrpm_means &lt;dbl&gt;, LUSC_nrpm_means &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   group1 &lt;chr&gt;, group2 &lt;chr&gt;, log2FC &lt;dbl&gt;, adjPval &lt;dbl&gt;, deltaBeta &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>Now there five new columns here, <code>group1</code>,
+<p>There are now five new columns, <code>group1</code>,
 <code>group2</code>, <code>log2FC</code>, <code>adjPval</code> and
-<code>deltaBeta</code>. This is now a tidy dataframe in long format,
-suitable for many downstream processing tasks [vignette(“tidy-data”,
-package = “tidyr”)]. Windows which are not differentially methylated (by
-the adjusted P value) will be dropped; this can be controlled by setting
-the value of <code>FDRthres</code>.</p>
-<p><code><a href="../reference/pivotDMRsLonger.html">pivotDMRsLonger()</a></code> also has the useful option to swap the
+<code>deltaBeta</code>. This is a tidy data frame in long format,
+suitable for many downstream processing tasks (see
+<code><a href="https://tidyr.tidyverse.org/articles/tidy-data.html" class="external-link">vignette("tidy-data", package = "tidyr")</a></code>). Windows which
+are not differentially methylated (by the adjusted p-value) will be
+dropped; this can be controlled by setting the value of
+<code>FDRthres</code>.</p>
+<p><code><a href="../reference/pivotDMRsLonger.html">pivotDMRsLonger()</a></code> also has a useful option to swap the
 contrast groups over if a region is hypomethylated in the
 comparison:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
@@ -943,8 +943,8 @@ within each comparison:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> LUSC        NormalColon    31     7</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> LUSC        NormalLung     51     6</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> NormalColon NormalLung     18     0</span></span></code></pre></div>
-<p>This can be thresholded by the fold change, adjusted p value or the
-delta beta:</p>
+<p>This can be thresholded by the fold change, adjusted p-value or delta
+beta:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/summariseDMRsByContrast.html">summariseDMRsByContrast</a></span><span class="op">(</span></span>
@@ -965,9 +965,9 @@ delta beta:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> LUSC        NormalColon     6     1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> LUSC        NormalLung     13     0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> NormalColon NormalLung      2     0</span></span></code></pre></div>
-<p>We also provide a function plot an <a href="https://upset.app/%5D" class="external-link">UpSet plot)</a>. These are a type of plot
-useful for showing the intersections between a set of data, in a more
-generalisable form than a venn diagram.</p>
+<p>We also provide a function to draw an <a href="https://upset.app/" class="external-link">UpSet plot</a>. These are useful for showing
+the intersections between sets of data, in a more generalisable form
+than a Venn diagram.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/plotDMRUpset.html">plotDMRUpset</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -993,7 +993,7 @@ generalisable form than a venn diagram.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-22-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-22-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="section level3">
 <h3 id="summarising-by-gene">Summarising by Gene<a class="anchor" aria-label="anchor" href="#summarising-by-gene"></a>
 </h3>
@@ -1035,9 +1035,9 @@ second argument.</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/plotting-windows-1.png" class="r-plt" alt="" width="672"></p>
-<p>We can add sample annotation bars to the top of the heatmap by using
-the sampleAnnotation option:</p>
+<p><img src="differentially-methylated-regions_files/figure-html/plotting-windows-1.png" class="r-plt" alt="" width="100%"></p>
+<p>We can add sample annotation bars to the heatmap by using the
+<code>sampleAnnotation</code> option:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/addLibraryInformation.html">addLibraryInformation</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -1046,9 +1046,9 @@ the sampleAnnotation option:</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-23-1.png" class="r-plt" alt="" width="672">
-Note that the annotation option allows for tidy evaluation, so we can
-also specify the columns unquoted:</p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-23-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Note that the annotation option allows for tidy evaluation, so we can
+specify the columns unquoted:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/plotRegionsHeatmap.html">plotRegionsHeatmap</a></span><span class="op">(</span>regionsToOverlap <span class="op">=</span> <span class="va">DMRsCovariatePatient</span>, </span>
@@ -1056,7 +1056,7 @@ also specify the columns unquoted:</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-24-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-24-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The default is to plot beta values, but you can change that via the
 <code>normMethod</code> option, for instance to get normalised reads per
 million <code>nrpm</code>:</p>
@@ -1068,13 +1068,13 @@ million <code>nrpm</code>:</p>
 <span><span class="co">#&gt; Generating table of nrpm values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-25-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-25-1.png" class="r-plt" alt="" width="100%"></p>
 <p>This <code>normMethod</code> option occurs in a number of functions
 throughout the package, with the typical choices of <code>counts</code>,
 <code>nrpm</code> or <code>beta</code> (other options exist within
 <code>qsea</code>).</p>
 <p>Annotation colours can be chosen, but with a rather specific
-requirement for how they specified. This is a list, containing named
+requirement for how they are specified. This is a list, containing named
 elements (for some/all annotation columns), each containing a named
 vector, names being the levels of the annotation and values being the
 colours. We can specify colours for just one variable (with the second
@@ -1091,7 +1091,7 @@ being chosen automatically):</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-26-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-26-1.png" class="r-plt" alt="" width="100%"></p>
 <p>Or both variables:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotColours</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Normal"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"Tumour"</span> <span class="op">=</span> <span class="st">"firebrick4"</span><span class="op">)</span>,</span>
@@ -1106,7 +1106,7 @@ being chosen automatically):</p>
 <span><span class="co">#&gt; Generating table of beta values for 23 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-27-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-27-1.png" class="r-plt" alt="" width="100%"></p>
 <p>Rows can be clustered using the <code>clusterRows = TRUE</code>
 option:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
@@ -1119,12 +1119,12 @@ option:</p>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-28-1.png" class="r-plt" alt="" width="672"></p>
-<p>While the columns can be controlled with <code>clusterCols</code>. By
-default the columns are clustered but the rows not, mostly to save
-computational speed. The number of clusters to break the column
-dendrogram into can be controlled using <code>clusterNum</code>
-(defaulting to 1, i.e. no breaks):</p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-28-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Column clustering is controlled with <code>clusterCols</code>. By
+default the columns are clustered but the rows are not, mostly to save
+computation time. The number of clusters to break the column dendrogram
+into can be controlled using <code>clusterNum</code> (defaulting to 1,
+i.e. no breaks):</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/plotRegionsHeatmap.html">plotRegionsHeatmap</a></span><span class="op">(</span>regionsToOverlap <span class="op">=</span> <span class="va">DMRsCovariatePatient</span>, </span>
@@ -1135,10 +1135,10 @@ dendrogram into can be controlled using <code>clusterNum</code>
 <span><span class="co">#&gt; Generating table of beta values for 32 regions across 10 samples.</span></span>
 <span><span class="co">#&gt; No empty columns to remove.</span></span>
 <span><span class="co">#&gt; No empty rows to remove.</span></span></code></pre></div>
-<p><img src="differentially-methylated-regions_files/figure-html/chunk-29-1.png" class="r-plt" alt="" width="672"></p>
-<p>Note that the default clustering method to use for the dendrogram is
-set as <code>clusterMethod = "ward.D2"</code>; other options can be
-used.</p>
+<p><img src="differentially-methylated-regions_files/figure-html/chunk-29-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Note that the default clustering method for the dendrogram is
+<code>clusterMethod = "ward.D2"</code>; other <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust()</a></code>
+methods can be used.</p>
 <div class="section level3">
 <h3 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h3>
@@ -1178,7 +1178,7 @@ used.</p>
 <span><span class="co">#&gt;   [4] tibble_3.3.1                             </span></span>
 <span><span class="co">#&gt;   [5] polyclip_1.10-7                          </span></span>
 <span><span class="co">#&gt;   [6] janitor_2.2.1                            </span></span>
-<span><span class="co">#&gt;   [7] enrichit_0.2.5                           </span></span>
+<span><span class="co">#&gt;   [7] enrichit_0.2.6                           </span></span>
 <span><span class="co">#&gt;   [8] XML_3.99-0.25                            </span></span>
 <span><span class="co">#&gt;   [9] lifecycle_1.0.5                          </span></span>
 <span><span class="co">#&gt;  [10] doParallel_1.0.17                        </span></span>

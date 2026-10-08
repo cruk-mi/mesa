@@ -117,12 +117,12 @@
 <span><span class="co">#&gt; The following object is masked from 'package:qsea':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     getPCA</span></span></code></pre></div>
-<p>One essential functionality in the analysis of large scale datasets
-is the ability to perform dimensionality reduction techniques and plot
-the outputs, such as Principal Component Analysis (PCA), t-distributed
-Stochastic Neighbor Embedding (t-SNE) or Uniform Manifold Approximation
-and Projection (UMAPs). The mesa package currently supports
-functionality for PCAs and UMAPs.</p>
+<p>One essential part of the analysis of large-scale datasets is the
+ability to perform dimensionality reduction and plot the outputs, such
+as Principal Component Analysis (PCA), t-distributed Stochastic Neighbor
+Embedding (t-SNE) or Uniform Manifold Approximation and Projection
+(UMAP). The mesa package currently supports functionality for PCAs and
+UMAPs.</p>
 <p>We will use the <code>exampleTumourNormal</code> data object for
 these examples.</p>
 <div class="section level2">
@@ -133,7 +133,7 @@ dimensionality reduction technique. PCA is performed with mesa using a
 two-step approach:</p>
 <ol style="list-style-type: decimal">
 <li>Running PCA with the <code><a href="../reference/getDimRed.html">getPCA()</a></code> function to generate the
-PCA results</li>
+PCA results.</li>
 <li>Plotting the PCA results using the <code><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA()</a></code>
 function.</li>
 </ol>
@@ -162,17 +162,17 @@ with the same names; the mesa functions are replacements for these.</p>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
 <p>By default, this will perform the PCA using beta values, and consider
 the 1000 most variable windows across all samples (or all windows if
-there are less than 1000).</p>
+there are fewer than 1000).</p>
 <p>We then can use the <code><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA()</a></code> function to plot the
 result.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-2-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-2-1.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/chunk-2-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-2-2.png" class="r-plt" alt="" width="100%"></p>
 <p>The output of <code><a href="../reference/getDimRed.html">getPCA()</a></code> is the PCA result object
 (technically a <code>mesaDimRed</code> object). This includes a copy of
 the <code>sampleTable</code>, detached from the original qseaSet.</p>
@@ -184,22 +184,22 @@ default; one for PC1 vs PC2 and another for PC2 vs PC3.</p>
 </h2>
 <p>In the same way as for a <code>qseaSet</code>, the sampleTable may be
 updated directly, using <code>mutate</code> or
-<code>left_join</code>.</p>
+<code>left_join</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca1</span> <span class="op">&lt;-</span> <span class="va">pca0</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>transformed_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="plotpca-function-arguments">
-<code>PlotPCA</code> function arguments<a class="anchor" aria-label="anchor" href="#plotpca-function-arguments"></a>
+<code>plotPCA()</code> function arguments<a class="anchor" aria-label="anchor" href="#plotpca-function-arguments"></a>
 </h2>
 <div class="section level3">
-<h3 id="anotating-samples-by-colour-andor-shape">Anotating samples by colour and/or shape<a class="anchor" aria-label="anchor" href="#anotating-samples-by-colour-andor-shape"></a>
+<h3 id="annotating-samples-by-colour-andor-shape">Annotating samples by colour and/or shape<a class="anchor" aria-label="anchor" href="#annotating-samples-by-colour-andor-shape"></a>
 </h3>
 <p>The <code>colour</code> and <code>shape</code> arguments to
 <code><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA()</a></code> specify variables to use to set the colour and/or
 shape of the points (samples) on the PCA plot. These variables need to
-be in the qseaSet sample table. Multiple variables can be specified for
+be in the sample table. Multiple variables can be specified for
 <code>colour</code> and a PCA plot will be produced for each
 variable. Only one variable can be specified for <code>shape</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -209,29 +209,29 @@ variable. Only one variable can be specified for <code>shape</code>.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-1.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$patient$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-2.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$age</span></span>
 <span><span class="co">#&gt; $pca1$age$PC1vsPC2</span></span></code></pre>
-<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-3.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-3.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$age$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-4.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-4.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$transformed_age</span></span>
 <span><span class="co">#&gt; $pca1$transformed_age$PC1vsPC2</span></span></code></pre>
-<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-5.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-5.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$transformed_age$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-6.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/anotating-samples-by-colour-an-6.png" class="r-plt" alt="" width="100%"></p>
 <p>Here, many PCA plots have been produced and displayed (PC1 vs PC2 and
-PC2 vs PC2 for three different colour variable annotations. To have more
-control over which plots are displayed you can save the plots to a
+PC2 vs PC3 for three different colour variable annotations). To have
+more control over which plots are displayed, you can save the plots to a
 variable and then choose which ones to display.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PCAplots1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, </span>
@@ -239,15 +239,15 @@ variable and then choose which ones to display.</p>
 <span>                        shape <span class="op">=</span> <span class="st">"tumour"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-3-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-3-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-3-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-3-2.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-3-3.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-3-3.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="colour-and-shape-palettes">Colour and shape palettes<a class="anchor" aria-label="anchor" href="#colour-and-shape-palettes"></a>
@@ -257,11 +257,11 @@ on the properties of the variable being used.</p>
 <p>For the <code>transformed_age</code> variable (that was generated in
 the <code>mutate</code> example above), a diverging colour palette is
 used, but it is not symmetric around zero. That is, the darkest blue
-maps to approx -0.5 whereas the darkest red maps to approx 2. Depending
-on the variable, it may be appropriate that the darkest blue maps to -2
-(i.e. equivalent to the darkest red mapping to 2), and for this the
-<code>symDivColourScale</code> argument can be set to TRUE, as seen
-below (and we also replot the above version for comparison).</p>
+maps to approximately -0.5 whereas the darkest red maps to approximately
+2. Depending on the variable, it may be appropriate for the darkest blue
+to map to -2 (i.e. equivalent to the darkest red mapping to 2), and for
+this the <code>symDivColourScale</code> argument can be set to TRUE, as
+seen below (and we also replot the above version for comparison).</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PCAplots2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span></span>
 <span>    <span class="va">pca1</span>,</span>
@@ -271,16 +271,16 @@ below (and we also replot the above version for comparison).</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">PCAplots1</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/colour-and-shape-palettes-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/colour-and-shape-palettes-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots2</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">transformed_age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/colour-and-shape-palettes-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/colour-and-shape-palettes-2.png" class="r-plt" alt="" width="100%"></p>
 <p>By default, filled shapes (21-25) with a black outline are used for
 points unless a categorical variable with more than 5 categories
-(including NA) is set to the shape, in which case the unfilled shapes
-are used (0-20)*. Filled shapes are generally preferred, as they remain
-more distinguishable when many points overlap.</p>
+(including NA) is mapped to shape, in which case unfilled shapes are
+used (0-20)*. Filled shapes are generally preferred, as they remain more
+distinguishable when many points overlap.</p>
 <p><em>*Note: Shapes 19 and 20 are excluded from default palettes as
 they are difficult to distinguish from shape 16.</em></p>
 <p>As a rule, we do not allow mixing of filled and unfilled shapes on
@@ -295,10 +295,10 @@ shapes and the colour aesthetic for unfilled shapes in the underlying
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-4-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-4-1.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/chunk-4-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-4-2.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>,</span>
 <span>        colour <span class="op">=</span> <span class="st">"tumour"</span>,</span>
@@ -306,10 +306,10 @@ shapes and the colour aesthetic for unfilled shapes in the underlying
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-5-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-5-1.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/chunk-5-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-5-2.png" class="r-plt" alt="" width="100%"></p>
 <p>It is possible to specify your own colour and shape palettes using
 the <code>colourPalette</code> and <code>shapePalette</code>
 arguments.</p>
@@ -322,10 +322,10 @@ arguments.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-6-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-6-1.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/chunk-6-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-6-2.png" class="r-plt" alt="" width="100%"></p>
 <p>These can be a named vector, in order to specify which value of the
 annotation gets which colour/shape:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -337,17 +337,17 @@ annotation gets which colour/shape:</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tumour</span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-7-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-7-1.png" class="r-plt" alt="" width="100%"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $pca1$tumour$PC2vsPC3</span></span></code></pre>
-<p><img src="pca_files/figure-html/chunk-7-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-7-2.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="na-values">NA values<a class="anchor" aria-label="anchor" href="#na-values"></a>
 </h3>
 <p>If a variable used for colour annotation contains NA values then
-these are displayed with a dark grey colour by default (this can be
-changed using the <code>NAcolour</code> argument).</p>
+these are displayed in dark grey by default (this can be changed using
+the <code>NAcolour</code> argument).</p>
 <p>If a variable used for shape annotation contains NA values then these
 are displayed explicitly with shape 25 by default for a filled shape
 palette and shape 7 by default for an unfilled shape palette (this can
@@ -357,13 +357,13 @@ be changed using the <code>NAshape</code> argument).</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$stage</span></span>
 <span><span class="co">#&gt; $pca1$stage$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/na-values-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/na-values-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, shape <span class="op">=</span> <span class="st">"stage"</span>, NAshape <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/na-values-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/na-values-2.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="components">Components<a class="anchor" aria-label="anchor" href="#components"></a>
@@ -388,7 +388,7 @@ has a default value of 2.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/point-size-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/point-size-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, </span>
@@ -399,7 +399,7 @@ has a default value of 2.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/point-size-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/point-size-2.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="text-annotations">Text annotations<a class="anchor" aria-label="anchor" href="#text-annotations"></a>
@@ -415,13 +415,13 @@ has a default value of 2.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$patient</span></span>
 <span><span class="co">#&gt; $pca1$patient$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/text-annotations-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/text-annotations-1.png" class="r-plt" alt="" width="100%"></p>
 <p>Alternatively, <code><a href="https://rdrr.io/pkg/plotly/man/ggplotly.html" class="external-link">plotly::ggplotly()</a></code> can be used to
 generate an interactive version of the plot which gives information for
-each point when you rollover the point with the mouse. The
+each point when you hover over it with the mouse. The
 <code>plotlyAnnotations</code> argument can be used to specify which
 variables to display in the pop-up boxes. The sample name will always be
-displayed, as will any variables being used colour and shape
+displayed, as will any variables used for the colour and shape
 annotations.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PCAplots3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca1</span>, </span>
@@ -429,21 +429,21 @@ annotations.</p>
 <span>                        colour <span class="op">=</span> <span class="st">"patient"</span>, </span>
 <span>                        shape <span class="op">=</span> <span class="st">"tumour"</span>, </span>
 <span>                        plotlyAnnotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stage"</span>, <span class="st">"age"</span>, <span class="st">"gender"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/pca-plot-1.png" class="r-plt" alt="" width="672"></p>
-<p>Plotly plots are great for interactive use in html reports. The
+<p><img src="pca_files/figure-html/pca-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Plotly plots are great for interactive use in HTML reports. The
 downside of using them is that the legend often gets displayed in a
-complicated, unhelpful way and the formatting of the plot is often not
-as good and hard to control.<br>
-Sometimes it makes sense to plot a non-plotly and plotly version of the
-same plot.</p>
+complicated, unhelpful way and the formatting of the plot is often worse
+and hard to control.<br>
+Sometimes it makes sense to make both a static and a plotly version of
+the same plot.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="output-of-getpca">Output of <code>getPCA()</code><a class="anchor" aria-label="anchor" href="#output-of-getpca"></a>
 </h2>
-<p>When you run <code><a href="../reference/getDimRed.html">getPCA()</a></code> some messages are printed and will
-appear in the console window and also below the code chunk in the source
-window. This gives the following information:</p>
+<p>When you run <code><a href="../reference/getDimRed.html">getPCA()</a></code>, it prints some messages (in the
+console, or below the code chunk in an R Markdown document). These give
+the following information:</p>
 <ul>
 <li>Initial number of windows</li>
 <li>Messages from <code>makeDataTable()</code> (if applicable), the
@@ -496,21 +496,20 @@ number filtered out at each filtering step (not including filtering based on
 </h2>
 <p>By default, the <code>getPCA</code> function will only consider a
 subset of the most variable windows across the qseaSet. This has two
-benefits, the first being computational efficiency, but the second is to
-prevent the effects of minor batch effects from appearing when they are
-summed over many windows (although that is also worth investigating
-separately). This is seen particularly when using <code>beta</code>
-values, as how close a beta value can get to 0 or 1 is determined by the
-enrichment and number of fragments sequenced; a sample with 5 million
-fragments might be assigned a beta value of 0.95 in a window, but 0.99
-in the same window if it had 10 million fragments.</p>
+benefits: the first is computational efficiency, and the second is to
+prevent minor batch effects from dominating when they are summed over
+many windows (although that is also worth investigating separately).
+This is seen particularly when using <code>beta</code> values, as how
+close a beta value can get to 0 or 1 is determined by the enrichment and
+number of fragments sequenced; a sample with 5 million fragments might
+be assigned a beta value of 0.95 in a window, but 0.99 in the same
+window if it had 10 million fragments.</p>
 <div class="section level3">
 <h3 id="setting-number-of-top-variable-windows-to-use">Setting number of top variable windows to use<a class="anchor" aria-label="anchor" href="#setting-number-of-top-variable-windows-to-use"></a>
 </h3>
-<p>This selection of the number of windows can be set using the
-<code>topVarNum</code> argument of <code><a href="../reference/getDimRed.html">getPCA()</a></code>. If not
-explicitly set, the default value is the top 1000 most variable
-windows.</p>
+<p>The number of windows can be set using the <code>topVarNum</code>
+argument of <code><a href="../reference/getDimRed.html">getPCA()</a></code>. If not explicitly set, the default
+value is the top 1000 most variable windows.</p>
 <p>More than one value can be specified for <code>topVarNum</code> and
 PCA results will be produced for each. This is computationally more
 efficient than running <code><a href="../reference/getDimRed.html">getPCA()</a></code> multiple times with a
@@ -554,26 +553,26 @@ being used (i.e. no filtering based on most variable windows).</p>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
 <p>Here, four different values have been used and the messages output
 tell you the name assigned to each PCA result.</p>
-<p>When plugging this output into <code>plotPCA</code>, plots are
-produced for all four PCA versions, with all options for the
-<code>colour</code> parameter:</p>
+<p>When this output is passed to <code>plotPCA</code>, plots are
+produced for all four PCA results, for each value of the
+<code>colour</code> argument:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PCAplots4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca2</span>, colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient"</span>, <span class="st">"age"</span><span class="op">)</span>, shape <span class="op">=</span> <span class="st">"tumour"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-10-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca2</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-10-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-10-2.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca3</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC2vsPC3</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-10-3.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-10-3.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca4</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-10-4.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-10-4.png" class="r-plt" alt="" width="100%"></p>
 <p>If you specify a value larger than the number of available windows,
 then PCA will be performed with all available windows and redundant
 values will be ignored:</p>
@@ -614,7 +613,7 @@ values will be ignored:</p>
 </h3>
 <p>It is possible to select which samples are used to calculate the
 standard deviation for each window using the <code>topVarSamples</code>
-argument. This may be either an explicit vector of sample names,</p>
+argument. This may be either an explicit vector of sample names:</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tumourNames</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -637,7 +636,7 @@ argument. This may be either an explicit vector of sample names,</p>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Object containing 1 dimensionality reduction objects for 10 samples</span></span></code></pre></div>
-<p>Or a string to apply (as a regular expression):</p>
+<p>or a string to match (as a regular expression):</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>, topVarSamples <span class="op">=</span> <span class="st">"_T"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
@@ -688,7 +687,7 @@ multiple times with the <code>dataTable</code> generated only once.</p>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
 <p>For example, we can use <code>getBetaTable</code> to generate the
-table to use:</p>
+table:</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dataTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getBetaTable.html">getBetaTable</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of beta values for 819 regions across 10 samples.</span></span>
@@ -761,9 +760,9 @@ memory-inefficient.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 589 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: Lung1_N &lt;dbl&gt;, Lung1_T &lt;dbl&gt;, Lung2_N &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   Lung2_T &lt;dbl&gt;, Lung3_N &lt;dbl&gt;, Lung3_T &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>We can then use the dataTable calculated in a previous
-<code>getPCA</code> call, but ask <code>getPCA</code> to return a
-different number of top windows:</p>
+<p>We can then reuse the <code>dataTable</code> calculated in a previous
+<code>getPCA</code> call, but ask <code>getPCA</code> to use a different
+number of top windows:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, </span>
 <span>                dataTable <span class="op">=</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="va">pca3</span>, <span class="st">"dataTable"</span><span class="op">)</span>, </span>
@@ -829,13 +828,13 @@ the <code>beta</code> values, which correct this to some extent.</p>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tissue</span></span>
 <span><span class="co">#&gt; $pca1$tissue$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/normalisation-method-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/normalisation-method-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca_nrpm</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"tissue"</span>, shape <span class="op">=</span> <span class="st">"tumour"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tissue</span></span>
 <span><span class="co">#&gt; $pca1$tissue$PC1vsPC2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/normalisation-method-2.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/normalisation-method-2.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="filtering-regions">Filtering regions<a class="anchor" aria-label="anchor" href="#filtering-regions"></a>
@@ -881,14 +880,14 @@ wish to see how these same windows split the samples.</p>
 <div class="section level2">
 <h2 id="umaps">UMAPs<a class="anchor" aria-label="anchor" href="#umaps"></a>
 </h2>
-<p>Uniform Manifold and Projection (UMAP) is another method for
-performing dimensionality reduction. This is a nonlinear technique,
-attempting to reduce the N-dimensional space onto a 2 or 3 dimensional
-projection, attempting to preserve both local distances between points
-as well as the global topology. This is more appropriate for large
-datasets so we use the [qsea::getExampleQseaSet()] function to create an
-example dataset with two types of samples, before calculating and
-plotting a UMAP using the <code>getUMAP</code> and <code>plotUMAP</code>
+<p>Uniform Manifold Approximation and Projection (UMAP) is another
+method for performing dimensionality reduction. This is a nonlinear
+technique, which projects the N-dimensional space onto 2 or 3 dimensions
+while attempting to preserve both local distances between points and the
+global topology. This is more appropriate for large datasets, so we use
+the <code><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">qsea::getExampleQseaSet()</a></code> function to create an example
+dataset with two types of samples, before calculating and plotting a
+UMAP using the <code>getUMAP</code> and <code>plotUMAP</code>
 functions:</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -921,21 +920,21 @@ functions:</p>
 <span><span class="co">#&gt; $umap1</span></span>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/umaps-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/umaps-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The vast majority of the options for <code>getUMAP</code> are the
 same as for <code>getPCA</code>, but while the PCA algorithm has no
 further options, the UMAP algorithm has a number of options which can
 affect the output. The underlying implementation is via the
-[uwot::umap()] function, and any additional parameters provided to
-<code>getUMAP</code> are passed to this function. Of particular note are
-the two options, <code>n_neighbors</code> and <code>min_dist</code>.
-<code>n_neighbors</code> controls how many neighbouring samples are
-considered to build the local structure, while <code>min_dist</code>
-controls how far apart the resulting embedded points must be. There is
-an <a href="https://pair-code.github.io/understanding-umap/" class="external-link">excellent
+<code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code> function, and any additional parameters
+provided to <code>getUMAP</code> are passed to this function. Of
+particular note are two options, <code>n_neighbors</code> and
+<code>min_dist</code>. <code>n_neighbors</code> controls how many
+neighbouring samples are considered to build the local structure, while
+<code>min_dist</code> controls how far apart the resulting embedded
+points must be. There is an <a href="https://pair-code.github.io/understanding-umap/" class="external-link">excellent
 interactive example</a> available to see how these two parameters
-influence the output, for a range of different datatypes.</p>
-<p>Here we show two UMAPs built off the same dataset with different
+influence the output, for a range of different data types.</p>
+<p>Here we show two UMAPs built from the same dataset with different
 values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSetRandom</span> <span class="op">|&gt;</span></span>
@@ -961,7 +960,7 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; $umap1</span></span>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-18-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="pca_files/figure-html/chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">qseaSetRandom</span> <span class="op">|&gt;</span></span>
@@ -987,9 +986,9 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; $umap1</span></span>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
-<p><img src="pca_files/figure-html/chunk-18-2.png" class="r-plt" alt="" width="672"></p>
-<p>As a final note, we state that UMAPs should be used with care, as
-they are easy to misinterpret.</p>
+<p><img src="pca_files/figure-html/chunk-18-2.png" class="r-plt" alt="" width="100%"></p>
+<p>As a final note, UMAPs should be used with care, as they are easy to
+misinterpret.</p>
 </div>
 <div class="section level2">
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
