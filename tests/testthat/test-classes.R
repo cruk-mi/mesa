@@ -153,6 +153,144 @@ test_that("mesaDimRed: each validity rule rejects an inconsistent object", {
         dataTable = cbind(dt, S5 = 0))))
 })
 
+test_that("mesaPCA and mesaUMAP accessors return their slots", {
+    mp <- validPCA()
+    expect_identical(getPrcomp(mp), makePrcomp())
+    expect_identical(getCoordinates(mp), as.data.frame(makePrcomp()$x))
+    expect_identical(getWindowNames(mp), paste0("W", 1:4))
+
+    mu <- validUMAP()
+    expect_identical(getCoordinates(mu), makePoints())
+    expect_identical(getWindowNames(mu), paste0("W", 1:4))
+})
+
+test_that("mesaDimRed accessors return their slots", {
+    res <- list(pca1 = validPCA(), pca2 = validPCA())
+    dt <- data.frame(S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0)
+    params <- list(method = "PCA", normMethod = "nrpm")
+    md <- mesaDimRed(res = res, sampleTable = makeSampleTable(),
+        params = params, dataTable = dt)
+
+    expect_identical(getResults(md), res)
+    expect_identical(getParameters(md), params)
+    expect_identical(getDimRedData(md), dt)
+    expect_identical(getCoordinates(md),
+        list(pca1 = getCoordinates(res$pca1),
+            pca2 = getCoordinates(res$pca2)))
+    expect_identical(getWindowNames(md),
+        list(pca1 = paste0("W", 1:4), pca2 = paste0("W", 1:4)))
+
+    # An empty container gives empty results.
+    empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
+        params = list())
+    expect_identical(getResults(empty), list())
+    expect_identical(getDimRedData(empty), data.frame())
+    expect_length(getCoordinates(empty), 0)
+    expect_length(getWindowNames(empty), 0)
+})
+
+test_that("as.data.frame() gives one long table of every result", {
+    st <- makeSampleTable()
+    md <- mesaDimRed(res = list(pca1 = validPCA(), pca2 = validPCA()),
+        sampleTable = st, params = list(method = "PCA"))
+    df <- as.data.frame(md)
+
+    expect_s3_class(df, "data.frame")
+    expect_identical(nrow(df), 10L)
+    expect_identical(df$resName, rep(c("pca1", "pca2"), each = 5))
+    expect_identical(df$sample_name, rep(paste0("S", 1:5), 2))
+    pcs <- colnames(getCoordinates(validPCA()))
+    expect_identical(colnames(df), c("resName", "sample_name", pcs, "group"))
+    expect_equal(as.matrix(df[1:5, pcs]), makePrcomp()$x,
+        ignore_attr = TRUE)
+    expect_identical(df$group, rep(st$group, 2))
+
+    umap <- mesaDimRed(res = list(umap1 = validUMAP()), sampleTable = st,
+        params = list(method = "UMAP"))
+    expect_identical(colnames(as.data.frame(umap)),
+        c("resName", "sample_name", "UMAP1", "UMAP2", "group"))
+})
+
+test_that("as.data.frame() keeps coordinate names on a sampleTable clash", {
+    st <- makeSampleTable()
+    st$PC1 <- 0
+    st$resName <- "x"
+    md <- mesaDimRed(res = list(pca1 = validPCA()), sampleTable = st,
+        params = list(method = "PCA"))
+    df <- as.data.frame(md)
+    expect_identical(df$PC1, makePrcomp()$x[, "PC1"], ignore_attr = TRUE)
+    expect_identical(df$resName, rep("pca1", 5))
+    expect_identical(df$PC1.sampleTable, rep(0, 5))
+    expect_identical(df$resName.sampleTable, rep("x", 5))
+})
+
+test_that("mesaDimRed sample IDs come from sampleTable$sample_name", {
+    st <- makeSampleTable()
+    build <- function(sampleTable) {
+        mesaDimRed(res = list(pca1 = validPCA()), sampleTable = sampleTable,
+            params = list(method = "PCA"))
+    }
+
+    noName <- st
+    noName$sample_name <- NULL
+    expect_error(build(noName),
+        "`sampleTable` must have a `sample_name` column")
+
+    # Row names that disagree with sample_name don't matter.
+    rownames(st) <- paste0("row", 1:5)
+    md <- build(st)
+    expect_true(validObject(md))
+    expect_identical(as.data.frame(md)$group, st$group)
+})
+
+test_that("as.data.frame() handles group means and empty containers", {
+    groups <- mesaUMAP(makePoints(c("A", "B")), "W1")
+    grouped <- mesaDimRed(res = list(umap1 = groups),
+        sampleTable = makeSampleTable(),
+        params = list(method = "UMAP", useGroupMeans = TRUE))
+    df <- as.data.frame(grouped)
+    expect_identical(colnames(df), c("resName", "group", "UMAP1", "UMAP2"))
+    expect_identical(df$group, c("A", "B"))
+
+    empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
+        params = list())
+    expect_identical(as.data.frame(empty),
+        data.frame(resName = character(), sample_name = character()))
+})
+
+test_that("plotPCA() explains a missing or unknown params$method", {
+    noMethod <- mesaDimRed(res = list(pca1 = validPCA()),
+        sampleTable = makeSampleTable(), params = list())
+    expect_error(plotPCA(noMethod),
+        "`params\\$method` must be \"PCA\" or \"UMAP\", not NULL")
+})
+
+test_that("getWindowNames() still labels qseaSet, GRanges and data.frame", {
+    gr <- GenomicRanges::GRanges(c("chr1", "chr2"),
+        IRanges::IRanges(c(10, 20), c(15, 30)))
+    expect_identical(getWindowNames(gr), c("chr1:10-15", "chr2:20-30"))
+    df <- data.frame(seqnames = c("chr1", "chr2"), start = c(10, 20),
+        end = c(15, 30))
+    expect_identical(getWindowNames(df), c("chr1:10-15", "chr2:20-30"))
+    expect_length(getWindowNames(exampleTumourNormal),
+        length(qsea::getRegions(exampleTumourNormal)))
+})
+
+test_that("getPCA() accessors agree with the PCA it ran", {
+    pca <- getPCA(exampleTumourNormal, topVarNum = c(10, 100),
+        verbose = FALSE)
+    expect_named(getResults(pca), names(getCoordinates(pca)))
+    expect_identical(getParameters(pca)$method, "PCA")
+    expect_identical(lengths(getWindowNames(pca), use.names = FALSE),
+        c(10L, 100L))
+    expect_identical(rownames(getCoordinates(pca)[[1]]),
+        getSampleNames(pca))
+
+    df <- as.data.frame(pca)
+    expect_identical(nrow(df), 2L * length(getSampleNames(pca)))
+    expect_true(all(colnames(getSampleTable(pca)) %in% colnames(df)))
+})
+
 test_that("getPCA() and getUMAP() output passes validObject()", {
     qs <- cachedExampleQset()
     expect_true(validObject(getPCA(qs, normMethod = "nrpm", verbose = FALSE)))
