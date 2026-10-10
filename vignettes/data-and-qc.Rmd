@@ -182,7 +182,7 @@ all. This can be a measure of background noise.
 
 ## Hyper-stably methylated regions
 Another metric used for quality control is based on windows that are known to be
-commonly methylated across a range of tissues anddiseases. For instance, for the 
+commonly methylated across a range of tissues and diseases. For instance, for the 
 human genome, [Edgar et al.(2014)](https://doi.org/10.1186/1756-8935-7-28) 
 identified probes from the Illumina 450k methylation array that were consistently
 methylated in over 1700 samples. We take windows covered by these probes, 
