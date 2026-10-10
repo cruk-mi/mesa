@@ -183,7 +183,7 @@ all. This can be a measure of background noise.
 ## Hyper-stably methylated regions
 Another metric used for quality control is based on windows that are known to be
 commonly methylated across a range of tissues and diseases. For instance, for the 
-human genome, [Edgar et al.(2014)](https://doi.org/10.1186/1756-8935-7-28) 
+human genome, [Edgar et al. (2014)](https://doi.org/10.1186/1756-8935-7-28)
 identified probes from the Illumina 450k methylation array that were consistently
 methylated in over 1700 samples. We take windows covered by these probes, 
 calculate beta values for them, and then determine the proportion of these 
@@ -213,8 +213,13 @@ For the T7-MBD-seq data studied by the package authors, a
 suitable values may depend on enrichment method and sample type.
 
 ## Summary
-In the package authors' experience, the three metrics `valid_fragments`, `relH` and `hyperStableEdgar` are the most useful for quality control. For 300 bp windows on the human genome with T7-MBD-seq data, the authors considered a `relH` of at least 2.5–3, a `hyperStableEdgar` value of at least 0.4 (40%), and around 3,000,000 `valid_fragments` acceptable. Most samples that 
-passed the first two metrics also met the `valid_fragments` threshold. These 
+In the package authors' experience, the three metrics `valid_fragments`, `relH`
+and `hyperStableEdgar` are the most useful for quality control. For 300 bp
+windows on the human genome with T7-MBD-seq data, the authors considered a
+`relH` of at least 2.5–3, a `hyperStableEdgar` value of at least 0.4 (40%), and
+around 3,000,000 `valid_fragments` acceptable. Samples that met the `relH` and
+`hyperStableEdgar` thresholds usually also met the `valid_fragments` threshold.
+These
 values are provided as guidelines rather than strict thresholds; suitable values 
 will depend on the enrichment protocol (MBD-seq or MeDIP-seq), the sample type 
 and the sequencing depth, so we recommend choosing thresholds from the 
