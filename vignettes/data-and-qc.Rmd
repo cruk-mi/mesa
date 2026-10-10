@@ -208,16 +208,12 @@ the function will not work with the provided example data, as there is no
 overlap of the probes with the windows in the example dataset (i.e.
 `filterByOverlaps(exampleTumourNormal, hg38UltraStableProbes)` has no windows).
 
-As a rough guideline, for the T7-MBD-seq data studied by the package authors, a 
+For the T7-MBD-seq data studied by the package authors, a 
 `hyperStableEdgar` value of at least 0.4 was considered acceptable. Again, 
 suitable values may depend on enrichment method and sample type.
 
 ## Summary
-Based on the package authors' experience, the three metrics `valid_fragments`, 
-`relH` and `hyperStableEdgar` are the most useful for quality control. As a 
-rough guide, for 300bp windows on the human genome with T7-MBD-seq data, a
-`relH` of at least 2.5-3, a `hyperStableEdgar` value of at least 0.4 (40%) and
-around 3,000,000 `valid_fragments` were considered acceptable. Most samples that 
+In the package authors' experience, the three metrics `valid_fragments`, `relH` and `hyperStableEdgar` are the most useful for quality control. For 300 bp windows on the human genome with T7-MBD-seq data, the authors considered a `relH` of at least 2.5–3, a `hyperStableEdgar` value of at least 0.4 (40%), and around 3,000,000 `valid_fragments` acceptable. Most samples that 
 passed the first two metrics also met the `valid_fragments` threshold. These 
 values are provided as guidelines rather than strict thresholds; suitable values 
 will depend on the enrichment protocol (MBD-seq or MeDIP-seq), the sample type 
