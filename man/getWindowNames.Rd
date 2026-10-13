@@ -6,7 +6,8 @@
 \alias{getWindowNames,mesaPCA-method}
 \alias{getWindowNames,mesaUMAP-method}
 \alias{getWindowNames,mesaDimRed-method}
-\title{Get window names from a qseaSet, ranges/table or dimension reduction}
+\title{Get window names from a qseaSet, ranges/table or dimensionality reduction
+object}
 \usage{
 getWindowNames(x)
 
@@ -35,8 +36,9 @@ window/region, or the windows a dimensionality reduction was computed over.
 }
 \details{
 If \code{x} is a \code{qseaSet}, regions are taken from \code{qsea::getRegions(x)}.
-If \code{x} is a \link[=mesaPCA-class]{mesaPCA} or \link[=mesaUMAP-class]{mesaUMAP}, the window IDs it was
-computed over are returned.
+If \code{x} is a \link[=mesaPCA-class]{mesaPCA} or \link[=mesaUMAP-class]{mesaUMAP}, the window IDs used to
+compute the dimensionality reduction are returned. If \code{x} is a
+\link[=mesaDimRed-class]{mesaDimRed}, the result is a named list of these, one per result.
 Otherwise
 the input is coerced to \code{GRanges} (see \code{\link[=asValidGranges]{asValidGranges()}}) and labels are
 constructed as \code{"seqnames:start-end"}.

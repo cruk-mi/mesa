@@ -73,7 +73,8 @@ qseaTableToChrGRanges <- function(dataTable) {
 }
 
 
-#' Get window names from a qseaSet, ranges/table or dimension reduction
+#' Get window names from a qseaSet, ranges/table or dimensionality reduction
+#' object
 #'
 #' Return character labels of the form `"seqnames:start-end"` for each genomic
 #' window/region, or the windows a dimensionality reduction was computed over.
@@ -86,8 +87,9 @@ qseaTableToChrGRanges <- function(dataTable) {
 #'
 #' @details
 #' If `x` is a `qseaSet`, regions are taken from `qsea::getRegions(x)`.
-#' If `x` is a [mesaPCA-class] or [mesaUMAP-class], the window IDs it was
-#' computed over are returned.
+#' If `x` is a [mesaPCA-class] or [mesaUMAP-class], the window IDs used to
+#' compute the dimensionality reduction are returned. If `x` is a
+#' [mesaDimRed-class], the result is a named list of these, one per result.
 #' Otherwise
 #' the input is coerced to `GRanges` (see [asValidGranges()]) and labels are
 #' constructed as `"seqnames:start-end"`.
@@ -128,20 +130,24 @@ setGeneric("getWindowNames", function(x) standardGeneric("getWindowNames"))
 #' @export
 setMethod("getWindowNames", "ANY", function(x) {
 
-    if (is.qseaSet(x)) {
-        return(x %>%
-            qsea::getRegions() %>%
-            tibble::as_tibble() %>%
-            dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-            dplyr::pull(window))
+    gr <- if (is.qseaSet(x)) {
+        qsea::getRegions(x)
+    } else {
+        tryCatch(
+            asValidGranges(x),
+            error = function(e) {
+                stop("Unknown data type! Expected a qseaSet, GRanges or ",
+                    "data.frame with window coordinates. ",
+                    conditionMessage(e), call. = FALSE)
+            }
+        )
     }
 
-    return(asValidGranges(x) %>%
-        tibble::as_tibble() %>%
-        dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-        dplyr::pull(window))
-
-    stop("Unknown data type!")
+    paste0(
+        as.character(GenomicRanges::seqnames(gr)), ":",
+        GenomicRanges::start(gr), "-",
+        GenomicRanges::end(gr)
+    )
 })
 
 #' @rdname getWindowNames
