@@ -140,7 +140,7 @@ getUMAP <- function(qseaSet,
 #'
 #' @param useGroupMeans `logical(1)`.
 #' If `TRUE`, average samples within the `group` column (combine replicates)
-#' before DR.
+#' before dimensionality reduction.
 #'   **Default:** `FALSE`.
 #'
 #' @param minDensity `numeric(1)`.
@@ -150,13 +150,15 @@ getUMAP <- function(qseaSet,
 #' @param topVarNum `numeric(1)` or `integer(1)` or `Inf` or `NULL` **or** a
 #' vector.
 #' Keep the `topVarNum` most variable windows (by SD). If `NA`, `NULL`, `Inf`,
-#' or `>=` available windows, use all. If a vector, DR is run once per value and
+#' or `>=` available windows, use all. If a vector, the reduction is run once
+#' per value and
 #' results are returned in a list.
 #'   **Default:** `1000`.
 #'
 #' @param topVarSamples `NULL`, `character()`, `list`, or `regex` string.
 #' Samples used to compute variability. If `NULL`/`NA`, use all samples. If a
-#' vector/regex, select matching samples. If a `list`, perform DR per list
+#' vector/regex, select matching samples. If a `list`, perform the reduction
+#' per list
 #' element (should match `length(topVarNum)` when vectorised).
 #'   **Default:** `NULL`.
 #'
@@ -173,7 +175,8 @@ getUMAP <- function(qseaSet,
 #'   **Default:** `5`.
 #'
 #' @param returnDataTable `logical(1)`.
-#' If `TRUE`, include the matrix used for DR in the return object.
+#' If `TRUE`, include the matrix used for the dimensionality reduction in the
+#' return object.
 #'   **Default:** `FALSE`.
 #'
 #' @param verbose `logical(1)`.
@@ -185,11 +188,12 @@ getUMAP <- function(qseaSet,
 #' e.g. `n_neighbors`, `min_dist`, `metric`.
 #'
 #' @return A [`mesaDimRed`] object with:
-#' * **res**: Named list of DR results; each element is a [`mesaPCA`] (for PCA)
+#' * **res**: Named list of dimensionality reduction results; each element is
+#' a [`mesaPCA`] (for PCA)
 #' or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
 #' The sample IDs are the row names of each result (sample group names when
 #' `useGroupMeans = TRUE`).
-#' * **dataTable** (optional): The numeric matrix used for DR when
+#' * **dataTable** (optional): The numeric matrix used for the reduction when
 #' `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
 #' `minDensity`, removal of rows with missing values, and may include columns of
 #' window SDs when applicable (named per `params$topVar`).
@@ -198,13 +202,14 @@ getUMAP <- function(qseaSet,
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
 #' @details:
-#' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
+#' - For `method = "PCA"`, the reduction is performed via [stats::prcomp()]
+#' with `center`
 #' and `scale` controls.
-#' - For `method = "UMAP"`, DR is performed via [uwot::umap()].
-#' - Prior to DR, optional filtering is applied: enrichment cut-off
+#' - For `method = "UMAP"`, the reduction is performed via [uwot::umap()].
+#' - Prior to the reduction, optional filtering is applied: enrichment cut-off
 #' (`minEnrichment`), CpG density (`minDensity`), region restriction
 #' (`regionsToOverlap`), and most-variable windows (`topVarNum`).
-#' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple DR runs
+#' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple runs
 #' are performed and collected in `res`.
 #'
 #' @seealso
@@ -224,7 +229,7 @@ getUMAP <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'     getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
 #'
-#' # Restrict DR to a set of regions (coerced from data.frame)
+#' # Restrict the reduction to a set of regions (coerced from data.frame)
 #' regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 #' exampleTumourNormal %>%
 #'     getDimRed(method = "PCA", regionsToOverlap = regs)
