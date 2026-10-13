@@ -24,7 +24,7 @@ methods::setOldClass("prcomp")
 
 #' Dimensionality reduction results container
 #'
-#' Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
+#' Aggregates one or more dimensionality reduction results (e.g., PCA/UMAP)
 #' computed on a common set of samples.
 #'
 #' A valid object has `res` empty, or:
@@ -50,7 +50,8 @@ methods::setOldClass("prcomp")
 #'   one long table, with the sample annotations.
 #'
 #' @slot res `list`
-#'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
+#'   Individual dimensionality reduction result objects (e.g.,
+#'   [mesaPCA-class], [mesaUMAP-class]).
 #'
 #' The sample IDs of the results are the row names of each element of
 #' `res` (`prcomp$x` for [mesaPCA-class],
@@ -65,7 +66,8 @@ methods::setOldClass("prcomp")
 #'   Parameters used to generate results in `res`.
 #'
 #' @slot dataTable `data.frame`
-#'   Optional matrix/data used to compute DR (for reproducibility).
+#'   Optional matrix/data used to compute the dimensionality reduction (for
+#'   reproducibility).
 #'
 #' @name mesaDimRed-class
 #' @aliases mesaDimRed-class
@@ -86,7 +88,8 @@ setClass("mesaDimRed",
 #' Construct a `mesaDimRed` object
 #'
 #' @param res `list`
-#'   DR result objects. **Default:** none. `res` must be supplied.
+#'   Dimensionality reduction result objects. **Default:** none. `res` must
+#'   be supplied.
 #'
 #' @param sampleTable `data.frame`
 #'   Sample annotations, with the sample IDs in a `sample_name` column.
@@ -96,11 +99,11 @@ setClass("mesaDimRed",
 #'   Parameters used to compute `res`. **Default:** none.
 #'
 #' @param dataTable `data.frame`
-#'   Optional numeric matrix/data used for DR.
+#'   Optional numeric matrix/data used for the dimensionality reduction.
 #'   **Default:** `data.frame()`.
 #'
 #' @return A [mesaDimRed-class] object:
-#' * stores DR results in `res`,
+#' * stores dimensionality reduction results in `res`,
 #' * carries sample metadata in `sampleTable`,
 #' * and persists parameters/data in `params` / `dataTable`.
 #'
@@ -417,27 +420,31 @@ setValidity("mesaUMAP", function(object) {
 #'   are no results.
 #' * `getSampleTable()`: the sample annotations, a `data.frame` with the
 #'   sample IDs in its `sample_name` column.
-#' * `getSampleNames()`: the sample IDs the results cover (the row names of
-#'   each result), or `character()` when there are no results. With
-#'   `useGroupMeans = TRUE` they are sample group names.
+#' * `getSampleNames()`: the sample IDs the results cover, or `character()`
+#'   when there are no results. With `useGroupMeans = TRUE` they are sample
+#'   group names.
 #' * `getParameters()`: the list of parameters used to compute the results,
 #'   including `method` (`"PCA"` or `"UMAP"`).
-#' * `getDimRedData()`: the data used to compute the results (a
-#'   `data.frame` of windows by samples), or an empty `data.frame` unless
-#'   the results were made with `returnDataTable = TRUE`.
+#' * `getDimRedData()`: if `returnDataTable = TRUE`, the input data used to
+#'   compute the results, as a `data.frame` with windows in rows and samples
+#'   in columns; otherwise, an empty `data.frame`.
 #' * `getCoordinates()`: for a [mesaPCA-class], its principal component
 #'   scores (`prcomp$x`); for a [mesaUMAP-class], its UMAP coordinates. Each
 #'   is a `data.frame` with one row per sample and sample IDs as row names.
 #'   For a [mesaDimRed-class], a named list of these, one per result.
-#' * `getPrcomp()`: the [stats::prcomp()] fit of a [mesaPCA-class].
+#' * `getPrcomp()`: the [stats::prcomp()] fit of a [mesaPCA-class]. For a
+#'   [mesaDimRed-class] of PCA results, a named list of these, one per
+#'   result; an error for UMAP results.
+#' * `getWindowNames()`: the window IDs a result was computed over. For a
+#'   [mesaDimRed-class], a named list of these, one per result. Documented
+#'   in [getWindowNames()].
 #' * `as.data.frame()`: one `data.frame` with a row per result and sample:
 #'   `resName` (the result's name, as in `getResults()`), `sample_name`, the
 #'   coordinate columns (`PC1`, `PC2`, ... or `UMAP1`, `UMAP2`), then the
 #'   `sampleTable` columns. With `useGroupMeans = TRUE` the ID column is
 #'   `group` and no sample annotations are added.
 #'
-#' @seealso [getWindowNames()] for the window IDs of each result,
-#'   [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class], [getPCA()],
+#' @seealso [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class], [getPCA()],
 #'   [getUMAP()], [plotDimRed()]
 #'
 #' @examples
@@ -518,6 +525,17 @@ setGeneric("getPrcomp", function(object, ...) {
 #' @rdname dimRedAccessors
 #' @export
 setMethod("getPrcomp", "mesaPCA", function(object) object@prcomp)
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getPrcomp", "mesaDimRed", function(object) {
+    if (identical(getParameters(object)$method, "UMAP") ||
+        any(vapply(object@res, inherits, logical(1), "mesaUMAP"))) {
+        stop("`getPrcomp()` needs PCA results, but this mesaDimRed holds ",
+            "UMAP results.", call. = FALSE)
+    }
+    lapply(object@res, getPrcomp)
+})
 
 #' @rdname dimRedAccessors
 #' @importFrom BiocGenerics as.data.frame

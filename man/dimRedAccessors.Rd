@@ -15,6 +15,7 @@
 \alias{getCoordinates,mesaDimRed-method}
 \alias{getPrcomp}
 \alias{getPrcomp,mesaPCA-method}
+\alias{getPrcomp,mesaDimRed-method}
 \alias{as.data.frame,mesaDimRed-method}
 \title{Accessors for dimensionality reduction results}
 \usage{
@@ -44,6 +45,8 @@ getPrcomp(object, ...)
 
 \S4method{getPrcomp}{mesaPCA}(object)
 
+\S4method{getPrcomp}{mesaDimRed}(object)
+
 \S4method{as.data.frame}{mesaDimRed}(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
@@ -63,19 +66,24 @@ objects, one per result (e.g. per \code{topVarNum} value); empty when there
 are no results.
 \item \code{getSampleTable()}: the sample annotations, a \code{data.frame} with the
 sample IDs in its \code{sample_name} column.
-\item \code{getSampleNames()}: the sample IDs the results cover (the row names of
-each result), or \code{character()} when there are no results. With
-\code{useGroupMeans = TRUE} they are sample group names.
+\item \code{getSampleNames()}: the sample IDs the results cover, or \code{character()}
+when there are no results. With \code{useGroupMeans = TRUE} they are sample
+group names.
 \item \code{getParameters()}: the list of parameters used to compute the results,
 including \code{method} (\code{"PCA"} or \code{"UMAP"}).
-\item \code{getDimRedData()}: the data used to compute the results (a
-\code{data.frame} of windows by samples), or an empty \code{data.frame} unless
-the results were made with \code{returnDataTable = TRUE}.
+\item \code{getDimRedData()}: if \code{returnDataTable = TRUE}, the input data used to
+compute the results, as a \code{data.frame} with windows in rows and samples
+in columns; otherwise, an empty \code{data.frame}.
 \item \code{getCoordinates()}: for a \link[=mesaPCA-class]{mesaPCA}, its principal component
 scores (\code{prcomp$x}); for a \link[=mesaUMAP-class]{mesaUMAP}, its UMAP coordinates. Each
 is a \code{data.frame} with one row per sample and sample IDs as row names.
 For a \link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per result.
-\item \code{getPrcomp()}: the \code{\link[stats:prcomp]{stats::prcomp()}} fit of a \link[=mesaPCA-class]{mesaPCA}.
+\item \code{getPrcomp()}: the \code{\link[stats:prcomp]{stats::prcomp()}} fit of a \link[=mesaPCA-class]{mesaPCA}. For a
+\link[=mesaDimRed-class]{mesaDimRed} of PCA results, a named list of these, one per
+result; an error for UMAP results.
+\item \code{getWindowNames()}: the window IDs a result was computed over. For a
+\link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per result. Documented
+in \code{\link[=getWindowNames]{getWindowNames()}}.
 \item \code{as.data.frame()}: one \code{data.frame} with a row per result and sample:
 \code{resName} (the result's name, as in \code{getResults()}), \code{sample_name}, the
 coordinate columns (\code{PC1}, \code{PC2}, ... or \code{UMAP1}, \code{UMAP2}), then the
@@ -109,7 +117,6 @@ head(as.data.frame(pca)[, 1:6])
 
 }
 \seealso{
-\code{\link[=getWindowNames]{getWindowNames()}} for the window IDs of each result,
 \link[=mesaDimRed-class]{mesaDimRed}, \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}, \code{\link[=getPCA]{getPCA()}},
 \code{\link[=getUMAP]{getUMAP()}}, \code{\link[=plotDimRed]{plotDimRed()}}
 }

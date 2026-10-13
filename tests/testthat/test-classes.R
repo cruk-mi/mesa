@@ -189,6 +189,22 @@ test_that("mesaDimRed accessors return their slots", {
     expect_length(getWindowNames(empty), 0)
 })
 
+test_that("getPrcomp() lists the fits of a PCA mesaDimRed, not UMAP", {
+    pcaRes <- list(pca1 = validPCA(), pca2 = validPCA())
+    md <- mesaDimRed(res = pcaRes, sampleTable = makeSampleTable(),
+        params = list(method = "PCA"))
+    expect_identical(getPrcomp(md),
+        list(pca1 = makePrcomp(), pca2 = makePrcomp()))
+
+    empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
+        params = list())
+    expect_length(getPrcomp(empty), 0)
+
+    umap <- mesaDimRed(res = list(umap1 = validUMAP()),
+        sampleTable = makeSampleTable(), params = list(method = "UMAP"))
+    expect_error(getPrcomp(umap), "needs PCA results")
+})
+
 test_that("as.data.frame() gives one long table of every result", {
     st <- makeSampleTable()
     md <- mesaDimRed(res = list(pca1 = validPCA(), pca2 = validPCA()),
@@ -274,6 +290,10 @@ test_that("getWindowNames() still labels qseaSet, GRanges and data.frame", {
     expect_identical(getWindowNames(df), c("chr1:10-15", "chr2:20-30"))
     expect_length(getWindowNames(exampleTumourNormal),
         length(qsea::getRegions(exampleTumourNormal)))
+})
+
+test_that("getWindowNames() says so for an unsupported input", {
+    expect_error(getWindowNames(1:3), "Unknown data type")
 })
 
 test_that("getPCA() accessors agree with the PCA it ran", {

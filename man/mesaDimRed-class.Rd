@@ -13,7 +13,8 @@ mesaDimRed(res, sampleTable, params, dataTable = data.frame())
 }
 \arguments{
 \item{res}{\code{list}
-DR result objects. \strong{Default:} none. \code{res} must be supplied.}
+Dimensionality reduction result objects. \strong{Default:} none. \code{res} must
+be supplied.}
 
 \item{sampleTable}{\code{data.frame}
 Sample annotations, with the sample IDs in a \code{sample_name} column.
@@ -23,7 +24,7 @@ Sample annotations, with the sample IDs in a \code{sample_name} column.
 Parameters used to compute \code{res}. \strong{Default:} none.}
 
 \item{dataTable}{\code{data.frame}
-Optional numeric matrix/data used for DR.
+Optional numeric matrix/data used for the dimensionality reduction.
 \strong{Default:} \code{data.frame()}.}
 
 \item{object}{\code{mesaDimRed}}
@@ -31,13 +32,13 @@ Optional numeric matrix/data used for DR.
 \value{
 A \link[=mesaDimRed-class]{mesaDimRed} object:
 \itemize{
-\item stores DR results in \code{res},
+\item stores dimensionality reduction results in \code{res},
 \item carries sample metadata in \code{sampleTable},
 \item and persists parameters/data in \code{params} / \code{dataTable}.
 }
 }
 \description{
-Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
+Aggregates one or more dimensionality reduction results (e.g., PCA/UMAP)
 computed on a common set of samples.
 }
 \details{
@@ -57,7 +58,8 @@ with no duplicates;
 
 \describe{
 \item{\code{res}}{\code{list}
-Individual DR result objects (e.g., \link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}).
+Individual dimensionality reduction result objects (e.g.,
+\link[=mesaPCA-class]{mesaPCA}, \link[=mesaUMAP-class]{mesaUMAP}).
 
 The sample IDs of the results are the row names of each element of
 \code{res} (\code{prcomp$x} for \link[=mesaPCA-class]{mesaPCA},
@@ -72,7 +74,8 @@ Sample annotations; the \code{sample_name} column holds the sample IDs
 Parameters used to generate results in \code{res}.}
 
 \item{\code{dataTable}}{\code{data.frame}
-Optional matrix/data used to compute DR (for reproducibility).}
+Optional matrix/data used to compute the dimensionality reduction (for
+reproducibility).}
 }}
 
 \section{Accessors}{
