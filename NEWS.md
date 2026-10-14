@@ -11,16 +11,19 @@
   IDs their results cover (sample group names with `useGroupMeans = TRUE`).
   ([#10](https://github.com/cruk-mi/mesa/issues/10))
 - New accessors read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects without
-  `@`: `getResults()`, `getParameters()`, `getDimRedData()`,
-  `getCoordinates()` and `getPrcomp()` (also a list of fits for a `getPCA()`
-  result). `getWindowNames()` now also returns the windows of a PCA or UMAP
-  result, and `as.data.frame()` turns a `getPCA()` or `getUMAP()` result into
-  one table of coordinates and sample annotations.
+  `@`: `getResults()`, `getParameters()`, `getCoordinates()` and
+  `getPrcomp()`. On a `mesaDimRed`, `getCoordinates()`, `getPrcomp()` and
+  `getWindowNames()` return a list with one element per result.
+  `getWindowNames()` now also returns the windows of a PCA or UMAP result, and
+  `getDataTable()` now also returns the data stored with
+  `returnDataTable = TRUE`. `as.data.frame()` turns a `getPCA()` or
+  `getUMAP()` result into one table of coordinates and sample annotations.
   ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
 ## Bug fixes
 - `getWindowNames()` now says "Unknown data type" when given something that
-  is not a `qseaSet`, `GRanges` or window table.
+  is not a `qseaSet`, `mesaDimRed`, `mesaPCA`, `mesaUMAP`, `GRanges` or
+  window table.
   ([#117](https://github.com/cruk-mi/mesa/issues/117))
 - `plotPCA()` and `plotUMAP()` no longer fail when the `sampleTable` has a
   column named like a component (for example `PC1`); the plot uses the
