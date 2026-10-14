@@ -136,9 +136,9 @@ setMethod("getWindowNames", "ANY", function(x) {
         tryCatch(
             asValidGranges(x),
             error = function(e) {
-                stop("Unknown data type! Expected a qseaSet, GRanges or ",
-                    "data.frame with window coordinates. ",
-                    conditionMessage(e), call. = FALSE)
+                stop("Unknown data type! Expected a qseaSet, mesaDimRed, ",
+                    "mesaPCA, mesaUMAP, GRanges or data.frame with window ",
+                    "coordinates. ", conditionMessage(e), call. = FALSE)
             }
         )
     }
