@@ -7,8 +7,6 @@
 \alias{getResults}
 \alias{getResults,mesaDimRed-method}
 \alias{getParameters,mesaDimRed-method}
-\alias{getDimRedData}
-\alias{getDimRedData,mesaDimRed-method}
 \alias{getCoordinates}
 \alias{getCoordinates,mesaPCA-method}
 \alias{getCoordinates,mesaUMAP-method}
@@ -28,10 +26,6 @@ getResults(object, ...)
 \S4method{getResults}{mesaDimRed}(object)
 
 \S4method{getParameters}{mesaDimRed}(object)
-
-getDimRedData(object, ...)
-
-\S4method{getDimRedData}{mesaDimRed}(object)
 
 getCoordinates(object, ...)
 
@@ -71,7 +65,7 @@ when there are no results. With \code{useGroupMeans = TRUE} they are sample
 group names.
 \item \code{getParameters()}: the list of parameters used to compute the results,
 including \code{method} (\code{"PCA"} or \code{"UMAP"}).
-\item \code{getDimRedData()}: if \code{returnDataTable = TRUE}, the input data used to
+\item \code{getDataTable()}: if \code{returnDataTable = TRUE}, the input data used to
 compute the results, as a \code{data.frame} with windows in rows and samples
 in columns; otherwise, an empty \code{data.frame}.
 \item \code{getCoordinates()}: for a \link[=mesaPCA-class]{mesaPCA}, its principal component

@@ -2037,6 +2037,8 @@ getSampleGroups2 <- function(qseaSet){
 #'   Print progress/messages.  
 #'   **Default:** `TRUE`.
 #'
+#' @param ... Passed to methods. Not used by the `mesaDimRed` method.
+#'
 #' @details
 #' The result is a **window × sample (or group)** table. Window coordinates and
 #' any available region metadata (e.g., `seqnames`, `start`, `end`, densities)
@@ -2049,13 +2051,19 @@ getSampleGroups2 <- function(qseaSet){
 #' aggregation. Use [removeNormMethodSuffix()] afterwards if you want to strip
 #' method tags in wide tables.
 #'
+#' If `qseaSet` is a [mesaDimRed-class] (from [getPCA()] or [getUMAP()]), the
+#' input data used to compute the results is returned instead, and the other
+#' arguments are ignored. It is only stored when `returnDataTable = TRUE`.
+#'
 #' @return
 #' A tibble/data.frame with one row per genomic window and one column per
-#' sample (or group), plus window metadata columns.
+#' sample (or group), plus window metadata columns. For a [mesaDimRed-class],
+#' a `data.frame` with windows in rows and samples in columns, or an empty
+#' `data.frame` if the data was not stored.
 #'
 #' @seealso
 #' [getCountTable()], [getNRPMTable()], [getBetaTable()],
-#' [removeNormMethodSuffix()]
+#' [removeNormMethodSuffix()], [dimRedAccessors]
 #'
 #' @family table-helpers
 #'
@@ -2086,9 +2094,23 @@ getSampleGroups2 <- function(qseaSet){
 #'   names() %>%
 #'   head()
 #'
+#' # The data a PCA was computed from, when kept with returnDataTable = TRUE
+#' exampleTumourNormal %>%
+#'   getPCA(topVarNum = 100, returnDataTable = TRUE, verbose = FALSE) %>%
+#'   getDataTable() %>%
+#'   dplyr::select(1:4) %>%
+#'   head()
+#'
 #' @export
-getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
-    minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE) {
+setGeneric("getDataTable", function(qseaSet, ...) {
+    standardGeneric("getDataTable")
+})
+
+#' @rdname getDataTable
+#' @export
+setMethod("getDataTable", "ANY", function(qseaSet, normMethod = "nrpm",
+    useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE,
+    verbose = TRUE) {
 
     if (!is.qseaSet(qseaSet)) {
         stop("Please provide a qseaSet as the first argument.")
@@ -2169,7 +2191,13 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
     return(tab)
     }
 
-}
+})
+
+#' @rdname getDataTable
+#' @export
+setMethod("getDataTable", "mesaDimRed", function(qseaSet, ...) {
+    qseaSet@dataTable
+})
 
 
 #' Write bigWig tracks per sample or group

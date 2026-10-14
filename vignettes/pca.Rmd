@@ -298,7 +298,7 @@ these accessors rather than with `@`:
 - `getParameters()`: the parameters used, and the number of windows filtered
     out at each step (`initial`, `notInRegionsToOverlap`, `belowMinDensity`,
     `containMissingVals`).
-- `getDimRedData()`: with `returnDataTable = TRUE`, the table of normalised
+- `getDataTable()`: with `returnDataTable = TRUE`, the table of normalised
     values the PCA was computed from, after filtering by `regionsToOverlap`,
     `minDensity` and missing values but _before_ `topVarNum`. Otherwise it is
     empty.

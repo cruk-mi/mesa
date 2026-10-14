@@ -43,7 +43,7 @@ methods::setOldClass("prcomp")
 #' * [getSampleTable()] and [getSampleNames()]: the sample annotations and the
 #'   sample IDs the results cover;
 #' * [getParameters()]: the parameters (`params`);
-#' * [getDimRedData()]: the data used to compute the results (`dataTable`);
+#' * [getDataTable()]: the data used to compute the results (`dataTable`);
 #' * [getCoordinates()] and [getWindowNames()]: per-result coordinates and
 #'   window IDs, as named lists;
 #' * [as.data.frame()][dimRedAccessors]: the coordinates of every result in
@@ -425,7 +425,7 @@ setValidity("mesaUMAP", function(object) {
 #'   group names.
 #' * `getParameters()`: the list of parameters used to compute the results,
 #'   including `method` (`"PCA"` or `"UMAP"`).
-#' * `getDimRedData()`: if `returnDataTable = TRUE`, the input data used to
+#' * `getDataTable()`: if `returnDataTable = TRUE`, the input data used to
 #'   compute the results, as a `data.frame` with windows in rows and samples
 #'   in columns; otherwise, an empty `data.frame`.
 #' * `getCoordinates()`: for a [mesaPCA-class], its principal component
@@ -483,16 +483,6 @@ setMethod("getResults", "mesaDimRed", function(object) object@res)
 #' @rdname dimRedAccessors
 #' @export
 setMethod("getParameters", "mesaDimRed", function(object) object@params)
-
-#' @rdname dimRedAccessors
-#' @export
-setGeneric("getDimRedData", function(object, ...) {
-    standardGeneric("getDimRedData")
-})
-
-#' @rdname dimRedAccessors
-#' @export
-setMethod("getDimRedData", "mesaDimRed", function(object) object@dataTable)
 
 #' @rdname dimRedAccessors
 #' @export

@@ -2,9 +2,13 @@
 % Please edit documentation in R/qseaExtra.R
 \name{getDataTable}
 \alias{getDataTable}
+\alias{getDataTable,ANY-method}
+\alias{getDataTable,mesaDimRed-method}
 \title{Extract per-window data (counts / NRPM / beta)}
 \usage{
-getDataTable(
+getDataTable(qseaSet, ...)
+
+\S4method{getDataTable}{ANY}(
   qseaSet,
   normMethod = "nrpm",
   useGroupMeans = FALSE,
@@ -12,11 +16,15 @@ getDataTable(
   addMethodSuffix = FALSE,
   verbose = TRUE
 )
+
+\S4method{getDataTable}{mesaDimRed}(qseaSet, ...)
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}.
 A qseaSet object containing methylation-enriched sequencing data.
 \strong{Default:} none (must be supplied).}
+
+\item{...}{Passed to methods. Not used by the \code{mesaDimRed} method.}
 
 \item{normMethod}{\code{character()}.
 One or more of \code{"counts"}, \code{"nrpm"}, \code{"beta"}.
@@ -44,7 +52,9 @@ Print progress/messages.
 }
 \value{
 A tibble/data.frame with one row per genomic window and one column per
-sample (or group), plus window metadata columns.
+sample (or group), plus window metadata columns. For a \link[=mesaDimRed-class]{mesaDimRed},
+a \code{data.frame} with windows in rows and samples in columns, or an empty
+\code{data.frame} if the data was not stored.
 }
 \description{
 Build a per-window table for one or more normalisation methods, returning
@@ -61,6 +71,10 @@ suffix is appended.
 For \code{"beta"}, windows with reads \verb{< minEnrichment} are set to \code{NA} before
 aggregation. Use \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}} afterwards if you want to strip
 method tags in wide tables.
+
+If \code{qseaSet} is a \link[=mesaDimRed-class]{mesaDimRed} (from \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}}), the
+input data used to compute the results is returned instead, and the other
+arguments are ignored. It is only stored when \code{returnDataTable = TRUE}.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
@@ -89,10 +103,17 @@ exampleTumourNormal \%>\%
   names() \%>\%
   head()
 
+# The data a PCA was computed from, when kept with returnDataTable = TRUE
+exampleTumourNormal \%>\%
+  getPCA(topVarNum = 100, returnDataTable = TRUE, verbose = FALSE) \%>\%
+  getDataTable() \%>\%
+  dplyr::select(1:4) \%>\%
+  head()
+
 }
 \seealso{
 \code{\link[=getCountTable]{getCountTable()}}, \code{\link[=getNRPMTable]{getNRPMTable()}}, \code{\link[=getBetaTable]{getBetaTable()}},
-\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}
+\code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}}, \link{dimRedAccessors}
 
 Other table-helpers:
 \code{\link[=getBetaTable]{getBetaTable()}},

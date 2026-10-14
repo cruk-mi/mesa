@@ -86,7 +86,7 @@ Read the slots with these functions rather than \code{@}:
 \item \code{\link[qsea:getSampleTable]{getSampleTable()}} and \code{\link[qsea:getSampleNames]{getSampleNames()}}: the sample annotations and the
 sample IDs the results cover;
 \item \code{\link[qsea:getParameters]{getParameters()}}: the parameters (\code{params});
-\item \code{\link[=getDimRedData]{getDimRedData()}}: the data used to compute the results (\code{dataTable});
+\item \code{\link[=getDataTable]{getDataTable()}}: the data used to compute the results (\code{dataTable});
 \item \code{\link[=getCoordinates]{getCoordinates()}} and \code{\link[=getWindowNames]{getWindowNames()}}: per-result coordinates and
 window IDs, as named lists;
 \item \link[=dimRedAccessors]{as.data.frame()}: the coordinates of every result in

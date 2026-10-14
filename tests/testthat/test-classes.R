@@ -173,7 +173,7 @@ test_that("mesaDimRed accessors return their slots", {
 
     expect_identical(getResults(md), res)
     expect_identical(getParameters(md), params)
-    expect_identical(getDimRedData(md), dt)
+    expect_identical(getDataTable(md), dt)
     expect_identical(getCoordinates(md),
         list(pca1 = getCoordinates(res$pca1),
             pca2 = getCoordinates(res$pca2)))
@@ -184,7 +184,7 @@ test_that("mesaDimRed accessors return their slots", {
     empty <- mesaDimRed(res = list(), sampleTable = makeSampleTable(),
         params = list())
     expect_identical(getResults(empty), list())
-    expect_identical(getDimRedData(empty), data.frame())
+    expect_identical(getDataTable(empty), data.frame())
     expect_length(getCoordinates(empty), 0)
     expect_length(getWindowNames(empty), 0)
 })
@@ -333,4 +333,10 @@ test_that("getPCA() and getUMAP() output passes validObject()", {
     set.seed(1)
     expect_true(validObject(getUMAP(exampleTumourNormal, n_neighbors = 5,
         returnDataTable = TRUE)))
+})
+
+test_that("getDataTable() still builds the table from a qseaSet", {
+    tab <- getDataTable(exampleTumourNormal, verbose = FALSE)
+    expect_equal(nrow(tab), length(getRegions(exampleTumourNormal)))
+    expect_error(getDataTable(1:3), "provide a qseaSet")
 })
