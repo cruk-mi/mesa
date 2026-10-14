@@ -436,8 +436,7 @@ setValidity("mesaUMAP", function(object) {
 #'   [mesaDimRed-class] of PCA results, a named list of these, one per
 #'   result; an error for UMAP results.
 #' * `getWindowNames()`: the window IDs a result was computed over. For a
-#'   [mesaDimRed-class], a named list of these, one per result. Documented
-#'   in [getWindowNames()].
+#'   [mesaDimRed-class], a named list of these, one per result.
 #' * `as.data.frame()`: one `data.frame` with a row per result and sample:
 #'   `resName` (the result's name, as in `getResults()`), `sample_name`, the
 #'   coordinate columns (`PC1`, `PC2`, ... or `UMAP1`, `UMAP2`), then the

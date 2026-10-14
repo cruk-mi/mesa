@@ -150,16 +150,15 @@ getUMAP <- function(qseaSet,
 #' @param topVarNum `numeric(1)` or `integer(1)` or `Inf` or `NULL` **or** a
 #' vector.
 #' Keep the `topVarNum` most variable windows (by SD). If `NA`, `NULL`, `Inf`,
-#' or `>=` available windows, use all. If a vector, the reduction is run once
-#' per value and
-#' results are returned in a list.
+#' or `>=` available windows, use all. If a vector, dimensionality reduction
+#' is run once per value and results are returned in a list.
 #'   **Default:** `1000`.
 #'
 #' @param topVarSamples `NULL`, `character()`, `list`, or `regex` string.
 #' Samples used to compute variability. If `NULL`/`NA`, use all samples. If a
-#' vector/regex, select matching samples. If a `list`, perform the reduction
-#' per list
-#' element (should match `length(topVarNum)` when vectorised).
+#' vector/regex, select matching samples. If a `list`, perform dimensionality
+#' reduction per list element (should match `length(topVarNum)` when
+#' vectorised).
 #'   **Default:** `NULL`.
 #'
 #' @param center `logical(1)`.
@@ -193,22 +192,23 @@ getUMAP <- function(qseaSet,
 #' or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
 #' The sample IDs are the row names of each result (sample group names when
 #' `useGroupMeans = TRUE`).
-#' * **dataTable** (optional): The numeric matrix used for the reduction when
-#' `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
-#' `minDensity`, removal of rows with missing values, and may include columns of
-#' window SDs when applicable (named per `params$topVar`).
+#' * **dataTable** (optional): The numeric matrix used for dimensionality
+#' reduction when `returnDataTable = TRUE`. It reflects filtering by
+#' `regionsToOverlap` and `minDensity`, removal of rows with missing values, and
+#' may include columns of window SDs when applicable (named per
+#' `params$topVar`).
 #' * **params**: List of parameters used (method, selection/filter settings,
 #' etc.).
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
 #' @details:
-#' - For `method = "PCA"`, the reduction is performed via [stats::prcomp()]
-#' with `center`
-#' and `scale` controls.
-#' - For `method = "UMAP"`, the reduction is performed via [uwot::umap()].
-#' - Prior to the reduction, optional filtering is applied: enrichment cut-off
-#' (`minEnrichment`), CpG density (`minDensity`), region restriction
-#' (`regionsToOverlap`), and most-variable windows (`topVarNum`).
+#' - For `method = "PCA"`, dimensionality reduction is performed via
+#' [stats::prcomp()] with `center` and `scale` controls.
+#' - For `method = "UMAP"`, dimensionality reduction is performed via
+#' [uwot::umap()].
+#' - Prior to dimensionality reduction, optional filtering is applied:
+#' enrichment cut-off (`minEnrichment`), CpG density (`minDensity`), region
+#' restriction (`regionsToOverlap`), and most-variable windows (`topVarNum`).
 #' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple runs
 #' are performed and collected in `res`.
 #'
@@ -229,7 +229,7 @@ getUMAP <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'     getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
 #'
-#' # Restrict the reduction to a set of regions (coerced from data.frame)
+#' # Restrict dimensionality reduction to a set of regions (from a data.frame)
 #' regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 #' exampleTumourNormal %>%
 #'     getDimRed(method = "PCA", regionsToOverlap = regs)

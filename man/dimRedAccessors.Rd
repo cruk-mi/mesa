@@ -76,8 +76,7 @@ For a \link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per resul
 \link[=mesaDimRed-class]{mesaDimRed} of PCA results, a named list of these, one per
 result; an error for UMAP results.
 \item \code{getWindowNames()}: the window IDs a result was computed over. For a
-\link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per result. Documented
-in \code{\link[=getWindowNames]{getWindowNames()}}.
+\link[=mesaDimRed-class]{mesaDimRed}, a named list of these, one per result.
 \item \code{as.data.frame()}: one \code{data.frame} with a row per result and sample:
 \code{resName} (the result's name, as in \code{getResults()}), \code{sample_name}, the
 coordinate columns (\code{PC1}, \code{PC2}, ... or \code{UMAP1}, \code{UMAP2}), then the
