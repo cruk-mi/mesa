@@ -65,6 +65,9 @@
   ([#155](https://github.com/cruk-mi/mesa/pull/155))
 
 ## Infrastructure
+- Codecov's patch status now fails when less than 80% of the lines a pull
+  request adds are covered by tests; the project status stays informational.
+  ([#160](https://github.com/cruk-mi/mesa/issues/160))
 - Coverage is now uploaded on pull requests as well as `main`; Codecov
   statuses are informational.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))
