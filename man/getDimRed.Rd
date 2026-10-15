@@ -84,7 +84,7 @@ Minimum reads required for beta values to be non-\code{NA}; forwarded to
 
 \item{useGroupMeans}{\code{logical(1)}.
 If \code{TRUE}, average samples within the \code{group} column (combine replicates)
-before DR.
+before dimensionality reduction.
 \strong{Default:} \code{FALSE}.}
 
 \item{minDensity}{\code{numeric(1)}.
@@ -94,14 +94,15 @@ Minimum CpG density; windows below this are removed.
 \item{topVarNum}{\code{numeric(1)} or \code{integer(1)} or \code{Inf} or \code{NULL} \strong{or} a
 vector.
 Keep the \code{topVarNum} most variable windows (by SD). If \code{NA}, \code{NULL}, \code{Inf},
-or \code{>=} available windows, use all. If a vector, DR is run once per value and
-results are returned in a list.
+or \code{>=} available windows, use all. If a vector, dimensionality reduction
+is run once per value and results are returned in a list.
 \strong{Default:} \code{1000}.}
 
 \item{topVarSamples}{\code{NULL}, \code{character()}, \code{list}, or \code{regex} string.
 Samples used to compute variability. If \code{NULL}/\code{NA}, use all samples. If a
-vector/regex, select matching samples. If a \code{list}, perform DR per list
-element (should match \code{length(topVarNum)} when vectorised).
+vector/regex, select matching samples. If a \code{list}, perform dimensionality
+reduction per list element (should match \code{length(topVarNum)} when
+vectorised).
 \strong{Default:} \code{NULL}.}
 
 \item{center}{\code{logical(1)}.
@@ -117,7 +118,8 @@ Number of principal components to compute (PCA only).
 \strong{Default:} \code{5}.}
 
 \item{returnDataTable}{\code{logical(1)}.
-If \code{TRUE}, include the matrix used for DR in the return object.
+If \code{TRUE}, include the matrix used for the dimensionality reduction in the
+return object.
 \strong{Default:} \code{FALSE}.}
 
 \item{verbose}{\code{logical(1)}.
@@ -134,14 +136,16 @@ e.g. \code{n_neighbors}, \code{min_dist}, \code{metric}.}
 \value{
 A \code{\link{mesaDimRed}} object with:
 \itemize{
-\item \strong{res}: Named list of DR results; each element is a \code{\link{mesaPCA}} (for PCA)
+\item \strong{res}: Named list of dimensionality reduction results; each element is
+a \code{\link{mesaPCA}} (for PCA)
 or \code{\link{mesaUMAP}} (for UMAP). Names correspond to entries in \code{params$topVar}.
 The sample IDs are the row names of each result (sample group names when
 \code{useGroupMeans = TRUE}).
-\item \strong{dataTable} (optional): The numeric matrix used for DR when
-\code{returnDataTable = TRUE}. It reflects filtering by \code{regionsToOverlap} and
-\code{minDensity}, removal of rows with missing values, and may include columns of
-window SDs when applicable (named per \code{params$topVar}).
+\item \strong{dataTable} (optional): The numeric matrix used for dimensionality
+reduction when \code{returnDataTable = TRUE}. It reflects filtering by
+\code{regionsToOverlap} and \code{minDensity}, removal of rows with missing values, and
+may include columns of window SDs when applicable (named per
+\code{params$topVar}).
 \item \strong{params}: List of parameters used (method, selection/filter settings,
 etc.).
 \item \strong{sampleTable}: Copy of \code{qsea::getSampleTable(qseaSet)}.
@@ -159,13 +163,14 @@ wrappers such as \code{\link[=getPCA]{getPCA()}} and \code{\link[=getUMAP]{getUM
 \details{
 :
 \itemize{
-\item For \code{method = "PCA"}, DR is performed via \code{\link[stats:prcomp]{stats::prcomp()}} with \code{center}
-and \code{scale} controls.
-\item For \code{method = "UMAP"}, DR is performed via \code{\link[uwot:umap]{uwot::umap()}}.
-\item Prior to DR, optional filtering is applied: enrichment cut-off
-(\code{minEnrichment}), CpG density (\code{minDensity}), region restriction
-(\code{regionsToOverlap}), and most-variable windows (\code{topVarNum}).
-\item When \code{topVarNum} or \code{topVarSamples} are vectorised/lists, multiple DR runs
+\item For \code{method = "PCA"}, dimensionality reduction is performed via
+\code{\link[stats:prcomp]{stats::prcomp()}} with \code{center} and \code{scale} controls.
+\item For \code{method = "UMAP"}, dimensionality reduction is performed via
+\code{\link[uwot:umap]{uwot::umap()}}.
+\item Prior to dimensionality reduction, optional filtering is applied:
+enrichment cut-off (\code{minEnrichment}), CpG density (\code{minDensity}), region
+restriction (\code{regionsToOverlap}), and most-variable windows (\code{topVarNum}).
+\item When \code{topVarNum} or \code{topVarSamples} are vectorised/lists, multiple runs
 are performed and collected in \code{res}.
 }
 }
@@ -215,7 +220,7 @@ exampleTumourNormal \%>\%
 exampleTumourNormal \%>\%
     getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
 
-# Restrict DR to a set of regions (coerced from data.frame)
+# Restrict dimensionality reduction to a set of regions (from a data.frame)
 regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 exampleTumourNormal \%>\%
     getDimRed(method = "PCA", regionsToOverlap = regs)

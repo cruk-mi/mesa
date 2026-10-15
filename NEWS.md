@@ -10,6 +10,38 @@
 - `getSampleNames()` now works on `mesaDimRed` objects and returns the sample
   IDs their results cover (sample group names with `useGroupMeans = TRUE`).
   ([#10](https://github.com/cruk-mi/mesa/issues/10))
+- New accessors let you read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects
+  without `@`: `getResults()`, `getParameters()`, `getCoordinates()`,
+  `getPrcomp()`, `getWindowNames()`, `getDataTable()`, `getSampleTable()` and
+  `getSampleNames()`. On a `mesaDimRed`, `getResults()`, `getCoordinates()`,
+  `getPrcomp()` and `getWindowNames()` return a list with one element per
+  result. `getCoordinates()`, `getWindowNames()` and `getSampleNames()` also
+  work directly on `mesaPCA` and `mesaUMAP` objects, and `getPrcomp()` on
+  `mesaPCA` objects. The first argument of `getDataTable()` is now `x`
+  instead of `qseaSet`.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+- `as.data.frame()` can now be applied to `mesaDimRed` objects, returning one
+  table of coordinates and sample annotations for all PCA or UMAP results in
+  the object.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+
+## Bug fixes
+- `getWindowNames()` now says "Unknown data type" when given something that
+  is not a `qseaSet`, `mesaDimRed`, `mesaPCA`, `mesaUMAP`, `GRanges` or
+  window table.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+- `plotPCA()` and `plotUMAP()` no longer fail when the `sampleTable` has a
+  column named like a component (for example `PC1`); the plot uses the
+  computed coordinates.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+- `plotPCA()` and `plotUMAP()` now say that `params$method` must be `"PCA"` or
+  `"UMAP"` when a `mesaDimRed` has none, instead of failing with "argument is
+  of length zero".
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+- `mesaDimRed` validity now checks sample IDs against the
+  `sampleTable$sample_name` column, as qsea does, rather than its row names,
+  and says so when the column is missing.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117))
 
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
@@ -25,6 +57,9 @@
   ([#116](https://github.com/cruk-mi/mesa/issues/116))
 
 ## Documentation
+- The `mesaDimRed`, `mesaPCA` and `mesaUMAP` help pages list their accessors,
+  `?dimRedAccessors` documents them, and the PCA vignette shows how to read a
+  `getPCA()` result. ([#7](https://github.com/cruk-mi/mesa/issues/7))
 - Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
   the pkgdown site and vignettes, and citations.
   ([#108](https://github.com/cruk-mi/mesa/pull/108))

@@ -2009,8 +2009,9 @@ getSampleGroups2 <- function(qseaSet){
 #' Build a per-window table for one or more normalisation methods, returning
 #' values per **sample** or **group means**.
 #'
-#' @param qseaSet `qseaSet`.  
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' @param x `qseaSet` or [mesaDimRed-class].  
+#'   A qseaSet object containing methylation-enriched sequencing data, or a
+#'   [mesaDimRed-class] object.
 #'   **Default:** none (must be supplied).
 #'
 #' @param normMethod `character()`.  
@@ -2037,6 +2038,8 @@ getSampleGroups2 <- function(qseaSet){
 #'   Print progress/messages.  
 #'   **Default:** `TRUE`.
 #'
+#' @param ... Passed to methods. Not used by the `mesaDimRed` method.
+#'
 #' @details
 #' The result is a **window × sample (or group)** table. Window coordinates and
 #' any available region metadata (e.g., `seqnames`, `start`, `end`, densities)
@@ -2049,13 +2052,21 @@ getSampleGroups2 <- function(qseaSet){
 #' aggregation. Use [removeNormMethodSuffix()] afterwards if you want to strip
 #' method tags in wide tables.
 #'
+#' If `x` is a [mesaDimRed-class] object (returned by [getDimRed()],
+#' [getPCA()] or [getUMAP()]), the input data used to compute the results is
+#' returned, provided it was stored when the dimensionality reduction was
+#' performed by setting `returnDataTable = TRUE`. The other arguments are
+#' ignored.
+#'
 #' @return
 #' A tibble/data.frame with one row per genomic window and one column per
-#' sample (or group), plus window metadata columns.
+#' sample (or group), plus window metadata columns. For a [mesaDimRed-class],
+#' a `data.frame` with windows in rows and samples in columns, or an empty
+#' `data.frame` if the data was not stored.
 #'
 #' @seealso
 #' [getCountTable()], [getNRPMTable()], [getBetaTable()],
-#' [removeNormMethodSuffix()]
+#' [removeNormMethodSuffix()], [dimRedAccessors]
 #'
 #' @family table-helpers
 #'
@@ -2086,15 +2097,29 @@ getSampleGroups2 <- function(qseaSet){
 #'   names() %>%
 #'   head()
 #'
+#' # The data a PCA was computed from, when kept with returnDataTable = TRUE
+#' exampleTumourNormal %>%
+#'   getPCA(topVarNum = 100, returnDataTable = TRUE, verbose = FALSE) %>%
+#'   getDataTable() %>%
+#'   dplyr::select(1:4) %>%
+#'   head()
+#'
 #' @export
-getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
-    minEnrichment = 3, addMethodSuffix = FALSE, verbose = TRUE) {
+setGeneric("getDataTable", function(x, ...) {
+    standardGeneric("getDataTable")
+})
 
-    if (!is.qseaSet(qseaSet)) {
+#' @rdname getDataTable
+#' @export
+setMethod("getDataTable", "ANY", function(x, normMethod = "nrpm",
+    useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE,
+    verbose = TRUE) {
+
+    if (!is.qseaSet(x)) {
         stop("Please provide a qseaSet as the first argument.")
     }
 
-    if(qseaSet %>% qsea::getRegions() %>% length() == 0){
+    if(x %>% qsea::getRegions() %>% length() == 0){
         stop(
             "Attempting to get data values for a qseaSet with no remaining ",
             "windows."
@@ -2105,11 +2130,11 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
     if(verbose){
         message(glue::glue(
             "Generating table of {normMethod} values for ",
-            "{qseaSet %>% qsea::getRegions() %>% length()} regions across ",
-            "{qseaSet %>% getSampleGroups2() %>% length()} sample groups."
+            "{x %>% qsea::getRegions() %>% length()} regions across ",
+            "{x %>% getSampleGroups2() %>% length()} sample groups."
         ))
     }
-    tab <- qseaSet %>%
+    tab <- x %>%
         qsea::makeTable(
             groupMeans = getSampleGroups2(.),
             norm_methods = normMethod,
@@ -2141,11 +2166,11 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
     if(verbose){
         message(glue::glue(
             "Generating table of {normMethod} values for ",
-            "{qseaSet %>% qsea::getRegions() %>% length()} regions across ",
-            "{qseaSet %>% getSampleGroups2() %>% length()} samples."
+            "{x %>% qsea::getRegions() %>% length()} regions across ",
+            "{x %>% getSampleGroups2() %>% length()} samples."
         ))
     }
-    tab <- qseaSet %>%
+    tab <- x %>%
         qsea::makeTable(
             samples = qsea::getSampleNames(.),
             norm_methods = normMethod,
@@ -2169,7 +2194,13 @@ getDataTable <- function(qseaSet, normMethod = "nrpm", useGroupMeans = FALSE,
     return(tab)
     }
 
-}
+})
+
+#' @rdname getDataTable
+#' @export
+setMethod("getDataTable", "mesaDimRed", function(x, ...) {
+    x@dataTable
+})
 
 
 #' Write bigWig tracks per sample or group

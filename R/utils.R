@@ -73,27 +73,33 @@ qseaTableToChrGRanges <- function(dataTable) {
 }
 
 
-#' Get window names from a qseaSet or ranges/table
+#' Get window names from a qseaSet, ranges/table or dimensionality reduction
+#' object
 #'
 #' Return character labels of the form `"seqnames:start-end"` for each genomic
-#' window/region.
+#' window/region, or the windows a dimensionality reduction was computed over.
 #'
-#' @param x `qseaSet` **or** `GRanges` **or** `data.frame`.
+#' @param x `qseaSet` **or** `GRanges` **or** `data.frame`, **or** a
+#'   [mesaPCA-class], [mesaUMAP-class] or [mesaDimRed-class] object.
 #' If a data frame, it must be coercible to `GRanges` (accepted columns include
 #' `seqnames/start/end`, or `chr/start/end`, or `chr/window_start/window_end`).
 #'   **Default:** none (must be supplied).
 #'
 #' @details
 #' If `x` is a `qseaSet`, regions are taken from `qsea::getRegions(x)`.
+#' If `x` is a [mesaPCA-class] or [mesaUMAP-class], the window IDs used to
+#' compute the dimensionality reduction are returned. If `x` is a
+#' [mesaDimRed-class], the result is a named list of these, one per result.
 #' Otherwise
 #' the input is coerced to `GRanges` (see [asValidGranges()]) and labels are
 #' constructed as `"seqnames:start-end"`.
 #'
 #' @return
-#' `character()` vector of window labels, one per region.
+#' `character()` vector of window labels, one per region. For a
+#' [mesaDimRed-class], a named list of these, one per result.
 #'
 #' @seealso
-#' [qsea::getRegions()], [asValidGranges()]
+#' [qsea::getRegions()], [asValidGranges()], [dimRedAccessors]
 #'
 #' @examples
 #' # From a GRanges (no intermediate objects)
@@ -111,24 +117,52 @@ qseaTableToChrGRanges <- function(dataTable) {
 #' data(exampleTumourNormal, package = "mesa")
 #' exampleTumourNormal %>% getWindowNames() %>% head()
 #'
+#' # The windows each PCA result was computed over
+#' exampleTumourNormal %>%
+#'     getPCA(topVarNum = c(100, 500), verbose = FALSE) %>%
+#'     getWindowNames() %>%
+#'     lengths()
+#'
 #' @export
-getWindowNames <- function(x) {
+setGeneric("getWindowNames", function(x) standardGeneric("getWindowNames"))
 
-    if (is.qseaSet(x)) {
-        return(x %>%
-            qsea::getRegions() %>%
-            tibble::as_tibble() %>%
-            dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-            dplyr::pull(window))
+#' @rdname getWindowNames
+#' @export
+setMethod("getWindowNames", "ANY", function(x) {
+
+    gr <- if (is.qseaSet(x)) {
+        qsea::getRegions(x)
+    } else {
+        tryCatch(
+            asValidGranges(x),
+            error = function(e) {
+                stop("Unknown data type! Expected a qseaSet, mesaDimRed, ",
+                    "mesaPCA, mesaUMAP, GRanges or data.frame with window ",
+                    "coordinates. ", conditionMessage(e), call. = FALSE)
+            }
+        )
     }
 
-    return(asValidGranges(x) %>%
-        tibble::as_tibble() %>%
-        dplyr::mutate(window = paste0(seqnames, ":", start, "-", end)) %>%
-        dplyr::pull(window))
+    paste0(
+        as.character(GenomicRanges::seqnames(gr)), ":",
+        GenomicRanges::start(gr), "-",
+        GenomicRanges::end(gr)
+    )
+})
 
-    stop("Unknown data type!")
-}
+#' @rdname getWindowNames
+#' @export
+setMethod("getWindowNames", "mesaPCA", function(x) x@windows)
+
+#' @rdname getWindowNames
+#' @export
+setMethod("getWindowNames", "mesaUMAP", function(x) x@windows)
+
+#' @rdname getWindowNames
+#' @export
+setMethod("getWindowNames", "mesaDimRed", function(x) {
+    lapply(getResults(x), getWindowNames)
+})
 
 
 #' Infer pattern names from region density columns

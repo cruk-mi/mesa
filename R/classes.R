@@ -24,7 +24,7 @@ methods::setOldClass("prcomp")
 
 #' Dimensionality reduction results container
 #'
-#' Aggregates one or more dimensionality reduction (DR) results (e.g., PCA/UMAP)
+#' Aggregates one or more dimensionality reduction results (e.g., PCA/UMAP)
 #' computed on a common set of samples.
 #'
 #' A valid object has `res` empty, or:
@@ -33,12 +33,25 @@ methods::setOldClass("prcomp")
 #'   [mesaUMAP-class] objects, matching `params$method` if set;
 #' * every element covers the same sample IDs, in the same order,
 #'   with no duplicates;
-#' * each sample ID is a row name of `sampleTable` (a value of
+#' * each sample ID is a value of `sampleTable$sample_name` (of
 #'   `sampleTable$group` when `params$useGroupMeans` is `TRUE`);
 #' * each sample ID is a column of `dataTable`, when it has columns.
 #'
+#' @section Accessors:
+#' Read the slots with these functions rather than `@`:
+#' * [getResults()]: the list of results (`res`);
+#' * [getSampleTable()] and [getSampleNames()]: the sample annotations and the
+#'   sample IDs the results cover;
+#' * [getParameters()]: the parameters (`params`);
+#' * [getDataTable()]: the data used to compute the results (`dataTable`);
+#' * [getCoordinates()] and [getWindowNames()]: per-result coordinates and
+#'   window IDs, as named lists;
+#' * [as.data.frame()][dimRedAccessors]: the coordinates of every result in
+#'   one long table, with the sample annotations.
+#'
 #' @slot res `list`
-#'   Individual DR result objects (e.g., [mesaPCA-class], [mesaUMAP-class]).
+#'   Individual dimensionality reduction result objects (e.g.,
+#'   [mesaPCA-class], [mesaUMAP-class]).
 #'
 #' The sample IDs of the results are the row names of each element of
 #' `res` (`prcomp$x` for [mesaPCA-class],
@@ -46,18 +59,21 @@ methods::setOldClass("prcomp")
 #' `useGroupMeans = TRUE` they are sample group names.
 #'
 #' @slot sampleTable `data.frame`
-#'   Sample annotations; row names are sample IDs.
+#'   Sample annotations; the `sample_name` column holds the sample IDs
+#'   (the row names mirror it, as in a `qseaSet`).
 #'
 #' @slot params `list`
 #'   Parameters used to generate results in `res`.
 #'
 #' @slot dataTable `data.frame`
-#'   Optional matrix/data used to compute DR (for reproducibility).
+#'   Optional matrix/data used to compute the dimensionality reduction (for
+#'   reproducibility).
 #'
 #' @name mesaDimRed-class
 #' @aliases mesaDimRed-class
 #' @rdname mesaDimRed-class
-#' @seealso [mesaPCA-class], [mesaUMAP-class]
+#' @seealso [mesaPCA-class], [mesaUMAP-class], [dimRedAccessors],
+#'   [getPCA()], [getUMAP()]
 #' @exportClass mesaDimRed
 setClass("mesaDimRed",
     slots = c(
@@ -72,20 +88,22 @@ setClass("mesaDimRed",
 #' Construct a `mesaDimRed` object
 #'
 #' @param res `list`
-#'   DR result objects. **Default:** none. `res` must be supplied.
+#'   Dimensionality reduction result objects. **Default:** none. `res` must
+#'   be supplied.
 #'
 #' @param sampleTable `data.frame`
-#'   Sample annotations; row names must be sample IDs. **Default:** none.
+#'   Sample annotations, with the sample IDs in a `sample_name` column.
+#'   **Default:** none.
 #'
 #' @param params `list`
 #'   Parameters used to compute `res`. **Default:** none.
 #'
 #' @param dataTable `data.frame`
-#'   Optional numeric matrix/data used for DR.
+#'   Optional numeric matrix/data used for the dimensionality reduction.
 #'   **Default:** `data.frame()`.
 #'
 #' @return A [mesaDimRed-class] object:
-#' * stores DR results in `res`,
+#' * stores dimensionality reduction results in `res`,
 #' * carries sample metadata in `sampleTable`,
 #' * and persists parameters/data in `params` / `dataTable`.
 #'
@@ -126,10 +144,12 @@ setMethod("show", "mesaDimRed", function(object) {
 .checkDimRedIds <- function(object, ids) {
     if (anyDuplicated(ids)) return("sample IDs in `res` must be unique")
 
-    known <- if (isTRUE(object@params$useGroupMeans)) {
-        object@sampleTable$group
+    if (isTRUE(object@params$useGroupMeans)) {
+        known <- object@sampleTable$group
+    } else if ("sample_name" %in% colnames(object@sampleTable)) {
+        known <- object@sampleTable$sample_name
     } else {
-        rownames(object@sampleTable)
+        return("`sampleTable` must have a `sample_name` column")
     }
     missing <- setdiff(ids, known)
     if (length(missing) > 0) {
@@ -187,14 +207,13 @@ setValidity("mesaDimRed", function(object) {
 
 setMethod("plotPCA", "mesaDimRed", plotPCA.mesaDimRed)
 
+#' @rdname dimRedAccessors
+#' @export
 setMethod("getSampleTable", "mesaDimRed", function(object) {
     object@sampleTable
 })
 
-#' @rdname mesaDimRed-class
-#' @details `getSampleNames()` returns the sample IDs that the results in `res`
-#'   cover (the row names of each result), or `character()` when `res` is
-#'   empty. With `params$useGroupMeans = TRUE` they are sample group names.
+#' @rdname dimRedAccessors
 setMethod("getSampleNames", "mesaDimRed", function(object) {
     if (length(object@res) == 0) return(character())
     .dimRedIds(object@res[[1]])
@@ -212,6 +231,13 @@ setMethod("getSampleNames", "mesaDimRed", function(object) {
 #' one per row of `prcomp$rotation`, and a `prcomp$x` matrix whose row
 #' names are the sample IDs.
 #'
+#' @section Accessors:
+#' * [getPrcomp()]: the `prcomp` fit, e.g. for `sdev` or `rotation`;
+#' * [getCoordinates()]: the sample coordinates (`prcomp$x`), as a
+#'   `data.frame`;
+#' * [getSampleNames()]: the sample IDs (row names of `prcomp$x`);
+#' * [getWindowNames()]: the window IDs (`windows`).
+#'
 #' @slot prcomp `prcomp`
 #'   A PCA fit returned by [stats::prcomp()].
 #'
@@ -221,7 +247,7 @@ setMethod("getSampleNames", "mesaDimRed", function(object) {
 #' @name mesaPCA-class
 #' @aliases mesaPCA-class
 #' @rdname mesaPCA-class
-#' @seealso [mesaDimRed-class]
+#' @seealso [mesaDimRed-class], [dimRedAccessors]
 #' @exportClass mesaPCA
 setClass("mesaPCA",
     slots = c(
@@ -296,6 +322,11 @@ setValidity("mesaPCA", function(object) {
 #' and at least one row of numeric `points` with the sample IDs as row
 #' names.
 #'
+#' @section Accessors:
+#' * [getCoordinates()]: the sample coordinates (`points`);
+#' * [getSampleNames()]: the sample IDs (row names of `points`);
+#' * [getWindowNames()]: the window IDs (`windows`).
+#'
 #' @slot points `data.frame`
 #'   One row per sample with UMAP coordinates (e.g., `UMAP1`, `UMAP2`).
 #'   Row names are sample IDs.
@@ -306,7 +337,7 @@ setValidity("mesaPCA", function(object) {
 #' @name mesaUMAP-class
 #' @aliases mesaUMAP-class
 #' @rdname mesaUMAP-class
-#' @seealso [mesaDimRed-class]
+#' @seealso [mesaDimRed-class], [dimRedAccessors]
 #' @exportClass mesaUMAP
 
 setClass("mesaUMAP",
@@ -365,6 +396,168 @@ setValidity("mesaUMAP", function(object) {
     }
     TRUE
 })
+
+
+# ==============================
+# Accessors
+# ==============================
+
+#' Accessors for dimensionality reduction results
+#'
+#' Read the contents of [mesaDimRed-class], [mesaPCA-class] and
+#' [mesaUMAP-class] objects, as returned by [getPCA()] and [getUMAP()].
+#'
+#' @param object A [mesaDimRed-class] object, or a [mesaPCA-class] or
+#'   [mesaUMAP-class] object where stated.
+#'
+#' @param x A [mesaDimRed-class] object.
+#'
+#' @param row.names,optional Not used.
+#'
+#' @param ... Not used.
+#'
+#' @return
+#' * `getResults()`: a named list of [mesaPCA-class] or [mesaUMAP-class]
+#'   objects, one per result (e.g. per `topVarNum` value); empty when there
+#'   are no results.
+#' * `getSampleTable()`: the sample annotations, a `data.frame` with the
+#'   sample IDs in its `sample_name` column.
+#' * `getSampleNames()`: the sample IDs the results cover, or `character()`
+#'   when there are no results; also works on a [mesaPCA-class] or
+#'   [mesaUMAP-class], giving its sample IDs. With `useGroupMeans = TRUE` they are sample
+#'   group names.
+#' * `getParameters()`: the list of parameters used to compute the results,
+#'   including `method` (`"PCA"` or `"UMAP"`).
+#' * `getDataTable()`: if `returnDataTable = TRUE`, the input data used to
+#'   compute the results, as a `data.frame` with windows in rows and samples
+#'   in columns; otherwise, an empty `data.frame`.
+#' * `getCoordinates()`: for a [mesaPCA-class], its principal component
+#'   scores (`prcomp$x`); for a [mesaUMAP-class], its UMAP coordinates. Each
+#'   is a `data.frame` with one row per sample and sample IDs as row names.
+#'   For a [mesaDimRed-class], a named list of these, one per result.
+#' * `getPrcomp()`: the [stats::prcomp()] fit of a [mesaPCA-class]. For a
+#'   [mesaDimRed-class] of PCA results, a named list of these, one per
+#'   result; an error for UMAP results.
+#' * `getWindowNames()`: the window IDs a result was computed over. For a
+#'   [mesaDimRed-class], a named list of these, one per result.
+#' * `as.data.frame()`: one `data.frame` with a row per result and sample:
+#'   `resName` (the result's name, as in `getResults()`), `sample_name`, the
+#'   coordinate columns (`PC1`, `PC2`, ... or `UMAP1`, `UMAP2`), then the
+#'   `sampleTable` columns. With `useGroupMeans = TRUE` the ID column is
+#'   `group` and no sample annotations are added.
+#'
+#' @seealso [mesaDimRed-class], [mesaPCA-class], [mesaUMAP-class], [getPCA()],
+#'   [getUMAP()], [plotDimRed()]
+#'
+#' @examples
+#' data(exampleTumourNormal, package = "mesa")
+#' pca <- getPCA(exampleTumourNormal, topVarNum = c(100, 500),
+#'     verbose = FALSE)
+#'
+#' names(getResults(pca))
+#' head(getSampleTable(pca))
+#' getSampleNames(pca)
+#' getParameters(pca)$method
+#'
+#' first <- getResults(pca)[[1]]
+#' head(getCoordinates(first))
+#' summary(getPrcomp(first))$importance[, 1:3]
+#'
+#' # Coordinates of every result at once
+#' lapply(getCoordinates(pca), dim)
+#'
+#' # Everything in one table, e.g. for a custom plot
+#' head(as.data.frame(pca)[, 1:6])
+#'
+#' @name dimRedAccessors
+NULL
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getResults", function(object, ...) {
+    standardGeneric("getResults")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getResults", "mesaDimRed", function(object) object@res)
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getParameters", "mesaDimRed", function(object) object@params)
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getCoordinates", function(object, ...) {
+    standardGeneric("getCoordinates")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getCoordinates", "mesaPCA", function(object) {
+    as.data.frame(object@prcomp$x)
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getCoordinates", "mesaUMAP", function(object) object@points)
+
+#' @rdname dimRedAccessors
+setMethod("getSampleNames", "mesaPCA", function(object) .dimRedIds(object))
+
+#' @rdname dimRedAccessors
+setMethod("getSampleNames", "mesaUMAP", function(object) .dimRedIds(object))
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getCoordinates", "mesaDimRed", function(object) {
+    lapply(object@res, getCoordinates)
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setGeneric("getPrcomp", function(object, ...) {
+    standardGeneric("getPrcomp")
+})
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getPrcomp", "mesaPCA", function(object) object@prcomp)
+
+#' @rdname dimRedAccessors
+#' @export
+setMethod("getPrcomp", "mesaDimRed", function(object) {
+    if (identical(getParameters(object)$method, "UMAP") ||
+        any(vapply(object@res, inherits, logical(1), "mesaUMAP"))) {
+        stop("`getPrcomp()` needs PCA results, but this mesaDimRed holds ",
+            "UMAP results.", call. = FALSE)
+    }
+    lapply(object@res, getPrcomp)
+})
+
+#' @rdname dimRedAccessors
+#' @importFrom BiocGenerics as.data.frame
+#' @export
+setMethod("as.data.frame", "mesaDimRed",
+    function(x, row.names = NULL, optional = FALSE, ...) {
+        byGroup <- isTRUE(getParameters(x)$useGroupMeans)
+        idCol <- if (byGroup) "group" else "sample_name"
+        if (length(getResults(x)) == 0) {
+            out <- data.frame(resName = character(), id = character())
+            return(rlang::set_names(out, c("resName", idCol)))
+        }
+
+        out <- getCoordinates(x) %>%
+            lapply(tibble::rownames_to_column, var = idCol) %>%
+            dplyr::bind_rows(.id = "resName")
+        if (!byGroup) {
+            # Coordinate columns keep their names if sampleTable reuses one.
+            out <- dplyr::left_join(out, getSampleTable(x), by = idCol,
+                suffix = c("", ".sampleTable"))
+        }
+        as.data.frame(out)
+    }
+)
 
 
 

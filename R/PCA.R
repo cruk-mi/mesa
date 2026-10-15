@@ -140,7 +140,7 @@ getUMAP <- function(qseaSet,
 #'
 #' @param useGroupMeans `logical(1)`.
 #' If `TRUE`, average samples within the `group` column (combine replicates)
-#' before DR.
+#' before dimensionality reduction.
 #'   **Default:** `FALSE`.
 #'
 #' @param minDensity `numeric(1)`.
@@ -150,14 +150,15 @@ getUMAP <- function(qseaSet,
 #' @param topVarNum `numeric(1)` or `integer(1)` or `Inf` or `NULL` **or** a
 #' vector.
 #' Keep the `topVarNum` most variable windows (by SD). If `NA`, `NULL`, `Inf`,
-#' or `>=` available windows, use all. If a vector, DR is run once per value and
-#' results are returned in a list.
+#' or `>=` available windows, use all. If a vector, dimensionality reduction
+#' is run once per value and results are returned in a list.
 #'   **Default:** `1000`.
 #'
 #' @param topVarSamples `NULL`, `character()`, `list`, or `regex` string.
 #' Samples used to compute variability. If `NULL`/`NA`, use all samples. If a
-#' vector/regex, select matching samples. If a `list`, perform DR per list
-#' element (should match `length(topVarNum)` when vectorised).
+#' vector/regex, select matching samples. If a `list`, perform dimensionality
+#' reduction per list element (should match `length(topVarNum)` when
+#' vectorised).
 #'   **Default:** `NULL`.
 #'
 #' @param center `logical(1)`.
@@ -173,7 +174,8 @@ getUMAP <- function(qseaSet,
 #'   **Default:** `5`.
 #'
 #' @param returnDataTable `logical(1)`.
-#' If `TRUE`, include the matrix used for DR in the return object.
+#' If `TRUE`, include the matrix used for the dimensionality reduction in the
+#' return object.
 #'   **Default:** `FALSE`.
 #'
 #' @param verbose `logical(1)`.
@@ -185,26 +187,29 @@ getUMAP <- function(qseaSet,
 #' e.g. `n_neighbors`, `min_dist`, `metric`.
 #'
 #' @return A [`mesaDimRed`] object with:
-#' * **res**: Named list of DR results; each element is a [`mesaPCA`] (for PCA)
+#' * **res**: Named list of dimensionality reduction results; each element is
+#' a [`mesaPCA`] (for PCA)
 #' or [`mesaUMAP`] (for UMAP). Names correspond to entries in `params$topVar`.
 #' The sample IDs are the row names of each result (sample group names when
 #' `useGroupMeans = TRUE`).
-#' * **dataTable** (optional): The numeric matrix used for DR when
-#' `returnDataTable = TRUE`. It reflects filtering by `regionsToOverlap` and
-#' `minDensity`, removal of rows with missing values, and may include columns of
-#' window SDs when applicable (named per `params$topVar`).
+#' * **dataTable** (optional): The numeric matrix used for dimensionality
+#' reduction when `returnDataTable = TRUE`. It reflects filtering by
+#' `regionsToOverlap` and `minDensity`, removal of rows with missing values, and
+#' may include columns of window SDs when applicable (named per
+#' `params$topVar`).
 #' * **params**: List of parameters used (method, selection/filter settings,
 #' etc.).
 #' * **sampleTable**: Copy of `qsea::getSampleTable(qseaSet)`.
 #'
 #' @details:
-#' - For `method = "PCA"`, DR is performed via [stats::prcomp()] with `center`
-#' and `scale` controls.
-#' - For `method = "UMAP"`, DR is performed via [uwot::umap()].
-#' - Prior to DR, optional filtering is applied: enrichment cut-off
-#' (`minEnrichment`), CpG density (`minDensity`), region restriction
-#' (`regionsToOverlap`), and most-variable windows (`topVarNum`).
-#' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple DR runs
+#' - For `method = "PCA"`, dimensionality reduction is performed via
+#' [stats::prcomp()] with `center` and `scale` controls.
+#' - For `method = "UMAP"`, dimensionality reduction is performed via
+#' [uwot::umap()].
+#' - Prior to dimensionality reduction, optional filtering is applied:
+#' enrichment cut-off (`minEnrichment`), CpG density (`minDensity`), region
+#' restriction (`regionsToOverlap`), and most-variable windows (`topVarNum`).
+#' - When `topVarNum` or `topVarSamples` are vectorised/lists, multiple runs
 #' are performed and collected in `res`.
 #'
 #' @seealso
@@ -224,7 +229,7 @@ getUMAP <- function(qseaSet,
 #' exampleTumourNormal %>%
 #'     getDimRed(method = "UMAP", topVarNum = 500, n_neighbors = 5)
 #'
-#' # Restrict DR to a set of regions (coerced from data.frame)
+#' # Restrict dimensionality reduction to a set of regions (from a data.frame)
 #' regs <- data.frame(seqnames = "chr7", start = 25002001, end = 25027900)
 #' exampleTumourNormal %>%
 #'     getDimRed(method = "PCA", regionsToOverlap = regs)
@@ -1660,7 +1665,8 @@ plotDimRed <- function(object,
         )
     }
 
-    sampleTable <- object@sampleTable
+    sampleTable <- getSampleTable(object)
+    params <- getParameters(object)
 
     if (!is.null(colour)) {
         colDiff <- setdiff(colour, colnames(sampleTable))
@@ -1686,12 +1692,15 @@ plotDimRed <- function(object,
         components <- list(components)
     }
 
-    if (object@params$method == "PCA") {
+    if (identical(params$method, "PCA")) {
         columnPrefix <- "PC"
-    } else if (object@params$method == "UMAP") {
+    } else if (identical(params$method, "UMAP")) {
         columnPrefix <- "UMAP"
     } else {
-        stop("Method {object@params$method} not known")
+        stop(glue::glue(
+            "`params$method` must be \"PCA\" or \"UMAP\",",
+            " not {deparse(params$method)}."
+        ))
     }
 
     if (length(plotlyAnnotations) > 1) {
@@ -1708,21 +1717,21 @@ plotDimRed <- function(object,
         )
     )
 
-    ggp <- purrr::imap(object@res, function(single, resName) {
-        numWindows <- length(single@windows)
+    ggp <- purrr::imap(getResults(object), function(single, resName) {
+        numWindows <- length(getWindowNames(single))
 
         if (columnPrefix == "PC") {
-            propVar <- single@prcomp$sdev^2 / sum(single@prcomp$sdev^2)
-            propVar <- round(propVar * 100, 2)
-            plotData <- single@prcomp$x
+            sdev <- getPrcomp(single)$sdev
+            propVar <- round(sdev^2 / sum(sdev^2) * 100, 2)
         } else {
             propVar <- NULL
-            plotData <- single@points
         }
+        plotData <- getCoordinates(single)
 
         plotData <- plotData %>%
             tibble::as_tibble(rownames = "sample_name") %>%
-            dplyr::left_join(sampleTable, by = "sample_name")
+            dplyr::left_join(sampleTable, by = "sample_name",
+                suffix = c("", ".sampleTable"))
 
         if (!is.null(colourPalette) & is.null(colour)) {
             stop(
@@ -1764,12 +1773,12 @@ plotDimRed <- function(object,
             env$components <- components
             env$plotlyAnnotations <- plotlyAnnotations
 
-            topVarInfo <- object@params$topVar %>% filter(resName == !!resName)
+            topVarInfo <- params$topVar %>% filter(resName == !!resName)
 
             if (is.na(topVarInfo$topVarNum)) {
                 titleString <- glue::glue("all {numWindows} windows")
                 subtitleString <- glue::glue(
-                    "Using {object@params$normMethod} values."
+                    "Using {params$normMethod} values."
                 )
             } else {
                 titleString <- glue::glue(
@@ -1782,7 +1791,7 @@ plotDimRed <- function(object,
                     titleSubstring <- ""
                 }
                 subtitleString <- glue::glue(
-                    "Using {object@params$normMethod} values and",
+                    "Using {params$normMethod} values and",
                     " {titleSubstring}",
                     "{length(topVarInfo$topVarSamples[[1]])} samples",
                     " to calculate std dev."
@@ -1810,7 +1819,7 @@ plotDimRed <- function(object,
                 my_legend_params +
                 ggplot2::ggtitle(
                     glue::glue(
-                        "{object@params$method} for",
+                        "{params$method} for",
                         " {length(.dimRedIds(single))}",
                         " samples using {titleString}."
                     ),
@@ -1819,7 +1828,7 @@ plotDimRed <- function(object,
                 ggplot2::theme_bw() +
                 ggplot2::theme(plot.title = ggplot2::element_text(size = 12.5))
 
-            if (object@params$method == "PCA") {
+            if (params$method == "PCA") {
                 ggp <- ggp +
                     ggplot2::xlab(glue::glue(
                         "PC{components[1]} ({propVar[components[1]]}%)"
