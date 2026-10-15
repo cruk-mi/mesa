@@ -6,10 +6,10 @@
   naming the problem: duplicate or missing windows, results without sample IDs,
   mixed PCA and UMAP results, results covering different samples, or samples
   absent from `sampleTable` or `dataTable`.
-  ([#115](https://github.com/cruk-mi/mesa/issues/115))
+  ([#115](https://github.com/cruk-mi/mesa/issues/115), PR #149)
 - `getSampleNames()` now works on `mesaDimRed` objects and returns the sample
   IDs their results cover (sample group names with `useGroupMeans = TRUE`).
-  ([#10](https://github.com/cruk-mi/mesa/issues/10))
+  ([#10](https://github.com/cruk-mi/mesa/issues/10), PR #149)
 - New accessors let you read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects
   without `@`: `getResults()`, `getParameters()`, `getCoordinates()`,
   `getPrcomp()`, `getWindowNames()`, `getDataTable()`, `getSampleTable()` and
@@ -29,19 +29,19 @@
 - `getWindowNames()` now says "Unknown data type" when given something that
   is not a `qseaSet`, `mesaDimRed`, `mesaPCA`, `mesaUMAP`, `GRanges` or
   window table.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
 - `plotPCA()` and `plotUMAP()` no longer fail when the `sampleTable` has a
   column named like a component (for example `PC1`); the plot uses the
   computed coordinates.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
 - `plotPCA()` and `plotUMAP()` now say that `params$method` must be `"PCA"` or
   `"UMAP"` when a `mesaDimRed` has none, instead of failing with "argument is
   of length zero".
-  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
 - `mesaDimRed` validity now checks sample IDs against the
   `sampleTable$sample_name` column, as qsea does, rather than its row names,
   and says so when the column is missing.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
 
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
@@ -49,31 +49,31 @@
   `@samples` should call `getSampleNames()` instead, and code that passes
   `samples =` to `mesaDimRed()` should drop it; objects saved with an earlier
   version still load and work.
-  ([#10](https://github.com/cruk-mi/mesa/issues/10))
+  ([#10](https://github.com/cruk-mi/mesa/issues/10), PR #149)
 
 ## Testing
 - Added tests for the `mesaDimRed`, `mesaPCA` and `mesaUMAP` constructors and
   for each validity check.
-  ([#116](https://github.com/cruk-mi/mesa/issues/116))
+  ([#116](https://github.com/cruk-mi/mesa/issues/116), PR #149)
 
 ## Documentation
 - The `mesaDimRed`, `mesaPCA` and `mesaUMAP` help pages list their accessors,
   `?dimRedAccessors` documents them, and the PCA vignette shows how to read a
-  `getPCA()` result. ([#7](https://github.com/cruk-mi/mesa/issues/7))
+  `getPCA()` result. ([#7](https://github.com/cruk-mi/mesa/issues/7), PR #158)
 - Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
   the pkgdown site and vignettes, and citations.
-  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+  (PR #108)
 - Fixed the "Annotatation" typo in the DMR vignette title.
-  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+  (PR #108)
 - `citation("mesa")` now returns the two published papers.
-  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+  (PR #108)
 - Added a package architecture diagram to the README; its Mermaid source is
   in `data-raw/figures/`.
-  ([#110](https://github.com/cruk-mi/mesa/pull/110))
+  (PR #110)
 - `?mesa` is now a user-facing overview listed in the reference index: what
   enrichment sequencing measures, the workflow from `makeQset()` to
   `annotateWindows()`, the example datasets and the vignettes.
-  ([#118](https://github.com/cruk-mi/mesa/issues/118))
+  ([#118](https://github.com/cruk-mi/mesa/issues/118), PR #151)
 - These help pages now have examples that run:
   `addBamCoveragePairedAndUnpaired()`, `addMedipsEnrichmentFactors()`,
   `addNormalisation()`, `annotateWindows()`,
@@ -82,42 +82,42 @@
   `plotRegionsHeatmap()`, `runHMMCopy()`, `summariseDMRsByGene()`,
   `exampleMouse` and `exampleTumourNormal`. Examples that need MEDIPSData or
   the annotation packages are skipped when those are not installed.
-  ([#118](https://github.com/cruk-mi/mesa/issues/118))
+  ([#118](https://github.com/cruk-mi/mesa/issues/118), PR #151)
 - The `addMedipsEnrichmentFactors()` example works: it adds coverage before
   calculating the enrichment factors, instead of failing.
-  ([#118](https://github.com/cruk-mi/mesa/issues/118))
+  ([#118](https://github.com/cruk-mi/mesa/issues/118), PR #151)
 - Proofread all five vignettes. Their examples and text now use the real
   `makeQset()` argument `properPairsOnly` and `CNVmethod = "None"`, the
   `group1`/`group2` contrast columns of `calculateDMRs()`, and describe the
   blind calibration and `getBetaTable(useGroupMeans = TRUE)` output correctly.
-  ([#120](https://github.com/cruk-mi/mesa/issues/120))
+  ([#120](https://github.com/cruk-mi/mesa/issues/120), PR #155)
 - Vignette plots now fill the page width. The relH plot in the data and QC
   vignette is no longer drawn at 3 x 3 inches, and its sample names and the
   UpSet plot's counts no longer overlap.
-  ([#78](https://github.com/cruk-mi/mesa/issues/78))
+  ([#78](https://github.com/cruk-mi/mesa/issues/78), PR #155)
 - The Edgar et al. (2014) reference in `?addHyperStableFraction` and
   `?hg38UltraStableProbes` now links to its DOI instead of PubMed.
-  ([#155](https://github.com/cruk-mi/mesa/pull/155))
+  (PR #155)
 
 ## Infrastructure
 - Codecov's patch status now fails when less than 80% of the lines a pull
   request adds are covered by tests; the project status stays informational.
-  ([#160](https://github.com/cruk-mi/mesa/issues/160))
+  ([#160](https://github.com/cruk-mi/mesa/issues/160), PR #161)
 - Coverage is now uploaded on pull requests as well as `main`; Codecov
   statuses are informational.
-  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+  (PR #108)
 - CI fails if Codecov rejects the upload after three attempts; fork pull
   requests are exempt.
-  ([#108](https://github.com/cruk-mi/mesa/pull/108))
+  (PR #108)
 - The devcontainer image no longer installs `immunedeconv` (with its GitHub
   dependencies) or `imsig`, which mesa does not use, and takes `ggtree` from
   Bioconductor instead of a GitHub pin. It now installs nothing from GitHub,
   so it no longer needs the pinned archives and SHA check added in 0.99.7.
-  ([#132](https://github.com/cruk-mi/mesa/pull/132))
+  (PR #132)
 - Pushing a `vX.Y.Z` tag now publishes a GitHub Release with the source
   tarball and that version's `NEWS.md` notes, once the tag matches
   `DESCRIPTION` and `NEWS.md` and passes the r-universe Bioconductor build.
-  ([#112](https://github.com/cruk-mi/mesa/pull/112))
+  (PR #112)
 - The Bioconductor check on pull requests now takes about 22 minutes instead
   of 37, and runs every check it ran before. The vignettes run twice per run
   instead of four times, and "re-building of vignette outputs", which
@@ -125,7 +125,7 @@
   coverage and the pkgdown site run in parallel with `R CMD check`. A push to
   an open pull request no longer starts a second run, and cancels the
   superseded one.
-  ([#114](https://github.com/cruk-mi/mesa/pull/114))
+  (PR #114)
 
 # mesa 0.99.7
 
@@ -135,34 +135,34 @@
   fresh session (`could not find function "strand<-"`) and silent read loss on
   chromosomes longer than 2^29 bp. Read counts are otherwise unchanged.
   ([#81](https://github.com/cruk-mi/mesa/issues/81),
-  [#102](https://github.com/cruk-mi/mesa/pull/102))
+  PR #102)
 - `calculateCGEnrichment()` now errors on a `chr.select` entry absent from the
   BSgenome instead of returning no reads.
-  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+  (PR #102)
 
 ## Other changes
 - `uniq` now accepts only `0` (keep all reads) or `1` (one read per location);
   the unused p-value form is removed.
-  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+  (PR #102)
 - With `chr.select = NULL`, CpGs are located only on chromosomes that carry
   reads, which is much faster on genomes with many scaffolds (e.g. hg19).
-  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+  (PR #102)
 - `MEDIPS` removed from `Suggests`.
-  ([#102](https://github.com/cruk-mi/mesa/pull/102))
+  (PR #102)
 
 ## Infrastructure
 - Pinned roxygen2 via `Config/roxygen2/version` in `DESCRIPTION`; the
   devcontainer installs that exact version. Regenerated `man/` and `NAMESPACE`
   with roxygen2 8.1.0 (link anchors and `importFrom()` formatting only).
-  ([#105](https://github.com/cruk-mi/mesa/pull/105))
+  (PR #105)
 - Added a `roxygen-drift` CI job that fails when `man/` or `NAMESPACE` is out
   of sync with the roxygen comments in `R/`.
-  ([#105](https://github.com/cruk-mi/mesa/pull/105))
+  (PR #105)
 - The devcontainer image build installs its GitHub-only packages from pinned
   archives instead of the rate-limited GitHub API, fixing its rate-limit
   failures, and fails if any of them does not install at its pinned SHA.
   Pull requests that change the devcontainer now build it (without pushing).
-  ([#127](https://github.com/cruk-mi/mesa/pull/127))
+  (PR #127)
 
 # mesa 0.99.6
 
@@ -170,6 +170,7 @@
 - Replaced the defunct `GenomicAlignments::cigarWidthAlongReferenceSpace()` with
   `cigarillo::cigar_extent_along_ref()`, fixing the vignette build on
   Bioconductor devel (GenomicAlignments >= 1.49.1).
+  (PR #98)
 
 # mesa 0.99.5
 
@@ -177,92 +178,92 @@
 - Replaced Unicode math symbols (`≥`, `≤`, `∈`) with ASCII equivalents (`>=`,
   `<=`, `in`) in roxygen2 comments and `.Rd` files to fix LaTeX errors in the
   PDF manual.
-  ([#88](https://github.com/cruk-mi/mesa/pull/88))
+  (PR #88)
 - Wrapped the `summariseDMRsByGene()` example in `\donttest{}` to keep
   `R CMD check` within the 10-minute limit (~52 s saved).
-  ([#88](https://github.com/cruk-mi/mesa/pull/88))
+  (PR #88)
 
 ## Infrastructure
 - Upgraded to R 4.6.0 and Bioconductor 3.23.
-  ([#92](https://github.com/cruk-mi/mesa/pull/92))
+  (PR #92)
 - Re-based devcontainer (slim + full) on `bioconductor/bioconductor_docker`,
   dropping conda; devcontainer and CI now share the same toolchain. The
   `R (>=)` line in `DESCRIPTION` is the single source of truth: Bioc version
   and image tag are derived automatically; upgrading R requires editing that
   one line only.
-  ([#92](https://github.com/cruk-mi/mesa/pull/92))
+  (PR #92)
 - Bumped all GitHub Actions to Node 24-compatible releases,
   clearing the Node 20 deprecation warnings
   on the devcontainer image build.
-  ([#93](https://github.com/cruk-mi/mesa/pull/93))
+  (PR #93)
   
 # mesa 0.99.4
 
 ## Testing
 - Guarded the slowest `testthat` blocks with `skip_long_checks()` to keep
   `R CMD check` within the Bioconductor 15-minute limit.
-  ([#84](https://github.com/cruk-mi/mesa/pull/84))
+  (PR #84)
 - Added `skip_long_checks()` guard to the `calculateCGEnrichment` test, which
   also fails in CI due to a missing `strand<-` in the MEDIPS namespace.
-  ([#84](https://github.com/cruk-mi/mesa/pull/84))
+  (PR #84)
 
 # mesa 0.99.3
 
 ## Documentation
 - Broadened licence from `GPL-3` to `GPL (>=2)`.
-  ([#80](https://github.com/cruk-mi/mesa/pull/80))
+  (PR #80)
 - Replaced `qsea::getExampleQseaSet()` calls in `getUMAP()` examples with 
   `exampleTumourNormal`, removing slow synthetic data generation from 
   `R CMD check` example runs.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - Wrapped `addNormalisation()` examples in `\donttest{}`: the function
   requires windows across a range of CpG densities for background
   estimation, which the pre-filtered example datasets do not provide.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 
 ## Bug Fixes
 - Fixed `plotly` PNG device error on headless build servers
-  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+  (PR #75)
 - Switched to `ragg_png` device in PCA vignette chunks to resolve
   Cairo/X11 dependency issues in CI
-  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+  (PR #75)
 - Restored vignette YAML front matter dropped during line-wrap reflow
-  ([#76](https://github.com/cruk-mi/mesa/pull/76))
+  (PR #76)
 - Fixed `R CMD check` TIMEOUT: `skip_long_checks()` read `options()`
   instead of `getOption()`, so slow tests never skipped. Also set
   `options(skip_long_checks = TRUE)` in `tests/testthat.R`.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - Cut test runtime: memoised `qsea::getExampleQseaSet()` builds via
   `cachedExampleQset()` (`helper-fixtures.R`) and gated the slowest
   `test_that()` blocks behind `skip_long_checks()`.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - Fixed `addHMMcopyCNV()`: replaced `qsea:::makeGenomeWindows()` with a
   fixed-width `GRanges` reimplementation, correcting window widths and
   boundaries.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - `addHyperStableFraction()` now uses `identical()` for the `BSgenome`
   check, avoiding an "argument is of length zero" error when the
   `BSgenome` parameter is missing (`NULL`).
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - `mixSamples()` now reports which sample name(s) are absent from the
   `qseaSet` instead of a generic `stopifnot()` failure, restoring the
   diagnostics lost when `qsea:::checkSamples()` was dropped.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - `mixThreeQsetSamples()` likewise now names the absent sample(s) rather
   than failing with a generic `stopifnot()` message.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 - Resolved BiocCheck NOTEs: imported `qsea` via `@import`
   (`R/mesa-package.R`), replaced all `qsea:::`/`janitor:::` calls with
   public-API equivalents or inline slot assignments, and declared five
   data-object names in `utils::globalVariables()`.
-  ([#77](https://github.com/cruk-mi/mesa/pull/77))
+  (PR #77)
 
 ## Style
 - Standardized 4-space indentation throughout codebase per
   Bioconductor style guide
-  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+  (PR #75)
 - Added missing chunk labels to all vignettes
-  ([#75](https://github.com/cruk-mi/mesa/pull/75))
+  (PR #75)
 - Wrapped all lines > 80 characters across R sources, vignettes, and helpers
   to satisfy BiocCheck `LINE_LENGTH` notes; where `::` cannot be broken across
   lines, replaced long namespace-qualified names with `getExportedValue()`
@@ -270,7 +271,7 @@
   `utils::data()` (for package datasets in `R/calculateEnrichment.R`,
   `R/qseaExtra.R`) — both are semantically equivalent to `pkg::name` but
   can be formatted across multiple lines
-  ([#76](https://github.com/cruk-mi/mesa/pull/76))
+  (PR #76)
 
 # mesa 0.99.2
 

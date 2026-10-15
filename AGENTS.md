@@ -67,7 +67,9 @@ same PR as the change.
   `## Documentation`, `## Testing`, `## Infrastructure`, `## Style`).
 - Describe what changed for someone calling the function, not how it was done. Write
   function names as `` `makeQset()` `` and end the bullet with
-  `([#NN](https://github.com/cruk-mi/mesa/issues/NN))`.
+  `([#NN](https://github.com/cruk-mi/mesa/issues/NN), PR #PP)`, where `PP` is the PR that
+  makes the change. A change with no issue ends with `(PR #PP)`. You only know `PP` once
+  the PR is open, so add it in a follow-up commit.
 - Never bump `Version:` in a work PR. Version bumps have their own PRs, described in the
   `bioc-release-cycle` skill.
 
