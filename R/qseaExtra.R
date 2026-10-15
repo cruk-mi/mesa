@@ -2009,8 +2009,9 @@ getSampleGroups2 <- function(qseaSet){
 #' Build a per-window table for one or more normalisation methods, returning
 #' values per **sample** or **group means**.
 #'
-#' @param qseaSet `qseaSet`.  
-#'   A qseaSet object containing methylation-enriched sequencing data.
+#' @param x `qseaSet` or [mesaDimRed-class].  
+#'   A qseaSet object containing methylation-enriched sequencing data, or a
+#'   [mesaDimRed-class] object.
 #'   **Default:** none (must be supplied).
 #'
 #' @param normMethod `character()`.  
@@ -2051,9 +2052,11 @@ getSampleGroups2 <- function(qseaSet){
 #' aggregation. Use [removeNormMethodSuffix()] afterwards if you want to strip
 #' method tags in wide tables.
 #'
-#' If `qseaSet` is a [mesaDimRed-class] (from [getPCA()] or [getUMAP()]), the
-#' input data used to compute the results is returned instead, and the other
-#' arguments are ignored. It is only stored when `returnDataTable = TRUE`.
+#' If `x` is a [mesaDimRed-class] object (returned by [getDimRed()],
+#' [getPCA()] or [getUMAP()]), the input data used to compute the results is
+#' returned, provided it was stored when the dimensionality reduction was
+#' performed by setting `returnDataTable = TRUE`. The other arguments are
+#' ignored.
 #'
 #' @return
 #' A tibble/data.frame with one row per genomic window and one column per
@@ -2102,21 +2105,21 @@ getSampleGroups2 <- function(qseaSet){
 #'   head()
 #'
 #' @export
-setGeneric("getDataTable", function(qseaSet, ...) {
+setGeneric("getDataTable", function(x, ...) {
     standardGeneric("getDataTable")
 })
 
 #' @rdname getDataTable
 #' @export
-setMethod("getDataTable", "ANY", function(qseaSet, normMethod = "nrpm",
+setMethod("getDataTable", "ANY", function(x, normMethod = "nrpm",
     useGroupMeans = FALSE, minEnrichment = 3, addMethodSuffix = FALSE,
     verbose = TRUE) {
 
-    if (!is.qseaSet(qseaSet)) {
+    if (!is.qseaSet(x)) {
         stop("Please provide a qseaSet as the first argument.")
     }
 
-    if(qseaSet %>% qsea::getRegions() %>% length() == 0){
+    if(x %>% qsea::getRegions() %>% length() == 0){
         stop(
             "Attempting to get data values for a qseaSet with no remaining ",
             "windows."
@@ -2127,11 +2130,11 @@ setMethod("getDataTable", "ANY", function(qseaSet, normMethod = "nrpm",
     if(verbose){
         message(glue::glue(
             "Generating table of {normMethod} values for ",
-            "{qseaSet %>% qsea::getRegions() %>% length()} regions across ",
-            "{qseaSet %>% getSampleGroups2() %>% length()} sample groups."
+            "{x %>% qsea::getRegions() %>% length()} regions across ",
+            "{x %>% getSampleGroups2() %>% length()} sample groups."
         ))
     }
-    tab <- qseaSet %>%
+    tab <- x %>%
         qsea::makeTable(
             groupMeans = getSampleGroups2(.),
             norm_methods = normMethod,
@@ -2163,11 +2166,11 @@ setMethod("getDataTable", "ANY", function(qseaSet, normMethod = "nrpm",
     if(verbose){
         message(glue::glue(
             "Generating table of {normMethod} values for ",
-            "{qseaSet %>% qsea::getRegions() %>% length()} regions across ",
-            "{qseaSet %>% getSampleGroups2() %>% length()} samples."
+            "{x %>% qsea::getRegions() %>% length()} regions across ",
+            "{x %>% getSampleGroups2() %>% length()} samples."
         ))
     }
-    tab <- qseaSet %>%
+    tab <- x %>%
         qsea::makeTable(
             samples = qsea::getSampleNames(.),
             norm_methods = normMethod,
@@ -2195,8 +2198,8 @@ setMethod("getDataTable", "ANY", function(qseaSet, normMethod = "nrpm",
 
 #' @rdname getDataTable
 #' @export
-setMethod("getDataTable", "mesaDimRed", function(qseaSet, ...) {
-    qseaSet@dataTable
+setMethod("getDataTable", "mesaDimRed", function(x, ...) {
+    x@dataTable
 })
 
 

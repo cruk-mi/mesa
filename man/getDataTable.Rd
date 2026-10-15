@@ -6,10 +6,10 @@
 \alias{getDataTable,mesaDimRed-method}
 \title{Extract per-window data (counts / NRPM / beta)}
 \usage{
-getDataTable(qseaSet, ...)
+getDataTable(x, ...)
 
 \S4method{getDataTable}{ANY}(
-  qseaSet,
+  x,
   normMethod = "nrpm",
   useGroupMeans = FALSE,
   minEnrichment = 3,
@@ -17,11 +17,12 @@ getDataTable(qseaSet, ...)
   verbose = TRUE
 )
 
-\S4method{getDataTable}{mesaDimRed}(qseaSet, ...)
+\S4method{getDataTable}{mesaDimRed}(x, ...)
 }
 \arguments{
-\item{qseaSet}{\code{qseaSet}.
-A qseaSet object containing methylation-enriched sequencing data.
+\item{x}{\code{qseaSet} or \link[=mesaDimRed-class]{mesaDimRed}.
+A qseaSet object containing methylation-enriched sequencing data, or a
+\link[=mesaDimRed-class]{mesaDimRed} object.
 \strong{Default:} none (must be supplied).}
 
 \item{...}{Passed to methods. Not used by the \code{mesaDimRed} method.}
@@ -72,9 +73,11 @@ For \code{"beta"}, windows with reads \verb{< minEnrichment} are set to \code{NA
 aggregation. Use \code{\link[=removeNormMethodSuffix]{removeNormMethodSuffix()}} afterwards if you want to strip
 method tags in wide tables.
 
-If \code{qseaSet} is a \link[=mesaDimRed-class]{mesaDimRed} (from \code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}}), the
-input data used to compute the results is returned instead, and the other
-arguments are ignored. It is only stored when \code{returnDataTable = TRUE}.
+If \code{x} is a \link[=mesaDimRed-class]{mesaDimRed} object (returned by \code{\link[=getDimRed]{getDimRed()}},
+\code{\link[=getPCA]{getPCA()}} or \code{\link[=getUMAP]{getUMAP()}}), the input data used to compute the results is
+returned, provided it was stored when the dimensionality reduction was
+performed by setting \code{returnDataTable = TRUE}. The other arguments are
+ignored.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
