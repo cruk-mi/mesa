@@ -6,10 +6,10 @@
   naming the problem: duplicate or missing windows, results without sample IDs,
   mixed PCA and UMAP results, results covering different samples, or samples
   absent from `sampleTable` or `dataTable`.
-  ([#115](https://github.com/cruk-mi/mesa/issues/115), PR #149)
+  (#115, PR #149)
 - `getSampleNames()` now works on `mesaDimRed` objects and returns the sample
   IDs their results cover (sample group names with `useGroupMeans = TRUE`).
-  ([#10](https://github.com/cruk-mi/mesa/issues/10), PR #149)
+  (#10, PR #149)
 - New accessors let you read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects
   without `@`: `getResults()`, `getParameters()`, `getCoordinates()`,
   `getPrcomp()`, `getWindowNames()`, `getDataTable()`, `getSampleTable()` and
@@ -19,29 +19,29 @@
   work directly on `mesaPCA` and `mesaUMAP` objects, and `getPrcomp()` on
   `mesaPCA` objects. The first argument of `getDataTable()` is now `x`
   instead of `qseaSet`.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+  (#117, PR #158)
 - `as.data.frame()` can now be applied to `mesaDimRed` objects, returning one
   table of coordinates and sample annotations for all PCA or UMAP results in
   the object.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+  (#117, PR #158)
 
 ## Bug fixes
 - `getWindowNames()` now says "Unknown data type" when given something that
   is not a `qseaSet`, `mesaDimRed`, `mesaPCA`, `mesaUMAP`, `GRanges` or
   window table.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+  (#117, PR #158)
 - `plotPCA()` and `plotUMAP()` no longer fail when the `sampleTable` has a
   column named like a component (for example `PC1`); the plot uses the
   computed coordinates.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+  (#117, PR #158)
 - `plotPCA()` and `plotUMAP()` now say that `params$method` must be `"PCA"` or
   `"UMAP"` when a `mesaDimRed` has none, instead of failing with "argument is
   of length zero".
-  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+  (#117, PR #158)
 - `mesaDimRed` validity now checks sample IDs against the
   `sampleTable$sample_name` column, as qsea does, rather than its row names,
   and says so when the column is missing.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+  (#117, PR #158)
 
 ## Other changes
 - **Breaking:** `mesaDimRed` objects no longer have a `samples` slot, and
@@ -49,20 +49,20 @@
   `@samples` should call `getSampleNames()` instead, and code that passes
   `samples =` to `mesaDimRed()` should drop it; objects saved with an earlier
   version still load and work.
-  ([#10](https://github.com/cruk-mi/mesa/issues/10), PR #149)
+  (#10, PR #149)
 
 ## Testing
 - Added tests for the `mesaDimRed`, `mesaPCA` and `mesaUMAP` constructors and
   for each validity check.
-  ([#116](https://github.com/cruk-mi/mesa/issues/116), PR #149)
+  (#116, PR #149)
 
 ## Documentation
 - Every `NEWS.md` bullet now ends with the issue and the pull request that
   delivered it, for example `(#117, PR #158)`.
-  ([#162](https://github.com/cruk-mi/mesa/issues/162), PR #165)
+  (#162, PR #165)
 - The `mesaDimRed`, `mesaPCA` and `mesaUMAP` help pages list their accessors,
   `?dimRedAccessors` documents them, and the PCA vignette shows how to read a
-  `getPCA()` result. ([#7](https://github.com/cruk-mi/mesa/issues/7), PR #158)
+  `getPCA()` result. (#7, PR #158)
 - Rewrote the README: badges, a quick start on `exampleTumourNormal`, links to
   the pkgdown site and vignettes, and citations.
   (PR #108)
@@ -76,7 +76,7 @@
 - `?mesa` is now a user-facing overview listed in the reference index: what
   enrichment sequencing measures, the workflow from `makeQset()` to
   `annotateWindows()`, the example datasets and the vignettes.
-  ([#118](https://github.com/cruk-mi/mesa/issues/118), PR #151)
+  (#118, PR #151)
 - These help pages now have examples that run:
   `addBamCoveragePairedAndUnpaired()`, `addMedipsEnrichmentFactors()`,
   `addNormalisation()`, `annotateWindows()`,
@@ -85,19 +85,19 @@
   `plotRegionsHeatmap()`, `runHMMCopy()`, `summariseDMRsByGene()`,
   `exampleMouse` and `exampleTumourNormal`. Examples that need MEDIPSData or
   the annotation packages are skipped when those are not installed.
-  ([#118](https://github.com/cruk-mi/mesa/issues/118), PR #151)
+  (#118, PR #151)
 - The `addMedipsEnrichmentFactors()` example works: it adds coverage before
   calculating the enrichment factors, instead of failing.
-  ([#118](https://github.com/cruk-mi/mesa/issues/118), PR #151)
+  (#118, PR #151)
 - Proofread all five vignettes. Their examples and text now use the real
   `makeQset()` argument `properPairsOnly` and `CNVmethod = "None"`, the
   `group1`/`group2` contrast columns of `calculateDMRs()`, and describe the
   blind calibration and `getBetaTable(useGroupMeans = TRUE)` output correctly.
-  ([#120](https://github.com/cruk-mi/mesa/issues/120), PR #155)
+  (#120, PR #155)
 - Vignette plots now fill the page width. The relH plot in the data and QC
   vignette is no longer drawn at 3 x 3 inches, and its sample names and the
   UpSet plot's counts no longer overlap.
-  ([#78](https://github.com/cruk-mi/mesa/issues/78), PR #155)
+  (#78, PR #155)
 - The Edgar et al. (2014) reference in `?addHyperStableFraction` and
   `?hg38UltraStableProbes` now links to its DOI instead of PubMed.
   (PR #155)
@@ -105,7 +105,7 @@
 ## Infrastructure
 - Codecov's patch status now fails when less than 80% of the lines a pull
   request adds are covered by tests; the project status stays informational.
-  ([#160](https://github.com/cruk-mi/mesa/issues/160), PR #161)
+  (#160, PR #161)
 - Coverage is now uploaded on pull requests as well as `main`; Codecov
   statuses are informational.
   (PR #108)
@@ -137,8 +137,7 @@
   with `Rsamtools` and CpGs located with `Biostrings`. This fixes a crash in a
   fresh session (`could not find function "strand<-"`) and silent read loss on
   chromosomes longer than 2^29 bp. Read counts are otherwise unchanged.
-  ([#81](https://github.com/cruk-mi/mesa/issues/81),
-  PR #102)
+  (#81, PR #102)
 - `calculateCGEnrichment()` now errors on a `chr.select` entry absent from the
   BSgenome instead of returning no reads.
   (PR #102)
