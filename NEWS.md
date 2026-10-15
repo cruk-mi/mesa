@@ -10,15 +10,20 @@
 - `getSampleNames()` now works on `mesaDimRed` objects and returns the sample
   IDs their results cover (sample group names with `useGroupMeans = TRUE`).
   ([#10](https://github.com/cruk-mi/mesa/issues/10))
-- New accessors read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects without
-  `@`: `getResults()`, `getParameters()`, `getCoordinates()` and
-  `getPrcomp()`. On a `mesaDimRed`, `getCoordinates()`, `getPrcomp()` and
-  `getWindowNames()` return a list with one element per result.
-  `getWindowNames()` now also returns the windows of a PCA or UMAP result, and
-  `getDataTable()` now also returns the data stored with
-  `returnDataTable = TRUE`. `as.data.frame()` turns a `getPCA()` or
-  `getUMAP()` result into one table of coordinates and sample annotations.
-  ([#117](https://github.com/cruk-mi/mesa/issues/117))
+- New accessors let you read `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects
+  without `@`: `getResults()`, `getParameters()`, `getCoordinates()`,
+  `getPrcomp()`, `getWindowNames()`, `getDataTable()`, `getSampleTable()` and
+  `getSampleNames()`. On a `mesaDimRed`, `getResults()`, `getCoordinates()`,
+  `getPrcomp()` and `getWindowNames()` return a list with one element per
+  result. `getCoordinates()`, `getWindowNames()` and `getSampleNames()` also
+  work directly on `mesaPCA` and `mesaUMAP` objects, and `getPrcomp()` on
+  `mesaPCA` objects. The first argument of `getDataTable()` is now `x`
+  instead of `qseaSet`.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
+- `as.data.frame()` can now be applied to `mesaDimRed` objects, returning one
+  table of coordinates and sample annotations for all PCA or UMAP results in
+  the object.
+  ([#117](https://github.com/cruk-mi/mesa/issues/117), PR #158)
 
 ## Bug fixes
 - `getWindowNames()` now says "Unknown data type" when given something that
