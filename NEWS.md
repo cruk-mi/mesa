@@ -57,6 +57,9 @@
   ([#116](https://github.com/cruk-mi/mesa/issues/116), PR #149)
 
 ## Documentation
+- Every `NEWS.md` bullet now ends with the issue and the pull request that
+  delivered it, for example `(#117, PR #158)`.
+  ([#162](https://github.com/cruk-mi/mesa/issues/162), PR #165)
 - The `mesaDimRed`, `mesaPCA` and `mesaUMAP` help pages list their accessors,
   `?dimRedAccessors` documents them, and the PCA vignette shows how to read a
   `getPCA()` result. ([#7](https://github.com/cruk-mi/mesa/issues/7), PR #158)
