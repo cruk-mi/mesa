@@ -472,23 +472,68 @@ PCA</li>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 599 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
-<!-- The output of `getPCA()` is a `mesaDimRed` object with the following
-components: -->
-<!-- -   **pcas** A named list of objects of class prcomp. List names
-correspond to entries in the `params$topVar` component of the output. -->
-<!-- -   **windows** A list of names of the windows analysed. List names
-correspond to entries in the `params$topVar` component of the output. -->
-<!-- -   **dataTable** If `returnDataTable = TRUE`, the table of normalised
-values. The table will contain windows after filtering based on
-`regionsToOverlap` and `minDensity`, but _prior_ to filtering based on
-`topVarNum`. Windows with missing values will also have been removed. The table
-will also include column(s) of window standard deviations, where applicable,
-with column name(s) corresponding to entries in the `params$topVar` component
-of the output. -->
-<!-- -   **params** A list of the parameters used. -->
-<!-- -   **windowFiltering** A list of the initial number of windows and the
-number filtered out at each filtering step (not including filtering based on
-`topVarNum`). -->
+<p>The output of <code><a href="../reference/getDimRed.html">getPCA()</a></code> is a <code>mesaDimRed</code>
+object. Read its contents with these accessors rather than with
+<code>@</code>:</p>
+<ul>
+<li>
+<code><a href="../reference/dimRedAccessors.html">getResults()</a></code>: a named list with one
+<code>mesaPCA</code> object per <code>topVarNum</code> value. The names
+match the <code>resName</code> column of
+<code>getParameters(pca)$topVar</code>.</li>
+<li>
+<code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable()</a></code> and <code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames()</a></code>: the
+sample annotations, and the samples (or sample groups) the PCA
+covers.</li>
+<li>
+<code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getParameters()</a></code>: the parameters used, and the number of
+windows filtered out at each step (<code>initial</code>,
+<code>notInRegionsToOverlap</code>, <code>belowMinDensity</code>,
+<code>containMissingVals</code>).</li>
+<li>
+<code><a href="../reference/getDataTable.html">getDataTable()</a></code>: if <code>returnDataTable = TRUE</code>,
+the table of normalised values the PCA was computed from, after
+filtering by <code>regionsToOverlap</code>, <code>minDensity</code> and
+missing values but <em>before</em> <code>topVarNum</code>. Otherwise it
+is empty.</li>
+<li>
+<code><a href="../reference/dimRedAccessors.html">getCoordinates()</a></code>, <code><a href="../reference/dimRedAccessors.html">getPrcomp()</a></code> and
+<code><a href="../reference/getWindowNames.html">getWindowNames()</a></code>: the sample coordinates, the
+<code>prcomp</code> fits and the windows used, one list element per
+result.</li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/dimRedAccessors.html">getResults</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "pca1"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getParameters</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span><span class="op">$</span><span class="va">method</span></span>
+<span><span class="co">#&gt; [1] "PCA"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/dimRedAccessors.html">getCoordinates</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span><span class="op">$</span><span class="va">pca1</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 PC1         PC2        PC3</span></span>
+<span><span class="co">#&gt; Colon1_N -1.7265582  1.71890024  0.8616370</span></span>
+<span><span class="co">#&gt; Colon1_T -3.2120852  0.78271341  0.7328694</span></span>
+<span><span class="co">#&gt; Colon2_N  0.2193696  0.61910259  0.2291153</span></span>
+<span><span class="co">#&gt; Colon2_T -1.0028419  0.66701624 -2.3451860</span></span>
+<span><span class="co">#&gt; Lung1_N   1.8640093  0.09053197  0.5992353</span></span>
+<span><span class="co">#&gt; Lung1_T   0.8782195 -0.28376153 -2.1642993</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="fu"><a href="../reference/getWindowNames.html">getWindowNames</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; pca1 </span></span>
+<span><span class="co">#&gt;  599</span></span></code></pre></div>
+<p>Each <code>mesaPCA</code> result also holds the <code>prcomp</code>
+fit, for example to get the proportion of variance explained by each
+principal component:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dimRedAccessors.html">getPrcomp</a></span><span class="op">(</span><span class="fu"><a href="../reference/dimRedAccessors.html">getResults</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span><span class="op">$</span><span class="va">pca1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pc</span><span class="op">$</span><span class="va">sdev</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">pc</span><span class="op">$</span><span class="va">sdev</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] 0.241 0.197 0.118 0.115 0.084</span></span></code></pre></div>
+<p>For a custom plot, <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> gives the coordinates
+of every result in one long table, with a <code>resName</code> column
+naming the result and the <code>sampleTable</code> columns
+alongside:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pcaTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">pcaTable</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">PC1</span>, y <span class="op">=</span> <span class="va">PC2</span>, colour <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="pca_files/figure-html/dimred-data-frame-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="getpca-function-arguments">
@@ -516,7 +561,7 @@ efficient than running <code><a href="../reference/getDimRed.html">getPCA()</a><
 single <code>topVarNum</code> value each time.</p>
 <p>Specifying a value of <code>NA</code> will result in all windows
 being used (i.e. no filtering based on most variable windows).</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">250</span>, <span class="fl">500</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -556,27 +601,27 @@ tell you the name assigned to each PCA result.</p>
 <p>When this output is passed to <code>plotPCA</code>, plots are
 produced for all four PCA results, for each value of the
 <code>colour</code> argument:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PCAplots4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span><span class="va">pca2</span>, colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient"</span>, <span class="st">"age"</span><span class="op">)</span>, shape <span class="op">=</span> <span class="st">"tumour"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca1</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca2</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/chunk-10-2.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca3</span><span class="op">$</span><span class="va">patient</span><span class="op">$</span><span class="va">PC2vsPC3</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/chunk-10-3.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">PCAplots4</span><span class="op">$</span><span class="va">pca4</span><span class="op">$</span><span class="va">age</span><span class="op">$</span><span class="va">PC1vsPC2</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/chunk-10-4.png" class="r-plt" alt="" width="100%"></p>
 <p>If you specify a value larger than the number of available windows,
 then PCA will be performed with all available windows and redundant
 values will be ignored:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">250</span>, <span class="fl">500</span>, <span class="fl">750</span>, <span class="fl">1000</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -614,7 +659,7 @@ values will be ignored:</p>
 <p>It is possible to select which samples are used to calculate the
 standard deviation for each window using the <code>topVarSamples</code>
 argument. This may be either an explicit vector of sample names:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tumourNames</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -637,7 +682,7 @@ argument. This may be either an explicit vector of sample names:</p>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Object containing 1 dimensionality reduction objects for 10 samples</span></span></code></pre></div>
 <p>or a string to match (as a regular expression):</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, topVarNum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>, topVarSamples <span class="op">=</span> <span class="st">"_T"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -670,7 +715,7 @@ you need to run <code><a href="../reference/getDimRed.html">getPCA()</a></code> 
 <code>dataTable</code> to be generated externally and then input into
 <code><a href="../reference/getDimRed.html">getPCA()</a></code>. This means <code><a href="../reference/getDimRed.html">getPCA()</a></code> can be run
 multiple times with the <code>dataTable</code> generated only once.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span> <span class="co"># dataTable generated within getPCA</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -688,7 +733,7 @@ multiple times with the <code>dataTable</code> generated only once.</p>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
 <p>For example, we can use <code>getBetaTable</code> to generate the
 table:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dataTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getBetaTable.html">getBetaTable</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generating table of beta values for 819 regions across 10 samples.</span></span>
 <span></span>
@@ -709,7 +754,7 @@ table:</p>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
 <p>And this gives the same result:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">pca1</span>, <span class="va">pca2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>Another option is to run <code><a href="../reference/getDimRed.html">getPCA()</a></code> and set the
@@ -720,7 +765,7 @@ be passed into any further calls to <code><a href="../reference/getDimRed.html">
 default since the <code>dataTable</code> can often be large and storing
 it every time <code><a href="../reference/getDimRed.html">getPCA()</a></code> is run would be
 memory-inefficient.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span></span>
 <span>    <span class="va">exampleTumourNormal</span>,</span>
 <span>    returnDataTable <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -739,7 +784,7 @@ memory-inefficient.</p>
 <span><span class="co">#&gt; Performing PCA with 10 samples and 599 windows</span></span>
 <span><span class="co">#&gt; -&gt; pca1.</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="va">pca1</span>,<span class="st">"dataTable"</span><span class="op">)</span> <span class="co"># NULL</span></span>
 <span><span class="co">#&gt; data frame with 0 columns and 0 rows</span></span>
 <span></span>
@@ -763,7 +808,7 @@ memory-inefficient.</p>
 <p>We can then reuse the <code>dataTable</code> calculated in a previous
 <code>getPCA</code> call, but ask <code>getPCA</code> to use a different
 number of top windows:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, </span>
 <span>                dataTable <span class="op">=</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="va">pca3</span>, <span class="st">"dataTable"</span><span class="op">)</span>, </span>
 <span>                topVarNum <span class="op">=</span> <span class="fl">250</span><span class="op">)</span> </span>
@@ -792,7 +837,7 @@ generate the PCA. This may be changed via the <code>normMethod</code>
 option, for instance to <code>nrpm</code> as shown below, although this
 has a tendency to show more enrichment-based variability than the use of
 the <code>beta</code> values, which correct this to some extent.</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDimRed.html">getPCA</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, normMethod <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ------------------------------</span></span>
 <span><span class="co">#&gt; Initial number of windows = 819.</span></span>
@@ -829,7 +874,7 @@ the <code>beta</code> values, which correct this to some extent.</p>
 <span><span class="co">#&gt; $pca1$tissue</span></span>
 <span><span class="co">#&gt; $pca1$tissue$PC1vsPC2</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/normalisation-method-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca_nrpm</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/plotPCA.html" class="external-link">plotPCA</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"tissue"</span>, shape <span class="op">=</span> <span class="st">"tumour"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $pca1</span></span>
 <span><span class="co">#&gt; $pca1$tissue</span></span>
@@ -849,7 +894,7 @@ comparison between methylation arrays (a different technology), and you
 wish to see how these same windows split the samples.</p>
 <p>This may be done by pre-filtering the qseaSet object via
 <code>filterByOverlaps</code>:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/alterQsetOverlap.html">filterByOverlaps</a></span><span class="op">(</span></span>
 <span>        regionsToOverlap <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
@@ -889,7 +934,7 @@ the <code><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-li
 dataset with two types of samples, before calculating and plotting a
 UMAP using the <code>getUMAP</code> and <code>plotUMAP</code>
 functions:</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">qseaSetRandom</span> <span class="op">&lt;-</span> <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>repl <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="co">#&gt; selecting windows with low CpG density for background read estimation</span></span>
@@ -936,7 +981,7 @@ interactive example</a> available to see how these two parameters
 influence the output, for a range of different data types.</p>
 <p>Here we show two UMAPs built from the same dataset with different
 values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSetRandom</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/getDimRed.html">getUMAP</a></span><span class="op">(</span>min_dist <span class="op">=</span> <span class="fl">0.01</span>, n_neighbors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/plotUMAP.html">plotUMAP</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span>
@@ -961,7 +1006,7 @@ values of <code>min_dist</code> and <code>n_neighbors</code>:</p>
 <span><span class="co">#&gt; $umap1$group</span></span>
 <span><span class="co">#&gt; $umap1$group$UMAP1vsUMAP2</span></span></code></pre></div>
 <p><img src="pca_files/figure-html/chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">qseaSetRandom</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/getDimRed.html">getUMAP</a></span><span class="op">(</span>min_dist <span class="op">=</span> <span class="fl">1</span>, n_neighbors <span class="op">=</span> <span class="fl">40</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1033,7 +1078,7 @@ misinterpret.</p>
 <span><span class="co">#&gt;  [23] FNN_1.1.4.1                 rtracklayer_1.72.0         </span></span>
 <span><span class="co">#&gt;  [25] knitr_1.52                  labeling_0.4.3             </span></span>
 <span><span class="co">#&gt;  [27] S4Arrays_1.12.1             htmlwidgets_1.6.4          </span></span>
-<span><span class="co">#&gt;  [29] curl_8.0.0                  DelayedArray_0.38.2        </span></span>
+<span><span class="co">#&gt;  [29] curl_8.1.0                  DelayedArray_0.38.2        </span></span>
 <span><span class="co">#&gt;  [31] RColorBrewer_1.1-3          abind_1.4-8                </span></span>
 <span><span class="co">#&gt;  [33] BiocParallel_1.46.0         HMMcopy_1.54.0             </span></span>
 <span><span class="co">#&gt;  [35] withr_3.0.3                 purrr_1.2.2                </span></span>

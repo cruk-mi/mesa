@@ -124,9 +124,19 @@ Window IDs used in the PCA.</p></dd>
 
 
 </dl></div>
+    <div id="accessors">
+    <h2>Accessors</h2>
+
+
+<ul><li><p><code><a href="dimRedAccessors.html">getPrcomp()</a></code>: the <code>prcomp</code> fit, e.g. for <code>sdev</code> or <code>rotation</code>;</p></li>
+<li><p><code><a href="dimRedAccessors.html">getCoordinates()</a></code>: the sample coordinates (<code>prcomp$x</code>), as a
+<code>data.frame</code>;</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames()</a></code>: the sample IDs (row names of <code>prcomp$x</code>);</p></li>
+<li><p><code><a href="getWindowNames.html">getWindowNames()</a></code>: the window IDs (<code>windows</code>).</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><a href="mesaDimRed-class.html">mesaDimRed</a></p></div>
+    <div class="dont-index"><p><a href="mesaDimRed-class.html">mesaDimRed</a>, <a href="dimRedAccessors.html">dimRedAccessors</a></p></div>
     </div>
 
     <div id="ref-examples">

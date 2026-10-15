@@ -176,7 +176,7 @@ Minimum reads required for beta values to be non-<code>NA</code>; forwarded to
 <dt id="arg-usegroupmeans">useGroupMeans<a class="anchor" aria-label="anchor" href="#arg-usegroupmeans"></a></dt>
 <dd><p><code>logical(1)</code>.
 If <code>TRUE</code>, average samples within the <code>group</code> column (combine replicates)
-before DR.
+before dimensionality reduction.
 <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
@@ -190,16 +190,17 @@ Minimum CpG density; windows below this are removed.
 <dd><p><code>numeric(1)</code> or <code>integer(1)</code> or <code>Inf</code> or <code>NULL</code> <strong>or</strong> a
 vector.
 Keep the <code>topVarNum</code> most variable windows (by SD). If <code>NA</code>, <code>NULL</code>, <code>Inf</code>,
-or <code>&gt;=</code> available windows, use all. If a vector, DR is run once per value and
-results are returned in a list.
+or <code>&gt;=</code> available windows, use all. If a vector, dimensionality reduction
+is run once per value and results are returned in a list.
 <strong>Default:</strong> <code>1000</code>.</p></dd>
 
 
 <dt id="arg-topvarsamples">topVarSamples<a class="anchor" aria-label="anchor" href="#arg-topvarsamples"></a></dt>
 <dd><p><code>NULL</code>, <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>, <code>list</code>, or <code>regex</code> string.
 Samples used to compute variability. If <code>NULL</code>/<code>NA</code>, use all samples. If a
-vector/regex, select matching samples. If a <code>list</code>, perform DR per list
-element (should match <code>length(topVarNum)</code> when vectorised).
+vector/regex, select matching samples. If a <code>list</code>, perform dimensionality
+reduction per list element (should match <code>length(topVarNum)</code> when
+vectorised).
 <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
@@ -223,7 +224,8 @@ Number of principal components to compute (PCA only).
 
 <dt id="arg-returndatatable">returnDataTable<a class="anchor" aria-label="anchor" href="#arg-returndatatable"></a></dt>
 <dd><p><code>logical(1)</code>.
-If <code>TRUE</code>, include the matrix used for DR in the return object.
+If <code>TRUE</code>, include the matrix used for the dimensionality reduction in the
+return object.
 <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
@@ -246,27 +248,30 @@ e.g. <code>n_neighbors</code>, <code>min_dist</code>, <code>metric</code>.</p></
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="mesaDimRed-class.html">mesaDimRed</a></code> object with:</p><ul><li><p><strong>res</strong>: Named list of DR results; each element is a <code><a href="mesaPCA-class.html">mesaPCA</a></code> (for PCA)
+    <p>A <code><a href="mesaDimRed-class.html">mesaDimRed</a></code> object with:</p><ul><li><p><strong>res</strong>: Named list of dimensionality reduction results; each element is
+a <code><a href="mesaPCA-class.html">mesaPCA</a></code> (for PCA)
 or <code><a href="mesaUMAP-class.html">mesaUMAP</a></code> (for UMAP). Names correspond to entries in <code>params$topVar</code>.
 The sample IDs are the row names of each result (sample group names when
 <code>useGroupMeans = TRUE</code>).</p></li>
-<li><p><strong>dataTable</strong> (optional): The numeric matrix used for DR when
-<code>returnDataTable = TRUE</code>. It reflects filtering by <code>regionsToOverlap</code> and
-<code>minDensity</code>, removal of rows with missing values, and may include columns of
-window SDs when applicable (named per <code>params$topVar</code>).</p></li>
+<li><p><strong>dataTable</strong> (optional): The numeric matrix used for dimensionality
+reduction when <code>returnDataTable = TRUE</code>. It reflects filtering by
+<code>regionsToOverlap</code> and <code>minDensity</code>, removal of rows with missing values, and
+may include columns of window SDs when applicable (named per
+<code>params$topVar</code>).</p></li>
 <li><p><strong>params</strong>: List of parameters used (method, selection/filter settings,
 etc.).</p></li>
 <li><p><strong>sampleTable</strong>: Copy of <code>qsea::getSampleTable(qseaSet)</code>.</p></li>
 </ul></div>
     <div id="details">
     <h2>Details</h2>
-    <p>:</p><ul><li><p>For <code>method = "PCA"</code>, DR is performed via <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code> with <code>center</code>
-and <code>scale</code> controls.</p></li>
-<li><p>For <code>method = "UMAP"</code>, DR is performed via <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code>.</p></li>
-<li><p>Prior to DR, optional filtering is applied: enrichment cut-off
-(<code>minEnrichment</code>), CpG density (<code>minDensity</code>), region restriction
-(<code>regionsToOverlap</code>), and most-variable windows (<code>topVarNum</code>).</p></li>
-<li><p>When <code>topVarNum</code> or <code>topVarSamples</code> are vectorised/lists, multiple DR runs
+    <p>:</p><ul><li><p>For <code>method = "PCA"</code>, dimensionality reduction is performed via
+<code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code> with <code>center</code> and <code>scale</code> controls.</p></li>
+<li><p>For <code>method = "UMAP"</code>, dimensionality reduction is performed via
+<code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code>.</p></li>
+<li><p>Prior to dimensionality reduction, optional filtering is applied:
+enrichment cut-off (<code>minEnrichment</code>), CpG density (<code>minDensity</code>), region
+restriction (<code>regionsToOverlap</code>), and most-variable windows (<code>topVarNum</code>).</p></li>
+<li><p>When <code>topVarNum</code> or <code>topVarSamples</code> are vectorised/lists, multiple runs
 are performed and collected in <code>res</code>.</p></li>
 </ul></div>
     <div id="functions">
@@ -469,7 +474,7 @@ qseaSet.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Object containing 1 dimensionality reduction objects for 10 samples</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Restrict DR to a set of regions (coerced from data.frame)</span></span></span>
+<span class="r-in"><span><span class="co"># Restrict dimensionality reduction to a set of regions (from a data.frame)</span></span></span>
 <span class="r-in"><span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>seqnames <span class="op">=</span> <span class="st">"chr7"</span>, start <span class="op">=</span> <span class="fl">25002001</span>, end <span class="op">=</span> <span class="fl">25027900</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">getDimRed</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"PCA"</span>, regionsToOverlap <span class="op">=</span> <span class="va">regs</span><span class="op">)</span></span></span>
