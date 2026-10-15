@@ -47,6 +47,7 @@ Window IDs used in the PCA.}
 \item \code{\link[=getPrcomp]{getPrcomp()}}: the \code{prcomp} fit, e.g. for \code{sdev} or \code{rotation};
 \item \code{\link[=getCoordinates]{getCoordinates()}}: the sample coordinates (\code{prcomp$x}), as a
 \code{data.frame};
+\item \code{\link[qsea:getSampleNames]{getSampleNames()}}: the sample IDs (row names of \code{prcomp$x});
 \item \code{\link[=getWindowNames]{getWindowNames()}}: the window IDs (\code{windows}).
 }
 }

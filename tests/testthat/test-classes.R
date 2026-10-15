@@ -158,9 +158,11 @@ test_that("mesaPCA and mesaUMAP accessors return their slots", {
     expect_identical(getPrcomp(mp), makePrcomp())
     expect_identical(getCoordinates(mp), as.data.frame(makePrcomp()$x))
     expect_identical(getWindowNames(mp), paste0("W", 1:4))
+    expect_identical(getSampleNames(mp), rownames(makePrcomp()$x))
 
     mu <- validUMAP()
     expect_identical(getCoordinates(mu), makePoints())
+    expect_identical(getSampleNames(mu), rownames(makePoints()))
     expect_identical(getWindowNames(mu), paste0("W", 1:4))
 })
 

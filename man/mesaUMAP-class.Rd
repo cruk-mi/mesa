@@ -48,6 +48,7 @@ Window IDs used to compute the embedding.}
 
 \itemize{
 \item \code{\link[=getCoordinates]{getCoordinates()}}: the sample coordinates (\code{points});
+\item \code{\link[qsea:getSampleNames]{getSampleNames()}}: the sample IDs (row names of \code{points});
 \item \code{\link[=getWindowNames]{getWindowNames()}}: the window IDs (\code{windows}).
 }
 }

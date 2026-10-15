@@ -235,6 +235,7 @@ setMethod("getSampleNames", "mesaDimRed", function(object) {
 #' * [getPrcomp()]: the `prcomp` fit, e.g. for `sdev` or `rotation`;
 #' * [getCoordinates()]: the sample coordinates (`prcomp$x`), as a
 #'   `data.frame`;
+#' * [getSampleNames()]: the sample IDs (row names of `prcomp$x`);
 #' * [getWindowNames()]: the window IDs (`windows`).
 #'
 #' @slot prcomp `prcomp`
@@ -323,6 +324,7 @@ setValidity("mesaPCA", function(object) {
 #'
 #' @section Accessors:
 #' * [getCoordinates()]: the sample coordinates (`points`);
+#' * [getSampleNames()]: the sample IDs (row names of `points`);
 #' * [getWindowNames()]: the window IDs (`windows`).
 #'
 #' @slot points `data.frame`
@@ -421,7 +423,8 @@ setValidity("mesaUMAP", function(object) {
 #' * `getSampleTable()`: the sample annotations, a `data.frame` with the
 #'   sample IDs in its `sample_name` column.
 #' * `getSampleNames()`: the sample IDs the results cover, or `character()`
-#'   when there are no results. With `useGroupMeans = TRUE` they are sample
+#'   when there are no results; also works on a [mesaPCA-class] or
+#'   [mesaUMAP-class], giving its sample IDs. With `useGroupMeans = TRUE` they are sample
 #'   group names.
 #' * `getParameters()`: the list of parameters used to compute the results,
 #'   including `method` (`"PCA"` or `"UMAP"`).
@@ -498,6 +501,12 @@ setMethod("getCoordinates", "mesaPCA", function(object) {
 #' @rdname dimRedAccessors
 #' @export
 setMethod("getCoordinates", "mesaUMAP", function(object) object@points)
+
+#' @rdname dimRedAccessors
+setMethod("getSampleNames", "mesaPCA", function(object) .dimRedIds(object))
+
+#' @rdname dimRedAccessors
+setMethod("getSampleNames", "mesaUMAP", function(object) .dimRedIds(object))
 
 #' @rdname dimRedAccessors
 #' @export

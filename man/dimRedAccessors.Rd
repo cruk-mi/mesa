@@ -10,6 +10,8 @@
 \alias{getCoordinates}
 \alias{getCoordinates,mesaPCA-method}
 \alias{getCoordinates,mesaUMAP-method}
+\alias{getSampleNames,mesaPCA-method}
+\alias{getSampleNames,mesaUMAP-method}
 \alias{getCoordinates,mesaDimRed-method}
 \alias{getPrcomp}
 \alias{getPrcomp,mesaPCA-method}
@@ -32,6 +34,10 @@ getCoordinates(object, ...)
 \S4method{getCoordinates}{mesaPCA}(object)
 
 \S4method{getCoordinates}{mesaUMAP}(object)
+
+\S4method{getSampleNames}{mesaPCA}(object)
+
+\S4method{getSampleNames}{mesaUMAP}(object)
 
 \S4method{getCoordinates}{mesaDimRed}(object)
 
@@ -61,7 +67,8 @@ are no results.
 \item \code{getSampleTable()}: the sample annotations, a \code{data.frame} with the
 sample IDs in its \code{sample_name} column.
 \item \code{getSampleNames()}: the sample IDs the results cover, or \code{character()}
-when there are no results. With \code{useGroupMeans = TRUE} they are sample
+when there are no results; also works on a \link[=mesaPCA-class]{mesaPCA} or
+\link[=mesaUMAP-class]{mesaUMAP}, giving its sample IDs. With \code{useGroupMeans = TRUE} they are sample
 group names.
 \item \code{getParameters()}: the list of parameters used to compute the results,
 including \code{method} (\code{"PCA"} or \code{"UMAP"}).
