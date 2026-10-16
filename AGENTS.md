@@ -65,13 +65,12 @@ same PR as the change.
 
 - File each bullet under a category heading (`## Bug fixes`, `## New features`,
   `## Documentation`, `## Testing`, `## Infrastructure`, `## Style`).
-- Describe what changed for someone calling the function, not how it was done. Write
-  function names as `` `makeQset()` `` and end the bullet with linked numbers, issues first
-  and the PR last: `([#NN](https://github.com/cruk-mi/mesa/issues/NN), [PR #PP](https://github.com/cruk-mi/mesa/pull/PP))`,
-  with one link per issue for several issues. GitHub doesn't autolink bare `#NN` in
-  Markdown files, so keep the full links. `PP` is the PR that makes the change. A change
-  with no issue ends with `([PR #PP](https://github.com/cruk-mi/mesa/pull/PP))`. You only
-  know `PP` once the PR is open, so add it in a follow-up commit.
+- Describe what changed for the caller, not how. Write function names as `` `makeQset()` ``.
+- End each bullet with full links, issues first, the PR last (GitHub doesn't autolink bare
+  `#NN` in `.md` files):
+  `([#NN](https://github.com/cruk-mi/mesa/issues/NN), [PR #PP](https://github.com/cruk-mi/mesa/pull/PP))`.
+  One link per issue; no issue means just the PR link. `PP` is known only once the PR is
+  open, so add it in a follow-up commit.
 - Never bump `Version:` in a work PR. Version bumps have their own PRs, described in the
   `bioc-release-cycle` skill.
 
