@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.7.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.8</span>
       </span>
     </div>
 
@@ -118,7 +118,8 @@
 <h2 id="newsmd">NEWS.md<a class="anchor" aria-label="anchor" href="#newsmd"></a></h2>
 <p>Every user-visible change gets a bullet under the top <code># mesa X.Y.Z.9000</code> heading, in the same PR as the change.</p>
 <ul><li>File each bullet under a category heading (<code>## Bug fixes</code>, <code>## New features</code>, <code>## Documentation</code>, <code>## Testing</code>, <code>## Infrastructure</code>, <code>## Style</code>).</li>
-<li>Describe what changed for someone calling the function, not how it was done. Write function names as <code>`makeQset()`</code> and end the bullet with <code>([#NN](https://github.com/cruk-mi/mesa/issues/NN))</code>.</li>
+<li>Describe what changed for the caller, not how. Write function names as <code>`makeQset()`</code>.</li>
+<li>End each bullet with full links, issues first, the PR last (GitHub doesn’t autolink bare <code>#NN</code> in <code>.md</code> files): <code>([#NN](https://github.com/cruk-mi/mesa/issues/NN), [PR #PP](https://github.com/cruk-mi/mesa/pull/PP))</code>. One link per issue; no issue means just the PR link. <code>PP</code> is known only once the PR is open, so add it in a follow-up commit.</li>
 <li>Never bump <code>Version:</code> in a work PR. Version bumps have their own PRs, described in the <code>bioc-release-cycle</code> skill.</li>
 </ul></div>
 <div class="section level2">
