@@ -424,8 +424,8 @@ setValidity("mesaUMAP", function(object) {
 #'   sample IDs in its `sample_name` column.
 #' * `getSampleNames()`: the sample IDs the results cover, or `character()`
 #'   when there are no results; also works on a [mesaPCA-class] or
-#'   [mesaUMAP-class], giving its sample IDs. With `useGroupMeans = TRUE` they are sample
-#'   group names.
+#'   [mesaUMAP-class], giving its sample IDs. With `useGroupMeans = TRUE` they
+#'   are sample group names.
 #' * `getParameters()`: the list of parameters used to compute the results,
 #'   including `method` (`"PCA"` or `"UMAP"`).
 #' * `getDataTable()`: if `returnDataTable = TRUE`, the input data used to
