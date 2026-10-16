@@ -29,6 +29,9 @@ say which checks did not run. The `bioc-check-ladder` skill says where each one 
 ## Code style
 
 - 4-space indent, no tabs. At most 80 characters per line, roxygen included.
+- The 80-character and 4-space rules cover roxygen text, `@examples` code and vignette
+  prose too: BiocCheck counts raw lines, while lintr only sees R code. Check with
+  `python3 .github/scripts/check-formatting.py` (CI's `formatting` job).
 - `<-` for assignment. `TRUE`/`FALSE`, never `T`/`F`. `seq_len()`/`seq_along()`, never `1:n`.
   `vapply()`, never `sapply()`. camelCase names (no underscores).
 - [`.lintr`](.lintr) is the source of truth for these rules. `BiocCheck` in CI is the final check.
