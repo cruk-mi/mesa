@@ -1,4 +1,4 @@
-# mesa 0.99.7.9000
+# mesa 0.99.8
 
 ## New features
 - `mesaDimRed`, `mesaPCA` and `mesaUMAP` objects are now checked for internal
