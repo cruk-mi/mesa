@@ -1,5 +1,10 @@
 # mesa 0.99.8.9000
 
+## Testing
+- The GRCh38 and proper-pairs `makeQset()` tests now use the public MEDIPSData
+  BAM files instead of a file on an internal server, so they run in CI.
+  ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
+
 # mesa 0.99.8
 
 ## New features
