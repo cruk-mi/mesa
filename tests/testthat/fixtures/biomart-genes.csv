@@ -1,0 +1,6 @@
+"host","filter","value","hgnc_symbol","description","chromosome_name","start_position","end_position","strand","ensembl_gene_id"
+"jul2022","hgnc_symbol","HOXA10","HOXA10","homeobox A10 [Source:HGNC Symbol;Acc:HGNC:5100]","7",27170605,27180261,-1,"ENSG00000253293"
+"feb2014","hgnc_symbol","JAM2","JAM2","junctional adhesion molecule 2 [Source:HGNC Symbol;Acc:14686]","21",27011584,27089874,1,"ENSG00000154721"
+"feb2014","hgnc_symbol","EWSR1","EWSR1","EWS RNA-binding protein 1 [Source:HGNC Symbol;Acc:3508]","22",29663998,29696515,1,"ENSG00000182944"
+"jul2023","mgi_symbol","Fbxl18",NA,"F-box and leucine-rich repeat protein 18 [Source:MGI Symbol;Acc:MGI:2444450]","5",142852701,142881176,-1,"ENSMUSG00000066640"
+"nov2020","mgi_symbol","Fbxl18",NA,"F-box and leucine-rich repeat protein 18 [Source:MGI Symbol;Acc:MGI:2444450]","5",142866946,142895421,-1,"ENSMUSG00000066640"

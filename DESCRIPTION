@@ -92,7 +92,7 @@ Suggests:
     rmarkdown,
     knitr,
     openxlsx,
-    testthat (>= 3.0.0),
+    testthat (>= 3.2.0),
     UpSetR,
     rtracklayer,
     ggrepel,

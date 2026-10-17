@@ -1,18 +1,31 @@
 test_that("Mouse plotting", {
 
-    biomart_success <- try(biomaRt::useMart('ensembl', dataset = 'mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org"))
-    biomart_success <- !class(biomart_success) == "try-error"
-    skip_if_not(biomart_success, "mart recieved try-error, biomart is possibly down or there is no internet connection.")
+    localMockBiomart()
 
     expect_true("Mart" %in% class(exampleMouse %>% getMart()))
 
-    testPlotGeneHeatmap(exampleMouse, gene = "Fbxl18")
+    plotGeneHeatmap(exampleMouse, gene = "Fbxl18")
 
     # specify a different Mart:
-    testPlotGeneHeatmap(exampleMouse,
+    plotGeneHeatmap(exampleMouse,
         gene = "Fbxl18",
-        mart = biomaRt::useMart('ensembl', dataset = 'mmusculus_gene_ensembl', host = "https://jul2023.archive.ensembl.org")
+        mart = biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl",
+            host = "https://jul2023.archive.ensembl.org")
     )
+})
+
+test_that("Mouse plotting against live Ensembl", {
+
+    skip_on_cran()
+    skip_if_offline("jul2023.archive.ensembl.org")
+
+    # exampleMouse stores a Mart for a retired archive, so set a live one
+    liveMart <- tryCatch(
+        biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl",
+            host = "https://jul2023.archive.ensembl.org"),
+        error = function(e) skip("Could not reach Ensembl.")
+    )
+    testPlotGeneHeatmap(exampleMouse %>% setMart(liveMart), gene = "Fbxl18")
 })
 
 test_that("Mouse annotation", {
