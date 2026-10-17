@@ -36,7 +36,8 @@ test_that("Making a hg19 qseaSet", {
 
     expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
-    testPlotGeneHeatmap(testSet, "JAM2")
+    localMockBiomart()
+    plotGeneHeatmap(testSet, "JAM2")
 
 })
 
@@ -80,7 +81,8 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 
     expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
-    testPlotGeneHeatmap(testSet, "EWSR1")
+    localMockBiomart()
+    plotGeneHeatmap(testSet, "EWSR1")
 
 })
 
