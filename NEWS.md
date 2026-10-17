@@ -4,7 +4,7 @@
 - The `plotGeneHeatmap()` and mouse tests now run offline against cached
   Ensembl lookups instead of skipping when Ensembl can't be reached, and
   tests that change the `mesa_*` annotation options restore them afterwards.
-  ([#123](https://github.com/cruk-mi/mesa/issues/123))
+  ([#123](https://github.com/cruk-mi/mesa/issues/123), [PR #172](https://github.com/cruk-mi/mesa/pull/172))
 
 # mesa 0.99.8
 
