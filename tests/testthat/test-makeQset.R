@@ -86,18 +86,23 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 
 test_that("Making a GRCh38 qseaSet", {
 
-    skip_on_ci()
     # skip check unless options(run_long_checks = TRUE)
     skip_long_checks()
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.NCBI.GRCh38")
 
-    if (!file.exists("/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")) {
-        skip("File not present")
-    }
+    # The MEDIPSData reads are aligned to hg19 with "chr" names. makeQset()
+    # drops the prefix to match the NCBI windows, so this checks the GRCh38
+    # build path, not the biology: hg19 coordinates on GRCh38 windows.
+    # HMMcopy needs all three chromosomes: chr22 alone gives too few 1 Mb
+    # bins for its loess GC correction.
+    bamFile <- system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE)
 
     sampleTable <- data.frame(sample_name = "Test1",
         group = "Group1",
-        file_name = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam",
-        input_file = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")
+        file_name = bamFile,
+        input_file = bamFile)
 
     GRCh38testSet <- makeQset(sampleTable,
         BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
@@ -114,36 +119,75 @@ test_that("Making a GRCh38 qseaSet", {
         badRegions = NULL,
         properPairsOnly = FALSE)
 
-    expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1) # number of samples
-    expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 3) # number of chromosomes
-    expect_equal(GRCh38testSet %>% getRegions() %>% length(), 809861) # number of windows
+    expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1)
+    expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 3)
+    expect_equal(GRCh38testSet %>% getRegions() %>% length(), 809861)
 
-    expect_true("relH" %in% (GRCh38testSet %>% addLibraryInformation() %>% getSampleTable() %>% colnames()))
+    libTable <- getSampleTable(addLibraryInformation(GRCh38testSet))
+    expect_true("relH" %in% colnames(libTable))
+
+    stableTable <- getSampleTable(addHyperStableFraction(GRCh38testSet))
+    expect_true("hyperStableEdgar" %in% colnames(stableTable))
+
+    qcSummary <- getSampleQCSummary(GRCh38testSet)
+    expect_true("relH" %in% colnames(qcSummary))
+    expect_true("valid_fragments" %in% colnames(qcSummary))
+
+    # check error is given if wrong size GC/map files given
+    expect_error(
+        makeQset(sampleTable,
+            BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+            chrSelect = 22,
+            windowSize = 200,
+            CNVwindowSize = 1000000,
+            fragmentType = "cfDNA",
+            CNVmethod = "HMMdefault",
+            coverageMethod = "PairedAndR1s",
+            hmmCopyGC = mesa::gc_hg38_500kb,
+            hmmCopyMap = mesa::map_hg38_500kb,
+            badRegions = NULL),
+        "window size should be the same as the CNVwindowSize"
+    )
+
+    # expect no error if right size GC/map files is given
+    expect_no_error(
+        makeQset(sampleTable,
+            BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+            chrSelect = 22,
+            windowSize = 200,
+            CNVwindowSize = 500000,
+            fragmentType = "cfDNA",
+            CNVmethod = "None",
+            coverageMethod = "PairedAndR1s",
+            hmmCopyGC = mesa::gc_hg38_500kb,
+            hmmCopyMap = mesa::map_hg38_500kb,
+            badRegions = NULL)
+    )
 
 })
 
-test_that("Making a GRCh38 qseaSet proper pairs only", {
+test_that("Making a qseaSet proper pairs only", {
 
-    skip_on_ci()
     # skip check unless options(run_long_checks = TRUE)
     skip_long_checks()
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
-    if (!file.exists("/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")) {
-        skip("Only run on internal server")
-    }
+    bamFile <- system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE)
 
     sampleTable <- data.frame(sample_name = "Test1",
         group = "Group1",
-        file_name = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam",
-        input_file = "/data/cep/Methylation/pipelineOutput/M004/PipelineBams/MK3_cfDNA_RepB_MeCap.bam")
+        file_name = bamFile,
+        input_file = bamFile)
 
-    GRCh38testSet <- makeQset(sampleTable,
-        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-        chrSelect = 20:22,
+    testSet <- makeQset(sampleTable,
+        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+        chrSelect = "chr22",
         windowSize = 200,
         CNVwindowSize = 1000000,
         fragmentType = "cfDNA",
-        CNVmethod = "HMMdefault",
+        CNVmethod = "None",
         coverageMethod = "PairedAndR1s",
         minMapQual = 10,
         minInsertSize = 70,
@@ -152,44 +196,12 @@ test_that("Making a GRCh38 qseaSet proper pairs only", {
         badRegions = NULL,
         properPairsOnly = TRUE)
 
-    expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1) # number of samples
-    expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 3) # number of chromosomes
-    expect_equal(GRCh38testSet %>% getRegions() %>% length(), 809861) # number of windows
+    expect_equal(testSet %>% getSampleNames() %>% length(), 1)
+    expect_equal(testSet %>% getChrNames(), "chr22")
+    expect_equal(testSet %>% getRegions() %>% length(), 256522)
 
-    expect_true("relH" %in% (GRCh38testSet %>% addLibraryInformation() %>% getSampleTable() %>% colnames()))
-
-    expect_true("hyperStableEdgar" %in% (GRCh38testSet %>% addHyperStableFraction() %>% getSampleTable() %>% colnames()))
-
-    expect_true("relH" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
-    expect_true("valid_fragments" %in% (GRCh38testSet %>% getSampleQCSummary() %>% colnames()))
-
-    # check error is given if wrong size GC/map files given
-    expect_error(makeQset(sampleTable,
-        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-        chrSelect = 22,
-        windowSize = 200,
-        CNVwindowSize = 1000000,
-        fragmentType = "cfDNA",
-        CNVmethod = "HMMdefault",
-        coverageMethod = "PairedAndR1s",
-        hmmCopyGC = mesa::gc_hg38_500kb,
-        hmmCopyMap = mesa::map_hg38_500kb,
-        badRegions = NULL)
-    )
-
-    # expect no error if right size GC/map files is given
-    expect_no_error(makeQset(sampleTable,
-        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-        chrSelect = 22,
-        windowSize = 200,
-        CNVwindowSize = 500000,
-        fragmentType = "cfDNA",
-        CNVmethod = "None",
-        coverageMethod = "PairedAndR1s",
-        hmmCopyGC = mesa::gc_hg38_500kb,
-        hmmCopyMap = mesa::map_hg38_500kb,
-        badRegions = NULL)
-    )
+    libTable <- getSampleTable(addLibraryInformation(testSet))
+    expect_true("relH" %in% colnames(libTable))
 
 })
 
