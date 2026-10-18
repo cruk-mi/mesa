@@ -2,6 +2,11 @@
 # plotGeneHeatmap() tests need no network (#123). Lookups are served from
 # fixtures/biomart-genes.csv, which make-biomart-genes.R in that folder
 # regenerates.
+#
+# plotGeneHeatmap() retries getBM() and then reports any failure as "Could not
+# retrieve gene information from biomart ... check your internet connection".
+# In a mocked test that message means the gene or archive host is missing from
+# the CSV, not that the network is down.
 
 .cachedBiomartGenes <- function() {
     utils::read.csv(testthat::test_path("fixtures", "biomart-genes.csv"),
@@ -20,8 +25,7 @@ localMockBiomart <- function(env = parent.frame()) {
             keep <- atHost & genes$filter == filters & genes$value %in% values
             hits <- genes[keep, ]
             if (nrow(hits) == 0) {
-                stop("No cached gene for ", values, " at ", mart@host,
-                    "; add it to fixtures/make-biomart-genes.R.")
+                stop("No cached gene for ", values, " at ", mart@host)
             }
             hits[, attributes]
         },

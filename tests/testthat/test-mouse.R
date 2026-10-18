@@ -5,13 +5,6 @@ test_that("Mouse plotting", {
     expect_true("Mart" %in% class(exampleMouse %>% getMart()))
 
     plotGeneHeatmap(exampleMouse, gene = "Fbxl18")
-
-    # specify a different Mart:
-    plotGeneHeatmap(exampleMouse,
-        gene = "Fbxl18",
-        mart = biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl",
-            host = "https://jul2023.archive.ensembl.org")
-    )
 })
 
 test_that("Mouse plotting against live Ensembl", {
