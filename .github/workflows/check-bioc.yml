@@ -99,6 +99,17 @@ jobs:
           echo "bioc-release=${BIOC_RELEASE}" >> "$GITHUB_OUTPUT"
           echo "roxygen-version=${ROXYGEN_VERSION}" >> "$GITHUB_OUTPUT"
 
+  ## BiocCheck only NOTEs long lines, tabs and odd indents, so they slipped
+  ## into releases unnoticed. Fail on them in the hand-written sources (R/,
+  ## vignettes/). No R needed, so this runs in seconds.
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Check line length and indentation
+        run: python3 .github/scripts/check-formatting.py
+
   ## man/ and NAMESPACE are roxygen2 output. Nothing else checks that they
   ## match the roxygen comments in R/, so they can drift silently until a
   ## reviewer notices. Regenerate and fail on any diff.

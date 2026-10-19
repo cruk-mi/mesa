@@ -68,8 +68,8 @@ are no results.
 sample IDs in its \code{sample_name} column.
 \item \code{getSampleNames()}: the sample IDs the results cover, or \code{character()}
 when there are no results; also works on a \link[=mesaPCA-class]{mesaPCA} or
-\link[=mesaUMAP-class]{mesaUMAP}, giving its sample IDs. With \code{useGroupMeans = TRUE} they are sample
-group names.
+\link[=mesaUMAP-class]{mesaUMAP}, giving its sample IDs. With \code{useGroupMeans = TRUE} they
+are sample group names.
 \item \code{getParameters()}: the list of parameters used to compute the results,
 including \code{method} (\code{"PCA"} or \code{"UMAP"}).
 \item \code{getDataTable()}: if \code{returnDataTable = TRUE}, the input data used to
