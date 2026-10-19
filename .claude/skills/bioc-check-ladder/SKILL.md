@@ -134,16 +134,19 @@ Recurring ones in this package:
 - **`Invalid package Version`** — BiocCheck rejects the four-part devel form
   `X.Y.Z.9000`. **Expected while a devel section is open**; it clears when the cycle is
   cut. Do not "fix" it by changing the version. See `bioc-release-cycle`.
-- **`Consider shorter lines` / `Consider multiples of 4 spaces`** — hits in `man/*.Rd`
-  and `NAMESPACE` are **expected**. They began when PR #105 moved to roxygen2 8.1.0 (before
-  it, with `RoxygenNote`, there were none); do not revert that to clear them. BiocCheck skips `man/` only when DESCRIPTION has
+- **`Consider shorter lines` / `Consider multiples of 4 spaces`** — hits in
+  `man/*.Rd` and `NAMESPACE` are **expected**. They began when PR #105 moved to
+  roxygen2 8.1.0 (before it, with `RoxygenNote`, there were none); do not revert
+  that to clear them. BiocCheck skips `man/` only when DESCRIPTION has
   `RoxygenNote`, and roxygen2 >= 8 deletes that field in favour of
-  `Config/roxygen2/version`, so every generated page is counted (`\usage` uses 2-space
-  indents; markdown expands to `\code{}`). `NAMESPACE` hits are roxygen2 8.1's
-  multi-line `importFrom()`. Do not re-add `RoxygenNote` (the roxygen-drift job fails)
-  or hand-edit generated files. Any hit in `R/` or `vignettes/` is a real regression:
-  run `python3 .github/scripts/check-formatting.py`, the same check as CI's
-  `formatting` job. See #169.
+  `Config/roxygen2/version`, so every generated page is counted (`\usage` uses
+  2-space indents; markdown expands to `\code{}`). `NAMESPACE` hits are
+  roxygen2 8.1's multi-line `importFrom()`. Do not re-add `RoxygenNote` (the
+  roxygen-drift job fails) or hand-edit generated files. Any hit in `R/` or
+  `vignettes/` is a real regression: run
+  `python3 .github/scripts/check-formatting.py`, the same check as CI's
+  `formatting` job. See #169. The upstream fix is tracked in
+  [Bioconductor/BiocCheck#262](https://github.com/Bioconductor/BiocCheck/issues/262).
 
 Verify the tarball directly rather than assuming:
 
