@@ -152,7 +152,7 @@ same patients.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">tumour</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">tumour</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          sample_name tumour</span></span>
 <span><span class="co">#&gt; Colon1_N    Colon1_N Normal</span></span>
 <span><span class="co">#&gt; Colon1_T    Colon1_T Tumour</span></span>
@@ -461,7 +461,7 @@ incorporating the tissue effect.</p>
 with the variable, then you will get an error:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># There are no levels of `type` in common between the levels of `tumour`:</span></span>
-<span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">tumour</span>,<span class="va">type</span><span class="op">)</span></span>
+<span><span class="va">exampleTumourNormal</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">tumour</span>,<span class="va">type</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># so this will fail with an error</span></span>
 <span><span class="co">#exampleTumourNormal |&gt;</span></span>
@@ -494,7 +494,7 @@ when plotting a volcano plot:</p>
 <span><span class="co">#&gt; adding test results from Tumour_vs_Normal</span></span>
 <span></span>
 <span><span class="va">allWindows</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>            x <span class="op">=</span> <span class="va">Tumour_vs_Normal_log2FC</span>,</span>
@@ -514,7 +514,7 @@ samples. This can be a more useful metric, as it characterises windows
 that have clearly changed in levels of methylation.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allWindows</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>significant <span class="op">=</span> <span class="op">(</span><span class="va">Tumour_vs_Normal_adjPval</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>            x <span class="op">=</span> <span class="va">Tumour_vs_Normal_deltaBeta</span>,</span>
@@ -649,7 +649,7 @@ this can be positive or negative, depending on which strand the gene is
 on, and that some genes are very large.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
 <span>        <span class="va">seqnames</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">distanceToTSS</span>, <span class="va">ENSEMBL</span>, <span class="va">SYMBOL</span>, <span class="va">GENENAME</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 7</span></span></span>
@@ -672,7 +672,7 @@ is assigned, while <code>shortAnno</code> abbreviates this to, e.g.,
 Intron/Exon/Promoter.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">start</span>, <span class="va">SYMBOL</span>, <span class="va">shortAnno</span>, <span class="va">annotation</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">start</span>, <span class="va">SYMBOL</span>, <span class="va">shortAnno</span>, <span class="va">annotation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 4</span></span></span>
 <span><span class="co">#&gt;       start SYMBOL   shortAnno         annotation                               </span></span>
 <span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                    </span></span>
@@ -692,7 +692,7 @@ long the gene is and which transcript is being used in the
 annotations.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
 <span>        <span class="va">geneChr</span>, <span class="va">geneStart</span>, <span class="va">geneEnd</span>, <span class="va">geneLength</span>, <span class="va">geneStrand</span>,</span>
 <span>        <span class="va">geneId</span>, <span class="va">transcriptId</span></span>
 <span>    <span class="op">)</span></span>
@@ -719,7 +719,7 @@ islands/shores/shelves simultaneously, so these columns give how many of
 each the region overlaps.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annoDMRs</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
 <span>        <span class="va">seqnames</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">nIslands</span>, <span class="va">nShore</span>, <span class="va">nShelf</span>, <span class="va">inFantom</span>, <span class="va">landscape</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 32 × 8</span></span></span>
@@ -871,7 +871,7 @@ we will calculate a set of DMRs with the output from 10 contrasts.</p>
 each contrast. Note that each row represents a genomic window, but it
 may be differentially methylated in only a subset of the contrasts.</p>
 <p>We therefore provide a function to pivot this longer (analogous to
-<code><a href="https://rdrr.io/pkg/tidyr/man/pivot_longer.html" class="external-link">tidyr::pivot_longer()</a></code>):</p>
+<code><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">tidyr::pivot_longer()</a></code>):</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allContrasts</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/pivotDMRsLonger.html">pivotDMRsLonger</a></span><span class="op">(</span><span class="op">)</span> </span>
@@ -897,7 +897,7 @@ may be differentially methylated in only a subset of the contrasts.</p>
 <code>group2</code>, <code>log2FC</code>, <code>adjPval</code> and
 <code>deltaBeta</code>. This is a tidy data frame in long format,
 suitable for many downstream processing tasks (see
-<code><a href="https://cran.rstudio.com/web/packages/tidyr/vignettes/tidy-data.html" class="external-link">vignette("tidy-data", package = "tidyr")</a></code>). Windows which
+<code><a href="https://tidyr.tidyverse.org/articles/tidy-data.html" class="external-link">vignette("tidy-data", package = "tidyr")</a></code>). Windows which
 are not differentially methylated (by the adjusted p-value) will be
 dropped; this can be controlled by setting the value of
 <code>FDRthres</code>.</p>

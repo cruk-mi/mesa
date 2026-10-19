@@ -145,7 +145,7 @@ using a count threshold, not a direct fraction of raw reads.</p>
 <span class="r-in"><span>    regionsToOverlap <span class="op">=</span> <span class="fu">mesa</span><span class="fu">::</span><span class="va"><a href="hg38CpGIslands.html">hg38CpGIslands</a></span>,</span></span>
 <span class="r-in"><span>    numCountsNeeded   <span class="op">=</span> <span class="fl">5</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">initialOverBackNum</span>, <span class="va">afterOverBackNum</span>, <span class="va">fraction</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">initialOverBackNum</span>, <span class="va">afterOverBackNum</span>, <span class="va">fraction</span><span class="op">)</span> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(sample_name)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    sample_name initialOverBackNum afterOverBackNum fraction</span>
@@ -170,7 +170,7 @@ using a count threshold, not a direct fraction of raw reads.</p>
 <span class="r-in"><span>      qseaSet           <span class="op">=</span> <span class="va">exampleTumourNormal</span>,</span></span>
 <span class="r-in"><span>      regionsToOverlap  <span class="op">=</span> <span class="va">gr</span>,</span></span>
 <span class="r-in"><span>      numCountsNeeded   <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">initialOverBackNum</span>, <span class="va">afterOverBackNum</span>, <span class="va">fraction</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">initialOverBackNum</span>, <span class="va">afterOverBackNum</span>, <span class="va">fraction</span><span class="op">)</span> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(sample_name)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    sample_name initialOverBackNum afterOverBackNum fraction</span>

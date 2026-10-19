@@ -72,13 +72,13 @@ sampleTable. Useful for adding annotations or metadata to samples."><!-- mathjax
     </div>
 
     <div class="ref-description">
-    <p>Extends <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> to merge a data frame into a <code>qseaSet</code>'s
+    <p>Extends <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> to merge a data frame into a <code>qseaSet</code>'s
 <code>sampleTable</code>. Useful for adding annotations or metadata to samples.</p>
     </div>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'qseaSet'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -105,7 +105,7 @@ A data frame or tibble to join onto the <code>sampleTable</code>.</p></dd>
 
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
 <dd><p><code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> or <code>named character()</code>.
-Join keys, as in <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>.
+Join keys, as in <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>.
 For qseaSets, the safest choice is <code>by = "sample_name"</code>.
 <strong>Default:</strong> <code>NULL</code> (all common variables between <code>x@sampleTable</code> and <code>y</code>).</p></dd>
 
@@ -127,11 +127,11 @@ Suffixes appended to overlapping non-join column names from <code>x</code> and <
 <dd><p><code>logical(1)</code> or <code>NULL</code>.
 If <code>TRUE</code>, keeps join keys from both <code>x</code> and <code>y</code>.
 If <code>FALSE</code>, only keys from <code>x</code> are kept.
-<strong>Default:</strong> <code>NULL</code> (deferred to <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> behaviour).</p></dd>
+<strong>Default:</strong> <code>NULL</code> (deferred to <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> behaviour).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments passed to <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>,
+<dd><p>Additional arguments passed to <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>,
 e.g. <code>relationship = "one-to-one"</code> (dplyr &gt;= 1.1).
 <strong>Default:</strong> none.</p></dd>
 
@@ -146,7 +146,7 @@ e.g. <code>relationship = "one-to-one"</code> (dplyr &gt;= 1.1).
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">qsea::getSampleTable()</a></code> to view metadata,
 <code><a href="mutate.qseaSet.html">mutate.qseaSet()</a></code>, <code><a href="filter.qseaSet.html">filter.qseaSet()</a></code> for other dplyr verbs,
-<code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> for join semantics.</p></div>
+<code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> for join semantics.</p></div>
     </div>
 
     <div id="ref-examples">
@@ -159,7 +159,7 @@ e.g. <code>relationship = "one-to-one"</code> (dplyr &gt;= 1.1).
 <span class="r-in"><span>    new <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">newData</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span> <span class="op">=</span> <span class="st">"patient"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">newData</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample_name"</span> <span class="op">=</span> <span class="st">"patient"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          sample_name    group patient        type tumour tissue age gender</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon Normal  Colon  80      F</span>
