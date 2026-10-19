@@ -72,13 +72,13 @@ mesaDimRed object."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
     </div>
 
     <div class="ref-description">
-    <p>Extend <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> to operate on the <code>sampleTable</code> slot of a
+    <p>Extend <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code> to operate on the <code>sampleTable</code> slot of a
 <a href="mesaDimRed-class.html">mesaDimRed</a> object.</p>
     </div>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'mesaDimRed'</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -105,12 +105,12 @@ Table to join.</p></dd>
 
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
 <dd><p><code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> or <code>NULL</code>
-Join columns; see <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>. <strong>Default:</strong> <code>NULL</code>.</p></dd>
+Join columns; see <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>. <strong>Default:</strong> <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-copy">copy<a class="anchor" aria-label="anchor" href="#arg-copy"></a></dt>
 <dd><p><code>logical(1)</code>
-See <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>. <strong>Default:</strong> <code>FALSE</code>.</p></dd>
+See <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>. <strong>Default:</strong> <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-suffix">suffix<a class="anchor" aria-label="anchor" href="#arg-suffix"></a></dt>
@@ -125,7 +125,7 @@ Retain join keys from both tables. <strong>Default:</strong> <code>NULL</code>.<
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments to <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>.</p></dd>
+<dd><p>Additional arguments to <code><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">dplyr::left_join()</a></code>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -139,7 +139,7 @@ Retain join keys from both tables. <strong>Default:</strong> <code>NULL</code>.<
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="getDimRed.html">getPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">new</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">sample_name</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">new</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">sample_name</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of windows = 819.</span>

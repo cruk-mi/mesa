@@ -226,7 +226,7 @@ instance, if we want to add a new column to the sample table, we can use
 <code>mutate</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSet</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>new_column <span class="op">=</span> <span class="st">"New"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>new_column <span class="op">=</span> <span class="st">"New"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          sample_name    group patient        type tumour tissue age gender</span></span>
 <span><span class="co">#&gt; Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon Normal  Colon  80      F</span></span>
@@ -262,9 +262,9 @@ on a different column by using <code>by</code>.</p>
 <span>                            <span class="st">"Lung3_T"</span>,<span class="fl">5</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">qseaSet</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">tumourVAFdata</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">sample_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">tumourVAFdata</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">sample_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">VAF</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">VAF</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          sample_name VAF</span></span>
 <span><span class="co">#&gt; Colon1_N    Colon1_N  NA</span></span>
 <span><span class="co">#&gt; Colon1_T    Colon1_T  23</span></span>
@@ -283,7 +283,7 @@ fewer samples. All the subcomponents of the qseaSet are reduced
 appropriately behind the scenes.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSet</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tumour</span> <span class="op">==</span> <span class="st">"Tumour"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; qseaSet</span></span>
 <span><span class="co">#&gt; =======================================</span></span>
 <span><span class="co">#&gt; 5 Samples:</span></span>
@@ -293,7 +293,7 @@ appropriately behind the scenes.</p>
 <code>sort</code> and <code>arrange</code> are implemented:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSet</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">tumour</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">tumour</span><span class="op">)</span></span>
 <span><span class="co">#&gt; qseaSet</span></span>
 <span><span class="co">#&gt; =======================================</span></span>
 <span><span class="co">#&gt; 10 Samples:</span></span>
@@ -307,7 +307,7 @@ always retain the columns <code>sample_name</code> and
 qseaSet.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSet</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">tumour</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">tumour</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          sample_name    group tumour</span></span>
 <span><span class="co">#&gt; Colon1_N    Colon1_N Colon1_N Normal</span></span>
@@ -322,7 +322,7 @@ qseaSet.</p>
 <span><span class="co">#&gt; Lung3_T      Lung3_T  Lung3_T Tumour</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qseaSet</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">tumour</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">tumour</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          sample_name    group patient        type tissue age gender stage</span></span>
 <span><span class="co">#&gt; Colon1_N    Colon1_N Colon1_N  Colon1 NormalColon  Colon  80      F  &lt;NA&gt;</span></span>
@@ -411,7 +411,7 @@ enrichment step, rather than immunoprecipitation.</p>
 <span><span class="co">#&gt;   seqinfo: 22 sequences from BSgenome.Hsapiens.NCBI.GRCh38 genome</span></span></code></pre></div>
 <p>We can filter the regions of the qseaSet by using the
 <code>filterWindows</code> function. Again, this uses
-<code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter</a></code> to do the logical subsetting. This function
+<code><a href="https://rdrr.io/pkg/dplyr/man/filter.html" class="external-link">dplyr::filter</a></code> to do the logical subsetting. This function
 can also use the <code>seqnames</code> (i.e. the chromosome),
 <code>start</code> or <code>end</code> columns to filter on.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -472,7 +472,7 @@ sampleTable, in order to be able to see or filter on them.</p>
 <span>    <span class="fu"><a href="../reference/addLibraryInformation.html">addLibraryInformation</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleTable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">total_fragments</span>, <span class="va">valid_fragments</span>, <span class="va">relH</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">total_fragments</span>, <span class="va">valid_fragments</span>, <span class="va">relH</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
 <span><span class="co">#&gt;    sample_name total_fragments valid_fragments  relH</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -706,7 +706,7 @@ cores.</p>
 <span><span class="co">#&gt; [87] Biobase_2.72.0              png_0.1-9                  </span></span>
 <span><span class="co">#&gt; [89] Rsamtools_2.28.0            cigarillo_1.2.1            </span></span>
 <span><span class="co">#&gt; [91] memoise_2.0.1               bslib_0.12.0               </span></span>
-<span><span class="co">#&gt; [93] SparseArray_1.12.3          xfun_0.61                  </span></span>
+<span><span class="co">#&gt; [93] SparseArray_1.12.3          xfun_0.62                  </span></span>
 <span><span class="co">#&gt; [95] GlobalOptions_0.1.4         fs_2.1.0                   </span></span>
 <span><span class="co">#&gt; [97] MatrixGenerics_1.24.0       zoo_1.9-1                  </span></span>
 <span><span class="co">#&gt; [99] pkgconfig_2.0.3</span></span></code></pre>

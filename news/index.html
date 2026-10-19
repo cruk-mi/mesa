@@ -71,6 +71,14 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.8.9000" id="mesa-09989000">mesa 0.99.8.9000<a class="anchor" aria-label="anchor" href="#mesa-09989000"></a></h2>
+<div class="section level3">
+<h3 id="style-0-99-8-9000">Style<a class="anchor" aria-label="anchor" href="#style-0-99-8-9000"></a></h3>
+<ul><li>Lines in the <code><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getSampleNames()</a></code> documentation and the data and QC vignette are now at most 80 characters, clearing those BiocCheck formatting notes. (<a href="https://github.com/cruk-mi/mesa/issues/169" class="external-link">#169</a>, <a href="https://github.com/cruk-mi/mesa/pull/170" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/170" class="external-link">#170</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="infrastructure-0-99-8-9000">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-8-9000"></a></h3>
+<ul><li>CI now fails when a line in <code>R/</code> or <code>vignettes/</code> is longer than 80 characters, contains a tab or is indented by a number of spaces that is not a multiple of 4. (<a href="https://github.com/cruk-mi/mesa/issues/169" class="external-link">#169</a>, <a href="https://github.com/cruk-mi/mesa/pull/170" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/170" class="external-link">#170</a>)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.8" id="mesa-0998">mesa 0.99.8<a class="anchor" aria-label="anchor" href="#mesa-0998"></a></h2>
@@ -355,7 +363,7 @@
 </li>
 <li>Fixed pkgdown deployment failure on GitHub Actions caused by git ownership mismatch in Docker containers. <a href="https://github.com/cruk-mi/mesa/pull/71" class="external-link">!71</a>
 </li>
-<li>Fixed <code>plyranges::mutate()</code> calls throughout the package — plyranges 1.30 no longer re-exports <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
+<li>Fixed <code>plyranges::mutate()</code> calls throughout the package — plyranges 1.30 no longer re-exports <code><a href="https://rdrr.io/pkg/dplyr/man/mutate.html" class="external-link">dplyr::mutate()</a></code>. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
 </li>
 <li>Fixed broken <code>GRanges-class</code> Rd cross-references in <code><a href="../reference/liftOverHg19.html">liftOverHg19()</a></code>, <code><a href="../reference/getCGPositions.html">getCGPositions()</a></code>, and <code><a href="../reference/qseaTableToChrGRanges.html">qseaTableToChrGRanges()</a></code>. <a href="https://github.com/cruk-mi/mesa/pull/72" class="external-link">!72</a>
 </li>
