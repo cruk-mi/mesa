@@ -84,11 +84,10 @@ Whether to cluster columns (samples).
 \strong{Default:} \code{TRUE}.}
 
 \item{mart}{\code{biomaRt::Mart} or \code{NULL}.
-Ensembl mart used to resolve gene coordinates. If \code{NULL}, attempts to use a
-mart
+Ensembl mart used to resolve gene coordinates. If \code{NULL}, uses the mart
 stored on the \code{qseaSet} (see \code{\link[=setMart]{setMart()}}); otherwise falls back to a default
-for
-GRCh38/hg38 or hg19.
+for GRCh38/hg38 or hg19. Other genomes, such as mouse, need a \code{mart} that
+matches the genome build.
 \strong{Default:} \code{NULL}.}
 
 \item{showSampleNames}{\code{logical(1)} or \code{NULL}.

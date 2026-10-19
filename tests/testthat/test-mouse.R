@@ -2,9 +2,34 @@ test_that("Mouse plotting", {
 
     localMockBiomart()
 
-    expect_true("Mart" %in% class(exampleMouse %>% getMart()))
+    expect_null(getMart(exampleMouse))
+    expect_error(plotGeneHeatmap(exampleMouse, gene = "Fbxl18"),
+        "Mmusculus")
 
-    plotGeneHeatmap(exampleMouse, gene = "Fbxl18")
+    mouseMart <- biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl",
+        host = "https://jul2023.archive.ensembl.org")
+    plotGeneHeatmap(exampleMouse, gene = "Fbxl18", mart = mouseMart)
+})
+
+test_that("plotGeneHeatmap() prefers an explicit mart to the stored one", {
+
+    localMockBiomart()
+
+    # the mock has no genes for this host, so querying it would fail (#173)
+    storedMart <- biomaRt::useMart("ensembl",
+        dataset = "mmusculus_gene_ensembl", host = "https://stored.invalid")
+    explicitMart <- biomaRt::useMart("ensembl",
+        dataset = "mmusculus_gene_ensembl",
+        host = "https://jul2023.archive.ensembl.org")
+
+    withStored <- setMart(exampleMouse, storedMart)
+    expect_no_error(
+        plotGeneHeatmap(withStored, gene = "Fbxl18", mart = explicitMart)
+    )
+    expect_error(
+        plotGeneHeatmap(withStored, gene = "Fbxl18"),
+        "Could not retrieve gene information"
+    )
 })
 
 test_that("Mouse plotting against live Ensembl", {
@@ -12,13 +37,13 @@ test_that("Mouse plotting against live Ensembl", {
     skip_on_cran()
     skip_if_offline("jul2023.archive.ensembl.org")
 
-    # exampleMouse stores a Mart for a retired archive, so set a live one
+    # exampleMouse stores no Mart, so pass a live one
     liveMart <- tryCatch(
         biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl",
             host = "https://jul2023.archive.ensembl.org"),
         error = function(e) skip("Could not reach Ensembl.")
     )
-    testPlotGeneHeatmap(exampleMouse %>% setMart(liveMart), gene = "Fbxl18")
+    testPlotGeneHeatmap(exampleMouse, gene = "Fbxl18", mart = liveMart)
 })
 
 test_that("Mouse annotation", {
