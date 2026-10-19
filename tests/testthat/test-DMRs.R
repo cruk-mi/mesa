@@ -2,6 +2,16 @@ test_that("Calculating DMRs", {
 
     skip_long_checks()
 
+    oldOptions <- options(
+        mesa_TxDb = getOption("mesa_TxDb"),
+        mesa_annoDb = getOption("mesa_annoDb"),
+        mesa_genome = getOption("mesa_genome")
+    )
+    on.exit(options(oldOptions), add = TRUE)
+    setMesaTxDb(NULL)
+    setMesaAnnoDb(NULL)
+    setMesaGenome(NULL)
+
     BiocParallel::SerialParam()
 
     randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
