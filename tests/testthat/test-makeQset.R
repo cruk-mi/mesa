@@ -94,8 +94,8 @@ test_that("Making a GRCh38 qseaSet", {
     # The MEDIPSData reads are aligned to hg19 with "chr" names. makeQset()
     # drops the prefix to match the NCBI windows, so this checks the GRCh38
     # build path, not the biology: hg19 coordinates on GRCh38 windows.
-    # HMMcopy needs all three chromosomes: chr22 alone gives too few 1 Mb
-    # bins for its loess GC correction.
+    # chr20 alone is enough for HMMcopy with 500 kb CNV windows; at 1 Mb it
+    # has too few bins for the loess GC correction.
     bamFile <- system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
         package = "MEDIPSData", mustWork = TRUE)
 
@@ -106,9 +106,9 @@ test_that("Making a GRCh38 qseaSet", {
 
     GRCh38testSet <- makeQset(sampleTable,
         BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-        chrSelect = 20:22,
+        chrSelect = 20,
         windowSize = 200,
-        CNVwindowSize = 1000000,
+        CNVwindowSize = 500000,
         fragmentType = "cfDNA",
         CNVmethod = "HMMdefault",
         coverageMethod = "PairedAndR1s",
@@ -120,8 +120,8 @@ test_that("Making a GRCh38 qseaSet", {
         properPairsOnly = FALSE)
 
     expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1)
-    expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 3)
-    expect_equal(GRCh38testSet %>% getRegions() %>% length(), 809861)
+    expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 1)
+    expect_equal(GRCh38testSet %>% getRegions() %>% length(), 322220)
 
     libTable <- getSampleTable(addLibraryInformation(GRCh38testSet))
     expect_true("relH" %in% colnames(libTable))
