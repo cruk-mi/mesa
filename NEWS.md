@@ -1,5 +1,16 @@
 # mesa 0.99.8.9000
 
+## Style
+- Lines in the `getSampleNames()` documentation and the data and QC vignette
+  are now at most 80 characters, clearing those BiocCheck formatting notes.
+  ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))
+
+## Infrastructure
+- CI now fails when a line in `R/` or `vignettes/` is longer than 80
+  characters, contains a tab or is indented by a number of spaces that is not
+  a multiple of 4.
+  ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))
+
 # mesa 0.99.8
 
 ## New features
