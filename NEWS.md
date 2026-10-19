@@ -4,7 +4,7 @@
 - `plotGeneHeatmap()` now uses an explicit `mart` instead of the one stored on
   the `qseaSet`, and `exampleMouse` no longer stores a Mart for the retired
   Ensembl `nov2020` archive: mouse users pass a `mart` matching mm10.
-  ([#173](https://github.com/cruk-mi/mesa/issues/173))
+  ([#173](https://github.com/cruk-mi/mesa/issues/173), [PR #174](https://github.com/cruk-mi/mesa/pull/174))
 
 ## Testing
 - The `plotGeneHeatmap()` and mouse tests now run offline against cached
