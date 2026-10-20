@@ -1,7 +1,5 @@
 test_that("Annotation getting works", {
 
-    skip_long_checks()
-
     expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = tumour, useGroupMeans = FALSE) %>% dim(), c(10, 1))
     expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = "tumour", useGroupMeans = FALSE) %>% dim(), c(10, 1))
     expect_equal(getAnnotation(exampleTumourNormal, sampleAnnotation = c("tumour", "type"), useGroupMeans = FALSE) %>% dim(), c(10, 2))
@@ -58,7 +56,6 @@ test_that("Annotation getting works", {
 
 test_that("Testing hg38 related annotation/plotting functions", {
 
-    skip_long_checks()
     localMockBiomart()
 
     plotGeneHeatmap(exampleTumourNormal, gene = "HOXA10", sampleAnnotation = tumour, useGroupMeans = FALSE)
@@ -125,9 +122,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
 test_that("Testing general functionality", {
 
-    skip_long_checks()
-
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),
@@ -150,8 +145,6 @@ test_that("Testing general functionality", {
 
 
 test_that("Analysing DMRs", {
-
-    skip_long_checks()
 
     expect_no_error(DMRs <- exampleTumourNormal %>%
         calculateDMRs(variable = "type",

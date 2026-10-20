@@ -1,7 +1,5 @@
 test_that("Calculating DMRs", {
 
-    skip_long_checks()
-
     oldOptions <- options(
         mesa_TxDb = getOption("mesa_TxDb"),
         mesa_annoDb = getOption("mesa_annoDb"),
@@ -14,7 +12,7 @@ test_that("Calculating DMRs", {
 
     BiocParallel::SerialParam()
 
-    randomSet <- qsea::getExampleQseaSet(repl = 8, expSamplingDepth = 1000000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),
@@ -183,8 +181,6 @@ test_that("Calculating DMRs", {
 })
 
 test_that("plotting DMRs", {
-
-    skip_long_checks()
 
     BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 
