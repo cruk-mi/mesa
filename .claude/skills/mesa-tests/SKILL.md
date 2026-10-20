@@ -42,15 +42,15 @@ test_that("something slow", {
 })
 ```
 
-**These tests are currently not run anywhere.** `tests/testthat.R` sets the option
-unconditionally and `check-bioc.yml` does not override it, so `skip_long_checks()` tests
-skip locally *and* in CI. Do not report them as verified. If you need one to actually run:
+**Only the `test-makeQset.R` blocks are still gated.** `tests/testthat.R` sets the option
+unconditionally, so those blocks skip under `R CMD check` and locally. The one place they
+run is the long-checks step in `check-bioc.yml`, which sets `skip_long_checks = FALSE` and
+runs `filter = "makeQset"` against an install of the checkout. Do not report them as
+verified from a local run. If you need one to actually run:
 
 ```r
 withr::with_options(list(skip_long_checks = FALSE), devtools::test())
 ```
-
-A dedicated CI job to run them is still outstanding.
 
 ## Skip guards for heavy data
 
