@@ -1,5 +1,15 @@
 # mesa 0.99.8.9000
 
+## Bug fixes
+- `makeQset()` now drops reads on chromosomes outside `chrSelect` before the
+  CpG enrichment, so a BAM with other chromosomes no longer warns about
+  out-of-bound ranges.
+  ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
+- `runHMMCopy()`, and so `makeQset()` and `addHMMcopyCNV()`, no longer passes
+  on the loess warnings from HMMcopy's GC correction. Other warnings are
+  still passed on.
+  ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
+
 ## Testing
 - The GRCh38 and proper-pairs `makeQset()` tests now use the public MEDIPSData
   BAM files instead of a file on an internal server, so they run in CI.

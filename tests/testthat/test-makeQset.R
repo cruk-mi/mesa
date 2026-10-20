@@ -106,20 +106,25 @@ test_that("Making a GRCh38 qseaSet", {
         file_name = bamFile,
         input_file = bamFile)
 
-    GRCh38testSet <- makeQset(sampleTable,
-        BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-        chrSelect = 20,
-        windowSize = 200,
-        CNVwindowSize = 500000,
-        fragmentType = "cfDNA",
-        CNVmethod = "HMMdefault",
-        coverageMethod = "PairedAndR1s",
-        minMapQual = 10,
-        minInsertSize = 70,
-        maxInsertSize = 1000,
-        minReferenceLength = 30,
-        badRegions = NULL,
-        properPairsOnly = FALSE)
+    # The BAM also holds chr21 and chr22, which must not reach the CpG
+    # enrichment (out-of-bound warnings), and HMMcopy's loess warnings are
+    # muffled, so nothing should warn.
+    expect_no_warning(
+        GRCh38testSet <- makeQset(sampleTable,
+            BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
+            chrSelect = 20,
+            windowSize = 200,
+            CNVwindowSize = 500000,
+            fragmentType = "cfDNA",
+            CNVmethod = "HMMdefault",
+            coverageMethod = "PairedAndR1s",
+            minMapQual = 10,
+            minInsertSize = 70,
+            maxInsertSize = 1000,
+            minReferenceLength = 30,
+            badRegions = NULL,
+            properPairsOnly = FALSE)
+    )
 
     expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1)
     expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 1)
@@ -139,7 +144,7 @@ test_that("Making a GRCh38 qseaSet", {
     expect_error(
         makeQset(sampleTable,
             BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-            chrSelect = 22,
+            chrSelect = 20,
             windowSize = 200,
             CNVwindowSize = 1000000,
             fragmentType = "cfDNA",
@@ -155,7 +160,7 @@ test_that("Making a GRCh38 qseaSet", {
     expect_no_error(
         makeQset(sampleTable,
             BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-            chrSelect = 22,
+            chrSelect = 20,
             windowSize = 200,
             CNVwindowSize = 500000,
             fragmentType = "cfDNA",

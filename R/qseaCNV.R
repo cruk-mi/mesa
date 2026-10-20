@@ -325,14 +325,31 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         dir.create(plotDir, recursive = TRUE, showWarnings = FALSE)
     }
 
-    correctOutput <- CNV_RegionsWithReads %>%
-        dplyr::select(
-            chr, start, end, width, strand, gc, map, tidyselect::any_of(colname)
-        ) %>%
-        dplyr::rename(reads = tidyselect::all_of(colname)) %>%
-        HMMcopy::correctReadcount(
-            mappability = 0.9, samplesize = 50000, verbose = FALSE
-        )
+    # The loess GC correction warns when there are few bins, and the fit
+    # still runs, so drop those warnings and let any other one through.
+    loessWarnings <- c(
+        "span too small", "pseudoinverse used", "neighborhood radius",
+        "reciprocal condition number", "near singularities",
+        "k-d tree limited", "zero-width neighborhood"
+    ) %>%
+        paste(collapse = "|")
+
+    correctOutput <- withCallingHandlers(
+        CNV_RegionsWithReads %>%
+            dplyr::select(
+                chr, start, end, width, strand, gc, map,
+                tidyselect::any_of(colname)
+            ) %>%
+            dplyr::rename(reads = tidyselect::all_of(colname)) %>%
+            HMMcopy::correctReadcount(
+                mappability = 0.9, samplesize = 50000, verbose = FALSE
+            ),
+        warning = function(w) {
+            if (stringr::str_detect(conditionMessage(w), loessWarnings)) {
+                invokeRestart("muffleWarning")
+            }
+        }
+    )
 
     initParam <- HMMcopy::HMMsegment(
         correctOutput,
