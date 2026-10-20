@@ -768,11 +768,10 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'   **Default:** `NULL`.
 #'
 #' @param mart `biomaRt::Mart` or `NULL`.
-#' Ensembl mart used to resolve gene coordinates. If `NULL`, attempts to use a
-#' mart
+#' Ensembl mart used to resolve gene coordinates. If `NULL`, uses the mart
 #' stored on the `qseaSet` (see [setMart()]); otherwise falls back to a default
-#' for
-#'   GRCh38/hg38 or hg19.
+#' for GRCh38/hg38 or hg19. Other genomes, such as mouse, need a `mart` that
+#' matches the genome build.
 #'   **Default:** `NULL`.
 #'
 #' @param idType `character(1)` or `NULL`.
@@ -857,7 +856,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
         otherwise = NULL
     )
 
-    if (!is.null(getMart(qseaSet))) { mart <- getMart(qseaSet) }
+    if (is.null(mart)) { mart <- getMart(qseaSet) }
 
     .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
     if (is.null(mart) &
@@ -871,7 +870,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
         mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
             host = "https://feb2014.archive.ensembl.org")
     } else if (is.null(mart)) {
-        stop("Please specify a mart object for biomaRt.")
+        stop("Please specify a mart object for biomaRt, matching the genome (",
+            .genome, "), e.g. biomaRt::useMart(\"ensembl\", dataset = ",
+            "\"mmusculus_gene_ensembl\", host = <archive for your build>).")
     }
 
     # If all useMart retries failed, stop with an informative message
