@@ -4,6 +4,10 @@
 - The GRCh38 and proper-pairs `makeQset()` tests now use the public MEDIPSData
   BAM files instead of a file on an internal server, so they run in CI.
   ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
+- The `plotGeneHeatmap()` and mouse tests now run offline against cached
+  Ensembl lookups instead of skipping when Ensembl can't be reached, and
+  tests that change the `mesa_*` annotation options restore them afterwards.
+  ([#123](https://github.com/cruk-mi/mesa/issues/123), [PR #172](https://github.com/cruk-mi/mesa/pull/172))
 
 ## Style
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
