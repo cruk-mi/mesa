@@ -283,6 +283,13 @@ jobs:
           r-version: ${{ needs.read-versions.outputs.r-version }}
           cache-version: ${{ env.cache-version }}
 
+      - name: Install mesa from the checkout
+        ## The tests below load the installed package. The cached R library
+        ## already holds a mesa with the same Version:, so install_local() in
+        ## the setup step says "SHA1 has not changed" and skips it, and the
+        ## long checks would test an older build than the PR (#175).
+        run: R CMD INSTALL --no-docs --no-multiarch .
+
       - name: Run long checks (read-count regression)
         if:  env.has_testthat == 'true'
         run: |
