@@ -20,7 +20,7 @@
 ## Infrastructure
 - The CI long checks now install mesa from the checkout before running, so
   they test the pull request's code instead of an older cached build.
-  ([#175](https://github.com/cruk-mi/mesa/issues/175))
+  ([#175](https://github.com/cruk-mi/mesa/issues/175), [PR #176](https://github.com/cruk-mi/mesa/pull/176))
 - CI now fails when a line in `R/` or `vignettes/` is longer than 80
   characters, contains a tab or is indented by a number of spaces that is not
   a multiple of 4.
