@@ -359,6 +359,18 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
         readGRanges <- properPairsGRanges
     }
 
+    # Only reads on the chromosomes being analysed are counted, and reads on
+    # others can lie beyond the end of the BSgenome chromosome (e.g. a BAM
+    # from another build), so drop them before the CpG enrichment.
+    readGRanges <- GenomeInfoDb::keepSeqlevels(
+        readGRanges,
+        intersect(
+            GenomeInfoDb::seqlevels(readGRanges),
+            GenomeInfoDb::seqlevels(regions)
+        ),
+        pruning.mode = "coarse"
+    )
+
 
 
     regions <- regions %>%
