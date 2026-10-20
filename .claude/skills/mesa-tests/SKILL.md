@@ -30,9 +30,10 @@ roxygen `@examples` blocks should use.
 
 ## The long-check gate
 
-`mesa:::skip_long_checks()` (defined in `R/utils.R`) skips when
+`skip_long_checks()` (defined in `tests/testthat/helper-skip.R`) skips when
 `options(skip_long_checks = TRUE)` is set. `tests/testthat.R` sets that option, so **long
-checks skip by default under `R CMD check`**, and around 15 tests currently depend on it.
+checks skip by default under `R CMD check`**. Only the `test-makeQset.R` blocks still
+depend on it (#121 is moving the rest to run by default).
 
 ```r
 test_that("something slow", {

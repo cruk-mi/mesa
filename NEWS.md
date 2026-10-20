@@ -7,6 +7,11 @@
   ([#173](https://github.com/cruk-mi/mesa/issues/173), [PR #174](https://github.com/cruk-mi/mesa/pull/174))
 
 ## Testing
+- The DMR, `exampleQset`, correlation, UMAP and general-functionality tests
+  now run by default instead of behind `skip_long_checks()`, using the cached
+  example `qseaSet`; `skip_long_checks()` moved into
+  `tests/testthat/helper-skip.R`.
+  ([#121](https://github.com/cruk-mi/mesa/issues/121))
 - The `plotGeneHeatmap()` and mouse tests now run offline against cached
   Ensembl lookups instead of skipping when Ensembl can't be reached, and
   tests that change the `mesa_*` annotation options restore them afterwards.
