@@ -122,7 +122,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
 test_that("Testing general functionality", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1000000) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),
