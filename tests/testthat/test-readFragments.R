@@ -116,15 +116,18 @@ test_that("calculateCGEnrichment works (single-end)", {
         "GenomicRanges already attached by an earlier test"
     )
 
-    enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    bamFile <- system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE)
+
+    enr <- calculateCGEnrichment(bamFile,
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = NULL,
         extend = 0, shift = 0, uniq = 0,
         chr.select = "chr22", paired = FALSE)
 
-    expect_true(all(c("file", "relH", "GoGe", "nReads",
-        "nReadsWithoutPattern", "n100bpReads",
-        "n100bpReadsWithoutPattern") %in% colnames(enr)))
+    expectedCols <- c("file", "relH", "GoGe", "nReads", "nReadsWithoutPattern",
+        "n100bpReads", "n100bpReadsWithoutPattern")
+    expect_true(all(expectedCols %in% colnames(enr)))
     expect_gt(enr$nReads, 0)
     expect_true(is.numeric(enr$relH) && is.finite(enr$relH))
     expect_true(is.numeric(enr$GoGe) && is.finite(enr$GoGe))
