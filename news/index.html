@@ -74,11 +74,16 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-99-8-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-99-8-9000"></a></h3>
 <ul><li>
+<code><a href="../reference/makeQset.html">makeQset()</a></code> now drops reads on chromosomes outside <code>chrSelect</code> before the CpG enrichment, so a BAM with other chromosomes no longer warns about out-of-bound ranges. (<a href="https://github.com/cruk-mi/mesa/issues/122" class="external-link">#122</a>, <a href="https://github.com/cruk-mi/mesa/pull/171" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/171" class="external-link">#171</a>)</li>
+<li>
+<code><a href="../reference/runHMMCopy.html">runHMMCopy()</a></code>, and so <code><a href="../reference/makeQset.html">makeQset()</a></code> and <code><a href="../reference/addHMMcopyCNV.html">addHMMcopyCNV()</a></code>, no longer passes on the loess warnings from HMMcopy’s GC correction. Other warnings are still passed on. (<a href="https://github.com/cruk-mi/mesa/issues/122" class="external-link">#122</a>, <a href="https://github.com/cruk-mi/mesa/pull/171" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/171" class="external-link">#171</a>)</li>
+<li>
 <code><a href="../reference/plotGeneHeatmap.html">plotGeneHeatmap()</a></code> now uses an explicit <code>mart</code> instead of the one stored on the <code>qseaSet</code>, and <code>exampleMouse</code> no longer stores a Mart for the retired Ensembl <code>nov2020</code> archive: mouse users pass a <code>mart</code> matching mm10. (<a href="https://github.com/cruk-mi/mesa/issues/173" class="external-link">#173</a>, <a href="https://github.com/cruk-mi/mesa/pull/174" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/174" class="external-link">#174</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="testing-0-99-8-9000">Testing<a class="anchor" aria-label="anchor" href="#testing-0-99-8-9000"></a></h3>
-<ul><li>The <code><a href="../reference/plotGeneHeatmap.html">plotGeneHeatmap()</a></code> and mouse tests now run offline against cached Ensembl lookups instead of skipping when Ensembl can’t be reached, and tests that change the <code>mesa_*</code> annotation options restore them afterwards. (<a href="https://github.com/cruk-mi/mesa/issues/123" class="external-link">#123</a>, <a href="https://github.com/cruk-mi/mesa/pull/172" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/172" class="external-link">#172</a>)</li>
+<ul><li>The GRCh38 and proper-pairs <code><a href="../reference/makeQset.html">makeQset()</a></code> tests now use the public MEDIPSData BAM files instead of a file on an internal server, so they run in CI. (<a href="https://github.com/cruk-mi/mesa/issues/122" class="external-link">#122</a>, <a href="https://github.com/cruk-mi/mesa/pull/171" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/171" class="external-link">#171</a>)</li>
+<li>The <code><a href="../reference/plotGeneHeatmap.html">plotGeneHeatmap()</a></code> and mouse tests now run offline against cached Ensembl lookups instead of skipping when Ensembl can’t be reached, and tests that change the <code>mesa_*</code> annotation options restore them afterwards. (<a href="https://github.com/cruk-mi/mesa/issues/123" class="external-link">#123</a>, <a href="https://github.com/cruk-mi/mesa/pull/172" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/172" class="external-link">#172</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="style-0-99-8-9000">Style<a class="anchor" aria-label="anchor" href="#style-0-99-8-9000"></a></h3>
@@ -86,7 +91,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="infrastructure-0-99-8-9000">Infrastructure<a class="anchor" aria-label="anchor" href="#infrastructure-0-99-8-9000"></a></h3>
-<ul><li>CI now fails when a line in <code>R/</code> or <code>vignettes/</code> is longer than 80 characters, contains a tab or is indented by a number of spaces that is not a multiple of 4. (<a href="https://github.com/cruk-mi/mesa/issues/169" class="external-link">#169</a>, <a href="https://github.com/cruk-mi/mesa/pull/170" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/170" class="external-link">#170</a>)</li>
+<ul><li>The CI long checks now install mesa from the checkout before running, so they test the pull request’s code instead of an older cached build. (<a href="https://github.com/cruk-mi/mesa/issues/175" class="external-link">#175</a>, <a href="https://github.com/cruk-mi/mesa/pull/176" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/176" class="external-link">#176</a>)</li>
+<li>CI now fails when a line in <code>R/</code> or <code>vignettes/</code> is longer than 80 characters, contains a tab or is indented by a number of spaces that is not a multiple of 4. (<a href="https://github.com/cruk-mi/mesa/issues/169" class="external-link">#169</a>, <a href="https://github.com/cruk-mi/mesa/pull/170" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/170" class="external-link">#170</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
