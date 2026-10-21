@@ -269,33 +269,6 @@ remove_almost_empty_cols <- function(dat, prop) {
 }
 
 
-#' Skip slow checks when configured
-#'
-#' Test helper that skips long-running checks when the option
-#' `options(skip_long_checks = TRUE)` is set.
-#'
-#' @return
-#' Invisibly returns `TRUE` if **not** skipping; otherwise calls
-#' `testthat::skip()` to skip the test.
-#'
-#' @examples
-#' old <- options(skip_long_checks = TRUE)
-#' mesa:::skip_long_checks() # will skip if option is TRUE
-#' options(old)
-#'
-#' @keywords internal
-#' @noRd
-skip_long_checks <- function() {
-    if (!isTRUE(getOption("skip_long_checks"))) {
-        return(invisible(TRUE))
-    }
-
-    testthat::skip(
-        "Slow checks skipped when options(skip_long_checks = TRUE) has been set"
-    )
-}
-
-
 #' Coerce common tabular inputs to GRanges
 #'
 #' Accept a `GRanges` or a data frame containing window coordinates and

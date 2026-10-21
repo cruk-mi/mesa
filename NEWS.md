@@ -15,6 +15,11 @@
   ([#173](https://github.com/cruk-mi/mesa/issues/173), [PR #174](https://github.com/cruk-mi/mesa/pull/174))
 
 ## Testing
+- The DMR, `exampleQset`, correlation, UMAP and general-functionality tests
+  now run by default instead of behind `skip_long_checks()`, using the cached
+  example `qseaSet`; `skip_long_checks()` moved into
+  `tests/testthat/helper-skip.R`.
+  ([#121](https://github.com/cruk-mi/mesa/issues/121), [PR #177](https://github.com/cruk-mi/mesa/pull/177))
 - The GRCh38 and proper-pairs `makeQset()` tests now use the public MEDIPSData
   BAM files instead of a file on an internal server, so they run in CI.
   ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
