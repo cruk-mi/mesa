@@ -15,6 +15,13 @@
   ([#173](https://github.com/cruk-mi/mesa/issues/173), [PR #174](https://github.com/cruk-mi/mesa/pull/174))
 
 ## Testing
+- The `makeQset()` and `calculateCGEnrichment()` tests now run by default, so
+  every test runs under `R CMD check`; the option and helper that switched
+  slow tests off are gone. The hg19 test uses chr21 and chr22 to stay fast.
+  ([#121](https://github.com/cruk-mi/mesa/issues/121))
+- The check that `calculateCGEnrichment()` works without GenomicRanges
+  attached (#81) now runs first in every test run, so it is no longer skipped.
+  ([#121](https://github.com/cruk-mi/mesa/issues/121))
 - The DMR, `exampleQset`, correlation, UMAP and general-functionality tests
   now run by default instead of behind `skip_long_checks()`, using the cached
   example `qseaSet`; `skip_long_checks()` moved into
@@ -34,6 +41,9 @@
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))
 
 ## Infrastructure
+- Removed the separate CI long-checks job: `R CMD check` now runs those tests,
+  including the exact read-count check, against the built package.
+  ([#121](https://github.com/cruk-mi/mesa/issues/121))
 - The CI long checks now install mesa from the checkout before running, so
   they test the pull request's code instead of an older cached build.
   ([#175](https://github.com/cruk-mi/mesa/issues/175), [PR #176](https://github.com/cruk-mi/mesa/pull/176))

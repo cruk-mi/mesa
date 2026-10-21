@@ -69,15 +69,11 @@ testChrLengths <- c(chr1 = 10000, chr2 = 10000)
 test_that("fragments import without GenomicRanges attached (#81)", {
 
     # The #81 crash - MEDIPS raising `could not find function "strand<-"` -
-    # only surfaced when GenomicRanges was absent from the search path. The
-    # equivalent assertion in test-makeQset.R sits behind skip_long_checks(),
-    # which tests/testthat.R enables unconditionally, so it never runs under
-    # R CMD check. This block carries no skip_long_checks(), so the guarantee
-    # is checked on every run.
-    #
-    # The precondition is not order-independent: running the suite with
-    # skip_long_checks disabled attaches GenomicRanges in an earlier file.
-    # Skip rather than report a false failure in that configuration.
+    # only surfaced when GenomicRanges was absent from the search path.
+    # DESCRIPTION's Config/testthat/start-first runs this file before any
+    # other, so nothing has attached GenomicRanges yet. The skip below only
+    # fires when the file is run after another one (e.g. interactively); a
+    # skip in a full run means the guarantee stopped being checked.
     skip_if(
         "package:GenomicRanges" %in% search(),
         "GenomicRanges already attached by an earlier test"
@@ -105,6 +101,34 @@ test_that("fragments import without GenomicRanges attached (#81)", {
 
     # and the helpers must not have attached it as a side effect
     expect_false("package:GenomicRanges" %in% search())
+})
+
+
+test_that("calculateCGEnrichment works (single-end)", {
+
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
+
+    # The same #81 guarantee on real data: with GenomicRanges not attached,
+    # the single-end path must not need `strand<-` from the search path.
+    skip_if(
+        "package:GenomicRanges" %in% search(),
+        "GenomicRanges already attached by an earlier test"
+    )
+
+    enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
+        exportPath = NULL,
+        extend = 0, shift = 0, uniq = 0,
+        chr.select = "chr22", paired = FALSE)
+
+    expect_true(all(c("file", "relH", "GoGe", "nReads",
+        "nReadsWithoutPattern", "n100bpReads",
+        "n100bpReadsWithoutPattern") %in% colnames(enr)))
+    expect_gt(enr$nReads, 0)
+    expect_true(is.numeric(enr$relH) && is.finite(enr$relH))
+    expect_true(is.numeric(enr$GoGe) && is.finite(enr$GoGe))
+
 })
 
 
@@ -327,3 +351,4 @@ test_that("reads off the standard chromosomes are classified against CpGs", {
     expect_equal(enr$nReads, 1L)
     expect_equal(enr$nReadsWithoutPattern, 0L)
 })
+

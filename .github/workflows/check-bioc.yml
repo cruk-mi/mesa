@@ -53,9 +53,9 @@ concurrency:
 ## Note that you can always run a GHA test without the cache by using the word
 ## "/nocache" in the commit message.
 ##
-## Layout: r-build-and-check, long-checks, coverage and pkgdown run in
-## parallel, each after the shared .github/actions/setup-mesa. They used to be
-## steps of one ~37-minute job, run one after the other.
+## Layout: r-build-and-check, coverage and pkgdown run in parallel, each after
+## the shared .github/actions/setup-mesa. They used to be steps of one
+## ~37-minute job, run one after the other.
 env:
   has_testthat: 'true'
   run_covr: 'true'
@@ -265,55 +265,6 @@ jobs:
         with:
           name: ${{ runner.os }}-biocversion-${{ needs.read-versions.outputs.bioc-version }}-r-${{ needs.read-versions.outputs.r-version }}-results
           path: check
-
-  long-checks:
-    needs: read-versions
-    runs-on: ubuntu-latest
-    name: Long checks (read-count regression)
-    container: "bioconductor/bioconductor_docker:${{ needs.read-versions.outputs.bioc-release }}"
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v7
-
-      - name: Set up mesa
-        uses: ./.github/actions/setup-mesa
-        with:
-          bioc-version: ${{ needs.read-versions.outputs.bioc-version }}
-          r-version: ${{ needs.read-versions.outputs.r-version }}
-          cache-version: ${{ env.cache-version }}
-
-      - name: Install mesa from the checkout
-        ## The tests below load the installed package. The cached R library
-        ## already holds a mesa with the same Version:, so install_local() in
-        ## the setup step says "SHA1 has not changed" and skips it, and the
-        ## long checks would test an older build than the PR (#175).
-        run: R CMD INSTALL --no-docs --no-multiarch .
-
-      - name: Run long checks (read-count regression)
-        if:  env.has_testthat == 'true'
-        run: |
-          ## tests/testthat.R sets skip_long_checks = TRUE unconditionally, so
-          ## R CMD check never runs the blocks guarded by it. One of those,
-          ## expect_equal(enr$nReads, 636130) in test-makeQset.R, is the only
-          ## exact check that calculateCGEnrichment() still returns the read
-          ## counts mesa has always returned for this data - so without this
-          ## step nothing catches a silent change to them (#81, #102).
-          ##
-          ## This runner already installs MEDIPSData and
-          ## BSgenome.Hsapiens.UCSC.hg19, so the block can run here with the
-          ## option disabled. Scoped to makeQset to keep the added runtime to
-          ## the tests that need the heavy data.
-          options(skip_long_checks = FALSE)
-          BiocParallel::register(BiocParallel::SerialParam())
-          testthat::test_dir(
-              "tests/testthat",
-              package = "mesa",
-              load_package = "installed",
-              filter = "makeQset",
-              stop_on_failure = TRUE
-          )
-        shell: Rscript {0}
 
   pkgdown:
     needs: read-versions

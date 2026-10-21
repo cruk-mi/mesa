@@ -1,11 +1,7 @@
 test_that("Making a hg19 qseaSet", {
 
-    # skip check unless options(run_long_checks = TRUE)
-    skip_long_checks()
-
-    if (!rlang::is_installed("MEDIPSData")) {
-        skip("MEDIPSData Not installed")
-    }
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
     sampleTable <- data.frame(sample_name = c("Normal1", "Tumour1"),
         group = c("Normal1", "Tumour1"),
@@ -14,7 +10,7 @@ test_that("Making a hg19 qseaSet", {
 
     testSet <- makeQset(sampleTable,
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-        chrSelect = paste0("chr", 20:22),
+        chrSelect = c("chr21", "chr22"),
         windowSize = 300,
         CNVwindowSize = 1000000,
         fragmentType = "Sheared",
@@ -29,10 +25,10 @@ test_that("Making a hg19 qseaSet", {
         parallel = FALSE)
 
     expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
-    expect_equal(testSet %>% qsea::getChrNames() %>% length(), 3)
+    expect_equal(testSet %>% qsea::getChrNames() %>% length(), 2)
     expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
     expect_equal(testSet %>% qsea::getCounts() %>% colSums() %>% unname(), testSet %>% qsea::getLibSize())
-    expect_equal(testSet %>% qsea::getRegions() %>% length(), 541532)
+    expect_equal(testSet %>% qsea::getRegions() %>% length(), 331447)
 
     expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
 
@@ -43,12 +39,8 @@ test_that("Making a hg19 qseaSet", {
 
 test_that("Making a hg19 qseaSet with qsea coverage method", {
 
-    # skip check unless options(run_long_checks = TRUE)
-    skip_long_checks()
-
-    if (!rlang::is_installed("MEDIPSData")) {
-        skip("MEDIPSData Not installed")
-    }
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
     sampleTable <- data.frame(sample_name = c("Test1", "Test2"),
         group = c("Test1", "Test2"),
@@ -88,8 +80,6 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
 
 test_that("Making a GRCh38 qseaSet", {
 
-    # skip check unless options(run_long_checks = TRUE)
-    skip_long_checks()
     skip_if_not_installed("MEDIPSData")
     skip_if_not_installed("BSgenome.Hsapiens.NCBI.GRCh38")
 
@@ -175,8 +165,6 @@ test_that("Making a GRCh38 qseaSet", {
 
 test_that("Making a qseaSet proper pairs only", {
 
-    # skip check unless options(run_long_checks = TRUE)
-    skip_long_checks()
     skip_if_not_installed("MEDIPSData")
     skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
@@ -213,11 +201,9 @@ test_that("Making a qseaSet proper pairs only", {
 })
 
 test_that("calculateCGEnrichment works", {
-    skip_long_checks()
 
-    if (!rlang::is_installed("MEDIPSData")) {
-        skip("MEDIPSData Not installed")
-    }
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
     enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
@@ -237,46 +223,9 @@ test_that("calculateCGEnrichment works", {
 
     # TODO: tolerance is relative, so tolerance = 5 passes for relH anywhere
     # from ~0.5 to ~5 against an expected 3.35. These catch gross breakage
-    # only. Tighten when this block is re-enabled and the values can be
+    # only. Tighten when the values can be
     # measured against the Rsamtools implementation.
     expect_equal(enr$relH, 3.353462, tolerance = 5)
     expect_equal(enr$GoGe, 1.631612, tolerance = 5)
-
-})
-
-test_that("calculateCGEnrichment works (single-end)", {
-
-    # skip check unless options(run_long_checks = TRUE)
-    skip_long_checks()
-
-    if (!rlang::is_installed("MEDIPSData")) {
-        skip("MEDIPSData Not installed")
-    }
-
-    # The fresh-session failure (#81) only manifested when GenomicRanges was
-    # not attached to the search path, so the assertion below is only
-    # meaningful while that holds. It is NOT order-independent: with
-    # skip_long_checks disabled the makeQset blocks above run first and
-    # attach GenomicRanges, so skip rather than report a false failure.
-    # The same guarantee runs unconditionally in test-readFragments.R,
-    # which needs neither MEDIPSData nor a BSgenome.
-    skip_if(
-        "package:GenomicRanges" %in% search(),
-        "GenomicRanges already attached by an earlier test"
-    )
-    expect_false("package:GenomicRanges" %in% search())
-
-    enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-        exportPath = NULL,
-        extend = 0, shift = 0, uniq = 0,
-        chr.select = "chr22", paired = FALSE)
-
-    expect_true(all(c("file", "relH", "GoGe", "nReads",
-        "nReadsWithoutPattern", "n100bpReads",
-        "n100bpReadsWithoutPattern") %in% colnames(enr)))
-    expect_gt(enr$nReads, 0)
-    expect_true(is.numeric(enr$relH) && is.finite(enr$relH))
-    expect_true(is.numeric(enr$GoGe) && is.finite(enr$GoGe))
 
 })

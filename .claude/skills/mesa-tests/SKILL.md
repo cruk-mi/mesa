@@ -1,6 +1,6 @@
 ---
 name: mesa-tests
-description: mesa's testthat conventions — the cached qseaSet fixtures, the skip_long_checks option gate, and the skip guards for heavy genome/annotation packages. Use when writing, fixing or debugging tests in tests/testthat/.
+description: mesa's testthat conventions — the cached qseaSet fixtures, the file order that keeps the #81 check meaningful, and the skip guards for heavy genome/annotation packages. Use when writing, fixing or debugging tests in tests/testthat/.
 ---
 
 # Testing mesa
@@ -28,29 +28,18 @@ costs a fresh simulation.
 The package also ships `exampleMouse` and `exampleTumourNormal` data objects, which are what
 roxygen `@examples` blocks should use.
 
-## The long-check gate
+## No long-check gate
 
-`skip_long_checks()` (defined in `tests/testthat/helper-skip.R`) skips when
-`options(skip_long_checks = TRUE)` is set. `tests/testthat.R` sets that option, so **long
-checks skip by default under `R CMD check`**. Only the `test-makeQset.R` blocks still
-depend on it (#121 is moving the rest to run by default).
+Every test runs by default: there is no option or helper to switch tests
+off (retired in #121). A test that is slow gets faster instead: subset `chrSelect`,
+use bigger windows, or reuse a cached fixture. Time new tests; the whole suite counts
+against Bioconductor's build limit.
 
-```r
-test_that("something slow", {
-    skip_long_checks()
-    # ...
-})
-```
-
-**Only the `test-makeQset.R` blocks are still gated.** `tests/testthat.R` sets the option
-unconditionally, so those blocks skip under `R CMD check` and locally. The one place they
-run is the long-checks step in `check-bioc.yml`, which sets `skip_long_checks = FALSE` and
-runs `filter = "makeQset"` against an install of the checkout. Do not report them as
-verified from a local run. If you need one to actually run:
-
-```r
-withr::with_options(list(skip_long_checks = FALSE), devtools::test())
-```
+`DESCRIPTION` has `Config/testthat/start-first: readFragments`, so `test-readFragments.R`
+runs before every other file. The #81 checks there skip when GenomicRanges is already
+attached, so they only mean something while no earlier file attaches it. Don't attach it
+in a helper, and treat a "GenomicRanges already attached" skip in a full run as a failure
+of that guarantee.
 
 ## Skip guards for heavy data
 

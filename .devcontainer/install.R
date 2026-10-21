@@ -60,7 +60,7 @@ deps <- remotes::dev_package_deps(pkg_dir, dependencies = TRUE)$package
 # The ONLY difference between slim and full: these heavy genome /
 # annotation data packages (declared in DESCRIPTION Suggests). slim
 # omits them; the test suite skips the cases that need them via
-# skip_if_not_installed() / skip_long_checks().
+# skip_if_not_installed().
 full_only <- c(
   "BSgenome.Hsapiens.NCBI.GRCh38",
   "BSgenome.Hsapiens.UCSC.hg19",
