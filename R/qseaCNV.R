@@ -263,6 +263,29 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
 }
 
 
+# HMMcopy::correctReadcount() fits a loess of reads on GC with span = 0.03.
+# With few bins (a small genome or one short chromosome) that fit warns, but it
+# still runs, so drop these warnings and let any other one through.
+muffleLoessWarnings <- function(expr) {
+
+    loessWarnings <- c(
+        "span too small", "pseudoinverse used", "neighborhood radius",
+        "reciprocal condition number", "near singularities",
+        "k-d tree limited", "zero-width neighborhood"
+    ) %>%
+        paste(collapse = "|")
+
+    withCallingHandlers(
+        expr,
+        warning = function(w) {
+            if (stringr::str_detect(conditionMessage(w), loessWarnings)) {
+                invokeRestart("muffleWarning")
+            }
+        }
+    )
+}
+
+
 #' Run HMMcopy on per-window reads for a single sample
 #'
 #' Given a table of per-window counts with GC and mappability, run HMMcopy
@@ -325,20 +348,19 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
         dir.create(plotDir, recursive = TRUE, showWarnings = FALSE)
     }
 
-    correctOutput <- CNV_RegionsWithReads %>%
-        dplyr::select(
-            chr, start, end, width, strand, gc, map, tidyselect::any_of(colname)
-        ) %>%
-        dplyr::rename(reads = tidyselect::all_of(colname)) %>%
-        HMMcopy::correctReadcount(
-            mappability = 0.9, samplesize = 50000, verbose = FALSE
-        )
+    # Arguments not given here keep HMMcopy's defaults.
+    correctOutput <- muffleLoessWarnings(
+        CNV_RegionsWithReads %>%
+            dplyr::select(
+                chr, start, end, width, strand, gc, map,
+                tidyselect::any_of(colname)
+            ) %>%
+            dplyr::rename(reads = tidyselect::all_of(colname)) %>%
+            HMMcopy::correctReadcount(verbose = FALSE)
+    )
 
     initParam <- HMMcopy::HMMsegment(
         correctOutput,
-        param = NULL,
-        autosomes = NULL,
-        maxiter = 50,
         getparam = TRUE,
         verbose = FALSE
     )
@@ -346,8 +368,6 @@ runHMMCopy <- function(CNV_RegionsWithReads, colname, plotDir = NULL) {
     hmmseg <- HMMcopy::HMMsegment(
         correctOutput,
         param = initParam,
-        autosomes = NULL,
-        maxiter = 50,
         verbose = FALSE
     )
 
