@@ -3,10 +3,15 @@ test_that("Making a hg19 qseaSet", {
     skip_if_not_installed("MEDIPSData")
     skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
+    bamFiles <- vapply(c("1N", "1T"), function(x) {
+        system.file("extdata",
+            paste0("NSCLC_MeDIP_", x, "_fst_chr_20_21_22.bam"),
+            package = "MEDIPSData", mustWork = TRUE)
+    }, character(1))
+
     sampleTable <- data.frame(sample_name = c("Normal1", "Tumour1"),
         group = c("Normal1", "Tumour1"),
-        file_name = c(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-            system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)))
+        file_name = unname(bamFiles))
 
     testSet <- makeQset(sampleTable,
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
@@ -27,10 +32,18 @@ test_that("Making a hg19 qseaSet", {
     expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
     expect_equal(testSet %>% qsea::getChrNames() %>% length(), 2)
     expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
-    expect_equal(testSet %>% qsea::getCounts() %>% colSums() %>% unname(), testSet %>% qsea::getLibSize())
+    expect_equal(
+        testSet %>% qsea::getCounts() %>% colSums() %>% unname(),
+        testSet %>% qsea::getLibSize()
+    )
     expect_equal(testSet %>% qsea::getRegions() %>% length(), 331447)
 
-    expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
+    expect_true("relH" %in% (
+        testSet %>%
+            addLibraryInformation() %>%
+            qsea::getSampleTable() %>%
+            colnames()
+    ))
 
     localMockBiomart()
     plotGeneHeatmap(testSet, "JAM2")
@@ -42,13 +55,16 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
     skip_if_not_installed("MEDIPSData")
     skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
+    bamFiles <- vapply(c("2N", "2T", "3N", "3T"), function(x) {
+        system.file("extdata",
+            paste0("NSCLC_MeDIP_", x, "_fst_chr_20_21_22.bam"),
+            package = "MEDIPSData", mustWork = TRUE)
+    }, character(1))
+
     sampleTable <- data.frame(sample_name = c("Test1", "Test2"),
         group = c("Test1", "Test2"),
-        file_name = c(system.file("extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-            system.file("extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE)),
-        input_file = c(system.file("extdata", "NSCLC_MeDIP_3N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
-            system.file("extdata", "NSCLC_MeDIP_3T_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE))
-    )
+        file_name = unname(bamFiles[c("2N", "2T")]),
+        input_file = unname(bamFiles[c("3N", "3T")]))
 
     testSet <- makeQset(sampleTable,
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
@@ -68,10 +84,18 @@ test_that("Making a hg19 qseaSet with qsea coverage method", {
     expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
     expect_equal(testSet %>% qsea::getChrNames() %>% length(), 1)
     expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
-    expect_equal(testSet %>% qsea::getCounts() %>% colSums() %>% unname(), testSet %>% qsea::getLibSize())
+    expect_equal(
+        testSet %>% qsea::getCounts() %>% colSums() %>% unname(),
+        testSet %>% qsea::getLibSize()
+    )
     expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
 
-    expect_true("relH" %in% (testSet %>% addLibraryInformation() %>% qsea::getSampleTable() %>% colnames()))
+    expect_true("relH" %in% (
+        testSet %>%
+            addLibraryInformation() %>%
+            qsea::getSampleTable() %>%
+            colnames()
+    ))
 
     localMockBiomart()
     plotGeneHeatmap(testSet, "EWSR1")
@@ -205,7 +229,10 @@ test_that("calculateCGEnrichment works", {
     skip_if_not_installed("MEDIPSData")
     skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
 
-    enr <- calculateCGEnrichment(system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam", package = "MEDIPSData", mustWork = TRUE),
+    bamFile <- system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
+        package = "MEDIPSData", mustWork = TRUE)
+
+    enr <- calculateCGEnrichment(bamFile,
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
         exportPath = NULL,
         extend = 0, shift = 0, uniq = 0,
