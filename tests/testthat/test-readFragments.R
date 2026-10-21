@@ -351,4 +351,3 @@ test_that("reads off the standard chromosomes are classified against CpGs", {
     expect_equal(enr$nReads, 1L)
     expect_equal(enr$nReadsWithoutPattern, 0L)
 })
-
