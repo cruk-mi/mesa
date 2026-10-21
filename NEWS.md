@@ -1,6 +1,14 @@
 # mesa 0.99.8.9000
 
 ## Bug fixes
+- `makeQset()` now drops reads on chromosomes outside `chrSelect` before the
+  CpG enrichment, so a BAM with other chromosomes no longer warns about
+  out-of-bound ranges.
+  ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
+- `runHMMCopy()`, and so `makeQset()` and `addHMMcopyCNV()`, no longer passes
+  on the loess warnings from HMMcopy's GC correction. Other warnings are
+  still passed on.
+  ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
 - `plotGeneHeatmap()` now uses an explicit `mart` instead of the one stored on
   the `qseaSet`, and `exampleMouse` no longer stores a Mart for the retired
   Ensembl `nov2020` archive: mouse users pass a `mart` matching mm10.
@@ -12,6 +20,9 @@
   example `qseaSet`; `skip_long_checks()` moved into
   `tests/testthat/helper-skip.R`.
   ([#121](https://github.com/cruk-mi/mesa/issues/121), [PR #177](https://github.com/cruk-mi/mesa/pull/177))
+- The GRCh38 and proper-pairs `makeQset()` tests now use the public MEDIPSData
+  BAM files instead of a file on an internal server, so they run in CI.
+  ([#122](https://github.com/cruk-mi/mesa/issues/122), [PR #171](https://github.com/cruk-mi/mesa/pull/171))
 - The `plotGeneHeatmap()` and mouse tests now run offline against cached
   Ensembl lookups instead of skipping when Ensembl can't be reached, and
   tests that change the `mesa_*` annotation options restore them afterwards.
