@@ -23,7 +23,7 @@
   mm10 annotation instead of human data, and `annotateWindows()` restores the
   `mesa_*` options it sets. The internal `mixThreeQsetSamples()` no longer has
   an example, and the `exampleMouse` title now says it holds 4 mouse samples.
-  ([#153](https://github.com/cruk-mi/mesa/issues/153))
+  ([#153](https://github.com/cruk-mi/mesa/issues/153), [PR #179](https://github.com/cruk-mi/mesa/pull/179))
 
 ## Testing
 - The `makeQset()` and `calculateCGEnrichment()` tests now run by default, so
