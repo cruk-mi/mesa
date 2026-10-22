@@ -803,7 +803,6 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' [biomaRt::useMart()], [ComplexHeatmap::Heatmap()]
 #'
 #' @examples
-#' \donttest{
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Basic gene heatmap (beta) with defaults
@@ -834,7 +833,6 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'             downstreamDist = 2000),
 #'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 #' )
-#' }
 #'
 #' @export
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
@@ -1330,22 +1328,24 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'         plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 #' }
 #'
-#' \donttest{
-#' # Override for specific analysis
-#' exampleTumourNormal %>%
-#'     plotGenomicFeatureDistribution(
-#'         genome = "mm10",
-#'         normMethod = "nrpm",
-#'         cutoff = 2
-#'     )
+#' # Override the genome for a specific analysis, here with mouse (mm10) data
+#' if (requireNamespace("TxDb.Mmusculus.UCSC.mm10.knownGene", quietly = TRUE) &&
+#'     requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
+#'     data(exampleMouse, package = "mesa")
+#'     exampleMouse %>%
+#'         plotGenomicFeatureDistribution(
+#'             genome = "mm10",
+#'             normMethod = "nrpm",
+#'             cutoff = 2
+#'         )
 #'
-#' # Advanced: manual control (bypasses mesa genome system)
-#' exampleTumourNormal %>%
-#'     plotGenomicFeatureDistribution(
-#'         TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
-#'             TxDb.Mmusculus.UCSC.mm10.knownGene,
-#'         annoDb = "org.Mm.eg.db"
-#'     )
+#'     # Advanced: manual control (bypasses mesa genome system)
+#'     exampleMouse %>%
+#'         plotGenomicFeatureDistribution(
+#'             TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
+#'                 TxDb.Mmusculus.UCSC.mm10.knownGene,
+#'             annoDb = "org.Mm.eg.db"
+#'         )
 #' }
 #'
 #' # Restore the previous genome setting
