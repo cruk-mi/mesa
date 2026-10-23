@@ -72,24 +72,6 @@ if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
         plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 }
 
-\donttest{
-# Override for specific analysis
-exampleTumourNormal \%>\%
-    plotGenomicFeatureDistribution(
-        genome = "mm10",
-        normMethod = "nrpm",
-        cutoff = 2
-    )
-
-# Advanced: manual control (bypasses mesa genome system)
-exampleTumourNormal \%>\%
-    plotGenomicFeatureDistribution(
-        TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
-            TxDb.Mmusculus.UCSC.mm10.knownGene,
-        annoDb = "org.Mm.eg.db"
-    )
-}
-
 # Restore the previous genome setting
 options(mesa_genome = oldGenome)
 

@@ -3,7 +3,7 @@
 \docType{data}
 \name{exampleMouse}
 \alias{exampleMouse}
-\title{A small example qseaSet with 5 paired tumour/normal samples.}
+\title{A small example qseaSet with 4 mouse samples.}
 \format{
 A qseaSet object with 153 regions and 4 samples:
 }

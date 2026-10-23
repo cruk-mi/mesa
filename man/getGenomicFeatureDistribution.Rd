@@ -73,17 +73,15 @@ if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
   exampleTumourNormal \%>\%
     getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") \%>\%
     head()
-}
 
-\donttest{
-# Beta-based summary (apply a minimum enrichment for non-NA betas)
-exampleTumourNormal \%>\%
-  getGenomicFeatureDistribution(
-      cutoff = 0.7,
-      normMethod = "beta",
-      minEnrichment = 3
-  ) \%>\%
-  head()
+  # Beta-based summary (apply a minimum enrichment for non-NA betas)
+  exampleTumourNormal \%>\%
+    getGenomicFeatureDistribution(
+        cutoff = 0.7,
+        normMethod = "beta",
+        minEnrichment = 3
+    ) \%>\%
+    head()
 }
 
 # Restore the previous genome setting

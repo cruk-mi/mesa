@@ -14,6 +14,18 @@
   Ensembl `nov2020` archive: mouse users pass a `mart` matching mm10.
   ([#173](https://github.com/cruk-mi/mesa/issues/173), [PR #174](https://github.com/cruk-mi/mesa/pull/174))
 
+## Documentation
+- The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
+  `plotGenomicFeatureDistribution()`, `plotGeneHeatmap()` and
+  `setMesaParallel()` now run instead of sitting in `\donttest{}` or
+  `\dontrun{}`. Annotation examples run when the TxDb and OrgDb packages are
+  installed, `plotGenomicFeatureDistribution()` no longer annotates human data
+  with the mm10 annotation, `plotGeneHeatmap()` runs one example instead of
+  three, and `annotateWindows()` restores the `mesa_*` options it sets. The
+  internal `mixThreeQsetSamples()` no longer has an example, and the
+  `exampleMouse` title now says it holds 4 mouse samples.
+  ([#153](https://github.com/cruk-mi/mesa/issues/153), [PR #179](https://github.com/cruk-mi/mesa/pull/179))
+
 ## Testing
 - The `makeQset()` and `calculateCGEnrichment()` tests now run by default, so
   every test runs under `R CMD check`; the option and helper that switched

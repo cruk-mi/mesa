@@ -171,36 +171,32 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults
+#' # Derive some regions (e.g., DMRs) once, then annotate them
+#' dmrs <- exampleTumourNormal %>%
+#'     calculateDMRs(variable = "tumour", contrasts = "first")
+#'
 #' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
 #'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-#'   exampleTumourNormal %>%
-#'     calculateDMRs(variable = "tumour", contrasts = "first") %>%
-#'     annotateWindows(genome = "hg38")
-#' }
+#'     # Annotate using GRCh38 defaults
+#'     dmrs %>%
+#'         annotateWindows(genome = "hg38")
 #'
-#' \donttest{
-#' # Or specify TxDb/annoDb explicitly
-#' exampleTumourNormal %>%
-#'   calculateDMRs(variable = "tumour", contrasts = "first") %>%
-#'   annotateWindows(
-#'     TxDb   = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-#'     annoDb = "org.Hs.eg.db"
-#'   )
+#'     # Or specify TxDb/annoDb explicitly
+#'     dmrs %>%
+#'         annotateWindows(
+#'             TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
+#'             annoDb = "org.Hs.eg.db"
+#'         )
 #'
-#' # Mouse example (mm10): supply mouse TxDb and OrgDb
-#' data(exampleMouse, package = "mesa")
-#' exampleMouse %>%
-#'   getRegions() %>%
-#'   annotateWindows(
-#'     TxDb   = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-#'     annoDb = "org.Mm.eg.db"
-#'   )
-#'
-#' # You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:
-#'   setMesaGenome("hg38"); 
-#'   setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene"); 
-#'   setMesaAnnoDb("org.Hs.eg.db")
+#'     # You can also set defaults globally using setMesaGenome, setMesaTxDb
+#'     # and setMesaAnnoDb (saving the current settings to restore them)
+#'     oldOptions <- options("mesa_genome", "mesa_TxDb", "mesa_annoDb")
+#'     setMesaGenome("hg38")
+#'     setMesaTxDb("TxDb.Hsapiens.UCSC.hg38.knownGene")
+#'     setMesaAnnoDb("org.Hs.eg.db")
+#'     dmrs %>%
+#'         annotateWindows()
+#'     options(oldOptions)
 #' }
 #'
 #' @export
@@ -1802,17 +1798,15 @@ addSummaryAcrossWindows <- function(qseaSet,
 #'   exampleTumourNormal %>%
 #'     getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") %>%
 #'     head()
-#' }
 #'
-#' \donttest{
-#' # Beta-based summary (apply a minimum enrichment for non-NA betas)
-#' exampleTumourNormal %>%
-#'   getGenomicFeatureDistribution(
-#'       cutoff = 0.7,
-#'       normMethod = "beta",
-#'       minEnrichment = 3
-#'   ) %>%
-#'   head()
+#'   # Beta-based summary (apply a minimum enrichment for non-NA betas)
+#'   exampleTumourNormal %>%
+#'     getGenomicFeatureDistribution(
+#'         cutoff = 0.7,
+#'         normMethod = "beta",
+#'         minEnrichment = 3
+#'     ) %>%
+#'     head()
 #' }
 #'
 #' # Restore the previous genome setting

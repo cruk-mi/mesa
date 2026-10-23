@@ -129,30 +129,15 @@ aggregated by \code{group} prior to plotting. Column annotations can be added vi
 \code{sampleAnnotation}; colours can be customized via \code{annotationColors}.
 }
 \examples{
-\donttest{
 data(exampleTumourNormal, package = "mesa")
 
-# Basic gene heatmap (beta) with defaults
-tryCatch(
-    exampleTumourNormal \%>\% plotGeneHeatmap("HOXA9"),
-    error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
-)
-
-# Add sample annotations (tidyselect bare names) and cluster columns into
-# 2 groups
+# Gene heatmap (beta) with sample annotations (tidyselect bare names),
+# columns clustered into 2 groups, custom colours and wider flanks
 tryCatch(
     exampleTumourNormal \%>\%
         plotGeneHeatmap("HOXA9",
             sampleAnnotation = c(tumour, tissue),
-            clusterNum = 2),
-    error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
-)
-
-# Custom colours and wider flanks
-tryCatch(
-    exampleTumourNormal \%>\%
-        plotGeneHeatmap("HOXA9",
-            sampleAnnotation = tumour,
+            clusterNum = 2,
             annotationColors = list(
                 tumour = c(Tumour = "firebrick4", Normal = "blue")
             ),
@@ -160,7 +145,6 @@ tryCatch(
             downstreamDist = 2000),
     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
 )
-}
 
 }
 \seealso{
