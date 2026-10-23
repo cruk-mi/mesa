@@ -176,14 +176,9 @@ trailing parenthetical), and—when contexts are provided—<code>landscape</cod
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Derive some regions (e.g., DMRs) then annotate using GRCh38 defaults</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"org.Hs.eg.db"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>, contrasts <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">annotateWindows</span><span class="op">(</span>genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co"># Derive some regions (e.g., DMRs) once, then annotate them</span></span></span>
+<span class="r-in"><span><span class="va">dmrs</span> <span class="op">&lt;-</span> <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>, contrasts <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating the first possible contrast on the tumour column.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 10 samples.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 309 windows, without using parallelisation.</span>
@@ -192,6 +187,31 @@ trailing parenthetical), and—when contexts are provided—<code>landscape</cod
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selecting regions from contrast Normal_vs_Tumour</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> selected 23/309 windows</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> adding test results from Normal_vs_Tumour</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"org.Hs.eg.db"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="co"># Annotate using GRCh38 defaults</span></span></span>
+<span class="r-in"><span>    <span class="va">dmrs</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        <span class="fu">annotateWindows</span><span class="op">(</span>genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Or specify TxDb/annoDb explicitly</span></span></span>
+<span class="r-in"><span>    <span class="va">dmrs</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        <span class="fu">annotateWindows</span><span class="op">(</span></span></span>
+<span class="r-in"><span>            TxDb <span class="op">=</span> <span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>,</span></span>
+<span class="r-in"><span>            annoDb <span class="op">=</span> <span class="st">"org.Hs.eg.db"</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># You can also set defaults globally using setMesaGenome, setMesaTxDb</span></span></span>
+<span class="r-in"><span>    <span class="co"># and setMesaAnnoDb (saving the current settings to restore them)</span></span></span>
+<span class="r-in"><span>    <span class="va">oldOptions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"mesa_genome"</span>, <span class="st">"mesa_TxDb"</span>, <span class="st">"mesa_annoDb"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="setMesaGenome.html">setMesaGenome</a></span><span class="op">(</span><span class="st">"hg38"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="setMesaTxDb.html">setMesaTxDb</a></span><span class="op">(</span><span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="setMesaAnnoDb.html">setMesaAnnoDb</a></span><span class="op">(</span><span class="st">"org.Hs.eg.db"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">dmrs</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>        <span class="fu">annotateWindows</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">oldOptions</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
@@ -209,106 +229,14 @@ trailing parenthetical), and—when contexts are provided—<code>landscape</cod
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     select</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'select()' returned 1:1 mapping between keys and columns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 23 × 29</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames    start      end CpG_density Normal_vs_Tumour_log2FC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 7        27<span style="text-decoration: underline;">102</span>901 27<span style="text-decoration: underline;">103</span>200       10.8                   -<span style="color: #BB0000;">1.94</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 7        27<span style="text-decoration: underline;">103</span>501 27<span style="text-decoration: underline;">103</span>800       13.1                   -<span style="color: #BB0000;">1.88</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 7        27<span style="text-decoration: underline;">103</span>801 27<span style="text-decoration: underline;">104</span>100        7.83                  -<span style="color: #BB0000;">1.33</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 7        27<span style="text-decoration: underline;">108</span>301 27<span style="text-decoration: underline;">108</span>600       15.7                   -<span style="color: #BB0000;">1.18</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 7        27<span style="text-decoration: underline;">108</span>601 27<span style="text-decoration: underline;">108</span>900       16.1                   -<span style="color: #BB0000;">0.933</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 7        27<span style="text-decoration: underline;">144</span>601 27<span style="text-decoration: underline;">144</span>900       11.1                   -<span style="color: #BB0000;">1.47</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 7        27<span style="text-decoration: underline;">144</span>901 27<span style="text-decoration: underline;">145</span>200       16.3                   -<span style="color: #BB0000;">1.30</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 7        27<span style="text-decoration: underline;">156</span>301 27<span style="text-decoration: underline;">156</span>600       18.5                   -<span style="color: #BB0000;">2.57</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 7        27<span style="text-decoration: underline;">159</span>901 27<span style="text-decoration: underline;">160</span>200        9.48                   1.16 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 7        27<span style="text-decoration: underline;">164</span>701 27<span style="text-decoration: underline;">165</span>000       13.8                   -<span style="color: #BB0000;">2.25</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 24 more variables: Normal_vs_Tumour_adjPval &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Normal_vs_Tumour_deltaBeta &lt;dbl&gt;, annotation &lt;chr&gt;, geneChr &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   geneStart &lt;int&gt;, geneEnd &lt;int&gt;, geneLength &lt;int&gt;, geneStrand &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   geneId &lt;chr&gt;, transcriptId &lt;chr&gt;, distanceToTSS &lt;dbl&gt;, ENSEMBL &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   SYMBOL &lt;chr&gt;, GENENAME &lt;chr&gt;, nIslands &lt;int&gt;, nShore &lt;int&gt;, nShelf &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   landscape &lt;chr&gt;, inFantom &lt;int&gt;, shortAnno &lt;chr&gt;, …</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Or specify TxDb/annoDb explicitly</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>, contrasts <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">annotateWindows</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    TxDb   <span class="op">=</span> <span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>,</span></span>
-<span class="r-in"><span>    annoDb <span class="op">=</span> <span class="st">"org.Hs.eg.db"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating the first possible contrast on the tumour column.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 10 samples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 309 windows, without using parallelisation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing contrast Normal_vs_Tumour</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Contrasts Complete</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting regions from contrast Normal_vs_Tumour</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selected 23/309 windows</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> adding test results from Normal_vs_Tumour</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'select()' returned 1:1 mapping between keys and columns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 23 × 24</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames    start      end CpG_density Normal_vs_Tumour_log2FC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 7        27<span style="text-decoration: underline;">102</span>901 27<span style="text-decoration: underline;">103</span>200       10.8                   -<span style="color: #BB0000;">1.94</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 7        27<span style="text-decoration: underline;">103</span>501 27<span style="text-decoration: underline;">103</span>800       13.1                   -<span style="color: #BB0000;">1.88</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 7        27<span style="text-decoration: underline;">103</span>801 27<span style="text-decoration: underline;">104</span>100        7.83                  -<span style="color: #BB0000;">1.33</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 7        27<span style="text-decoration: underline;">108</span>301 27<span style="text-decoration: underline;">108</span>600       15.7                   -<span style="color: #BB0000;">1.18</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 7        27<span style="text-decoration: underline;">108</span>601 27<span style="text-decoration: underline;">108</span>900       16.1                   -<span style="color: #BB0000;">0.933</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 7        27<span style="text-decoration: underline;">144</span>601 27<span style="text-decoration: underline;">144</span>900       11.1                   -<span style="color: #BB0000;">1.47</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 7        27<span style="text-decoration: underline;">144</span>901 27<span style="text-decoration: underline;">145</span>200       16.3                   -<span style="color: #BB0000;">1.30</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 7        27<span style="text-decoration: underline;">156</span>301 27<span style="text-decoration: underline;">156</span>600       18.5                   -<span style="color: #BB0000;">2.57</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 7        27<span style="text-decoration: underline;">159</span>901 27<span style="text-decoration: underline;">160</span>200        9.48                   1.16 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 7        27<span style="text-decoration: underline;">164</span>701 27<span style="text-decoration: underline;">165</span>000       13.8                   -<span style="color: #BB0000;">2.25</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 19 more variables: Normal_vs_Tumour_adjPval &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Normal_vs_Tumour_deltaBeta &lt;dbl&gt;, annotation &lt;chr&gt;, geneChr &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   geneStart &lt;int&gt;, geneEnd &lt;int&gt;, geneLength &lt;int&gt;, geneStrand &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   geneId &lt;chr&gt;, transcriptId &lt;chr&gt;, distanceToTSS &lt;dbl&gt;, ENSEMBL &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   SYMBOL &lt;chr&gt;, GENENAME &lt;chr&gt;, shortAnno &lt;chr&gt;, Normal_beta_means &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Tumour_beta_means &lt;dbl&gt;, Normal_nrpm_means &lt;dbl&gt;, Tumour_nrpm_means &lt;dbl&gt;</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Mouse example (mm10): supply mouse TxDb and OrgDb</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleMouse</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">exampleMouse</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/pkg/qsea/man/qseaSet-class.html" class="external-link">getRegions</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">annotateWindows</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    TxDb   <span class="op">=</span> <span class="st">"TxDb.Mmusculus.UCSC.mm10.knownGene"</span>,</span></span>
-<span class="r-in"><span>    annoDb <span class="op">=</span> <span class="st">"org.Mm.eg.db"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Update txdb in cache...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: mm10 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: mm10 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: mm10 ...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: org.Mm.eg.db</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'select()' returned 1:1 mapping between keys and columns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 153 × 17</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames     start       end CpG_density annotation geneChr geneStart geneEnd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 5        142<span style="text-decoration: underline;">501</span>201 142<span style="text-decoration: underline;">501</span>500        5.22 Intron (E…       5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 5        142<span style="text-decoration: underline;">506</span>601 142<span style="text-decoration: underline;">506</span>900        5.98 Exon (ENS…       5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 5        142<span style="text-decoration: underline;">508</span>101 142<span style="text-decoration: underline;">508</span>400        6.80 5' UTR           5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 5        142<span style="text-decoration: underline;">523</span>701 142<span style="text-decoration: underline;">524</span>000        5.22 Intron (E…       5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 5        142<span style="text-decoration: underline;">529</span>401 142<span style="text-decoration: underline;">529</span>700        5.86 Exon (ENS…       5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 5        142<span style="text-decoration: underline;">529</span>701 142<span style="text-decoration: underline;">530</span>000       14.9  5' UTR           5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 5        142<span style="text-decoration: underline;">530</span>001 142<span style="text-decoration: underline;">530</span>300       15.4  Promoter …       5 142<span style="text-decoration: underline;">525</span>838  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 5        142<span style="text-decoration: underline;">538</span>401 142<span style="text-decoration: underline;">538</span>700        5.25 Intron (E…       5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 5        142<span style="text-decoration: underline;">550</span>401 142<span style="text-decoration: underline;">550</span>700       11.0  Promoter …       5 142<span style="text-decoration: underline;">484</span>839  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 5        142<span style="text-decoration: underline;">550</span>701 142<span style="text-decoration: underline;">551</span>000       20.8  Promoter …       5 142<span style="text-decoration: underline;">543</span>618  1.43<span style="color: #949494;">e</span>8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 143 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 9 more variables: geneLength &lt;int&gt;, geneStrand &lt;int&gt;, geneId &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   transcriptId &lt;chr&gt;, distanceToTSS &lt;dbl&gt;, ENSEMBL &lt;chr&gt;, SYMBOL &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   GENENAME &lt;chr&gt;, shortAnno &lt;chr&gt;</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># You can also set defaults globally using setMesaTxDb and setMesaAnnoDb:</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="setMesaGenome.html">setMesaGenome</a></span><span class="op">(</span><span class="st">"hg38"</span><span class="op">)</span>; </span></span>
-<span class="r-in"><span>  <span class="fu"><a href="setMesaTxDb.html">setMesaTxDb</a></span><span class="op">(</span><span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span><span class="op">)</span>; </span></span>
-<span class="r-in"><span>  <span class="fu"><a href="setMesaAnnoDb.html">setMesaAnnoDb</a></span><span class="op">(</span><span class="st">"org.Hs.eg.db"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
