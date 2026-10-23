@@ -192,6 +192,35 @@ test_that("poolSamples works on a set without input libraries (#152)", {
     expect_equal(ncol(getBetaTable(pooled)), 4L + 8L)
 })
 
+test_that("poolSamples weights CNV and zygosity by fragments (#152)", {
+
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    # Sim3 is left with one member, so it is pooled with a weight of one
+    unevenSet <- subsetQset(randomSet, samplesToDrop = "Sim3N")
+
+    pooled <- poolSamples(unevenSet, "[TN]$", maxPatternDensity = 0.5)
+
+    cnv <- as.matrix(GenomicRanges::mcols(qsea::getCNV(randomSet)))
+    pooledCnv <- as.matrix(GenomicRanges::mcols(qsea::getCNV(pooled)))
+    weights <- randomSet@libraries$file_name[
+        c("Sim1T", "Sim1N"), "total_fragments"
+    ]
+    weights <- weights / sum(weights)
+
+    expect_equal(getSampleNames(pooled), paste0("Sim", 1:8))
+    expect_equal(
+        unname(pooledCnv[, "Sim1"]),
+        unname((cnv[, c("Sim1T", "Sim1N")] %*% weights)[, 1])
+    )
+    expect_equal(
+        unname(pooled@zygosity["Sim1", ]),
+        unname(colSums(
+            randomSet@zygosity[c("Sim1T", "Sim1N"), , drop = FALSE] * weights
+        ))
+    )
+    expect_equal(unname(pooledCnv[, "Sim3"]), unname(cnv[, "Sim3T"]))
+})
+
 test_that("poolSamples pools only the samples that share a name (#152)", {
 
     # "Sim1" is a prefix of "Sim12", but the two must stay separate pools

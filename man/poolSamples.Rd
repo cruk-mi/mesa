@@ -19,9 +19,9 @@ pool them into \code{"Patient1"}.}
 
 \item{renormalise}{\code{logical(1)}
 Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. The pooled samples have no
-offsets or enrichment parameters until it has run, so set this to \code{FALSE}
-only for a set that cannot be normalised, such as one whose windows are all
-CpG-dense.
+library factors, offsets or enrichment parameters until it has run, so beta
+values and DMR calls need it. Set this to \code{FALSE} only for a set that cannot
+be normalised, such as one whose windows are all CpG-dense.
 \strong{Default:} \code{TRUE}.}
 
 \item{maxPatternDensity}{\code{numeric(1)}

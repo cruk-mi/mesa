@@ -413,9 +413,9 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #'
 #' @param renormalise `logical(1)`
 #' Whether to run [addNormalisation()] on the result. The pooled samples have no
-#' offsets or enrichment parameters until it has run, so set this to `FALSE`
-#' only for a set that cannot be normalised, such as one whose windows are all
-#' CpG-dense.
+#' library factors, offsets or enrichment parameters until it has run, so beta
+#' values and DMR calls need it. Set this to `FALSE` only for a set that cannot
+#' be normalised, such as one whose windows are all CpG-dense.
 #'   **Default:** `TRUE`.
 #'
 #' @param maxPatternDensity `numeric(1)`
