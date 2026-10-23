@@ -972,7 +972,9 @@ addMedipsEnrichmentFactors <- function(
     newCols <- dplyr::select(enrichData, -file)
     libraryName <- ifelse(nonEnrich, "input_file", "file_name")
 
+    # qsea::addCoverage() stores the library table as a matrix
     qseaSet@libraries[[libraryName]] <- qseaSet@libraries[[libraryName]] %>%
+        as.data.frame() %>%
         dplyr::select(-tidyselect::any_of(colnames(newCols))) %>%
         cbind(newCols)
 
