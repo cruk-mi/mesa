@@ -406,10 +406,22 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #'
 #' @param mergeString `character(1)`
 #' Regular expression used to remove the **suffix** that distinguishes samples
-#' to be merged. The remaining prefix becomes the pooled sample name. After
-#' removal, pooled names are matched using `startsWith()`. For example, with
+#' to be merged. The remaining prefix becomes the pooled sample name, and the
+#' samples that give the same prefix are pooled together. For example, with
 #' names like `"Patient1_T"` and `"Patient1_N"`, use `mergeString = "_[TN]$"` to
 #' pool them into `"Patient1"`.
+#'
+#' @param renormalise `logical(1)`
+#' Whether to run [addNormalisation()] on the result. The pooled samples have no
+#' offsets or enrichment parameters until it has run, so set this to `FALSE`
+#' only for a set that cannot be normalised, such as one whose windows are all
+#' CpG-dense.
+#'   **Default:** `TRUE`.
+#'
+#' @param maxPatternDensity `numeric(1)`
+#' Maximum pattern density in a window to consider it for the background
+#' calculation. Passed to [addNormalisation()] when `renormalise = TRUE`.
+#'   **Default:** `0.05`.
 #'
 #' @return A `qseaSet` object:
 #'
@@ -421,32 +433,43 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #' @details
 #' Internally, pooled counts are simple sums. CNV values and zygosity are
 #' combined by a weighted average using `total_fragments` from
-#' `@libraries$input_file`. Library statistics are aggregated (sums for counts,
-#' weighted means for rates).
+#' `@libraries$input_file`, or from `@libraries$file_name` when the set has no
+#' input libraries. Library statistics are aggregated (sums for counts,
+#' weighted means for rates). When `renormalise = TRUE`, [addNormalisation()]
+#' is run with the `enrichmentMethod` recorded in the input set (`"blind1-15"`
+#' if there is none).
+#'
+#' @seealso [addNormalisation()], [mixSamples()]
 #'
 #' @examples
-#' \dontrun{
 #' data(exampleTumourNormal)
 #' # Pool Tumour/Normal pairs by patient into a single sample per patient:
-#' # e.g., "Colon1_T","Colon1_N" -> "Colon1"
-#' poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
-#' }
+#' # e.g., "Colon1_T","Colon1_N" -> "Colon1". The windows of the example data
+#' # are too CpG-dense to estimate the background, so skip the normalisation.
+#' poolSamples(exampleTumourNormal, mergeString = "_[TN]$", renormalise = FALSE)
+#'
+#' # A set with a range of CpG densities can be renormalised after pooling
+#' qsea::getExampleQseaSet(expSamplingDepth = 1e5) %>%
+#'     poolSamples(mergeString = "[TN]$", maxPatternDensity = 0.5)
 #' @export
-poolSamples <- function(qseaSet, mergeString) {
+poolSamples <- function(qseaSet, mergeString, renormalise = TRUE,
+    maxPatternDensity = 0.05) {
     ## TODO: rewrite this function to use a column.
-    ## TODO: check this actually works!
     ## TODO: make sure it works in general
 
     samplesToMerge <- qsea::getSampleTable(qseaSet) %>%
         dplyr::pull(sample_name) %>%
         stringr::str_subset(mergeString)
 
-    newNames <- stringr::str_remove(samplesToMerge, mergeString) %>%
-        unique()
+    poolNames <- stringr::str_remove(samplesToMerge, mergeString)
+    newNames <- unique(poolNames)
 
     if (length(newNames) >= length(samplesToMerge)) {
         stop(glue::glue("New names are the same length as the old ones!"))
     }
+
+    # the samples that make up each pool, matched exactly
+    poolMembers <- split(samplesToMerge, factor(poolNames, levels = newNames))
 
     newSet <- qseaSet %>%
         subsetQset(samplesToKeep = samplesToMerge)
@@ -455,73 +478,64 @@ poolSamples <- function(qseaSet, mergeString) {
         newNames,
         function(x) {
             rowSums(
-                qseaSet@count_matrix[
-                    , startsWith(colnames(qseaSet@count_matrix), x),
-                    drop = FALSE
-                ]
+                qseaSet@count_matrix[, poolMembers[[x]], drop = FALSE]
             )
         },
         FUN.VALUE = numeric(nrow(qseaSet@count_matrix))
     )
 
+    # weight CNV and zygosity by the input libraries, or by the pulldown
+    # libraries when there are no inputs
+    weightLibraries <- qseaSet@libraries$input_file
+    if (is.null(weightLibraries)) {
+        weightLibraries <- qseaSet@libraries$file_name
+    }
+
+    poolWeights <- lapply(poolMembers, function(members) {
+        weights <- weightLibraries[members, "total_fragments"]
+        weights / sum(weights)
+    })
+
+    cnvMat <- qseaSet %>%
+        qsea::getCNV() %>%
+        GenomicRanges::mcols() %>%
+        as.matrix()
+
     newCNVvals <- vapply(
         newNames,
         function(x) {
-            columnsToKeep <- qseaSet %>%
-                qsea::getCNV() %>%
-                GenomicRanges::mcols() %>%
-                colnames() %>%
-                stringr::str_subset(x)
-
-            reducedMat <- qseaSet %>%
-                qsea::getCNV() %>%
-                GenomicRanges::mcols() %>%
-                as.matrix()
-
-            weights <- qseaSet@libraries$input_file[
-                columnsToKeep, "total_fragments"
-            ]
-            weights <- weights / sum(weights)
-
+            weights <- poolWeights[[x]]
             rowSums(
-                reducedMat[, columnsToKeep, drop = FALSE] %*% diag(weights)
+                cnvMat[, poolMembers[[x]], drop = FALSE] %*%
+                    diag(weights, nrow = length(weights))
             )
         },
-        FUN.VALUE = numeric(nrow(GenomicRanges::mcols(qseaSet@cnv)))
+        FUN.VALUE = numeric(nrow(cnvMat))
     )
 
     newZygosity <- vapply(
         newNames,
         function(x) {
-            columnsToKeep <- qseaSet %>%
-                qsea::getCNV() %>%
-                GenomicRanges::mcols() %>%
-                colnames() %>%
-                stringr::str_subset(x)
-
-            weights <- qseaSet@libraries$input_file[
-                columnsToKeep, "total_fragments"
-            ]
-            weights <- weights / sum(weights)
-
             colSums(
-                qseaSet@zygosity[
-                    startsWith(rownames(qseaSet@zygosity), x), ,
-                    drop = FALSE
-                ] * weights
+                qseaSet@zygosity[poolMembers[[x]], , drop = FALSE] *
+                    poolWeights[[x]]
             )
         },
         FUN.VALUE = numeric(ncol(qseaSet@zygosity))
-    ) %>% t()
+    )
+    # vapply() drops to a vector when there is one chromosome
+    newZygosity <- t(matrix(
+        newZygosity,
+        ncol = length(newNames),
+        dimnames = list(colnames(qseaSet@zygosity), newNames)
+    ))
 
     newSet@count_matrix <- newCounts
     GenomicRanges::mcols(newSet@cnv) <- newCNVvals
     newSet@zygosity <- newZygosity
 
     newSampleTable <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@sampleTable[
-            startsWith(rownames(qseaSet@sampleTable), x), , drop = FALSE
-        ] %>%
+        qseaSet@sampleTable[poolMembers[[x]], , drop = FALSE] %>%
             dplyr::select(-tidyselect::matches("file_name|input_file")) %>%
             dplyr::mutate(
                 sample_name = x,
@@ -535,61 +549,66 @@ poolSamples <- function(qseaSet, mergeString) {
 
     newSet@sampleTable <- newSampleTable
 
-    newLibrariesFile <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@libraries$file_name[
-            startsWith(rownames(qseaSet@sampleTable), x), ] %>%
-            tibble::as_tibble() %>%
-            dplyr::summarise(
-                dplyr::across(
-                    tidyselect::any_of(tidyselect::matches(
-                        "mean|median|sd|relH|GoGe"
-                    )),
-                    ~ stats::weighted.mean(.x, total_fragments)
-                ),
-                dplyr::across(
-                    tidyselect::any_of(tidyselect::matches(
-                        "reads|pairs|r1s|fragments"
-                    )),
-                    ~ sum(.x)
-                )
-            ) %>%
-            dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
-            tibble::remove_rownames() %>%
-            tibble::column_to_rownames("rownameCol")
-    })
+    poolLibraries <- function(libraries) {
+        purrr::map_dfr(newNames, function(x) {
+            libraries[poolMembers[[x]], , drop = FALSE] %>%
+                tibble::as_tibble() %>%
+                dplyr::summarise(
+                    dplyr::across(
+                        tidyselect::where(is.numeric) &
+                            !tidyselect::matches("reads|pairs|r1s|fragments"),
+                        ~ stats::weighted.mean(.x, total_fragments)
+                    ),
+                    dplyr::across(
+                        tidyselect::matches("reads|pairs|r1s|fragments"),
+                        ~ sum(.x)
+                    )
+                ) %>%
+                dplyr::mutate(
+                    rownameCol = x, library_factor = NA, offset = NA
+                ) %>%
+                tibble::remove_rownames() %>%
+                tibble::column_to_rownames("rownameCol")
+        }) %>%
+            as.data.frame()
+    }
 
-    newLibrariesInput <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@libraries$input_file[
-            startsWith(rownames(qseaSet@sampleTable), x), ] %>%
-            tibble::as_tibble() %>%
-            dplyr::mutate(total_fragments2 = total_fragments) %>%
-            dplyr::summarise(
-                dplyr::across(
-                    tidyselect::any_of(tidyselect::matches(
-                        "mean|median|sd|relH|GoGe"
-                    )),
-                    ~ stats::weighted.mean(.x, total_fragments)
-                ),
-                dplyr::across(
-                    tidyselect::any_of(tidyselect::matches(
-                        "reads|pairs|r1s|fragments"
-                    )),
-                    ~ sum(.x)
-                )
-            ) %>%
-            dplyr::mutate(rownameCol = x, library_factor = NA, offset = NA) %>%
-            tibble::remove_rownames() %>%
-            tibble::column_to_rownames("rownameCol")
-    })
+    newSet@libraries$file_name <- poolLibraries(qseaSet@libraries$file_name)
+    if (!is.null(qseaSet@libraries$input_file)) {
+        newSet@libraries$input_file <-
+            poolLibraries(qseaSet@libraries$input_file)
+    }
 
-    newSet@libraries$file_name <- as.data.frame(newLibrariesFile)
-    newSet@libraries$input_file <- as.data.frame(newLibrariesInput)
+    # the pooled samples have no enrichment fit until addNormalisation() runs
+    enrichParams <- qseaSet@enrichment$parameters
+    if (!is.null(enrichParams)) {
+        newSet@enrichment$parameters <- matrix(
+            NA_real_, nrow = length(newNames), ncol = ncol(enrichParams),
+            dimnames = list(newNames, colnames(enrichParams))
+        )
+        newSet@enrichment$factors <- matrix(
+            NA_real_, nrow = nrow(qseaSet@enrichment$factors),
+            ncol = length(newNames),
+            dimnames = list(rownames(qseaSet@enrichment$factors), newNames)
+        )
+    }
 
     oldSet <- qseaSet %>%
         subsetQset(samplesToDrop = samplesToMerge)
 
-    finalSet <- combineQsets(oldSet, newSet) %>%
-        addNormalisation(enrichmentMethod = "blind1-15")
+    finalSet <- combineQsets(oldSet, newSet)
+
+    if (renormalise) {
+        enrichmentMethod <- qsea::getParameters(qseaSet)$enrichmentMethod
+        if (is.null(enrichmentMethod)) {
+            enrichmentMethod <- "blind1-15"
+        }
+        finalSet <- addNormalisation(
+            finalSet,
+            enrichmentMethod = enrichmentMethod,
+            maxPatternDensity = maxPatternDensity
+        )
+    }
 
     return(finalSet)
 }

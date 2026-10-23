@@ -148,6 +148,78 @@ test_that("renameSamples", {
 
 })
 
+test_that("poolSamples works on the example data (#152)", {
+
+    # The pre-filtered example windows are all above CpG density 5, so
+    # addNormalisation() has no background windows to fit.
+    pooled <- poolSamples(
+        exampleTumourNormal, "_[TN]$", renormalise = FALSE
+    )
+    patients <- c("Colon1", "Colon2", "Lung1", "Lung2", "Lung3")
+
+    expect_equal(getSampleNames(pooled), patients)
+    expect_equal(
+        unname(qsea::getCounts(pooled)[, "Colon1"]),
+        unname(rowSums(
+            qsea::getCounts(exampleTumourNormal)[, c("Colon1_N", "Colon1_T")]
+        ))
+    )
+    expect_equal(rownames(pooled@enrichment$parameters), patients)
+    expect_equal(colnames(pooled@enrichment$factors), patients)
+    expect_equal(rownames(pooled@zygosity), patients)
+
+    # every library column survives pooling, not just the matched ones
+    expect_setequal(
+        colnames(pooled@libraries$file_name),
+        colnames(exampleTumourNormal@libraries$file_name)
+    )
+    expect_true(all(is.na(pooled@libraries$file_name$offset)))
+    expect_equal(nrow(getSampleQCSummary(pooled)), 5L)
+})
+
+test_that("poolSamples works on a set without input libraries (#152)", {
+
+    # qsea's example set has no input_file library table
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    expect_null(randomSet@libraries$input_file)
+
+    pooled <- poolSamples(randomSet, "[TN]$", maxPatternDensity = 0.5)
+
+    expect_equal(getSampleNames(pooled), paste0("Sim", 1:8))
+    expect_equal(dim(pooled@zygosity), c(8L, 1L))
+    expect_false(anyNA(pooled@libraries$file_name$offset))
+    expect_true("fragment_length" %in% colnames(pooled@libraries$file_name))
+    expect_equal(ncol(getBetaTable(pooled)), 4L + 8L)
+})
+
+test_that("poolSamples pools only the samples that share a name (#152)", {
+
+    # "Sim1" is a prefix of "Sim12", but the two must stay separate pools
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
+        renameQsetNames("^Sim2", "Sim12")
+    pooled <- poolSamples(randomSet, "[TN]$", renormalise = FALSE)
+    counts <- qsea::getCounts(randomSet)
+
+    expect_true(all(c("Sim1", "Sim12") %in% getSampleNames(pooled)))
+    expect_equal(
+        unname(qsea::getCounts(pooled)[, "Sim1"]),
+        unname(rowSums(counts[, c("Sim1T", "Sim1N")]))
+    )
+    expect_equal(
+        unname(qsea::getCounts(pooled)[, "Sim12"]),
+        unname(rowSums(counts[, c("Sim12T", "Sim12N")]))
+    )
+})
+
+test_that("poolSamples keeps the enrichment method of the set (#152)", {
+
+    noEnrichment <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
+        addNormalisation(enrichmentMethod = "none", maxPatternDensity = 0.5)
+    pooled <- poolSamples(noEnrichment, "[TN]$", maxPatternDensity = 0.5)
+
+    expect_equal(qsea::getParameters(pooled)$enrichmentMethod, "none")
+})
+
 test_that("is.qseaSet", {
 
     expect_true(qsea::getExampleQseaSet() %>%
