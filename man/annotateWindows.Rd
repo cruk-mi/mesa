@@ -106,18 +106,6 @@ if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
     options(oldOptions)
 }
 
-# Mouse example (mm10): supply mouse TxDb and OrgDb
-if (requireNamespace("TxDb.Mmusculus.UCSC.mm10.knownGene", quietly = TRUE) &&
-    requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
-    data(exampleMouse, package = "mesa")
-    exampleMouse \%>\%
-        getRegions() \%>\%
-        annotateWindows(
-            TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-            annoDb = "org.Mm.eg.db"
-        )
-}
-
 }
 \seealso{
 \code{\link[ChIPseeker:annotatePeak]{ChIPseeker::annotatePeak()}}, \code{\link[=setMesaGenome]{setMesaGenome()}}, \code{\link[=setMesaTxDb]{setMesaTxDb()}},

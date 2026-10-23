@@ -805,27 +805,13 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Basic gene heatmap (beta) with defaults
-#' tryCatch(
-#'     exampleTumourNormal %>% plotGeneHeatmap("HOXA9"),
-#'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
-#' )
-#'
-#' # Add sample annotations (tidyselect bare names) and cluster columns into
-#' # 2 groups
+#' # Gene heatmap (beta) with sample annotations (tidyselect bare names),
+#' # columns clustered into 2 groups, custom colours and wider flanks
 #' tryCatch(
 #'     exampleTumourNormal %>%
 #'         plotGeneHeatmap("HOXA9",
 #'             sampleAnnotation = c(tumour, tissue),
-#'             clusterNum = 2),
-#'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
-#' )
-#'
-#' # Custom colours and wider flanks
-#' tryCatch(
-#'     exampleTumourNormal %>%
-#'         plotGeneHeatmap("HOXA9",
-#'             sampleAnnotation = tumour,
+#'             clusterNum = 2,
 #'             annotationColors = list(
 #'                 tumour = c(Tumour = "firebrick4", Normal = "blue")
 #'             ),
@@ -1326,26 +1312,6 @@ makeGeneHeatmapRowAnnotation <- function(rowAnnotationDF) {
 #'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
 #'     exampleTumourNormal %>%
 #'         plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
-#' }
-#'
-#' # Override the genome for a specific analysis, here with mouse (mm10) data
-#' if (requireNamespace("TxDb.Mmusculus.UCSC.mm10.knownGene", quietly = TRUE) &&
-#'     requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
-#'     data(exampleMouse, package = "mesa")
-#'     exampleMouse %>%
-#'         plotGenomicFeatureDistribution(
-#'             genome = "mm10",
-#'             normMethod = "nrpm",
-#'             cutoff = 2
-#'         )
-#'
-#'     # Advanced: manual control (bypasses mesa genome system)
-#'     exampleMouse %>%
-#'         plotGenomicFeatureDistribution(
-#'             TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::
-#'                 TxDb.Mmusculus.UCSC.mm10.knownGene,
-#'             annoDb = "org.Mm.eg.db"
-#'         )
 #' }
 #'
 #' # Restore the previous genome setting

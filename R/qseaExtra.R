@@ -199,18 +199,6 @@ setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
 #'     options(oldOptions)
 #' }
 #'
-#' # Mouse example (mm10): supply mouse TxDb and OrgDb
-#' if (requireNamespace("TxDb.Mmusculus.UCSC.mm10.knownGene", quietly = TRUE) &&
-#'     requireNamespace("org.Mm.eg.db", quietly = TRUE)) {
-#'     data(exampleMouse, package = "mesa")
-#'     exampleMouse %>%
-#'         getRegions() %>%
-#'         annotateWindows(
-#'             TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
-#'             annoDb = "org.Mm.eg.db"
-#'         )
-#' }
-#'
 #' @export
 annotateWindows <- function(dataTable, genome = .getMesaGenome(),
     TxDb = .getMesaTxDb(), annoDb = .getMesaAnnoDb(), CpGislandsGR = NULL,
