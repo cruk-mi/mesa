@@ -27,9 +27,9 @@
   second pair, so `addLibraryInformation()` and `getSampleQCSummary()` work on
   the result.
   ([#152](https://github.com/cruk-mi/mesa/issues/152), [PR #181](https://github.com/cruk-mi/mesa/pull/181))
-- `plotGeneHeatmap()` now stops at once with its "Could not connect to
-  Ensembl" error when the default hg38 or hg19 archive does not answer, instead
-  of retrying `biomaRt` through three connection timeouts.
+- `plotGeneHeatmap()` now stops with an error when the default hg38 or hg19
+  Ensembl archive does not answer within `getOption("mesa_ensemblTimeout", 5)`
+  seconds, instead of retrying `biomaRt` through three connection timeouts.
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 ## Documentation
