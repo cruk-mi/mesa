@@ -27,6 +27,10 @@
   second pair, so `addLibraryInformation()` and `getSampleQCSummary()` work on
   the result.
   ([#152](https://github.com/cruk-mi/mesa/issues/152), [PR #181](https://github.com/cruk-mi/mesa/pull/181))
+- `plotGeneHeatmap()` now stops at once with its "Could not connect to
+  Ensembl" error when the default hg38 or hg19 archive does not answer, instead
+  of retrying `biomaRt` through three connection timeouts.
+  ([#183](https://github.com/cruk-mi/mesa/issues/183))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
@@ -83,6 +87,10 @@
   characters, contains a tab or is indented by a number of spaces that is not
   a multiple of 4.
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))
+- The `plotGeneHeatmap()` example and the live mouse test now run only when the
+  Ensembl archive answers, so `R CMD check` no longer waits on a hung archive.
+  `testPlotGeneHeatmap()` moved from `R/` to the test helpers.
+  ([#183](https://github.com/cruk-mi/mesa/issues/183))
 
 # mesa 0.99.8
 
