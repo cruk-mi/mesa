@@ -806,19 +806,24 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Gene heatmap (beta) with sample annotations (tidyselect bare names),
-#' # columns clustered into 2 groups, custom colours and wider flanks
-#' tryCatch(
-#'     exampleTumourNormal %>%
-#'         plotGeneHeatmap("HOXA9",
-#'             sampleAnnotation = c(tumour, tissue),
-#'             clusterNum = 2,
-#'             annotationColors = list(
-#'                 tumour = c(Tumour = "firebrick4", Normal = "blue")
-#'             ),
-#'             upstreamDist = 1000,
-#'             downstreamDist = 2000),
-#'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
-#' )
+#' # columns clustered into 2 groups, custom colours and wider flanks. Only
+#' # run when the Ensembl archive answers, as a hung archive stalls the example
+#' if (mesa:::ensemblReachable("jul2022.archive.ensembl.org")) {
+#'     tryCatch(
+#'         exampleTumourNormal %>%
+#'             plotGeneHeatmap("HOXA9",
+#'                 sampleAnnotation = c(tumour, tissue),
+#'                 clusterNum = 2,
+#'                 annotationColors = list(
+#'                     tumour = c(Tumour = "firebrick4", Normal = "blue")
+#'                 ),
+#'                 upstreamDist = 1000,
+#'                 downstreamDist = 2000),
+#'         error = function(e) {
+#'             message("Ensembl unavailable: ", conditionMessage(e))
+#'         }
+#'     )
+#' }
 #'
 #' @export
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
@@ -1781,6 +1786,55 @@ getAnnotation <- function(
     return(annotationColDf)
 }
 
+
+#' Check that an Ensembl BioMart service answers
+#'
+#' Asks the BioMart service of an Ensembl host for its registry, giving up
+#' after `timeout` seconds. The archive hosts can accept the connection and
+#' then never reply, and `biomaRt` waits for that connection timeout on every
+#' retry, which stalls `R CMD check` and the tests. Probing the service rather
+#' than the site root matters: an archive can answer at `/` while its BioMart
+#' service does not.
+#'
+#' @param host `character(1)`.
+#'   Ensembl host, with or without the `https://` scheme, such as
+#'   `"jul2022.archive.ensembl.org"`.
+#'
+#' @param timeout `numeric(1)`.
+#'   Seconds to wait before giving up.
+#'   **Default:** `5`.
+#'
+#' @return `TRUE` if the service answers with a status below 400, otherwise
+#'   `FALSE`, including on any connection error or timeout.
+#'
+#' @seealso [plotGeneHeatmap()]
+#'
+#' @keywords internal
+ensemblReachable <- function(host, timeout = 5) {
+    if (!grepl("^https?://", host)) {
+        host <- paste0("https://", host)
+    }
+    url <- paste0(host, "/biomart/martservice?type=registry")
+    status <- tryCatch(martServiceStatus(url, timeout),
+        error = function(e) NA_integer_)
+    isTRUE(status < 400)
+}
+
+#' HTTP status of a URL, with a timeout
+#'
+#' A thin wrapper around [curlGetHeaders()] so that tests can replace the
+#' network call. A timeout or connection failure is an error.
+#'
+#' @param url `character(1)`. URL to request.
+#'
+#' @param timeout `numeric(1)`. Seconds to wait.
+#'
+#' @return `integer(1)`. The HTTP status code.
+#'
+#' @keywords internal
+martServiceStatus <- function(url, timeout) {
+    attr(curlGetHeaders(url, timeout = as.integer(timeout)), "status")
+}
 
 #' Test wrapper for \code{plotGeneHeatmap} that skips on network errors
 #'
