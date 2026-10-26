@@ -3,7 +3,8 @@
 #' Runs a CNV pipeline on each sample: counts fragments in fixed-size genomic
 #' windows, normalises for GC and mappability (HMMcopy), segments, and stores
 #' per-window copy-number in the \code{qseaSet}. Supports parallel execution.
-#' Only GRCh38/hg38 is currently supported.
+#' The GC and mappability tracks must match the genome of the \code{qseaSet}:
+#' mesa ships them for hg38 (genome-wide) and for hg19 chr22.
 #'
 #' @param qs `qseaSet`.
 #'   Input object whose samples will receive CNV tracks.
@@ -13,7 +14,8 @@
 #'   **Default:** `"input_file"`.
 #'
 #' @param windowSize `integer(1)`.
-#'   CNV bin size in bp. Allowed values: `50000`, `500000`, `1000000`.
+#'   CNV bin size in bp, which must be the bin size of `hmmCopyGC` and
+#'   `hmmCopyMap`. The hg38 tracks come in `50000`, `500000` and `1000000`.
 #'   **Default:** `1000000`.
 #'
 #' @param fragmentLength `integer(1)` or `NULL`.
@@ -85,19 +87,28 @@
 #' @family CNV
 #'
 #' @examples
-#' \dontrun{
-#' data(exampleTumourNormal, package = "mesa")
-#' exampleTumourNormal %>%
+#' # A single-end MeDIP-seq input BAM on chr22 (hg19), from MEDIPSData, with
+#' # the GC and mappability tracks for hg19 chr22 that ship with mesa
+#' if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+#'     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+#'     bam <- system.file("extdata", "hESCs.Input.chr22.bam",
+#'         package = "MEDIPSData")
 #'
-#'     addHMMcopyCNV(
-#'         inputColumn = "input_file",
-#'         windowSize = 1e6,
-#'         hmmCopyGC = gc_hg38_1000kb, # GRanges with 'gc' column
-#'         hmmCopyMap = map_hg38_1000kb, # GRanges with 'map' column
-#'         properPairsOnly = TRUE,
-#'         parallel = FALSE,
-#'         plotDir = tempdir()
+#'     qs <- data.frame(sample_name = "hESC", file_name = bam,
+#'         input_file = bam, group = "Input") %>%
+#'         qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19",
+#'             chr.select = "chr22", window_size = 5000)
+#'
+#'     qs <- addHMMcopyCNV(qs,
+#'         windowSize = 1e5,
+#'         fragmentLength = 300,
+#'         hmmCopyGC = gc_hg19_chr22_100kb,
+#'         hmmCopyMap = map_hg19_chr22_100kb,
+#'         parallel = FALSE
 #'     )
+#'
+#'     # The copy-number state of each 100 kb window
+#'     qsea::getCNV(qs)
 #' }
 #'
 #' @export

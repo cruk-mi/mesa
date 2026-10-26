@@ -29,7 +29,8 @@ Column in the sample table containing BAM paths (e.g. \code{"input_file"}).
 \strong{Default:} \code{"input_file"}.}
 
 \item{windowSize}{\code{integer(1)}.
-CNV bin size in bp. Allowed values: \code{50000}, \code{500000}, \code{1000000}.
+CNV bin size in bp, which must be the bin size of \code{hmmCopyGC} and
+\code{hmmCopyMap}. The hg38 tracks come in \code{50000}, \code{500000} and \code{1000000}.
 \strong{Default:} \code{1000000}.}
 
 \item{fragmentLength}{\code{integer(1)} or \code{NULL}.
@@ -86,7 +87,8 @@ The input \code{qseaSet} with CNV information attached, including:
 Runs a CNV pipeline on each sample: counts fragments in fixed-size genomic
 windows, normalises for GC and mappability (HMMcopy), segments, and stores
 per-window copy-number in the \code{qseaSet}. Supports parallel execution.
-Only GRCh38/hg38 is currently supported.
+The GC and mappability tracks must match the genome of the \code{qseaSet}:
+mesa ships them for hg38 (genome-wide) and for hg19 chr22.
 }
 \details{
 Coverage is obtained (pairs + optional R1) over tiled windows, corrected with
@@ -99,19 +101,28 @@ When \code{parallel = TRUE}, computation uses the currently registered backend
 (see \code{BiocParallel::register()}).
 }
 \examples{
-\dontrun{
-data(exampleTumourNormal, package = "mesa")
-exampleTumourNormal \%>\%
+# A single-end MeDIP-seq input BAM on chr22 (hg19), from MEDIPSData, with
+# the GC and mappability tracks for hg19 chr22 that ship with mesa
+if (requireNamespace("MEDIPSData", quietly = TRUE) &&
+    requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
+    bam <- system.file("extdata", "hESCs.Input.chr22.bam",
+        package = "MEDIPSData")
 
-    addHMMcopyCNV(
-        inputColumn = "input_file",
-        windowSize = 1e6,
-        hmmCopyGC = gc_hg38_1000kb, # GRanges with 'gc' column
-        hmmCopyMap = map_hg38_1000kb, # GRanges with 'map' column
-        properPairsOnly = TRUE,
-        parallel = FALSE,
-        plotDir = tempdir()
+    qs <- data.frame(sample_name = "hESC", file_name = bam,
+        input_file = bam, group = "Input") \%>\%
+        qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19",
+            chr.select = "chr22", window_size = 5000)
+
+    qs <- addHMMcopyCNV(qs,
+        windowSize = 1e5,
+        fragmentLength = 300,
+        hmmCopyGC = gc_hg19_chr22_100kb,
+        hmmCopyMap = map_hg19_chr22_100kb,
+        parallel = FALSE
     )
+
+    # The copy-number state of each 100 kb window
+    qsea::getCNV(qs)
 }
 
 }
