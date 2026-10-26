@@ -27,9 +27,11 @@
   second pair, so `addLibraryInformation()` and `getSampleQCSummary()` work on
   the result.
   ([#152](https://github.com/cruk-mi/mesa/issues/152), [PR #181](https://github.com/cruk-mi/mesa/pull/181))
-- `plotGeneHeatmap()` now stops with an error when the default hg38 or hg19
-  Ensembl archive does not answer within `getOption("mesa_ensemblTimeout", 5)`
-  seconds, instead of retrying `biomaRt` through three connection timeouts.
+- `plotGeneHeatmap()` now checks that the Ensembl BioMart answers within
+  `getOption("mesa_ensemblTimeout", 5)` seconds before it queries it, for the
+  default hg38 or hg19 archive and for a stored or explicit `mart`. It stops
+  with an error instead of retrying `biomaRt` through three connection
+  timeouts.
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 ## Documentation
@@ -90,6 +92,9 @@
 - The `plotGeneHeatmap()` example and the live mouse test now run only when the
   Ensembl archive answers, so `R CMD check` no longer waits on a hung archive.
   `testPlotGeneHeatmap()` moved from `R/` to the test helpers.
+  ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
+- The CI `R CMD check` step now stops after 40 minutes instead of waiting on a
+  hung network call.
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 # mesa 0.99.8
