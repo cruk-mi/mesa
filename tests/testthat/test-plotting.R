@@ -38,7 +38,7 @@ test_that("ensemblReachable() probes the BioMart service, not the site root", {
     expect_equal(seen$timeout, 5)
 })
 
-test_that("ensemblReachable() returns without waiting on a failing probe", {
+test_that("ensemblReachable() returns FALSE at once when the probe errors", {
 
     local_mocked_bindings(martServiceStatus = function(url, timeout) {
         stop("Connection timed out")
