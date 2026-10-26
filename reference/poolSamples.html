@@ -81,7 +81,7 @@ new <code>qseaSet</code> with pooled samples and updated metadata.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poolSamples</span><span class="op">(</span><span class="va">qseaSet</span>, <span class="va">mergeString</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poolSamples</span><span class="op">(</span><span class="va">qseaSet</span>, <span class="va">mergeString</span>, renormalise <span class="op">=</span> <span class="cn">TRUE</span>, maxPatternDensity <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -96,10 +96,26 @@ A qseaSet object containing methylation-enriched sequencing data.</p></dd>
 <dt id="arg-mergestring">mergeString<a class="anchor" aria-label="anchor" href="#arg-mergestring"></a></dt>
 <dd><p><code>character(1)</code>
 Regular expression used to remove the <strong>suffix</strong> that distinguishes samples
-to be merged. The remaining prefix becomes the pooled sample name. After
-removal, pooled names are matched using <code><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith()</a></code>. For example, with
+to be merged. The remaining prefix becomes the pooled sample name, and the
+samples that give the same prefix are pooled together. For example, with
 names like <code>"Patient1_T"</code> and <code>"Patient1_N"</code>, use <code>mergeString = "_[TN]$"</code> to
 pool them into <code>"Patient1"</code>.</p></dd>
+
+
+<dt id="arg-renormalise">renormalise<a class="anchor" aria-label="anchor" href="#arg-renormalise"></a></dt>
+<dd><p><code>logical(1)</code>
+Whether to run <code><a href="addNormalisation.html">addNormalisation()</a></code> on the result. The pooled samples have no
+library factors, offsets or enrichment parameters until it has run, so beta
+values and DMR calls need it. Set this to <code>FALSE</code> only for a set that cannot
+be normalised, such as one whose windows are all CpG-dense.
+<strong>Default:</strong> <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-maxpatterndensity">maxPatternDensity<a class="anchor" aria-label="anchor" href="#arg-maxpatterndensity"></a></dt>
+<dd><p><code>numeric(1)</code>
+Maximum pattern density in a window to consider it for the background
+calculation. Passed to <code><a href="addNormalisation.html">addNormalisation()</a></code> when <code>renormalise = TRUE</code>.
+<strong>Default:</strong> <code>0.05</code>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -113,18 +129,46 @@ statistics are aggregated.</p></li>
     <h2>Details</h2>
     <p>Internally, pooled counts are simple sums. CNV values and zygosity are
 combined by a weighted average using <code>total_fragments</code> from
-<code>@libraries$input_file</code>. Library statistics are aggregated (sums for counts,
-weighted means for rates).</p>
+<code>@libraries$input_file</code>, or from <code>@libraries$file_name</code> when the set has no
+input libraries. Library statistics are aggregated (sums for counts,
+weighted means for rates). When <code>renormalise = TRUE</code>, <code><a href="addNormalisation.html">addNormalisation()</a></code>
+is run with the <code>enrichmentMethod</code> recorded in the input set (<code>"blind1-15"</code>
+if there is none).</p>
+    </div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p><code><a href="addNormalisation.html">addNormalisation()</a></code>, <code><a href="mixSamples.html">mixSamples()</a></code></p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Pool Tumour/Normal pairs by patient into a single sample per patient:</span></span></span>
-<span class="r-in"><span><span class="co"># e.g., "Colon1_T","Colon1_N" -&gt; "Colon1"</span></span></span>
-<span class="r-in"><span><span class="fu">poolSamples</span><span class="op">(</span><span class="va">exampleTumourNormal</span>, mergeString <span class="op">=</span> <span class="st">"_[TN]$"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="co"># e.g., "Colon1_T","Colon1_N" -&gt; "Colon1". The windows of the example data</span></span></span>
+<span class="r-in"><span><span class="co"># are too CpG-dense to estimate the background, so skip the normalisation.</span></span></span>
+<span class="r-in"><span><span class="fu">poolSamples</span><span class="op">(</span><span class="va">exampleTumourNormal</span>, mergeString <span class="op">=</span> <span class="st">"_[TN]$"</span>, renormalise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All names in common, returning second qseaSet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 5 Samples: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Colon1, Colon2, Lung1, Lung2, Lung3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 819 Regions in 22 chromosomes of BSgenome.Hsapiens.NCBI.GRCh38</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A set with a range of CpG densities can be renormalised after pooling</span></span></span>
+<span class="r-in"><span><span class="fu">qsea</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qsea/man/example.html" class="external-link">getExampleQseaSet</a></span><span class="op">(</span>expSamplingDepth <span class="op">=</span> <span class="fl">1e5</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>    <span class="fu">poolSamples</span><span class="op">(</span>mergeString <span class="op">=</span> <span class="st">"[TN]$"</span>, maxPatternDensity <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All names in common, returning second qseaSet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting windows with low CpG density for background read estimation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.48% of the windows have enrichment pattern density of at most 0.5 per fragment </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> and are used for background reads estimation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qseaSet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> =======================================</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2 Samples: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sim1, Sim2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 10000 Regions in 1 chromosomes of example_genome</span>
 </code></pre></div>
     </div>
   </div>
