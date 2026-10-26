@@ -30,7 +30,7 @@
 - `plotGeneHeatmap()` now stops at once with its "Could not connect to
   Ensembl" error when the default hg38 or hg19 archive does not answer, instead
   of retrying `biomaRt` through three connection timeouts.
-  ([#183](https://github.com/cruk-mi/mesa/issues/183))
+  ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
@@ -90,7 +90,7 @@
 - The `plotGeneHeatmap()` example and the live mouse test now run only when the
   Ensembl archive answers, so `R CMD check` no longer waits on a hung archive.
   `testPlotGeneHeatmap()` moved from `R/` to the test helpers.
-  ([#183](https://github.com/cruk-mi/mesa/issues/183))
+  ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 # mesa 0.99.8
 
