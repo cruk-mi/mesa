@@ -136,8 +136,9 @@ slow connection, set a larger value or pass a \code{mart}.
 data(exampleTumourNormal, package = "mesa")
 
 # Gene heatmap (beta) with sample annotations (tidyselect bare names),
-# columns clustered into 2 groups, custom colours and wider flanks. Only
-# run when the Ensembl archive answers, as a hung archive stalls the example
+# columns clustered into 2 groups, custom colours and wider flanks.
+# ensemblReachable() is an internal check that skips the example when the
+# Ensembl archive does not answer, as a hung archive stalls the example.
 if (mesa:::ensemblReachable("jul2022.archive.ensembl.org")) {
     tryCatch(
         exampleTumourNormal \%>\%
