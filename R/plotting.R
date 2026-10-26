@@ -792,9 +792,10 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' aggregated by `group` prior to plotting. Column annotations can be added via
 #' `sampleAnnotation`; colours can be customized via `annotationColors`.
 #'
-#' The default human archives are probed first, and the function stops if one
-#' does not answer within `getOption("mesa_ensemblTimeout", 5)` seconds. On a
-#' slow connection, set a larger value or pass a `mart`.
+#' The BioMart service of the mart, whether the default human archive, the one
+#' stored on the object or one passed as `mart`, is probed first. The function
+#' stops if it does not answer within `getOption("mesa_ensemblTimeout", 5)`
+#' seconds. On a slow connection, set a larger value.
 #'
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
@@ -853,8 +854,8 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     if (is.null(mart)) { mart <- getMart(qseaSet) }
 
     .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
-    # Probe the default archive first: a hung archive makes useMart() wait out
-    # a connection timeout on every retry (#183)
+    # Probe the mart's host before connecting: a hung archive makes useMart()
+    # and getBM() wait out a connection timeout on every retry (#183)
     host <- NULL
     if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
@@ -870,14 +871,15 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
             "\"mmusculus_gene_ensembl\", host = <archive for your build>).")
     }
 
+    timeout <- getOption("mesa_ensemblTimeout", 5)
+    probeHost <- if (is.null(host)) mart@host else host
+    if (!ensemblReachable(probeHost, timeout)) {
+        stop("The Ensembl BioMart at ", probeHost, " did not answer within ",
+            timeout, " s. Set a longer wait with ",
+            "options(mesa_ensemblTimeout = ...) or supply a mart object ",
+            "via the `mart` argument.")
+    }
     if (!is.null(host)) {
-        timeout <- getOption("mesa_ensemblTimeout", 5)
-        if (!ensemblReachable(host, timeout)) {
-            stop("The Ensembl BioMart at ", host, " did not answer within ",
-                timeout, " s. Set a longer wait with ",
-                "options(mesa_ensemblTimeout = ...) or supply a mart object ",
-                "via the `mart` argument.")
-        }
         mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
             host = host)
     }
@@ -1839,6 +1841,8 @@ ensemblReachable <- function(host, timeout = 5) {
     if (!grepl("^https?://", host)) {
         host <- paste0("https://", host)
     }
+    # a Mart's host already ends in the service path, so keep scheme and host
+    host <- sub("^(https?://[^/]+).*$", "\\1", host)
     url <- paste0(host, "/biomart/martservice?type=registry")
     status <- tryCatch(martServiceStatus(url, timeout),
         error = function(e) NA_integer_)

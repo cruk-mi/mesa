@@ -114,3 +114,45 @@ test_that("plotGeneHeatmap() waits for mesa_ensemblTimeout seconds", {
     )
     expect_equal(waited, 12)
 })
+
+test_that("ensemblReachable() probes a mart's host without doubling the path", {
+
+    seen <- NULL
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        seen <<- url
+        200L
+    })
+
+    # Mart@host already ends in the BioMart service path
+    ensemblReachable("https://x.org:443/biomart/martservice")
+    expect_equal(seen, "https://x.org:443/biomart/martservice?type=registry")
+})
+
+test_that("plotGeneHeatmap() probes an explicit mart before getBM()", {
+
+    martHost <- "https://jul2023.archive.ensembl.org:443/biomart/martservice"
+    explicitMart <- methods::new("Mart", biomart = "ensembl",
+        dataset = "mmusculus_gene_ensembl", host = martHost)
+
+    # purrr::possibly() swallows errors from getBM(), so record the call
+    probed <- NULL
+    queried <- FALSE
+    local_mocked_bindings(ensemblReachable = function(host, timeout) {
+        probed <<- host
+        FALSE
+    })
+    local_mocked_bindings(
+        getBM = function(...) {
+            queried <<- TRUE
+            stop("getBM() must not be called")
+        },
+        .package = "biomaRt"
+    )
+
+    expect_error(
+        plotGeneHeatmap(exampleMouse, gene = "Fbxl18", mart = explicitMart),
+        "did not answer within 5 s"
+    )
+    expect_equal(probed, martHost)
+    expect_false(queried)
+})
