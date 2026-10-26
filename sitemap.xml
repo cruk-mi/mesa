@@ -43,6 +43,7 @@
 <url><loc>/reference/filter.qseaSet.html</loc></url>
 <url><loc>/reference/filterWindows.html</loc></url>
 <url><loc>/reference/fitQseaGLM.html</loc></url>
+<url><loc>/reference/gc_hg19_chr22_100kb.html</loc></url>
 <url><loc>/reference/gc_hg38_1000kb.html</loc></url>
 <url><loc>/reference/getAnnotation.html</loc></url>
 <url><loc>/reference/getBetaTable.html</loc></url>
@@ -76,6 +77,7 @@
 <url><loc>/reference/makeHeatmapAnnotations.html</loc></url>
 <url><loc>/reference/makeQset.html</loc></url>
 <url><loc>/reference/makeTransposedTable.html</loc></url>
+<url><loc>/reference/map_hg19_chr22_100kb.html</loc></url>
 <url><loc>/reference/map_hg38_1000kb.html</loc></url>
 <url><loc>/reference/mesa-package.html</loc></url>
 <url><loc>/reference/mesaDimRed-class.html</loc></url>
