@@ -48,3 +48,23 @@ test_that("ensemblReachable() returns without waiting on a failing probe", {
     expect_false(reachable)
     expect_lt(elapsed[["elapsed"]], 1)
 })
+
+test_that("plotGeneHeatmap() fails fast when the default archive hangs", {
+
+    # purrr::possibly() swallows errors from useMart(), so record the call
+    called <- FALSE
+    local_mocked_bindings(ensemblReachable = function(host, ...) FALSE)
+    local_mocked_bindings(
+        useMart = function(...) {
+            called <<- TRUE
+            stop("useMart() must not be called")
+        },
+        .package = "biomaRt"
+    )
+
+    expect_error(
+        plotGeneHeatmap(exampleTumourNormal, gene = "HOXA9"),
+        "Could not connect to Ensembl"
+    )
+    expect_false(called)
+})

@@ -848,16 +848,24 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     if (is.null(mart)) { mart <- getMart(qseaSet) }
 
     .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
+    # Probe the default archive first: a hung archive makes useMart() wait out
+    # a connection timeout on every retry (#183)
     if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
         stringr::str_detect(.genome, "hg38|GRCh38")) {
-        mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
-            host = "https://jul2022.archive.ensembl.org")
+        host <- "https://jul2022.archive.ensembl.org"
+        if (ensemblReachable(host)) {
+            mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
+                host = host)
+        }
     } else if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
         stringr::str_detect(.genome, "hg19|GRCh37")) {
-        mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
-            host = "https://feb2014.archive.ensembl.org")
+        host <- "https://feb2014.archive.ensembl.org"
+        if (ensemblReachable(host)) {
+            mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
+                host = host)
+        }
     } else if (is.null(mart)) {
         stop("Please specify a mart object for biomaRt, matching the genome (",
             .genome, "), e.g. biomaRt::useMart(\"ensembl\", dataset = ",

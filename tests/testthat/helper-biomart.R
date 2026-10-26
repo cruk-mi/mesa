@@ -15,6 +15,11 @@
 
 localMockBiomart <- function(env = parent.frame()) {
     genes <- .cachedBiomartGenes()
+    # plotGeneHeatmap() probes the default archive before connecting (#183)
+    testthat::local_mocked_bindings(
+        ensemblReachable = function(host, ...) TRUE,
+        .env = env
+    )
     testthat::local_mocked_bindings(
         useMart = function(biomart, dataset, host, ...) {
             methods::new("Mart", biomart = biomart, dataset = dataset,
