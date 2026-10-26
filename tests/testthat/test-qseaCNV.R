@@ -40,6 +40,14 @@ test_that("addHMMcopyCNV runs on a MEDIPSData chr22 BAM (#180)", {
     expect_length(cnv, 513L)
     expect_equal(colnames(GenomicRanges::mcols(cnv)), "hESC")
     expect_false(anyNA(GenomicRanges::mcols(cnv)$hESC))
+    # one copy-number state for the whole of chr22 in this normal sample
+    expect_equal(unique(round(GenomicRanges::mcols(cnv)$hESC, 2)), -0.01)
+
+    # each window got the GC and mappability of its own bin
+    inputCounts <- qs@libraries$input_counts
+    expect_equal(inputCounts$start, gc_hg19_chr22_100kb$start)
+    expect_equal(inputCounts$gc, gc_hg19_chr22_100kb$gc)
+    expect_equal(inputCounts$map, map_hg19_chr22_100kb$map)
     expect_equal(rownames(qs@libraries$input_file), "hESC")
 })
 
