@@ -44,7 +44,7 @@
   mappability of hg19 chr22 in 100 kb bins, built by two new `data-raw/`
   scripts from public sources. The `addHMMcopyCNV()` help no longer says that
   only hg38 is supported, and says that `windowSize` must match the tracks.
-  ([#180](https://github.com/cruk-mi/mesa/issues/180), [#153](https://github.com/cruk-mi/mesa/issues/153))
+  ([#180](https://github.com/cruk-mi/mesa/issues/180), [#153](https://github.com/cruk-mi/mesa/issues/153), [PR #182](https://github.com/cruk-mi/mesa/pull/182))
 
 ## Testing
 - The `makeQset()` and `calculateCGEnrichment()` tests now run by default, so
