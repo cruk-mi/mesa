@@ -135,6 +135,35 @@ test_that("calculateCGEnrichment works (single-end)", {
 })
 
 
+test_that("addMedipsEnrichmentFactors replaces the coverage relH/GoGe (#152)", {
+
+    skip_if_not_installed("MEDIPSData")
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
+
+    bamFile <- system.file("extdata", "hESCs.Input.chr22.bam",
+        package = "MEDIPSData", mustWork = TRUE)
+
+    # addBamCoveragePairedAndUnpaired() already writes relH and GoGe
+    qs <- data.frame(
+        sample_name = "hESC", file_name = bamFile, group = "Input"
+    ) %>%
+        qsea::createQseaSet("BSgenome.Hsapiens.UCSC.hg19",
+            chr.select = "chr22", window_size = 5000) %>%
+        addBamCoveragePairedAndUnpaired(fragmentLength = 300)
+    expect_true(all(c("relH", "GoGe") %in% colnames(qs@libraries$file_name)))
+
+    qs <- addMedipsEnrichmentFactors(qs, chr.select = "chr22", paired = FALSE)
+
+    libCols <- colnames(qs@libraries$file_name)
+    expect_false(anyDuplicated(libCols) > 0L)
+    expect_true(all(c("relH", "GoGe", "nReads") %in% libCols))
+
+    qcSummary <- getSampleQCSummary(qs)
+    expect_equal(qcSummary$sample_name, "hESC")
+    expect_true(is.finite(qcSummary$relH))
+})
+
+
 test_that("readSingleEndFragments applies the MEDIPS read filters", {
 
     dir <- tempfile("mesaBam")

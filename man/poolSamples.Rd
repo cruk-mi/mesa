@@ -4,7 +4,7 @@
 \alias{poolSamples}
 \title{Pool (merge) samples that share a common name prefix}
 \usage{
-poolSamples(qseaSet, mergeString)
+poolSamples(qseaSet, mergeString, renormalise = TRUE, maxPatternDensity = 0.05)
 }
 \arguments{
 \item{qseaSet}{\code{qseaSet}
@@ -12,10 +12,22 @@ A qseaSet object containing methylation-enriched sequencing data.}
 
 \item{mergeString}{\code{character(1)}
 Regular expression used to remove the \strong{suffix} that distinguishes samples
-to be merged. The remaining prefix becomes the pooled sample name. After
-removal, pooled names are matched using \code{startsWith()}. For example, with
+to be merged. The remaining prefix becomes the pooled sample name, and the
+samples that give the same prefix are pooled together. For example, with
 names like \code{"Patient1_T"} and \code{"Patient1_N"}, use \code{mergeString = "_[TN]$"} to
 pool them into \code{"Patient1"}.}
+
+\item{renormalise}{\code{logical(1)}
+Whether to run \code{\link[=addNormalisation]{addNormalisation()}} on the result. The pooled samples have no
+library factors, offsets or enrichment parameters until it has run, so beta
+values and DMR calls need it. Set this to \code{FALSE} only for a set that cannot
+be normalised, such as one whose windows are all CpG-dense.
+\strong{Default:} \code{TRUE}.}
+
+\item{maxPatternDensity}{\code{numeric(1)}
+Maximum pattern density in a window to consider it for the background
+calculation. Passed to \code{\link[=addNormalisation]{addNormalisation()}} when \code{renormalise = TRUE}.
+\strong{Default:} \code{0.05}.}
 }
 \value{
 A \code{qseaSet} object:
@@ -35,14 +47,23 @@ new \code{qseaSet} with pooled samples and updated metadata.
 \details{
 Internally, pooled counts are simple sums. CNV values and zygosity are
 combined by a weighted average using \code{total_fragments} from
-\verb{@libraries$input_file}. Library statistics are aggregated (sums for counts,
-weighted means for rates).
+\verb{@libraries$input_file}, or from \verb{@libraries$file_name} when the set has no
+input libraries. Library statistics are aggregated (sums for counts,
+weighted means for rates). When \code{renormalise = TRUE}, \code{\link[=addNormalisation]{addNormalisation()}}
+is run with the \code{enrichmentMethod} recorded in the input set (\code{"blind1-15"}
+if there is none).
 }
 \examples{
-\dontrun{
 data(exampleTumourNormal)
 # Pool Tumour/Normal pairs by patient into a single sample per patient:
-# e.g., "Colon1_T","Colon1_N" -> "Colon1"
-poolSamples(exampleTumourNormal, mergeString = "_[TN]$")
+# e.g., "Colon1_T","Colon1_N" -> "Colon1". The windows of the example data
+# are too CpG-dense to estimate the background, so skip the normalisation.
+poolSamples(exampleTumourNormal, mergeString = "_[TN]$", renormalise = FALSE)
+
+# A set with a range of CpG densities can be renormalised after pooling
+qsea::getExampleQseaSet(expSamplingDepth = 1e5) \%>\%
+    poolSamples(mergeString = "[TN]$", maxPatternDensity = 0.5)
 }
+\seealso{
+\code{\link[=addNormalisation]{addNormalisation()}}, \code{\link[=mixSamples]{mixSamples()}}
 }

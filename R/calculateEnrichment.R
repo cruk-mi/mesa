@@ -967,13 +967,16 @@ addMedipsEnrichmentFactors <- function(
     ) %>%
         do.call(rbind, .)
 
-    if (!nonEnrich) {
-        qseaSet@libraries$file_name <- qseaSet@libraries$file_name %>%
-            cbind(dplyr::select(enrichData, -file))
-    } else {
-        qseaSet@libraries$input_file <- qseaSet@libraries$input_file %>%
-            cbind(dplyr::select(enrichData, -file))
-    }
+    # replace columns that are already there, such as the relH and GoGe that
+    # addBamCoveragePairedAndUnpaired() writes, rather than appending twice
+    newCols <- dplyr::select(enrichData, -file)
+    libraryName <- ifelse(nonEnrich, "input_file", "file_name")
+
+    # qsea::addCoverage() stores the library table as a matrix
+    qseaSet@libraries[[libraryName]] <- qseaSet@libraries[[libraryName]] %>%
+        as.data.frame() %>%
+        dplyr::select(-tidyselect::any_of(colnames(newCols))) %>%
+        cbind(newCols)
 
     return(qseaSet)
 }

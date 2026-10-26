@@ -13,6 +13,20 @@
   the `qseaSet`, and `exampleMouse` no longer stores a Mart for the retired
   Ensembl `nov2020` archive: mouse users pass a `mart` matching mm10.
   ([#173](https://github.com/cruk-mi/mesa/issues/173), [PR #174](https://github.com/cruk-mi/mesa/pull/174))
+- `poolSamples()` now runs on `exampleTumourNormal` and on `qsea`'s example
+  set, and its example is no longer wrapped in `\dontrun{}`. It has new
+  `renormalise` and `maxPatternDensity` arguments for `addNormalisation()`, and
+  `renormalise = FALSE` pools the CpG-dense example data, which cannot be
+  normalised. It also falls back to the pulldown libraries when the set has no
+  input libraries, pools only samples with the same name (`Sim1` no longer
+  takes `Sim12`), keeps every library column and keeps the set's enrichment
+  method.
+  ([#152](https://github.com/cruk-mi/mesa/issues/152), [#153](https://github.com/cruk-mi/mesa/issues/153), [PR #181](https://github.com/cruk-mi/mesa/pull/181))
+- `addMedipsEnrichmentFactors()` now replaces the `relH` and `GoGe` columns
+  that `addBamCoveragePairedAndUnpaired()` already wrote, instead of adding a
+  second pair, so `addLibraryInformation()` and `getSampleQCSummary()` work on
+  the result.
+  ([#152](https://github.com/cruk-mi/mesa/issues/152), [PR #181](https://github.com/cruk-mi/mesa/pull/181))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
