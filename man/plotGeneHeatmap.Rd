@@ -127,6 +127,10 @@ values
 below \code{minEnrichment} are set to \code{NA}. If \code{useGroupMeans = TRUE}, samples are
 aggregated by \code{group} prior to plotting. Column annotations can be added via
 \code{sampleAnnotation}; colours can be customized via \code{annotationColors}.
+
+The default human archives are probed first, and the function stops if one
+does not answer within \code{getOption("mesa_ensemblTimeout", 5)} seconds. On a
+slow connection, set a larger value or pass a \code{mart}.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

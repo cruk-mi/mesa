@@ -64,7 +64,25 @@ test_that("plotGeneHeatmap() fails fast when the default archive hangs", {
 
     expect_error(
         plotGeneHeatmap(exampleTumourNormal, gene = "HOXA9"),
-        "Could not connect to Ensembl"
+        "did not answer within 5 s"
     )
     expect_false(called)
+})
+
+test_that("plotGeneHeatmap() waits for mesa_ensemblTimeout seconds", {
+
+    oldOptions <- options(mesa_ensemblTimeout = 12)
+    on.exit(options(oldOptions), add = TRUE)
+
+    waited <- NULL
+    local_mocked_bindings(ensemblReachable = function(host, timeout) {
+        waited <<- timeout
+        FALSE
+    })
+
+    expect_error(
+        plotGeneHeatmap(exampleTumourNormal, gene = "HOXA9"),
+        "did not answer within 12 s"
+    )
+    expect_equal(waited, 12)
 })

@@ -792,6 +792,10 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' aggregated by `group` prior to plotting. Column annotations can be added via
 #' `sampleAnnotation`; colours can be customized via `annotationColors`.
 #'
+#' The default human archives are probed first, and the function stops if one
+#' does not answer within `getOption("mesa_ensemblTimeout", 5)` seconds. On a
+#' slow connection, set a larger value or pass a `mart`.
+#'
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
 #' **ComplexHeatmap** object (e.g., a `Heatmap`/`HeatmapList`) for further
@@ -850,26 +854,31 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
     # Probe the default archive first: a hung archive makes useMart() wait out
     # a connection timeout on every retry (#183)
+    host <- NULL
     if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
         stringr::str_detect(.genome, "hg38|GRCh38")) {
         host <- "https://jul2022.archive.ensembl.org"
-        if (ensemblReachable(host)) {
-            mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
-                host = host)
-        }
     } else if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
         stringr::str_detect(.genome, "hg19|GRCh37")) {
         host <- "https://feb2014.archive.ensembl.org"
-        if (ensemblReachable(host)) {
-            mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
-                host = host)
-        }
     } else if (is.null(mart)) {
         stop("Please specify a mart object for biomaRt, matching the genome (",
             .genome, "), e.g. biomaRt::useMart(\"ensembl\", dataset = ",
             "\"mmusculus_gene_ensembl\", host = <archive for your build>).")
+    }
+
+    if (!is.null(host)) {
+        timeout <- getOption("mesa_ensemblTimeout", 5)
+        if (!ensemblReachable(host, timeout)) {
+            stop("The Ensembl BioMart at ", host, " did not answer within ",
+                timeout, " s. Set a longer wait with ",
+                "options(mesa_ensemblTimeout = ...) or supply a mart object ",
+                "via the `mart` argument.")
+        }
+        mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
+            host = host)
     }
 
     # If all useMart retries failed, stop with an informative message
