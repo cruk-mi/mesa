@@ -38,3 +38,25 @@ localMockBiomart <- function(env = parent.frame()) {
         .env = env
     )
 }
+
+# Runs plotGeneHeatmap() against live Ensembl and skips, rather than fails, on
+# a likely network or BioMart error. Used by the live test in test-mouse.R.
+testPlotGeneHeatmap <- function(...) {
+    tryCatch({
+        plotGeneHeatmap(...)
+        testthat::succeed()
+    }, error = function(e) {
+        if (stringr::str_detect(
+            e$message,
+            paste0(
+                "(?i)biomart|SSL|connection|timeout|could not resolve|",
+                "unexpected eof|http [45][0-9][0-9]|service unavailable|",
+                "req_perform"
+            )
+        )) {
+            testthat::skip("Connection to biomart failed, skipping test.")
+        } else {
+            stop(e)
+        }
+    })
+}
