@@ -49,6 +49,34 @@ test_that("ensemblReachable() returns FALSE at once when the probe errors", {
     expect_lt(elapsed[["elapsed"]], 1)
 })
 
+test_that("ensemblReachable() rounds the timeout up to whole seconds", {
+
+    # curlGetHeaders() reads 0 as its 60 s default, so 0.5 must not become 0
+    sent <- NULL
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        sent <<- timeout
+        200L
+    })
+
+    ensemblReachable("jul2022.archive.ensembl.org", timeout = 0.5)
+    expect_equal(sent, 1)
+
+    ensemblReachable("jul2022.archive.ensembl.org", timeout = 2.2)
+    expect_equal(sent, 3)
+})
+
+test_that("ensemblReachable() rejects a timeout that is not positive", {
+
+    local_mocked_bindings(martServiceStatus = function(url, timeout) 200L)
+
+    for (bad in list(0, -1, NA_real_, "5", c(1, 2))) {
+        expect_error(
+            ensemblReachable("jul2022.archive.ensembl.org", timeout = bad),
+            "positive number"
+        )
+    }
+})
+
 test_that("plotGeneHeatmap() fails fast when the default archive hangs", {
 
     # purrr::possibly() swallows errors from useMart(), so record the call

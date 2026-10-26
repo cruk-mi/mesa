@@ -12,7 +12,8 @@ Ensembl host, with or without the \verb{https://} scheme, such as
 \code{"jul2022.archive.ensembl.org"}.}
 
 \item{timeout}{\code{numeric(1)}.
-Seconds to wait before giving up.
+Seconds to wait before giving up, rounded up to a whole second. Must be
+positive.
 \strong{Default:} \code{5}.}
 }
 \value{

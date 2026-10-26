@@ -1819,7 +1819,8 @@ getAnnotation <- function(
 #'   `"jul2022.archive.ensembl.org"`.
 #'
 #' @param timeout `numeric(1)`.
-#'   Seconds to wait before giving up.
+#'   Seconds to wait before giving up, rounded up to a whole second. Must be
+#'   positive.
 #'   **Default:** `5`.
 #'
 #' @return `TRUE` if the service answers with a status below 400, otherwise
@@ -1829,6 +1830,12 @@ getAnnotation <- function(
 #'
 #' @keywords internal
 ensemblReachable <- function(host, timeout = 5) {
+    if (!is.numeric(timeout) || length(timeout) != 1 || is.na(timeout) ||
+        timeout <= 0) {
+        stop("`timeout` must be a single positive number of seconds.")
+    }
+    # curlGetHeaders() takes whole seconds and reads 0 as its 60 s default
+    timeout <- ceiling(timeout)
     if (!grepl("^https?://", host)) {
         host <- paste0("https://", host)
     }
