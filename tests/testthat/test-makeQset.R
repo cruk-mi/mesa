@@ -70,12 +70,17 @@ test_that("Making a qseaSet proper pairs only", {
     skip_if_not_installed("BSgenome.Scerevisiae.UCSC.sacCer3")
     skip_if_not_installed("Rsamtools")
 
-    testSet <- makeYeastQset(
-        coverageMethod = "PairedAndR1s", properPairsOnly = TRUE
-    )
+    # 200 unpaired reads per file on top of the 5000 proper pairs
+    sampleTable <- yeastSampleTable(nSingles = 200)
 
-    expectYeastQset(testSet)
-    expect_true(testSet@parameters$properPairsOnly)
+    withSingles <- makeYeastQset(sampleTable, coverageMethod = "PairedAndR1s")
+    expect_equal(unname(qsea::getLibSize(withSingles)), c(5200, 5200))
+
+    pairsOnly <- makeYeastQset(
+        sampleTable, coverageMethod = "PairedAndR1s", properPairsOnly = TRUE
+    )
+    expect_equal(unname(qsea::getLibSize(pairsOnly)), c(5000, 5000))
+    expect_true(pairsOnly@parameters$properPairsOnly)
 })
 
 test_that("makeQset() rejects GC and map files of the wrong window size", {
