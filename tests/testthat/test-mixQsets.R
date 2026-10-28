@@ -117,7 +117,7 @@ test_that("mixSamples() stops on bad input", {
             exampleMouse, "A_Rep1", "B_Rep1", mixNReads, 0.5,
             renormalise = FALSE
         )),
-        "mcols"
+        "unable to find an inherited method for function .mcols."
     )
 })
 

@@ -103,7 +103,10 @@ test_that("combineQsets() warns when CpG densities differ", {
 
 test_that("combineQsets(checkParams = TRUE) stops on differing settings", {
 
-    expect_no_error(combineQsets(tumours(), normals(), checkParams = TRUE))
+    checked <- combineQsets(tumours(), normals(), checkParams = TRUE)
+    expect_setequal(
+        qsea::getSampleNames(checked), qsea::getSampleNames(allSamples)
+    )
 
     other <- normals()
     other@parameters$minMapQual <- other@parameters$minMapQual + 10
@@ -112,7 +115,10 @@ test_that("combineQsets(checkParams = TRUE) stops on differing settings", {
         "Parameters are not the same!"
     )
     # the same difference is ignored by default
-    expect_no_error(combineQsets(tumours(), other))
+    ignored <- combineQsets(tumours(), other)
+    expect_setequal(
+        qsea::getSampleNames(ignored), qsea::getSampleNames(allSamples)
+    )
 
     other <- normals()
     other@enrichment$extra <- 1
