@@ -98,69 +98,69 @@ test_that("PCAs", {
 
 test_that("UMAPs", {
 
-  # uwot calls gc() four times per fit, about 0.35 s each with mesa loaded
-  local_mocked_bindings(gc = function(...) invisible(NULL), .package = "base")
-  set.seed(1)
-  expect_no_error(obj1 <- exampleTumourNormal %>% getUMAP(n_neighbors = 5) )
-  set.seed(1)
-  expect_no_error(obj2 <- exampleTumourNormal %>% getUMAP(returnDataTable = TRUE, n_neighbors = 5) )
-  set.seed(1)
-  expect_no_error(obj3 <- exampleTumourNormal %>% getUMAP(topVarNum = 10, n_neighbors = 5) )
-  set.seed(1)
-  expect_no_error(obj4 <- exampleTumourNormal %>% getUMAP(topVarSamples = "_T", topVarNum = 10, n_neighbors = 5) )
-  set.seed(1)
-  expect_no_error(obj5 <- exampleTumourNormal %>% getUMAP(minDensity = 10, n_neighbors = 5) )
-  set.seed(1)
-  expect_no_error(obj6 <- exampleTumourNormal %>% getUMAP(topVarNum = c(10,100,200), n_neighbors = 5) )
-  set.seed(1)
-  expect_no_error(obj7 <- exampleTumourNormal %>% getUMAP(dataTable = getBetaTable(exampleTumourNormal), n_neighbors = 5) )
+    # uwot calls gc() four times per fit, about 0.35 s each with mesa loaded
+    local_mocked_bindings(gc = function(...) invisible(NULL), .package = "base")
+    set.seed(1)
+    expect_no_error(obj1 <- exampleTumourNormal %>% getUMAP(n_neighbors = 5) )
+    set.seed(1)
+    expect_no_error(obj2 <- exampleTumourNormal %>% getUMAP(returnDataTable = TRUE, n_neighbors = 5) )
+    set.seed(1)
+    expect_no_error(obj3 <- exampleTumourNormal %>% getUMAP(topVarNum = 10, n_neighbors = 5) )
+    set.seed(1)
+    expect_no_error(obj4 <- exampleTumourNormal %>% getUMAP(topVarSamples = "_T", topVarNum = 10, n_neighbors = 5) )
+    set.seed(1)
+    expect_no_error(obj5 <- exampleTumourNormal %>% getUMAP(minDensity = 10, n_neighbors = 5) )
+    set.seed(1)
+    expect_no_error(obj6 <- exampleTumourNormal %>% getUMAP(topVarNum = c(10,100,200), n_neighbors = 5) )
+    set.seed(1)
+    expect_no_error(obj7 <- exampleTumourNormal %>% getUMAP(dataTable = getBetaTable(exampleTumourNormal), n_neighbors = 5) )
 
-  expect_error(exampleTumourNormal %>% filter(str_detect(sample_name, "Colon1_T")) %>% getUMAP())
-  expect_error(exampleTumourNormal %>% filter(str_detect(sample_name, "Colon1")) %>% getUMAP())
-  expect_error(exampleTumourNormal %>% filterWindows(seqnames == 1) %>% getUMAP()) #no windows left
+    expect_error(exampleTumourNormal %>% filter(str_detect(sample_name, "Colon1_T")) %>% getUMAP())
+    expect_error(exampleTumourNormal %>% filter(str_detect(sample_name, "Colon1")) %>% getUMAP())
+    expect_error(exampleTumourNormal %>% filterWindows(seqnames == 1) %>% getUMAP()) #no windows left
 
-  expect_true(isTRUE(all.equal(
-      getCoordinates(obj1)$umap1,
-      getCoordinates(obj2)$umap1)))
-  expect_false(isTRUE(all.equal(
-      getCoordinates(obj3)$umap1,
-      getCoordinates(obj4)$umap1)))
-  expect_false(isTRUE(all.equal(
-      getCoordinates(obj1)$umap1,
-      getCoordinates(obj5)$umap1)))
-  expect_false(isTRUE(all.equal(
-      getCoordinates(obj1)$umap1,
-      getCoordinates(obj6)$umap1)))
-  expect_true(isTRUE(all.equal(
-      getCoordinates(obj1)$umap1,
-      getCoordinates(obj7)$umap1)))
+    expect_true(isTRUE(all.equal(
+            getCoordinates(obj1)$umap1,
+            getCoordinates(obj2)$umap1)))
+    expect_false(isTRUE(all.equal(
+            getCoordinates(obj3)$umap1,
+            getCoordinates(obj4)$umap1)))
+    expect_false(isTRUE(all.equal(
+            getCoordinates(obj1)$umap1,
+            getCoordinates(obj5)$umap1)))
+    expect_false(isTRUE(all.equal(
+            getCoordinates(obj1)$umap1,
+            getCoordinates(obj6)$umap1)))
+    expect_true(isTRUE(all.equal(
+            getCoordinates(obj1)$umap1,
+            getCoordinates(obj7)$umap1)))
 
-  expect_equal(length(getResults(obj1)), 1)
+    expect_equal(length(getResults(obj1)), 1)
 
-  expect_equal(length(getResults(obj6)), 3)
-  expect_false(isTRUE(all.equal(
-      getCoordinates(obj6)$umap1,
-      getCoordinates(obj6)$umap2)))
-  expect_false(isTRUE(all.equal(
-      getCoordinates(obj6)$umap1,
-      getCoordinates(obj6)$umap3)))
+    expect_equal(length(getResults(obj6)), 3)
+    expect_false(isTRUE(all.equal(
+            getCoordinates(obj6)$umap1,
+            getCoordinates(obj6)$umap2)))
+    expect_false(isTRUE(all.equal(
+            getCoordinates(obj6)$umap1,
+            getCoordinates(obj6)$umap3)))
 
-  expect_no_error(plots1 <- plotUMAP(obj1))
-  expect_no_error(plots6 <- plotUMAP(obj6))
+    expect_no_error(plots1 <- plotUMAP(obj1))
+    expect_no_error(plots6 <- plotUMAP(obj6))
 
-  expect_no_error(plotUMAP(obj1, colour = "type"))
-  expect_no_error(plotUMAP(obj1, colour = "age"))
-  expect_no_error(plotUMAP(obj1, colour = "gender"))
-  expect_no_error(plotUMAP(obj1 %>% mutate(diver = seq(-4,5)), colour = "diver"))
-  expect_no_error(plotUMAP(obj1, shape = "type"))
+    expect_no_error(plotUMAP(obj1, colour = "type"))
+    expect_no_error(plotUMAP(obj1, colour = "age"))
+    expect_no_error(plotUMAP(obj1, colour = "gender"))
+    expect_no_error(plotUMAP(obj1 %>% mutate(diver = seq(-4,5)), colour = "diver"))
+    expect_no_error(plotUMAP(obj1, shape = "type"))
 
-  expect_no_error(plotUMAP(obj1, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
-  expect_no_error(plotUMAP(obj1, colour = "gender", shapePalette = c(2,5), shape = "gender"))
+    expect_no_error(plotUMAP(obj1, colour = "type", colourPalette = RColorBrewer::brewer.pal(5,"Oranges")))
+    expect_no_error(plotUMAP(obj1, colour = "gender", shapePalette = c(2,5), shape = "gender"))
 
-  expect_no_error(obj1 %>% mutate(newCol = rnorm(10)) %>% plotUMAP(colour = "newCol"))
+    expect_no_error(obj1 %>% mutate(newCol = rnorm(10)) %>% plotUMAP(colour = "newCol"))
 
-  expect_equal(length(plots1), 1)
-  expect_equal(length(plots6), 3)
+    expect_equal(length(plots1), 1)
+    expect_equal(length(plots6), 3)
 
 }
 
