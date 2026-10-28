@@ -792,11 +792,9 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' aggregated by `group` prior to plotting. Column annotations can be added via
 #' `sampleAnnotation`; colours can be customized via `annotationColors`.
 #'
-#' The BioMart service of the mart, whether the default human archive, the one
-#' stored on the object or one passed as `mart`, is probed first. The function
-#' stops if it does not answer within `getOption("mesa_ensemblTimeout", 5)`
-#' seconds. On a slow connection, set a larger value. A mart that sets its own
-#' `http_config` is not probed.
+#' The mart's BioMart service is probed first, and the function stops if it
+#' does not answer within `getOption("mesa_ensemblTimeout", 5)` seconds. A mart
+#' with its own `http_config` is not probed.
 #'
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
@@ -813,8 +811,7 @@ makeHeatmapAnnotations <- function(qseaSet,
 #'
 #' # Gene heatmap (beta) with sample annotations (tidyselect bare names),
 #' # columns clustered into 2 groups, custom colours and wider flanks.
-#' # ensemblReachable() is an internal check that skips the example when the
-#' # Ensembl archive does not answer, as a hung archive stalls the example.
+#' # (ensemblReachable() skips the example when Ensembl does not answer.)
 #' if (mesa:::ensemblReachable("jul2022.archive.ensembl.org")) {
 #'     tryCatch(
 #'         exampleTumourNormal %>%
@@ -855,8 +852,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     if (is.null(mart)) { mart <- getMart(qseaSet) }
 
     .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
-    # Probe the mart's host before connecting: a hung archive makes useMart()
-    # and getBM() wait out a connection timeout on every retry (#183)
+    # Probe the mart first: a hung archive stalls every useMart()/getBM() retry
     host <- NULL
     if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
@@ -874,8 +870,7 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     timeout <- getOption("mesa_ensemblTimeout", 5)
     probeHost <- if (is.null(host)) mart@host else host
-    # a mart with its own http_config (proxy, certificates) reaches Ensembl in
-    # ways curlGetHeaders() cannot reproduce, so trust it rather than probe it
+    # http_config (proxy, certificates) is not reproducible by the probe
     customConfig <- is.null(host) && length(mart@http_config) > 0
     if (!customConfig && !ensemblReachable(probeHost, timeout)) {
         stop("The Ensembl BioMart at ", probeHost, " did not answer within ",
@@ -1813,24 +1808,18 @@ getAnnotation <- function(
 
 #' Check that an Ensembl BioMart service answers
 #'
-#' Asks the BioMart service of an Ensembl host for its registry, giving up
-#' after `timeout` seconds. The archive hosts can accept the connection and
-#' then never reply, and `biomaRt` waits for that connection timeout on every
-#' retry, which stalls `R CMD check` and the tests. Probing the service rather
-#' than the site root matters: an archive can answer at `/` while its BioMart
-#' service does not.
+#' Requests the registry of an Ensembl BioMart service and gives up after
+#' `timeout` seconds. An archive can answer at `/` while its service hangs, so
+#' the service itself is probed.
 #'
 #' @param host `character(1)`.
-#'   Ensembl host, with or without the `https://` scheme, such as
-#'   `"jul2022.archive.ensembl.org"`.
+#'   Ensembl host, with or without the `https://` scheme.
 #'
 #' @param timeout `numeric(1)`.
-#'   Seconds to wait before giving up, rounded up to a whole second. Must be
-#'   positive.
+#'   Seconds to wait, rounded up. Must be positive.
 #'   **Default:** `5`.
 #'
-#' @return `TRUE` if the service answers with a status below 400, otherwise
-#'   `FALSE`, including on any connection error or timeout.
+#' @return `TRUE` if the service answers with a status below 400, else `FALSE`.
 #'
 #' @seealso [plotGeneHeatmap()]
 #'
@@ -1840,12 +1829,12 @@ ensemblReachable <- function(host, timeout = 5) {
         timeout <= 0) {
         stop("`timeout` must be a single positive number of seconds.")
     }
-    # curlGetHeaders() takes whole seconds and reads 0 as its 60 s default
+    # curlGetHeaders() reads 0 as its 60 s default
     timeout <- ceiling(timeout)
     if (!grepl("^https?://", host)) {
         host <- paste0("https://", host)
     }
-    # a Mart's host already ends in the service path, so keep scheme and host
+    # a Mart's host already ends in the service path
     host <- sub("^(https?://[^/]+).*$", "\\1", host)
     url <- paste0(host, "/biomart/martservice?type=registry")
     status <- tryCatch(martServiceStatus(url, timeout),
@@ -1855,14 +1844,13 @@ ensemblReachable <- function(host, timeout = 5) {
 
 #' HTTP status of a URL, with a timeout
 #'
-#' A thin wrapper around [curlGetHeaders()] so that tests can replace the
-#' network call. A timeout or connection failure is an error.
+#' Wraps [curlGetHeaders()] so that tests can replace the network call.
 #'
 #' @param url `character(1)`. URL to request.
 #'
 #' @param timeout `numeric(1)`. Seconds to wait.
 #'
-#' @return `integer(1)`. The HTTP status code.
+#' @return `integer(1)`. The HTTP status; a timeout is an error.
 #'
 #' @keywords internal
 martServiceStatus <- function(url, timeout) {

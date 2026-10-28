@@ -128,19 +128,16 @@ below \code{minEnrichment} are set to \code{NA}. If \code{useGroupMeans = TRUE},
 aggregated by \code{group} prior to plotting. Column annotations can be added via
 \code{sampleAnnotation}; colours can be customized via \code{annotationColors}.
 
-The BioMart service of the mart, whether the default human archive, the one
-stored on the object or one passed as \code{mart}, is probed first. The function
-stops if it does not answer within \code{getOption("mesa_ensemblTimeout", 5)}
-seconds. On a slow connection, set a larger value. A mart that sets its own
-\code{http_config} is not probed.
+The mart's BioMart service is probed first, and the function stops if it
+does not answer within \code{getOption("mesa_ensemblTimeout", 5)} seconds. A mart
+with its own \code{http_config} is not probed.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
 # Gene heatmap (beta) with sample annotations (tidyselect bare names),
 # columns clustered into 2 groups, custom colours and wider flanks.
-# ensemblReachable() is an internal check that skips the example when the
-# Ensembl archive does not answer, as a hung archive stalls the example.
+# (ensemblReachable() skips the example when Ensembl does not answer.)
 if (mesa:::ensemblReachable("jul2022.archive.ensembl.org")) {
     tryCatch(
         exampleTumourNormal \%>\%

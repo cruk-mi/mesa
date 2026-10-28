@@ -8,25 +8,19 @@ ensemblReachable(host, timeout = 5)
 }
 \arguments{
 \item{host}{\code{character(1)}.
-Ensembl host, with or without the \verb{https://} scheme, such as
-\code{"jul2022.archive.ensembl.org"}.}
+Ensembl host, with or without the \verb{https://} scheme.}
 
 \item{timeout}{\code{numeric(1)}.
-Seconds to wait before giving up, rounded up to a whole second. Must be
-positive.
+Seconds to wait, rounded up. Must be positive.
 \strong{Default:} \code{5}.}
 }
 \value{
-\code{TRUE} if the service answers with a status below 400, otherwise
-\code{FALSE}, including on any connection error or timeout.
+\code{TRUE} if the service answers with a status below 400, else \code{FALSE}.
 }
 \description{
-Asks the BioMart service of an Ensembl host for its registry, giving up
-after \code{timeout} seconds. The archive hosts can accept the connection and
-then never reply, and \code{biomaRt} waits for that connection timeout on every
-retry, which stalls \verb{R CMD check} and the tests. Probing the service rather
-than the site root matters: an archive can answer at \code{/} while its BioMart
-service does not.
+Requests the registry of an Ensembl BioMart service and gives up after
+\code{timeout} seconds. An archive can answer at \code{/} while its service hangs, so
+the service itself is probed.
 }
 \seealso{
 \code{\link[=plotGeneHeatmap]{plotGeneHeatmap()}}

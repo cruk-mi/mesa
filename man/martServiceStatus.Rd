@@ -12,10 +12,9 @@ martServiceStatus(url, timeout)
 \item{timeout}{\code{numeric(1)}. Seconds to wait.}
 }
 \value{
-\code{integer(1)}. The HTTP status code.
+\code{integer(1)}. The HTTP status; a timeout is an error.
 }
 \description{
-A thin wrapper around \code{\link[=curlGetHeaders]{curlGetHeaders()}} so that tests can replace the
-network call. A timeout or connection failure is an error.
+Wraps \code{\link[=curlGetHeaders]{curlGetHeaders()}} so that tests can replace the network call.
 }
 \keyword{internal}

@@ -10,7 +10,7 @@ test_that("ensemblReachable() is FALSE on an HTTP error or a timeout", {
     local_mocked_bindings(martServiceStatus = function(url, timeout) 500L)
     expect_false(ensemblReachable("jul2022.archive.ensembl.org"))
 
-    # curlGetHeaders() signals a timeout as an error (#183)
+    # a timeout is an error from curlGetHeaders()
     local_mocked_bindings(martServiceStatus = function(url, timeout) {
         stop("libcurl error code 28:\n\tOperation timed out")
     })
@@ -25,7 +25,7 @@ test_that("ensemblReachable() probes the BioMart service, not the site root", {
         200L
     })
 
-    # the jul2023 root answers while its BioMart service does not (#183)
+    # the jul2023 root answered while its BioMart service hung (#183)
     service <- "/biomart/martservice?type=registry"
     ensemblReachable("jul2023.archive.ensembl.org", timeout = 2)
     expect_equal(seen$url,
@@ -51,7 +51,7 @@ test_that("ensemblReachable() returns FALSE at once when the probe errors", {
 
 test_that("ensemblReachable() rounds the timeout up to whole seconds", {
 
-    # curlGetHeaders() reads 0 as its 60 s default, so 0.5 must not become 0
+    # 0 means a 60 s default to curlGetHeaders()
     sent <- NULL
     local_mocked_bindings(martServiceStatus = function(url, timeout) {
         sent <<- timeout
@@ -161,8 +161,7 @@ test_that("plotGeneHeatmap() does not probe a mart with its own http_config", {
 
     localMockBiomart()
 
-    # a proxy or certificate set through http_config is used by getBM() but not
-    # by the libcurl probe, which would wrongly report the mart as unreachable
+    # getBM() uses http_config (proxy, certificates); the probe cannot
     martHost <- "https://jul2023.archive.ensembl.org:443/biomart/martservice"
     proxyMart <- methods::new("Mart", biomart = "ensembl",
         dataset = "mmusculus_gene_ensembl", host = martHost,

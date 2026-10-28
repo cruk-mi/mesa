@@ -219,8 +219,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Run CMD check
-        ## A hung network call in an example or test once stretched this step
-        ## from about 19 minutes to 53 (#183); fail instead of waiting.
+        ## A hung network call once stretched this step to 53 min (#183)
         timeout-minutes: 40
         env:
           _R_CHECK_CRAN_INCOMING_: false
