@@ -42,6 +42,11 @@ integration test per genome. Yeast needs `maxPatternDensity = 100`, because its 
 denser than human ones. Most of a slow `annotateWindows()` is the first-call TxDb load
 (about 30 s for hg38), so subsetting windows doesn't help.
 
+`uwot::umap()` calls `gc()` four times per fit, and each call takes about 0.35 s with
+mesa's dependencies loaded. In a test that fits a UMAP, start with
+`local_mocked_bindings(gc = function(...) invisible(NULL), .package = "base")`. Only
+the explicit calls become no-ops; R still collects garbage on its own.
+
 The one test that talks to live Ensembl (`test-mouse.R`) skips unless
 `MESA_LIVE_ENSEMBL` is set to a non-empty value.
 

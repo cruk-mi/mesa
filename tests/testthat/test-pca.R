@@ -98,6 +98,8 @@ test_that("PCAs", {
 
 test_that("UMAPs", {
 
+  # uwot calls gc() four times per fit, about 0.35 s each with mesa loaded
+  local_mocked_bindings(gc = function(...) invisible(NULL), .package = "base")
   set.seed(1)
   expect_no_error(obj1 <- exampleTumourNormal %>% getUMAP(n_neighbors = 5) )
   set.seed(1)
@@ -165,6 +167,9 @@ test_that("UMAPs", {
 )
 
 test_that("show() and plot labels report the samples in each result", {
+
+    # uwot calls gc() four times per fit, about 0.35 s each with mesa loaded
+    local_mocked_bindings(gc = function(...) invisible(NULL), .package = "base")
 
     plotLabels <- function(obj) {
         p <- plotDimRed(obj)[[1]][[1]]
