@@ -274,3 +274,82 @@ test_that("select.qseaSet", {
     expect_contains(exampleTumourNormal %>% select(-age) %>% getSampleTable() %>% colnames(), c("sample_name", "group"))
 
 })
+
+test_that("filterByNonOverlaps() checks and matches chromosome names", {
+
+    expect_error(
+        filterByNonOverlaps(exampleTumourNormal, data.frame(a = 1)),
+        "regionsToOverlap must be a GRanges object or a dataframe"
+    )
+
+    # exampleTumourNormal calls its chromosome "7", the regions say "chr7"
+    region <- GenomicRanges::GRanges(
+        "chr7", IRanges::IRanges(25002001, 25017900)
+    )
+    kept <- filterByNonOverlaps(exampleTumourNormal, region)
+    expect_lt(length(qsea::getRegions(kept)), 819)
+    expect_equal(
+        length(qsea::getRegions(kept)),
+        819 - length(qsea::getRegions(
+            filterByOverlaps(exampleTumourNormal, region)
+        ))
+    )
+
+    # exampleMouse uses "chr5", the regions say "5"
+    mouseRegions <- GenomicRanges::GRanges(
+        "5", IRanges::ranges(qsea::getRegions(exampleMouse)[1:20])
+    )
+    mouseKept <- filterByNonOverlaps(exampleMouse, mouseRegions)
+    expect_equal(
+        length(qsea::getRegions(mouseKept)),
+        length(qsea::getRegions(exampleMouse)) - 20
+    )
+})
+
+test_that("renameQsetNames() and renameSamples() validate the new names", {
+
+    expect_message(
+        same <- renameQsetNames(exampleTumourNormal, "nomatch", "x"),
+        "Renaming had no effect!"
+    )
+    expect_equal(same, exampleTumourNormal)
+
+    expect_error(
+        renameQsetNames(exampleTumourNormal, "^Colon1_T$", "1bad name"),
+        "Sample names must be valid names for columns in R"
+    )
+    expect_error(
+        renameQsetNames(exampleTumourNormal, "_[TN]$", ""),
+        "Duplicate sample_name now present"
+    )
+
+    # input_file libraries are renamed too
+    renamed <- renameQsetNames(exampleTumourNormal, "^Colon1_T$", "ColonTumour")
+    expect_true("ColonTumour" %in% rownames(renamed@libraries$input_file))
+    expect_true("ColonTumour" %in% rownames(renamed@libraries$file_name))
+    expect_true("ColonTumour" %in% colnames(renamed@count_matrix))
+    expect_true("ColonTumour" %in% names(GenomicRanges::mcols(renamed@cnv)))
+
+    samples <- exampleTumourNormal %>%
+        mutate(newName = paste0("S", seq_len(10)))
+    expect_equal(
+        qsea::getSampleNames(renameSamples(samples, newName)),
+        paste0("S", seq_len(10))
+    )
+    expect_error(
+        renameSamples(mutate(samples, newName = NA), newName),
+        "NAs present in the new sample name column"
+    )
+    expect_error(
+        renameSamples(mutate(samples, newName = "bad name"), newName),
+        "Sample names must be valid names for columns in R"
+    )
+    expect_error(
+        renameSamples(mutate(samples, newName = "same"), newName),
+        "Duplicate sample_name now present"
+    )
+    expect_message(
+        renameSamples(exampleTumourNormal, sample_name),
+        "Renaming had no effect!"
+    )
+})
