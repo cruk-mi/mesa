@@ -237,6 +237,9 @@ values
 below <code>minEnrichment</code> are set to <code>NA</code>. If <code>useGroupMeans = TRUE</code>, samples are
 aggregated by <code>group</code> prior to plotting. Column annotations can be added via
 <code>sampleAnnotation</code>; colours can be customized via <code>annotationColors</code>.</p>
+<p>The mart's BioMart service is probed first, and the function stops if it
+does not answer within <code>getOption("mesa_ensemblTimeout", 5)</code> seconds. A mart
+with its own <code>http_config</code> is not probed.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -249,20 +252,24 @@ aggregated by <code>group</code> prior to plotting. Column annotations can be ad
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Gene heatmap (beta) with sample annotations (tidyselect bare names),</span></span></span>
-<span class="r-in"><span><span class="co"># columns clustered into 2 groups, custom colours and wider flanks</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>        <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span>,</span></span>
-<span class="r-in"><span>            sampleAnnotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tumour</span>, <span class="va">tissue</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>            clusterNum <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>            annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>                tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Tumour <span class="op">=</span> <span class="st">"firebrick4"</span>, Normal <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>            <span class="op">)</span>,</span></span>
-<span class="r-in"><span>            upstreamDist <span class="op">=</span> <span class="fl">1000</span>,</span></span>
-<span class="r-in"><span>            downstreamDist <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Ensembl unavailable: Could not connect to Ensembl via biomaRt after multiple attempts. Please check your internet connection or supply a mart object directly via the `mart` argument.</span>
+<span class="r-in"><span><span class="co"># columns clustered into 2 groups, custom colours and wider flanks.</span></span></span>
+<span class="r-in"><span><span class="co"># (ensemblReachable() skips the example when Ensembl does not answer.)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu">mesa</span><span class="fu">:::</span><span class="fu"><a href="ensemblReachable.html">ensemblReachable</a></span><span class="op">(</span><span class="st">"jul2022.archive.ensembl.org"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>            <span class="fu">plotGeneHeatmap</span><span class="op">(</span><span class="st">"HOXA9"</span>,</span></span>
+<span class="r-in"><span>                sampleAnnotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tumour</span>, <span class="va">tissue</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                clusterNum <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>                annotationColors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>                    tumour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Tumour <span class="op">=</span> <span class="st">"firebrick4"</span>, Normal <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                <span class="op">)</span>,</span></span>
+<span class="r-in"><span>                upstreamDist <span class="op">=</span> <span class="fl">1000</span>,</span></span>
+<span class="r-in"><span>                downstreamDist <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>            <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Ensembl unavailable: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>        <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -38,6 +38,7 @@
 <url><loc>/reference/countWindowsAboveCutoff.html</loc></url>
 <url><loc>/reference/dimRedAccessors.html</loc></url>
 <url><loc>/reference/downSample.html</loc></url>
+<url><loc>/reference/ensemblReachable.html</loc></url>
 <url><loc>/reference/exampleMouse.html</loc></url>
 <url><loc>/reference/exampleTumourNormal.html</loc></url>
 <url><loc>/reference/filter.qseaSet.html</loc></url>
@@ -79,6 +80,7 @@
 <url><loc>/reference/makeTransposedTable.html</loc></url>
 <url><loc>/reference/map_hg19_chr22_100kb.html</loc></url>
 <url><loc>/reference/map_hg38_1000kb.html</loc></url>
+<url><loc>/reference/martServiceStatus.html</loc></url>
 <url><loc>/reference/mesa-package.html</loc></url>
 <url><loc>/reference/mesaDimRed-class.html</loc></url>
 <url><loc>/reference/mesaPCA-class.html</loc></url>
@@ -123,7 +125,6 @@
 <url><loc>/reference/summariseAcrossWindows.html</loc></url>
 <url><loc>/reference/summariseDMRsByContrast.html</loc></url>
 <url><loc>/reference/summariseDMRsByGene.html</loc></url>
-<url><loc>/reference/testPlotGeneHeatmap.html</loc></url>
 <url><loc>/reference/writeBigWigs.html</loc></url>
 <url><loc>/reference/writeDMRsToBed.html</loc></url>
 <url><loc>/reference/writeDMRsToExcel.html</loc></url>
