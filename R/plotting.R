@@ -792,6 +792,10 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' aggregated by `group` prior to plotting. Column annotations can be added via
 #' `sampleAnnotation`; colours can be customized via `annotationColors`.
 #'
+#' The mart's BioMart service is probed first, and the function stops if it
+#' does not answer within `getOption("mesa_ensemblTimeout", 5)` seconds. A mart
+#' with its own `http_config` is not probed.
+#'
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
 #' **ComplexHeatmap** object (e.g., a `Heatmap`/`HeatmapList`) for further
@@ -806,19 +810,24 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' data(exampleTumourNormal, package = "mesa")
 #'
 #' # Gene heatmap (beta) with sample annotations (tidyselect bare names),
-#' # columns clustered into 2 groups, custom colours and wider flanks
-#' tryCatch(
-#'     exampleTumourNormal %>%
-#'         plotGeneHeatmap("HOXA9",
-#'             sampleAnnotation = c(tumour, tissue),
-#'             clusterNum = 2,
-#'             annotationColors = list(
-#'                 tumour = c(Tumour = "firebrick4", Normal = "blue")
-#'             ),
-#'             upstreamDist = 1000,
-#'             downstreamDist = 2000),
-#'     error = function(e) message("Ensembl unavailable: ", conditionMessage(e))
-#' )
+#' # columns clustered into 2 groups, custom colours and wider flanks.
+#' # (ensemblReachable() skips the example when Ensembl does not answer.)
+#' if (mesa:::ensemblReachable("jul2022.archive.ensembl.org")) {
+#'     tryCatch(
+#'         exampleTumourNormal %>%
+#'             plotGeneHeatmap("HOXA9",
+#'                 sampleAnnotation = c(tumour, tissue),
+#'                 clusterNum = 2,
+#'                 annotationColors = list(
+#'                     tumour = c(Tumour = "firebrick4", Normal = "blue")
+#'                 ),
+#'                 upstreamDist = 1000,
+#'                 downstreamDist = 2000),
+#'         error = function(e) {
+#'             message("Ensembl unavailable: ", conditionMessage(e))
+#'         }
+#'     )
+#' }
 #'
 #' @export
 plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
@@ -843,20 +852,35 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
     if (is.null(mart)) { mart <- getMart(qseaSet) }
 
     .genome <- qsea::getParameters(qseaSet)[["BSgenome"]]
+    # Probe the mart first: a hung archive stalls every useMart()/getBM() retry
+    host <- NULL
     if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
         stringr::str_detect(.genome, "hg38|GRCh38")) {
-        mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
-            host = "https://jul2022.archive.ensembl.org")
+        host <- "https://jul2022.archive.ensembl.org"
     } else if (is.null(mart) &
         stringr::str_detect(.genome, "Hsapiens") &
         stringr::str_detect(.genome, "hg19|GRCh37")) {
-        mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
-            host = "https://feb2014.archive.ensembl.org")
+        host <- "https://feb2014.archive.ensembl.org"
     } else if (is.null(mart)) {
         stop("Please specify a mart object for biomaRt, matching the genome (",
             .genome, "), e.g. biomaRt::useMart(\"ensembl\", dataset = ",
             "\"mmusculus_gene_ensembl\", host = <archive for your build>).")
+    }
+
+    timeout <- getOption("mesa_ensemblTimeout", 5)
+    probeHost <- if (is.null(host)) mart@host else host
+    # http_config (proxy, certificates) is not reproducible by the probe
+    customConfig <- is.null(host) && length(mart@http_config) > 0
+    if (!customConfig && !ensemblReachable(probeHost, timeout)) {
+        stop("The Ensembl BioMart at ", probeHost, " did not answer within ",
+            timeout, " s. Set a longer wait with ",
+            "options(mesa_ensemblTimeout = ...) or supply a mart object ",
+            "via the `mart` argument.")
+    }
+    if (!is.null(host)) {
+        mart <- safeUseMart('ensembl', dataset = 'hsapiens_gene_ensembl',
+            host = host)
     }
 
     # If all useMart retries failed, stop with an informative message
@@ -1782,40 +1806,53 @@ getAnnotation <- function(
 }
 
 
-#' Test wrapper for \code{plotGeneHeatmap} that skips on network errors
+#' Check that an Ensembl BioMart service answers
 #'
-#' Calls \code{plotGeneHeatmap(...)} inside \code{tryCatch}. If a likely
-#' BiomaRt/network error occurs, the test is skipped instead of failing.
+#' Requests the registry of an Ensembl BioMart service and gives up after
+#' `timeout` seconds. An archive can answer at `/` while its service hangs, so
+#' the service itself is probed.
 #'
-#' @param ... Arguments passed to \code{plotGeneHeatmap()}.
+#' @param host `character(1)`.
+#'   Ensembl host, with or without the `https://` scheme.
 #'
-#' @details Errors are matched case-insensitively against patterns such as
-#'   "biomart", "SSL", "connection", "timeout", "could not resolve",
-#'   "unexpected eof", and "http 500". On a match, the test is skipped via
-#'   \code{testthat::skip()}.
+#' @param timeout `numeric(1)`.
+#'   Seconds to wait, rounded up. Must be positive.
+#'   **Default:** `5`.
 #'
-#' @return Invisibly returns \code{TRUE} when the plot call succeeds and the
-#'   test is marked as succeeded. Otherwise, rethrows non-network errors.
+#' @return `TRUE` if the service answers with a status below 400, else `FALSE`.
 #'
-#' @seealso \code{\link{plotGeneHeatmap}}
+#' @seealso [plotGeneHeatmap()]
 #'
 #' @keywords internal
-testPlotGeneHeatmap <- function(...) {
-    tryCatch({
-        plotGeneHeatmap(...)
-        testthat::succeed()
-    }, error = function(e) {
-        if (stringr::str_detect(
-            e$message,
-            paste0(
-                "(?i)biomart|SSL|connection|timeout|could not resolve|",
-                "unexpected eof|http [45][0-9][0-9]|service unavailable|",
-                "req_perform"
-            )
-        )) {
-            testthat::skip("Connection to biomart failed, skipping test.")
-        } else {
-            stop(e)
-        }
-    })
+ensemblReachable <- function(host, timeout = 5) {
+    if (!is.numeric(timeout) || length(timeout) != 1 || is.na(timeout) ||
+        timeout <= 0) {
+        stop("`timeout` must be a single positive number of seconds.")
+    }
+    # curlGetHeaders() reads 0 as its 60 s default
+    timeout <- ceiling(timeout)
+    if (!grepl("^https?://", host)) {
+        host <- paste0("https://", host)
+    }
+    # a Mart's host already ends in the service path
+    host <- sub("^(https?://[^/]+).*$", "\\1", host)
+    url <- paste0(host, "/biomart/martservice?type=registry")
+    status <- tryCatch(martServiceStatus(url, timeout),
+        error = function(e) NA_integer_)
+    isTRUE(status < 400)
+}
+
+#' HTTP status of a URL, with a timeout
+#'
+#' Wraps [curlGetHeaders()] so that tests can replace the network call.
+#'
+#' @param url `character(1)`. URL to request.
+#'
+#' @param timeout `numeric(1)`. Seconds to wait.
+#'
+#' @return `integer(1)`. The HTTP status; a timeout is an error.
+#'
+#' @keywords internal
+martServiceStatus <- function(url, timeout) {
+    attr(curlGetHeaders(url, timeout = as.integer(timeout)), "status")
 }

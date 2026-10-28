@@ -27,6 +27,11 @@
   second pair, so `addLibraryInformation()` and `getSampleQCSummary()` work on
   the result.
   ([#152](https://github.com/cruk-mi/mesa/issues/152), [PR #181](https://github.com/cruk-mi/mesa/pull/181))
+- `plotGeneHeatmap()` now stops with an error when the Ensembl BioMart does
+  not answer within `getOption("mesa_ensemblTimeout", 5)` seconds, instead of
+  retrying `biomaRt` through three connection timeouts. A mart with its own
+  `http_config` is not probed.
+  ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
@@ -83,6 +88,11 @@
   characters, contains a tab or is indented by a number of spaces that is not
   a multiple of 4.
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))
+- The `plotGeneHeatmap()` example and the live mouse test now run only when
+  Ensembl answers, so `R CMD check` no longer waits on a hung archive.
+  ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
+- The CI `R CMD check` step now stops after 40 minutes.
+  ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 # mesa 0.99.8
 

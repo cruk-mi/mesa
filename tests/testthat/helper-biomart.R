@@ -15,6 +15,11 @@
 
 localMockBiomart <- function(env = parent.frame()) {
     genes <- .cachedBiomartGenes()
+    # plotGeneHeatmap() probes the default archive before connecting (#183)
+    testthat::local_mocked_bindings(
+        ensemblReachable = function(host, ...) TRUE,
+        .env = env
+    )
     testthat::local_mocked_bindings(
         useMart = function(biomart, dataset, host, ...) {
             methods::new("Mart", biomart = biomart, dataset = dataset,
@@ -32,4 +37,26 @@ localMockBiomart <- function(env = parent.frame()) {
         .package = "biomaRt",
         .env = env
     )
+}
+
+# Runs plotGeneHeatmap() against live Ensembl and skips, rather than fails, on
+# a likely network or BioMart error. Used by the live test in test-mouse.R.
+testPlotGeneHeatmap <- function(...) {
+    tryCatch({
+        plotGeneHeatmap(...)
+        testthat::succeed()
+    }, error = function(e) {
+        if (stringr::str_detect(
+            e$message,
+            paste0(
+                "(?i)biomart|SSL|connection|timeout|could not resolve|",
+                "unexpected eof|http [45][0-9][0-9]|service unavailable|",
+                "req_perform"
+            )
+        )) {
+            testthat::skip("Connection to biomart failed, skipping test.")
+        } else {
+            stop(e)
+        }
+    })
 }

@@ -1,0 +1,180 @@
+test_that("ensemblReachable() is TRUE when the BioMart service answers", {
+
+    local_mocked_bindings(martServiceStatus = function(url, timeout) 200L)
+
+    expect_true(ensemblReachable("jul2022.archive.ensembl.org"))
+})
+
+test_that("ensemblReachable() is FALSE on an HTTP error or a timeout", {
+
+    local_mocked_bindings(martServiceStatus = function(url, timeout) 500L)
+    expect_false(ensemblReachable("jul2022.archive.ensembl.org"))
+
+    # a timeout is an error from curlGetHeaders()
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        stop("libcurl error code 28:\n\tOperation timed out")
+    })
+    expect_false(ensemblReachable("jul2022.archive.ensembl.org"))
+})
+
+test_that("ensemblReachable() probes the BioMart service, not the site root", {
+
+    seen <- NULL
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        seen <<- list(url = url, timeout = timeout)
+        200L
+    })
+
+    # the jul2023 root answered while its BioMart service hung (#183)
+    service <- "/biomart/martservice?type=registry"
+    ensemblReachable("jul2023.archive.ensembl.org", timeout = 2)
+    expect_equal(seen$url,
+        paste0("https://jul2023.archive.ensembl.org", service))
+    expect_equal(seen$timeout, 2)
+
+    ensemblReachable("https://jul2022.archive.ensembl.org")
+    expect_equal(seen$url,
+        paste0("https://jul2022.archive.ensembl.org", service))
+    expect_equal(seen$timeout, 5)
+})
+
+test_that("ensemblReachable() returns FALSE at once when the probe errors", {
+
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        stop("Connection timed out")
+    })
+
+    elapsed <- system.time(reachable <- ensemblReachable("10.255.255.1"))
+    expect_false(reachable)
+    expect_lt(elapsed[["elapsed"]], 1)
+})
+
+test_that("ensemblReachable() rounds the timeout up to whole seconds", {
+
+    # 0 means a 60 s default to curlGetHeaders()
+    sent <- NULL
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        sent <<- timeout
+        200L
+    })
+
+    ensemblReachable("jul2022.archive.ensembl.org", timeout = 0.5)
+    expect_equal(sent, 1)
+
+    ensemblReachable("jul2022.archive.ensembl.org", timeout = 2.2)
+    expect_equal(sent, 3)
+})
+
+test_that("ensemblReachable() rejects a timeout that is not positive", {
+
+    local_mocked_bindings(martServiceStatus = function(url, timeout) 200L)
+
+    for (bad in list(0, -1, NA_real_, "5", c(1, 2))) {
+        expect_error(
+            ensemblReachable("jul2022.archive.ensembl.org", timeout = bad),
+            "positive number"
+        )
+    }
+})
+
+test_that("plotGeneHeatmap() fails fast when the default archive hangs", {
+
+    # purrr::possibly() swallows errors from useMart(), so record the call
+    called <- FALSE
+    local_mocked_bindings(ensemblReachable = function(host, ...) FALSE)
+    local_mocked_bindings(
+        useMart = function(...) {
+            called <<- TRUE
+            stop("useMart() must not be called")
+        },
+        .package = "biomaRt"
+    )
+
+    expect_error(
+        plotGeneHeatmap(exampleTumourNormal, gene = "HOXA9"),
+        "did not answer within 5 s"
+    )
+    expect_false(called)
+})
+
+test_that("plotGeneHeatmap() waits for mesa_ensemblTimeout seconds", {
+
+    oldOptions <- options(mesa_ensemblTimeout = 12)
+    on.exit(options(oldOptions), add = TRUE)
+
+    waited <- NULL
+    local_mocked_bindings(ensemblReachable = function(host, timeout) {
+        waited <<- timeout
+        FALSE
+    })
+
+    expect_error(
+        plotGeneHeatmap(exampleTumourNormal, gene = "HOXA9"),
+        "did not answer within 12 s"
+    )
+    expect_equal(waited, 12)
+})
+
+test_that("ensemblReachable() probes a mart's host without doubling the path", {
+
+    seen <- NULL
+    local_mocked_bindings(martServiceStatus = function(url, timeout) {
+        seen <<- url
+        200L
+    })
+
+    # Mart@host already ends in the BioMart service path
+    ensemblReachable("https://x.org:443/biomart/martservice")
+    expect_equal(seen, "https://x.org:443/biomart/martservice?type=registry")
+})
+
+test_that("plotGeneHeatmap() probes an explicit mart before getBM()", {
+
+    martHost <- "https://jul2023.archive.ensembl.org:443/biomart/martservice"
+    explicitMart <- methods::new("Mart", biomart = "ensembl",
+        dataset = "mmusculus_gene_ensembl", host = martHost)
+
+    # purrr::possibly() swallows errors from getBM(), so record the call
+    probed <- NULL
+    queried <- FALSE
+    local_mocked_bindings(ensemblReachable = function(host, timeout) {
+        probed <<- host
+        FALSE
+    })
+    local_mocked_bindings(
+        getBM = function(...) {
+            queried <<- TRUE
+            stop("getBM() must not be called")
+        },
+        .package = "biomaRt"
+    )
+
+    expect_error(
+        plotGeneHeatmap(exampleMouse, gene = "Fbxl18", mart = explicitMart),
+        "did not answer within 5 s"
+    )
+    expect_equal(probed, martHost)
+    expect_false(queried)
+})
+
+test_that("plotGeneHeatmap() does not probe a mart with its own http_config", {
+
+    localMockBiomart()
+
+    # getBM() uses http_config (proxy, certificates); the probe cannot
+    martHost <- "https://jul2023.archive.ensembl.org:443/biomart/martservice"
+    proxyMart <- methods::new("Mart", biomart = "ensembl",
+        dataset = "mmusculus_gene_ensembl", host = martHost,
+        http_config = list(proxy = "http://proxy.invalid"))
+
+    probed <- FALSE
+    local_mocked_bindings(ensemblReachable = function(host, timeout) {
+        probed <<- TRUE
+        FALSE
+    })
+
+    expect_no_error(
+        plotGeneHeatmap(exampleMouse, gene = "Fbxl18", mart = proxyMart)
+    )
+    expect_false(probed)
+})

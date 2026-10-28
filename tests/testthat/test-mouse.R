@@ -35,7 +35,8 @@ test_that("plotGeneHeatmap() prefers an explicit mart to the stored one", {
 test_that("Mouse plotting against live Ensembl", {
 
     skip_on_cran()
-    skip_if_offline("jul2023.archive.ensembl.org")
+    skip_if_not(ensemblReachable("jul2023.archive.ensembl.org"),
+        "Could not reach Ensembl.")
 
     # exampleMouse stores no Mart, so pass a live one
     liveMart <- tryCatch(
