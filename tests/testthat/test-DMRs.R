@@ -28,12 +28,12 @@ test_that("Calculating DMRs", {
     setMesaTxDb(NULL)
     setMesaAnnoDb(NULL)
     skip_if_not_installed("org.Hs.eg.db") # skip if org.Hs.eg.db not installed
-    expect_error(annotatedData <- DMRdata %>% annotateWindows()) # expect error if no local or global genome specified
-    expect_no_error(annotatedData <- DMRdata %>% annotateWindows(genome = "hg38")) # expect no error if genome set
-
-    expect_error(annotatedData <- DMRdata %>% annotateWindows()) # expect error if no local or global genome specified
-    expect_no_error(annotatedData <- DMRdata %>% annotateWindows(genome = "hg38")) # expect no error if genome set
-
+    # error if no local or global genome is specified
+    expect_error(annotateWindows(DMRdata))
+    # no error if the genome is set
+    expect_no_error(
+        annotatedData <- annotateWindows(DMRdata, genome = "hg38")
+    )
 
     expect_true(annotatedData %>% tibble::has_name(c("SYMBOL", "annotation", "geneId", "geneChr")) %>% all())
 
