@@ -57,6 +57,8 @@
   `makeQset()` test still read the MEDIPSData BAMs, and the live-Ensembl mouse
   test only runs when `MESA_LIVE_ENSEMBL` is set. The `calculateCGEnrichment()`
   test now pins `relH` and `GoGe` to a relative tolerance of 1e-6 instead of 5.
+  The UMAP tests no longer run `gc()` inside `uwot::umap()`, which cut
+  `test-pca.R` from about 20 s to 2 s.
   ([#189](https://github.com/cruk-mi/mesa/issues/189), [PR #192](https://github.com/cruk-mi/mesa/pull/192))
 - The `makeQset()` and `calculateCGEnrichment()` tests now run by default, so
   every test runs under `R CMD check`; the option and helper that switched
