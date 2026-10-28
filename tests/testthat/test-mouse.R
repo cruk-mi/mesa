@@ -35,6 +35,9 @@ test_that("plotGeneHeatmap() prefers an explicit mart to the stored one", {
 test_that("Mouse plotting against live Ensembl", {
 
     skip_on_cran()
+    # The probe and the connection cost about 5 s, so this is opt-in
+    skip_if(Sys.getenv("MESA_LIVE_ENSEMBL") == "",
+        "Set MESA_LIVE_ENSEMBL=1 to test against live Ensembl.")
     skip_if_not(ensemblReachable("jul2023.archive.ensembl.org"),
         "Could not reach Ensembl.")
 

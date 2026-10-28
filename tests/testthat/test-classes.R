@@ -314,6 +314,10 @@ test_that("getPCA() accessors agree with the PCA it ran", {
 })
 
 test_that("getPCA() and getUMAP() output passes validObject()", {
+    # uwot calls gc() four times per fit, about 0.35 s each with mesa loaded
+    local_mocked_bindings(
+        gc = function(...) invisible(NULL), .package = "base"
+    )
     qs <- cachedExampleQset()
     expect_true(validObject(getPCA(qs, normMethod = "nrpm", verbose = FALSE)))
     expect_identical(

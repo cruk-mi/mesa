@@ -1,3 +1,104 @@
+# The option tests run on synthetic yeast reads (helper-bams.R), which build in
+# a few seconds. Two blocks then build from the real MEDIPSData reads, one per
+# chromosome naming convention (UCSC and NCBI) and per human BSgenome.
+
+# Yeast CpGs are denser than human ones, so the default maxPatternDensity
+# leaves no windows to estimate the background from.
+makeYeastQset <- function(
+    sampleTable = yeastSampleTable(), CNVmethod = "None", ...
+) {
+    suppressMessages(
+        makeQset(
+            sampleTable,
+            BSgenome = "BSgenome.Scerevisiae.UCSC.sacCer3",
+            chrSelect = "chrI",
+            windowSize = 300,
+            fragmentType = "Sheared",
+            CNVmethod = CNVmethod,
+            maxPatternDensity = 100,
+            parallel = FALSE,
+            ...
+        )
+    )
+}
+
+expectYeastQset <- function(testSet) {
+    expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
+    expect_equal(testSet %>% qsea::getChrNames(), "chrI")
+    expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
+    # sacCer3 chrI is 230218 bp long
+    expect_equal(testSet %>% qsea::getRegions() %>% length(), 767)
+    expect_equal(
+        testSet %>% qsea::getCounts() %>% colSums() %>% unname(),
+        testSet %>% qsea::getLibSize()
+    )
+    # every synthetic pair is a proper pair that passes the filters
+    expect_equal(unname(qsea::getLibSize(testSet)), c(5000, 5000))
+
+    expect_true("relH" %in% (
+        testSet %>%
+            addLibraryInformation() %>%
+            qsea::getSampleTable() %>%
+            colnames()
+    ))
+}
+
+test_that("Making a qseaSet from paired reads", {
+
+    skip_if_not_installed("BSgenome.Scerevisiae.UCSC.sacCer3")
+    skip_if_not_installed("Rsamtools")
+
+    testSet <- makeYeastQset(coverageMethod = "PairedAndR1s")
+
+    expectYeastQset(testSet)
+    expect_false(testSet@parameters$properPairsOnly)
+    expect_equal(testSet@parameters$minMapQual, 10)
+})
+
+test_that("Making a qseaSet with qsea coverage method", {
+
+    skip_if_not_installed("BSgenome.Scerevisiae.UCSC.sacCer3")
+    skip_if_not_installed("Rsamtools")
+
+    testSet <- makeYeastQset(coverageMethod = "qseaPaired")
+
+    expectYeastQset(testSet)
+})
+
+test_that("Making a qseaSet proper pairs only", {
+
+    skip_if_not_installed("BSgenome.Scerevisiae.UCSC.sacCer3")
+    skip_if_not_installed("Rsamtools")
+
+    # 200 unpaired reads per file on top of the 5000 proper pairs
+    sampleTable <- yeastSampleTable(nSingles = 200)
+
+    withSingles <- makeYeastQset(sampleTable, coverageMethod = "PairedAndR1s")
+    expect_equal(unname(qsea::getLibSize(withSingles)), c(5200, 5200))
+
+    pairsOnly <- makeYeastQset(
+        sampleTable, coverageMethod = "PairedAndR1s", properPairsOnly = TRUE
+    )
+    expect_equal(unname(qsea::getLibSize(pairsOnly)), c(5000, 5000))
+    expect_true(pairsOnly@parameters$properPairsOnly)
+})
+
+test_that("makeQset() rejects GC and map files of the wrong window size", {
+
+    skip_if_not_installed("BSgenome.Scerevisiae.UCSC.sacCer3")
+    skip_if_not_installed("Rsamtools")
+
+    expect_error(
+        makeYeastQset(
+            CNVmethod = "HMMdefault",
+            CNVwindowSize = 1000000,
+            hmmCopyGC = mesa::gc_hg38_500kb,
+            hmmCopyMap = mesa::map_hg38_500kb
+        ),
+        "window size should be the same as the CNVwindowSize"
+    )
+})
+
 test_that("Making a hg19 qseaSet", {
 
     skip_if_not_installed("MEDIPSData")
@@ -13,9 +114,10 @@ test_that("Making a hg19 qseaSet", {
         group = c("Normal1", "Tumour1"),
         file_name = unname(bamFiles))
 
+    # chr21 is the smallest chromosome in the BAMs, and holds JAM2
     testSet <- makeQset(sampleTable,
         BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-        chrSelect = c("chr21", "chr22"),
+        chrSelect = "chr21",
         windowSize = 300,
         CNVwindowSize = 1000000,
         fragmentType = "Sheared",
@@ -29,14 +131,21 @@ test_that("Making a hg19 qseaSet", {
         properPairsOnly = FALSE,
         parallel = FALSE)
 
+    chr21Length <- GenomeInfoDb::seqlengths(
+        BSgenome::getBSgenome("BSgenome.Hsapiens.UCSC.hg19")
+    )[["chr21"]]
+
     expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
-    expect_equal(testSet %>% qsea::getChrNames() %>% length(), 2)
+    expect_equal(testSet %>% qsea::getChrNames(), "chr21")
     expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
     expect_equal(
         testSet %>% qsea::getCounts() %>% colSums() %>% unname(),
         testSet %>% qsea::getLibSize()
     )
-    expect_equal(testSet %>% qsea::getRegions() %>% length(), 331447)
+    expect_equal(
+        testSet %>% qsea::getRegions() %>% length(),
+        floor(chr21Length / 300)
+    )
 
     expect_true("relH" %in% (
         testSet %>%
@@ -47,58 +156,6 @@ test_that("Making a hg19 qseaSet", {
 
     localMockBiomart()
     plotGeneHeatmap(testSet, "JAM2")
-
-})
-
-test_that("Making a hg19 qseaSet with qsea coverage method", {
-
-    skip_if_not_installed("MEDIPSData")
-    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
-
-    bamFiles <- vapply(c("2N", "2T", "3N", "3T"), function(x) {
-        system.file("extdata",
-            paste0("NSCLC_MeDIP_", x, "_fst_chr_20_21_22.bam"),
-            package = "MEDIPSData", mustWork = TRUE)
-    }, character(1))
-
-    sampleTable <- data.frame(sample_name = c("Test1", "Test2"),
-        group = c("Test1", "Test2"),
-        file_name = unname(bamFiles[c("2N", "2T")]),
-        input_file = unname(bamFiles[c("3N", "3T")]))
-
-    testSet <- makeQset(sampleTable,
-        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-        chrSelect = paste0("chr", 22),
-        windowSize = 300,
-        CNVwindowSize = 1000000,
-        fragmentType = "Sheared",
-        CNVmethod = "None",
-        coverageMethod = "qseaPaired",
-        minMapQual = 10,
-        minInsertSize = 70,
-        maxInsertSize = 1000,
-        minReferenceLength = 30,
-        badRegions = NULL,
-        properPairsOnly = FALSE)
-
-    expect_equal(testSet %>% qsea::getSampleNames() %>% length(), 2)
-    expect_equal(testSet %>% qsea::getChrNames() %>% length(), 1)
-    expect_equal(testSet %>% qsea::getRegions() %>% width() %>% unique(), 300)
-    expect_equal(
-        testSet %>% qsea::getCounts() %>% colSums() %>% unname(),
-        testSet %>% qsea::getLibSize()
-    )
-    expect_equal(testSet %>% qsea::getRegions() %>% length(), 171015)
-
-    expect_true("relH" %in% (
-        testSet %>%
-            addLibraryInformation() %>%
-            qsea::getSampleTable() %>%
-            colnames()
-    ))
-
-    localMockBiomart()
-    plotGeneHeatmap(testSet, "EWSR1")
 
 })
 
@@ -122,7 +179,8 @@ test_that("Making a GRCh38 qseaSet", {
 
     # The BAM also holds chr21 and chr22, which must not reach the CpG
     # enrichment (out-of-bound warnings), and HMMcopy's loess warnings are
-    # muffled, so nothing should warn.
+    # muffled, so nothing should warn. The GC and map files of the right size
+    # (500 kb) must be accepted.
     expect_no_warning(
         GRCh38testSet <- makeQset(sampleTable,
             BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
@@ -136,13 +194,22 @@ test_that("Making a GRCh38 qseaSet", {
             minInsertSize = 70,
             maxInsertSize = 1000,
             minReferenceLength = 30,
+            hmmCopyGC = mesa::gc_hg38_500kb,
+            hmmCopyMap = mesa::map_hg38_500kb,
             badRegions = NULL,
             properPairsOnly = FALSE)
     )
 
+    chr20Length <- GenomeInfoDb::seqlengths(
+        BSgenome::getBSgenome("BSgenome.Hsapiens.NCBI.GRCh38")
+    )[["20"]]
+
     expect_equal(GRCh38testSet %>% getSampleNames() %>% length(), 1)
     expect_equal(GRCh38testSet %>% getChrNames() %>% length(), 1)
-    expect_equal(GRCh38testSet %>% getRegions() %>% length(), 322220)
+    expect_equal(
+        GRCh38testSet %>% getRegions() %>% length(),
+        floor(chr20Length / 200)
+    )
 
     libTable <- getSampleTable(addLibraryInformation(GRCh38testSet))
     expect_true("relH" %in% colnames(libTable))
@@ -153,74 +220,6 @@ test_that("Making a GRCh38 qseaSet", {
     qcSummary <- getSampleQCSummary(GRCh38testSet)
     expect_true("relH" %in% colnames(qcSummary))
     expect_true("valid_fragments" %in% colnames(qcSummary))
-
-    # check error is given if wrong size GC/map files given
-    expect_error(
-        makeQset(sampleTable,
-            BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-            chrSelect = 20,
-            windowSize = 200,
-            CNVwindowSize = 1000000,
-            fragmentType = "cfDNA",
-            CNVmethod = "HMMdefault",
-            coverageMethod = "PairedAndR1s",
-            hmmCopyGC = mesa::gc_hg38_500kb,
-            hmmCopyMap = mesa::map_hg38_500kb,
-            badRegions = NULL),
-        "window size should be the same as the CNVwindowSize"
-    )
-
-    # expect no error if right size GC/map files is given
-    expect_no_error(
-        makeQset(sampleTable,
-            BSgenome = "BSgenome.Hsapiens.NCBI.GRCh38",
-            chrSelect = 20,
-            windowSize = 200,
-            CNVwindowSize = 500000,
-            fragmentType = "cfDNA",
-            CNVmethod = "None",
-            coverageMethod = "PairedAndR1s",
-            hmmCopyGC = mesa::gc_hg38_500kb,
-            hmmCopyMap = mesa::map_hg38_500kb,
-            badRegions = NULL)
-    )
-
-})
-
-test_that("Making a qseaSet proper pairs only", {
-
-    skip_if_not_installed("MEDIPSData")
-    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg19")
-
-    bamFile <- system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
-        package = "MEDIPSData", mustWork = TRUE)
-
-    sampleTable <- data.frame(sample_name = "Test1",
-        group = "Group1",
-        file_name = bamFile,
-        input_file = bamFile)
-
-    testSet <- makeQset(sampleTable,
-        BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-        chrSelect = "chr22",
-        windowSize = 200,
-        CNVwindowSize = 1000000,
-        fragmentType = "cfDNA",
-        CNVmethod = "None",
-        coverageMethod = "PairedAndR1s",
-        minMapQual = 10,
-        minInsertSize = 70,
-        maxInsertSize = 1000,
-        minReferenceLength = 30,
-        badRegions = NULL,
-        properPairsOnly = TRUE)
-
-    expect_equal(testSet %>% getSampleNames() %>% length(), 1)
-    expect_equal(testSet %>% getChrNames(), "chr22")
-    expect_equal(testSet %>% getRegions() %>% length(), 256522)
-
-    libTable <- getSampleTable(addLibraryInformation(testSet))
-    expect_true("relH" %in% colnames(libTable))
 
 })
 
@@ -248,11 +247,10 @@ test_that("calculateCGEnrichment works", {
     # paired reads on chr22 of the BAM above.
     expect_equal(enr$nReads, 636130)
 
-    # TODO: tolerance is relative, so tolerance = 5 passes for relH anywhere
-    # from ~0.5 to ~5 against an expected 3.35. These catch gross breakage
-    # only. Tighten when the values can be
-    # measured against the Rsamtools implementation.
-    expect_equal(enr$relH, 3.353462, tolerance = 5)
-    expect_equal(enr$GoGe, 1.631612, tolerance = 5)
+    # relH and GoGe are pinned to the same MEDIPS-era values as nReads. The
+    # Rsamtools implementation reproduces them to 6 significant digits
+    # (3.35346222 and 1.63161162), so a relative tolerance of 1e-6 holds.
+    expect_equal(enr$relH, 3.353462, tolerance = 1e-6)
+    expect_equal(enr$GoGe, 1.631612, tolerance = 1e-6)
 
 })
