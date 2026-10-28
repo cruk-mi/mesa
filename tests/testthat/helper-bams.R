@@ -25,7 +25,8 @@ writeYeastPairs <- function(
     singleIdx <- seq_len(nSingles)
     singleStart <- 1L + (singleIdx * 104729L + offset) %% (chrLen - 400L)
     singleRecs <- paste(paste0("single", singleIdx), 0, "chrI", singleStart,
-        60, "50M", "*", 0, 0, strrep("A", 50), strrep("I", 50), sep = "\t")
+        60, "50M", "*", 0, 0, strrep("A", 50), strrep("I", 50), sep = "\t",
+        recycle0 = TRUE)
 
     recs <- c(
         pairRec(99, start1, start2, insert),
