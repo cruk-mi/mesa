@@ -131,7 +131,8 @@ aggregated by \code{group} prior to plotting. Column annotations can be added vi
 The BioMart service of the mart, whether the default human archive, the one
 stored on the object or one passed as \code{mart}, is probed first. The function
 stops if it does not answer within \code{getOption("mesa_ensemblTimeout", 5)}
-seconds. On a slow connection, set a larger value.
+seconds. On a slow connection, set a larger value. A mart that sets its own
+\code{http_config} is not probed.
 }
 \examples{
 data(exampleTumourNormal, package = "mesa")

@@ -31,7 +31,7 @@
   `getOption("mesa_ensemblTimeout", 5)` seconds before it queries it, for the
   default hg38 or hg19 archive and for a stored or explicit `mart`. It stops
   with an error instead of retrying `biomaRt` through three connection
-  timeouts.
+  timeouts. A mart that sets its own `http_config` is not probed.
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 
 ## Documentation

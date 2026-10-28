@@ -795,7 +795,8 @@ makeHeatmapAnnotations <- function(qseaSet,
 #' The BioMart service of the mart, whether the default human archive, the one
 #' stored on the object or one passed as `mart`, is probed first. The function
 #' stops if it does not answer within `getOption("mesa_ensemblTimeout", 5)`
-#' seconds. On a slow connection, set a larger value.
+#' seconds. On a slow connection, set a larger value. A mart that sets its own
+#' `http_config` is not probed.
 #'
 #' @return
 #' Draws a heatmap on the active device and (invisibly) returns the underlying
@@ -873,7 +874,10 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     timeout <- getOption("mesa_ensemblTimeout", 5)
     probeHost <- if (is.null(host)) mart@host else host
-    if (!ensemblReachable(probeHost, timeout)) {
+    # a mart with its own http_config (proxy, certificates) reaches Ensembl in
+    # ways curlGetHeaders() cannot reproduce, so trust it rather than probe it
+    customConfig <- is.null(host) && length(mart@http_config) > 0
+    if (!customConfig && !ensemblReachable(probeHost, timeout)) {
         stop("The Ensembl BioMart at ", probeHost, " did not answer within ",
             timeout, " s. Set a longer wait with ",
             "options(mesa_ensemblTimeout = ...) or supply a mart object ",

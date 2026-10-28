@@ -156,3 +156,26 @@ test_that("plotGeneHeatmap() probes an explicit mart before getBM()", {
     expect_equal(probed, martHost)
     expect_false(queried)
 })
+
+test_that("plotGeneHeatmap() does not probe a mart with its own http_config", {
+
+    localMockBiomart()
+
+    # a proxy or certificate set through http_config is used by getBM() but not
+    # by the libcurl probe, which would wrongly report the mart as unreachable
+    martHost <- "https://jul2023.archive.ensembl.org:443/biomart/martservice"
+    proxyMart <- methods::new("Mart", biomart = "ensembl",
+        dataset = "mmusculus_gene_ensembl", host = martHost,
+        http_config = list(proxy = "http://proxy.invalid"))
+
+    probed <- FALSE
+    local_mocked_bindings(ensemblReachable = function(host, timeout) {
+        probed <<- TRUE
+        FALSE
+    })
+
+    expect_no_error(
+        plotGeneHeatmap(exampleMouse, gene = "Fbxl18", mart = proxyMart)
+    )
+    expect_false(probed)
+})
