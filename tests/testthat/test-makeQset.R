@@ -242,11 +242,10 @@ test_that("calculateCGEnrichment works", {
     # paired reads on chr22 of the BAM above.
     expect_equal(enr$nReads, 636130)
 
-    # TODO: tolerance is relative, so tolerance = 5 passes for relH anywhere
-    # from ~0.5 to ~5 against an expected 3.35. These catch gross breakage
-    # only. Tighten when the values can be
-    # measured against the Rsamtools implementation.
-    expect_equal(enr$relH, 3.353462, tolerance = 5)
-    expect_equal(enr$GoGe, 1.631612, tolerance = 5)
+    # relH and GoGe are pinned to the same MEDIPS-era values as nReads. The
+    # Rsamtools implementation reproduces them to 6 significant digits
+    # (3.35346222 and 1.63161162), so a relative tolerance of 1e-6 holds.
+    expect_equal(enr$relH, 3.353462, tolerance = 1e-6)
+    expect_equal(enr$GoGe, 1.631612, tolerance = 1e-6)
 
 })
