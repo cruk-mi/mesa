@@ -52,15 +52,30 @@ test_that("subsetWindowsOverBackground() splits windows by background", {
         out
     }
     nWindows <- length(qsea::getRegions(exampleTumourNormal))
+    nKept <- function(...) length(qsea::getRegions(removeWindows(...)))
+    # numWindows sets the background rate: with the 819 windows of the example
+    # every window is below background, so assume a genome of 1e6 windows
+    samples <- c("Colon1_T", "Colon2_T", "Lung1_T")
 
-    above <- removeWindows(keepAbove = TRUE, FDRthres = 0.5)
-    below <- removeWindows(keepAbove = FALSE, FDRthres = 0.5)
+    above <- removeWindows(
+        keepAbove = TRUE, samples = samples, numWindows = 1e6
+    )
+    below <- removeWindows(
+        keepAbove = FALSE, samples = samples, numWindows = 1e6
+    )
 
     expect_s4_class(above, "qseaSet")
-    expect_equal(
-        length(qsea::getRegions(above)) + length(qsea::getRegions(below)),
-        nWindows
-    )
+    expect_equal(length(qsea::getRegions(above)), 121)
+    expect_equal(length(qsea::getRegions(below)), nWindows - 121)
+    # more samples above background, a stricter FDR or a smaller genome keep
+    # fewer windows
+    kept <- function(...) {
+        nKept(keepAbove = TRUE, samples = samples, ...)
+    }
+    expect_equal(kept(numWindows = 1e6, numAbove = 2), 75)
+    expect_equal(kept(numWindows = 1e6, numAbove = 3), 36)
+    expect_equal(kept(numWindows = 1e6, FDRthres = 1e-10), 71)
+    expect_equal(kept(numWindows = 1e5), 16)
     expect_equal(
         qsea::getSampleNames(above), qsea::getSampleNames(exampleTumourNormal)
     )
@@ -71,10 +86,6 @@ test_that("subsetWindowsOverBackground() splits windows by background", {
             exampleTumourNormal, samples = "_T$", FDRthres = 0.5
         )),
         "Filtering out 5 samples containing _T\\$ in the name."
-    )
-    expect_length(
-        qsea::getRegions(removeWindows(samples = "Colon1_T", numAbove = 1)),
-        length(qsea::getRegions(removeWindows(samples = "Colon1_T")))
     )
     expect_error(
         subsetWindowsOverBackground(
