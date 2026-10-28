@@ -61,7 +61,7 @@
   `getGenomicFeatureDistribution()`, `plotGenomicFeatureDistribution()`,
   `plotDMRUpset()`, and the shape and colour scales and error checks of
   `getPCA()` and `plotDimRed()`.
-  ([#193](https://github.com/cruk-mi/mesa/issues/193))
+  ([#193](https://github.com/cruk-mi/mesa/issues/193), [PR #194](https://github.com/cruk-mi/mesa/pull/194))
 - The test suite runs in about 145 s instead of 260 s: the `makeQset()` option
   tests build on small synthetic yeast BAMs, only one hg19 and one GRCh38
   `makeQset()` test still read the MEDIPSData BAMs, and the live-Ensembl mouse
