@@ -52,6 +52,12 @@
   ([#180](https://github.com/cruk-mi/mesa/issues/180), [#153](https://github.com/cruk-mi/mesa/issues/153), [PR #182](https://github.com/cruk-mi/mesa/pull/182))
 
 ## Testing
+- The test suite runs in about 145 s instead of 260 s: the `makeQset()` option
+  tests build on small synthetic yeast BAMs, only one hg19 and one GRCh38 test
+  still read the MEDIPSData BAMs, and the live-Ensembl mouse test only runs when
+  `MESA_LIVE_ENSEMBL` is set. The `calculateCGEnrichment()` test now pins `relH`
+  and `GoGe` to a relative tolerance of 1e-6 instead of 5.
+  ([#189](https://github.com/cruk-mi/mesa/issues/189))
 - The `makeQset()` and `calculateCGEnrichment()` tests now run by default, so
   every test runs under `R CMD check`; the option and helper that switched
   slow tests off are gone. The hg19 test uses chr21 and chr22 to stay fast.

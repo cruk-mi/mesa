@@ -35,6 +35,16 @@ off (retired in #121). A test that is slow gets faster instead: subset `chrSelec
 use bigger windows, or reuse a cached fixture. Time new tests; the whole suite counts
 against Bioconductor's build limit.
 
+Test `makeQset()` options on the synthetic yeast reads from
+`tests/testthat/helper-bams.R` (`yeastSampleTable()`, built once per run, about 2 s per
+`makeQset()` call) and keep real MEDIPSData builds, at about 15 s each, for one
+integration test per genome. Yeast needs `maxPatternDensity = 100`, because its CpGs are
+denser than human ones. Most of a slow `annotateWindows()` is the first-call TxDb load
+(about 30 s for hg38), so subsetting windows doesn't help.
+
+The one test that talks to live Ensembl (`test-mouse.R`) skips unless
+`MESA_LIVE_ENSEMBL` is set to a non-empty value.
+
 `DESCRIPTION` has `Config/testthat/start-first: readFragments`, so `test-readFragments.R`
 runs before every other file. The #81 checks there skip when GenomicRanges is already
 attached, so they only mean something while no earlier file attaches it. Don't attach it
