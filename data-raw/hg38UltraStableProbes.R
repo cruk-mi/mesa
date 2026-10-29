@@ -1,11 +1,28 @@
 ## code to prepare `ultraStableGR` dataset goes here
 
-hyperStableCpGs <- read_tsv("/data/cep/Methylation/refData/Edgar2014_HyperStable_CpGs.txt",
+## Ultra-stable CpGs: Additional file 2 of Edgar et al. 2014, Epigenetics &
+## Chromatin 7:28 (doi:10.1186/1756-8935-7-28), and the InfiniumAnnotation hm450
+## hg38 manifest (Zhou, Laird and Shen 2017, doi:10.1093/nar/gkw967), the
+## archived 202209 release, because the current one has renamed probeID to
+## Probe_ID. Both downloaded on 2026-10-29.
+
+edgarUrl <- paste0("https://static-content.springer.com/esm/",
+    "art%3A10.1186%2F1756-8935-7-28/MediaObjects/",
+    "13072_2014_333_MOESM2_ESM.txt")
+edgarPath <- tempfile(fileext = ".txt")
+download.file(edgarUrl, edgarPath, mode = "wb")
+
+manifestUrl <- paste0("https://github.com/zhou-lab/InfiniumAnnotationV1/raw/",
+    "main/Anno/HM450/archive/202209/HM450.hg38.manifest.tsv.gz")
+manifestPath <- tempfile(fileext = ".tsv.gz")
+download.file(manifestUrl, manifestPath, mode = "wb")
+
+hyperStableCpGs <- read_tsv(edgarPath,
                             col_types = cols(Chromosome_37 = "c"))
 
 # Read in the hg38 information for the 450k microarrays, which includes remapped positions
 # Make into a GRanges object with just the 2bp of the CpG island.
-hg38MethyProbePositionsStable <- read_tsv("/data/cep/Methylation/refData/hm450.hg38.manifest.tsv") %>%
+hg38MethyProbePositionsStable <- read_tsv(manifestPath) %>%
   mutate(CpG_chrm = str_remove(CpG_chrm,"chr")) %>%
   dplyr::filter(CpG_chrm %in% 1:22) %>%
   dplyr::select(c("CpG_chrm","CpG_beg","CpG_end","probeID")) %>%
