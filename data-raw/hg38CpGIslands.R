@@ -4,6 +4,11 @@
 ## The table has a bin column first and writes the name as "CpG: n". Drop the
 ## bin, close up the name, remove "chr" and sort by chromosome then start (as
 ## bedtools sort did when this was first built from the same table).
+## Originally built from the CRUK internal file
+## /data/cep/Methylation/refData/cpgIslandExt.hg38.noChr.bed.
+## Re-run 2026-10-29: the same as the shipped object, except that UCSC has since
+## added 894 islands on 91 patch contigs, and the shipped object keeps the
+## `name` column that is dropped below.
 
 url <- paste0("https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/",
     "cpgIslandExt.txt.gz")

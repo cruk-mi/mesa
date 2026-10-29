@@ -4,9 +4,15 @@
 ## doi:10.1093/nar/gkw967), the InfiniumAnnotation hm450 hg38 manifest,
 ## downloaded on 2026-10-29. This is the archived 202209 release: the current
 ## manifest has renamed probeID to Probe_ID and dropped the MASK_general column.
+## Originally built from the CRUK internal file
+## /data/cep/Methylation/refData/hm450.hg38.manifest.tsv.
+## Re-run 2026-10-29: the same data as the shipped object (identical() is
+## FALSE only because of the Seqinfo class attribute, which varies with the
+## Bioconductor version).
 
-url <- paste0("https://github.com/zhou-lab/InfiniumAnnotationV1/raw/main/",
-    "Anno/HM450/archive/202209/HM450.hg38.manifest.tsv.gz")
+url <- paste0("https://github.com/zhou-lab/InfiniumAnnotationV1/raw/",
+    "78c0c5d23ca6863c4ab26f5e80f31c0e5d05743f/Anno/HM450/archive/202209/",
+    "HM450.hg38.manifest.tsv.gz")
 manifest <- tempfile(fileext = ".tsv.gz")
 download.file(url, manifest, mode = "wb")
 

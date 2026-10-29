@@ -5,6 +5,12 @@
 ## hg38 manifest (Zhou, Laird and Shen 2017, doi:10.1093/nar/gkw967), the
 ## archived 202209 release, because the current one has renamed probeID to
 ## Probe_ID. Both downloaded on 2026-10-29.
+## Originally built from the CRUK internal files
+## /data/cep/Methylation/refData/Edgar2014_HyperStable_CpGs.txt and
+## /data/cep/Methylation/refData/hm450.hg38.manifest.tsv.
+## Re-run 2026-10-29: the same data as the shipped object (identical() is
+## FALSE only because of the Seqinfo class attribute, which varies with the
+## Bioconductor version).
 
 edgarUrl <- paste0("https://static-content.springer.com/esm/",
     "art%3A10.1186%2F1756-8935-7-28/MediaObjects/",
@@ -13,7 +19,8 @@ edgarPath <- tempfile(fileext = ".txt")
 download.file(edgarUrl, edgarPath, mode = "wb")
 
 manifestUrl <- paste0("https://github.com/zhou-lab/InfiniumAnnotationV1/raw/",
-    "main/Anno/HM450/archive/202209/HM450.hg38.manifest.tsv.gz")
+    "78c0c5d23ca6863c4ab26f5e80f31c0e5d05743f/Anno/HM450/archive/202209/",
+    "HM450.hg38.manifest.tsv.gz")
 manifestPath <- tempfile(fileext = ".tsv.gz")
 download.file(manifestUrl, manifestPath, mode = "wb")
 
