@@ -213,10 +213,11 @@ test_that("plotDMRUpset() plots overlaps between contrasts", {
 
 test_that("plotDMRUpset() stops without UpSetR or with one contrast", {
 
+    skip_if_not_installed("UpSetR")
+
     dmrs <- tibble::tibble(
         A_vs_B_adjPval = c(0.001, 0.01), A_vs_C_adjPval = c(0.5, 0.01)
     )
-    skip_if_not_installed("UpSetR")
     expect_error(
         plotDMRUpset(dmrs, string = "A_vs_B"),
         "Only 1 column remaining, nothing to plot!"
