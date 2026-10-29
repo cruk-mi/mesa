@@ -1,5 +1,20 @@
 ## code to prepare `tumourPairs` dataset goes here
-exampleTumourNormal <- read_rds("/data/cep/Methylation/pipelineOutput/M022/qseaSets/M022_All_min50_max1000_w300_q10.rds") %>%
+
+## Example data for showing the package's functions, not a dataset for
+## analysis. Tumour and normal colon and lung tissue bought from OriGene and
+## processed at CRUK-MI CBC (project M022) into a qseaSet on GRCh38 with
+## makeQset(): insert size 50-1000 bp, 300 bp windows, MAPQ 10. The subset is
+## unpublished and the full qseaSet is internal, so this script cannot be
+## re-run outside CRUK-MI.
+## Originally built from the CRUK internal file
+## /data/cep/Methylation/pipelineOutput/M022/qseaSets/
+## M022_All_min50_max1000_w300_q10.rds.
+## Subset: all of chr22 and the same 5 tumour/normal pairs, with the pooled
+## control dropped.
+
+qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
+
+exampleTumourNormal <- read_rds(qsetFile) %>%
   filterWindows(seqnames == 22, !is.na(CpG_density)) %>%
   filterQset(sample_name %in% c("MR006_T","MR006_N","MR007_T","MR007_N","MR059_T","MR059_N","MR055_N",
                                 "MR060_N","MR060_T","MR062_T","MR062_N")) %>%
