@@ -56,7 +56,7 @@
   `map_hg38_*` tracks) now download their public sources instead of reading
   internal `/data/cep` paths, so anyone can see where the shipped data come
   from. The shipped data are unchanged.
-  ([#95](https://github.com/cruk-mi/mesa/issues/95))
+  ([#95](https://github.com/cruk-mi/mesa/issues/95), [PR #195](https://github.com/cruk-mi/mesa/pull/195))
 
 ## Testing
 - The test suite runs in about 145 s instead of 260 s: the `makeQset()` option
