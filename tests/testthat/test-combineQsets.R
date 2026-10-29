@@ -2,17 +2,15 @@
 # different ways.
 
 allSamples <- exampleTumourNormal
-tumourSamples <- grep("_T$", qsea::getSampleNames(exampleTumourNormal),
-    value = TRUE)
-normalSamples <- grep("_N$", qsea::getSampleNames(exampleTumourNormal),
-    value = TRUE)
 
 tumours <- function() {
-    subsetQset(allSamples, samplesToKeep = tumourSamples)
+    filter(allSamples, tumour == "Tumour")
 }
 normals <- function() {
-    subsetQset(allSamples, samplesToKeep = normalSamples)
+    filter(allSamples, tumour == "Normal")
 }
+
+tumourSamples <- qsea::getSampleNames(tumours())
 
 test_that("combineQsets() renames clashing samples with _Dup", {
 
