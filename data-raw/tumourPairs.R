@@ -9,8 +9,8 @@
 ## Originally built from the CRUK internal file
 ## /data/cep/Methylation/pipelineOutput/M022/qseaSets/
 ## M022_All_min50_max1000_w300_q10.rds.
-## Subset: all of chr22 and the same 5 tumour/normal pairs, with the pooled
-## control dropped.
+## Subset: the chr22 windows that have a CpG density and the same 5
+## tumour/normal pairs, with the pooled control dropped.
 
 qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
 
