@@ -1,11 +1,7 @@
 ## code to prepare `map_hg38_10kb` dataset goes here
 
 ## Mappability of 10 kb bins of GRCh38 (HMMcopy wig format), from the
-## ichorCNA repository (https://github.com/broadinstitute/ichorCNA), the source
-## named in the help page. Downloaded on 2026-10-29.
-## Originally built from the CRUK internal file
-## /data/cep/Methylation/refData/map_hg38_10kb.wig.
-## Re-run 2026-10-29: no shipped object to compare with.
+## ichorCNA repository (https://github.com/broadinstitute/ichorCNA).
 
 url <- paste0("https://github.com/broadinstitute/ichorCNA/raw/",
     "5bfc03ed854f0e93fe5b624c97c1290fa0053837/inst/extdata/",

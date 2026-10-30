@@ -1,16 +1,10 @@
 ## code to prepare `ultraStableGR` dataset goes here
 
 ## Ultra-stable CpGs: Additional file 2 of Edgar et al. 2014, Epigenetics &
-## Chromatin 7:28 (doi:10.1186/1756-8935-7-28), and the InfiniumAnnotation hm450
-## hg38 manifest (Zhou, Laird and Shen 2017, doi:10.1093/nar/gkw967), the
-## archived 202209 release, because the current one has renamed probeID to
-## Probe_ID. Both downloaded on 2026-10-29.
-## Originally built from the CRUK internal files
-## /data/cep/Methylation/refData/Edgar2014_HyperStable_CpGs.txt and
-## /data/cep/Methylation/refData/hm450.hg38.manifest.tsv.
-## Re-run 2026-10-29: the same data as the shipped object (identical() is
-## FALSE only because of the Seqinfo class attribute, which varies with the
-## Bioconductor version).
+## Chromatin 7:28 (doi:10.1186/1756-8935-7-28), downloaded on 2026-10-29, and
+## the InfiniumAnnotation hm450 hg38 manifest (Zhou, Laird and Shen 2017,
+## doi:10.1093/nar/gkw967), the archived 202209 release, because the current
+## one has renamed probeID to Probe_ID.
 
 edgarUrl <- paste0("https://static-content.springer.com/esm/",
     "art%3A10.1186%2F1756-8935-7-28/MediaObjects/",

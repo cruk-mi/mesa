@@ -1,16 +1,7 @@
 ## code to prepare `exampleTumourNormal` dataset goes here
 
-## Example data for showing the package's functions, not a dataset for
-## analysis. Tumour and normal colon and lung tissue bought from OriGene and
-## processed at CRUK-MI CBC (project M022) into a qseaSet on GRCh38 with
-## makeQset(): insert size 50-1000 bp, 300 bp windows, MAPQ 10. The subset is
-## unpublished and the full qseaSet is internal, so this script cannot be
-## re-run outside CRUK-MI.
-## Originally built from the CRUK internal file
-## /data/cep/Methylation/pipelineOutput/M022/qseaSets/
-## M022_All_min50_max1000_w300_q10.rds.
-## Subset: chr7 25-28 Mb, windows with CpG density >= 5, and 5 tumour/normal
-## pairs renamed Colon1-2 and Lung1-3. The input counts are dropped.
+## Unpublished example data: tumour/normal colon and lung tissue from OriGene,
+## processed within CRUK NBC. The full qseaSet is internal.
 
 qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
 
