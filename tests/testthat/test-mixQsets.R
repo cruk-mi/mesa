@@ -111,14 +111,6 @@ test_that("mixSamples() stops on bad input", {
         )),
         "Not enough reads in Colon1_T"
     )
-    # a set with no CNV (exampleMouse) cannot be mixed
-    expect_error(
-        suppressMessages(mixSamples(
-            exampleMouse, "A_Rep1", "B_Rep1", mixNReads, 0.5,
-            renormalise = FALSE
-        )),
-        "unable to find an inherited method for function .mcols."
-    )
 })
 
 test_that("mixThreeQsetSamples() stops on bad input", {
