@@ -1,16 +1,29 @@
 ## code to prepare `hg38CpGIslands` dataset goes here
 
-#Generated via:
-# ml apps/bedtools2/2.27.1-7
-# wget -qO- http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cpgIslandExt.txt.gz \
-# | gunzip -c \
-# | awk 'BEGIN{ OFS="\t"; }{ print $2, $3, $4, $5$6, $7, $8, $9, $10, $11, $12 ; }' \
-# | sed 's/chr//g' \
-# | bedtools sort -i -  > cpgIslandExt.hg38.noChr.noHead.bed
-# echo $'chrom\tstart\tend\tname\tlength\tcpgNum\tgcNum\tperCpg\tperGc\tobsExp' | cat - cpgIslandExt.hg38.noChr.noHead.bed > cpgIslandExt.hg38.noChr.bed
+## UCSC "CpG Islands" track (cpgIslandExt) for hg38, downloaded on 2026-10-29.
+## The table has a bin column first and writes the name as "CpG: n". Drop the
+## bin, close up the name, remove "chr" and sort by chromosome then start.
 
-hg38CpGIslands <- regioneR::toGRanges(read.table("/data/cep/Methylation/refData/cpgIslandExt.hg38.noChr.bed",
-                                                 sep = "\t", head = TRUE)) %>%
+url <- paste0("https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/",
+    "cpgIslandExt.txt.gz")
+path <- tempfile(fileext = ".txt.gz")
+download.file(url, path, mode = "wb")
+
+cpgIslandExt <- read.table(path, sep = "", quote = "")
+cpgIslandExt <- data.frame(
+    chrom = sub("chr", "", cpgIslandExt$V2),
+    start = cpgIslandExt$V3,
+    end = cpgIslandExt$V4,
+    name = paste0(cpgIslandExt$V5, cpgIslandExt$V6),
+    cpgIslandExt[, 7:12]
+)
+colnames(cpgIslandExt)[5:10] <- c("length", "cpgNum", "gcNum", "perCpg",
+                                  "perGc", "obsExp")
+cpgIslandExt <- cpgIslandExt[order(cpgIslandExt$chrom, cpgIslandExt$start,
+                                   method = "radix"), ]
+rownames(cpgIslandExt) <- NULL
+
+hg38CpGIslands <- regioneR::toGRanges(cpgIslandExt) %>%
   dplyr::select(-name)
 
 usethis::use_data(hg38CpGIslands, overwrite = TRUE, internal = TRUE, compress = "xz")

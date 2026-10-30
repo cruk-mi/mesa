@@ -1,6 +1,15 @@
 ## code to prepare `map_hg38_500kb` dataset goes here
 
-map_hg38_500kb <- HMMcopy::wigToRangedData("/data/cep/Methylation/refData/map_hg38_500kb.wig", verbose = FALSE) %>%
+## Mappability of 500 kb bins of GRCh38 (HMMcopy wig format), from the
+## ichorCNA repository (https://github.com/broadinstitute/ichorCNA).
+
+url <- paste0("https://github.com/broadinstitute/ichorCNA/raw/",
+    "5bfc03ed854f0e93fe5b624c97c1290fa0053837/inst/extdata/",
+    "map_hg38_500kb.wig")
+path <- tempfile(fileext = ".wig")
+download.file(url, path, mode = "wb")
+
+map_hg38_500kb <- HMMcopy::wigToRangedData(path, verbose = FALSE) %>%
   dplyr::mutate(chr = stringr::str_remove(chr,"chr"), end = end - 1) %>%
   dplyr::rename(map = value)
 

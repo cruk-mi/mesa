@@ -50,6 +50,16 @@
   scripts from public sources. The `addHMMcopyCNV()` help no longer says that
   only hg38 is supported, and says that `windowSize` must match the tracks.
   ([#180](https://github.com/cruk-mi/mesa/issues/180), [#153](https://github.com/cruk-mi/mesa/issues/153), [PR #182](https://github.com/cruk-mi/mesa/pull/182))
+- The `data-raw/` scripts for the reference data (`hg38CpGIslands`,
+  `ENCODEbadRegions`, `FantomRegions`, `hg19ToHg38.over.chain`,
+  `hg38_450kArrayGR`, `hg38UltraStableProbes` and the `gc_hg38_*` and
+  `map_hg38_*` tracks) now download their public sources instead of reading
+  internal `/data/cep` paths, and the scripts for `exampleTumourNormal` say
+  where that example data came from. The `exampleMouse` and
+  `exampleTumourNormal` help pages now say the data were processed within CRUK
+  NBC. Anyone can now see where the shipped data come from, and the shipped
+  data are unchanged.
+  ([#95](https://github.com/cruk-mi/mesa/issues/95), [PR #195](https://github.com/cruk-mi/mesa/pull/195))
 
 ## Testing
 - The test suite runs in about 145 s instead of 260 s: the `makeQset()` option

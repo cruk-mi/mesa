@@ -1,6 +1,11 @@
 ## code to prepare `exampleTumourNormal` dataset goes here
 
-exampleTumourNormal <- read_rds("/data/cep/Methylation/pipelineOutput/M022/qseaSets/M022_All_min50_max1000_w300_q10.rds") %>%
+## Unpublished example data: tumour/normal colon and lung tissue from OriGene,
+## processed within CRUK NBC. The full qseaSet is internal.
+
+qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
+
+exampleTumourNormal <- read_rds(qsetFile) %>%
   filterWindows(seqnames == 7, start >= 25000000, end <= 28000000, CpG_density >= 5) %>%
   filter(sample_name %in% c("MR006_T","MR006_N","MR007_T","MR007_N","MR059_T","MR059_N","MR055_N",
                                 "MR060_N","MR060_T","MR062_T","MR062_N")) %>%

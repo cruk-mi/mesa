@@ -12,8 +12,8 @@ exampleTumourNormal
 }
 \description{
 A qseaSet object containing a small region of chromosome 7 for 5 paired
-tumour/normal samples (commercially bought from Origene and processed within
-CRUK-MI CBC).
+tumour/normal samples (commercially bought from OriGene and processed within
+CRUK NBC).
 }
 \examples{
 data("exampleTumourNormal", package = "mesa")
