@@ -178,3 +178,120 @@ test_that("plotGeneHeatmap() does not probe a mart with its own http_config", {
     )
     expect_false(probed)
 })
+
+test_that("plotDMRUpset() plots overlaps between contrasts", {
+
+    skip_if_not_installed("UpSetR")
+
+    dmrs <- tibble::tibble(
+        A_vs_B_adjPval = c(0.001, 0.01, 0.5, 0.01),
+        A_vs_C_adjPval = c(0.001, 0.5, 0.01, 0.01),
+        B_vs_C_adjPval = c(0.5, 0.5, 0.5, 0.01)
+    )
+
+    # UpSetR still uses ggplot2 features deprecated since 3.4
+    plot <- suppressWarnings(plotDMRUpset(dmrs))
+    expect_s3_class(plot, "upset")
+    expect_equal(sort(colnames(plot$New_data)),
+        c("A_vs_B", "A_vs_C", "B_vs_C"))
+    # four windows, three significant in A_vs_B, three in A_vs_C
+    expect_equal(sum(plot$New_data$A_vs_B), 3)
+    expect_equal(sum(plot$New_data$A_vs_C), 3)
+
+    # removeVS drops "_vs_..." from the names, which must stay unique
+    distinct <- dmrs
+    colnames(distinct) <- c(
+        "A_vs_B_adjPval", "C_vs_B_adjPval", "D_vs_B_adjPval"
+    )
+    named <- suppressWarnings(plotDMRUpset(
+        distinct, string = "^[AC]$", removeVS = TRUE, minAdjPval = 0.005
+    ))
+    expect_equal(sort(colnames(named$New_data)), c("A", "C"))
+    # only windows below minAdjPval count
+    expect_equal(sum(named$New_data$A), 1)
+})
+
+test_that("plotDMRUpset() stops without UpSetR or with one contrast", {
+
+    skip_if_not_installed("UpSetR")
+
+    dmrs <- tibble::tibble(
+        A_vs_B_adjPval = c(0.001, 0.01), A_vs_C_adjPval = c(0.5, 0.01)
+    )
+    expect_error(
+        plotDMRUpset(dmrs, string = "A_vs_B"),
+        "Only 1 column remaining, nothing to plot!"
+    )
+
+    local_mocked_bindings(requireNamespace = function(...) FALSE,
+        .package = "base")
+    expect_error(plotDMRUpset(dmrs), "must be installed")
+})
+
+test_that("plotGenomicFeatureDistribution() plots feature fractions", {
+
+    skip_if_not_installed("org.Hs.eg.db")
+    skip_if_not_installed("TxDb.Hsapiens.UCSC.hg38.knownGene")
+    oldGenome <- getOption("mesa_genome")
+    on.exit(options(mesa_genome = oldGenome), add = TRUE)
+
+    # Annotating peaks with ChIPseeker takes about 10 s to load the
+    # annotation, so a stand-in labels the windows with three features.
+    # getGenomicFeatureDistribution() tests the real annotation.
+    methods::setClass("mockPeakAnno", methods::representation(anno = "GRanges"))
+    on.exit(methods::removeClass("mockPeakAnno"), add = TRUE)
+    features <- c("Promoter (<=1kb)", "Intron (ENSG1, intron 1 of 3)",
+        "Distal Intergenic")
+    seen <- list()
+    local_mocked_bindings(
+        annotatePeak = function(peak, TxDb, annoDb, ...) {
+            seen <<- list(TxDb = TxDb, annoDb = annoDb)
+            peak$annotation <- rep_len(features, length(peak))
+            methods::new("mockPeakAnno", anno = peak)
+        },
+        .package = "ChIPseeker"
+    )
+    small <- subsetQset(
+        exampleTumourNormal, samplesToKeep = c("Colon1_T", "Colon1_N")
+    )
+    nrpm <- getNRPMTable(small)
+    expectedBars <- vapply(
+        c("Colon1_T", "Colon1_N"),
+        function(x) sum(nrpm[[x]] > 1), numeric(1)
+    )
+
+    setMesaGenome(NULL)
+    plot <- plotGenomicFeatureDistribution(
+        small, cutoff = 1, barType = "fill", genome = "hg38"
+    )
+
+    expect_s3_class(plot, "ggplot")
+    expect_setequal(unique(as.character(plot$data$sample)),
+        c("Colon1_T", "Colon1_N"))
+    # "Intron (ENSG1, intron 1 of 3)" is shortened to its feature
+    expect_setequal(unique(plot$data$feature),
+        c("Promoter (<=1kb)", "Intron", "Distal Intergenic"))
+    expect_equal(
+        vapply(c("Colon1_T", "Colon1_N"),
+            function(x) sum(plot$data$value[plot$data$sample == x]),
+            numeric(1)),
+        expectedBars
+    )
+    expect_equal(plot$layers[[1]]$position$fill, TRUE)
+    expect_s4_class(seen$TxDb, "TxDb")
+    expect_equal(seen$annoDb, "org.Hs.eg.db")
+
+    # the global genome, then the hg38 fallback, give the same annotation
+    setMesaGenome("hg38")
+    viaOption <- plotGenomicFeatureDistribution(small, cutoff = 1)
+    setMesaGenome(NULL)
+    fallback <- plotGenomicFeatureDistribution(small, cutoff = 1)
+    expect_equal(viaOption$data, plot$data)
+    expect_equal(fallback$data, plot$data)
+    expect_equal(seen$annoDb, "org.Hs.eg.db")
+
+    expect_error(
+        plotGenomicFeatureDistribution(small, genome = "hg5"),
+        "Unsupported genome: hg5"
+    )
+})
