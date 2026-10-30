@@ -32,7 +32,15 @@ test_that("countWindowsAboveCutoff() counts windows per sample", {
         %in% colnames(counts)
     ))
     expect_true(all(counts$totalWindowsUsed == 200))
-    expect_true(all(counts$numOverCutoff >= 0 & counts$numOverCutoff <= 200))
+    # the cutoff is inclusive, as in the nrpm table of the same windows
+    nrpm <- suppressMessages(qsea::makeTable(
+        exampleTumourNormal, norm_methods = "nrpm", samples = counts$sample_name
+    ))[1:200, ]
+    expect_equal(
+        counts$numOverCutoff,
+        unname(colSums(nrpm[, paste0(counts$sample_name, "_nrpm")] >= 1))
+    )
+    expect_true(all(counts$numOverCutoff > 0))
 
     # a huge cutoff leaves nothing, and samples can be chosen
     none <- suppressMessages(countWindowsAboveCutoff(
