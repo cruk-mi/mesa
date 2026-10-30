@@ -55,8 +55,10 @@
   `hg38_450kArrayGR`, `hg38UltraStableProbes` and the `gc_hg38_*` and
   `map_hg38_*` tracks) now download their public sources instead of reading
   internal `/data/cep` paths, and the scripts for `exampleTumourNormal` say
-  where that example data came from. Anyone can now see where the shipped data
-  come from, and the shipped data are unchanged.
+  where that example data came from. The `exampleMouse` and
+  `exampleTumourNormal` help pages now say the data were processed within CRUK
+  NBC. Anyone can now see where the shipped data come from, and the shipped
+  data are unchanged.
   ([#95](https://github.com/cruk-mi/mesa/issues/95), [PR #195](https://github.com/cruk-mi/mesa/pull/195))
 
 ## Testing
