@@ -216,6 +216,11 @@ test_that("show() and plot labels report the samples in each result", {
         "UMAP for 10 samples using all 599 windows.")
 })
 
+# the manual palette returns all its values: keep the first n
+palette <- function(scale, n) head(unname(scale$palette(n)), n)
+filled <- ggplot2::scale_shape_manual(values = c(21, 24))
+unfilled <- ggplot2::scale_shape_manual(values = c(1, 2))
+
 test_that("getShapeScale() picks default shapes by number of levels", {
 
     shapes <- function(n, withNA = FALSE) {
@@ -223,8 +228,6 @@ test_that("getShapeScale() picks default shapes by number of levels", {
         if (withNA) x$s[1] <- NA
         x
     }
-    # the manual palette returns all its values: keep the first n
-    palette <- function(scale, n) head(unname(scale$palette(n)), n)
 
     # NULLshape just wraps the palette and hides the legend
     nullScale <- getShapeScale(tibble::tibble(), "NULLshape", shapePalette = 21)
@@ -267,9 +270,6 @@ test_that("getShapeScale() picks default shapes by number of levels", {
 test_that("getShapeScale() checks a custom shapePalette", {
 
     x <- tibble::tibble(s = c("a", "b", "c"))
-    # the manual palette returns all its values: keep the first n
-    palette <- function(scale, n) head(unname(scale$palette(n)), n)
-
     expect_equal(palette(getShapeScale(x, "s", c(1, 2, 3)), 3), c(1, 2, 3))
     expect_error(
         getShapeScale(x, "s", c(1, 2)),
@@ -318,9 +318,6 @@ test_that("getShapeScale() checks a custom shapePalette", {
 test_that("getShapeScale() resolves clashes with the NA shape", {
 
     x <- tibble::tibble(s = c("a", "b", "c", NA))
-    # the manual palette returns all its values: keep the first n
-    palette <- function(scale, n) head(unname(scale$palette(n)), n)
-
     # an NA shape from the wrong (filled/unfilled) set is reset
     expect_warning(
         scale <- getShapeScale(x, "s", NAshape = 7),
@@ -364,14 +361,11 @@ test_that("getShapeScale() resolves clashes with the NA shape", {
 
 test_that("getColourScale() builds the scale for each colour type", {
 
-    filled <- ggplot2::scale_shape_manual(values = c(21, 24))
-    unfilled <- ggplot2::scale_shape_manual(values = c(1, 2))
     x <- tibble::tibble(
-        grp = c("a", "b", "c"), pos = c(1, 2, 3), neg = c(-3, -2, -1),
-        div = c(-1, 0, 3)
+        grp = c("a", "b", "c"), pos = c(1, 2, 3), neg = c(-3, -2, -1)
     )
-    scaleOf <- function(cV, type, shape = filled, cols = NULL, sym = FALSE) {
-        getColourScale(x, cV, cols, type, shape, "grey50", sym)
+    scaleOf <- function(cV, type, shape = filled, cols = NULL) {
+        getColourScale(x, cV, cols, type, shape, "grey50", FALSE)
     }
 
     expect_equal(scaleOf("NULLcol", "qualitative")$aesthetics, "fill")
@@ -415,8 +409,6 @@ test_that("getColourScale() builds the scale for each colour type", {
 
 test_that("getColourScale() centres diverging scales on zero", {
 
-    filled <- ggplot2::scale_shape_manual(values = c(21, 24))
-    unfilled <- ggplot2::scale_shape_manual(values = c(1, 2))
     scaleOf <- function(values, shape = filled, sym = FALSE) {
         getColourScale(
             tibble::tibble(div = values), "div", NULL, "diverging", shape,
