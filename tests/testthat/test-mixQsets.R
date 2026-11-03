@@ -116,7 +116,7 @@ test_that("mixSamples() stops on bad input", {
 test_that("mixThreeQsetSamples() stops on bad input", {
 
     # Only the error paths are tested: its success path currently fails
-    # (parked in the PR).
+    # (#188).
     mix3 <- function(...) {
         suppressMessages(mixThreeQsetSamples(
             exampleTumourNormal, "Colon1_T", "Colon1_N", "Lung1_T",
