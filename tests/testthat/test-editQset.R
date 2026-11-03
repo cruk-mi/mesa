@@ -325,10 +325,10 @@ test_that("renameQsetNames() and renameSamples() validate the new names", {
 
     # input_file libraries are renamed too
     renamed <- renameQsetNames(exampleTumourNormal, "^Colon1_T$", "ColonTumour")
-    expect_true("ColonTumour" %in% rownames(renamed@libraries$input_file))
-    expect_true("ColonTumour" %in% rownames(renamed@libraries$file_name))
-    expect_true("ColonTumour" %in% colnames(renamed@count_matrix))
-    expect_true("ColonTumour" %in% names(GenomicRanges::mcols(renamed@cnv)))
+    expect_contains(rownames(renamed@libraries$input_file), "ColonTumour")
+    expect_contains(rownames(renamed@libraries$file_name), "ColonTumour")
+    expect_contains(colnames(renamed@count_matrix), "ColonTumour")
+    expect_contains(names(GenomicRanges::mcols(renamed@cnv)), "ColonTumour")
 
     samples <- exampleTumourNormal %>%
         mutate(newName = paste0("S", seq_len(10)))
