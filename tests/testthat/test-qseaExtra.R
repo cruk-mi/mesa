@@ -27,10 +27,10 @@ test_that("countWindowsAboveCutoff() counts windows per sample", {
     )
 
     expect_equal(nrow(counts), 10)
-    expect_true(all(
+    expect_contains(
+        colnames(counts),
         c("sample_name", "numOverCutoff", "totalWindowsUsed", "tumour")
-        %in% colnames(counts)
-    ))
+    )
     expect_true(all(counts$totalWindowsUsed == 200))
     # the cutoff is inclusive, as in the nrpm table of the same windows
     nrpm <- suppressMessages(qsea::makeTable(
@@ -53,40 +53,32 @@ test_that("countWindowsAboveCutoff() counts windows per sample", {
 
 test_that("subsetWindowsOverBackground() splits windows by background", {
 
-    removeWindows <- function(...) {
-        capture.output(out <- suppressMessages(
-            subsetWindowsOverBackground(exampleTumourNormal, ...)
-        ))
+    samples <- c("Colon1_T", "Colon2_T", "Lung1_T")
+    subsetOver <- function(keepAbove = TRUE, ...) {
+        capture.output(out <- suppressMessages(subsetWindowsOverBackground(
+            exampleTumourNormal, keepAbove = keepAbove, samples = samples, ...
+        )))
         out
     }
+    nKept <- function(...) length(qsea::getRegions(subsetOver(...)))
     nWindows <- length(qsea::getRegions(exampleTumourNormal))
-    nKept <- function(...) length(qsea::getRegions(removeWindows(...)))
+
     # numWindows sets the background rate: with the 819 windows of the example
     # every window is below background, so assume a genome of 1e6 windows
-    samples <- c("Colon1_T", "Colon2_T", "Lung1_T")
-
-    above <- removeWindows(
-        keepAbove = TRUE, samples = samples, numWindows = 1e6
-    )
-    below <- removeWindows(
-        keepAbove = FALSE, samples = samples, numWindows = 1e6
-    )
+    above <- subsetOver(numWindows = 1e6)
 
     expect_s4_class(above, "qseaSet")
-    expect_equal(length(qsea::getRegions(above)), 121)
-    expect_equal(length(qsea::getRegions(below)), nWindows - 121)
-    # more samples above background, a stricter FDR or a smaller genome keep
-    # fewer windows
-    kept <- function(...) {
-        nKept(keepAbove = TRUE, samples = samples, ...)
-    }
-    expect_equal(kept(numWindows = 1e6, numAbove = 2), 75)
-    expect_equal(kept(numWindows = 1e6, numAbove = 3), 36)
-    expect_equal(kept(numWindows = 1e6, FDRthres = 1e-10), 71)
-    expect_equal(kept(numWindows = 1e5), 16)
     expect_equal(
         qsea::getSampleNames(above), qsea::getSampleNames(exampleTumourNormal)
     )
+    expect_equal(length(qsea::getRegions(above)), 121)
+    expect_equal(nKept(keepAbove = FALSE, numWindows = 1e6), nWindows - 121)
+    # more samples above background, a stricter FDR or a smaller genome keep
+    # fewer windows
+    expect_equal(nKept(numWindows = 1e6, numAbove = 2), 75)
+    expect_equal(nKept(numWindows = 1e6, numAbove = 3), 36)
+    expect_equal(nKept(numWindows = 1e6, FDRthres = 1e-10), 71)
+    expect_equal(nKept(numWindows = 1e5), 16)
 
     # samples can be given by name or by a regular expression
     expect_message(
@@ -148,16 +140,17 @@ test_that("getGenomicFeatureDistribution() counts windows per feature", {
     # annotateWindows() is tested on real annotation in test-DMRs.R and
     # test-mouse.R, and takes about 20 s to load it, so a stand-in labels
     # the windows here.
-    local_mocked_bindings(
-        annotateWindows = function(dataTable, ...) {
-            dataTable %>%
-                mutate(
-                    landscape = rep_len(c("CpG island", "Open sea"), n()),
-                    shortAnno = rep_len(
-                        c("Promoter", "Intron", "Distal Intergenic"), n()
-                    )
+    labelWindows <- function(dataTable) {
+        dataTable %>%
+            mutate(
+                landscape = rep_len(c("CpG island", "Open sea"), n()),
+                shortAnno = rep_len(
+                    c("Promoter", "Intron", "Distal Intergenic"), n()
                 )
-        }
+            )
+    }
+    local_mocked_bindings(
+        annotateWindows = function(dataTable, ...) labelWindows(dataTable)
     )
     samples <- c("Colon1_T", "Lung1_N")
     small <- subsetQset(exampleTumourNormal, samplesToKeep = samples)
@@ -167,18 +160,14 @@ test_that("getGenomicFeatureDistribution() counts windows per feature", {
     labelled <- getDataTable(
         small, normMethod = "nrpm", minEnrichment = 3, addMethodSuffix = TRUE
     ) %>%
-        mutate(
-            landscape = rep_len(c("CpG island", "Open sea"), n()),
-            shortAnno = rep_len(
-                c("Promoter", "Intron", "Distal Intergenic"), n()
-            )
-        )
+        labelWindows()
     islands <- labelled$landscape == "CpG island"
 
-    expect_true(all(
+    expect_contains(
+        colnames(distribution),
         c("sample_name", "landscape", "shortAnno", "nWindows", "sum",
-            "nOverCutoff", "tumour") %in% colnames(distribution)
-    ))
+            "nOverCutoff", "tumour")
+    )
     expect_setequal(distribution$sample_name, samples)
     expect_setequal(
         na.omit(distribution$landscape), c("CpG island", "Open sea")
