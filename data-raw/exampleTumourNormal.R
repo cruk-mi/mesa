@@ -1,7 +1,8 @@
 ## code to prepare `exampleTumourNormal` dataset goes here
 
-## Unpublished example data: tumour/normal colon and lung tissue from OriGene,
-## processed within CRUK NBC. The full qseaSet is internal.
+## Unpublished example data: tumour/normal colon and lung tissue from OriGene
+## Technologies, processed within the CRUK National Biomarker Centre. The full
+## qseaSet is internal.
 
 qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
 
