@@ -77,3 +77,16 @@ test_that("addHMMcopyCNV stops when the window size does not match (#180)", {
         "overlap with multiple windows"
     )
 })
+
+test_that("removeCNV() zeroes the copy number but keeps the windows", {
+
+    flat <- removeCNV(exampleTumourNormal)
+    cnvValues <- as.matrix(GenomicRanges::mcols(qsea::getCNV(flat)))
+    original <- qsea::getCNV(exampleTumourNormal)
+
+    expect_length(qsea::getCNV(flat), length(original))
+    expect_equal(colnames(cnvValues), qsea::getSampleNames(exampleTumourNormal))
+    expect_true(all(cnvValues == 0))
+    # the original is untouched
+    expect_true(any(as.matrix(GenomicRanges::mcols(original)) != 0))
+})
