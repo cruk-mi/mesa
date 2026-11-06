@@ -1,4 +1,7 @@
 ## code to prepare `map_hg19_chr22_100kb` dataset goes here
+
+## Needs (not in DESCRIPTION): usethis.
+
 ##
 ## Mean mappability of 100 kb bins on chr22 of hg19, from the public
 ## ENCODE/CRG 100mer alignability track on the UCSC download server.
