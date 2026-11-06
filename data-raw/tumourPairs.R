@@ -1,7 +1,9 @@
 ## code to prepare `tumourPairs` dataset goes here
 
-## Unpublished example data: tumour/normal colon and lung tissue from OriGene,
-## processed within CRUK NBC. The full qseaSet is internal.
+## Unpublished example data: a small region of chromosome 7 for five paired
+## tumour/normal colon or lung tissue samples (commercially bought from
+## OriGene Technologies and processed within the Cancer Research UK National
+## Biomarker Centre, University of Manchester). The full qseaSet is internal.
 
 qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
 
