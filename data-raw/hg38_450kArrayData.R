@@ -1,5 +1,7 @@
 ## code to prepare `hg38_450kArrayGR` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## Illumina HM450 probes remapped to hg38 (Zhou, Laird and Shen 2017,
 ## doi:10.1093/nar/gkw967), the InfiniumAnnotation hm450 hg38 manifest. This is
 ## the archived 202209 release: the current manifest has renamed probeID to

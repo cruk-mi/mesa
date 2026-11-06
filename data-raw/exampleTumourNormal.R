@@ -1,5 +1,7 @@
 ## code to prepare `exampleTumourNormal` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## Unpublished example data: a small region of chromosome 7 for five paired
 ## tumour/normal colon or lung tissue samples (commercially bought from
 ## OriGene Technologies and processed within the Cancer Research UK National
@@ -7,7 +9,7 @@
 
 qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
 
-exampleTumourNormal <- read_rds(qsetFile) %>%
+exampleTumourNormal <- readr::read_rds(qsetFile) %>%
   filterWindows(seqnames == 7, start >= 25000000, end <= 28000000, CpG_density >= 5) %>%
   filter(sample_name %in% c("MR006_T","MR006_N","MR007_T","MR007_N","MR059_T","MR059_N",
                                 "MR060_N","MR060_T","MR062_T","MR062_N")) %>%
@@ -22,7 +24,7 @@ exampleTumourNormal <- read_rds(qsetFile) %>%
   renameQsetNames("MR060_N","Lung2_N") %>%
   renameQsetNames("MR062_T","Lung3_T") %>%
   renameQsetNames("MR062_N","Lung3_N") %>%
-  mutate(patient = str_remove(sample_name,"_[NT]"),
+  mutate(patient = stringr::str_remove(sample_name,"_[NT]"),
              group = sample_name)
 
 exampleTumourNormal@libraries$input_counts <- NULL

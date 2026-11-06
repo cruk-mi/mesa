@@ -1,5 +1,7 @@
 ## code to prepare `hg38UltraStableProbes` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## Ultra-stable CpGs: Additional file 2 of Edgar et al. 2014, Epigenetics &
 ## Chromatin 7:28 (doi:10.1186/1756-8935-7-28), downloaded on 2026-10-29.
 ##

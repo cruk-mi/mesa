@@ -1,5 +1,7 @@
 ## code to prepare `map_hg38_1000kb` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## Mappability of 1 Mb bins of GRCh38 (HMMcopy wig format), from the
 ## ichorCNA repository (https://github.com/broadinstitute/ichorCNA).
 

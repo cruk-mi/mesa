@@ -1,5 +1,7 @@
 ## code to prepare `hg19ToHg38.over.chain` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## UCSC liftOver chain from hg19 to hg38, downloaded on 2026-10-29.
 
 url <- paste0("https://hgdownload.soe.ucsc.edu/goldenPath/hg19/liftOver/",

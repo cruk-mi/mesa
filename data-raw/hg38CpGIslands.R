@@ -1,5 +1,7 @@
 ## code to prepare `hg38CpGIslands` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis, regioneR.
+
 ## WARNING: this script does not yet reproduce the shipped object, see
 ## https://github.com/cruk-mi/mesa/issues/197. Today's UCSC table gives 32038
 ## islands and the result drops `name`; the shipped object in R/sysdata.rda

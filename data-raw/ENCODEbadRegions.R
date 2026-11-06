@@ -1,5 +1,7 @@
 ## code to prepare `ENCODEbadRegions` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis, regioneR.
+
 ## ENCODE Blacklist v2 for hg38 (Amemiya, Kundaje and Boyle 2019,
 ## doi:10.1038/s41598-019-45839-z), from the Boyle-Lab/Blacklist repository.
 ## Remove "chr" and the description column.

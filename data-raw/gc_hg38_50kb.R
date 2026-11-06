@@ -1,5 +1,7 @@
 ## code to prepare `gc_hg38_50kb.wig` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## GC content of 50 kb bins of GRCh38 (HMMcopy wig format), from the
 ## ichorCNA repository (https://github.com/broadinstitute/ichorCNA).
 

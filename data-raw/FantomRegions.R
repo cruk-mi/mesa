@@ -1,5 +1,7 @@
 ## code to prepare `FantomRegions` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 ## FANTOM5 hg38 enhancers (Andersson et al. 2014, doi:10.1038/nature12787),
 ## reprocessed to hg38 by FANTOM, downloaded on 2026-10-29. Remove "chr".
 
