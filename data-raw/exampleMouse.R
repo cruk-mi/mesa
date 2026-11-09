@@ -1,9 +1,11 @@
 ## code to prepare `exampleMouse` dataset goes here
 
+## Needs (not in DESCRIPTION): usethis.
+
 # M073 mouse samples
-exampleMouse <- read_rds("<PATH TO M073>") %>% 
+exampleMouse <- readr::read_rds("<PATH TO M073>") %>% 
   filterWindows(seqnames == "chr5", end < 143009500, start > 142500000) %>% 
-  filter(str_detect(sample_name,"Day1|Day5")) %>%
+  filter(stringr::str_detect(sample_name,"Day1|Day5")) %>%
   renameQsetNames("Day1","A") %>%
   renameQsetNames("Day5","B") %>%
   # No Mart is stored: exampleMouse is mm10 (GRCm38), and no live Ensembl

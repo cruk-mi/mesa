@@ -1,4 +1,7 @@
 ## code to prepare `gc_hg19_chr22_100kb` dataset goes here
+
+## Needs (not in DESCRIPTION): usethis.
+
 ##
 ## GC fraction of 100 kb bins on chr22 of hg19, computed from the public
 ## BSgenome.Hsapiens.UCSC.hg19 sequence. Bins that are all N get -1, the value

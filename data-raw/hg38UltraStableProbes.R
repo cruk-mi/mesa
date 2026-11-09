@@ -1,22 +1,33 @@
-## code to prepare `ultraStableGR` dataset goes here
+## code to prepare `hg38UltraStableProbes` dataset goes here
 
-hyperStableCpGs <- read_tsv("/data/cep/Methylation/refData/Edgar2014_HyperStable_CpGs.txt",
-                            col_types = cols(Chromosome_37 = "c"))
+## Needs (not in DESCRIPTION): usethis.
 
-# Read in the hg38 information for the 450k microarrays, which includes remapped positions
-# Make into a GRanges object with just the 2bp of the CpG island.
-hg38MethyProbePositionsStable <- read_tsv("/data/cep/Methylation/refData/hm450.hg38.manifest.tsv") %>%
-  mutate(CpG_chrm = str_remove(CpG_chrm,"chr")) %>%
-  dplyr::filter(CpG_chrm %in% 1:22) %>%
-  dplyr::select(c("CpG_chrm","CpG_beg","CpG_end","probeID")) %>%
-  dplyr::rename(chr = CpG_chrm, start= CpG_beg, end = CpG_end, ID = probeID) %>%
-  mutate(seqnames = as.factor(chr), start = as.numeric(start), end = as.numeric(end)) %>%
-  left_join(hyperStableCpGs, ., by = c("Probe_ID" = "ID"))
+## Ultra-stable CpGs: Additional file 2 of Edgar et al. 2014, Epigenetics &
+## Chromatin 7:28 (doi:10.1186/1756-8935-7-28), downloaded on 2026-10-29.
+##
+## Depends on the package data object `hg38_450kArrayGR` (made by
+## hg38_450kArrayData.R) for the hg38 probe positions. Re-run that script
+## first if the object changes.
+
+edgarUrl <- paste0("https://static-content.springer.com/esm/",
+    "art%3A10.1186%2F1756-8935-7-28/MediaObjects/",
+    "13072_2014_333_MOESM2_ESM.txt")
+edgarPath <- tempfile(fileext = ".txt")
+download.file(edgarUrl, edgarPath, mode = "wb")
+
+hyperStableCpGs <- readr::read_tsv(edgarPath,
+                                   col_types = readr::cols(Chromosome_37 = "c"))
+
+# Positions of the 450k probes on the autosomes, from the package data object.
+hg38MethyProbePositionsStable <- as.data.frame(mesa::hg38_450kArrayGR) %>%
+  dplyr::filter(seqnames %in% 1:22) %>%
+  dplyr::transmute(seqnames = as.factor(as.character(seqnames)),
+                   start, end, ID) %>%
+  dplyr::left_join(hyperStableCpGs, ., by = c("Probe_ID" = "ID"))
 
 hg38UltraStableProbes <- hg38MethyProbePositionsStable %>%
-  filter(State == "Ultra-stable Methylated") %>%
+  dplyr::filter(State == "Ultra-stable Methylated") %>%
   dplyr::select(seqnames, start, end, Probe_ID) %>%
   plyranges::as_granges()
-
 
 usethis::use_data(hg38UltraStableProbes, overwrite = TRUE)
