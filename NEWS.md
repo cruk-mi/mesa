@@ -32,6 +32,14 @@
   retrying `biomaRt` through three connection timeouts. A mart with its own
   `http_config` is not probed.
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
+  
+## Other changes
+
+- The shipped `exampleMouse` qseaSet has been regenerated from
+  `data-raw/exampleMouse.R`. Its sampleTable has an updated `group` column
+  giving each sample's replicate group, and no longer has a `project_name`
+  column.
+  ([#200](https://github.com/cruk-mi/mesa/issues/200), [PR #201](https://github.com/cruk-mi/mesa/pull/201))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
@@ -55,14 +63,9 @@
   `hg38_450kArrayGR`, `hg38UltraStableProbes` and the `gc_hg38_*` and
   `map_hg38_*` tracks) now download their public sources instead of reading
   internal paths. The scripts and help pages for `exampleTumourNormal` and
-  `exampleMouse` have updated descriptions, and the mouse data-preparation
-  script assigns replicate groups; the shipped `exampleMouse` data now
-  reflects these changes.
-  ([#95](https://github.com/cruk-mi/mesa/issues/95),
-  [#200](https://github.com/cruk-mi/mesa/issues/200),
-  [PR #195](https://github.com/cruk-mi/mesa/pull/195),
-  [PR #201](https://github.com/cruk-mi/mesa/pull/201))
-
+  `exampleMouse` have updated descriptions.
+  ([#95](https://github.com/cruk-mi/mesa/issues/95), [#200](https://github.com/cruk-mi/mesa/issues/200),s [PR #195](https://github.com/cruk-mi/mesa/pull/195), [PR #201](https://github.com/cruk-mi/mesa/pull/201))
+  
 ## Testing
 - Test coverage rises from 68.7 % to 85.1 %, for about 3 s of extra test time.
   New tests cover `mixSamples()`, `combineQsets()` and `combineQsetsList()`,
