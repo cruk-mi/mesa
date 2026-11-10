@@ -32,8 +32,8 @@
 #'    [annotateWindows()] and [plotGenomicFeatureDistribution()].
 #'
 #' Two small `qseaSet` objects are shipped for examples:
-#' [exampleTumourNormal] (human, paired tumour/normal samples) and
-#' [exampleMouse] (mouse cell line).
+#' [exampleTumourNormal] (human, paired tumour/normal tissue samples) and
+#' [exampleMouse] (mouse hematopoietic stem cell samples).
 #'
 #' @section Vignettes:
 #' * `vignette("introduction", package = "mesa")`: overview and quick start.
