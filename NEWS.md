@@ -56,7 +56,8 @@
   `map_hg38_*` tracks) now download their public sources instead of reading
   internal paths. The scripts and help pages for `exampleTumourNormal` and
   `exampleMouse` have updated descriptions, and the mouse data-preparation
-  script assigns replicate groups. The shipped data files are unchanged.
+  script assigns replicate groups; the shipped `exampleMouse` data now
+  reflects these changes.
   ([#95](https://github.com/cruk-mi/mesa/issues/95),
   [#200](https://github.com/cruk-mi/mesa/issues/200),
   [PR #195](https://github.com/cruk-mi/mesa/pull/195),
