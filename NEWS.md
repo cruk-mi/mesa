@@ -50,20 +50,17 @@
   scripts from public sources. The `addHMMcopyCNV()` help no longer says that
   only hg38 is supported, and says that `windowSize` must match the tracks.
   ([#180](https://github.com/cruk-mi/mesa/issues/180), [#153](https://github.com/cruk-mi/mesa/issues/153), [PR #182](https://github.com/cruk-mi/mesa/pull/182))
-- The `data-raw/` scripts for the reference data (`hg38CpGIslands`,
+- The `data-raw/` scripts for reference data (`hg38CpGIslands`,
   `ENCODEbadRegions`, `FantomRegions`, `hg19ToHg38.over.chain`,
   `hg38_450kArrayGR`, `hg38UltraStableProbes` and the `gc_hg38_*` and
   `map_hg38_*` tracks) now download their public sources instead of reading
-  internal `/data/cep` paths, and the scripts for `exampleTumourNormal` say
-  where that example data came from. The `exampleMouse` and
-  `exampleTumourNormal` help pages now have a `@source` section and say the
-  data were processed within the CRUK National Biomarker Centre. Anyone can now
-  see where the shipped data come from, and the shipped data are unchanged.
-  ([#95](https://github.com/cruk-mi/mesa/issues/95), [PR #195](https://github.com/cruk-mi/mesa/pull/195))
-- The `exampleMouse` help now identifies the samples as hematopoietic stem
-  cells, and the `exampleTumourNormal` help identifies them as colon or lung
-  tissue. The mouse data-preparation script now assigns replicate groups.
-  ([#200](https://github.com/cruk-mi/mesa/issues/200), [PR #201](https://github.com/cruk-mi/mesa/pull/201))
+  internal paths. The scripts and help pages for `exampleTumourNormal` and
+  `exampleMouse` have updated descriptions, and the mouse data-preparation
+  script assigns replicate groups. The shipped data files are unchanged.
+  ([#95](https://github.com/cruk-mi/mesa/issues/95),
+  [#200](https://github.com/cruk-mi/mesa/issues/200),
+  [PR #195](https://github.com/cruk-mi/mesa/pull/195),
+  [PR #201](https://github.com/cruk-mi/mesa/pull/201))
 
 ## Testing
 - Test coverage rises from 68.7 % to 85.1 %, for about 3 s of extra test time.
