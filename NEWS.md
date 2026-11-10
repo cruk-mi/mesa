@@ -60,6 +60,10 @@
   data were processed within the CRUK National Biomarker Centre. Anyone can now
   see where the shipped data come from, and the shipped data are unchanged.
   ([#95](https://github.com/cruk-mi/mesa/issues/95), [PR #195](https://github.com/cruk-mi/mesa/pull/195))
+- The `exampleMouse` help now identifies the samples as hematopoietic stem
+  cells, and the `exampleTumourNormal` help identifies them as colon or lung
+  tissue. The mouse data-preparation script now assigns replicate groups.
+  ([#200](https://github.com/cruk-mi/mesa/issues/200), [PR #201](https://github.com/cruk-mi/mesa/pull/201))
 
 ## Testing
 - Test coverage rises from 68.7 % to 85.1 %, for about 3 s of extra test time.
