@@ -3,21 +3,20 @@
 \docType{data}
 \name{exampleMouse}
 \alias{exampleMouse}
-\title{A small example qseaSet with 4 mouse samples.}
+\title{A small example qseaSet with four mouse samples.}
 \format{
-A qseaSet object with 153 regions and 4 samples:
+A qseaSet object with 153 regions and 4 samples.
 }
 \source{
-Unpublished. Processed within the Cancer Research UK National
+Samples processed within the Cancer Research UK National
 Biomarker Centre, University of Manchester.
 }
 \usage{
 exampleMouse
 }
 \description{
-A qseaSet object containing a small region of chromosome 5 for a mouse cell
-line, 2 replicates of 2 conditions (processed within Cancer Research UK
-National Biomarker Centre, University of Manchester).
+A qseaSet object containing a small region of chromosome 5 for four mouse
+hematopoietic stem cell (HSC) samples; two replicates of two conditions.
 }
 \examples{
 data("exampleMouse", package = "mesa")
