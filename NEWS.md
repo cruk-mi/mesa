@@ -1,4 +1,4 @@
-# mesa 0.99.8.9000
+# mesa 0.99.9
 
 ## Bug fixes
 - `makeQset()` now drops reads on chromosomes outside `chrSelect` before the
