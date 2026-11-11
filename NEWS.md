@@ -69,7 +69,7 @@
 ## Testing
 - The `writeBigWigs()` test no longer reads the bigWig back on Windows, where
   `rtracklayer` cannot import bigWig files. The other checks still run there.
-  ([#203](https://github.com/cruk-mi/mesa/issues/203))
+  ([#203](https://github.com/cruk-mi/mesa/issues/203), [PR #204](https://github.com/cruk-mi/mesa/pull/204))
 - Test coverage rises from 68.7 % to 85.1 %, for about 3 s of extra test time.
   New tests cover `mixSamples()`, `combineQsets()` and `combineQsetsList()`,
   `getMesaGenome()`, `getMesaTxDb()` and `getMesaAnnoDb()`, `removeCNV()`,
