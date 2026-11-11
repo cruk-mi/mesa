@@ -126,6 +126,9 @@
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
 - The CI `R CMD check` step now stops after 40 minutes.
   ([#183](https://github.com/cruk-mi/mesa/issues/183), [PR #184](https://github.com/cruk-mi/mesa/pull/184))
+- Removed the out-of-date `docs/` folder. CI builds the pkgdown site and serves
+  it from the `gh-pages` branch, so the site and its links are unchanged.
+  ([#196](https://github.com/cruk-mi/mesa/issues/196), [PR #199](https://github.com/cruk-mi/mesa/pull/199))
 
 # mesa 0.99.8
 
