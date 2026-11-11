@@ -123,8 +123,11 @@ test_that("writeBigWigs() writes one bigWig per sample or per group", {
     expect_setequal(
         list.files(folder), c("Colon1_T_nrpm.bw", "Colon1_N_nrpm.bw")
     )
-    imported <- rtracklayer::import(file.path(folder, "Colon1_T_nrpm.bw"))
-    expect_gt(length(imported), 0)
+    # rtracklayer cannot import bigWig files on Windows
+    if (.Platform$OS.type != "windows") {
+        imported <- rtracklayer::import(file.path(folder, "Colon1_T_nrpm.bw"))
+        expect_gt(length(imported), 0)
+    }
 
     groupFolder <- tempfile("groupBigwigs")
     on.exit(unlink(groupFolder, recursive = TRUE), add = TRUE)
