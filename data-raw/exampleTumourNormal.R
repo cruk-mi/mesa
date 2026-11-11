@@ -2,10 +2,10 @@
 
 ## Needs (not in DESCRIPTION): usethis.
 
-## Unpublished example data: a small region of chromosome 7 for five paired
+## Example qseaSet data: a small region of chromosome 7 for five paired
 ## tumour/normal colon or lung tissue samples (commercially bought from
 ## OriGene Technologies and processed within the Cancer Research UK National
-## Biomarker Centre, University of Manchester). The full qseaSet is internal.
+## Biomarker Centre, University of Manchester).
 
 qsetFile <- "M022_All_min50_max1000_w300_q10.rds"
 

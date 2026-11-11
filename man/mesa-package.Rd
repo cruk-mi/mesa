@@ -40,8 +40,8 @@ per window with \code{\link[=getDataTable]{getDataTable()}}, for example over th
 }
 
 Two small \code{qseaSet} objects are shipped for examples:
-\link{exampleTumourNormal} (human, paired tumour/normal samples) and
-\link{exampleMouse} (mouse cell line).
+\link{exampleTumourNormal} (human, paired tumour/normal tissue samples) and
+\link{exampleMouse} (mouse hematopoietic stem cell samples).
 }
 
 \section{Vignettes}{
