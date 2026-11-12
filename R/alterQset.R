@@ -88,16 +88,21 @@ filterByOverlaps <- function(qseaSet, regionsToOverlap) {
             plyranges::as_granges()
     }
 
-    qseaSet@count_matrix <- qseaSet@count_matrix[
-        which(
-            plyranges::count_overlaps(
-                qseaSet@regions, regionsToOverlap
-            ) > 0
-        ), ,
-        drop = FALSE
-    ]
-    qseaSet@regions <- qseaSet@regions %>%
-        plyranges::filter_by_overlaps(regionsToOverlap)
+    windowsToKeep <- which(
+        plyranges::count_overlaps(
+            qsea::getRegions(qseaSet), regionsToOverlap
+        ) > 0
+    )
+
+    qseaSet <- qseaSet %>%
+        setCounts(
+            qsea::getCounts(qseaSet)[windowsToKeep, , drop = FALSE]
+        ) %>%
+        setRegions(
+            plyranges::filter_by_overlaps(
+                qsea::getRegions(qseaSet), regionsToOverlap
+            )
+        )
 
     return(qseaSet)
 }
@@ -159,8 +164,8 @@ filterByNonOverlaps <- function(qseaSet, regionsToOverlap) {
 #' Add library metrics to the qseaSet sample table
 #'
 #' Append library information to the `sampleTable` of a `qseaSet`. Columns are
-#' taken from `qseaSet@libraries$file_name`, and when available, from
-#' `qseaSet@libraries$input_file` (prefixed with `"input_"`). Existing columns
+#' taken from the `"file_name"` table of [getLibraries()], and when available,
+#' from the `"input_file"` table (prefixed with `"input_"`). Existing columns
 #' are not duplicated.
 #'
 #' @param qseaSet `qseaSet`
@@ -182,24 +187,24 @@ addLibraryInformation <- function(qseaSet) {
         qsea::getSampleTable() %>%
         colnames()
 
-    qseaSet@sampleTable <- cbind(
-        qseaSet@sampleTable,
-        qseaSet@libraries$file_name %>%
+    qseaSet <- setSampleTable(qseaSet, cbind(
+        qsea::getSampleTable(qseaSet),
+        getLibraries(qseaSet, "file_name") %>%
             dplyr::select(-tidyselect::any_of(curColNames))
-    )
+    ))
 
-    if ("input_file" %in% names(qseaSet@libraries)) {
+    if ("input_file" %in% names(getLibraries(qseaSet))) {
         curColNames <- qseaSet %>%
             qsea::getSampleTable() %>%
             colnames()
 
-        qseaSet@sampleTable <- cbind(
-            qseaSet@sampleTable,
-            qseaSet@libraries$input_file %>%
+        qseaSet <- setSampleTable(qseaSet, cbind(
+            qsea::getSampleTable(qseaSet),
+            getLibraries(qseaSet, "input_file") %>%
                 dplyr::rename_with(~ paste0("input_", .x)) %>%
                 dplyr::select(-tidyselect::any_of(curColNames)) %>%
                 dplyr::select(-tidyselect::matches("^library_factor$|^offset$"))
-        )
+        ))
     }
 
 
@@ -261,24 +266,37 @@ subsetQset <- function(qseaSet, samplesToKeep = NULL, samplesToDrop = NULL) {
         samplesToKeep <- setdiff(qsea::getSampleNames(qseaSet), samplesToDrop)
     }
 
-    newSet <- qseaSet
+    newSet <- qseaSet %>%
+        setSampleTable(
+            qsea::getSampleTable(qseaSet)[samplesToKeep, , drop = FALSE]
+        ) %>%
+        setCounts(qsea::getCounts(qseaSet)[, samplesToKeep, drop = FALSE]) %>%
+        qsea::setZygosity(
+            qsea::getZygosity(qseaSet)[samplesToKeep, , drop = FALSE]
+        ) %>%
+        setLibraries(
+            getLibraries(qseaSet, "file_name")[samplesToKeep, , drop = FALSE],
+            "file_name"
+        ) %>%
+        setLibraries(
+            getLibraries(qseaSet, "input_file")[samplesToKeep, , drop = FALSE],
+            "input_file"
+        ) %>%
+        setEnrichment(
+            getEnrichment(qseaSet, "parameters")[
+                samplesToKeep, ,
+                drop = FALSE
+            ],
+            "parameters"
+        ) %>%
+        setEnrichment(
+            getEnrichment(qseaSet, "factors")[, samplesToKeep, drop = FALSE],
+            "factors"
+        )
 
-    newSet@sampleTable <- qseaSet@sampleTable[samplesToKeep, , drop = FALSE]
-    newSet@count_matrix <- qseaSet@count_matrix[, samplesToKeep, drop = FALSE]
-    newSet@zygosity <- qseaSet@zygosity[samplesToKeep, , drop = FALSE]
-
-    if (length(qseaSet@cnv) > 0) {
-        newSet@cnv <- qseaSet@cnv[, samplesToKeep, drop = FALSE]
+    if (qsea::hasCNV(qseaSet)) {
+        newSet <- setCNV(newSet, qsea::getCNV(qseaSet, samplesToKeep))
     }
-
-    newSet@libraries$file_name <-
-        qseaSet@libraries$file_name[samplesToKeep, , drop = FALSE]
-    newSet@libraries$input_file <-
-        qseaSet@libraries$input_file[samplesToKeep, , drop = FALSE]
-    newSet@enrichment$parameters <-
-        qseaSet@enrichment$parameters[samplesToKeep, , drop = FALSE]
-    newSet@enrichment$factors <-
-        qseaSet@enrichment$factors[, samplesToKeep, drop = FALSE]
 
     return(newSet)
 }
@@ -321,7 +339,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
         dplyr::pull(sample_name) %>%
         stringr::str_replace_all(pattern, replacement)
 
-    if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
+    if (all(renamedNames == qsea::getSampleNames(qseaSet))) {
         message("Renaming had no effect!")
         return(qseaSet)
     }
@@ -350,47 +368,7 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
         ))
     }
 
-    newQSet <- qseaSet
-
-    newQSet@sampleTable <- newQSet@sampleTable %>%
-        tibble::remove_rownames() %>%
-        dplyr::mutate(
-            sample_name = stringr::str_replace_all(
-                sample_name, pattern, replacement
-            ),
-            rownameCol = sample_name
-        ) %>%
-        tibble::column_to_rownames("rownameCol")
-
-    rownames(newQSet@zygosity) <- stringr::str_replace_all(
-        rownames(newQSet@zygosity), pattern, replacement
-    )
-    rownames(newQSet@libraries$file_name) <- stringr::str_replace_all(
-        rownames(newQSet@libraries$file_name), pattern, replacement
-    )
-
-    if (!is.null(newQSet@libraries$input_file)) {
-        rownames(newQSet@libraries$input_file) <- stringr::str_replace_all(
-            rownames(newQSet@libraries$input_file), pattern, replacement
-        )
-    }
-
-    colnames(newQSet@count_matrix) <- stringr::str_replace_all(
-        colnames(newQSet@count_matrix), pattern, replacement
-    )
-
-    rownames(newQSet@enrichment$parameters) <- stringr::str_replace_all(
-        rownames(newQSet@enrichment$parameters), pattern, replacement
-    )
-    colnames(newQSet@enrichment$factors) <- stringr::str_replace_all(
-        colnames(newQSet@enrichment$factors), pattern, replacement
-    )
-
-    colnames(GenomicRanges::mcols(newQSet@cnv)) <- stringr::str_replace_all(
-        colnames(GenomicRanges::mcols(newQSet@cnv)), pattern, replacement
-    )
-
-    return(newQSet)
+    return(.setSampleNames(qseaSet, renamedNames))
 }
 
 
@@ -432,12 +410,12 @@ renameQsetNames <- function(qseaSet, pattern, replacement = "") {
 #'
 #' @details
 #' Internally, pooled counts are simple sums. CNV values and zygosity are
-#' combined by a weighted average using `total_fragments` from
-#' `@libraries$input_file`, or from `@libraries$file_name` when the set has no
-#' input libraries. Library statistics are aggregated (sums for counts,
-#' weighted means for rates). When `renormalise = TRUE`, [addNormalisation()]
-#' is run with the `enrichmentMethod` recorded in the input set (`"blind1-15"`
-#' if there is none).
+#' combined by a weighted average using `total_fragments` from the
+#' `"input_file"` table of [getLibraries()], or from the `"file_name"` table
+#' when the set has no input libraries. Library statistics are aggregated
+#' (sums for counts, weighted means for rates). When `renormalise = TRUE`,
+#' [addNormalisation()] is run with the `enrichmentMethod` recorded in the
+#' input set (`"blind1-15"` if there is none).
 #'
 #' @seealso [addNormalisation()], [mixSamples()]
 #'
@@ -474,21 +452,22 @@ poolSamples <- function(qseaSet, mergeString, renormalise = TRUE,
     newSet <- qseaSet %>%
         subsetQset(samplesToKeep = samplesToMerge)
 
+    counts <- qsea::getCounts(qseaSet)
+    zygosity <- qsea::getZygosity(qseaSet)
+
     newCounts <- vapply(
         newNames,
         function(x) {
-            rowSums(
-                qseaSet@count_matrix[, poolMembers[[x]], drop = FALSE]
-            )
+            rowSums(counts[, poolMembers[[x]], drop = FALSE])
         },
-        FUN.VALUE = numeric(nrow(qseaSet@count_matrix))
+        FUN.VALUE = numeric(nrow(counts))
     )
 
     # weight CNV and zygosity by the input libraries, or by the pulldown
     # libraries when there are no inputs
-    weightLibraries <- qseaSet@libraries$input_file
+    weightLibraries <- getLibraries(qseaSet, "input_file")
     if (is.null(weightLibraries)) {
-        weightLibraries <- qseaSet@libraries$file_name
+        weightLibraries <- getLibraries(qseaSet, "file_name")
     }
 
     poolWeights <- lapply(poolMembers, function(members) {
@@ -517,25 +496,29 @@ poolSamples <- function(qseaSet, mergeString, renormalise = TRUE,
         newNames,
         function(x) {
             colSums(
-                qseaSet@zygosity[poolMembers[[x]], , drop = FALSE] *
+                zygosity[poolMembers[[x]], , drop = FALSE] *
                     poolWeights[[x]]
             )
         },
-        FUN.VALUE = numeric(ncol(qseaSet@zygosity))
+        FUN.VALUE = numeric(ncol(zygosity))
     )
     # vapply() drops to a vector when there is one chromosome
     newZygosity <- t(matrix(
         newZygosity,
         ncol = length(newNames),
-        dimnames = list(colnames(qseaSet@zygosity), newNames)
+        dimnames = list(colnames(zygosity), newNames)
     ))
 
-    newSet@count_matrix <- newCounts
-    GenomicRanges::mcols(newSet@cnv) <- newCNVvals
-    newSet@zygosity <- newZygosity
+    newCNV <- qsea::getCNV(newSet)
+    GenomicRanges::mcols(newCNV) <- newCNVvals
+
+    newSet <- newSet %>%
+        setCounts(newCounts) %>%
+        setCNV(newCNV) %>%
+        qsea::setZygosity(newZygosity)
 
     newSampleTable <- purrr::map_dfr(newNames, function(x) {
-        qseaSet@sampleTable[poolMembers[[x]], , drop = FALSE] %>%
+        qsea::getSampleTable(qseaSet)[poolMembers[[x]], , drop = FALSE] %>%
             dplyr::select(-tidyselect::matches("file_name|input_file")) %>%
             dplyr::mutate(
                 sample_name = x,
@@ -547,7 +530,7 @@ poolSamples <- function(qseaSet, mergeString, renormalise = TRUE,
             tibble::column_to_rownames("rownameCol")
     })
 
-    newSet@sampleTable <- newSampleTable
+    newSet <- setSampleTable(newSet, newSampleTable)
 
     poolLibraries <- function(libraries) {
         purrr::map_dfr(newNames, function(x) {
@@ -573,24 +556,38 @@ poolSamples <- function(qseaSet, mergeString, renormalise = TRUE,
             as.data.frame()
     }
 
-    newSet@libraries$file_name <- poolLibraries(qseaSet@libraries$file_name)
-    if (!is.null(qseaSet@libraries$input_file)) {
-        newSet@libraries$input_file <-
-            poolLibraries(qseaSet@libraries$input_file)
+    newSet <- setLibraries(
+        newSet, poolLibraries(getLibraries(qseaSet, "file_name")), "file_name"
+    )
+    if (!is.null(getLibraries(qseaSet, "input_file"))) {
+        newSet <- setLibraries(
+            newSet,
+            poolLibraries(getLibraries(qseaSet, "input_file")),
+            "input_file"
+        )
     }
 
     # the pooled samples have no enrichment fit until addNormalisation() runs
-    enrichParams <- qseaSet@enrichment$parameters
+    enrichParams <- getEnrichment(qseaSet, "parameters")
     if (!is.null(enrichParams)) {
-        newSet@enrichment$parameters <- matrix(
-            NA_real_, nrow = length(newNames), ncol = ncol(enrichParams),
-            dimnames = list(newNames, colnames(enrichParams))
-        )
-        newSet@enrichment$factors <- matrix(
-            NA_real_, nrow = nrow(qseaSet@enrichment$factors),
-            ncol = length(newNames),
-            dimnames = list(rownames(qseaSet@enrichment$factors), newNames)
-        )
+        enrichFactors <- getEnrichment(qseaSet, "factors")
+        newSet <- newSet %>%
+            setEnrichment(
+                matrix(
+                    NA_real_,
+                    nrow = length(newNames), ncol = ncol(enrichParams),
+                    dimnames = list(newNames, colnames(enrichParams))
+                ),
+                "parameters"
+            ) %>%
+            setEnrichment(
+                matrix(
+                    NA_real_,
+                    nrow = nrow(enrichFactors), ncol = length(newNames),
+                    dimnames = list(rownames(enrichFactors), newNames)
+                ),
+                "factors"
+            )
     }
 
     oldSet <- qseaSet %>%
@@ -674,7 +671,7 @@ renameSamples <- function(qseaSet, newNameColumn) {
         ))
     }
 
-    if (all(renamedNames == dplyr::pull(qseaSet@sampleTable, sample_name))) {
+    if (all(renamedNames == qsea::getSampleNames(qseaSet))) {
         message("Renaming had no effect!")
         return(qseaSet)
     }
@@ -684,23 +681,5 @@ renameSamples <- function(qseaSet, newNameColumn) {
             "{renamedNames[duplicated(renamedNames)]}"
         ))
     }
-    newQSet <- qseaSet
-    newQSet@sampleTable <- newQSet@sampleTable %>%
-        tibble::remove_rownames() %>%
-        dplyr::mutate(
-            sample_name = renamedNames,
-            rownameCol = renamedNames
-        ) %>%
-        tibble::column_to_rownames("rownameCol")
-
-    rownames(newQSet@zygosity) <- renamedNames
-    rownames(newQSet@libraries$file_name) <- renamedNames
-    if (!is.null(newQSet@libraries$input_file)) {
-        rownames(newQSet@libraries$input_file) <- renamedNames
-    }
-    colnames(newQSet@count_matrix) <- renamedNames
-    rownames(newQSet@enrichment$parameters) <- renamedNames
-    colnames(newQSet@enrichment$factors) <- renamedNames
-    colnames(GenomicRanges::mcols(newQSet@cnv)) <- renamedNames
-    return(newQSet)
+    return(.setSampleNames(qseaSet, renamedNames))
 }

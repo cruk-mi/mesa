@@ -135,23 +135,20 @@ combineQsets <- function(
     if (!identical(slots1, slots2)) {
         stop("Objects have different slots!")
     }
-    # if (!identical(qseaSet1@parameters, qseaSet2@parameters))
-    # {stop("Parameters are not the same, use checkParams = FALSE to combine
-    # anyway.")}
 
-    parameters1 <- tibble::as_tibble(qseaSet1@parameters) %>%
+    parameters1 <- tibble::as_tibble(qsea::getParameters(qseaSet1)) %>%
         dplyr::select(order(colnames(.)))
-    parameters2 <- tibble::as_tibble(qseaSet2@parameters) %>%
+    parameters2 <- tibble::as_tibble(qsea::getParameters(qseaSet2)) %>%
         dplyr::select(order(colnames(.)))
 
     if (!all(
         identical(
-            GenomeInfoDb::seqnames(qseaSet1@regions),
-            GenomeInfoDb::seqnames(qseaSet2@regions)
+            GenomeInfoDb::seqnames(qsea::getRegions(qseaSet1)),
+            GenomeInfoDb::seqnames(qsea::getRegions(qseaSet2))
         ),
         identical(
-            IRanges::ranges(qseaSet1@regions),
-            IRanges::ranges(qseaSet2@regions)
+            IRanges::ranges(qsea::getRegions(qseaSet1)),
+            IRanges::ranges(qsea::getRegions(qseaSet2))
         )
     )) {
         regions1 <- qseaSet1 %>%
@@ -201,73 +198,93 @@ combineQsets <- function(
 
 
         if (!identical(
-            names(qseaSet1@enrichment), names(qseaSet2@enrichment)
+            names(getEnrichment(qseaSet1)), names(getEnrichment(qseaSet2))
         )) {
             stop("Enrichment entries are not the same")
         }
-        if (qseaSet1@enrichment$pattern_name !=
-            qseaSet2@enrichment$pattern_name) {
+        if (getEnrichment(qseaSet1, "pattern_name") !=
+            getEnrichment(qseaSet2, "pattern_name")) {
             stop("Pattern names are different")
         }
         if (!identical(
-            qseaSet1@enrichment$density, qseaSet2@enrichment$density
+            getEnrichment(qseaSet1, "density"),
+            getEnrichment(qseaSet2, "density")
         )) {
             stop("Enrichment density is different.")
         }
-        if (!identical(qseaSet1@enrichment$n, qseaSet2@enrichment$n)) {
+        if (!identical(
+            getEnrichment(qseaSet1, "n"), getEnrichment(qseaSet2, "n")
+        )) {
             stop("Enrichment n is different")
         }
     }
 
-    newQSet <- qseaSet1
-
-    newQSet@regions <- qseaSet1@regions %>%
+    newRegions <- qsea::getRegions(qseaSet1) %>%
         tibble::as_tibble() %>%
-        dplyr::left_join(tibble::as_tibble(qseaSet2@regions)) %>%
+        dplyr::left_join(tibble::as_tibble(qsea::getRegions(qseaSet2))) %>%
         dplyr::select(CpG_density, tidyselect::everything()) %>%
         plyranges::as_granges()
 
-    GenomeInfoDb::seqinfo(newQSet@regions) <-
-        GenomeInfoDb::seqinfo(qseaSet1@regions)
+    GenomeInfoDb::seqinfo(newRegions) <-
+        GenomeInfoDb::seqinfo(qsea::getRegions(qseaSet1))
 
-    newQSet@zygosity <- rbind(qseaSet1@zygosity, qseaSet2@zygosity)
-    newQSet@sampleTable <- dplyr::bind_rows(
-        qseaSet1@sampleTable, qseaSet2@sampleTable
+    newQSet <- setRegions(qseaSet1, newRegions)
+
+    newQSet <- qsea::setZygosity(
+        newQSet,
+        rbind(qsea::getZygosity(qseaSet1), qsea::getZygosity(qseaSet2))
+    )
+    newQSet <- setSampleTable(newQSet, dplyr::bind_rows(
+        qsea::getSampleTable(qseaSet1), qsea::getSampleTable(qseaSet2)
+    ))
+
+    df1 <- getLibraries(qseaSet1, "file_name")
+    df2 <- getLibraries(qseaSet2, "file_name")
+
+    newQSet <- setLibraries(
+        newQSet,
+        dplyr::bind_rows(as.data.frame(df1), as.data.frame(df2)),
+        "file_name"
     )
 
-    df1 <- qseaSet1@libraries$file_name
-    df2 <- qseaSet2@libraries$file_name
+    if ("input_file" %in% names(getLibraries(qseaSet1))) {
+        df1 <- getLibraries(qseaSet1, "input_file")
+        df2 <- getLibraries(qseaSet2, "input_file")
 
-    newQSet@libraries$file_name <- dplyr::bind_rows(
-        as.data.frame(df1), as.data.frame(df2)
-    )
-
-    if ("input_file" %in% names(qseaSet1@libraries)) {
-        df1 <- qseaSet1@libraries$input_file
-        df2 <- qseaSet2@libraries$input_file
-
-        newQSet@libraries$input_file <- dplyr::bind_rows(
-            as.data.frame(df1), as.data.frame(df2)
+        newQSet <- setLibraries(
+            newQSet,
+            dplyr::bind_rows(as.data.frame(df1), as.data.frame(df2)),
+            "input_file"
         )
     }
 
-    newQSet@cnv <- qseaSet1@cnv %>%
+    newQSet <- setCNV(newQSet, .cnvSlot(qseaSet1) %>%
         data.frame(check.names = FALSE) %>%
         dplyr::full_join(
-            data.frame(qseaSet2@cnv, check.names = FALSE),
+            data.frame(.cnvSlot(qseaSet2), check.names = FALSE),
             by = c("seqnames", "start", "end", "width", "strand")
         ) %>%
-        plyranges::as_granges()
+        plyranges::as_granges())
 
-    newQSet@count_matrix <- cbind(qseaSet1@count_matrix, qseaSet2@count_matrix)
-
-    newQSet@enrichment$parameters <- rbind(
-        qseaSet1@enrichment$parameters,
-        qseaSet2@enrichment$parameters
+    newQSet <- setCounts(
+        newQSet, cbind(qsea::getCounts(qseaSet1), qsea::getCounts(qseaSet2))
     )
-    newQSet@enrichment$factors <- cbind(
-        qseaSet1@enrichment$factors,
-        qseaSet2@enrichment$factors
+
+    newQSet <- setEnrichment(
+        newQSet,
+        rbind(
+            getEnrichment(qseaSet1, "parameters"),
+            getEnrichment(qseaSet2, "parameters")
+        ),
+        "parameters"
+    )
+    newQSet <- setEnrichment(
+        newQSet,
+        cbind(
+            getEnrichment(qseaSet1, "factors"),
+            getEnrichment(qseaSet2, "factors")
+        ),
+        "factors"
     )
 
     return(newQSet)

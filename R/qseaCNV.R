@@ -220,7 +220,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
 
     rownames(libraries) <- qsea::getSampleTable(qs)$sample_name
 
-    qs@libraries[["input_file"]] <- libraries
+    qs <- setLibraries(qs, libraries, "input_file")
 
     counts <- bamOutList %>%
         purrr::map_dfc(function(x) {
@@ -252,7 +252,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
     # try saving the raw CNV data in the qseaSet.
     # TODO would be better as a slot of its own, but can't seem to manage that
     # into the S4 class
-    qs@libraries$input_counts <- CNV_RegionsWithReads
+    qs <- setLibraries(qs, CNV_RegionsWithReads, "input_counts")
 
     mergedCNV <- purrr::map(
         qsea::getSampleTable(qs)$sample_name,
@@ -260,7 +260,7 @@ addHMMcopyCNV <- function(qs, inputColumn = "input_file", windowSize = 1000000,
     ) %>%
         purrr::reduce(plyranges::join_overlap_inner)
 
-    qs@cnv <- mergedCNV
+    qs <- setCNV(qs, mergedCNV)
 
     if (length(qsea::getOffset(qs)) > 0 && !all(is.na(qsea::getOffset(qs))))
         warning("Consider recalculating offset based on new CNV values")
@@ -592,12 +592,12 @@ plotCNVheatmap <- function(qseaSet,
 #' @export
 removeCNV <- function(qseaSet) {
 
-    qseaSet@cnv <- qseaSet@cnv %>%
+    qseaSet <- setCNV(qseaSet, .cnvSlot(qseaSet) %>%
         tibble::as_tibble() %>%
         dplyr::mutate(
             dplyr::across(-c(seqnames, start, end, width, strand), ~ . * 0)
         ) %>%
-        plyranges::as_granges()
+        plyranges::as_granges())
 
     return(qseaSet)
 

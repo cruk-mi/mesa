@@ -19,8 +19,8 @@ A \code{qseaSet} object:
 }
 \description{
 Append library information to the \code{sampleTable} of a \code{qseaSet}. Columns are
-taken from \code{qseaSet@libraries$file_name}, and when available, from
-\code{qseaSet@libraries$input_file} (prefixed with \code{"input_"}). Existing columns
+taken from the \code{"file_name"} table of \code{\link[=getLibraries]{getLibraries()}}, and when available,
+from the \code{"input_file"} table (prefixed with \code{"input_"}). Existing columns
 are not duplicated.
 }
 \examples{

@@ -16,7 +16,7 @@ Input object containing methylation-enriched sequencing data.}
 
 \item{enrichmentMethod}{\code{character(1)}
 Method used to calculate enrichment. Options are described in \strong{Details}.
-Recorded in \code{qseaSet@parameters$enrichmentMethod}.
+Recorded as the \code{enrichmentMethod} parameter of the returned object.
 \strong{Default:} \code{"blind1-15"}.}
 
 \item{maxPatternDensity}{\code{numeric(1)}
@@ -33,8 +33,7 @@ A \code{qseaSet} with updates to:
 \item \strong{Enrichment parameters} — configured over windows with CpG density in
 \verb{[1, 15]} using a linear signal schedule and
 \code{bins = seq(0.5, 40.5, 0.5)}.
-\item \strong{Parameters slot} — \code{enrichmentMethod} recorded in
-\code{qseaSet@parameters$enrichmentMethod}.
+\item \strong{Parameters} — \code{enrichmentMethod} recorded via \code{\link[=setParameters]{setParameters()}}.
 }
 }
 \description{

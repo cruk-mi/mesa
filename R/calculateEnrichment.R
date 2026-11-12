@@ -815,8 +815,8 @@ calculateCGEnrichmentGRanges <- function(
 #'
 #' @param nonEnrich `logical(1)`
 #' If `TRUE`, treat samples as **Input** libraries (columns appended under
-#' `@libraries$input_file`). If `FALSE`, treat as **Pulldown** (columns appended
-#' under `@libraries$file_name`).
+#' `"input_file"` table of [getLibraries()]). If `FALSE`, treat as **Pulldown**
+#' (columns appended under the `"file_name"` table).
 #'   **Default:** `FALSE`.
 #'
 #' @param extend `integer(1)`
@@ -863,7 +863,7 @@ calculateCGEnrichmentGRanges <- function(
 #'
 #' @details
 #' Internally calls [calculateCGEnrichment()] per sample to derive relH/GoGe and
-#' counts, then merges the results into the `@libraries` slot (`$file_name` for
+#' counts, then merges the results into the libraries (the `"file_name"` table
 #' pulldown, `$input_file` for input when `nonEnrich = TRUE`). Parallelisation
 #' uses `parallel::mclapply()`; on non-Unix systems, `nCores` > 1 is ignored.
 #'
@@ -973,10 +973,14 @@ addMedipsEnrichmentFactors <- function(
     libraryName <- ifelse(nonEnrich, "input_file", "file_name")
 
     # qsea::addCoverage() stores the library table as a matrix
-    qseaSet@libraries[[libraryName]] <- qseaSet@libraries[[libraryName]] %>%
-        as.data.frame() %>%
-        dplyr::select(-tidyselect::any_of(colnames(newCols))) %>%
-        cbind(newCols)
+    qseaSet <- setLibraries(
+        qseaSet,
+        getLibraries(qseaSet, libraryName) %>%
+            as.data.frame() %>%
+            dplyr::select(-tidyselect::any_of(colnames(newCols))) %>%
+            cbind(newCols),
+        libraryName
+    )
 
     return(qseaSet)
 }

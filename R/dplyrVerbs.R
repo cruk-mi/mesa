@@ -125,23 +125,14 @@ mutate.qseaSet <- function(.data, ...) {
         dplyr::mutate(...) %>%
         tibble::column_to_rownames(".rownameCol")
 
-    if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
+    if (!(identical(qsea::getSampleNames(.data), newTable$sample_name))) {
         stop(glue::glue(
             "sample_name cannot be changed with dplyr::mutate(). Use ",
             "mesa::renameQsetNames() or mesa::renameSamples() instead."
         ))
     }
 
-    .data@sampleTable <- newTable
-
-    if (!(identical(.data@sampleTable$sample_name, newTable$sample_name))) {
-        stop(glue::glue(
-            "sample_name cannot be changed with dplyr::mutate(). Use ",
-            "mesa::renameQsetNames() or mesa::renameSamples() instead."
-        ))
-    }
-
-    .data@sampleTable <- newTable
+    .data <- setSampleTable(.data, newTable)
 
     return(.data)}
 
@@ -163,7 +154,8 @@ mutate.qseaSet <- function(.data, ...) {
 #' @param by `character()` or `named character()`.
 #'   Join keys, as in [dplyr::left_join()].
 #'   For qseaSets, the safest choice is `by = "sample_name"`.
-#'   **Default:** `NULL` (all common variables between `x@sampleTable` and `y`).
+#'   **Default:** `NULL` (all common variables between the sample table of `x`
+#'   and `y`).
 #'
 #' @param copy `logical(1)`.
 #'   For remote backends only. If `TRUE`, copies `y` into the same data source
@@ -211,13 +203,13 @@ left_join.qseaSet <- function(
     suffix = c(".x", ".y"), keep = NULL, ...
 ) {
 
-    x@sampleTable <- x %>%
+    x <- setSampleTable(x, x %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column("rownameCol") %>%
         dplyr::left_join(
             y, by = by, copy = copy, suffix = suffix, keep = keep, ...
         ) %>%
-        tibble::column_to_rownames("rownameCol")
+        tibble::column_to_rownames("rownameCol"))
 
     return(x)}
 
@@ -332,13 +324,13 @@ selectQset <- function(qseaSet, ...) {
 
     # ensure that the sample_name and group columns are still present at the
     # front of the output
-    qseaSet@sampleTable <- qseaSet %>%
+    qseaSet <- setSampleTable(qseaSet, qseaSet %>%
         qsea::getSampleTable() %>%
         dplyr::select(sample_name, group) %>%
         dplyr::bind_cols(
             newSampleTable %>%
                 dplyr::select(-tidyselect::matches("^sample_name$|^group$"))
-        )
+        ))
 
     return(qseaSet)
 }
@@ -466,7 +458,7 @@ sort.qseaSet <- function(x, decreasing = FALSE, ...) {
 #'   **Default:** none (no filtering).
 #'
 #' @return A `qseaSet` object with only regions matching the filter conditions.
-#' Both the `count_matrix` and `@regions` slot are updated consistently.
+#' Both the counts and the regions are updated consistently.
 #'
 #' @seealso
 #' [qsea::getRegions()],
