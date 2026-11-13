@@ -136,13 +136,13 @@ mixSamples <- function(
         ))
     }
 
-    validFragNums <- qseaSet@libraries$file_name[
+    validFragNums <- getLibraries(qseaSet, "file_name")[
         c(sample1, sample2), "valid_fragments", drop = FALSE
     ] %>%
         tibble::rownames_to_column() %>%
         tibble::deframe()
 
-    counts <- qseaSet@count_matrix[, c(sample1, sample2)]
+    counts <- qsea::getCounts(qseaSet)[, c(sample1, sample2)]
     sampleColSums <- colSums(counts)
 
     message(glue::glue(
@@ -194,25 +194,29 @@ mixSamples <- function(
             paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName
         )
 
-    newSet@count_matrix <- as.matrix(newCounts)
-    colnames(newSet@count_matrix) <- newName
+    newCounts <- as.matrix(newCounts)
+    colnames(newCounts) <- newName
+    newSet <- setCounts(newSet, newCounts)
 
     reducedCNVMat <- qseaSet %>%
         qsea::getCNV() %>%
         GenomicRanges::mcols() %>%
         as.matrix()
 
-    GenomicRanges::mcols(newSet@cnv) <-
+    newCNV <- qsea::getCNV(newSet)
+    GenomicRanges::mcols(newCNV) <-
         proportion * reducedCNVMat[, sample1] +
         (1 - proportion) * reducedCNVMat[, sample2]
-    colnames(GenomicRanges::mcols(newSet@cnv)) <- newName
+    colnames(GenomicRanges::mcols(newCNV)) <- newName
+    newSet <- setCNV(newSet, newCNV)
 
-    newSet@zygosity <-
-        proportion * qseaSet@zygosity[sample1, , drop = FALSE] +
-        (1 - proportion) * qseaSet@zygosity[sample2, , drop = FALSE]
-    rownames(newSet@zygosity) <- newName
+    newZygosity <-
+        proportion * qsea::getZygosity(qseaSet)[sample1, , drop = FALSE] +
+        (1 - proportion) * qsea::getZygosity(qseaSet)[sample2, , drop = FALSE]
+    rownames(newZygosity) <- newName
+    newSet <- qsea::setZygosity(newSet, newZygosity)
 
-    newSet@sampleTable <- tibble::tibble(
+    newSet <- setSampleTable(newSet, tibble::tibble(
         sample_name = newName,
         rownameCol = newName,
         group = groupName,
@@ -221,14 +225,14 @@ mixSamples <- function(
         prop1 = proportion
     ) %>%
         tibble::remove_rownames() %>%
-        tibble::column_to_rownames("rownameCol") %>%
-        as.data.frame()
+        tibble::column_to_rownames("rownameCol"))
 
-    newSet@libraries$file_name[, "valid_fragments"] <- nReadsTotal
-    newSet@libraries$file_name[, "offset"] <- NA
-    newSet@libraries$file_name[, "library_factor"] <- NA
-
-    rownames(newSet@libraries$file_name) <- newName
+    newLibraries <- getLibraries(newSet, "file_name")
+    newLibraries[, "valid_fragments"] <- nReadsTotal
+    newLibraries[, "offset"] <- NA
+    newLibraries[, "library_factor"] <- NA
+    rownames(newLibraries) <- newName
+    newSet <- setLibraries(newSet, newLibraries, "file_name")
 
     if (renormalise) {
         newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")
@@ -368,13 +372,13 @@ mixThreeQsetSamples <- function(
         ))
     }
 
-    validFragNums <- qseaSet@libraries$file_name[
+    validFragNums <- getLibraries(qseaSet, "file_name")[
         c(sample1, sample2, sample3), "valid_fragments", drop = FALSE
     ] %>%
         tibble::rownames_to_column() %>%
         tibble::deframe()
 
-    counts <- qseaSet@count_matrix[, c(sample1, sample2, sample3)]
+    counts <- qsea::getCounts(qseaSet)[, c(sample1, sample2, sample3)]
     sampleColSums <- colSums(counts)
 
     message(glue::glue(
@@ -445,28 +449,33 @@ mixThreeQsetSamples <- function(
             paste0("^", qsea::getSampleNames(qseaSet)[1], "$"), newName
         )
 
-    newSet@count_matrix <- as.matrix(newCounts)
-    colnames(newSet@count_matrix) <- newName
+    newCounts <- as.matrix(newCounts)
+    colnames(newCounts) <- newName
+    newSet <- setCounts(newSet, newCounts)
 
     reducedCNVMat <- qseaSet %>%
         qsea::getCNV() %>%
         GenomicRanges::mcols() %>%
         as.matrix()
 
-    GenomicRanges::mcols(newSet@cnv) <-
+    newCNV <- qsea::getCNV(newSet)
+    GenomicRanges::mcols(newCNV) <-
         proportion1 * reducedCNVMat[, sample1] +
         proportion2 * reducedCNVMat[, sample2] +
         (1 - proportion1 - proportion2) * reducedCNVMat[, sample3]
-    colnames(GenomicRanges::mcols(newSet@cnv)) <- newName
+    colnames(GenomicRanges::mcols(newCNV)) <- newName
+    newSet <- setCNV(newSet, newCNV)
 
-    newSet@zygosity <-
-        proportion1 * qseaSet@zygosity[sample1, , drop = FALSE] +
-        proportion2 * qseaSet@zygosity[sample2, , drop = FALSE] +
+    zygosity <- qsea::getZygosity(qseaSet)
+    newZygosity <-
+        proportion1 * zygosity[sample1, , drop = FALSE] +
+        proportion2 * zygosity[sample2, , drop = FALSE] +
         (1 - proportion1 - proportion2) *
-        qseaSet@zygosity[sample3, , drop = FALSE]
-    rownames(newSet@zygosity) <- newName
+            zygosity[sample3, , drop = FALSE]
+    rownames(newZygosity) <- newName
+    newSet <- qsea::setZygosity(newSet, newZygosity)
 
-    newSet@sampleTable <- tibble::tibble(
+    newSet <- setSampleTable(newSet, tibble::tibble(
         sample_name = newName,
         rownameCol = newName,
         group = groupName,
@@ -476,14 +485,14 @@ mixThreeQsetSamples <- function(
         prop2 = proportion2
     ) %>%
         tibble::remove_rownames() %>%
-        tibble::column_to_rownames("rownameCol") %>%
-        as.data.frame()
+        tibble::column_to_rownames("rownameCol"))
 
-    newSet@libraries$file_name[, "valid_fragments"] <- nReadsTotal
-    newSet@libraries$file_name[, "offset"] <- NA
-    newSet@libraries$file_name[, "library_factor"] <- NA
-
-    rownames(newSet@libraries$file_name) <- newName
+    newLibraries <- getLibraries(newSet, "file_name")
+    newLibraries[, "valid_fragments"] <- nReadsTotal
+    newLibraries[, "offset"] <- NA
+    newLibraries[, "library_factor"] <- NA
+    rownames(newLibraries) <- newName
+    newSet <- setLibraries(newSet, newLibraries, "file_name")
 
     if (renormalise) {
         newSet <- addNormalisation(newSet, enrichmentMethod = "blind1-15")

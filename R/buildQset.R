@@ -607,13 +607,10 @@ addBamCoveragePairedAndUnpaired <- function(qs,
         maxInsertSize = maxInsertSize, minInsertSize = minInsertSize,
         properPairsOnly = properPairsOnly
     )
-    qs@parameters <- c(qsea::getParameters(qs), param)
-    qs@count_matrix <- coverage
-    qs@libraries[["file_name"]] <- libraries
-
-    # GenomicRanges::mcols(qs@regions) <-
-    # cbind(GenomicRanges::mcols(qs@regions), regionAvgs)
-
+    qs <- qs %>%
+        setParameters(param) %>%
+        setCounts(coverage) %>%
+        setLibraries(libraries, "file_name")
 
     return(qs)
 }
@@ -631,7 +628,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #'
 #' @param enrichmentMethod `character(1)`
 #'   Method used to calculate enrichment. Options are described in **Details**.
-#'   Recorded in `qseaSet@parameters$enrichmentMethod`.
+#'   Recorded as the `enrichmentMethod` parameter of the returned object.
 #'   **Default:** `"blind1-15"`.
 #'
 #' @param maxPatternDensity `numeric(1)`
@@ -647,8 +644,7 @@ addBamCoveragePairedAndUnpaired <- function(qs,
 #' * **Enrichment parameters** — configured over windows with CpG density in
 #'   `[1, 15]` using a linear signal schedule and
 #'   `bins = seq(0.5, 40.5, 0.5)`.
-#' * **Parameters slot** — `enrichmentMethod` recorded in
-#'   `qseaSet@parameters$enrichmentMethod`.
+#' * **Parameters** — `enrichmentMethod` recorded via [setParameters()].
 #'
 #' @details
 #' This function encapsulates a recommended default pipeline for qsea
@@ -716,10 +712,11 @@ addNormalisation <- function(qseaSet, enrichmentMethod = "blind1-15",
         )
 
         # store the enrichment method used
-        qseaSet@parameters$enrichmentMethod <- "blind1-15"
-
+        qseaSet <- setParameters(
+            qseaSet, list(enrichmentMethod = "blind1-15")
+        )
     } else if (enrichmentMethod == "none") {
-        qseaSet@parameters$enrichmentMethod <- "none"
+        qseaSet <- setParameters(qseaSet, list(enrichmentMethod = "none"))
     } else {
         stop(glue::glue("enrichmentMethod {enrichmentMethod} not implemented!"))
     }

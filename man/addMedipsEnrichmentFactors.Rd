@@ -28,8 +28,8 @@ files. If \code{NULL}, no files are written.
 
 \item{nonEnrich}{\code{logical(1)}
 If \code{TRUE}, treat samples as \strong{Input} libraries (columns appended under
-\verb{@libraries$input_file}). If \code{FALSE}, treat as \strong{Pulldown} (columns appended
-under \verb{@libraries$file_name}).
+\code{"input_file"} table of \code{\link[=getLibraries]{getLibraries()}}). If \code{FALSE}, treat as \strong{Pulldown}
+(columns appended under the \code{"file_name"} table).
 \strong{Default:} \code{FALSE}.}
 
 \item{extend}{\code{integer(1)}
@@ -84,7 +84,7 @@ libraries.
 }
 \details{
 Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and
-counts, then merges the results into the \verb{@libraries} slot (\verb{$file_name} for
+counts, then merges the results into the libraries (the \code{"file_name"} table
 pulldown, \verb{$input_file} for input when \code{nonEnrich = TRUE}). Parallelisation
 uses \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }

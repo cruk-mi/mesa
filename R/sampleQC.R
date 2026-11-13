@@ -115,10 +115,10 @@ addHyperStableFraction <- function(qseaSet, minDensity = 5, minBeta = 0.8) {
             hyperStableEdgar = tidyr::replace_na(round(hyperStableEdgar, 3), 0)
         )
 
-    qseaSet@sampleTable <- cbind(
-        qseaSet@sampleTable,
+    qseaSet <- setSampleTable(qseaSet, cbind(
+        qsea::getSampleTable(qseaSet),
         dplyr::select(newData, -sample_name)
-    )
+    ))
 
     return(qseaSet)
 

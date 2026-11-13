@@ -175,7 +175,7 @@
 #' * loaded coverage according to `coverageMethod`;
 #' * CNV results depending on `CNVmethod`;
 #' * CpG density and enrichment parameters;
-#' * recorded processing parameters in `@parameters`.
+#' * recorded processing parameters, see [qsea::getParameters()].
 #'
 #' @seealso
 #' [qsea::createQseaSet()], [qsea::addCoverage()], [qsea::addCNV()],
@@ -414,11 +414,8 @@ makeQset <- function(sampleTable,
     if (any(GenomeInfoDb::genome(qsea::getRegions(qseaSet)) != BSgenome)) {
         regions <- qseaSet %>% qsea::getRegions()
         GenomeInfoDb::genome(regions) <- BSgenome
-        qseaSet@regions <- regions
+        qseaSet <- setRegions(qseaSet, regions)
     }
-
-    # store the extra blacklist file location
-    # qseaSet@parameters$badRegions2 <- blacklistBed
 
     # TODO add a single-end coverage method.
 
@@ -459,13 +456,15 @@ makeQset <- function(sampleTable,
         ))
     }
 
-    qseaSet@parameters$minInsertSize <- minInsertSize
-    qseaSet@parameters$maxInsertSize <- maxInsertSize
-    qseaSet@parameters$properPairsOnly <- properPairsOnly
-    qseaSet@parameters$minReferenceLength <- minReferenceLength
-    qseaSet@parameters$minMapQual <- minMapQual
+    qseaSet <- setParameters(qseaSet, list(
+        minInsertSize = minInsertSize,
+        maxInsertSize = maxInsertSize,
+        properPairsOnly = properPairsOnly,
+        minReferenceLength = minReferenceLength,
+        minMapQual = minMapQual
+    ))
 
-    numEmpty <- qseaSet@libraries$file_name %>%
+    numEmpty <- getLibraries(qseaSet, "file_name") %>%
         as.data.frame() %>%
         dplyr::select(total_fragments) %>%
         dplyr::filter(total_fragments == 0)
@@ -675,8 +674,10 @@ makeQset <- function(sampleTable,
         masks = NULL)
 
     # store the values of the fragment length and SD used into the object
-    qseaSet@parameters$fragmentLength <- fragmentLength
-    qseaSet@parameters$fragmentSD <- fragmentSD
+    qseaSet <- setParameters(qseaSet, list(
+        fragmentLength = fragmentLength,
+        fragmentSD = fragmentSD
+    ))
 
     # do not set library factors via TMM, just set to be 1.
     # Makes no difference to beta values as gets normalised
@@ -688,8 +689,10 @@ makeQset <- function(sampleTable,
         maxPatternDensity = maxPatternDensity
     )
 
-    qseaSet@parameters$coverageMethod <- coverageMethod
-    qseaSet@parameters$cnvMethod <- CNVmethod
+    qseaSet <- setParameters(qseaSet, list(
+        coverageMethod = coverageMethod,
+        cnvMethod = CNVmethod
+    ))
 
     message("qseaSet object generated successfully")
 

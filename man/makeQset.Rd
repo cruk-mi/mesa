@@ -152,7 +152,7 @@ A \code{qseaSet} containing:
 \item loaded coverage according to \code{coverageMethod};
 \item CNV results depending on \code{CNVmethod};
 \item CpG density and enrichment parameters;
-\item recorded processing parameters in \verb{@parameters}.
+\item recorded processing parameters, see \code{\link[qsea:getParameters]{qsea::getParameters()}}.
 }
 }
 \description{

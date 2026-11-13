@@ -41,6 +41,14 @@
   column.
   ([#200](https://github.com/cruk-mi/mesa/issues/200), [PR #201](https://github.com/cruk-mi/mesa/pull/201))
 
+## New features
+- New accessors for the `qseaSet` slots that qsea does not expose:
+  `getLibraries()` and `setLibraries()` for the library tables,
+  `getEnrichment()` and `setEnrichment()` for the enrichment fit, and
+  `setCounts()`, `setRegions()`, `setSampleTable()`, `setParameters()` and
+  `setCNV()` for the slots qsea only lets you read. `setParameters()` merges
+  the parameters it is given rather than replacing the whole list.
+
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
   `plotGenomicFeatureDistribution()`, `plotGeneHeatmap()` and
@@ -109,6 +117,10 @@
   ([#123](https://github.com/cruk-mi/mesa/issues/123), [PR #172](https://github.com/cruk-mi/mesa/pull/172))
 
 ## Style
+- mesa no longer reaches into a `qseaSet` slot with `@`. Every read now goes
+  through a `qsea::get*()` accessor or one of the new mesa ones, and every
+  write through a new setter, so slot access is confined to `R/qseaSlots.R`.
+  Behaviour is unchanged.
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
   are now at most 80 characters, clearing those BiocCheck formatting notes.
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))

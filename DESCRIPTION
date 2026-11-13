@@ -118,4 +118,4 @@ Config/testthat/edition: 3
 Config/testthat/start-first: readFragments
 URL: https://github.com/cruk-mi/mesa, https://cruk-mi.github.io/mesa/
 BugReports: https://github.com/cruk-mi/mesa/issues
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1

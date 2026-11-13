@@ -957,7 +957,9 @@ plotGeneHeatmap <- function(qseaSet, gene, normMethod = "beta",
 
     if (nrow(gene_details) > 1) {
         gene_details <- gene_details %>%
-            filter(seqnames %in% GenomeInfoDb::seqlevels(qseaSet@regions))
+            filter(seqnames %in% GenomeInfoDb::seqlevels(
+                qsea::getRegions(qseaSet)
+            ))
     }
 
     if (nrow(gene_details) != 1) {
