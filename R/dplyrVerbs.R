@@ -320,17 +320,18 @@ select.qseaSet <- function(.data, ...) {selectQset(.data, ...)}
 selectQset <- function(qseaSet, ...) {
     newSampleTable <- qseaSet %>%
         qsea::getSampleTable() %>%
-        dplyr::select(...)
+        dplyr::select(...) %>%
+        dplyr::select(-tidyselect::matches("^sample_name$|^group$"))
 
     # ensure that the sample_name and group columns are still present at the
     # front of the output
-    qseaSet <- setSampleTable(qseaSet, qseaSet %>%
+
+    updatedSampleTable <- qseaSet %>%
         qsea::getSampleTable() %>%
         dplyr::select(sample_name, group) %>%
-        dplyr::bind_cols(
-            newSampleTable %>%
-                dplyr::select(-tidyselect::matches("^sample_name$|^group$"))
-        ))
+        dplyr::bind_cols(newSampleTable)
+
+    qseaSet <- qseaSet %>% setSampleTable(updatedSampleTable)
 
     return(qseaSet)
 }

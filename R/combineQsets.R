@@ -234,9 +234,11 @@ combineQsets <- function(
         newQSet,
         rbind(qsea::getZygosity(qseaSet1), qsea::getZygosity(qseaSet2))
     )
-    newQSet <- setSampleTable(newQSet, dplyr::bind_rows(
-        qsea::getSampleTable(qseaSet1), qsea::getSampleTable(qseaSet2)
-    ))
+    newQSet <- setSampleTable(newQSet, 
+        dplyr::bind_rows(
+            qsea::getSampleTable(qseaSet1),
+            qsea::getSampleTable(qseaSet2))
+        )
 
     df1 <- getLibraries(qseaSet1, "file_name")
     df2 <- getLibraries(qseaSet2, "file_name")

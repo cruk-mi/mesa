@@ -187,26 +187,29 @@ addLibraryInformation <- function(qseaSet) {
         qsea::getSampleTable() %>%
         colnames()
 
-    qseaSet <- setSampleTable(qseaSet, cbind(
-        qsea::getSampleTable(qseaSet),
-        getLibraries(qseaSet, "file_name") %>%
-            dplyr::select(-tidyselect::any_of(curColNames))
-    ))
+    newSampleTable <- qsea::getSampleTable(qseaSet) %>%
+        dplyr::bind_cols(
+            getLibraries(qseaSet, "file_name") %>%
+                dplyr::select(-tidyselect::any_of(curColNames))
+        )
+
+    qseaSet <- qseaSet %>% setSampleTable(newSampleTable)
 
     if ("input_file" %in% names(getLibraries(qseaSet))) {
         curColNames <- qseaSet %>%
             qsea::getSampleTable() %>%
             colnames()
 
-        qseaSet <- setSampleTable(qseaSet, cbind(
-            qsea::getSampleTable(qseaSet),
-            getLibraries(qseaSet, "input_file") %>%
-                dplyr::rename_with(~ paste0("input_", .x)) %>%
-                dplyr::select(-tidyselect::any_of(curColNames)) %>%
-                dplyr::select(-tidyselect::matches("^library_factor$|^offset$"))
-        ))
-    }
+        newSampleTable <- qsea::getSampleTable(qseaSet) %>%
+            dplyr::bind_cols(
+                getLibraries(qseaSet, "input_file") %>%
+                    dplyr::rename_with(~ paste0("input_", .x)) %>%
+                    dplyr::select(-tidyselect::any_of(curColNames)) %>%
+                    dplyr::select(-tidyselect::matches("^library_factor$|^offset$"))
+            )
 
+        qseaSet <- qseaSet %>% setSampleTable(newSampleTable)
+    }
 
     return(qseaSet)
 }
