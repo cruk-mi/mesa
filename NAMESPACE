@@ -18,6 +18,7 @@ export(addMedipsEnrichmentFactors)
 export(addNormalisation)
 export(addSummaryAcrossWindows)
 export(annotateWindows)
+export(asRangedSummarizedExperiment)
 export(asValidGranges)
 export(calculateCGEnrichment)
 export(calculateCGEnrichmentGRanges)
@@ -134,6 +135,17 @@ importFrom(BiocGenerics,
   as.data.frame,
   colnames
 )
+importFrom(GenomicRanges,
+  findOverlaps,
+  pintersect
+)
+importFrom(IRanges,width)
+importFrom(S4Vectors,
+  mcols,
+  queryHits,
+  subjectHits
+)
+importFrom(SummarizedExperiment,SummarizedExperiment)
 importFrom(dplyr,
   arrange,
   filter,
