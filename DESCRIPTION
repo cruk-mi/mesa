@@ -54,6 +54,8 @@ Imports:
     rlang,
     GenomeInfoDb,
     GenomicRanges,
+       S4Vectors,
+       SummarizedExperiment,
     BiocGenerics,
     Biostrings,
     gtools,
