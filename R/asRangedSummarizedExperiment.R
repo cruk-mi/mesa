@@ -18,9 +18,9 @@
 #'   and the original CNV bins -> `metadata()`
 #'
 #' @param qs A `qseaSet`.
-#' @param assays Which assays to include, any of `"counts"`, `"nrpm"`, 
-#'   `"beta"`, `"cnv"`. Defaults to `"counts"` only, as genome-wide objects can be
-#'   very large. 
+#' @param assays Which assays to include, any of `"counts"`, `"nrpm"`,
+#'   `"beta"`, `"cnv"`. Defaults to `"counts"` only, as genome-wide
+#'   objects can be very large.
 #'
 #' @return A `RangedSummarizedExperiment` with windows as rows and samples as
 #'   columns.
@@ -41,8 +41,7 @@
 #' @importFrom IRanges width
 #' @importFrom S4Vectors queryHits subjectHits
 #' @export
-asRangedSummarizedExperiment <- function(qs,
-                                         assays = "counts") {
+asRangedSummarizedExperiment <- function(qs, assays = "counts") {
     if (!methods::is(qs, "qseaSet")) {
         stop("`qs` must be a qseaSet.", call. = FALSE)
     }
@@ -128,8 +127,10 @@ asRangedSummarizedExperiment <- function(qs,
         tab <- as.data.frame(tab)
         missingSamples <- setdiff(samples, colnames(tab))
         if (length(missingSamples) > 0) {
-            stop("Sample columns not found in table: ",
-                 paste(missingSamples, collapse = ", "), call. = FALSE)
+            stop(
+                "Sample columns not found in table: ",
+                paste(missingSamples, collapse = ", "), call. = FALSE
+            )
         }
         m <- as.matrix(tab[, samples, drop = FALSE])
     }
@@ -143,8 +144,10 @@ asRangedSummarizedExperiment <- function(qs,
     cnvVals <- as.matrix(as.data.frame(S4Vectors::mcols(cnv)))
     missingSamples <- setdiff(samples, colnames(cnvVals))
     if (length(missingSamples) > 0) {
-        stop("CNV has no values for samples: ",
-             paste(missingSamples, collapse = ", "), call. = FALSE)
+        stop(
+            "CNV has no values for samples: ",
+            paste(missingSamples, collapse = ", "), call. = FALSE
+        )
     }
     cnvVals <- cnvVals[, samples, drop = FALSE]
 
@@ -160,8 +163,10 @@ asRangedSummarizedExperiment <- function(qs,
     s <- s[ord]
     keep <- !duplicated(q)
 
-    out <- matrix(NA_real_, nrow = length(windows), ncol = length(samples),
-                  dimnames = list(NULL, samples))
+    out <- matrix(
+        NA_real_, nrow = length(windows), ncol = length(samples),
+        dimnames = list(NULL, samples)
+    )
     out[q[keep], ] <- cnvVals[s[keep], , drop = FALSE]
     out
 }
