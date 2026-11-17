@@ -205,7 +205,9 @@ addLibraryInformation <- function(qseaSet) {
                 getLibraries(qseaSet, "input_file") %>%
                     dplyr::rename_with(~ paste0("input_", .x)) %>%
                     dplyr::select(-tidyselect::any_of(curColNames)) %>%
-                    dplyr::select(-tidyselect::matches("^library_factor$|^offset$"))
+                    dplyr::select(
+                        -tidyselect::matches("^library_factor$|^offset$")
+                    )
             )
 
         qseaSet <- qseaSet %>% setSampleTable(newSampleTable)
