@@ -1,5 +1,11 @@
 # mesa 0.99.9.9000
 
+## Testing
+- Cut the number of real `ChIPseeker::annotatePeak()` runs in the test suite.
+  `summariseDMRsByGene()` is now tested against a stand-in `annotateWindows()`,
+  and the mouse tests annotate for real once instead of three times, checking
+  the remaining `TxDb` argument forms against the object each resolves to.
+
 # mesa 0.99.9
 
 ## Bug fixes

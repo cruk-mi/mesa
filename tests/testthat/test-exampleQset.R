@@ -164,8 +164,19 @@ test_that("Analysing DMRs", {
         summariseDMRsByContrast() %>%
         dim(), c(3, 4))
 
-    skip_if_not_installed("org.Hs.eg.db") # skip, before calling annotateWindows
-    # if org.Hs.eg.db is not installed
+    # annotateWindows() is tested on real annotation in test-DMRs.R and
+    # test-mouse.R, and costs several seconds a call, so a stand-in supplies
+    # the gene columns summariseDMRsByGene() groups by.
+    local_mocked_bindings(
+        annotateWindows = function(dataTable, ...) {
+            dataTable %>%
+                mutate(
+                    ENSEMBL = rep_len(c("ENSG001", "ENSG002"), n()),
+                    SYMBOL = rep_len(c("GeneA", "GeneB"), n()),
+                    GENENAME = rep_len(c("gene A", "gene B"), n())
+                )
+        }
+    )
     expect_equal(DMRs %>%
         pivotDMRsLonger() %>%
         annotateWindows(genome = "hg38") %>%
