@@ -46,9 +46,11 @@
   `getLibraries()` and `setLibraries()` for the library tables,
   `getEnrichment()` and `setEnrichment()` for the enrichment fit, and
   `setCounts()`, `setRegions()`, `setSampleTable()`, `setParameters()` and
-  `setCNV()` for the slots qsea only lets you read. `setParameters()` merges
-  the parameters it is given by name, replacing matching values and retaining
-  parameters not supplied.
+  `setCNV()` for the slots qsea only lets you read. `getLibraries()`, 
+  `setLibraries()`, `getEnrichment()` and `setEnrichment()` can read or write
+  a whole slot or a single named slot element. `setParameters()` merges
+  the parameters it is given in a named list, replacing matching values and 
+  retaining parameters not supplied.
   ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 
 ## Documentation
@@ -122,9 +124,11 @@
 - mesa no longer reaches into a `qseaSet` slot with `@`. Every read now goes
   through a `qsea::get*()` accessor or one of the new mesa ones, and every
   write through a new setter, so slot access is confined to `R/qseaSlots.R`.
-  The refactor preserves behavior except that
+  The refactor preserves behaviour except that
   `addBamCoveragePairedAndUnpaired()` now replaces parameter values with
-  matching names rather than appending duplicate entries.
+  matching names rather than appending duplicate entries, and 
+  `setMart(qs, NULL)` leaves a NULL entry in the `parameters` slot whereas 
+  previously it used to be deleted.
   ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
   are now at most 80 characters, clearing those BiocCheck formatting notes.
