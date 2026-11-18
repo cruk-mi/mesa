@@ -224,16 +224,14 @@ enrichment parameters, allowing for estimation of beta values.
 }
 }
 \examples{
-# A tumour/normal pair of MeDIP-seq BAMs from MEDIPSData, restricted to
-# chr22 to keep the example short
+# A tumour sample of MeDIP-seq BAMs from MEDIPSData, restricted to
+# chr21 to keep the example short
 if (requireNamespace("MEDIPSData", quietly = TRUE) &&
     requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)) {
     sampleTable <- data.frame(
-        sample_name = c("Normal1", "Tumour1"),
-        group = c("Normal", "Tumour"),
+        sample_name = "Tumour1",
+        group = "Tumour",
         file_name = c(
-            system.file("extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
-                package = "MEDIPSData", mustWork = TRUE),
             system.file("extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
                 package = "MEDIPSData", mustWork = TRUE)
         )
@@ -242,7 +240,7 @@ if (requireNamespace("MEDIPSData", quietly = TRUE) &&
     sampleTable \%>\%
         makeQset(
             BSgenome          = "BSgenome.Hsapiens.UCSC.hg19",
-            chrSelect         = "chr22",
+            chrSelect         = "chr21",
             windowSize        = 300,
             fragmentLength    = 200,
             fragmentSD        = 50,
