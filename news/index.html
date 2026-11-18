@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mesa</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.9.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.10</span>
       </span>
     </div>
 
@@ -70,17 +70,17 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.99.9.9000" id="mesa-09999000">mesa 0.99.9.9000<a class="anchor" aria-label="anchor" href="#mesa-09999000"></a></h2>
+<h2 class="page-header" data-toc-text="0.99.10" id="mesa-09910">mesa 0.99.10<a class="anchor" aria-label="anchor" href="#mesa-09910"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-99-9-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-99-9-9000"></a></h3>
+<h3 id="new-features-0-99-10">New features<a class="anchor" aria-label="anchor" href="#new-features-0-99-10"></a></h3>
 <ul><li>New <code>exampleDMRs</code> dataset: annotated DMRs between all <code>type</code> groups of <code>exampleTumourNormal</code>, used by the examples of the DMR helper functions so they no longer recompute DMRs or annotation. (<a href="https://github.com/cruk-mi/mesa/pull/207" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/207" class="external-link">#207</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="documentation-0-99-9-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-9-9000"></a></h3>
+<h3 id="documentation-0-99-10">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-99-10"></a></h3>
 <ul><li>The examples of <code><a href="../reference/makeQset.html">makeQset()</a></code> and the generation vignette now use a single MEDIPSData bam file restricted to chr21, and the <code><a href="../reference/sliceDMRs.html">sliceDMRs()</a></code> example for <code>adjPval</code> now uses <code>metric = adjPval</code>. (<a href="https://github.com/cruk-mi/mesa/pull/207" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/207" class="external-link">#207</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="testing-0-99-9-9000">Testing<a class="anchor" aria-label="anchor" href="#testing-0-99-9-9000"></a></h3>
+<h3 id="testing-0-99-10">Testing<a class="anchor" aria-label="anchor" href="#testing-0-99-10"></a></h3>
 <ul><li>Cut the number of real <code><a href="https://rdrr.io/pkg/ChIPseeker/man/annotatePeak.html" class="external-link">ChIPseeker::annotatePeak()</a></code> runs in the test suite. <code><a href="../reference/summariseDMRsByGene.html">summariseDMRsByGene()</a></code> is now tested on <code>exampleDMRs</code>, and the mouse tests annotate for real once instead of three times, checking the remaining <code>TxDb</code> argument forms against the object each resolves to. The cached example <code>qseaSet</code> now uses one sampling depth throughout. (<a href="https://github.com/cruk-mi/mesa/pull/207" class="external-link">PR </a><a href="https://github.com/cruk-mi/mesa/issues/207" class="external-link">#207</a>)</li>
 </ul></div>
 </div>
