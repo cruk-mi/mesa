@@ -78,23 +78,57 @@ test_that("Mouse annotation", {
             annoDb = "org.Mm.eg.db"))
 
     expect_true(any(stringr::str_detect(tab1$SYMBOL, "Fbxl18")))
+})
 
-    # should work if TxDb is specified using the full object not a string
-    tab2 <- expect_no_error(exampleMouse %>%
-        getBetaTable() %>%
-        annotateWindows(TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene,
-            annoDb = "org.Mm.eg.db"))
 
-    expect_true(any(stringr::str_detect(tab2$SYMBOL, "Fbxl18")))
+test_that("annotateWindows() resolves every way of naming a TxDb alike", {
 
-    # should also work if TxDb and annoDb are specified globally
+    skip_if_not_installed("TxDb.Mmusculus.UCSC.mm10.knownGene")
+    skip_if_not_installed("org.Mm.eg.db")
+
+    oldOptions <- options(
+        mesa_TxDb = getOption("mesa_TxDb"),
+        mesa_annoDb = getOption("mesa_annoDb"),
+        mesa_genome = getOption("mesa_genome")
+    )
+    on.exit(options(oldOptions), add = TRUE)
+
+    mm10 <- getExportedValue(
+        "TxDb.Mmusculus.UCSC.mm10.knownGene",
+        "TxDb.Mmusculus.UCSC.mm10.knownGene"
+    )
+
+    # The annotation itself is run for real above; each extra call costs
+    # several seconds, and all that differs here is how the TxDb is named.
+    seen <- NULL
+    local_mocked_bindings(
+        annotatePeak = function(peak, TxDb, annoDb, ...) {
+            seen <<- list(TxDb = TxDb, annoDb = annoDb)
+            stop("mocked annotatePeak")
+        },
+        .package = "ChIPseeker"
+    )
+
+    resolved <- function(...) {
+        seen <<- NULL
+        try(annotateWindows(getBetaTable(exampleMouse), ...), silent = TRUE)
+        seen
+    }
+
+    setMesaTxDb(NULL)
+    setMesaAnnoDb(NULL)
+    setMesaGenome(NULL)
+    byString <- resolved(TxDb = "TxDb.Mmusculus.UCSC.mm10.knownGene",
+        annoDb = "org.Mm.eg.db")
+    byObject <- resolved(TxDb = mm10, annoDb = "org.Mm.eg.db")
+
     setMesaTxDb("TxDb.Mmusculus.UCSC.mm10.knownGene")
     setMesaAnnoDb("org.Mm.eg.db")
-    tab3 <- expect_no_error(exampleMouse %>%
-        getBetaTable() %>%
-        annotateWindows())
+    byOption <- resolved()
 
-    expect_true(any(stringr::str_detect(tab3$SYMBOL, "Fbxl18")))
-    expect_equal(tab1, tab2)
-    expect_equal(tab1, tab3)
+    expect_identical(byString$TxDb, mm10)
+    expect_identical(byObject$TxDb, mm10)
+    expect_identical(byOption$TxDb, mm10)
+    expect_identical(byString$annoDb, "org.Mm.eg.db")
+    expect_identical(byOption$annoDb, "org.Mm.eg.db")
 })

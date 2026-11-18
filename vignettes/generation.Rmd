@@ -79,31 +79,21 @@ ensuring that the enriched and non-enriched samples do indeed come from the same
 individual, and to check that paired samples are actually paired (for
 instance when comparing pre- and post-treatment).
 
-For the example here, we use the example data in the `MEDIPSData` package. This
-contains pairs of tumour and normal tissue from the same patients, with
-MeDIP-seq performed as the enrichment step. These bam files are downsampled to
-only contain chromosomes 20-22, and are aligned to hg19. Note, we highly
-recommend using the hg38/GRCh38 reference genome rather than hg19 as used here!
+For the example here, we use one of the example samples in the `MEDIPSData`
+package. The package contains pairs of tumour and normal tissue from the same
+patients, with MeDIP-seq performed as the enrichment step. These bam files are
+downsampled to only contain chromosomes 20-22, and are aligned to hg19. Note,
+we highly recommend using the hg38/GRCh38 reference genome rather than hg19 as
+used here! For speed, we only use the tumour sample from the first patient, and
+only chromosome 21.
 
 ```{r chunk-2, eval = requireNamespace("MEDIPSData")}
 sampleTable <- tribble(~sample_name, ~group, ~tumour, ~patient, ~file_name,
-    "Normal1", "Normal1", "Normal", "Patient1", system.file(
-        "extdata", "NSCLC_MeDIP_1N_fst_chr_20_21_22.bam",
-        package = "MEDIPSData", mustWork = TRUE
-    ),
-    "Normal2", "Normal1", "Normal", "Patient2", system.file(
-        "extdata", "NSCLC_MeDIP_2N_fst_chr_20_21_22.bam",
-        package = "MEDIPSData", mustWork = TRUE
-    ),
     "Tumour1", "Tumour1", "Tumour", "Patient1", system.file(
         "extdata", "NSCLC_MeDIP_1T_fst_chr_20_21_22.bam",
         package = "MEDIPSData", mustWork = TRUE
-    ),
-    "Tumour2", "Tumour2", "Tumour", "Patient2", system.file(
-        "extdata", "NSCLC_MeDIP_2T_fst_chr_20_21_22.bam",
-        package = "MEDIPSData", mustWork = TRUE
     )
-    )
+)
 ```
 
 ## Making a qseaSet
@@ -138,13 +128,13 @@ Before creating the `qseaSet`, you need to have:
     sequencing, as a smaller window size will be more prone to noise.
 
 For our hg19 example data, we set `BSgenome = "BSgenome.Hsapiens.UCSC.hg19"`,
-specify the three chromosomes included in the test dataset and give some
+specify the chromosome used from the test dataset and give some
 approximate fragment length and SD values.
 
 ```{r chunk-3, eval = requireNamespace("BSgenome.Hsapiens.UCSC.hg19")}
 makeQset(sampleTable,
     BSgenome = "BSgenome.Hsapiens.UCSC.hg19",
-    chrSelect = paste0("chr",20:22),
+    chrSelect = "chr21",
     windowSize = 300,
     fragmentLength = 200,
     fragmentSD = 50,

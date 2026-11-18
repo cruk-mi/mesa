@@ -14,7 +14,7 @@ test_that("Filtering Qset works", {
 
 test_that("Changing Qset Windows", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5)
 
     regions <- qsea::getRegions(randomSet)[1:1000]
 
@@ -75,7 +75,7 @@ test_that("Join works", {
 
 test_that("Sorting Qsets", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5)
 
     sortedSet <- randomSet %>%
         sort()
@@ -103,7 +103,7 @@ test_that("Combining Qsets", {
 
 test_that("filterByOverlaps", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5)
 
     reducedGRanges <- randomSet %>% qsea::getRegions() %>% filter(start <= 1000000)
 
@@ -121,7 +121,7 @@ test_that("filterByOverlaps", {
 
 test_that("addLibraryInformation", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5)
 
     colNames <- randomSet %>%
         addLibraryInformation() %>%
@@ -180,7 +180,7 @@ test_that("poolSamples works on the example data (#152)", {
 test_that("poolSamples works on a set without input libraries (#152)", {
 
     # qsea's example set has no input_file library table
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5)
     expect_null(randomSet@libraries$input_file)
 
     pooled <- poolSamples(randomSet, "[TN]$", maxPatternDensity = 0.5)
@@ -194,7 +194,7 @@ test_that("poolSamples works on a set without input libraries (#152)", {
 
 test_that("poolSamples weights CNV and zygosity by fragments (#152)", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000)
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5)
     # Sim3 is left with one member, so it is pooled with a weight of one
     unevenSet <- subsetQset(randomSet, samplesToDrop = "Sim3N")
 
@@ -224,7 +224,7 @@ test_that("poolSamples weights CNV and zygosity by fragments (#152)", {
 test_that("poolSamples pools only the samples that share a name (#152)", {
 
     # "Sim1" is a prefix of "Sim12", but the two must stay separate pools
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5) %>%
         renameQsetNames("^Sim2", "Sim12")
     pooled <- poolSamples(randomSet, "[TN]$", renormalise = FALSE)
     counts <- qsea::getCounts(randomSet)
@@ -242,7 +242,7 @@ test_that("poolSamples pools only the samples that share a name (#152)", {
 
 test_that("poolSamples keeps the enrichment method of the set (#152)", {
 
-    noEnrichment <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
+    noEnrichment <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5) %>%
         addNormalisation(enrichmentMethod = "none", maxPatternDensity = 0.5)
     pooled <- poolSamples(noEnrichment, "[TN]$", maxPatternDensity = 0.5)
 

@@ -12,7 +12,7 @@ test_that("Calculating DMRs", {
 
     BiocParallel::SerialParam()
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1000000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),
@@ -184,7 +184,7 @@ test_that("plotting DMRs", {
 
     BiocParallel::register(BiocParallel::SerialParam(), default = TRUE)
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 100000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),

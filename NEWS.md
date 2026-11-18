@@ -1,5 +1,25 @@
 # mesa 0.99.9.9000
 
+## New features
+- New `exampleDMRs` dataset: annotated DMRs between all `type` groups of
+  `exampleTumourNormal`, used by the examples of the DMR helper functions so
+  they no longer recompute DMRs or annotation.
+  ([PR #207](https://github.com/cruk-mi/mesa/pull/207))
+
+## Documentation
+- The examples of `makeQset()` and the generation vignette now use a single
+  MEDIPSData bam file restricted to chr21, and the `sliceDMRs()` example for
+  `adjPval` now uses `metric = adjPval`.
+  ([PR #207](https://github.com/cruk-mi/mesa/pull/207))
+
+## Testing
+- Cut the number of real `ChIPseeker::annotatePeak()` runs in the test suite.
+  `summariseDMRsByGene()` is now tested on `exampleDMRs`, and the mouse tests
+  annotate for real once instead of three times, checking the remaining `TxDb`
+  argument forms against the object each resolves to. The cached example
+  `qseaSet` now uses one sampling depth throughout.
+  ([PR #207](https://github.com/cruk-mi/mesa/pull/207))
+
 # mesa 0.99.9
 
 ## Bug fixes
