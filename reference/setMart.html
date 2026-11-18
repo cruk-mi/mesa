@@ -105,15 +105,15 @@ The object to modify or query.</p></dd>
 <dt id="arg-mart">mart<a class="anchor" aria-label="anchor" href="#arg-mart"></a></dt>
 <dd><p><code>biomaRt::Mart</code>, <code>character(1)</code>, or <code>ANY</code>.
 Connection object returned by <strong>biomaRt</strong> (recommended), or a string label
-you interpret elsewhere (e.g., <code>"ENSEMBL_110"</code>). Stored verbatim in
-<code>object@parameters$mart</code>.
+you interpret elsewhere (e.g., <code>"ENSEMBL_110"</code>). Stored verbatim as the
+<code>mart</code> entry of the parameters, see <code><a href="qseaSlots.html">setParameters()</a></code>.
 <strong>Default:</strong> none (must be supplied to <code>setMart()</code>).</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
 
-<ul><li><p><code>setMart()</code> returns the updated <code>qseaSet</code> (with <code>@parameters$mart</code> set).</p></li>
+<ul><li><p><code>setMart()</code> returns the updated <code>qseaSet</code>, with the <code>mart</code> parameter set.</p></li>
 <li><p><code>getMart()</code> returns the stored value (whatever was set), or <code>NULL</code> if
 absent.</p></li>
 </ul></div>

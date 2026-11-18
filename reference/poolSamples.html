@@ -128,12 +128,12 @@ statistics are aggregated.</p></li>
     <div id="details">
     <h2>Details</h2>
     <p>Internally, pooled counts are simple sums. CNV values and zygosity are
-combined by a weighted average using <code>total_fragments</code> from
-<code>@libraries$input_file</code>, or from <code>@libraries$file_name</code> when the set has no
-input libraries. Library statistics are aggregated (sums for counts,
-weighted means for rates). When <code>renormalise = TRUE</code>, <code><a href="addNormalisation.html">addNormalisation()</a></code>
-is run with the <code>enrichmentMethod</code> recorded in the input set (<code>"blind1-15"</code>
-if there is none).</p>
+combined by a weighted average using <code>total_fragments</code> from the
+<code>"input_file"</code> table of <code><a href="qseaSlots.html">getLibraries()</a></code>, or from the <code>"file_name"</code> table
+when the set has no input libraries. Library statistics are aggregated
+(sums for counts, weighted means for rates). When <code>renormalise = TRUE</code>,
+<code><a href="addNormalisation.html">addNormalisation()</a></code> is run with the <code>enrichmentMethod</code> recorded in the
+input set (<code>"blind1-15"</code> if there is none).</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

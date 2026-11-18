@@ -101,7 +101,7 @@ Input object containing methylation-enriched sequencing data.</p></dd>
 <dt id="arg-enrichmentmethod">enrichmentMethod<a class="anchor" aria-label="anchor" href="#arg-enrichmentmethod"></a></dt>
 <dd><p><code>character(1)</code>
 Method used to calculate enrichment. Options are described in <strong>Details</strong>.
-Recorded in <code>qseaSet@parameters$enrichmentMethod</code>.
+Recorded as the <code>enrichmentMethod</code> parameter of the returned object.
 <strong>Default:</strong> <code>"blind1-15"</code>.</p></dd>
 
 
@@ -120,8 +120,7 @@ calculation, passed to <code><a href="https://rdrr.io/pkg/qsea/man/addOffset.htm
 <li><p><strong>Enrichment parameters</strong> — configured over windows with CpG density in
 <code>[1, 15]</code> using a linear signal schedule and
 <code>bins = seq(0.5, 40.5, 0.5)</code>.</p></li>
-<li><p><strong>Parameters slot</strong> — <code>enrichmentMethod</code> recorded in
-<code>qseaSet@parameters$enrichmentMethod</code>.</p></li>
+<li><p><strong>Parameters</strong> — <code>enrichmentMethod</code> recorded via <code><a href="qseaSlots.html">setParameters()</a></code>.</p></li>
 </ul></div>
     <div id="details">
     <h2>Details</h2>
