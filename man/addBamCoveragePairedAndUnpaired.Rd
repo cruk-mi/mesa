@@ -56,7 +56,8 @@ A \code{qseaSet} with updated slots:
 \itemize{
 \item \strong{Counts}: updated count matrix.
 \item \strong{Library}: updated library table with summary metrics.
-\item \strong{Parameters}: appended record of MAPQ/size thresholds.
+\item \strong{Parameters}: MAPQ/size thresholds, replacing any existing values with
+the same names while retaining other parameters.
 }
 }
 \description{
