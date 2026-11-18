@@ -23,6 +23,11 @@
 # mesa 0.99.9
 
 ## Bug fixes
+- `addLibraryInformation()` now handles matrix-backed library tables.
+  ([PR #208](https://github.com/cruk-mi/mesa/pull/208))
+- `getDataTable()` preserves sample names containing assay suffixes by removing
+  only the final method suffix.
+  ([PR #208](https://github.com/cruk-mi/mesa/pull/208))
 - `makeQset()` now drops reads on chromosomes outside `chrSelect` before the
   CpG enrichment, so a BAM with other chromosomes no longer warns about
   out-of-bound ranges.
@@ -74,6 +79,10 @@
   the parameters it is given in a named list, replacing matching values and 
   retaining parameters not provided.
   ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
+- Added `asRangedSummarizedExperiment()` to convert a `qseaSet` to a 
+  `rangedSummarizedExperiment` for compatibility with other BioConductor
+  packages. This is still in progress, with further updates expected.
+  ([PR #208](https://github.com/cruk-mi/mesa/pull/208))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
