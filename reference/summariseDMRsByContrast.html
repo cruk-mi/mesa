@@ -131,27 +131,24 @@ the specified thresholds.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleDMRs</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Summarise DMRs for a single contrast, using custom FDR threshold</span></span></span>
-<span class="r-in"><span><span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>        variable <span class="op">=</span> <span class="st">"type"</span>,</span></span>
-<span class="r-in"><span>        contrasts <span class="op">=</span> <span class="st">"LUAD_vs_NormalLung"</span>,</span></span>
-<span class="r-in"><span>        FDRthres <span class="op">=</span> <span class="fl">0.1</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="co"># Summarise DMRs for each contrast, using custom FDR threshold</span></span></span>
+<span class="r-in"><span><span class="va">exampleDMRs</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>    <span class="fu">summariseDMRsByContrast</span><span class="op">(</span>FDRthres <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 5 samples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 255 windows, without using parallelisation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing contrast LUAD_vs_NormalLung</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Contrasts Complete</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting regions from contrast LUAD_vs_NormalLung</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selected 58/255 windows</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> adding test results from LUAD_vs_NormalLung</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   group1 group2       nUp nDown</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> LUAD   NormalLung    56     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    group1      group2        nUp nDown</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> CRC         LUAD           11    26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> CRC         LUSC            9    33</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> CRC         NormalColon     2     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> CRC         NormalLung     42    10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> LUAD        LUSC            5    11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> LUAD        NormalColon    12     7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> LUAD        NormalLung     34     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> LUSC        NormalColon    34     8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> LUSC        NormalLung     56     8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> NormalColon NormalLung     19     0</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

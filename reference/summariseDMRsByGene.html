@@ -107,40 +107,23 @@ associated DMRs and any aggregated metadata.</p></li>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">exampleTumourNormal</span>, package <span class="op">=</span> <span class="st">"mesa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Summarise DMRs with explicit annotation databases</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"org.Hs.eg.db"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">exampleTumourNormal</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>        <span class="fu"><a href="calculateDMRs.html">calculateDMRs</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"tumour"</span>, contrasts <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>        <span class="fu"><a href="annotateWindows.html">annotateWindows</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>            TxDb <span class="op">=</span> <span class="st">"TxDb.Hsapiens.UCSC.hg38.knownGene"</span>,</span></span>
-<span class="r-in"><span>            annoDb <span class="op">=</span> <span class="st">"org.Hs.eg.db"</span></span></span>
-<span class="r-in"><span>        <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="co"># exampleDMRs is already annotated with annotateWindows()</span></span></span>
+<span class="r-in"><span><span class="va">exampleDMRs</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>        <span class="fu">summariseDMRsByGene</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating 1 possible contrasts on the tumour column.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating table of nrpm values for 819 regions across 10 samples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting initial GLM on 309 windows, without using parallelisation.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing contrast Normal_vs_Tumour</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Contrasts Complete</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selecting regions from contrast Normal_vs_Tumour</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> selected 23/309 windows</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> adding test results from Normal_vs_Tumour</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Using Genome: hg38 ...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 'select()' returned 1:1 mapping between keys and columns</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 8 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSEMBL         SYMBOL       GENENAME                                        n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> ENSG00000233429 HOTAIRM1     HOXA transcript antisense RNA, myeloid-spe…     5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> <span style="color: #BB0000;">NA</span>              HOTTIP       HOXA distal transcript antisense RNA            5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> ENSG00000240990 HOXA11-AS    HOXA11 antisense RNA                            3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> ENSG00000253405 EVX1-AS      EVX1 antisense RNA                              3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> ENSG00000106038 EVX1         even-skipped homeobox 1                         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> ENSG00000122592 HOXA7        homeobox A7                                     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> ENSG00000254369 HOXA-AS3     HOXA cluster antisense RNA 3                    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span> ENSG00000257184 HOXA10-HOXA9 HOXA10-HOXA9 readthrough                        1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 23 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ENSEMBL         SYMBOL       GENENAME                                       n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> ENSG00000233429 HOTAIRM1     HOXA transcript antisense RNA, myeloid-sp…    17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> ENSG00000257184 HOXA10-HOXA9 HOXA10-HOXA9 readthrough                      15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> <span style="color: #BB0000;">NA</span>              HOTTIP       HOXA distal transcript antisense RNA          11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> ENSG00000254369 HOXA-AS3     HOXA cluster antisense RNA 3                   9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ENSG00000240990 HOXA11-AS    HOXA11 antisense RNA                           8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ENSG00000253405 EVX1-AS      EVX1 antisense RNA                             8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ENSG00000122592 HOXA7        homeobox A7                                    7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> ENSG00000286725 LOC100506236 uncharacterized LOC100506236                   6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> ENSG00000105991 HOXA1        homeobox A1                                    4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> ENSG00000106038 EVX1         even-skipped homeobox 1                        4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more rows</span></span>
 </code></pre></div>
     </div>
   </div>

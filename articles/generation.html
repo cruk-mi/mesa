@@ -184,32 +184,21 @@ This is useful both for ensuring that the enriched and non-enriched
 samples do indeed come from the same individual, and to check that
 paired samples are actually paired (for instance when comparing pre- and
 post-treatment).</p>
-<p>For the example here, we use the example data in the
-<code>MEDIPSData</code> package. This contains pairs of tumour and
-normal tissue from the same patients, with MeDIP-seq performed as the
-enrichment step. These bam files are downsampled to only contain
+<p>For the example here, we use one of the example samples in the
+<code>MEDIPSData</code> package. The package contains pairs of tumour
+and normal tissue from the same patients, with MeDIP-seq performed as
+the enrichment step. These bam files are downsampled to only contain
 chromosomes 20-22, and are aligned to hg19. Note, we highly recommend
-using the hg38/GRCh38 reference genome rather than hg19 as used
-here!</p>
+using the hg38/GRCh38 reference genome rather than hg19 as used here!
+For speed, we only use the tumour sample from the first patient, and
+only chromosome 21.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sampleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span><span class="op">~</span><span class="va">sample_name</span>, <span class="op">~</span><span class="va">group</span>, <span class="op">~</span><span class="va">tumour</span>, <span class="op">~</span><span class="va">patient</span>, <span class="op">~</span><span class="va">file_name</span>,</span>
-<span>    <span class="st">"Normal1"</span>, <span class="st">"Normal1"</span>, <span class="st">"Normal"</span>, <span class="st">"Patient1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
-<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1N_fst_chr_20_21_22.bam"</span>,</span>
-<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    <span class="st">"Normal2"</span>, <span class="st">"Normal1"</span>, <span class="st">"Normal"</span>, <span class="st">"Patient2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
-<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_2N_fst_chr_20_21_22.bam"</span>,</span>
-<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>    <span class="op">)</span>,</span>
 <span>    <span class="st">"Tumour1"</span>, <span class="st">"Tumour1"</span>, <span class="st">"Tumour"</span>, <span class="st">"Patient1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
 <span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_1T_fst_chr_20_21_22.bam"</span>,</span>
 <span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    <span class="st">"Tumour2"</span>, <span class="st">"Tumour2"</span>, <span class="st">"Tumour"</span>, <span class="st">"Patient2"</span>, <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
-<span>        <span class="st">"extdata"</span>, <span class="st">"NSCLC_MeDIP_2T_fst_chr_20_21_22.bam"</span>,</span>
-<span>        package <span class="op">=</span> <span class="st">"MEDIPSData"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>    <span class="op">)</span></span>
-<span>    <span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="making-a-qseaset">Making a qseaSet<a class="anchor" aria-label="anchor" href="#making-a-qseaset"></a>
@@ -248,13 +237,13 @@ by your depth of sequencing, as a smaller window size will be more prone
 to noise.</li>
 </ul>
 <p>For our hg19 example data, we set
-<code>BSgenome = "BSgenome.Hsapiens.UCSC.hg19"</code>, specify the three
-chromosomes included in the test dataset and give some approximate
-fragment length and SD values.</p>
+<code>BSgenome = "BSgenome.Hsapiens.UCSC.hg19"</code>, specify the
+chromosome used from the test dataset and give some approximate fragment
+length and SD values.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/makeQset.html">makeQset</a></span><span class="op">(</span><span class="va">sampleTable</span>,</span>
 <span>    BSgenome <span class="op">=</span> <span class="st">"BSgenome.Hsapiens.UCSC.hg19"</span>,</span>
-<span>    chrSelect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"chr"</span>,<span class="fl">20</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,</span>
+<span>    chrSelect <span class="op">=</span> <span class="st">"chr21"</span>,</span>
 <span>    windowSize <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>    fragmentLength <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>    fragmentSD <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -305,60 +294,34 @@ fragment length and SD values.</p>
 <span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     strsplit</span></span>
-<span><span class="co">#&gt; Considering 541532 regions with total size 162459600</span></span>
+<span><span class="co">#&gt; Considering 160432 regions with total size 48129600</span></span>
 <span><span class="co">#&gt; ==== Creating qsea set ====</span></span>
-<span><span class="co">#&gt; restricting analysis on chr20, chr21, chr22</span></span>
+<span><span class="co">#&gt; restricting analysis on chr21</span></span>
 <span><span class="co">#&gt; Dividing provided regions in 300nt windows</span></span>
 <span><span class="co">#&gt; Scanning one file at a time. Use e.g. setMesaParallel(nCores = 4) to parallelise this process.</span></span>
-<span><span class="co">#&gt; Reading NSCLC_MeDIP_1N_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
-<span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
-<span><span class="co">#&gt; Dropping 20294 proper pairs that have neither read with mapq &gt;= 10</span></span>
-<span><span class="co">#&gt; Dropping 179 proper pairs that do not lie within [70, 1000]</span></span>
-<span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
-<span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 186, based on 879638 proper pairs.</span></span>
-<span><span class="co">#&gt; Reading NSCLC_MeDIP_2N_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
-<span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
-<span><span class="co">#&gt; Dropping 22848 proper pairs that have neither read with mapq &gt;= 10</span></span>
-<span><span class="co">#&gt; Dropping 312 proper pairs that do not lie within [70, 1000]</span></span>
-<span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
-<span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 188, based on 1132561 proper pairs.</span></span>
 <span><span class="co">#&gt; Reading NSCLC_MeDIP_1T_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
 <span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
 <span><span class="co">#&gt; Dropping 12436 proper pairs that have neither read with mapq &gt;= 10</span></span>
 <span><span class="co">#&gt; Dropping 146 proper pairs that do not lie within [70, 1000]</span></span>
 <span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
 <span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 183, based on 637854 proper pairs.</span></span>
-<span><span class="co">#&gt; Reading NSCLC_MeDIP_2T_fst_chr_20_21_22.bam, with minimum mapping quality 10.</span></span>
-<span><span class="co">#&gt; No samtools fixmate MQ (mate quality) tags on the bam file, using R1 MAPQ only.</span></span>
-<span><span class="co">#&gt; Dropping 11131 proper pairs that have neither read with mapq &gt;= 10</span></span>
-<span><span class="co">#&gt; Dropping 168 proper pairs that do not lie within [70, 1000]</span></span>
-<span><span class="co">#&gt; Using high quality R1 unpaired reads as well as pairs</span></span>
-<span><span class="co">#&gt; Estimating fragment length for 0 unpaired R1 reads as 189, based on 632731 proper pairs.</span></span>
 <span><span class="co">#&gt; Generated objects</span></span>
 <span><span class="co">#&gt; Calculated coverage</span></span>
 <span><span class="co">#&gt; No CNV being calculated</span></span>
 <span><span class="co">#&gt; Get genomic positions of "CG" ...</span></span>
-<span><span class="co">#&gt; searching chr20 for "CG"...</span></span>
-<span><span class="co">#&gt; found 717722 occurances of CG in chr20</span></span>
-<span><span class="co">#&gt; estimating expected number of CGs per fragment for windows of chr20...</span></span>
-<span><span class="co">#&gt;  ...done</span></span>
 <span><span class="co">#&gt; searching chr21 for "CG"...</span></span>
 <span><span class="co">#&gt; found 380444 occurances of CG in chr21</span></span>
 <span><span class="co">#&gt; estimating expected number of CGs per fragment for windows of chr21...</span></span>
 <span><span class="co">#&gt;  ...done</span></span>
-<span><span class="co">#&gt; searching chr22 for "CG"...</span></span>
-<span><span class="co">#&gt; found 578097 occurances of CG in chr22</span></span>
-<span><span class="co">#&gt; estimating expected number of CGs per fragment for windows of chr22...</span></span>
-<span><span class="co">#&gt;  ...done</span></span>
 <span><span class="co">#&gt; selecting windows with low CpG density for background read estimation</span></span>
-<span><span class="co">#&gt; 4.396% of the windows have enrichment pattern density of at most 0.05 per fragment </span></span>
+<span><span class="co">#&gt; 6.415% of the windows have enrichment pattern density of at most 0.05 per fragment </span></span>
 <span><span class="co">#&gt; and are used for background reads estimation</span></span>
 <span><span class="co">#&gt; qseaSet object generated successfully</span></span>
 <span><span class="co">#&gt; qseaSet</span></span>
 <span><span class="co">#&gt; =======================================</span></span>
-<span><span class="co">#&gt; 4 Samples:</span></span>
-<span><span class="co">#&gt; Normal1, Normal2, Tumour1, Tumour2</span></span>
-<span><span class="co">#&gt; 541532 Regions in 3 chromosomes of BSgenome.Hsapiens.UCSC.hg19</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 Samples:</span></span>
+<span><span class="co">#&gt; Tumour1</span></span>
+<span><span class="co">#&gt; 160432 Regions in 1 chromosomes of BSgenome.Hsapiens.UCSC.hg19</span></span></code></pre></div>
 <p>A range of messages are produced as output during this process. Note
 that by default the process is performed without parallelisation; this
 can be controlled via the <code>setMesaParallel</code> function and will
@@ -760,7 +723,7 @@ used to apply this normalisation if required.</p>
 <span><span class="co">#&gt; [65] glue_1.8.1                  HMMcopy_1.54.0             </span></span>
 <span><span class="co">#&gt; [67] jsonlite_2.0.0              R6_2.6.1                   </span></span>
 <span><span class="co">#&gt; [69] MatrixGenerics_1.24.0       GenomicAlignments_1.48.0   </span></span>
-<span><span class="co">#&gt; [71] systemfonts_1.3.2           fs_2.1.0</span></span></code></pre>
+<span><span class="co">#&gt; [71] systemfonts_1.3.3           fs_2.1.0</span></span></code></pre>
 </div>
 </div>
   </div>
