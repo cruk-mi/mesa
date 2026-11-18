@@ -184,7 +184,7 @@ summariseDMRsByContrast <- function(
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Summarise DMRs with explicit annotation databases
+#' # exampleDMRs is already annotated with annotateWindows()
 #' exampleDMRs %>%
 #'         summariseDMRsByGene()
 #' @export
