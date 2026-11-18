@@ -24,7 +24,8 @@ A data frame or tibble to join onto the \code{sampleTable}.}
 \item{by}{\code{character()} or \verb{named character()}.
 Join keys, as in \code{\link[dplyr:left_join]{dplyr::left_join()}}.
 For qseaSets, the safest choice is \code{by = "sample_name"}.
-\strong{Default:} \code{NULL} (all common variables between \code{x@sampleTable} and \code{y}).}
+\strong{Default:} \code{NULL} (all common variables between the sample table of \code{x}
+and \code{y}).}
 
 \item{copy}{\code{logical(1)}.
 For remote backends only. If \code{TRUE}, copies \code{y} into the same data source

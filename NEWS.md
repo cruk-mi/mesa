@@ -63,6 +63,18 @@
   column.
   ([#200](https://github.com/cruk-mi/mesa/issues/200), [PR #201](https://github.com/cruk-mi/mesa/pull/201))
 
+## New features
+- New accessors for the `qseaSet` slots that qsea does not expose:
+  `getLibraries()` and `setLibraries()` for the library tables,
+  `getEnrichment()` and `setEnrichment()` for the enrichment fit, and
+  `setCounts()`, `setRegions()`, `setSampleTable()`, `setParameters()` and
+  `setCNV()` for the slots qsea only lets you read. `getLibraries()`, 
+  `setLibraries()`, `getEnrichment()` and `setEnrichment()` can read or write
+  a whole slot or a single named slot element. `setParameters()` merges
+  the parameters it is given in a named list, replacing matching values and 
+  retaining parameters not provided.
+  ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
+
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
   `plotGenomicFeatureDistribution()`, `plotGeneHeatmap()` and
@@ -131,6 +143,15 @@
   ([#123](https://github.com/cruk-mi/mesa/issues/123), [PR #172](https://github.com/cruk-mi/mesa/pull/172))
 
 ## Style
+- mesa no longer reaches into a `qseaSet` slot with `@`. Every read now goes
+  through a `qsea::get*()` accessor or one of the new mesa ones, and every
+  write through a new setter, so slot access is confined to `R/qseaSlots.R`.
+  The refactor preserves behaviour except that
+  `addBamCoveragePairedAndUnpaired()` now replaces parameter values with
+  matching names rather than appending duplicate entries, and 
+  `setMart(qs, NULL)` leaves a NULL entry in the `parameters` slot whereas 
+  previously it used to be deleted.
+  ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
   are now at most 80 characters, clearing those BiocCheck formatting notes.
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))

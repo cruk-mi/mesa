@@ -48,15 +48,15 @@ is.qseaSet <- function(x){
 #'
 #' @param mart `biomaRt::Mart`, `character(1)`, or `ANY`.  
 #'   Connection object returned by **biomaRt** (recommended), or a string label
-#'   you interpret elsewhere (e.g., `"ENSEMBL_110"`). Stored verbatim in
-#'   `object@parameters$mart`.  
+#'   you interpret elsewhere (e.g., `"ENSEMBL_110"`). Stored verbatim as the
+#'   `mart` entry of the parameters, see [setParameters()].  
 #'   **Default:** none (must be supplied to `setMart()`).
 #'   
 #' @param ... Additional arguments passed to methods or to
 #'   [biomaRt::useMart()]. Not used in the default `"qseaSet"` method.
 #'
 #' @return
-#' - `setMart()` returns the updated `qseaSet` (with `@parameters$mart` set).  
+#' - `setMart()` returns the updated `qseaSet`, with the `mart` parameter set.  
 #' - `getMart()` returns the stored value (whatever was set), or `NULL` if
 #' absent.
 #'
@@ -91,8 +91,7 @@ setGeneric('setMart', function(object, ...) standardGeneric('setMart'))
 #' @rdname setMart
 #' @export
 setMethod('setMart', 'qseaSet', function(object, mart){
-    object@parameters$mart <- mart
-    object
+    setParameters(object, list(mart = mart))
 })
 
 #' @rdname setMart
@@ -101,7 +100,9 @@ setGeneric('getMart', function(object, ...) standardGeneric('getMart'))
 
 #' @rdname setMart
 #' @export
-setMethod('getMart', 'qseaSet', function(object) object@parameters$mart)
+setMethod('getMart', 'qseaSet', function(object) {
+    qsea::getParameters(object)$mart
+})
 
 #' Annotate genomic windows using ChIPseeker (with optional CpG/FANTOM context)
 #'
@@ -646,9 +647,9 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 
     fdrMat <- purrr::map_dfc(samples,
                             function(x){
-                                totalNumReads <- qseaSet@libraries$file_name[
-                                    x, "valid_fragments"
-                                ]
+                                totalNumReads <- getLibraries(
+                                    qseaSet, "file_name"
+                                )[x, "valid_fragments"]
                                 lambda <- totalNumReads/numWindows
                                 pvals <- stats::ppois(
                                     countMat[, x] - 1,
@@ -741,7 +742,7 @@ subsetWindowsOverBackground <- function(qseaSet, keepAbove = FALSE,
 #'
 #' @export
 downSample <- function(qseaSet, nReads){
-    counts <- qseaSet@count_matrix
+    counts <- qsea::getCounts(qseaSet)
 
     if (min(colSums(counts)) < nReads) {
     stop(glue::glue(
@@ -775,10 +776,14 @@ downSample <- function(qseaSet, nReads){
         }
         )
 
-    qseaSet@count_matrix <- as.matrix(newCounts)
-    qseaSet@libraries$file_name[,"valid_fragments"] <- rep(nReads, ncol(counts))
-    qseaSet@libraries$file_name[,"offset"] <- rep(NA, ncol(counts))
-    qseaSet@libraries$file_name[,"library_factor"] <- rep(NA, ncol(counts))
+    newLibraries <- getLibraries(qseaSet, "file_name")
+    newLibraries[, "valid_fragments"] <- rep(nReads, ncol(counts))
+    newLibraries[, "offset"] <- rep(NA, ncol(counts))
+    newLibraries[, "library_factor"] <- rep(NA, ncol(counts))
+
+    qseaSet <- qseaSet %>%
+        setCounts(newCounts) %>%
+        setLibraries(newLibraries, "file_name")
 
     return(qseaSet)
 }

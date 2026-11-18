@@ -17,7 +17,7 @@ frame.
 }
 \value{
 A \code{qseaSet} object with only regions matching the filter conditions.
-Both the \code{count_matrix} and \verb{@regions} slot are updated consistently.
+Both the counts and the regions are updated consistently.
 }
 \description{
 Filters the \strong{regions} of a \code{qseaSet} using \code{\link[dplyr:filter]{dplyr::filter()}} predicates

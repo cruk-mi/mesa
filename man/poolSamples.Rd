@@ -46,12 +46,12 @@ new \code{qseaSet} with pooled samples and updated metadata.
 }
 \details{
 Internally, pooled counts are simple sums. CNV values and zygosity are
-combined by a weighted average using \code{total_fragments} from
-\verb{@libraries$input_file}, or from \verb{@libraries$file_name} when the set has no
-input libraries. Library statistics are aggregated (sums for counts,
-weighted means for rates). When \code{renormalise = TRUE}, \code{\link[=addNormalisation]{addNormalisation()}}
-is run with the \code{enrichmentMethod} recorded in the input set (\code{"blind1-15"}
-if there is none).
+combined by a weighted average using \code{total_fragments} from the
+\code{"input_file"} table of \code{\link[=getLibraries]{getLibraries()}}, or from the \code{"file_name"} table
+when the set has no input libraries. Library statistics are aggregated
+(sums for counts, weighted means for rates). When \code{renormalise = TRUE},
+\code{\link[=addNormalisation]{addNormalisation()}} is run with the \code{enrichmentMethod} recorded in the
+input set (\code{"blind1-15"} if there is none).
 }
 \examples{
 data(exampleTumourNormal)

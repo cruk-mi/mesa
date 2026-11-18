@@ -24,13 +24,13 @@ The object to modify or query.}
 
 \item{mart}{\code{biomaRt::Mart}, \code{character(1)}, or \code{ANY}.
 Connection object returned by \strong{biomaRt} (recommended), or a string label
-you interpret elsewhere (e.g., \code{"ENSEMBL_110"}). Stored verbatim in
-\code{object@parameters$mart}.
+you interpret elsewhere (e.g., \code{"ENSEMBL_110"}). Stored verbatim as the
+\code{mart} entry of the parameters, see \code{\link[=setParameters]{setParameters()}}.
 \strong{Default:} none (must be supplied to \code{setMart()}).}
 }
 \value{
 \itemize{
-\item \code{setMart()} returns the updated \code{qseaSet} (with \verb{@parameters$mart} set).
+\item \code{setMart()} returns the updated \code{qseaSet}, with the \code{mart} parameter set.
 \item \code{getMart()} returns the stored value (whatever was set), or \code{NULL} if
 absent.
 }
