@@ -24,7 +24,7 @@ Aggregate differentially methylated region (DMR) windows by gene annotation.
 \examples{
 data(exampleTumourNormal, package = "mesa")
 
-# Summarise DMRs with explicit annotation databases
+# exampleDMRs is already annotated with annotateWindows()
 exampleDMRs \%>\%
         summariseDMRsByGene()
 }
