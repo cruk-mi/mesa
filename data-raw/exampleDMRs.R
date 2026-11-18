@@ -1,7 +1,6 @@
 ## code to prepare `exampleDMRs` dataset goes here
 
-## Needs (not in DESCRIPTION): usethis, TxDb.Hsapiens.UCSC.hg38.knownGene,
-## org.Hs.eg.db.
+## Needs usethis (not in DESCRIPTION).
 
 ## Example annotated set of DMRs generated from the example tumour/normal
 ## qseaSet, with every pairwise contrast of the `type` column.
