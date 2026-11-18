@@ -85,7 +85,7 @@ libraries.
 \details{
 Internally calls \code{\link[=calculateCGEnrichment]{calculateCGEnrichment()}} per sample to derive relH/GoGe and
 counts, then merges the results into the libraries (the \code{"file_name"} table
-for methylation pulldown when \code{nonEnrich = FALSE} and the, \code{"input_file"}
+for methylation pulldown when \code{nonEnrich = FALSE} and the \code{"input_file"}
 table for input when \code{nonEnrich = TRUE}). Parallelisation uses
 \code{parallel::mclapply()}; on non-Unix systems, \code{nCores} > 1 is ignored.
 }
