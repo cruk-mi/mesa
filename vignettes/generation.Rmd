@@ -80,7 +80,7 @@ individual, and to check that paired samples are actually paired (for
 instance when comparing pre- and post-treatment).
 
 For the example here, we use the one of the example samples in the `MEDIPSData` 
-package. This contains pairs of tumour and normal tissue from the same patients, 
+package. This contains pairs of tumour and normal tissue from the same patients,
 with MeDIP-seq performed as the enrichment step. These bam files are downsampled
 to only contain chromosomes 20-22, and are aligned to hg19. Note, we highly
 recommend using the hg38/GRCh38 reference genome rather than hg19 as used here! 
