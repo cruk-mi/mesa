@@ -5,18 +5,24 @@
 \alias{exampleDMRs}
 \title{Annotated example differentially methylated regions}
 \format{
-A tibble with 23 rows and 24 columns, containing DMR statistics and
-gene annotations.
+A tibble with 109 rows and 57 columns, in the wide format returned
+by \code{\link[=calculateDMRs]{calculateDMRs()}}: one set of statistic columns per contrast (ten
+contrasts between NormalColon, CRC, NormalLung, LUAD and LUSC), the
+per-group \verb{_beta_means} and \verb{_nrpm_means} columns, and the gene annotation
+columns added by \code{\link[=annotateWindows]{annotateWindows()}}. Use \code{\link[=pivotDMRsLonger]{pivotDMRsLonger()}} to convert
+it to long format.
 }
 \source{
-Generated with \code{\link[=calculateDMRs]{calculateDMRs()}} and \code{\link[=annotateWindows]{annotateWindows()}} using
-\code{TxDb.Hsapiens.UCSC.hg38.knownGene} and \code{org.Hs.eg.db}.
+Generated from \link{exampleTumourNormal} with \code{\link[=calculateDMRs]{calculateDMRs()}} (all
+contrasts of \code{type}) and \code{\link[=annotateWindows]{annotateWindows()}}, using
+\code{TxDb.Hsapiens.UCSC.hg38.knownGene} and \code{org.Hs.eg.db}. See
+\code{data-raw/exampleDMRs.R}.
 }
 \usage{
 exampleDMRs
 }
 \description{
-DMR results for the tumour-versus-normal comparison in
+DMR results for all pairwise contrasts between the \code{type} groups of
 \link{exampleTumourNormal}, annotated with hg38 gene information.
 }
 \examples{
