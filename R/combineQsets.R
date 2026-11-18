@@ -234,11 +234,14 @@ combineQsets <- function(
         newQSet,
         rbind(qsea::getZygosity(qseaSet1), qsea::getZygosity(qseaSet2))
     )
-    newQSet <- setSampleTable(newQSet, 
-        dplyr::bind_rows(
-            qsea::getSampleTable(qseaSet1),
-            qsea::getSampleTable(qseaSet2))
-        )
+    sampleTable <- dplyr::bind_rows(
+        qsea::getSampleTable(qseaSet1),
+        qsea::getSampleTable(qseaSet2)
+    )
+    newQSet <- setSampleTable(
+        newQSet,
+        sampleTable
+    )
 
     df1 <- getLibraries(qseaSet1, "file_name")
     df2 <- getLibraries(qseaSet2, "file_name")
@@ -260,13 +263,14 @@ combineQsets <- function(
         )
     }
 
-    newQSet <- setCNV(newQSet, .cnvSlot(qseaSet1) %>%
+    newCNV <- .cnvSlot(qseaSet1) %>%
         data.frame(check.names = FALSE) %>%
         dplyr::full_join(
             data.frame(.cnvSlot(qseaSet2), check.names = FALSE),
             by = c("seqnames", "start", "end", "width", "strand")
         ) %>%
-        plyranges::as_granges())
+        plyranges::as_granges()
+    newQSet <- setCNV(newQSet, newCNV)
 
     newQSet <- setCounts(
         newQSet, cbind(qsea::getCounts(qseaSet1), qsea::getCounts(qseaSet2))

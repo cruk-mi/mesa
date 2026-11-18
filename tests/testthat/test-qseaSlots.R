@@ -97,7 +97,7 @@ test_that("setSampleTable() replaces the sample annotations", {
 })
 
 
-test_that("setParameters() merges rather than replaces", {
+test_that("setParameters() merges and overwrites by name", {
 
     qseaSet <- cachedExampleQset(repl = 3, expSamplingDepth = 1000)
 
@@ -106,9 +106,12 @@ test_that("setParameters() merges rather than replaces", {
     expect_equal(qsea::getParameters(newSet)$minMapQual, 10)
     expect_equal(qsea::getParameters(newSet)$newParam, "x")
 
+    overwrittenSet <- setParameters(newSet, list(newParam = "updated"))
+    expect_equal(qsea::getParameters(overwrittenSet)$newParam, "updated")
+
     # pre-existing parameters survive
     expect_equal(
-        qsea::getParameters(newSet)$window_size,
+        qsea::getParameters(overwrittenSet)$window_size,
         qsea::getParameters(qseaSet)$window_size
     )
 

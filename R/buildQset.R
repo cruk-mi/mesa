@@ -486,7 +486,8 @@ getBamCoveragePairedAndUnpairedR1 <- function(fileName = NULL, BSgenome = NULL,
 #'
 #' * **Counts**: updated count matrix.
 #' * **Library**: updated library table with summary metrics.
-#' * **Parameters**: appended record of MAPQ/size thresholds.
+#' * **Parameters**: MAPQ/size thresholds, replacing any existing values with
+#'   the same names while retaining other parameters.
 #'
 #' @details
 #' Per-region counts are computed from fragment midpoints to align with qsea’s

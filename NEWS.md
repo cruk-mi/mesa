@@ -47,7 +47,9 @@
   `getEnrichment()` and `setEnrichment()` for the enrichment fit, and
   `setCounts()`, `setRegions()`, `setSampleTable()`, `setParameters()` and
   `setCNV()` for the slots qsea only lets you read. `setParameters()` merges
-  the parameters it is given rather than replacing the whole list.
+  the parameters it is given by name, replacing matching values and retaining
+  parameters not supplied.
+  ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 
 ## Documentation
 - The examples of `annotateWindows()`, `getGenomicFeatureDistribution()`,
@@ -120,7 +122,10 @@
 - mesa no longer reaches into a `qseaSet` slot with `@`. Every read now goes
   through a `qsea::get*()` accessor or one of the new mesa ones, and every
   write through a new setter, so slot access is confined to `R/qseaSlots.R`.
-  Behaviour is unchanged.
+  The exception is `setParameters()`: it replaces supplied values with
+  matching names rather than appending duplicates, while retaining other
+  parameters.
+  ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
   are now at most 80 characters, clearing those BiocCheck formatting notes.
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))

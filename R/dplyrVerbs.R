@@ -203,13 +203,14 @@ left_join.qseaSet <- function(
     suffix = c(".x", ".y"), keep = NULL, ...
 ) {
 
-    x <- setSampleTable(x, x %>%
+    sampleTable <- x %>%
         qsea::getSampleTable() %>%
         tibble::rownames_to_column("rownameCol") %>%
         dplyr::left_join(
             y, by = by, copy = copy, suffix = suffix, keep = keep, ...
         ) %>%
-        tibble::column_to_rownames("rownameCol"))
+        tibble::column_to_rownames("rownameCol")
+    x <- setSampleTable(x, sampleTable)
 
     return(x)}
 
@@ -325,7 +326,6 @@ selectQset <- function(qseaSet, ...) {
 
     # ensure that the sample_name and group columns are still present at the
     # front of the output
-
     updatedSampleTable <- qseaSet %>%
         qsea::getSampleTable() %>%
         dplyr::select(sample_name, group) %>%

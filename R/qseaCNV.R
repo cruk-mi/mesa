@@ -592,12 +592,13 @@ plotCNVheatmap <- function(qseaSet,
 #' @export
 removeCNV <- function(qseaSet) {
 
-    qseaSet <- setCNV(qseaSet, .cnvSlot(qseaSet) %>%
+    cnv <- .cnvSlot(qseaSet) %>%
         tibble::as_tibble() %>%
         dplyr::mutate(
             dplyr::across(-c(seqnames, start, end, width, strand), ~ . * 0)
         ) %>%
-        plyranges::as_granges())
+        plyranges::as_granges()
+    qseaSet <- setCNV(qseaSet, cnv)
 
     return(qseaSet)
 
