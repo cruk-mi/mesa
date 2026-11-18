@@ -67,8 +67,8 @@ methods.}
 
 \item{type}{\code{character(1)} or \code{NULL}
 Which library table to return or replace: \code{"file_name"} for the pulldown
-libraries, \code{"input_file"} for the input libraries, or \code{"input_counts"}
-for the per-window input counts. \code{NULL} returns the whole list.
+libraries, \code{"input_file"} for the input libraries. \code{NULL} returns the
+whole list.
 \strong{Default:} \code{NULL}.}
 
 \item{value}{The replacement value: a \code{matrix} for \code{setCounts()}, a \code{GRanges} for

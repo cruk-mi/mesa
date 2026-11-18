@@ -5,9 +5,10 @@ test_that("getLibraries() returns the whole list or one table", {
     expect_type(getLibraries(qseaSet), "list")
     expect_true("file_name" %in% names(getLibraries(qseaSet)))
 
-    fileNames <- getLibraries(qseaSet, "file_name")
-    expect_equal(rownames(fileNames), qsea::getSampleNames(qseaSet))
-    expect_true("valid_fragments" %in% colnames(fileNames))
+    libraryTable <- getLibraries(qseaSet, "file_name")
+    expect_equal(getLibraries(qseaSet)$file_name, libraryTable)
+    expect_equal(rownames(libraryTable), qsea::getSampleNames(qseaSet))
+    expect_true("valid_fragments" %in% colnames(libraryTable))
 
     expect_null(getLibraries(qseaSet, "notATable"))
 })
@@ -17,22 +18,30 @@ test_that("setLibraries() replaces one table or the whole list", {
 
     qseaSet <- cachedExampleQset(repl = 3, expSamplingDepth = 1000)
 
-    fileNames <- getLibraries(qseaSet, "file_name")
-    fileNames[, "valid_fragments"] <- 1
+    libraryTable <- getLibraries(qseaSet, "file_name")
+    libraryTable[, "valid_fragments"] <- 1
 
-    newSet <- setLibraries(qseaSet, fileNames, "file_name")
+    newSet <- setLibraries(qseaSet, libraryTable, "file_name")
     expect_equal(
         unname(getLibraries(newSet, "file_name")[, "valid_fragments"]),
         rep(1, length(qsea::getSampleNames(qseaSet)))
     )
 
-    # the other tables are untouched
-    expect_equal(
-        names(getLibraries(newSet)), names(getLibraries(qseaSet))
-    )
+    expectedLibraries <- getLibraries(qseaSet)
+    expectedLibraries$file_name <- libraryTable
+    expect_equal(getLibraries(newSet), expectedLibraries)
 
-    newSet <- setLibraries(qseaSet, list(file_name = fileNames))
-    expect_equal(names(getLibraries(newSet)), "file_name")
+    newLibraries <- list(file_name = libraryTable)
+    newSet <- setLibraries(qseaSet, newLibraries)
+    expect_equal(getLibraries(newSet), newLibraries)
+
+    inputTable <- getLibraries(qseaSet, "file_name")
+    libraryTable[, "valid_fragments"] <- 2
+    libraryList <- list("file_name" = libraryTable, "input_file" = inputTable)
+    newSet <- setLibraries(qseaSet, libraryList)
+
+    expect_equal(getLibraries(newSet), libraryList)
+
 })
 
 
@@ -97,7 +106,7 @@ test_that("setSampleTable() replaces the sample annotations", {
 })
 
 
-test_that("setParameters() merges rather than replaces", {
+test_that("setParameters() merges and overwrites by name", {
 
     qseaSet <- cachedExampleQset(repl = 3, expSamplingDepth = 1000)
 
@@ -106,9 +115,12 @@ test_that("setParameters() merges rather than replaces", {
     expect_equal(qsea::getParameters(newSet)$minMapQual, 10)
     expect_equal(qsea::getParameters(newSet)$newParam, "x")
 
+    overwrittenSet <- setParameters(newSet, list(newParam = "updated"))
+    expect_equal(qsea::getParameters(overwrittenSet)$newParam, "updated")
+
     # pre-existing parameters survive
     expect_equal(
-        qsea::getParameters(newSet)$window_size,
+        qsea::getParameters(overwrittenSet)$window_size,
         qsea::getParameters(qseaSet)$window_size
     )
 

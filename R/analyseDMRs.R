@@ -27,15 +27,10 @@
 #' @family DMR-helpers
 #'
 #' @examples
-#' data(exampleTumourNormal, package = "mesa")
+#' data(exampleDMRs, package = "mesa")
 #'
 #' # Convert results to long format and filter at custom FDR threshold
-#' exampleTumourNormal %>%
-#'     calculateDMRs(
-#'         variable = "type",
-#'         contrasts = "LUAD_vs_NormalLung",
-#'         FDRthres = 0.1
-#'     ) %>%
+#' exampleDMRs %>%
 #'     pivotDMRsLonger(FDRthres = 0.1)
 #'
 #' @export
@@ -112,15 +107,10 @@ pivotDMRsLonger <- function(DMRtable, FDRthres = 0.05, makePositive = FALSE) {
 #' @family DMR-helpers
 #'
 #' @examples
-#' data(exampleTumourNormal, package = "mesa")
+#' data(exampleDMRs, package = "mesa")
 #'
-#' # Summarise DMRs for a single contrast, using custom FDR threshold
-#' exampleTumourNormal %>%
-#'     calculateDMRs(
-#'         variable = "type",
-#'         contrasts = "LUAD_vs_NormalLung",
-#'         FDRthres = 0.1
-#'     ) %>%
+#' # Summarise DMRs for each contrast, using custom FDR threshold
+#' exampleDMRs %>%
 #'     summariseDMRsByContrast(FDRthres = 0.1)
 #'
 #' @export
@@ -194,17 +184,9 @@ summariseDMRsByContrast <- function(
 #' @examples
 #' data(exampleTumourNormal, package = "mesa")
 #'
-#' # Summarise DMRs with explicit annotation databases
-#' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
-#'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-#'     exampleTumourNormal %>%
-#'         calculateDMRs(variable = "tumour", contrasts = "all") %>%
-#'         annotateWindows(
-#'             TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-#'             annoDb = "org.Hs.eg.db"
-#'         ) %>%
+#' # exampleDMRs is already annotated with annotateWindows()
+#' exampleDMRs %>%
 #'         summariseDMRsByGene()
-#' }
 #' @export
 summariseDMRsByGene <- function(DMRtable) {
     if (!("ENSEMBL" %in% colnames(DMRtable))) {
@@ -258,20 +240,10 @@ summariseDMRsByGene <- function(DMRtable) {
 #' @family DMR-helpers
 #'
 #' @examples
-#' data(exampleTumourNormal, package = "mesa")
+#' data(exampleDMRs, package = "mesa")
 #'
-#' # Minimal example: write results for a single contrast
-#' exampleTumourNormal %>%
-#'     calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") %>%
-#'     writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
-#'
-#' # With multiple contrasts and annotation
-#' exampleTumourNormal %>%
-#'     calculateDMRs(variable = "tumour", contrasts = "all") %>%
-#'     annotateWindows(
-#'         TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-#'         annoDb = "org.Hs.eg.db"
-#'     ) %>%
+#' # Example with multiple contrasts and annotation
+#' exampleDMRs %>%
 #'     writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
 #' @export
 writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
@@ -337,23 +309,10 @@ writeDMRsToExcel <- function(dataTable, path, FDRthres = 0.05) {
 #' @family DMR-helpers
 #'
 #' @examples
-#' data(exampleTumourNormal, package = "mesa")
+#' data(exampleDMRs, package = "mesa")
 #'
-#' # Export DMRs for a single contrast to BED files in a temp directory
-#' exampleTumourNormal %>%
-#'     calculateDMRs(
-#'         variable = "type",
-#'         contrasts = "LUAD_vs_NormalLung"
-#'     ) %>%
-#'     writeDMRsToBed(folder = tempdir())
-#'
-#' # Export DMRs with explicit annotation (requires TxDb/annotation packages)
-#' exampleTumourNormal %>%
-#'     calculateDMRs(variable = "tumour", contrasts = "all") %>%
-#'     annotateWindows(
-#'         TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-#'         annoDb = "org.Hs.eg.db"
-#'     ) %>%
+#' # Export a set of bed files, one per contrast in the object
+#' exampleDMRs %>%
 #'     writeDMRsToBed(folder = tempdir(), FDRthres = 0.1)
 #' @export
 writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
@@ -401,22 +360,16 @@ writeDMRsToBed <- function(dataTable, folder, FDRthres = 0.05) {
 #' @return A data frame with the DMRs with the largest value of the selected
 #' metrics
 #' @examples
-#' # calculate some DMRs
-#' DMRs <- exampleTumourNormal %>%
-#'     calculateDMRs(
-#'         variable = "type", contrasts = "all",
-#'         keepContrastMeans = FALSE
-#'     )
 #' # Find the DMRs with the largest deltaBeta between each comparison:
-#' DMRs %>% sliceDMRs(n = 1)
+#' exampleDMRs %>% sliceDMRs(n = 1)
 #' # Or the windows with the largest log2FC:
-#' DMRs %>% sliceDMRs(n = 1, metric = log2FC)
+#' exampleDMRs %>% sliceDMRs(n = 1, metric = log2FC)
 #' # Or the windows with the largest CpG_density:
-#' DMRs %>% sliceDMRs(n = 1, metric = CpG_density)
+#' exampleDMRs %>% sliceDMRs(n = 1, metric = CpG_density)
 #' # If adjPval is used, then the smallest value is chosen instead:
-#' DMRs %>% sliceDMRs(n = 1, metric = CpG_density)
+#' exampleDMRs %>% sliceDMRs(n = 1, metric = adjPval)
 #' # If position is used, then the windows are sorted by genomic position:
-#' DMRs %>% sliceDMRs(n = 1, metric = position)
+#' exampleDMRs %>% sliceDMRs(n = 1, metric = position)
 #' @export
 sliceDMRs <- function(
     DMRs, n = 1, metric = deltaBeta, makePositive = TRUE, FDRthres = 0.05

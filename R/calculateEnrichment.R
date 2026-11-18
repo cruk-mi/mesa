@@ -864,8 +864,9 @@ calculateCGEnrichmentGRanges <- function(
 #' @details
 #' Internally calls [calculateCGEnrichment()] per sample to derive relH/GoGe and
 #' counts, then merges the results into the libraries (the `"file_name"` table
-#' pulldown, `$input_file` for input when `nonEnrich = TRUE`). Parallelisation
-#' uses `parallel::mclapply()`; on non-Unix systems, `nCores` > 1 is ignored.
+#' for methylation pulldown when `nonEnrich = FALSE` and the `"input_file"`
+#' table for input when `nonEnrich = TRUE`). Parallelisation uses 
+#' `parallel::mclapply()`; on non-Unix systems, `nCores` > 1 is ignored.
 #'
 #' @seealso
 #' [calculateCGEnrichment()], [calculateCGEnrichmentGRanges()]

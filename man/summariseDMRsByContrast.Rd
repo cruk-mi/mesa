@@ -41,15 +41,10 @@ Count the number of up- and down-regulated DMR windows per contrast.
 Internally, results are reshaped to long format before summarisation.
 }
 \examples{
-data(exampleTumourNormal, package = "mesa")
+data(exampleDMRs, package = "mesa")
 
-# Summarise DMRs for a single contrast, using custom FDR threshold
-exampleTumourNormal \%>\%
-    calculateDMRs(
-        variable = "type",
-        contrasts = "LUAD_vs_NormalLung",
-        FDRthres = 0.1
-    ) \%>\%
+# Summarise DMRs for each contrast, using custom FDR threshold
+exampleDMRs \%>\%
     summariseDMRsByContrast(FDRthres = 0.1)
 
 }

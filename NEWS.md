@@ -1,3 +1,25 @@
+# mesa 0.99.9.9000
+
+## New features
+- New `exampleDMRs` dataset: annotated DMRs between all `type` groups of
+  `exampleTumourNormal`, used by the examples of the DMR helper functions so
+  they no longer recompute DMRs or annotation.
+  ([PR #207](https://github.com/cruk-mi/mesa/pull/207))
+
+## Documentation
+- The examples of `makeQset()` and the generation vignette now use a single
+  MEDIPSData bam file restricted to chr21, and the `sliceDMRs()` example for
+  `adjPval` now uses `metric = adjPval`.
+  ([PR #207](https://github.com/cruk-mi/mesa/pull/207))
+
+## Testing
+- Cut the number of real `ChIPseeker::annotatePeak()` runs in the test suite.
+  `summariseDMRsByGene()` is now tested on `exampleDMRs`, and the mouse tests
+  annotate for real once instead of three times, checking the remaining `TxDb`
+  argument forms against the object each resolves to. The cached example
+  `qseaSet` now uses one sampling depth throughout.
+  ([PR #207](https://github.com/cruk-mi/mesa/pull/207))
+
 # mesa 0.99.9
 
 ## Bug fixes
@@ -51,9 +73,12 @@
   `getLibraries()` and `setLibraries()` for the library tables,
   `getEnrichment()` and `setEnrichment()` for the enrichment fit, and
   `setCounts()`, `setRegions()`, `setSampleTable()`, `setParameters()` and
-  `setCNV()` for the slots qsea only lets you read. `setParameters()` merges
-  the parameters it is given rather than replacing the whole list.
-
+  `setCNV()` for the slots qsea only lets you read. `getLibraries()`, 
+  `setLibraries()`, `getEnrichment()` and `setEnrichment()` can read or write
+  a whole slot or a single named slot element. `setParameters()` merges
+  the parameters it is given in a named list, replacing matching values and 
+  retaining parameters not provided.
+  ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 - Added `asRangedSummarizedExperiment()` to convert a `qseaSet` to a 
   `rangedSummarizedExperiment` for compatibility with other BioConductor
   packages. This is still in progress, with further updates expected.
@@ -129,7 +154,12 @@
 - mesa no longer reaches into a `qseaSet` slot with `@`. Every read now goes
   through a `qsea::get*()` accessor or one of the new mesa ones, and every
   write through a new setter, so slot access is confined to `R/qseaSlots.R`.
-  Behaviour is unchanged.
+  The refactor preserves behaviour except that
+  `addBamCoveragePairedAndUnpaired()` now replaces parameter values with
+  matching names rather than appending duplicate entries, and 
+  `setMart(qs, NULL)` leaves a NULL entry in the `parameters` slot whereas 
+  previously it used to be deleted.
+  ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
   are now at most 80 characters, clearing those BiocCheck formatting notes.
   ([#169](https://github.com/cruk-mi/mesa/issues/169), [PR #170](https://github.com/cruk-mi/mesa/pull/170))

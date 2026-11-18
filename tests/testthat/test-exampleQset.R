@@ -122,7 +122,7 @@ test_that("Testing hg38 related annotation/plotting functions", {
 
 test_that("Testing general functionality", {
 
-    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1000000) %>%
+    randomSet <- cachedExampleQset(repl = 8, expSamplingDepth = 1e5) %>%
         mutate(patient = stringr::str_remove(sample_name, "[TN]$"),
             variableWithOneLevel = "Test",
             experiment = ifelse(stringr::str_detect(sample_name, "[1234]"), "A", "B"),
@@ -146,29 +146,22 @@ test_that("Testing general functionality", {
 
 test_that("Analysing DMRs", {
 
-    expect_no_error(DMRs <- exampleTumourNormal %>%
-        calculateDMRs(variable = "type",
-            contrasts = tibble::tibble(sample1 = c("LUAD", "LUSC", "CRC"),
-                sample2 = c("NormalLung", "NormalLung", "NormalColon"))))
-
-    expect_equal(DMRs %>%
+    expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
-        nrow(), 81)
+        nrow(), 277)
 
-    expect_equal(DMRs %>%
+    expect_equal(exampleDMRs %>%
         summariseDMRsByContrast() %>%
-        dim(), c(3, 4))
+        dim(), c(10, 4))
 
-    expect_equal(DMRs %>%
+    expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
         summariseDMRsByContrast() %>%
-        dim(), c(3, 4))
+        dim(), c(10, 4))
 
-    skip_if_not_installed("org.Hs.eg.db") # skip, before calling annotateWindows
-    # if org.Hs.eg.db is not installed
-    expect_equal(DMRs %>%
+    # exampleDMRs is already annotated, so no annotateWindows() call is needed
+    expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
-        annotateWindows(genome = "hg38") %>%
         summariseDMRsByGene() %>%
         ncol(), 4)
 
