@@ -27,14 +27,21 @@ test_that("setLibraries() replaces one table or the whole list", {
         rep(1, length(qsea::getSampleNames(qseaSet)))
     )
 
-    # the other tables are untouched
-    expect_equal(
-        names(getLibraries(newSet)), names(getLibraries(qseaSet))
-    )
+    expectedLibraries <- getLibraries(qseaSet)
+    expectedLibraries$file_name <- libraryTable
+    expect_equal(getLibraries(newSet), expectedLibraries)
 
     newLibraries <- list(file_name = libraryTable)
     newSet <- setLibraries(qseaSet, newLibraries)
     expect_equal(getLibraries(newSet), newLibraries)
+
+    inputTable <- getLibraries(qseaSet, "file_name")
+    libraryTable[, "valid_fragments"] <- 2
+    libraryList <- list("file_name" = libraryTable, "input_file" = inputTable)
+    newSet <- setLibraries(qseaSet, libraryList)
+
+    expect_equal(getLibraries(newSet), libraryList)
+
 })
 
 
