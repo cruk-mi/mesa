@@ -1,6 +1,11 @@
 # mesa 0.99.9
 
 ## Bug fixes
+- `addLibraryInformation()` now handles matrix-backed library tables.
+  ([PR #208](https://github.com/cruk-mi/mesa/pull/208))
+- `getDataTable()` preserves sample names containing assay suffixes by removing
+  only the final method suffix.
+  ([PR #208](https://github.com/cruk-mi/mesa/pull/208))
 - `makeQset()` now drops reads on chromosomes outside `chrSelect` before the
   CpG enrichment, so a BAM with other chromosomes no longer warns about
   out-of-bound ranges.
