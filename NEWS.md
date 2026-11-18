@@ -1,4 +1,4 @@
-# mesa 0.99.9.9000
+# mesa 0.99.10
 
 ## New features
 - New `exampleDMRs` dataset: annotated DMRs between all `type` groups of
