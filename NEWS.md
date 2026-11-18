@@ -49,7 +49,7 @@
   `setCNV()` for the slots qsea only lets you read. `setParameters()` merges
   the parameters it is given rather than replacing the whole list.
 
-- Added a `asRangedSummarizedExperiment()` to convert a `qseaSet` to a 
+- Added `asRangedSummarizedExperiment()` to convert a `qseaSet` to a 
   `rangedSummarizedExperiment` for compatibility with other BioConductor
   packages. This is still in progress, with further updates expected.
 
