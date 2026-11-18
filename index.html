@@ -181,6 +181,12 @@ Tracked in issue #109.
 <p>See the articles below for generating a <code>qseaSet</code> from BAM files, quality control, and calling differentially methylated regions.</p>
 </div>
 <div class="section level2">
+<h2 id="interoperability-with-summarizedexperiment">Interoperability with SummarizedExperiment<a class="anchor" aria-label="anchor" href="#interoperability-with-summarizedexperiment"></a>
+</h2>
+<p>mesa builds on the <code>qseaSet</code> class from the qsea package, which predates <code>SummarizedExperiment</code>. We have provided a function <code>asRangedSummarizedExperiment</code> to convert to a <code>RangedSummarizedExperiment</code> with windows as rows and samples as columns. This can include the calculated nrpm and beta values, so they may be added as <code>assay</code> elements. Please note that copy number variation is often estimated over large bins, while in the converted object each window takes the value of the CNV bin that it overlaps, so that copy number is an ordinary assay with the same dimensions as the counts.</p>
+<p>Currently this conversion is one-way, and the qseaSet is the object that mesa functions expected. We aim to improve this capability in future releases.</p>
+</div>
+<div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
 <p>Full function reference and articles: <a href="https://cruk-mi.github.io/mesa/" class="external-link uri">https://cruk-mi.github.io/mesa/</a></p>
