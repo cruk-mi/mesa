@@ -151,7 +151,7 @@ test_that("Analysing DMRs", {
         nrow(), 277)
 
     expect_equal(exampleDMRs %>%
-            summariseDMRsByContrast() %>%
+        summariseDMRsByContrast() %>%
         dim(), c(10, 4))
 
     expect_equal(exampleDMRs %>%
@@ -159,19 +159,7 @@ test_that("Analysing DMRs", {
         summariseDMRsByContrast() %>%
         dim(), c(10, 4))
 
-    # annotateWindows() is tested on real annotation in test-DMRs.R and
-    # test-mouse.R, and costs several seconds a call, so a stand-in supplies
-    # the gene columns summariseDMRsByGene() groups by.
-    local_mocked_bindings(
-        annotateWindows = function(dataTable, ...) {
-            dataTable %>%
-                mutate(
-                    ENSEMBL = rep_len(c("ENSG001", "ENSG002"), n()),
-                    SYMBOL = rep_len(c("GeneA", "GeneB"), n()),
-                    GENENAME = rep_len(c("gene A", "gene B"), n())
-                )
-        }
-    )
+    # exampleDMRs is already annotated, so no annotateWindows() call is needed
     expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
         summariseDMRsByGene() %>%
