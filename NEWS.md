@@ -50,7 +50,7 @@
   `setLibraries()`, `getEnrichment()` and `setEnrichment()` can read or write
   a whole slot or a single named slot element. `setParameters()` merges
   the parameters it is given in a named list, replacing matching values and 
-  retaining parameters not supplied.
+  retaining parameters not provided.
   ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 
 ## Documentation
