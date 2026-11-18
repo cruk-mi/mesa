@@ -2149,11 +2149,7 @@ setMethod("getDataTable", "ANY", function(x, normMethod = "nrpm",
 
     if(length(normMethod) == 1 & !addMethodSuffix) {
         tab <- tab %>%
-        dplyr::rename_with(~ stringr::str_replace_all(
-            .x,
-            glue::glue("_{normMethod}_means"),
-            ""
-        ))
+        removeNormMethodSuffix(., normMethod)
     } else {
         tab <- tab %>%
         dplyr::rename_with(~ stringr::str_replace_all(.x, "_means$", ""))
@@ -2185,9 +2181,7 @@ setMethod("getDataTable", "ANY", function(x, normMethod = "nrpm",
 
     if(length(normMethod) == 1 & !addMethodSuffix) {
         tab <- tab %>%
-        dplyr::rename_with(
-            ~ stringr::str_replace_all(.x, glue::glue("_{normMethod}"), "")
-        )
+        removeNormMethodSuffix(., normMethod)
     }
 
     return(tab)

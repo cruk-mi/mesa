@@ -189,7 +189,7 @@ addLibraryInformation <- function(qseaSet) {
 
     newSampleTable <- qsea::getSampleTable(qseaSet) %>%
         dplyr::bind_cols(
-            getLibraries(qseaSet, "file_name") %>%
+            as.data.frame(getLibraries(qseaSet, "file_name")) %>%
                 dplyr::select(-tidyselect::any_of(curColNames))
         )
 
@@ -202,7 +202,7 @@ addLibraryInformation <- function(qseaSet) {
 
         newSampleTable <- qsea::getSampleTable(qseaSet) %>%
             dplyr::bind_cols(
-                getLibraries(qseaSet, "input_file") %>%
+                as.data.frame(getLibraries(qseaSet, "input_file")) %>%
                     dplyr::rename_with(~ paste0("input_", .x)) %>%
                     dplyr::select(-tidyselect::any_of(curColNames)) %>%
                     dplyr::select(

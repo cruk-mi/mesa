@@ -32,6 +32,32 @@ test_that("library and enrichment information is carried over", {
     )
 })
 
+test_that("matrix library metrics don't cause an issue (e.g. qsea::addCoverage)", {
+    qs <- exampleTumourNormal
+    libraries <- getLibraries(qs)
+    libraries[["file_name"]] <- as.matrix(libraries[["file_name"]])
+
+    qs <- setLibraries(qs, libraries)
+
+    se <- asRangedSummarizedExperiment(qs)
+
+    expect_true("total_fragments" %in%
+                colnames(SummarizedExperiment::colData(se)))
+})
+
+test_that("sample names ending in assay suffixes are preserved", {
+    for (method in c("counts", "nrpm", "beta")) {
+        qs <- exampleTumourNormal %>%
+            mutate(newName = paste0(getSampleNames(.), "_", method)) %>%
+            renameSamples("newName")
+
+        se <- asRangedSummarizedExperiment(qs, assays = method)
+
+        expect_equal(colnames(se), getSampleNames(qs))
+        expect_equal(SummarizedExperiment::assayNames(se), method)
+    }
+})
+
 test_that("optional assays are added on request", {
     se <- asRangedSummarizedExperiment(
         exampleTumourNormal,
@@ -53,6 +79,15 @@ test_that("CNV is expanded to windows, with NA where uncovered", {
     se <- asRangedSummarizedExperiment(exampleTumourNormal, assays = c("counts", "cnv"))
     cnv <- SummarizedExperiment::assay(se, "cnv")
     expect_equal(dim(cnv), dim(se))
+})
+
+test_that("CNV bins stay in metadata when the CNV assay is omitted", {
+    cnvBins <- getCNV(exampleTumourNormal)
+
+    se <- asRangedSummarizedExperiment(exampleTumourNormal)
+
+    expect_equal(S4Vectors::metadata(se)$cnvBins, cnvBins)
+    expect_false("cnv" %in% SummarizedExperiment::assayNames(se))
 })
 
 test_that(".expandCNV picks the largest-overlap bin and leaves gaps NA", {

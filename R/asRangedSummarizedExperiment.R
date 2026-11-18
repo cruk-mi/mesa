@@ -66,9 +66,8 @@ asRangedSummarizedExperiment <- function(qs, assays = "counts") {
         assayList$beta <- .tableToMatrix(getBetaTable(qs), samples)
     }
 
-    cnv <- NULL
+    cnv <- getCNV(qs)
     if ("cnv" %in% assays) {
-        cnv <- getCNV(qs)
         if (is.null(cnv) || length(cnv) == 0) {
             warning("No CNV found in the qseaSet, skipping the cnv assay.",
                     call. = FALSE)
