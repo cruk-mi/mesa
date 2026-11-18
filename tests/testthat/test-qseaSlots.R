@@ -5,9 +5,10 @@ test_that("getLibraries() returns the whole list or one table", {
     expect_type(getLibraries(qseaSet), "list")
     expect_true("file_name" %in% names(getLibraries(qseaSet)))
 
-    fileNames <- getLibraries(qseaSet, "file_name")
-    expect_equal(rownames(fileNames), qsea::getSampleNames(qseaSet))
-    expect_true("valid_fragments" %in% colnames(fileNames))
+    libraryTable <- getLibraries(qseaSet, "file_name")
+    expect_equal(getLibraries(qseaSet)$file_name, libraryTable)
+    expect_equal(rownames(libraryTable), qsea::getSampleNames(qseaSet))
+    expect_true("valid_fragments" %in% colnames(libraryTable))
 
     expect_null(getLibraries(qseaSet, "notATable"))
 })
@@ -17,10 +18,10 @@ test_that("setLibraries() replaces one table or the whole list", {
 
     qseaSet <- cachedExampleQset(repl = 3, expSamplingDepth = 1000)
 
-    fileNames <- getLibraries(qseaSet, "file_name")
-    fileNames[, "valid_fragments"] <- 1
+    libraryTable <- getLibraries(qseaSet, "file_name")
+    libraryTable[, "valid_fragments"] <- 1
 
-    newSet <- setLibraries(qseaSet, fileNames, "file_name")
+    newSet <- setLibraries(qseaSet, libraryTable, "file_name")
     expect_equal(
         unname(getLibraries(newSet, "file_name")[, "valid_fragments"]),
         rep(1, length(qsea::getSampleNames(qseaSet)))
@@ -31,8 +32,9 @@ test_that("setLibraries() replaces one table or the whole list", {
         names(getLibraries(newSet)), names(getLibraries(qseaSet))
     )
 
-    newSet <- setLibraries(qseaSet, list(file_name = fileNames))
-    expect_equal(names(getLibraries(newSet)), "file_name")
+    newLibraries <- list(file_name = libraryTable)
+    newSet <- setLibraries(qseaSet, newLibraries)
+    expect_equal(getLibraries(newSet), newLibraries)
 })
 
 

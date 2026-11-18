@@ -15,8 +15,8 @@
 #'
 #' @param type `character(1)` or `NULL`
 #'   Which library table to return or replace: `"file_name"` for the pulldown
-#'   libraries, `"input_file"` for the input libraries, or `"input_counts"`
-#'   for the per-window input counts. `NULL` returns the whole list.
+#'   libraries, `"input_file"` for the input libraries. `NULL` returns the
+#' whole list.
 #'   **Default:** `NULL`.
 #'
 #' @param name `character(1)` or `NULL`

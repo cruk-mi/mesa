@@ -122,9 +122,9 @@
 - mesa no longer reaches into a `qseaSet` slot with `@`. Every read now goes
   through a `qsea::get*()` accessor or one of the new mesa ones, and every
   write through a new setter, so slot access is confined to `R/qseaSlots.R`.
-  The exception is `setParameters()`: it replaces supplied values with
-  matching names rather than appending duplicates, while retaining other
-  parameters.
+  The refactor preserves behavior except that
+  `addBamCoveragePairedAndUnpaired()` now replaces parameter values with
+  matching names rather than appending duplicate entries.
   ([PR #205](https://github.com/cruk-mi/mesa/pull/205))
 - Lines in the `getSampleNames()` documentation and the data and QC vignette
   are now at most 80 characters, clearing those BiocCheck formatting notes.
