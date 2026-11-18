@@ -32,15 +32,10 @@ Convert wide-format DMR results into a long-format table with explicit
 columns for contrasts, effect sizes, and significance values.
 }
 \examples{
-data(exampleTumourNormal, package = "mesa")
+data(exampleDMRs, package = "mesa")
 
 # Convert results to long format and filter at custom FDR threshold
-exampleTumourNormal \%>\%
-    calculateDMRs(
-        variable = "type",
-        contrasts = "LUAD_vs_NormalLung",
-        FDRthres = 0.1
-    ) \%>\%
+exampleDMRs \%>\%
     pivotDMRsLonger(FDRthres = 0.1)
 
 }

@@ -36,20 +36,10 @@ restricted on the system (e.g., some HPC build environments), consider
 writing to \code{tempfile(fileext = ".xlsx")} in examples or tests.
 }
 \examples{
-data(exampleTumourNormal, package = "mesa")
+data(exampleDMRs, package = "mesa")
 
-# Minimal example: write results for a single contrast
-exampleTumourNormal \%>\%
-    calculateDMRs(variable = "type", contrasts = "LUAD_vs_NormalLung") \%>\%
-    writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
-
-# With multiple contrasts and annotation
-exampleTumourNormal \%>\%
-    calculateDMRs(variable = "tumour", contrasts = "all") \%>\%
-    annotateWindows(
-        TxDb = "TxDb.Hsapiens.UCSC.hg38.knownGene",
-        annoDb = "org.Hs.eg.db"
-    ) \%>\%
+# Example with multiple contrasts and annotation
+exampleDMRs \%>\%
     writeDMRsToExcel(path = file.path(tempdir(), "test.xlsx"))
 }
 \seealso{

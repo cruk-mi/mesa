@@ -146,23 +146,18 @@ test_that("Testing general functionality", {
 
 test_that("Analysing DMRs", {
 
-    expect_no_error(DMRs <- exampleTumourNormal %>%
-        calculateDMRs(variable = "type",
-            contrasts = tibble::tibble(sample1 = c("LUAD", "LUSC", "CRC"),
-                sample2 = c("NormalLung", "NormalLung", "NormalColon"))))
-
-    expect_equal(DMRs %>%
+    expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
-        nrow(), 81)
+        nrow(), 277)
 
-    expect_equal(DMRs %>%
-        summariseDMRsByContrast() %>%
-        dim(), c(3, 4))
+    expect_equal(exampleDMRs %>%
+            summariseDMRsByContrast() %>%
+        dim(), c(10, 4))
 
-    expect_equal(DMRs %>%
+    expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
         summariseDMRsByContrast() %>%
-        dim(), c(3, 4))
+        dim(), c(10, 4))
 
     # annotateWindows() is tested on real annotation in test-DMRs.R and
     # test-mouse.R, and costs several seconds a call, so a stand-in supplies
@@ -177,9 +172,8 @@ test_that("Analysing DMRs", {
                 )
         }
     )
-    expect_equal(DMRs %>%
+    expect_equal(exampleDMRs %>%
         pivotDMRsLonger() %>%
-        annotateWindows(genome = "hg38") %>%
         summariseDMRsByGene() %>%
         ncol(), 4)
 
