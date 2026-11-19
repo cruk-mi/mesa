@@ -1,5 +1,11 @@
 # mesa 0.99.11
 
+## Bug fixes
+- Declare `GO.db` in `Suggests` and guard the examples and tests that run
+  `ChIPseeker::annotatePeak()` on it, fixing Windows r-universe failures where
+  it is no longer installed implicitly.
+  ([PR #216](https://github.com/cruk-mi/mesa/pull/216))
+
 # mesa 0.99.10
 
 ## New features
