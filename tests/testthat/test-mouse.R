@@ -54,6 +54,7 @@ test_that("Mouse annotation", {
 
     skip_if_not_installed("TxDb.Mmusculus.UCSC.mm10.knownGene")
     skip_if_not_installed("org.Mm.eg.db")
+    skip_if_not_installed("GO.db")
 
     oldOptions <- options(
         mesa_TxDb = getOption("mesa_TxDb"),
@@ -85,6 +86,7 @@ test_that("annotateWindows() resolves every way of naming a TxDb alike", {
 
     skip_if_not_installed("TxDb.Mmusculus.UCSC.mm10.knownGene")
     skip_if_not_installed("org.Mm.eg.db")
+    skip_if_not_installed("GO.db")
 
     oldOptions <- options(
         mesa_TxDb = getOption("mesa_TxDb"),
