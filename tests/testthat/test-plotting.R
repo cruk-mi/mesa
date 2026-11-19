@@ -232,6 +232,7 @@ test_that("plotGenomicFeatureDistribution() plots feature fractions", {
 
     skip_if_not_installed("org.Hs.eg.db")
     skip_if_not_installed("TxDb.Hsapiens.UCSC.hg38.knownGene")
+    skip_if_not_installed("GO.db")
     oldGenome <- getOption("mesa_genome")
     on.exit(options(mesa_genome = oldGenome), add = TRUE)
 

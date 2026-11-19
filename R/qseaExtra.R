@@ -177,7 +177,8 @@ setMethod('getMart', 'qseaSet', function(object) {
 #'     calculateDMRs(variable = "tumour", contrasts = "first")
 #'
 #' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
-#'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+#'     requireNamespace("org.Hs.eg.db", quietly = TRUE) &&
+#'     requireNamespace("GO.db", quietly = TRUE)) {
 #'     # Annotate using GRCh38 defaults
 #'     dmrs %>%
 #'         annotateWindows(genome = "hg38")
@@ -1799,7 +1800,8 @@ addSummaryAcrossWindows <- function(qseaSet,
 #'
 #' # NRPM-based context summary
 #' if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
-#'     requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+#'     requireNamespace("org.Hs.eg.db", quietly = TRUE) &&
+#'     requireNamespace("GO.db", quietly = TRUE)) {
 #'   exampleTumourNormal %>%
 #'     getGenomicFeatureDistribution(cutoff = 1, normMethod = "nrpm") %>%
 #'     head()

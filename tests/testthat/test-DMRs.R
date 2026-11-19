@@ -28,6 +28,7 @@ test_that("Calculating DMRs", {
     setMesaTxDb(NULL)
     setMesaAnnoDb(NULL)
     skip_if_not_installed("org.Hs.eg.db") # skip if org.Hs.eg.db not installed
+    skip_if_not_installed("GO.db") # needed by ChIPseeker::annotatePeak()
     # error if no local or global genome is specified
     expect_error(annotateWindows(DMRdata))
     # no error if the genome is set

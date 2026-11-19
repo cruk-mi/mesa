@@ -67,7 +67,8 @@ data(exampleTumourNormal, package = "mesa")
 
 # Uses global hg38 setting
 if (requireNamespace("TxDb.Hsapiens.UCSC.hg38.knownGene", quietly = TRUE) &&
-    requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
+    requireNamespace("org.Hs.eg.db", quietly = TRUE) &&
+    requireNamespace("GO.db", quietly = TRUE)) {
     exampleTumourNormal \%>\%
         plotGenomicFeatureDistribution(normMethod = "beta", cutoff = 0.75)
 }

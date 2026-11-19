@@ -106,6 +106,7 @@ Suggests:
     BSgenome.Scerevisiae.UCSC.sacCer3,
     org.Hs.eg.db,
     org.Mm.eg.db,
+    GO.db,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
     TxDb.Hsapiens.UCSC.hg19.knownGene,
     TxDb.Mmusculus.UCSC.mm10.knownGene,
